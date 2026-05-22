@@ -1,0 +1,69 @@
+═══════════════════════════════════════════════════════════════════
+  SCHONE VERVANGING VAN JE GITHUB-REPO  (lost railpack-plan.json op)
+═══════════════════════════════════════════════════════════════════
+
+Het probleem: je GitHub-repo bevat nog 'railpack-plan.json' met oude
+build-commando's. Dat bestand laat Railway 'composer install' draaien
+voordat Composer beschikbaar is → 'composer: not found' → exit 127.
+
+Onderstaande stappen vervangen de hele repo-inhoud door de schone versie.
+Kopieer en plak ze één voor één in een terminal.
+
+───────────────────────────────────────────────────────────────────
+STAP 1 — Pak de nieuwe zip uit in een aparte map
+───────────────────────────────────────────────────────────────────
+
+  cd ~/Downloads
+  unzip easyinvoice-mvp.zip -d easyinvoice-schoon
+  # Hierdoor ontstaat: ~/Downloads/easyinvoice-schoon/easyinvoice/
+
+───────────────────────────────────────────────────────────────────
+STAP 2 — Ga naar je BESTAANDE lokale repo en verwijder de oude inhoud
+───────────────────────────────────────────────────────────────────
+
+  cd ~/pad/naar/jouw/easyinvoice          # <-- pas dit pad aan
+  
+  # Verwijder alles BEHALVE de .git map (zo behoud je de Git-historie)
+  find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+───────────────────────────────────────────────────────────────────
+STAP 3 — Kopieer de schone bestanden erin
+───────────────────────────────────────────────────────────────────
+
+  cp -r ~/Downloads/easyinvoice-schoon/easyinvoice/. .
+
+───────────────────────────────────────────────────────────────────
+STAP 4 — Controleer dat railpack-plan.json WEG is
+───────────────────────────────────────────────────────────────────
+
+  ls railpack-plan.json
+  ls config/app 2>/dev/null && echo "FOUT: config/app bestaat nog" || echo "config/app weg ✓"
+  # Moet zeggen: "No such file or directory"  ✓
+
+───────────────────────────────────────────────────────────────────
+STAP 5 — Commit en push
+───────────────────────────────────────────────────────────────────
+
+  git add -A
+  git commit -m "Schone herbouw: verwijder railpack-plan.json en oude build-config"
+  git push
+
+───────────────────────────────────────────────────────────────────
+STAP 6 — In Railway
+───────────────────────────────────────────────────────────────────
+
+  - Variables: zorg dat APP_KEY gezet is. Genereer er een met:
+        php artisan key:generate --show
+    en zet de base64:... waarde in Railway -> Variables (NOOIT in code committen).
+  - De push triggert automatisch een nieuwe deploy.
+
+───────────────────────────────────────────────────────────────────
+VERWACHT RESULTAAT in het build-log:
+───────────────────────────────────────────────────────────────────
+
+  ✓ "load build definition" verwijst NIET meer naar het oude plan
+  ✓ Railpack genereert een vers plan
+  ✓ Composer wordt correct gevonden
+  ✓ Geen "composer: not found" meer
+
+═══════════════════════════════════════════════════════════════════
