@@ -67,7 +67,7 @@ class InvoiceController extends Controller
             'overdue' => Invoice::regular()->where('status', 'overdue')->count(),
             'incasso' => Invoice::regular()->where('status', 'incasso')->count(),
             'paid' => Invoice::regular()->where('status', 'paid')->count(),
-            'creditnota' => Invoice::creditNotes()->count(),
+            'creditnota' => Invoice::credit()->count(),
         ];
 
         return Inertia::render('Invoices/Index', [
