@@ -1,0 +1,8 @@
+# Railway / Nixpacks build configuration.
+# Adds the PHP GD extension required by DomPDF for image rendering (logos).
+# Without GD, /invoices/{id}/pdf throws "GD extension is required".
+
+providers = ["node", "php"]
+
+[phases.setup]
+nixPkgs = ["...", "php82Extensions.gd"]

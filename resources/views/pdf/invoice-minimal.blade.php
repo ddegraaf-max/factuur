@@ -91,10 +91,13 @@
 <body>
 
 <div class="doc-header">
-  @php $scale = max(50, min(200, (int) ($company->logo_scale ?? 100))) / 100; @endphp
-  @if($company->logo_data)
+  @php
+    $scale = max(50, min(200, (int) ($company->logo_scale ?? 100))) / 100;
+    $hasGd = extension_loaded('gd');
+  @endphp
+  @if($hasGd && $company->logo_data)
     <img src="{{ $company->logo_data }}" style="max-height: {{ round(44 * $scale) }}px; max-width: {{ round(180 * $scale) }}px; margin-bottom: 18px;" alt="">
-  @elseif($company->logo_path)
+  @elseif($hasGd && $company->logo_path)
     <img src="{{ public_path('storage/' . $company->logo_path) }}" style="max-height: {{ round(44 * $scale) }}px; max-width: {{ round(180 * $scale) }}px; margin-bottom: 18px;" alt="">
   @endif
   <div class="doc-title">Factuur</div>
