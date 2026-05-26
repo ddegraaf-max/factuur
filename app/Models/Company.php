@@ -14,7 +14,7 @@ class Company extends Model
         'name', 'trading_name', 'kvk_number', 'vat_number', 'iban',
         'email', 'phone', 'website',
         'address_line', 'postal_code', 'city', 'country', 'currency',
-        'logo_path', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
+        'logo_path', 'logo_data', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
         'numbering_settings', 'price_mode', 'fiscal_year_start',
         'default_send_method', 'results_per_page',
         'copy_email', 'daily_notification_enabled', 'daily_notification_email',

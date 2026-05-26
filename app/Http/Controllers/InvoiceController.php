@@ -192,7 +192,11 @@ class InvoiceController extends Controller
         $invoice->load('lines');
         $company = auth()->user()->company;
 
-        $pdf = Pdf::loadView('pdf.invoice', [
+        $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
+            ? $company->invoice_template
+            : 'modern';
+
+        $pdf = Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,
             'company' => $company,
         ])->setPaper('a4');

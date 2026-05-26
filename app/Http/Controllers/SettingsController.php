@@ -91,11 +91,14 @@ class SettingsController extends Controller
             'invoice_footer' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        // Optional logo upload
+        // Optional logo upload — store as base64 data URL in DB (survives Railway redeploys)
         if ($request->hasFile('logo')) {
-            $request->validate(['logo' => 'image|max:2048']);
-            $path = $request->file('logo')->store('logos', 'public');
-            $data['logo_path'] = $path;
+            $request->validate(['logo' => 'image|mimes:png,jpg,jpeg,svg,webp|max:2048']);
+            $file = $request->file('logo');
+            $mime = $file->getMimeType();
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $data['logo_data'] = 'data:' . $mime . ';base64,' . $base64;
+            $data['logo_path'] = null; // clear old path-based logo
         }
 
         auth()->user()->company->update($data);
@@ -107,8 +110,8 @@ class SettingsController extends Controller
         $company = auth()->user()->company;
         if ($company->logo_path) {
             Storage::disk('public')->delete($company->logo_path);
-            $company->update(['logo_path' => null]);
         }
+        $company->update(['logo_path' => null, 'logo_data' => null]);
         return back()->with('flash', 'Logo verwijderd.');
     }
 
