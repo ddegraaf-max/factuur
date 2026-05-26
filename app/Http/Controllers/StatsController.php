@@ -16,7 +16,7 @@ class StatsController extends Controller
         // Distinct years available
         $allYears = Invoice::regular()
             ->whereNotIn('status', ['draft', 'cancelled'])
-            ->selectRaw('DISTINCT strftime("%Y", invoice_date) AS yr')  // SQLite
+           ->selectRaw('DISTINCT EXTRACT(YEAR FROM invoice_date) AS yr')
             ->pluck('yr')
             ->map(fn ($y) => (int) $y)
             ->sortDesc()

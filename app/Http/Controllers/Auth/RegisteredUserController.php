@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerificationCodeMail;
 use App\Models\Company;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
@@ -64,9 +65,11 @@ class RegisteredUserController extends Controller
             ]);
         });
 
-        event(new Registered($user));
-        Auth::login($user);
+        $code = $user->generateVerificationCode();
+        Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
 
-        return redirect()->route('dashboard')->with('flash', 'Welkom bij EasyInvoice, ' . $data['firstName'] . '!');
+        Session::put('verifying_user_id', $user->id);
+
+        return redirect()->route('verification.show');
     }
 }

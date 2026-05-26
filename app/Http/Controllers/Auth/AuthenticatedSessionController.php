@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -34,6 +36,17 @@ class AuthenticatedSessionController extends Controller
             throw ValidationException::withMessages([
                 'email' => 'Deze inloggegevens kloppen niet.',
             ]);
+        }
+
+        if (! $user->hasVerifiedEmail()) {
+            // Issue a fresh code if the previous one is missing or expired
+            if (! $user->verification_code || ! $user->verification_code_expires_at || now()->greaterThan($user->verification_code_expires_at)) {
+                $code = $user->generateVerificationCode();
+                Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+            }
+
+            Session::put('verifying_user_id', $user->id);
+            return redirect()->route('verification.show');
         }
 
         if ($user->hasTwoFactorEnabled()) {

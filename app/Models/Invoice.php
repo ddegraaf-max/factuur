@@ -93,7 +93,7 @@ class Invoice extends Model
         return $query->where('is_credit', false);
     }
 
-    public function scopeCreditNotes(Builder $query): Builder
+    public function scopeCredit(Builder $query): Builder
     {
         return $query->where('is_credit', true);
     }
