@@ -62,10 +62,11 @@
 <table class="header">
   <tr>
     <td>
+      @php $scale = max(50, min(200, (int) ($company->logo_scale ?? 100))) / 100; @endphp
       @if($company->logo_data)
-        <img src="{{ $company->logo_data }}" class="logo-img" alt="">
+        <img src="{{ $company->logo_data }}" style="max-height: {{ round(56 * $scale) }}px; max-width: {{ round(200 * $scale) }}px; margin-bottom: 8px;" alt="">
       @elseif($company->logo_path)
-        <img src="{{ public_path('storage/' . $company->logo_path) }}" class="logo-img" alt="">
+        <img src="{{ public_path('storage/' . $company->logo_path) }}" style="max-height: {{ round(56 * $scale) }}px; max-width: {{ round(200 * $scale) }}px; margin-bottom: 8px;" alt="">
       @else
         <div class="logo-mark">{{ strtoupper(substr($company->name ?? 'E', 0, 1)) }}</div>
       @endif

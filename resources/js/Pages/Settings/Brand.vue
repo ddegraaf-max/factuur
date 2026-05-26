@@ -13,11 +13,21 @@ const form = useForm({
   invoice_template: props.company.invoice_template || 'modern',
   invoice_font: props.company.invoice_font || 'sans',
   invoice_footer: props.company.invoice_footer || '',
+  logo_scale: props.company.logo_scale || 100,
   logo: null,
 });
 
 const logoUploading = ref(false);
 const previewLogo = computed(() => props.company.logo_data || (props.company.logo_path ? `/storage/${props.company.logo_path}` : null));
+
+const logoStyleModern = computed(() => ({
+  maxHeight: (36 * form.logo_scale / 100) + 'px',
+  maxWidth: (180 * form.logo_scale / 100) + 'px',
+}));
+const logoStyleClassic = computed(() => ({
+  maxHeight: (36 * form.logo_scale / 100) + 'px',
+  maxWidth: (120 * form.logo_scale / 100) + 'px',
+}));
 
 const colorPresets = ['#E8231F', '#0F172A', '#1E40AF', '#15803D', '#7C3AED', '#DB2777', '#EA580C', '#0891B2'];
 const templates = [
@@ -76,6 +86,26 @@ const removeLogo = () => {
                   <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" @change="onLogoChange" :disabled="logoUploading" style="display:none;" />
                 </label>
                 <button class="btn btn-danger btn-sm" @click="removeLogo" :disabled="logoUploading">Verwijderen</button>
+              </div>
+
+              <div class="logo-scale-row">
+                <div class="logo-scale-label">
+                  <span>Grootte op factuur</span>
+                  <span class="logo-scale-value">{{ form.logo_scale }}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="50"
+                  max="200"
+                  step="5"
+                  v-model.number="form.logo_scale"
+                  class="logo-scale-slider"
+                />
+                <div class="logo-scale-ticks">
+                  <span>50%</span>
+                  <span>100%</span>
+                  <span>200%</span>
+                </div>
               </div>
             </div>
             <label v-else class="logo-upload-zone">
@@ -191,7 +221,7 @@ const removeLogo = () => {
           <template v-if="form.invoice_template === 'modern'">
             <div class="pv-modern-header">
               <div>
-                <img v-if="previewLogo" :src="previewLogo" class="pv-logo" alt="" />
+                <img v-if="previewLogo" :src="previewLogo" class="pv-logo" :style="logoStyleModern" alt="" />
                 <div v-else class="pv-logo-mark">{{ (company.name || 'E')[0] }}</div>
                 <div class="pv-company-name">{{ company.name }}</div>
                 <div class="pv-company-addr">{{ company.address_line || 'Voorbeeldstraat 1' }}</div>
@@ -222,7 +252,7 @@ const removeLogo = () => {
           <template v-else-if="form.invoice_template === 'classic'">
             <div class="pv-classic-header">
               <div style="text-align:center;">
-                <img v-if="previewLogo" :src="previewLogo" class="pv-logo-c" alt="" />
+                <img v-if="previewLogo" :src="previewLogo" class="pv-logo-c" :style="logoStyleClassic" alt="" />
                 <div class="pv-classic-title">FACTUUR</div>
                 <div class="pv-classic-sub">{{ company.name }} · 2026-0007</div>
               </div>
@@ -251,7 +281,7 @@ const removeLogo = () => {
           <!-- ============ MINIMAL ============ -->
           <template v-else>
             <div class="pv-minimal-header">
-              <img v-if="previewLogo" :src="previewLogo" class="pv-logo" alt="" />
+              <img v-if="previewLogo" :src="previewLogo" class="pv-logo" :style="logoStyleModern" alt="" />
               <div class="pv-minimal-title">Factuur</div>
               <div class="pv-minimal-num">2026-0007 · 26 mei 2026</div>
             </div>
@@ -284,6 +314,63 @@ const removeLogo = () => {
 .logo-preview { max-width: 200px; max-height: 80px; display: block; }
 .logo-upload-zone { display: block; padding: 28px; border: 2px dashed var(--border); border-radius: 10px; text-align: center; cursor: pointer; background: var(--surface-2); }
 .logo-upload-zone:hover { border-color: var(--brand); background: var(--brand-tint); }
+
+.logo-scale-row {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.logo-scale-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+.logo-scale-value {
+  font-family: var(--font-mono);
+  color: var(--brand);
+  font-weight: 600;
+}
+.logo-scale-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--surface-3);
+  border-radius: 100px;
+  outline: none;
+  cursor: pointer;
+}
+.logo-scale-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--brand);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+.logo-scale-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--brand);
+  border: 2px solid white;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+.logo-scale-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-4);
+  font-family: var(--font-mono);
+}
 .upload-hint { font-size: 12px; color: var(--text-3); margin-bottom: 8px; }
 .upload-cta { font-size: 14px; color: var(--text); }
 .color-presets { display: flex; gap: 6px; margin-top: 8px; }

@@ -89,6 +89,7 @@ class SettingsController extends Controller
             'invoice_template' => ['required', 'in:modern,classic,minimal'],
             'invoice_font' => ['required', 'in:sans,serif'],
             'invoice_footer' => ['nullable', 'string', 'max:1000'],
+            'logo_scale' => ['nullable', 'integer', 'min:50', 'max:200'],
         ]);
 
         // Optional logo upload — store as base64 data URL in DB (survives Railway redeploys)
