@@ -1,0 +1,65 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Dev / IDE
+.idea
+.vscode
+.zed
+.nova
+.fleet
+.phpactor.json
+*.iml
+
+# Dependencies (will be reinstalled in container)
+node_modules
+vendor
+
+# Build artifacts (will be regenerated)
+public/build
+public/hot
+public/storage
+
+# Logs and cache
+storage/logs/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing/*
+storage/debugbar
+storage/pail
+bootstrap/cache/*.php
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Tests
+tests
+phpunit.xml
+.phpunit.result.cache
+
+# Local databases / files
+*.sqlite
+*.sqlite-journal
+
+# Misc
+README.md
+DEPLOYMENT.md
+VERVANG-REPO-INHOUD.txt
+CLEANUP-REPO.sh
+build-assets-locally.sh
+install.sh
+npm-debug.log
+yarn-error.log
+auth.json
+
+# Docker (don't include Dockerfile itself in image)
+Dockerfile
+.dockerignore
+
+# Railway / Nixpacks configs (not needed inside container)
+nixpacks.toml
+railpack.json
