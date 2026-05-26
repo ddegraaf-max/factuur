@@ -1,8 +1,5 @@
 {
   "$schema": "https://schema.railpack.com",
   "providers": ["node", "php"],
-  "buildAptPackages": ["php8.2-gd"],
-  "deploy": {
-    "aptPackages": ["php8.2-gd"]
-  }
+  "buildAptPackages": ["php8.2-gd"]
 }
