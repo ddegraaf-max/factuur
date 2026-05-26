@@ -307,13 +307,16 @@ a { color: inherit; text-decoration: none; }
 .verify-card { max-width: 460px; }
 
 .otp-group {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   margin: 8px 0 6px;
 }
 .otp-input {
+  width: 48px;
   height: 56px;
+  padding: 0;
+  flex: 0 0 auto;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 24px;
@@ -367,6 +370,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 480px) {
-  .otp-input { height: 48px; font-size: 20px; }
-  .otp-group { gap: 6px; }
+  .otp-input { width: 42px; height: 50px; font-size: 20px; }
+  .otp-group { gap: 8px; }
 }
