@@ -57,8 +57,9 @@ RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # ----- Railway uses $PORT — tell FrankenPHP to listen on it -----
-# FrankenPHP reads SERVER_NAME for binding; fall back to :8080 for local
-ENV SERVER_NAME=":${PORT:-8080}"
+# SERVER_NAME is a static fallback; the real (runtime) port is set by the CMD
+# below via --listen :$PORT, so $PORT must NOT be referenced at build time here.
+ENV SERVER_NAME=":8080"
 EXPOSE 8080
 
 # Default: serve /app/public via FrankenPHP php-server.
