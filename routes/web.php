@@ -16,7 +16,7 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard');
+Route::view('/', 'landing');
 
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
