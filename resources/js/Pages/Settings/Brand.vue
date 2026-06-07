@@ -482,13 +482,14 @@ const removeLogo = () => {
 /* ============ CLASSIC variant ============ */
 .pv-classic .pv-classic-header {
   padding: 22px 24px 16px;
-  border-bottom: 2px double #6b6b6b;
+  border-bottom: 2px double var(--brand);
 }
 .pv-classic .pv-classic-title {
   font-weight: 700;
   font-size: 20px;
   letter-spacing: 4px;
   margin-top: 6px;
+  color: var(--brand);
 }
 .pv-classic .pv-classic-sub {
   font-size: 10px;
@@ -514,9 +515,9 @@ const removeLogo = () => {
   border: 1px solid #d1d1d1;
   padding: 5px 6px;
 }
-.pv-classic .pv-lines-classic th { background: #f3f3f3; font-weight: 700; }
+.pv-classic .pv-lines-classic th { background: var(--brand); color: #fff; font-weight: 700; border-color: var(--brand); }
 .pv-classic .pv-totals-classic > div { border-bottom: 1px solid #ddd; }
-.pv-classic .pv-grand { border-bottom: 3px double var(--text) !important; border-top: 2px solid var(--text); }
+.pv-classic .pv-grand { border-bottom: 3px double var(--brand) !important; border-top: 2px solid var(--brand); }
 .pv-classic .pv-footer-classic { text-align: center; font-style: italic; }
 
 /* ============ MINIMAL variant ============ */
@@ -528,7 +529,7 @@ const removeLogo = () => {
   font-weight: 300;
   font-size: 28px;
   letter-spacing: -1px;
-  color: var(--text);
+  color: var(--brand);
 }
 .pv-minimal .pv-minimal-num {
   font-size: 10px;
@@ -542,5 +543,5 @@ const removeLogo = () => {
   border-bottom: 1px solid #f0f0f0;
 }
 .pv-minimal .pv-lines-minimal td:first-child { color: var(--text-2); }
-.pv-minimal .pv-grand { border-top: 1px solid var(--text); padding-top: 10px; }
+.pv-minimal .pv-grand { border-top: 2px solid var(--brand); padding-top: 10px; }
 </style>
