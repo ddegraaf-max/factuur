@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Services\ResendScheduler;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class StripeWebhookController extends Controller
 {
-    public function __construct(private StripeService $stripe)
-    {
+    public function __construct(
+        private StripeService $stripe,
+        private ResendScheduler $resend,
+    ) {
     }
 
     public function handle(Request $request)
@@ -68,12 +71,14 @@ class StripeWebhookController extends Controller
             $subscription = $this->stripe->retrieveSubscription($session['subscription']);
             if ($subscription) {
                 $this->stripe->applySubscriptionToCompany($company, $subscription);
+                $this->resend->cancelTrialReminder($company->fresh());
 
                 return;
             }
         }
 
         $company->save();
+        $this->resend->cancelTrialReminder($company->fresh());
     }
 
     private function onSubscriptionChanged(array $subscription): void

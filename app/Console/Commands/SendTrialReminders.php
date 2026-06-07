@@ -21,6 +21,7 @@ class SendTrialReminders extends Command
         $companies = Company::query()
             ->whereNull('subscription_ends_at')          // nog geen betaald abonnement
             ->whereNull('trial_reminder_sent_at')        // nog geen herinnering verstuurd
+            ->whereNull('trial_reminder_email_id')       // niet al via Resend ingepland
             ->whereNotNull('trial_ends_at')
             ->where('trial_ends_at', '>', now())
             ->where('trial_ends_at', '<=', now()->addDays($days))

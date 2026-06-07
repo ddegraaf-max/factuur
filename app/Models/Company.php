@@ -21,7 +21,8 @@ class Company extends Model
         'copy_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings',
         'default_payment_terms', 'invoice_footer', 'invoice_number_format',
-        'trial_ends_at', 'trial_reminder_sent_at', 'subscription_status', 'subscription_ends_at',
+        'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id',
+        'subscription_status', 'subscription_ends_at',
         'stripe_customer_id', 'stripe_subscription_id',
     ];
 

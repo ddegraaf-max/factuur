@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ResendScheduler;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -9,8 +10,10 @@ use Inertia\Inertia;
 
 class BillingController extends Controller
 {
-    public function __construct(private StripeService $stripe)
-    {
+    public function __construct(
+        private StripeService $stripe,
+        private ResendScheduler $resend,
+    ) {
     }
 
     public function show(Request $request)
@@ -70,7 +73,9 @@ class BillingController extends Controller
                     if (! empty($session['subscription'])) {
                         $subscription = $this->stripe->retrieveSubscription($session['subscription']);
                         if ($subscription) {
-                            $this->stripe->applySubscriptionToCompany($company->fresh(), $subscription);
+                            $company = $company->fresh();
+                            $this->stripe->applySubscriptionToCompany($company, $subscription);
+                            $this->resend->cancelTrialReminder($company->fresh());
                         }
                     }
                 }
