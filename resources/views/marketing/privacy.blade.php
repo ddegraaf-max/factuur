@@ -39,13 +39,13 @@
       <p>We bewaren je gegevens zolang je een account hebt en daarna niet langer dan wettelijk verplicht of redelijkerwijs noodzakelijk.</p>
 
       <h2>Jouw rechten</h2>
-      <p>Je hebt het recht op inzage, correctie, verwijdering en overdraagbaarheid van je gegevens. Je kunt je data op elk moment exporteren vanuit je account. Voor verzoeken mail je <a href="mailto:privacy@easyinvoice.nl">privacy@easyinvoice.nl</a>.</p>
+      <p>Je hebt het recht op inzage, correctie, verwijdering en overdraagbaarheid van je gegevens. Je kunt je data op elk moment exporteren vanuit je account. Voor verzoeken mail je <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
 
       <h2>Cookies</h2>
       <p>We gebruiken alleen functionele en analytische cookies. Lees meer op onze <a href="{{ route('cookies') }}">cookiepagina</a>.</p>
 
       <h2>Contact</h2>
-      <p>Vragen over je privacy? Mail <a href="mailto:privacy@easyinvoice.nl">privacy@easyinvoice.nl</a>.</p>
+      <p>Vragen over je privacy? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
 
       <p style="font-size:13px;color:var(--text-3);margin-top:32px;">Dit is een voorbeeldtekst en vormt geen juridisch advies. Laat het definitieve privacybeleid controleren door een jurist.</p>
     </div>

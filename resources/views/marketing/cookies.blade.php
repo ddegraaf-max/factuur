@@ -28,7 +28,7 @@
       <p>Je kunt cookies op elk moment beheren of verwijderen via de instellingen van je browser. Houd er rekening mee dat het uitschakelen van functionele cookies de werking van de dienst kan beperken.</p>
 
       <h2>Meer informatie</h2>
-      <p>Lees ook ons <a href="{{ route('privacy') }}">privacybeleid</a> voor hoe we met je persoonsgegevens omgaan. Vragen? Mail <a href="mailto:privacy@easyinvoice.nl">privacy@easyinvoice.nl</a>.</p>
+      <p>Lees ook ons <a href="{{ route('privacy') }}">privacybeleid</a> voor hoe we met je persoonsgegevens omgaan. Vragen? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
 
       <p style="font-size:13px;color:var(--text-3);margin-top:32px;">Dit is een voorbeeldtekst en vormt geen juridisch advies.</p>
     </div>

@@ -53,9 +53,9 @@
 
 <section class="cta-final">
   <div class="container cta-inner">
-    <h2>Werk met ons mee</h2>
-    <p>We zijn altijd op zoek naar mensen die het MKB vooruit willen helpen.</p>
-    <a href="{{ route('vacatures') }}" class="btn btn-white btn-lg">Bekijk vacatures</a>
+    <h2>Klaar om te beginnen?</h2>
+    <p>Probeer EasyInvoice 14 dagen gratis en ervaar zelf hoe eenvoudig factureren kan zijn.</p>
+    <a href="{{ route('register') }}" class="btn btn-white btn-lg">Start 14 dagen gratis</a>
   </div>
 </section>
 @endsection

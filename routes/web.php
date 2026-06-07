@@ -24,7 +24,6 @@ Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog');
 Route::view('/roadmap', 'marketing.roadmap')->name('roadmap');
 Route::view('/over-ons', 'marketing.over-ons')->name('over');
 Route::view('/pers', 'marketing.pers')->name('pers');
-Route::view('/werken-bij', 'marketing.werken-bij')->name('vacatures');
 Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum');
 Route::view('/status', 'marketing.status')->name('status');
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');

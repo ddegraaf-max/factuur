@@ -22,7 +22,7 @@
   <div class="container page-hero-inner">
     <div class="eyebrow">Pers</div>
     <h1>Perskit &amp; nieuws</h1>
-    <p class="lead">Schrijf je over EasyInvoice? Hier vind je de feiten, ons logo en de laatste aankondigingen. Voor persvragen mail je <a href="mailto:pers@easyinvoice.nl" style="color:var(--brand);font-weight:600;">pers@easyinvoice.nl</a>.</p>
+    <p class="lead">Schrijf je over EasyInvoice? Hier vind je de feiten, ons logo en de laatste aankondigingen. Voor persvragen mail je <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:600;">hallo@easyinvoice.nl</a>.</p>
   </div>
 </section>
 

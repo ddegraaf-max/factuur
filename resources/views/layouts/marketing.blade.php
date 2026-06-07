@@ -474,7 +474,6 @@
           <li><a href="{{ route('over') }}">Over ons</a></li>
           <li><a href="{{ route('contact') }}">Contact</a></li>
           <li><a href="{{ route('pers') }}">Pers</a></li>
-          <li><a href="{{ route('vacatures') }}">Werken bij</a></li>
         </ul>
       </div>
 
