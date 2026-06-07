@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,8 @@ class Company extends Model
         'copy_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings',
         'default_payment_terms', 'invoice_footer', 'invoice_number_format',
+        'trial_ends_at', 'subscription_status', 'subscription_ends_at',
+        'stripe_customer_id', 'stripe_subscription_id',
     ];
 
     protected $casts = [
@@ -30,6 +33,8 @@ class Company extends Model
         'daily_notification_enabled' => 'boolean',
         'numbering_settings' => 'array',
         'reminder_settings' => 'array',
+        'trial_ends_at' => 'datetime',
+        'subscription_ends_at' => 'datetime',
     ];
 
     public function users(): HasMany { return $this->hasMany(User::class); }
@@ -68,5 +73,79 @@ class Company extends Model
             $this->address_line,
             trim(($this->postal_code ?? '') . ' ' . ($this->city ?? '')),
         ])->filter()->implode(', ');
+    }
+
+    /* ===================== ABONNEMENT / PROEFPERIODE ===================== */
+
+    /** Heeft een betaald abonnement dat nog loopt. */
+    public function subscriptionActive(): bool
+    {
+        return $this->subscription_ends_at !== null
+            && $this->subscription_ends_at->isFuture();
+    }
+
+    /** Zit nog in de gratis proefperiode (en heeft (nog) geen lopend abonnement). */
+    public function onTrial(): bool
+    {
+        return ! $this->subscriptionActive()
+            && $this->trial_ends_at !== null
+            && $this->trial_ends_at->isFuture();
+    }
+
+    /** Heeft toegang tot de app (proef of betaald). */
+    public function hasAccess(): bool
+    {
+        return $this->onTrial() || $this->subscriptionActive();
+    }
+
+    /** Tot wanneer loopt de toegang (proef of abonnement). */
+    public function accessEndsAt(): ?Carbon
+    {
+        if ($this->subscriptionActive()) {
+            return $this->subscription_ends_at;
+        }
+        if ($this->onTrial()) {
+            return $this->trial_ends_at;
+        }
+
+        return $this->subscription_ends_at ?? $this->trial_ends_at;
+    }
+
+    /** Aantal volledige dagen dat de toegang nog loopt (0 als verlopen). */
+    public function daysLeft(): int
+    {
+        $end = $this->accessEndsAt();
+        if (! $end || $end->isPast()) {
+            return 0;
+        }
+
+        return (int) ceil(now()->floatDiffInDays($end));
+    }
+
+    /** Status voor de UI: 'trialing' | 'active' | 'expired'. */
+    public function accessStatus(): string
+    {
+        if ($this->subscriptionActive()) {
+            return 'active';
+        }
+        if ($this->onTrial()) {
+            return 'trialing';
+        }
+
+        return 'expired';
+    }
+
+    /** Compacte samenvatting voor het frontend. */
+    public function subscriptionSummary(): array
+    {
+        return [
+            'status' => $this->accessStatus(),
+            'has_access' => $this->hasAccess(),
+            'days_left' => $this->daysLeft(),
+            'ends_at' => optional($this->accessEndsAt())->toIso8601String(),
+            'on_trial' => $this->onTrial(),
+            'stripe_status' => $this->subscription_status,
+            'has_subscription' => $this->subscription_ends_at !== null,
+        ];
     }
 }

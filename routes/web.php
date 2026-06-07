@@ -5,7 +5,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CreditNoteController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncassoController;
@@ -71,6 +73,9 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
 })->name('contact.send');
 
+// ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -95,10 +100,18 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Abonnement (ook bereikbaar wanneer de proefperiode/het abonnement is verlopen)
+    Route::get('abonnement', [BillingController::class, 'show'])->name('billing.show');
+    Route::post('abonnement/afrekenen', [BillingController::class, 'checkout'])->name('billing.checkout');
+    Route::get('abonnement/gelukt', [BillingController::class, 'success'])->name('billing.success');
+    Route::post('abonnement/beheren', [BillingController::class, 'portal'])->name('billing.portal');
 
-    // Customers
-    Route::resource('customers', CustomerController::class);
+    // Alles hieronder vereist een actieve proefperiode of abonnement.
+    Route::middleware('subscribed')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Customers
+        Route::resource('customers', CustomerController::class);
 
     // Products
     Route::resource('products', ProductController::class);
@@ -147,4 +160,5 @@ Route::middleware(['auth'])->group(function () {
     Route::post('settings/security/verify', [SecurityController::class, 'verifySetup'])->name('settings.security.verify');
     Route::delete('settings/security', [SecurityController::class, 'disable'])->name('settings.security.disable');
     Route::post('settings/security/recovery', [SecurityController::class, 'regenerateBackupCodes'])->name('settings.security.recovery');
+    });
 });

@@ -35,6 +35,7 @@ class HandleInertiaRequests extends Middleware
         if ($request->user()) {
             $shared['easy_insights'] = fn () => app(EasyInsightsService::class)->gather();
             $shared['easy_data'] = fn () => app(EasyInsightsService::class)->data();
+            $shared['subscription'] = fn () => $request->user()->company?->subscriptionSummary();
         }
 
         return $shared;

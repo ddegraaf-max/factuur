@@ -55,6 +55,7 @@ class RegisteredUserController extends Controller
                 'results_per_page' => 25,
                 'daily_notification_enabled' => true,
                 'daily_notification_email' => $data['email'],
+                'trial_ends_at' => now()->addDays(14),
             ]);
 
             return User::create([

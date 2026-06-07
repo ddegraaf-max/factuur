@@ -45,9 +45,13 @@ const nav = [
       { name: 'Nummering', route: 'settings.numbering', icon: 'hash' },
       { name: 'Herinneringen', route: 'settings.reminders', icon: 'bell' },
       { name: 'Beveiliging', route: 'settings.security', icon: 'shield' },
+      { name: 'Abonnement', route: 'billing.show', icon: 'card' },
     ],
   },
 ];
+
+const subscription = computed(() => page.props.subscription || {});
+const showTrialBanner = computed(() => subscription.value.status === 'trialing');
 
 const isActive = (routeName) => {
   return route().current(routeName) || route().current(routeName.replace('.index', '.*'));
@@ -91,6 +95,7 @@ const logout = () => {
             <svg v-else-if="item.icon === 'hash'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></svg>
             <svg v-else-if="item.icon === 'bell'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <svg v-else-if="item.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <svg v-else-if="item.icon === 'card'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             {{ item.name }}
           </Link>
         </div>
@@ -118,6 +123,14 @@ const logout = () => {
           <slot name="topbar-actions"></slot>
         </div>
       </header>
+
+      <div v-if="showTrialBanner" class="trial-banner">
+        <span class="trial-banner-text">
+          🎁 Nog <strong>{{ subscription.days_left }}</strong>
+          {{ subscription.days_left === 1 ? 'dag' : 'dagen' }} in je gratis proefperiode.
+        </span>
+        <Link :href="route('billing.show')" class="trial-banner-btn">Abonnement afsluiten</Link>
+      </div>
 
       <div class="content">
         <slot />
@@ -337,6 +350,33 @@ table { border-collapse: collapse; width: 100%; }
 .breadcrumb { font-size: 13px; color: var(--text-3); }
 .breadcrumb-current { color: var(--text); font-weight: 500; }
 .content { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+/* TRIAL BANNER */
+.trial-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 24px;
+  background: var(--brand-tint);
+  border-bottom: 1px solid var(--brand-border);
+  color: var(--brand-darker);
+  font-size: 14px;
+}
+.trial-banner-text strong { font-weight: 700; }
+.trial-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.trial-banner-btn:hover { background: var(--brand-dark); }
 
 /* HEADERS */
 .page-header {
