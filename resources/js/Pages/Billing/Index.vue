@@ -81,8 +81,7 @@ const openPortal = () => portal.post(route('billing.portal'));
 
           <p class="status-note">{{ statusMeta.note }}</p>
           <p v-if="endsAtLabel" class="status-sub">
-            <template v-if="status === 'active' && sub.stripe_status === 'trialing'">Eerste afschrijving op <strong>{{ endsAtLabel }}</strong> · daarna automatisch €2,50/maand</template>
-            <template v-else-if="status === 'active'">Volgende verlenging op <strong>{{ endsAtLabel }}</strong></template>
+            <template v-if="status === 'active'">Volgende verlenging op <strong>{{ endsAtLabel }}</strong></template>
             <template v-else-if="status === 'trialing'">Proefperiode loopt tot <strong>{{ endsAtLabel }}</strong></template>
             <template v-else>Verlopen op <strong>{{ endsAtLabel }}</strong></template>
           </p>

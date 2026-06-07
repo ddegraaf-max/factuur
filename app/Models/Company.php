@@ -121,15 +121,7 @@ class Company extends Model
             return 0;
         }
 
-        $days = (int) ceil(now()->floatDiffInDays($end));
-
-        // Wie tijdens de proefperiode al een abonnement afsluit, heeft de eerste
-        // betaalde maand (30 dagen) al vastliggen bovenop de resterende proefdagen.
-        if ($this->subscription_status === 'trialing' && $this->subscriptionActive()) {
-            $days += 30;
-        }
-
-        return $days;
+        return (int) ceil(now()->floatDiffInDays($end));
     }
 
     /** Status voor de UI: 'trialing' | 'active' | 'expired'. */
