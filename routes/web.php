@@ -23,8 +23,17 @@ Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq');
 Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog');
 Route::view('/roadmap', 'marketing.roadmap')->name('roadmap');
 Route::view('/over-ons', 'marketing.over-ons')->name('over');
-Route::view('/pers', 'marketing.pers')->name('pers');
 Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum');
+Route::get('/helpcentrum/{slug}', function (string $slug) {
+    $articles = config('help.articles');
+    abort_unless(isset($articles[$slug]), 404);
+
+    return view('marketing.help-article', [
+        'slug' => $slug,
+        'article' => $articles[$slug],
+        'articles' => $articles,
+    ]);
+})->name('help.article');
 Route::view('/status', 'marketing.status')->name('status');
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
 Route::view('/privacy', 'marketing.privacy')->name('privacy');
@@ -39,11 +48,25 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'message' => ['required', 'string', 'max:4000'],
     ]);
 
-    \Illuminate\Support\Facades\Log::info('Nieuw contactbericht via website', [
-        'name' => $data['name'],
-        'email' => $data['email'],
-        'subject' => $data['subject'] ?? null,
-    ]);
+    $subject = $data['subject'] ?: 'Nieuw contactbericht via website';
+    $body = "Naam: {$data['name']}\nE-mail: {$data['email']}\nOnderwerp: {$subject}\n\n{$data['message']}";
+
+    try {
+        \Illuminate\Support\Facades\Mail::raw($body, function ($mail) use ($data, $subject) {
+            $mail->to('hallo@easyinvoice.nl')
+                ->replyTo($data['email'], $data['name'])
+                ->subject('[Contact] '.$subject);
+        });
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::error('Versturen contactbericht mislukt', [
+            'error' => $e->getMessage(),
+            'email' => $data['email'],
+        ]);
+
+        return back()
+            ->withInput()
+            ->with('contact_error', 'Er ging iets mis bij het versturen. Mail ons gerust direct op hallo@easyinvoice.nl.');
+    }
 
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
 })->name('contact.send');

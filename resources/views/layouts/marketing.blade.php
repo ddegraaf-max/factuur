@@ -395,6 +395,7 @@
   .m-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 600px) { .m-row-2 { grid-template-columns: 1fr; } }
   .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #6EE7B7; padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; font-weight: 600; font-size: 14px; }
+  .alert-error { background: var(--brand-tint); color: var(--brand-darker); border: 1px solid var(--brand-border); padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; font-weight: 600; font-size: 14px; }
 
   .divider { border: none; border-top: 1px solid var(--border); margin: 56px 0; }
 
@@ -473,7 +474,6 @@
         <ul class="footer-links">
           <li><a href="{{ route('over') }}">Over ons</a></li>
           <li><a href="{{ route('contact') }}">Contact</a></li>
-          <li><a href="{{ route('pers') }}">Pers</a></li>
         </ul>
       </div>
 

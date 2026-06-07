@@ -29,6 +29,9 @@
       @if (session('contact_success'))
         <div class="alert-success">{{ session('contact_success') }}</div>
       @endif
+      @if (session('contact_error'))
+        <div class="alert-error">{{ session('contact_error') }}</div>
+      @endif
       <form class="contact-card" method="POST" action="{{ route('contact.send') }}">
         @csrf
         <div class="m-row-2">

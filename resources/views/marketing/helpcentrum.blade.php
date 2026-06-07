@@ -32,46 +32,46 @@
         <div class="ic-emoji">🚀</div>
         <h3>Aan de slag</h3>
         <p style="margin-bottom:12px;">Account aanmaken en je eerste factuur versturen.</p>
-        <a class="help-link" href="{{ route('faq') }}">Een account aanmaken →</a>
-        <a class="help-link" href="{{ route('faq') }}">Je bedrijfsgegevens instellen →</a>
-        <a class="help-link" href="{{ route('faq') }}">Je eerste factuur maken →</a>
+        <a class="help-link" href="{{ route('help.article', 'een-account-aanmaken') }}">Een account aanmaken →</a>
+        <a class="help-link" href="{{ route('help.article', 'bedrijfsgegevens-instellen') }}">Je bedrijfsgegevens instellen →</a>
+        <a class="help-link" href="{{ route('help.article', 'eerste-factuur-maken') }}">Je eerste factuur maken →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🧾</div>
         <h3>Facturen</h3>
         <p style="margin-bottom:12px;">BTW, creditnota's en nummering.</p>
-        <a class="help-link" href="{{ route('faq') }}">BTW per regel instellen →</a>
-        <a class="help-link" href="{{ route('faq') }}">Een creditfactuur maken →</a>
-        <a class="help-link" href="{{ route('faq') }}">Factuurnummering aanpassen →</a>
+        <a class="help-link" href="{{ route('help.article', 'btw-per-regel') }}">BTW per regel instellen →</a>
+        <a class="help-link" href="{{ route('help.article', 'creditfactuur-maken') }}">Een creditfactuur maken →</a>
+        <a class="help-link" href="{{ route('help.article', 'factuurnummering') }}">Factuurnummering aanpassen →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">💸</div>
         <h3>Betalingen &amp; incasso</h3>
         <p style="margin-bottom:12px;">Herinneringen en het incassotraject.</p>
-        <a class="help-link" href="{{ route('faq') }}">Een betaling registreren →</a>
-        <a class="help-link" href="{{ route('faq') }}">Automatische herinneringen →</a>
-        <a class="help-link" href="{{ route('faq') }}">Het incassotraject →</a>
+        <a class="help-link" href="{{ route('help.article', 'betaling-registreren') }}">Een betaling registreren →</a>
+        <a class="help-link" href="{{ route('help.article', 'automatische-herinneringen') }}">Automatische herinneringen →</a>
+        <a class="help-link" href="{{ route('help.article', 'incassotraject') }}">Het incassotraject →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">👥</div>
         <h3>Klanten &amp; producten</h3>
         <p style="margin-bottom:12px;">Klantgegevens en je catalogus.</p>
-        <a class="help-link" href="{{ route('faq') }}">Een klant toevoegen →</a>
-        <a class="help-link" href="{{ route('faq') }}">Producten beheren →</a>
+        <a class="help-link" href="{{ route('help.article', 'klant-toevoegen') }}">Een klant toevoegen →</a>
+        <a class="help-link" href="{{ route('help.article', 'producten-beheren') }}">Producten beheren →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🎨</div>
         <h3>Huisstijl</h3>
         <p style="margin-bottom:12px;">Logo, kleuren en sjablonen.</p>
-        <a class="help-link" href="{{ route('faq') }}">Je logo uploaden →</a>
-        <a class="help-link" href="{{ route('faq') }}">Een sjabloon kiezen →</a>
+        <a class="help-link" href="{{ route('help.article', 'logo-uploaden') }}">Je logo uploaden →</a>
+        <a class="help-link" href="{{ route('help.article', 'sjabloon-kiezen') }}">Een sjabloon kiezen →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🔒</div>
         <h3>Account &amp; beveiliging</h3>
         <p style="margin-bottom:12px;">Wachtwoord en tweestapsverificatie.</p>
-        <a class="help-link" href="{{ route('faq') }}">2FA instellen →</a>
-        <a class="help-link" href="{{ route('faq') }}">Je wachtwoord wijzigen →</a>
+        <a class="help-link" href="{{ route('help.article', '2fa-instellen') }}">2FA instellen →</a>
+        <a class="help-link" href="{{ route('help.article', 'wachtwoord-wijzigen') }}">Je wachtwoord wijzigen →</a>
       </div>
     </div>
 
