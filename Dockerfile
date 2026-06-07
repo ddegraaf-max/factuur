@@ -32,6 +32,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 
 # ----- Composer dependencies (cache layer: copy lock files first) -----
+# Geen geheugenlimiet: zonder composer.lock doet 'install' een volledige
+# dependency-resolutie die anders out-of-memory kan gaan op de builder.
+ENV COMPOSER_MEMORY_LIMIT=-1
 COPY composer.json composer.lock* ./
 RUN composer config --global policy.advisories.block false && \
     composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-progress --prefer-dist
