@@ -11,7 +11,7 @@
   .fact-num { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: var(--brand); }
   .fact-label { font-size: 14px; color: var(--text-3); margin-top: 4px; }
   .logo-box { border: 1px solid var(--border); border-radius: 14px; padding: 44px; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: var(--font-display); font-weight: 700; font-size: 24px; }
-  .logo-mark { width: 44px; height: 44px; border-radius: 11px; background: var(--brand); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+  .logo-mark { width: 44px; height: 44px; border-radius: 11px; background: var(--brand); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-family: system-ui, sans-serif; font-weight: 700; font-size: 24px; line-height: 1; }
   .news-row { display: flex; gap: 16px; align-items: baseline; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; }
   .news-date { font-size: 13px; color: var(--text-3); white-space: nowrap; min-width: 110px; }
 </style>
@@ -43,11 +43,11 @@
     <h2 style="font-size:24px;margin-bottom:22px;">Logo &amp; merk</h2>
     <div class="card-grid cols-2">
       <div class="logo-box" style="background:var(--surface);">
-        <span class="logo-mark"><svg viewBox="0 0 32 32" width="26" height="26" fill="none"><circle cx="16" cy="14" r="11" stroke="currentColor" stroke-width="2.5"/><path d="M11 10h10v3h-7v2h6v3h-6v2h7v3H11z" fill="currentColor"/></svg></span>
+        <span class="logo-mark">E</span>
         EasyInvoice
       </div>
       <div class="logo-box" style="background:var(--text);color:#fff;">
-        <span class="logo-mark"><svg viewBox="0 0 32 32" width="26" height="26" fill="none"><circle cx="16" cy="14" r="11" stroke="currentColor" stroke-width="2.5"/><path d="M11 10h10v3h-7v2h6v3h-6v2h7v3H11z" fill="currentColor"/></svg></span>
+        <span class="logo-mark">E</span>
         EasyInvoice
       </div>
     </div>

@@ -66,12 +66,7 @@ const logout = () => {
   <div class="app">
     <aside class="sidebar">
       <Link :href="route('dashboard')" class="sidebar-brand">
-        <span class="logo-mark">
-          <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-            <circle cx="16" cy="14" r="11" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M11 10h10v3h-7v2h6v3h-6v2h7v3H11z" fill="currentColor"/>
-          </svg>
-        </span>
+        <span class="logo-mark">E</span>
         <span class="brand-name">EasyInvoice</span>
       </Link>
 
@@ -227,6 +222,10 @@ table { border-collapse: collapse; width: 100%; }
   justify-content: center;
   color: white;
   flex-shrink: 0;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
 }
 .sidebar-brand .brand-name {
   font-family: var(--font-display);

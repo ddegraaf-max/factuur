@@ -6,12 +6,7 @@ import { Link } from '@inertiajs/vue3';
   <div class="auth-shell">
     <div class="auth-hero">
       <Link href="/" class="auth-logo">
-        <span class="logo-mark">
-          <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
-            <circle cx="16" cy="14" r="11" stroke="currentColor" stroke-width="2.5"/>
-            <path d="M11 10h10v3h-7v2h6v3h-6v2h7v3H11z" fill="currentColor"/>
-          </svg>
-        </span>
+        <span class="logo-mark">E</span>
         <span>EasyInvoice</span>
       </Link>
       <div class="auth-tagline">
@@ -72,6 +67,10 @@ import { Link } from '@inertiajs/vue3';
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  font-family: system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 1;
 }
 .auth-tagline { z-index: 1; }
 .auth-tagline h2 {
