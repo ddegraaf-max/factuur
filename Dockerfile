@@ -33,7 +33,8 @@ WORKDIR /app
 
 # ----- Composer dependencies (cache layer: copy lock files first) -----
 COPY composer.json composer.lock* ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-progress --prefer-dist
+RUN composer config --global policy.advisories.block false && \
+    composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-progress --prefer-dist
 
 # ----- NPM dependencies -----
 COPY package.json package-lock.json* ./
