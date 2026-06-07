@@ -40,11 +40,19 @@ class BillingController extends Controller
             return back()->with('error', 'Betalen is nog niet beschikbaar. Probeer het later opnieuw.');
         }
 
+        // Wordt er tijdens de proefperiode afgesloten, laat Stripe dan pas
+        // afschrijven aan het einde van de proef (Stripe vereist >48u vooruit).
+        $trialEnd = null;
+        if ($company->onTrial() && $company->trial_ends_at?->greaterThan(now()->addHours(49))) {
+            $trialEnd = $company->trial_ends_at->timestamp;
+        }
+
         try {
             $url = $this->stripe->createCheckoutSession(
                 $company,
                 route('billing.success').'?session_id={CHECKOUT_SESSION_ID}',
                 route('billing.show'),
+                $trialEnd,
             );
         } catch (\Throwable $e) {
             Log::error('Stripe checkout aanmaken mislukt', ['error' => $e->getMessage(), 'company' => $company->id]);

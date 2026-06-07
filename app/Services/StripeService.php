@@ -38,7 +38,7 @@ class StripeService
     /**
      * Maak een Checkout-sessie (abonnement) en geef de hosted checkout-URL terug.
      */
-    public function createCheckoutSession(Company $company, string $successUrl, string $cancelUrl): string
+    public function createCheckoutSession(Company $company, string $successUrl, string $cancelUrl, ?int $trialEnd = null): string
     {
         $payload = [
             'mode' => 'subscription',
@@ -51,6 +51,12 @@ class StripeService
             'subscription_data[metadata][company_id]' => (string) $company->id,
             'metadata[company_id]' => (string) $company->id,
         ];
+
+        // Bij afsluiten tijdens de proefperiode: eerste afschrijving pas op het
+        // einde van de proef (geen dubbele dagen, geen directe kosten).
+        if ($trialEnd) {
+            $payload['subscription_data[trial_end]'] = $trialEnd;
+        }
 
         if ($company->stripe_customer_id) {
             $payload['customer'] = $company->stripe_customer_id;
