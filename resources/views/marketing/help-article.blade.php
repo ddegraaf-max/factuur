@@ -33,7 +33,7 @@
 <section class="section" style="padding-top:48px;">
   <div class="container article-layout">
     <aside class="article-side">
-      @php $grouped = collect($articles)->groupBy('category'); @endphp
+      @php $grouped = collect($articles)->groupBy('category', true); @endphp
       @foreach ($grouped as $cat => $items)
         <div class="side-cat">{{ $cat }}</div>
         @foreach ($items as $key => $a)
