@@ -9,13 +9,30 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncassoController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard');
+// ---------- PUBLIEKE MARKETINGSITE ----------
+Route::get('/', [MarketingController::class, 'home'])->name('home');
+
+Route::get('/functies', [MarketingController::class, 'functies'])->name('functies');
+Route::get('/prijzen', [MarketingController::class, 'prijzen'])->name('prijzen');
+Route::get('/reviews', [MarketingController::class, 'reviews'])->name('reviews');
+Route::get('/wat-is-nieuw', [MarketingController::class, 'changelog'])->name('changelog');
+Route::get('/roadmap', [MarketingController::class, 'roadmap'])->name('roadmap');
+Route::get('/over-ons', [MarketingController::class, 'over'])->name('over');
+Route::get('/contact', [MarketingController::class, 'contact'])->name('contact');
+Route::post('/contact', [MarketingController::class, 'sendContact'])->name('contact.send');
+Route::get('/pers', [MarketingController::class, 'pers'])->name('pers');
+Route::get('/vacatures', [MarketingController::class, 'vacatures'])->name('vacatures');
+Route::get('/helpcentrum', [MarketingController::class, 'helpcentrum'])->name('helpcentrum');
+Route::get('/veelgestelde-vragen', [MarketingController::class, 'faq'])->name('faq');
+Route::get('/support', [MarketingController::class, 'support'])->name('support');
+Route::get('/status', [MarketingController::class, 'status'])->name('status');
 
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
