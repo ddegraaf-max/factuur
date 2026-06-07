@@ -23,7 +23,7 @@
     font-weight: 300;
     letter-spacing: -1.5px;
     margin: 0;
-    color: #1C1917;
+    color: {{ $company->brand_color }};
   }
   .doc-meta {
     font-size: 10pt;
@@ -58,8 +58,8 @@
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #999;
-    border-bottom: 1px solid #1C1917;
+    color: {{ $company->brand_color }};
+    border-bottom: 1px solid {{ $company->brand_color }};
   }
   .lines th.right { text-align: right; }
   .lines td {
@@ -76,7 +76,7 @@
   .totals tr td { padding: 5px 0; font-size: 10pt; color: #666; }
   .totals .value { text-align: right; font-variant-numeric: tabular-nums; }
   .totals .grand-row td {
-    border-top: 1px solid #1C1917;
+    border-top: 2px solid {{ $company->brand_color }};
     padding-top: 12px;
     font-weight: 600;
     font-size: 13pt;

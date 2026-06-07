@@ -18,7 +18,7 @@
   .doc-header {
     text-align: center;
     padding-bottom: 18px;
-    border-bottom: 3px double #6b6b6b;
+    border-bottom: 3px double {{ $company->brand_color }};
     margin-bottom: 24px;
   }
   .logo-img { max-height: 56px; max-width: 200px; display: block; margin: 0 auto 10px; }
@@ -27,6 +27,7 @@
     font-weight: 700;
     letter-spacing: 6px;
     margin: 6px 0 4px;
+    color: {{ $company->brand_color }};
   }
   .doc-sub {
     font-size: 10pt;
@@ -45,7 +46,7 @@
     padding: 12px 14px;
     margin-bottom: 18px;
   }
-  .party-label { font-weight: 700; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .party-label { font-weight: 700; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.06em; margin-bottom: 4px; color: {{ $company->brand_color }}; }
   .party-name { font-weight: 600; font-size: 11pt; }
   .party-line { font-size: 10pt; color: #333; }
 
@@ -57,12 +58,13 @@
     border: 1px solid #6b6b6b;
   }
   .lines th {
-    background: #ebebeb;
+    background: {{ $company->brand_color }};
+    color: #fff;
     text-align: left;
     padding: 8px 10px;
     font-size: 9.5pt;
     font-weight: 700;
-    border: 1px solid #6b6b6b;
+    border: 1px solid {{ $company->brand_color }};
   }
   .lines th.right { text-align: right; }
   .lines th.center { text-align: center; }
@@ -91,8 +93,8 @@
   .totals .label { color: #333; }
   .totals .value { text-align: right; font-weight: 500; }
   .totals .grand-row td {
-    border-top: 2px solid #1C1917;
-    border-bottom: 3px double #1C1917;
+    border-top: 2px solid {{ $company->brand_color }};
+    border-bottom: 3px double {{ $company->brand_color }};
     padding: 8px;
     font-weight: 700;
     font-size: 12pt;
