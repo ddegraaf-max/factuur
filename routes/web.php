@@ -16,7 +16,38 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing');
+Route::view('/', 'landing')->name('home');
+
+// ---------- PUBLIEKE MARKETINGPAGINA'S ----------
+Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq');
+Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog');
+Route::view('/roadmap', 'marketing.roadmap')->name('roadmap');
+Route::view('/over-ons', 'marketing.over-ons')->name('over');
+Route::view('/pers', 'marketing.pers')->name('pers');
+Route::view('/werken-bij', 'marketing.werken-bij')->name('vacatures');
+Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum');
+Route::view('/status', 'marketing.status')->name('status');
+Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
+Route::view('/privacy', 'marketing.privacy')->name('privacy');
+Route::view('/cookies', 'marketing.cookies')->name('cookies');
+
+Route::get('/contact', fn () => view('marketing.contact'))->name('contact');
+Route::post('/contact', function (\Illuminate\Http\Request $request) {
+    $data = $request->validate([
+        'name' => ['required', 'string', 'max:120'],
+        'email' => ['required', 'email', 'max:180'],
+        'subject' => ['nullable', 'string', 'max:160'],
+        'message' => ['required', 'string', 'max:4000'],
+    ]);
+
+    \Illuminate\Support\Facades\Log::info('Nieuw contactbericht via website', [
+        'name' => $data['name'],
+        'email' => $data['email'],
+        'subject' => $data['subject'] ?? null,
+    ]);
+
+    return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
+})->name('contact.send');
 
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
