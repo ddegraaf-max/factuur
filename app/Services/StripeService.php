@@ -162,7 +162,13 @@ class StripeService
 
         $company->subscription_status = $subscription['status'] ?? $company->subscription_status;
 
-        $periodEnd = $subscription['current_period_end'] ?? null;
+        // In nieuwere Stripe-API-versies staat current_period_end op de
+        // subscription items i.p.v. op het hoofdobject. Val terug op trial_end.
+        $periodEnd = $subscription['items']['data'][0]['current_period_end']
+            ?? $subscription['current_period_end']
+            ?? $subscription['trial_end']
+            ?? null;
+
         if ($periodEnd) {
             $company->subscription_ends_at = \Illuminate\Support\Carbon::createFromTimestamp($periodEnd);
         }
