@@ -18,11 +18,18 @@ class SettingsController extends Controller
 
     public function updateCompany(Request $request)
     {
+        $company = auth()->user()->company;
+
+        // Normaliseer het BTW-nummer naar hoofdletters voor de unieke-check/opslag.
+        if (filled($request->input('vat_number'))) {
+            $request->merge(['vat_number' => strtoupper(trim($request->input('vat_number')))]);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'trading_name' => ['nullable', 'string', 'max:255'],
-            'kvk_number' => ['nullable', 'string', 'max:20'],
-            'vat_number' => ['nullable', 'string', 'max:20'],
+            'kvk_number' => ['nullable', 'string', 'max:20', 'unique:companies,kvk_number,' . $company->id],
+            'vat_number' => ['nullable', 'string', 'max:20', 'unique:companies,vat_number,' . $company->id],
             'iban' => ['nullable', 'string', 'max:34'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
@@ -44,12 +51,15 @@ class SettingsController extends Controller
             'invoice_footer' => ['nullable', 'string'],
             'invoice_number_format' => ['nullable', 'string', 'max:50'],
             'brand_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+        ], [
+            'kvk_number.unique' => 'Er bestaat al een account met dit KvK-nummer.',
+            'vat_number.unique' => 'Er bestaat al een account met dit BTW-nummer.',
         ]);
 
         // Drop nulls so we don't overwrite existing values with null
         $data = array_filter($data, fn ($v) => $v !== null);
 
-        auth()->user()->company->update($data);
+        $company->update($data);
         return back()->with('flash', 'Bedrijfsgegevens opgeslagen.');
     }
 

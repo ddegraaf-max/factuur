@@ -23,6 +23,12 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
+        // Normaliseer het BTW-nummer naar hoofdletters zodat de unieke-check
+        // (en de opslag) hoofdletterongevoelig werken.
+        if (filled($request->input('vatNumber'))) {
+            $request->merge(['vatNumber' => strtoupper(trim($request->input('vatNumber')))]);
+        }
+
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:60'],
             'lastName' => ['required', 'string', 'max:60'],
@@ -30,10 +36,13 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)],
             'companyName' => ['required', 'string', 'max:255'],
             'companyType' => ['required', 'in:eenmanszaak,bv,vof,maatschap,stichting,vereniging,other'],
-            'kvkNumber' => ['required', 'digits:8'],
-            'vatNumber' => ['nullable', 'regex:/^NL\d{9}B\d{2}$/i'],
+            'kvkNumber' => ['required', 'digits:8', 'unique:companies,kvk_number'],
+            'vatNumber' => ['nullable', 'regex:/^NL\d{9}B\d{2}$/i', 'unique:companies,vat_number'],
             'acceptTerms' => ['accepted'],
             'newsletter' => ['boolean'],
+        ], [
+            'kvkNumber.unique' => 'Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.',
+            'vatNumber.unique' => 'Er bestaat al een account met dit BTW-nummer. Neem contact met ons op als dit onterecht is.',
         ]);
 
         $user = DB::transaction(function () use ($data) {
