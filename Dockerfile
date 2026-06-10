@@ -36,8 +36,16 @@ WORKDIR /app
 # dependency-resolutie die anders out-of-memory kan gaan op de builder.
 ENV COMPOSER_MEMORY_LIMIT=-1
 COPY composer.json composer.lock* ./
+# Retry de install: GitHub API geeft af en toe een transient 504 bij het
+# downloaden van een package-zipball, wat anders de hele build laat falen.
 RUN composer config --global policy.advisories.block false && \
-    composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-progress --prefer-dist
+    for i in 1 2 3 4 5; do \
+        echo "composer install — poging $i/5"; \
+        composer install --no-dev --optimize-autoloader --no-interaction --no-scripts --no-progress --prefer-dist && exit 0; \
+        echo "composer install faalde (poging $i/5), opnieuw over 10s..."; \
+        sleep 10; \
+    done; \
+    echo "composer install bleef falen na 5 pogingen" && exit 1
 
 # ----- NPM dependencies -----
 COPY package.json package-lock.json* ./
