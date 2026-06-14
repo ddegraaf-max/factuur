@@ -1,0 +1,44 @@
+EASYINVOICE — LOGO, FAVICON & MERKVERMELDING
+=============================================
+
+Pak deze ZIP uit op de ROOT van je repo (waar /public en /resources staan).
+De mappen sluiten exact aan, dus de bestanden landen automatisch goed.
+Committen naar GitHub -> Railway bouwt automatisch. Bestanden in /public staan
+in git, dus ze overleven elke deploy (geen volume nodig).
+
+WAT IS GEWIJZIGD
+----------------
+public/images/   -> 6 logo-/favicon-bestanden (nieuw)
+resources/views/app.blade.php
+    - placeholder-favicon ("E"-vierkant) vervangen door echte favicon-links
+resources/views/layouts/marketing.blade.php   (de gedeelde marketing-layout)
+    - favicon in <head>: placeholder -> echte favicons (geldt voor alle marketingpagina's)
+    - HEADER (nav-brand): rode "E"-placeholder -> echt embleem (/images/easyinvoice-favicon-180.png)
+    - FOOTER (footer-brand): zelfde embleem + EasyInvoice(R) bij het woordmerk
+    - FOOTER onderaan: nieuwe merkregel toegevoegd:
+        "EasyInvoice(R) is een geregistreerd Benelux-merk van Creditline B.V. - BOIP-inschrijving nr. 1485323."
+      met bijbehorende .footer-trademark CSS in jouw eigen footer-stijl (geen Tailwind)
+
+NIET AANGERAAKT (bewust)
+------------------------
+- landing.blade.php: hoefde niet; logo/footer zaten in de layout.
+- De groene vinkje-SVG (background-image) in de layout-CSS: dat is een icoon, geen placeholder.
+- De decoratieve .ico in de hero-mockup: dat is een nep-screenshot, blijft zo.
+
+FOOTER — VOLLEDIG INGEVULD (klaar om live)
+------------------------------------------
+Copyrightregel staat nu correct en compleet:
+    (c) 2026 Creditline B.V. - KvK 59683198 - BTW NL853603108B01
+Daarnaast in het footer-brandblok een adresregel toegevoegd:
+    Creditline B.V. - Torenlaan 5B - 1402 AT Bussum - Nederland
+En "Gemaakt in Amsterdam" gecorrigeerd naar "Gemaakt in Bussum".
+
+Er zijn GEEN openstaande velden meer. Uitpakken op repo-root, committen, klaar.
+
+MERKGEGEVENS (ter referentie)
+-----------------------------
+Merk:               EasyInvoice (beeldmerk met woordelementen)
+Houder:             Creditline B.V., Bussum (NL)
+Inschrijvingsnr.:   1485323   | Basis: Benelux
+Ingeschreven:       22-08-2023 | Geldig tot: 07-06-2033
+Klassen:            9, 35, 42  | Status: ingeschreven (R-teken toegestaan)
