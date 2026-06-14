@@ -68,3 +68,33 @@ Wat is toegevoegd:
 Pas je deze handmatig toe? Dan zijn dit de enige twee mini-wijzigingen
 (1 regel in web.php, 1 attribuut in landing.blade.php). demo.blade.php is
 volledig nieuw en hoeft alleen geplaatst te worden.
+
+==================================================
+NIEUW: JURIDISCHE PAGINA'S GECORRIGEERD
+==================================================
+De live pagina's hadden in de BODY nog oude dummygegevens
+("EasyInvoice B.V., Amsterdam, KvK 87654321"). De footer was al goed.
+Deze drie pagina's zijn herschreven met de juiste gegevens en in
+dezelfde huisstijl (extends layouts.marketing). Drop-in, vervangt de
+bestaande bestanden:
+
+- resources/views/marketing/voorwaarden.blade.php
+- resources/views/marketing/privacy.blade.php
+- resources/views/marketing/cookies.blade.php
+
+Wat is gecorrigeerd / toegevoegd:
+- Aanbieder/verwerkingsverantwoordelijke: Creditline B.V., Bussum,
+  KvK 59683198, BTW NL853603108B01 (handelend onder EasyInvoice®).
+- Duidelijk bedrijfsblok bovenaan elke pagina.
+- Contact-e-mail overal: hallo@easyinvoice.nl (komt overeen met web.php).
+- Voorwaarden: aansprakelijkheid nu op naam van Creditline B.V.;
+  extra artikel "Toepasselijk recht" (NL recht) toegevoegd.
+- Privacy: nette verwerkingsverantwoordelijke + sectie "Delen met derden"
+  (Stripe als betaalprovider, EU-hosting) + verwijzing Autoriteit
+  Persoonsgegevens.
+- Datum "Laatst bijgewerkt" naar 14 juni 2026.
+- De voorbeeldtekst-disclaimer ("laat controleren door jurist") is
+  bewust behouden.
+
+Let op: dit blijven voorbeeldteksten. Laat ze voor productie nakijken
+door een jurist.
