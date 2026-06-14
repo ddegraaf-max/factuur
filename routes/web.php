@@ -19,6 +19,7 @@ use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('home');
+Route::view('/demo', 'marketing.demo')->name('demo');
 
 // ---------- PUBLIEKE MARKETINGPAGINA'S ----------
 Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq');

@@ -23,10 +23,14 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request)
     {
-        // Normaliseer het BTW-nummer naar hoofdletters zodat de unieke-check
-        // (en de opslag) hoofdletterongevoelig werken.
+        // Normaliseer het BTW-nummer: strip spaties/punten/streepjes en zet om
+        // naar hoofdletters, zodat de unieke-check (en de opslag) werken en de
+        // gebruiker het nummer mag invoeren zoals het op zijn papieren staat
+        // (bijv. "NL 1234.56.789.B01" of "nl123456789b01").
         if (filled($request->input('vatNumber'))) {
-            $request->merge(['vatNumber' => strtoupper(trim($request->input('vatNumber')))]);
+            $request->merge([
+                'vatNumber' => strtoupper(preg_replace('/[\s.\-]/', '', $request->input('vatNumber'))),
+            ]);
         }
 
         $data = $request->validate([
@@ -42,6 +46,7 @@ class RegisteredUserController extends Controller
             'newsletter' => ['boolean'],
         ], [
             'kvkNumber.unique' => 'Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.',
+            'vatNumber.regex' => 'Vul een geldig Nederlands BTW-nummer in, bijvoorbeeld NL123456789B01.',
             'vatNumber.unique' => 'Er bestaat al een account met dit BTW-nummer. Neem contact met ons op als dit onterecht is.',
         ]);
 

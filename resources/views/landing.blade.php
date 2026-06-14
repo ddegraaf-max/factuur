@@ -17,7 +17,7 @@
         Start 14 dagen gratis
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
-      <a href="#functies" class="btn btn-secondary btn-lg">
+      <a href="{{ route('demo') }}" class="btn btn-secondary btn-lg">
         Bekijk de demo
       </a>
     </div>

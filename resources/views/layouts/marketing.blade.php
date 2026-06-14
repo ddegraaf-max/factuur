@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf €2,50 per maand.')">
 <title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf €2,50/maand')</title>
-<link rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23E8231F'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700' font-size='18'%3EE%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -408,6 +410,7 @@
   .footer-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: white; margin-bottom: 14px; }
   .footer-brand img { width: 28px; height: 28px; border-radius: 6px; }
   .footer-desc { font-size: 13.5px; line-height: 1.6; color: rgba(255,255,255,0.55); }
+  .footer-legal { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,0.4); }
   .footer-col-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: white; margin-bottom: 14px; }
   .footer-links { list-style: none; padding: 0; margin: 0; }
   .footer-links li { padding: 4px 0; }
@@ -417,6 +420,9 @@
   .footer-bottom-links { display: flex; gap: 18px; }
   .footer-bottom-links a { color: rgba(255,255,255,0.55); }
   .footer-bottom-links a:hover { color: rgba(255,255,255,0.8); }
+  .footer-trademark { margin-top: 16px; font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.35); }
+  .footer-trademark a { color: rgba(255,255,255,0.55); text-decoration: underline; }
+  .footer-trademark a:hover { color: rgba(255,255,255,0.8); }
 </style>
 @stack('styles')
 </head>
@@ -426,7 +432,7 @@
 <header class="nav">
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
-      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23E8231F'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700' font-size='18'%3EE%3C/text%3E%3C/svg%3E" alt="">
+      <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice logo">
       EasyInvoice
     </a>
     <nav class="nav-links">
@@ -450,11 +456,14 @@
     <div class="footer-grid">
       <div class="footer-brand-block">
         <div class="footer-brand">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23E8231F'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700' font-size='18'%3EE%3C/text%3E%3C/svg%3E" alt="">
-          EasyInvoice
+          <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice logo">
+          EasyInvoice<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>
         </div>
         <div class="footer-desc">
-          Eenvoudige facturatie voor Nederlandse ondernemers. Vanaf €2,50 per maand. Gemaakt in Amsterdam.
+          Eenvoudige facturatie voor Nederlandse ondernemers. Vanaf €2,50 per maand. Gemaakt in Bussum.
+        </div>
+        <div class="footer-legal">
+          Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Nederland
         </div>
       </div>
 
@@ -489,12 +498,17 @@
     </div>
 
     <div class="footer-bottom">
-      <div>© 2026 EasyInvoice B.V. · KvK 87654321 · BTW NL862345678B01</div>
+      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01</div>
       <div class="footer-bottom-links">
         <a href="{{ route('voorwaarden') }}">Algemene voorwaarden</a>
         <a href="{{ route('privacy') }}">Privacybeleid</a>
         <a href="{{ route('cookies') }}">Cookies</a>
       </div>
+    </div>
+
+    <div class="footer-trademark">
+      EasyInvoice&reg; is een geregistreerd Benelux-merk van Creditline B.V. &mdash;
+      <a href="https://www.boip.int/nl/merkenregister?app=%2Fitem%2Fbx1485323&amp;query=easyinvoice" target="_blank" rel="noopener">BOIP-inschrijving nr.&nbsp;1485323</a>.
     </div>
   </div>
 </footer>

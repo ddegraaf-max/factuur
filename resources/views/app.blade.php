@@ -7,7 +7,9 @@
 
     <title inertia>{{ config('app.name', 'EasyInvoice') }}</title>
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23E8231F'/><text x='16' y='22' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='700' font-size='18'>E</text></svg>">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
 
     @routes
     @vite(['resources/js/app.js'])
