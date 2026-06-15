@@ -70,7 +70,7 @@ const logout = () => {
   <div class="app">
     <aside class="sidebar">
       <Link :href="route('dashboard')" class="sidebar-brand">
-        <span class="logo-mark">E</span>
+        <img src="/images/easyinvoice-favicon-180.png" class="logo-mark" alt="EasyInvoice" />
         <span class="brand-name">EasyInvoice</span>
       </Link>
 
@@ -228,17 +228,10 @@ table { border-collapse: collapse; width: 100%; }
 }
 .sidebar-brand .logo-mark {
   width: 36px; height: 36px;
-  background: var(--brand);
   border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
   flex-shrink: 0;
-  font-family: system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 20px;
-  line-height: 1;
+  object-fit: cover;
+  display: block;
 }
 .sidebar-brand .brand-name {
   font-family: var(--font-display);

@@ -6,7 +6,7 @@ import { Link } from '@inertiajs/vue3';
   <div class="auth-shell">
     <div class="auth-hero">
       <Link href="/" class="auth-logo">
-        <span class="logo-mark">E</span>
+        <img src="/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice" />
         <span>EasyInvoice</span>
       </Link>
       <div class="auth-tagline">
@@ -60,17 +60,9 @@ import { Link } from '@inertiajs/vue3';
   z-index: 1;
 }
 .auth-logo .logo-mark {
-  width: 32px; height: 32px;
-  background: white;
-  color: var(--brand);
-  border-radius: 7px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: system-ui, sans-serif;
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 1;
+  width: 34px; height: 34px;
+  object-fit: contain;
+  display: block;
 }
 .auth-tagline { z-index: 1; }
 .auth-tagline h2 {
