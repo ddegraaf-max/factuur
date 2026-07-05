@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je EasyInvoice-proefperiode</title>
+    <title>Je EasyInvoice-proefperiode is afgelopen</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -14,9 +14,9 @@
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
-        .days-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
-        .days-num { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; color: #7F1310; line-height: 1; }
-        .days-label { font-size: 13px; font-weight: 600; color: #B81814; margin-top: 6px; }
+        .notice-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 20px 22px; margin: 24px 0; text-align: center; }
+        .notice-title { font-size: 16px; font-weight: 700; color: #7F1310; margin-bottom: 4px; }
+        .notice-sub { font-size: 13px; color: #B81814; }
         .btn { display: inline-block; background: #E8231F; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 13px 26px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 28px 0 8px; }
         .price { font-size: 13px; color: #78716C; text-align: center; margin-top: 6px; }
@@ -40,18 +40,14 @@
             <div class="body">
                 <h1>Hi {{ $firstName }},</h1>
 
-                @if ($daysLeft === 1)
-                    <p>Je gratis proefperiode van EasyInvoice eindigt <strong>morgen</strong>. Sluit nu een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
-                @else
-                    <p>Je gratis proefperiode van EasyInvoice eindigt over <strong>{{ $daysLeft }} dagen</strong>. Sluit op tijd een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
-                @endif
+                <p>Je gratis proefperiode van EasyInvoice is vandaag afgelopen. Je account en al je gegevens blijven bewaard — je hebt alleen even geen toegang meer tot de app totdat je een abonnement afsluit.</p>
 
-                <div class="days-box">
-                    <div class="days-num">{{ $daysLeft }}</div>
-                    <div class="days-label">{{ $daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
+                <div class="notice-box">
+                    <div class="notice-title">Je proefperiode is afgelopen</div>
+                    <div class="notice-sub">Sluit een abonnement af om weer verder te gaan</div>
                 </div>
 
-                <p>Voor maar <strong>€10 per maand</strong> (excl. btw) houd je volledige toegang tot alles:</p>
+                <p>Voor maar <strong>€10 per maand</strong> (excl. btw) heb je meteen weer volledige toegang tot alles:</p>
                 <ul class="feats">
                     <li>Onbeperkt facturen, klanten en producten</li>
                     <li>BTW automatisch · herinneringen · incasso</li>

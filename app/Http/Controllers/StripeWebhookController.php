@@ -71,14 +71,14 @@ class StripeWebhookController extends Controller
             $subscription = $this->stripe->retrieveSubscription($session['subscription']);
             if ($subscription) {
                 $this->stripe->applySubscriptionToCompany($company, $subscription);
-                $this->resend->cancelTrialReminder($company->fresh());
+                $this->resend->cancelTrialEmails($company->fresh());
 
                 return;
             }
         }
 
         $company->save();
-        $this->resend->cancelTrialReminder($company->fresh());
+        $this->resend->cancelTrialEmails($company->fresh());
     }
 
     private function onSubscriptionChanged(array $subscription): void

@@ -23,10 +23,10 @@ class BillingController extends Controller
         return Inertia::render('Billing/Index', [
             'subscription' => $company->subscriptionSummary(),
             'price' => [
-                'amount' => '2,50',
+                'amount' => '10',
                 'currency' => '€',
                 'period' => 'maand',
-                'vat_note' => 'Excl. 21% btw · €3,03 incl. btw',
+                'vat_note' => 'Excl. 21% btw · €12,10 incl. btw',
             ],
             'stripeReady' => $this->stripe->configured(),
         ]);
@@ -83,7 +83,7 @@ class BillingController extends Controller
                         if ($subscription) {
                             $company = $company->fresh();
                             $this->stripe->applySubscriptionToCompany($company, $subscription);
-                            $this->resend->cancelTrialReminder($company->fresh());
+                            $this->resend->cancelTrialEmails($company->fresh());
                         }
                     }
                 }

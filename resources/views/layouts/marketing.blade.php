@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf €2,50 per maand.')">
-<title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf €2,50/maand')</title>
+<meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf €10 per maand.')">
+<title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf €10/maand')</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
@@ -460,7 +460,7 @@
           EasyInvoice<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>
         </div>
         <div class="footer-desc">
-          Eenvoudige facturatie voor Nederlandse ondernemers. Vanaf €2,50 per maand. Gemaakt in Bussum.
+          Eenvoudige facturatie voor Nederlandse ondernemers. Vanaf €10 per maand. Gemaakt in Bussum.
         </div>
         <div class="footer-legal">
           Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Nederland

@@ -10,7 +10,7 @@
         .container { max-width: 520px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
         .header { background: linear-gradient(135deg, #E8231F 0%, #B81814 100%); padding: 28px 36px; color: white; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-        .logo-mark { width: 32px; height: 32px; background: white; color: #E8231F; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }
+        .logo-mark { width: 34px; height: 34px; display: block; border: 0; }
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
@@ -27,7 +27,7 @@
         <div class="container">
             <div class="header">
                 <div class="logo">
-                    <span class="logo-mark">E</span>
+                    <img src="{{ rtrim(config('app.url'), '/') }}/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice">
                     <span>EasyInvoice</span>
                 </div>
             </div>

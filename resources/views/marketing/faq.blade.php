@@ -33,7 +33,7 @@
       <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:32px 0 14px;">Prijs &amp; abonnement</h3>
       <details class="faq-item">
         <summary>Wat kost EasyInvoice? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">€2,50 per maand (excl. 21% BTW), met alle functies inbegrepen. Geen extra of verborgen kosten.</div>
+        <div class="faq-content">€10 per maand (excl. 21% BTW), met alle functies inbegrepen. Geen extra of verborgen kosten.</div>
       </details>
       <details class="faq-item">
         <summary>Kan ik op elk moment opzeggen? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>

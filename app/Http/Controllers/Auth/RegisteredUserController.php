@@ -83,12 +83,23 @@ class RegisteredUserController extends Controller
         $code = $user->generateVerificationCode();
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
 
-        // Plan de "proefperiode eindigt bijna"-herinnering vooruit in via Resend,
-        // zodat er geen cron nodig is. Wordt geannuleerd zodra er wordt betaald.
-        $reminderId = app(\App\Services\ResendScheduler::class)
-            ->scheduleTrialReminder($user->company, $user->email, $data['firstName']);
+        // Plan de proef-mails vooruit in via Resend, zodat er geen cron nodig is:
+        // 1) de "proefperiode eindigt bijna"-herinnering (enkele dagen vooraf), en
+        // 2) de "proefperiode is afgelopen"-mail (op het moment dat de proef stopt).
+        // Beide worden geannuleerd zodra er wordt betaald.
+        $resend = app(\App\Services\ResendScheduler::class);
+        $reminderId = $resend->scheduleTrialReminder($user->company, $user->email, $data['firstName']);
+        $endedId = $resend->scheduleTrialEndedNotice($user->company, $user->email, $data['firstName']);
+
+        $company = $user->company;
         if ($reminderId) {
-            $user->company->forceFill(['trial_reminder_email_id' => $reminderId])->save();
+            $company->trial_reminder_email_id = $reminderId;
+        }
+        if ($endedId) {
+            $company->trial_ended_email_id = $endedId;
+        }
+        if ($reminderId || $endedId) {
+            $company->save();
         }
 
         Session::put('verifying_user_id', $user->id);

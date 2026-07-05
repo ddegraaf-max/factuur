@@ -44,7 +44,7 @@
     <p>Nieuwe accounts krijgen een gratis proefperiode van 14 dagen met volledige toegang tot alle functies. Tijdens de proefperiode hoef je geen betaalgegevens op te geven. Na afloop van de proefperiode is een betaald abonnement nodig om te blijven werken; je gegevens blijven bewaard.</p>
 
     <h2>3. Abonnement en betaling</h2>
-    <p>Het abonnement kost €2,50 per maand (exclusief 21% btw). Na het afsluiten wordt het abonnement automatisch elke 30 dagen verlengd en geïncasseerd, totdat je opzegt. Betaling verloopt veilig via onze betaalprovider Stripe; wij bewaren geen volledige kaartgegevens.</p>
+    <p>Het abonnement kost €10 per maand (exclusief 21% btw). Na het afsluiten wordt het abonnement automatisch elke 30 dagen verlengd en geïncasseerd, totdat je opzegt. Betaling verloopt veilig via onze betaalprovider Stripe; wij bewaren geen volledige kaartgegevens.</p>
     <p>Je kunt je abonnement op elk moment maandelijks opzeggen via Instellingen → Abonnement. Na opzegging behoud je toegang tot het einde van de reeds betaalde periode. Er volgt geen restitutie voor een lopende periode.</p>
 
     <h2>4. Gebruik</h2>
