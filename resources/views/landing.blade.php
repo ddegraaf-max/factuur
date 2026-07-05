@@ -4,6 +4,96 @@
 @section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf €10 per maand.')
 
 @section('content')
+
+@push('styles')
+<style>
+  /* ===== Geanimeerd, realistisch hero-dashboard ===== */
+  #heroDash .d-body { display: grid; grid-template-columns: 208px 1fr; height: 588px; background: var(--bg); text-align: left; }
+
+  /* Sidebar */
+  #heroDash .d-side { background: var(--surface); border-right: 1px solid var(--border); padding: 14px 12px; display: flex; flex-direction: column; gap: 1px; }
+  #heroDash .d-brand { display: flex; align-items: center; gap: 9px; padding: 4px 8px 14px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; color: var(--text); }
+  #heroDash .d-brand img { width: 24px; height: 24px; border-radius: 6px; display: block; }
+  #heroDash .d-navlabel { font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-4); font-weight: 700; padding: 12px 10px 5px; }
+  #heroDash .d-navitem { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 12.5px; color: var(--text-2); font-weight: 500; }
+  #heroDash .d-navitem svg { width: 15px; height: 15px; opacity: 0.72; }
+  #heroDash .d-navitem.active { background: var(--brand-tint); color: var(--brand); font-weight: 600; }
+  #heroDash .d-navitem.active svg { opacity: 1; }
+
+  /* Main */
+  #heroDash .d-main { padding: 18px 20px; overflow: hidden; }
+  #heroDash .d-topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  #heroDash .d-greet { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; color: var(--text); }
+  #heroDash .d-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+  #heroDash .d-newbtn { display: inline-flex; align-items: center; gap: 6px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 600; padding: 8px 13px; border-radius: 8px; box-shadow: 0 4px 12px rgba(232,35,31,0.28); white-space: nowrap; }
+  #heroDash .d-newbtn svg { width: 13px; height: 13px; }
+
+  /* KPI's */
+  #heroDash .d-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 14px; }
+  #heroDash .d-kpi { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 13px 14px; }
+  #heroDash .d-kpi.alert { border-color: var(--brand-border); background: linear-gradient(180deg, var(--brand-tint) 0%, var(--surface) 65%); }
+  #heroDash .d-kpi-label { display: flex; align-items: center; gap: 5px; font-size: 10.5px; color: var(--text-3); font-weight: 500; margin-bottom: 8px; }
+  #heroDash .d-kpi-label svg { width: 12px; height: 12px; }
+  #heroDash .d-kpi-value { font-family: var(--font-display); font-weight: 700; font-size: 21px; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1; }
+  #heroDash .d-kpi-value.red { color: var(--brand); }
+  #heroDash .d-kpi-meta { font-size: 10.5px; color: var(--text-3); margin-top: 6px; }
+  #heroDash .d-kpi-meta.red { color: var(--brand); font-weight: 600; }
+  #heroDash .d-kpi-meta .up { color: var(--success); font-weight: 700; }
+  #heroDash .d-dot-alert { position: absolute; top: 12px; right: 12px; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+
+  /* Kaarten */
+  #heroDash .d-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; }
+  #heroDash .d-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  #heroDash .d-card-title { font-family: var(--font-display); font-weight: 700; font-size: 13.5px; letter-spacing: -0.01em; color: var(--text); }
+  #heroDash .d-card-sub { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+  #heroDash .d-card-link { font-size: 11px; color: var(--brand); font-weight: 600; }
+  #heroDash .d-legend { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--text-3); }
+  #heroDash .d-legend-dot { width: 8px; height: 8px; border-radius: 2px; background: var(--brand); }
+
+  /* Grafiek */
+  #heroDash .d-bars { display: flex; align-items: flex-end; gap: 7px; height: 118px; }
+  #heroDash .d-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  #heroDash .d-bar-col span { font-size: 9px; color: var(--text-4); font-weight: 500; }
+  #heroDash .d-bar { width: 100%; max-width: 26px; border-radius: 4px 4px 0 0; background: var(--brand-tint-2); height: var(--h); transition: height 0.9s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #heroDash .d-bar.tall { background: var(--brand); }
+  #heroDash.anim-ready .d-bar { height: 0; }
+  #heroDash.is-live .d-bar { height: var(--h); }
+
+  /* Tabel */
+  #heroDash .d-table { width: 100%; border-collapse: collapse; }
+  #heroDash .d-table td { padding: 8px 6px; font-size: 11.5px; color: var(--text-2); border-top: 1px solid var(--border); }
+  #heroDash .d-table tr:first-child td { border-top: none; }
+  #heroDash .d-table .mono { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+  #heroDash .d-table .right { text-align: right; color: var(--text); font-weight: 600; }
+  #heroDash .d-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 100px; }
+  #heroDash .d-pill.green { background: var(--success-bg); color: #047857; }
+  #heroDash .d-pill.blue { background: #E0F2FE; color: var(--info); }
+  #heroDash .d-pill.red { background: var(--brand-tint-2); color: var(--brand); }
+
+  /* Entree-animatie (alleen actief zodra JS klaarstaat; zonder JS blijft alles zichtbaar) */
+  #heroDash .d-anim { transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #heroDash.anim-ready .d-anim { opacity: 0; transform: translateY(14px); }
+  #heroDash.is-live .d-anim { opacity: 1; transform: none; }
+
+  /* Pulserende aandacht-stip + subtiele glow op de hoogste balk */
+  #heroDash.is-live .d-dot-alert { animation: dPulse 2s ease-in-out infinite; }
+  #heroDash.is-live .d-bar.tall { animation: dGlow 2.6s ease-in-out 1.3s infinite; }
+  @keyframes dPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,35,31,0.5); } 50% { box-shadow: 0 0 0 6px rgba(232,35,31,0); } }
+  @keyframes dGlow { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 6px rgba(232,35,31,0.55)); } }
+
+  @media (max-width: 760px) {
+    #heroDash .d-body { grid-template-columns: 1fr; height: auto; }
+    #heroDash .d-side { display: none; }
+    #heroDash .d-kpis { grid-template-columns: repeat(2, 1fr); }
+    #heroDash .d-hide { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #heroDash .d-anim, #heroDash .d-bar { transition: none !important; }
+    #heroDash.is-live .d-dot-alert, #heroDash.is-live .d-bar.tall { animation: none !important; }
+  }
+</style>
+@endpush
+
 <!-- HERO -->
 <section class="hero">
   <div class="container hero-inner">
@@ -25,71 +115,133 @@
       Geen creditcard nodig · 14 dagen gratis · Daarna <b>€10/maand</b>
     </div>
 
-    <!-- APP MOCKUP -->
+    <!-- APP MOCKUP — geanimeerd, realistisch dashboard -->
     <div class="app-mockup-wrap">
-      <div class="app-mockup">
+      <div class="app-mockup" id="heroDash">
         <div class="mock-chrome">
           <div class="mock-dot red"></div>
           <div class="mock-dot yellow"></div>
           <div class="mock-dot green"></div>
           <div class="mock-url">app.easyinvoice.nl/dashboard</div>
         </div>
-        <div class="mock-body">
-          <div class="mock-sidebar">
-            <div class="mock-side-brand"><div class="ico"></div>EasyInvoice</div>
-            <div class="mock-side-label">Overzicht</div>
-            <div class="mock-side-item active"><div class="mock-side-dot"></div>Dashboard</div>
-            <div class="mock-side-label">Verkoop</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Facturen</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Klanten</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Producten</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Incasso</div>
-            <div class="mock-side-label">Rapporten</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Klantomzet</div>
-            <div class="mock-side-label">Instellingen</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Bedrijf</div>
-            <div class="mock-side-item"><div class="mock-side-dot"></div>Huisstijl</div>
-          </div>
-          <div class="mock-main">
-            <div class="mock-h1">Welkom terug, Jan</div>
-            <div class="mock-kpi-grid">
-              <div class="mock-kpi">
-                <div class="mock-kpi-label">Openstaand</div>
-                <div class="mock-kpi-value">€ 7.842</div>
-                <div class="mock-kpi-meta" style="color:var(--warning);">12 facturen</div>
+        <div class="d-body">
+          <!-- SIDEBAR -->
+          <aside class="d-side">
+            <div class="d-brand">
+              <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice">
+              <span>EasyInvoice</span>
+            </div>
+            <div class="d-navlabel">Overzicht</div>
+            <div class="d-navitem active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+              Dashboard
+            </div>
+            <div class="d-navlabel">Verkoop</div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Facturen
+            </div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+              Klanten
+            </div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Producten
+            </div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="11" rx="2"/></svg>
+              Incasso
+            </div>
+            <div class="d-navlabel">Rapporten</div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Klantomzet
+            </div>
+            <div class="d-navlabel">Instellingen</div>
+            <div class="d-navitem">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Bedrijf
+            </div>
+          </aside>
+
+          <!-- MAIN -->
+          <div class="d-main">
+            <div class="d-topbar d-anim" style="--d:.05s">
+              <div>
+                <div class="d-greet">Goedemorgen, Jan</div>
+                <div class="d-sub">Je hebt 2 facturen die aandacht nodig hebben.</div>
               </div>
-              <div class="mock-kpi">
-                <div class="mock-kpi-label">Achterstallig</div>
-                <div class="mock-kpi-value" style="color:var(--brand);">€ 1.573</div>
-                <div class="mock-kpi-meta" style="color:var(--brand);">2 facturen</div>
-              </div>
-              <div class="mock-kpi">
-                <div class="mock-kpi-label">Deze maand</div>
-                <div class="mock-kpi-value">€ 4.230</div>
-                <div class="mock-kpi-meta">+18% vs vorige maand</div>
-              </div>
-              <div class="mock-kpi">
-                <div class="mock-kpi-label">BTW Q2</div>
-                <div class="mock-kpi-value">€ 892</div>
-                <div class="mock-kpi-meta" style="color:var(--info);">Over 14 dagen</div>
+              <div class="d-newbtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nieuwe factuur
               </div>
             </div>
-            <div class="mock-card">
-              <div class="mock-card-title">Omzet laatste 12 maanden</div>
-              <div class="mock-chart">
-                <div class="mock-bar" style="height:30%"></div>
-                <div class="mock-bar" style="height:40%"></div>
-                <div class="mock-bar" style="height:55%"></div>
-                <div class="mock-bar" style="height:50%"></div>
-                <div class="mock-bar" style="height:65%"></div>
-                <div class="mock-bar" style="height:70%"></div>
-                <div class="mock-bar" style="height:60%"></div>
-                <div class="mock-bar" style="height:80%"></div>
-                <div class="mock-bar" style="height:75%"></div>
-                <div class="mock-bar" style="height:85%"></div>
-                <div class="mock-bar" style="height:78%"></div>
-                <div class="mock-bar tall" style="height:95%"></div>
+
+            <!-- KPI CARDS -->
+            <div class="d-kpis">
+              <div class="d-kpi d-anim" style="--d:.12s">
+                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Openstaand</div>
+                <div class="d-kpi-value" data-count="7842" data-prefix="€ ">€ 7.842</div>
+                <div class="d-kpi-meta">12 facturen</div>
               </div>
+              <div class="d-kpi alert d-anim" style="--d:.19s">
+                <span class="d-dot-alert"></span>
+                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Achterstallig</div>
+                <div class="d-kpi-value red" data-count="1573" data-prefix="€ ">€ 1.573</div>
+                <div class="d-kpi-meta red">2 facturen</div>
+              </div>
+              <div class="d-kpi d-anim" style="--d:.26s">
+                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Omzet deze maand</div>
+                <div class="d-kpi-value" data-count="4230" data-prefix="€ ">€ 4.230</div>
+                <div class="d-kpi-meta"><span class="up" data-count="18" data-prefix="↑ " data-suffix="%">↑ 18%</span> vs vorige maand</div>
+              </div>
+              <div class="d-kpi d-anim" style="--d:.33s">
+                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>BTW Q2</div>
+                <div class="d-kpi-value" data-count="892" data-prefix="€ ">€ 892</div>
+                <div class="d-kpi-meta">Deadline 31-07</div>
+              </div>
+            </div>
+
+            <!-- REVENUE CHART -->
+            <div class="d-card d-anim" style="--d:.4s">
+              <div class="d-card-head">
+                <div>
+                  <div class="d-card-title">Omzet per maand</div>
+                  <div class="d-card-sub">Exclusief BTW · laatste 12 maanden</div>
+                </div>
+                <div class="d-legend"><span class="d-legend-dot"></span>2025 — 2026</div>
+              </div>
+              <div class="d-bars">
+                <div class="d-bar-col"><div class="d-bar" style="--h:34%;--d:.45s"></div><span>jul</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:44%;--d:.50s"></div><span>aug</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:39%;--d:.55s"></div><span>sep</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:53%;--d:.60s"></div><span>okt</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:48%;--d:.65s"></div><span>nov</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:61%;--d:.70s"></div><span>dec</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:56%;--d:.75s"></div><span>jan</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:69%;--d:.80s"></div><span>feb</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:64%;--d:.85s"></div><span>mrt</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:77%;--d:.90s"></div><span>apr</span></div>
+                <div class="d-bar-col"><div class="d-bar" style="--h:72%;--d:.95s"></div><span>mei</span></div>
+                <div class="d-bar-col"><div class="d-bar tall" style="--h:94%;--d:1s"></div><span>jun</span></div>
+              </div>
+            </div>
+
+            <!-- RECENT INVOICES -->
+            <div class="d-card d-anim" style="--d:.5s">
+              <div class="d-card-head">
+                <div class="d-card-title">Recente facturen</div>
+                <span class="d-card-link">Alle →</span>
+              </div>
+              <table class="d-table">
+                <tbody>
+                  <tr><td class="mono">2026-0042</td><td>Bakkerij de Korenbloem</td><td class="d-hide">28 jun</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 1.210</td></tr>
+                  <tr><td class="mono">2026-0041</td><td>Groenveld Advies</td><td class="d-hide">26 jun</td><td><span class="d-pill blue">Verzonden</span></td><td class="mono right">€ 845</td></tr>
+                  <tr><td class="mono">2026-0040</td><td>Studio Lumen</td><td class="d-hide">24 jun</td><td><span class="d-pill red">Achterstallig</span></td><td class="mono right">€ 1.573</td></tr>
+                  <tr><td class="mono">2026-0039</td><td>Van Dijk Techniek</td><td class="d-hide">21 jun</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 2.310</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -367,4 +519,60 @@
     <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna €10/maand</div>
   </div>
 </section>
+
+<script>
+(function () {
+  var mock = document.getElementById('heroDash');
+  if (!mock) return;
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nums = mock.querySelectorAll('[data-count]');
+
+  function fmt(n, d) { return n.toLocaleString('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function setNum(el, val) {
+    var d = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    var prefix = el.getAttribute('data-prefix') || '';
+    var suffix = el.getAttribute('data-suffix') || '';
+    el.textContent = prefix + fmt(d ? val : Math.round(val), d) + suffix;
+  }
+
+  // Zonder JS-animatie (reduced motion): laat alles direct en met echte cijfers staan.
+  if (reduce) return;
+
+  mock.classList.add('anim-ready');
+  for (var i = 0; i < nums.length; i++) setNum(nums[i], 0);
+
+  function countUp(el) {
+    var target = parseFloat(el.getAttribute('data-count')) || 0;
+    var dur = 1300, s = null;
+    function step(ts) {
+      if (s === null) s = ts;
+      var p = Math.min((ts - s) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      setNum(el, target * eased);
+      if (p < 1) requestAnimationFrame(step); else setNum(el, target);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var fired = false;
+  function activate() {
+    if (fired) return;
+    fired = true;
+    mock.classList.add('is-live');
+    for (var j = 0; j < nums.length; j++) countUp(nums[j]);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      for (var k = 0; k < entries.length; k++) {
+        if (entries[k].isIntersecting) { activate(); io.disconnect(); break; }
+      }
+    }, { threshold: 0.3 });
+    io.observe(mock);
+  } else {
+    activate();
+  }
+})();
+</script>
 @endsection
