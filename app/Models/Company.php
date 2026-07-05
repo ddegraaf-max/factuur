@@ -22,7 +22,7 @@ class Company extends Model
         'reminder_settings',
         'default_payment_terms', 'invoice_footer', 'invoice_number_format',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
-        'subscription_status', 'subscription_ends_at',
+        'subscription_status', 'subscription_ends_at', 'subscription_cancel_emailed_at',
         'stripe_customer_id', 'stripe_subscription_id',
     ];
 
@@ -37,6 +37,7 @@ class Company extends Model
         'trial_ends_at' => 'datetime',
         'trial_reminder_sent_at' => 'datetime',
         'subscription_ends_at' => 'datetime',
+        'subscription_cancel_emailed_at' => 'datetime',
     ];
 
     public function users(): HasMany { return $this->hasMany(User::class); }

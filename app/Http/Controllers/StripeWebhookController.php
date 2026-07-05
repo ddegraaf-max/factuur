@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SubscriptionCanceledMail;
 use App\Models\Company;
 use App\Services\ResendScheduler;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class StripeWebhookController extends Controller
 {
@@ -89,6 +91,54 @@ class StripeWebhookController extends Controller
         }
 
         $this->stripe->applySubscriptionToCompany($company, $subscription);
+        $this->maybeSendCancellationEmail($company->fresh(), $subscription);
+    }
+
+    /**
+     * Stuur eenmalig de "abonnement opgezegd"-mail zodra een betaald abonnement
+     * wordt opgezegd (direct of tegen het einde van de periode). Zodra het
+     * abonnement weer actief loopt, wordt de vlag gewist zodat een volgende
+     * opzegging opnieuw een mail oplevert.
+     */
+    private function maybeSendCancellationEmail(Company $company, array $subscription): void
+    {
+        $status = $subscription['status'] ?? null;
+        $scheduledToCancel = ($subscription['cancel_at_period_end'] ?? false) === true;
+        $ended = $status === 'canceled';
+
+        if (! $scheduledToCancel && ! $ended) {
+            // Actief en niet opgezegd: reset zodat een volgende opzegging weer mailt.
+            if ($company->subscription_cancel_emailed_at) {
+                $company->forceFill(['subscription_cancel_emailed_at' => null])->save();
+            }
+
+            return;
+        }
+
+        if ($company->subscription_cancel_emailed_at) {
+            return; // al gemaild voor deze opzegging
+        }
+
+        $user = $company->users()->orderBy('id')->first();
+        $to = $company->email ?: $user?->email;
+        if (! $to) {
+            return;
+        }
+
+        $firstName = $user && trim($user->name) !== ''
+            ? explode(' ', trim($user->name))[0]
+            : 'daar';
+
+        $accessUntil = $ended
+            ? null
+            : optional($company->subscription_ends_at)->format('d-m-Y');
+
+        try {
+            Mail::to($to)->send(new SubscriptionCanceledMail($company, $firstName, $accessUntil, $ended));
+            $company->forceFill(['subscription_cancel_emailed_at' => now()])->save();
+        } catch (\Throwable $e) {
+            Log::warning('Opzeg-mail versturen mislukt', ['company' => $company->id, 'error' => $e->getMessage()]);
+        }
     }
 
     private function onInvoicePaid(array $invoice): void
