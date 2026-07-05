@@ -56,8 +56,8 @@
   #heroDash .d-bar-col span { font-size: 9px; color: var(--text-4); font-weight: 500; }
   #heroDash .d-bar { width: 100%; max-width: 26px; border-radius: 4px 4px 0 0; background: var(--brand-tint-2); height: var(--h); transition: height 0.9s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
   #heroDash .d-bar.tall { background: var(--brand); }
-  #heroDash.anim-ready .d-bar { height: 0; }
-  #heroDash.is-live .d-bar { height: var(--h); }
+  #heroDash.js-ready .d-screen .d-bar { height: 0; }
+  #heroDash.js-ready .d-screen.active .d-bar { height: var(--h); }
 
   /* Tabel */
   #heroDash .d-table { width: 100%; border-collapse: collapse; }
@@ -71,25 +71,78 @@
   #heroDash .d-pill.red { background: var(--brand-tint-2); color: var(--brand); }
 
   /* Entree-animatie (alleen actief zodra JS klaarstaat; zonder JS blijft alles zichtbaar) */
-  #heroDash .d-anim { transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
-  #heroDash.anim-ready .d-anim { opacity: 0; transform: translateY(14px); }
-  #heroDash.is-live .d-anim { opacity: 1; transform: none; }
+  #heroDash .d-anim, #heroDash .d-fade { transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #heroDash.js-ready .d-screen .d-anim { opacity: 0; transform: translateY(12px); }
+  #heroDash.js-ready .d-screen .d-fade { opacity: 0; }
+  #heroDash.js-ready .d-screen.active .d-anim,
+  #heroDash.js-ready .d-screen.active .d-fade { opacity: 1; transform: none; }
 
   /* Pulserende aandacht-stip + subtiele glow op de hoogste balk */
-  #heroDash.is-live .d-dot-alert { animation: dPulse 2s ease-in-out infinite; }
-  #heroDash.is-live .d-bar.tall { animation: dGlow 2.6s ease-in-out 1.3s infinite; }
+  #heroDash .d-screen.active .d-dot-alert { animation: dPulse 2s ease-in-out infinite; }
+  #heroDash .d-screen.active .d-bar.tall { animation: dGlow 2.6s ease-in-out 1.3s infinite; }
   @keyframes dPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(232,35,31,0.5); } 50% { box-shadow: 0 0 0 6px rgba(232,35,31,0); } }
   @keyframes dGlow { 0%, 100% { filter: none; } 50% { filter: drop-shadow(0 0 6px rgba(232,35,31,0.55)); } }
+
+  /* ===== Tour: schermsysteem + componenten ===== */
+  #heroDash .d-progress { height: 3px; background: var(--surface-3); border-radius: 3px; margin: 0 0 14px; overflow: hidden; }
+  #heroDash .d-progress i { display: block; height: 100%; width: 0; background: var(--brand); border-radius: 3px; }
+  #heroDash .d-screen { display: none; }
+  #heroDash .d-screen:first-of-type { display: block; }
+  #heroDash.js-ready .d-screen { display: none; }
+  #heroDash.js-ready .d-screen.active { display: block; animation: dIn 0.45s ease both; }
+  @keyframes dIn { from { opacity: 0.3; } to { opacity: 1; } }
+
+  #heroDash.js-ready .d-navitem { cursor: pointer; transition: background 0.15s, color 0.15s; }
+  #heroDash.js-ready .d-navitem:not(.active):hover { background: var(--surface-2); color: var(--text); }
+
+  #heroDash .d-shead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  #heroDash .d-h1 { font-family: var(--font-display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; color: var(--text); }
+  #heroDash .d-newbtn.ghost { background: var(--surface); color: var(--text-2); border: 1px solid var(--border-strong); box-shadow: none; }
+
+  #heroDash .d-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  #heroDash .d-tab { font-size: 11px; font-weight: 600; color: var(--text-3); padding: 5px 11px; border-radius: 100px; background: var(--surface); border: 1px solid var(--border); }
+  #heroDash .d-tab.active { background: var(--brand-tint); color: var(--brand); border-color: var(--brand-border); }
+
+  #heroDash .d-table thead th { text-align: left; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-4); font-weight: 700; padding: 0 6px 9px; border-bottom: 1px solid var(--border); }
+  #heroDash .d-table thead th.right { text-align: right; }
+
+  #heroDash .d-cust { display: flex; align-items: center; gap: 9px; }
+  #heroDash .d-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--brand-tint-2); color: var(--brand); font-size: 9.5px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); flex-shrink: 0; }
+
+  #heroDash .d-pill.gray { background: var(--surface-3); color: var(--text-3); }
+  #heroDash .d-pill.amber { background: #FEF3C7; color: #B45309; }
+
+  #heroDash .d-hbars { display: flex; flex-direction: column; gap: 13px; }
+  #heroDash .d-hrow { display: grid; grid-template-columns: 140px 1fr 64px; align-items: center; gap: 12px; }
+  #heroDash .d-hlabel { font-size: 11.5px; color: var(--text-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #heroDash .d-htrack { height: 15px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  #heroDash .d-hfill { height: 100%; width: var(--w); background: var(--brand-tint-2); border-radius: 4px; transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #heroDash .d-hrow:first-child .d-hfill { background: var(--brand); }
+  #heroDash .d-hval { font-family: var(--font-mono); font-size: 11px; color: var(--text); font-weight: 600; text-align: right; }
+  #heroDash.js-ready .d-screen .d-hfill { width: 0; }
+  #heroDash.js-ready .d-screen.active .d-hfill { width: var(--w); }
+
+  #heroDash .d-logo-tile { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 11px; background: var(--surface); margin-bottom: 13px; }
+  #heroDash .d-logo-tile img { width: 40px; height: 40px; border-radius: 9px; display: block; }
+  #heroDash .d-logo-tile .t { font-size: 12.5px; font-weight: 700; color: var(--text); }
+  #heroDash .d-logo-tile .s { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+  #heroDash .d-form { display: grid; grid-template-columns: 1fr 1fr; gap: 11px 14px; }
+  #heroDash .d-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-4); font-weight: 700; margin-bottom: 4px; }
+  #heroDash .d-field .val { font-size: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 11px; }
 
   @media (max-width: 760px) {
     #heroDash .d-body { grid-template-columns: 1fr; height: auto; }
     #heroDash .d-side { display: none; }
     #heroDash .d-kpis { grid-template-columns: repeat(2, 1fr); }
     #heroDash .d-hide { display: none; }
+    #heroDash .d-form { grid-template-columns: 1fr; }
+    #heroDash .d-hrow { grid-template-columns: 92px 1fr 58px; gap: 8px; }
+    #heroDash .d-hlabel { font-size: 10.5px; }
   }
   @media (prefers-reduced-motion: reduce) {
-    #heroDash .d-anim, #heroDash .d-bar { transition: none !important; }
-    #heroDash.is-live .d-dot-alert, #heroDash.is-live .d-bar.tall { animation: none !important; }
+    #heroDash .d-anim, #heroDash .d-fade, #heroDash .d-bar, #heroDash .d-hfill { transition: none !important; }
+    #heroDash .d-screen.active .d-dot-alert, #heroDash .d-screen.active .d-bar.tall { animation: none !important; }
+    #heroDash.js-ready .d-screen.active { animation: none !important; }
   }
 </style>
 @endpush
@@ -122,7 +175,7 @@
           <div class="mock-dot red"></div>
           <div class="mock-dot yellow"></div>
           <div class="mock-dot green"></div>
-          <div class="mock-url">app.easyinvoice.nl/dashboard</div>
+          <div class="mock-url" id="dashUrl">app.easyinvoice.nl/dashboard</div>
         </div>
         <div class="d-body">
           <!-- SIDEBAR -->
@@ -167,6 +220,10 @@
 
           <!-- MAIN -->
           <div class="d-main">
+            <div class="d-progress"><i id="dashProgress"></i></div>
+
+            <!-- SCHERM: Dashboard -->
+            <section class="d-screen active" data-screen="dashboard">
             <div class="d-topbar d-anim" style="--d:.05s">
               <div>
                 <div class="d-greet">Goedemorgen, Jan</div>
@@ -243,6 +300,131 @@
                 </tbody>
               </table>
             </div>
+            </section>
+
+            <!-- SCHERM: Facturen -->
+            <section class="d-screen" data-screen="facturen">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Facturen</div><div class="d-sub">142 facturen · € 7.842 openstaand</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nieuwe factuur</div>
+              </div>
+              <div class="d-tabs d-anim" style="--d:.09s">
+                <span class="d-tab active">Alle</span><span class="d-tab">Concept</span><span class="d-tab">Verzonden</span><span class="d-tab">Betaald</span><span class="d-tab">Achterstallig</span>
+              </div>
+              <div class="d-card d-anim" style="--d:.14s">
+                <table class="d-table">
+                  <thead><tr><th>Nummer</th><th>Klant</th><th class="d-hide">Datum</th><th class="d-hide">Vervalt</th><th>Status</th><th class="right">Bedrag</th></tr></thead>
+                  <tbody>
+                    <tr class="d-fade" style="--d:.18s"><td class="mono">2026-0042</td><td>Bakkerij de Korenbloem</td><td class="d-hide">28-06</td><td class="d-hide">12-07</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 1.210</td></tr>
+                    <tr class="d-fade" style="--d:.24s"><td class="mono">2026-0041</td><td>Groenveld Advies</td><td class="d-hide">26-06</td><td class="d-hide">10-07</td><td><span class="d-pill blue">Verzonden</span></td><td class="mono right">€ 845</td></tr>
+                    <tr class="d-fade" style="--d:.30s"><td class="mono">2026-0040</td><td>Studio Lumen</td><td class="d-hide">24-06</td><td class="d-hide">08-07</td><td><span class="d-pill red">Achterstallig</span></td><td class="mono right">€ 1.573</td></tr>
+                    <tr class="d-fade" style="--d:.36s"><td class="mono">2026-0039</td><td>Van Dijk Techniek</td><td class="d-hide">21-06</td><td class="d-hide">05-07</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 2.310</td></tr>
+                    <tr class="d-fade" style="--d:.42s"><td class="mono">2026-0038</td><td>De Groot Interim</td><td class="d-hide">18-06</td><td class="d-hide">02-07</td><td><span class="d-pill blue">Verzonden</span></td><td class="mono right">€ 690</td></tr>
+                    <tr class="d-fade" style="--d:.48s"><td class="mono">2026-0037</td><td>Horizon Media</td><td class="d-hide">15-06</td><td class="d-hide">29-06</td><td><span class="d-pill gray">Concept</span></td><td class="mono right">€ 540</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCHERM: Klanten -->
+            <section class="d-screen" data-screen="klanten">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Klanten</div><div class="d-sub">58 klanten · € 7.842 openstaand</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Klant toevoegen</div>
+              </div>
+              <div class="d-card d-anim" style="--d:.12s">
+                <table class="d-table">
+                  <thead><tr><th>Klant</th><th class="d-hide">Plaats</th><th class="right">Openstaand</th><th class="right d-hide">Facturen</th></tr></thead>
+                  <tbody>
+                    <tr class="d-fade" style="--d:.18s"><td><div class="d-cust"><span class="d-avatar">BK</span>Bakkerij de Korenbloem</div></td><td class="d-hide">Amsterdam</td><td class="mono right">€ 1.210</td><td class="mono right d-hide">18</td></tr>
+                    <tr class="d-fade" style="--d:.24s"><td><div class="d-cust"><span class="d-avatar">GA</span>Groenveld Advies</div></td><td class="d-hide">Utrecht</td><td class="mono right">€ 845</td><td class="mono right d-hide">9</td></tr>
+                    <tr class="d-fade" style="--d:.30s"><td><div class="d-cust"><span class="d-avatar">SL</span>Studio Lumen</div></td><td class="d-hide">Rotterdam</td><td class="mono right">€ 1.573</td><td class="mono right d-hide">12</td></tr>
+                    <tr class="d-fade" style="--d:.36s"><td><div class="d-cust"><span class="d-avatar">VD</span>Van Dijk Techniek</div></td><td class="d-hide">Eindhoven</td><td class="mono right">€ 0</td><td class="mono right d-hide">24</td></tr>
+                    <tr class="d-fade" style="--d:.42s"><td><div class="d-cust"><span class="d-avatar">DG</span>De Groot Interim</div></td><td class="d-hide">Den Haag</td><td class="mono right">€ 690</td><td class="mono right d-hide">7</td></tr>
+                    <tr class="d-fade" style="--d:.48s"><td><div class="d-cust"><span class="d-avatar">HM</span>Horizon Media</div></td><td class="d-hide">Groningen</td><td class="mono right">€ 540</td><td class="mono right d-hide">5</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCHERM: Producten -->
+            <section class="d-screen" data-screen="producten">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Producten</div><div class="d-sub">24 producten &amp; diensten</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Product toevoegen</div>
+              </div>
+              <div class="d-card d-anim" style="--d:.12s">
+                <table class="d-table">
+                  <thead><tr><th>Code</th><th>Naam</th><th class="right">Prijs</th><th class="right d-hide">BTW</th></tr></thead>
+                  <tbody>
+                    <tr class="d-fade" style="--d:.18s"><td class="mono">P001</td><td>Consultancy (uur)</td><td class="mono right">€ 95,00</td><td class="right d-hide">21%</td></tr>
+                    <tr class="d-fade" style="--d:.24s"><td class="mono">P002</td><td>Webdesign pakket</td><td class="mono right">€ 1.250,00</td><td class="right d-hide">21%</td></tr>
+                    <tr class="d-fade" style="--d:.30s"><td class="mono">P003</td><td>Onderhoud maandelijks</td><td class="mono right">€ 45,00</td><td class="right d-hide">21%</td></tr>
+                    <tr class="d-fade" style="--d:.36s"><td class="mono">P004</td><td>Hosting (managed)</td><td class="mono right">€ 12,50</td><td class="right d-hide">21%</td></tr>
+                    <tr class="d-fade" style="--d:.42s"><td class="mono">P005</td><td>Fotografie dagdeel</td><td class="mono right">€ 350,00</td><td class="right d-hide">21%</td></tr>
+                    <tr class="d-fade" style="--d:.48s"><td class="mono">P006</td><td>Advies internationaal</td><td class="mono right">€ 80,00</td><td class="right d-hide">0%</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCHERM: Incasso -->
+            <section class="d-screen" data-screen="incasso">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Incasso</div><div class="d-sub">3 lopende dossiers · via Armaere Gerechtsdeurwaarders</div></div>
+              </div>
+              <div class="d-card d-anim" style="--d:.12s">
+                <table class="d-table">
+                  <thead><tr><th>Klant</th><th class="d-hide">Factuur</th><th class="right">Bedrag</th><th class="right d-hide">Te laat</th><th>Stap</th></tr></thead>
+                  <tbody>
+                    <tr class="d-fade" style="--d:.18s"><td>Studio Lumen</td><td class="mono d-hide">2026-0040</td><td class="mono right">€ 1.573</td><td class="right d-hide">14 dagen</td><td><span class="d-pill amber">Aanmaning</span></td></tr>
+                    <tr class="d-fade" style="--d:.26s"><td>Horizon Media</td><td class="mono d-hide">2026-0021</td><td class="mono right">€ 2.940</td><td class="right d-hide">32 dagen</td><td><span class="d-pill red">Deurwaarder</span></td></tr>
+                    <tr class="d-fade" style="--d:.34s"><td>De Groot Interim</td><td class="mono d-hide">2026-0033</td><td class="mono right">€ 690</td><td class="right d-hide">6 dagen</td><td><span class="d-pill blue">Herinnering</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCHERM: Klantomzet -->
+            <section class="d-screen" data-screen="klantomzet">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Klantomzet</div><div class="d-sub">Top klanten in 2026 · € 48.320 totaal</div></div>
+              </div>
+              <div class="d-card d-anim" style="--d:.12s">
+                <div class="d-hbars">
+                  <div class="d-hrow d-fade" style="--d:.18s"><span class="d-hlabel">Van Dijk Techniek</span><div class="d-htrack"><div class="d-hfill" style="--w:100%;--d:.20s"></div></div><span class="d-hval">€ 12.480</span></div>
+                  <div class="d-hrow d-fade" style="--d:.24s"><span class="d-hlabel">Meijer &amp; Zn</span><div class="d-htrack"><div class="d-hfill" style="--w:74%;--d:.26s"></div></div><span class="d-hval">€ 9.240</span></div>
+                  <div class="d-hrow d-fade" style="--d:.30s"><span class="d-hlabel">Bakkerij de Korenbloem</span><div class="d-htrack"><div class="d-hfill" style="--w:61%;--d:.32s"></div></div><span class="d-hval">€ 7.610</span></div>
+                  <div class="d-hrow d-fade" style="--d:.36s"><span class="d-hlabel">Studio Lumen</span><div class="d-htrack"><div class="d-hfill" style="--w:50%;--d:.38s"></div></div><span class="d-hval">€ 6.180</span></div>
+                  <div class="d-hrow d-fade" style="--d:.42s"><span class="d-hlabel">Groenveld Advies</span><div class="d-htrack"><div class="d-hfill" style="--w:39%;--d:.44s"></div></div><span class="d-hval">€ 4.920</span></div>
+                  <div class="d-hrow d-fade" style="--d:.48s"><span class="d-hlabel">Horizon Media</span><div class="d-htrack"><div class="d-hfill" style="--w:28%;--d:.50s"></div></div><span class="d-hval">€ 3.540</span></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SCHERM: Bedrijf -->
+            <section class="d-screen" data-screen="bedrijf">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Bedrijfsgegevens</div><div class="d-sub">Deze gegevens verschijnen op je facturen</div></div>
+                <div class="d-newbtn ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Opslaan</div>
+              </div>
+              <div class="d-logo-tile d-anim" style="--d:.10s">
+                <img src="/images/easyinvoice-favicon-180.png" alt="Logo">
+                <div><div class="t">Bedrijfslogo</div><div class="s">Verschijnt rechtsboven op elke factuur</div></div>
+              </div>
+              <div class="d-card d-anim" style="--d:.16s">
+                <div class="d-form">
+                  <div class="d-field d-fade" style="--d:.22s"><label>Bedrijfsnaam</label><div class="val">Jansen Consultancy B.V.</div></div>
+                  <div class="d-field d-fade" style="--d:.26s"><label>KvK-nummer</label><div class="val">59683198</div></div>
+                  <div class="d-field d-fade" style="--d:.30s"><label>BTW-nummer</label><div class="val">NL853603108B01</div></div>
+                  <div class="d-field d-fade" style="--d:.34s"><label>IBAN</label><div class="val">NL91 ABNA 0417 1643 00</div></div>
+                  <div class="d-field d-fade" style="--d:.38s"><label>Adres</label><div class="val">Torenlaan 5B</div></div>
+                  <div class="d-field d-fade" style="--d:.42s"><label>Postcode &amp; plaats</label><div class="val">1402 AT Bussum</div></div>
+                  <div class="d-field d-fade" style="--d:.46s"><label>E-mail</label><div class="val">hallo@jansenconsultancy.nl</div></div>
+                  <div class="d-field d-fade" style="--d:.50s"><label>Telefoon</label><div class="val">035 - 123 45 67</div></div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       </div>
@@ -526,52 +708,87 @@
   if (!mock) return;
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var nums = mock.querySelectorAll('[data-count]');
+  var screens = Array.prototype.slice.call(mock.querySelectorAll('.d-screen'));
+  var navitems = Array.prototype.slice.call(mock.querySelectorAll('.d-navitem'));
+  var urlEl = document.getElementById('dashUrl');
+  var progEl = document.getElementById('dashProgress');
+  var DWELL = 3800;
+  if (!screens.length) return;
+
+  // URL-slug per scherm (zelfde volgorde als de schermen en de menu-items).
+  var slugs = ['dashboard', 'facturen', 'klanten', 'producten', 'incasso', 'klantomzet', 'instellingen/bedrijf'];
 
   function fmt(n, d) { return n.toLocaleString('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function setNum(el, val) {
     var d = parseInt(el.getAttribute('data-decimals') || '0', 10);
-    var prefix = el.getAttribute('data-prefix') || '';
-    var suffix = el.getAttribute('data-suffix') || '';
-    el.textContent = prefix + fmt(d ? val : Math.round(val), d) + suffix;
+    el.textContent = (el.getAttribute('data-prefix') || '') + fmt(d ? val : Math.round(val), d) + (el.getAttribute('data-suffix') || '');
   }
-
-  // Zonder JS-animatie (reduced motion): laat alles direct en met echte cijfers staan.
-  if (reduce) return;
-
-  mock.classList.add('anim-ready');
-  for (var i = 0; i < nums.length; i++) setNum(nums[i], 0);
-
   function countUp(el) {
     var target = parseFloat(el.getAttribute('data-count')) || 0;
-    var dur = 1300, s = null;
+    if (reduce) { setNum(el, target); return; }
+    var dur = 1200, s = null;
     function step(ts) {
       if (s === null) s = ts;
       var p = Math.min((ts - s) / dur, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      setNum(el, target * eased);
+      setNum(el, target * (1 - Math.pow(1 - p, 3)));
       if (p < 1) requestAnimationFrame(step); else setNum(el, target);
     }
     requestAnimationFrame(step);
   }
 
-  var fired = false;
-  function activate() {
-    if (fired) return;
-    fired = true;
-    mock.classList.add('is-live');
-    for (var j = 0; j < nums.length; j++) countUp(nums[j]);
+  var current = -1, timer = null, hovering = false, started = false;
+
+  function restartProgress() {
+    if (!progEl || reduce) return;
+    progEl.style.transition = 'none';
+    progEl.style.width = '0%';
+    void progEl.offsetWidth; // forceer reflow zodat de animatie opnieuw start
+    progEl.style.transition = 'width ' + DWELL + 'ms linear';
+    progEl.style.width = '100%';
   }
+
+  function show(idx) {
+    idx = ((idx % screens.length) + screens.length) % screens.length;
+    if (idx === current) return;
+    current = idx;
+    for (var i = 0; i < screens.length; i++) screens[i].classList.toggle('active', i === idx);
+    for (var j = 0; j < navitems.length; j++) navitems[j].classList.toggle('active', j === idx);
+    if (urlEl && slugs[idx]) urlEl.textContent = 'app.easyinvoice.nl/' + slugs[idx];
+    var nums = screens[idx].querySelectorAll('[data-count]');
+    for (var k = 0; k < nums.length; k++) countUp(nums[k]);
+    restartProgress();
+  }
+
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  function play() { stop(); if (reduce) return; timer = setInterval(function () { show(current + 1); }, DWELL); }
+
+  // Klikbaar menu: spring naar het gekozen scherm.
+  navitems.forEach(function (item, i) {
+    item.addEventListener('click', function () { show(i); if (!hovering && !reduce) play(); });
+  });
+
+  // Pauzeer zolang de muis erop staat.
+  mock.addEventListener('mouseenter', function () { hovering = true; stop(); });
+  mock.addEventListener('mouseleave', function () { hovering = false; if (started) { restartProgress(); play(); } });
+
+  mock.classList.add('js-ready');
+
+  function onEnter() {
+    if (!started) { started = true; show(0); }
+    if (!hovering) play();
+  }
+
+  if (reduce) { show(0); return; }
 
   if ('IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
-      for (var k = 0; k < entries.length; k++) {
-        if (entries[k].isIntersecting) { activate(); io.disconnect(); break; }
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) onEnter(); else stop();
       }
     }, { threshold: 0.3 });
     io.observe(mock);
   } else {
-    activate();
+    onEnter();
   }
 })();
 </script>
