@@ -17,6 +17,10 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
         'price_id' => env('STRIPE_PRICE_ID'),
     ],
+    'turnstile' => [
+        'sitekey' => env('TURNSTILE_SITEKEY'),
+        'secret' => env('TURNSTILE_SECRET'),
+    ],
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

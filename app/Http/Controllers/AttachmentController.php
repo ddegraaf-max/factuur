@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class AttachmentController extends Controller
 {
@@ -14,7 +15,9 @@ class AttachmentController extends Controller
     {
         $request->validate([
             'files' => 'required|array|max:10',
-            'files.*' => 'file|max:10240', // 10 MB per file
+            'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+        ], [
+            'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
         ]);
 
         $added = 0;
@@ -34,12 +37,24 @@ class AttachmentController extends Controller
         return back()->with('flash', "{$added} bijlage(n) toegevoegd.");
     }
 
+    // Alleen deze typen tonen we inline in de browser; de rest wordt gedownload.
+    private const INLINE_SAFE = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'];
+
     public function show(Attachment $attachment)
     {
         abort_unless(Storage::disk('local')->exists($attachment->storage_path), 404);
+
+        $inline = in_array($attachment->mime_type, self::INLINE_SAFE, true);
+        $disposition = HeaderUtils::makeDisposition(
+            $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT,
+            $attachment->filename,
+            'bijlage'
+        );
+
         return response()->file(Storage::disk('local')->path($attachment->storage_path), [
-            'Content-Type' => $attachment->mime_type,
-            'Content-Disposition' => 'inline; filename="' . $attachment->filename . '"',
+            'Content-Type' => $inline ? $attachment->mime_type : 'application/octet-stream',
+            'Content-Disposition' => $disposition,
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 

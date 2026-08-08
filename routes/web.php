@@ -72,7 +72,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     }
 
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
-})->name('contact.send');
+})->middleware(['throttle:5,1', 'turnstile'])->name('contact.send');
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
@@ -80,18 +80,22 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware(['throttle:10,1', 'turnstile']);
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware(['throttle:5,1', 'turnstile']);
 
     // 2FA challenge (after credentials but before full auth)
     Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'show'])->name('two-factor.challenge');
-    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store']);
+    Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])
+        ->middleware('throttle:5,1');
 
     // E-mail verification (6-digit code, after registration or unverified login)
     Route::get('verify-email', [EmailVerificationController::class, 'show'])->name('verification.show');
-    Route::post('verify-email', [EmailVerificationController::class, 'verify'])->name('verification.verify');
+    Route::post('verify-email', [EmailVerificationController::class, 'verify'])
+        ->middleware('throttle:10,1')->name('verification.verify');
     Route::post('verify-email/resend', [EmailVerificationController::class, 'resend'])
         ->middleware('throttle:6,1')
         ->name('verification.resend');

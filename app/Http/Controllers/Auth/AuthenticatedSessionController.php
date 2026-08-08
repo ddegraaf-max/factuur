@@ -32,7 +32,17 @@ class AuthenticatedSessionController extends Controller
         $remember = (bool) $request->input('remember', false);
 
         $user = User::where('email', $creds['email'])->first();
-        if (! $user || ! \Hash::check($creds['password'], $user->password)) {
+
+        if ($user) {
+            $passwordOk = Hash::check($creds['password'], $user->password);
+        } else {
+            // Voer alsnog een (mislukkende) hash-berekening uit zodat de
+            // responstijd geen bestaande e-mailadressen verraadt (timing-aanval).
+            Hash::make($creds['password']);
+            $passwordOk = false;
+        }
+
+        if (! $passwordOk) {
             throw ValidationException::withMessages([
                 'email' => 'Deze inloggegevens kloppen niet.',
             ]);

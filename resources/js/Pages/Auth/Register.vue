@@ -2,6 +2,9 @@
 import { useForm, Head } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
+import Turnstile from '@/Components/Turnstile.vue';
+
+const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
 
 const form = useForm({
   firstName: '',
@@ -15,6 +18,7 @@ const form = useForm({
   vatNumber: '',
   acceptTerms: false,
   newsletter: true,
+  'cf-turnstile-response': '',
 });
 
 const companyTypes = [
@@ -143,6 +147,11 @@ const submit = () => form.post(route('register'));
           <input type="checkbox" v-model="form.newsletter" />
           <span>Stuur me tips, productupdates en nieuws.</span>
         </label>
+
+        <Turnstile :sitekey="turnstileSitekey"
+                   @verified="t => form['cf-turnstile-response'] = t"
+                   @expired="() => form['cf-turnstile-response'] = ''" />
+        <div v-if="form.errors['cf-turnstile-response']" class="field-error">{{ form.errors['cf-turnstile-response'] }}</div>
 
         <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
           {{ form.processing ? 'Bezig…' : 'Account aanmaken' }}

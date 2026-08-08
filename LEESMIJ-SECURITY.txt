@@ -1,0 +1,83 @@
+EASYINVOICE — SECURITY FIX-PACK (drop-in voor de 'factuur'-repo)
+================================================================
+Uitpakken op de ROOT van je factuur-repo. De mappenstructuur komt exact
+overeen, dus de bestanden vervangen/aanvullen de juiste plek. Daarna:
+committen (GitHub Desktop) en Railway deployt.
+
+BELANGRIJK — twee handelingen na het uitpakken:
+1) Zet je Turnstile-keys in Railway (Variables) — zie hieronder.
+2) Draai `npm run build` gebeurt automatisch in je deploy; de Vue-wijzigingen
+   worden dan meegebouwd.
+
+
+WAT ER IS AANGEPAST (punt 1 t/m 5)
+----------------------------------
+
+1. TURNSTILE — volledig geïntegreerd (client + server)
+   NIEUW:
+   - resources/js/Components/Turnstile.vue   (widget; laadt het script zelf,
+     werkt ook na Inertia-navigatie; rendert niets als er geen sitekey is)
+   - app/Http/Middleware/VerifyTurnstile.php (verifieert de token server-side
+     bij Cloudflare; slaat controle over als er nog geen secret is ingesteld)
+   GEWIJZIGD:
+   - config/services.php        → 'turnstile' config toegevoegd
+   - bootstrap/app.php          → alias 'turnstile' geregistreerd
+   - resources/js/Pages/Auth/Register.vue  → widget + token in formulier
+   - resources/js/Pages/Auth/Login.vue     → widget + token in formulier
+   - resources/views/marketing/contact.blade.php → widget + script
+
+   >>> INSTELLEN (Railway → Variables), 3 regels:
+       TURNSTILE_SITEKEY=0x......           (publieke sitekey)
+       TURNSTILE_SECRET=0x......            (geheime secret)
+       VITE_TURNSTILE_SITEKEY=0x......      (zelfde waarde als SITEKEY)
+   Sitekey + secret maak je aan op https://dash.cloudflare.com > Turnstile.
+   Zolang deze leeg zijn, blijft alles gewoon werken (widget verschijnt niet,
+   verificatie wordt overgeslagen). Zodra ze zijn ingevuld, is de bescherming
+   direct actief. De VITE_-variabele moet aanwezig zijn tijdens de build.
+
+2. RATE-LIMITING (brute-force / spam) — routes/web.php
+   - login            : throttle 5 per minuut
+   - register         : throttle 10 per minuut
+   - 2FA-challenge    : throttle 5 per minuut
+   - verify-email     : throttle 10 per minuut (bovenop de bestaande 6-pogingen)
+   - contact          : throttle 5 per minuut
+   Turnstile zit óók op login, register en contact.
+
+3. BIJLAGEN-HARDENING — app/Http/Controllers/AttachmentController.php
+   - Upload beperkt tot PDF/PNG/JPG/WEBP (mimetypes-check), max 10 MB.
+   - show() serveert alleen veilige typen 'inline'; de rest wordt gedownload.
+   - Toegevoegd: header X-Content-Type-Options: nosniff en een veilig
+     opgebouwde Content-Disposition (voorkomt header-injectie via bestandsnaam).
+   Dit sluit stored-XSS via geüploade HTML/SVG-bijlagen af.
+
+4. EASYAGENT — resources/js/Components/EasyAgent.vue
+   - v-html vervangen door veilige tekstweergave ({{ }} met pre-wrap),
+     zodat AI-/gebruikerscontent niet als HTML wordt uitgevoerd.
+   - Let op: als de AI-assistent bewust HTML-opmaak teruggaf, wordt die nu
+     als platte tekst getoond. Wil je opmaak behouden? Laat het weten, dan
+     bouw ik een veilige markdown-render met sanitatie (DOMPurify).
+
+5. KLEINE HARDENING
+   - AuthenticatedSessionController: bij een onbekend e-mailadres wordt nu
+     alsnog een hash-berekening gedaan, zodat de responstijd geen bestaande
+     accounts verraadt (timing-/enumeratie-bescherming).
+   - .env.example: SESSION_SECURE_COOKIE=true toegevoegd — zet die ook in
+     Railway zodat de sessiecookie alleen over HTTPS gaat.
+
+
+WAT AL GOED WAS (geen actie nodig)
+----------------------------------
+- Tenant-isolatie via global scopes op company_id (geen IDOR tussen bedrijven).
+- Stripe-webhook: handtekening + replay-bescherming + hash_equals; CSRF-uitzondering
+  alleen op stripe/webhook.
+- Wachtwoorden gehasht; gevoelige velden hidden; 2FA-secret/recovery versleuteld.
+- E-mailverificatie: 6 pogingen, 15 min geldig, 60s cooldown.
+- Geen SQL-injectie; geen rauwe {!! !!}; dompdf zonder remote assets (geen SSRF).
+
+
+NA HET DEPLOYEN — even testen
+-----------------------------
+- Draai lokaal `php -l` over de gewijzigde PHP-bestanden (kon ik hier niet).
+- Log in / registreer: mét lege Turnstile-keys werkt alles zoals nu.
+- Vul daarna de keys in Railway → widget verschijnt op inloggen/registreren/contact.
+- Probeer >5x snel fout in te loggen → je hoort een 429 (te veel pogingen) te krijgen.

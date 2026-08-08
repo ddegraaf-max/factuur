@@ -103,14 +103,14 @@ const quick = (q) => send(q);
         <div class="section-label">Wat ik vandaag voor je zie</div>
         <div v-for="ins in insights" :key="ins.title" class="insight" :class="ins.severity">
           <div class="ins-title">{{ ins.title }}</div>
-          <div class="ins-detail" v-html="ins.detail"></div>
+          <div class="ins-detail" style="white-space: pre-wrap;">{{ ins.detail }}</div>
         </div>
       </div>
 
       <div v-if="messages.length" class="messages">
         <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.from">
           <div v-if="m.from === 'bot'" class="msg-avatar">E</div>
-          <div class="bubble" v-html="m.text"></div>
+          <div class="bubble" style="white-space: pre-wrap;">{{ m.text }}</div>
         </div>
       </div>
     </div>
