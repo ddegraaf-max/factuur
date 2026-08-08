@@ -122,6 +122,12 @@ const submit = () => form.patch(route('settings.reminders.update'), { preserveSc
 <style scoped>
 .setting-line { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
 .setting-line:last-child { border-bottom: none; }
+.setting-line > div { display: flex; align-items: center; gap: 10px; }
+.setting-line input[type="number"] { width: 110px; text-align: center; }
+.setting-line select { min-width: 220px; }
+.setting-line span { color: var(--text-3); font-size: 13px; }
+.setting-line label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); cursor: pointer; }
+.setting-line:last-child { border-bottom: none; }
 .setting-line input[type="number"] { width: 80px; }
 .tl-preview-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 22px; margin-top: 14px; }
 .tl-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 14px; }

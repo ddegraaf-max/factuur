@@ -1,0 +1,23 @@
+EASYINVOICE — UI-OPFRISSER: INVULVELDEN (drop-in voor 'factuur'-repo)
+====================================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+WAT ER VERANDERT
+----------------
+resources/css/app.css
+  Globale, nette styling voor ALLE invulvelden in de hele app:
+  - input, select, textarea: consistente rand, radius, hoogte, padding
+  - focus-highlight (merkkleur) en hover-rand
+  - select met een eigen dropdown-pijl (i.p.v. lelijke browserstandaard)
+  - gestylede checkboxes/radio's (merk-accentkleur)
+  - nette placeholder- en disabled-stijl
+  - number-velden zonder spinner-pijltjes (strakker)
+
+resources/js/Pages/Settings/Reminders.vue
+  De "setting-line"-rijen: number-velden krijgen een nette vaste breedte,
+  selects een minimumbreedte, en labels/checkboxes staan netjes uitgelijnd.
+
+Waarom: de instellingen-pagina's gebruikten kale <input>/<select> buiten
+.form-group, waardoor ze browser-standaard (lelijk) waren. Deze globale
+styling maakt élk veld in de app in één keer strak — ook op pagina's die
+ik nu niet apart heb aangeraakt.
