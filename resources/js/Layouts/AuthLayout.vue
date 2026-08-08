@@ -1,5 +1,6 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+const version = usePage().props.version;
 </script>
 
 <template>
@@ -15,7 +16,7 @@ import { Link } from '@inertiajs/vue3';
           <p>Nederlandse facturatie voor MKB en ZZP'ers.</p>
         </slot>
       </div>
-      <div class="auth-footer-text">© 2026 EasyInvoice</div>
+      <div class="auth-footer-text">© 2026 EasyInvoice · {{ version }}</div>
     </div>
     <div class="auth-form-pane">
       <slot />

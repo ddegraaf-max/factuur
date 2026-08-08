@@ -70,7 +70,6 @@
     <h2>Contact</h2>
     <p>Vragen over je privacy? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
 
-    <div class="disclaimer">Dit is een voorbeeldtekst en vormt geen juridisch advies. Laat het definitieve privacybeleid controleren door een jurist.</div>
   </div>
 </section>
 @endsection

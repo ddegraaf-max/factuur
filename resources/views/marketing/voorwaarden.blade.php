@@ -68,7 +68,6 @@
     <h2>10. Contact</h2>
     <p>Vragen over deze voorwaarden? Mail ons via <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a> of bekijk de <a href="{{ route('contact') }}">contactpagina</a>.</p>
 
-    <div class="disclaimer">Dit is een voorbeeldtekst en vormt geen juridisch advies. Laat de definitieve voorwaarden controleren door een jurist.</div>
   </div>
 </section>
 @endsection

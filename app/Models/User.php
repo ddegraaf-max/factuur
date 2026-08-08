@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -37,6 +38,12 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /** Stuur de wachtwoord-reset e-mail in het Nederlands. */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     public function hasTwoFactorEnabled(): bool

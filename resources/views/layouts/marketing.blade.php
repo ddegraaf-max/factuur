@@ -498,7 +498,7 @@
     </div>
 
     <div class="footer-bottom">
-      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01</div>
+      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01 · <span class="footer-version">{{ config('app.version') }}</span></div>
       <div class="footer-bottom-links">
         <a href="{{ route('voorwaarden') }}">Algemene voorwaarden</a>
         <a href="{{ route('privacy') }}">Privacybeleid</a>

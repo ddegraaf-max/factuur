@@ -336,7 +336,7 @@
                 <table class="d-table">
                   <thead><tr><th>Klant</th><th class="d-hide">Plaats</th><th class="right">Openstaand</th><th class="right d-hide">Facturen</th></tr></thead>
                   <tbody>
-                    <tr class="d-fade" style="--d:.18s"><td><div class="d-cust"><span class="d-avatar">BK</span>Bakkerij de Korenbloem</div></td><td class="d-hide">Amsterdam</td><td class="mono right">€ 1.210</td><td class="mono right d-hide">18</td></tr>
+                    <tr class="d-fade" style="--d:.18s"><td><div class="d-cust"><span class="d-avatar">BK</span>Bakkerij de Korenbloem</div></td><td class="d-hide">Hilversum</td><td class="mono right">€ 1.210</td><td class="mono right d-hide">18</td></tr>
                     <tr class="d-fade" style="--d:.24s"><td><div class="d-cust"><span class="d-avatar">GA</span>Groenveld Advies</div></td><td class="d-hide">Utrecht</td><td class="mono right">€ 845</td><td class="mono right d-hide">9</td></tr>
                     <tr class="d-fade" style="--d:.30s"><td><div class="d-cust"><span class="d-avatar">SL</span>Studio Lumen</div></td><td class="d-hide">Rotterdam</td><td class="mono right">€ 1.573</td><td class="mono right d-hide">12</td></tr>
                     <tr class="d-fade" style="--d:.36s"><td><div class="d-cust"><span class="d-avatar">VD</span>Van Dijk Techniek</div></td><td class="d-hide">Eindhoven</td><td class="mono right">€ 0</td><td class="mono right d-hide">24</td></tr>
@@ -659,7 +659,7 @@
           <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="faq-content">
-          Je data staat op servers in Amsterdam, dagelijks geback-upt. We zijn AVG-compliant en bieden tweestapsverificatie. Alle verkeer is versleuteld via TLS 1.3. Je houdt de eigendomsrechten op al je data en kunt het op elk moment exporteren.
+          Je data staat op servers in de Europese Unie, dagelijks geback-upt. We zijn AVG-compliant en bieden tweestapsverificatie. Alle verkeer is versleuteld via TLS 1.3. Je houdt de eigendomsrechten op al je data en kunt het op elk moment exporteren.
         </div>
       </details>
 

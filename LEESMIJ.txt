@@ -1,100 +1,96 @@
-EASYINVOICE — LOGO, FAVICON & MERKVERMELDING
-=============================================
+EASYINVOICE — UPDATE (drop-in voor de 'factuur'-repo)
+=====================================================
+Uitpakken op de ROOT van je factuur-repo, committen (GitHub Desktop),
+Railway deployt. De mapstructuur komt exact overeen.
 
-Pak deze ZIP uit op de ROOT van je repo (waar /public en /resources staan).
-De mappen sluiten exact aan, dus de bestanden landen automatisch goed.
-Committen naar GitHub -> Railway bouwt automatisch. Bestanden in /public staan
-in git, dus ze overleven elke deploy (geen volume nodig).
+LET OP: dit pakket bevat OOK de eerdere security-fixes (Turnstile,
+rate-limiting, bijlagen, EasyAgent, login-timing). Heb je die al toegepast?
+Dan zijn die bestanden simpelweg gelijk/nieuwer — gewoon overschrijven.
 
-WAT IS GEWIJZIGD
-----------------
-public/images/   -> 6 logo-/favicon-bestanden (nieuw)
-resources/views/app.blade.php
-    - placeholder-favicon ("E"-vierkant) vervangen door echte favicon-links
-resources/views/layouts/marketing.blade.php   (de gedeelde marketing-layout)
-    - favicon in <head>: placeholder -> echte favicons (geldt voor alle marketingpagina's)
-    - HEADER (nav-brand): rode "E"-placeholder -> echt embleem (/images/easyinvoice-favicon-180.png)
-    - FOOTER (footer-brand): zelfde embleem + EasyInvoice(R) bij het woordmerk
-    - FOOTER onderaan: nieuwe merkregel toegevoegd:
-        "EasyInvoice(R) is een geregistreerd Benelux-merk van Creditline B.V. - BOIP-inschrijving nr. 1485323."
-      met bijbehorende .footer-trademark CSS in jouw eigen footer-stijl (geen Tailwind)
 
-NIET AANGERAAKT (bewust)
-------------------------
-- landing.blade.php: hoefde niet; logo/footer zaten in de layout.
-- De groene vinkje-SVG (background-image) in de layout-CSS: dat is een icoon, geen placeholder.
-- De decoratieve .ico in de hero-mockup: dat is een nep-screenshot, blijft zo.
+=====================================================
+1) VERSIENUMMER
+=====================================================
+Nieuw: config('app.version'), standaard "v1.0.0", instelbaar via env APP_VERSION.
+Het nummer is nu zichtbaar op:
+  - de inlog-/registratie-/wachtwoord-pagina's (linksonder in het rode paneel)
+  - de footer van de marketingsite (naast het KvK/BTW-regeltje)
 
-FOOTER — VOLLEDIG INGEVULD (klaar om live)
-------------------------------------------
-Copyrightregel staat nu correct en compleet:
-    (c) 2026 Creditline B.V. - KvK 59683198 - BTW NL853603108B01
-Daarnaast in het footer-brandblok een adresregel toegevoegd:
-    Creditline B.V. - Torenlaan 5B - 1402 AT Bussum - Nederland
-En "Gemaakt in Amsterdam" gecorrigeerd naar "Gemaakt in Bussum".
+Zo werk je: verhoog het nummer bij elke release in Railway → Variables:
+      APP_VERSION=v1.0.1
+Na de deploy zie je het nieuwe nummer meteen op de inlogpagina — dan weet je
+zeker dat de nieuwe versie live staat. (Staat de env leeg, dan toont hij v1.0.0.)
 
-Er zijn GEEN openstaande velden meer. Uitpakken op repo-root, committen, klaar.
 
-MERKGEGEVENS (ter referentie)
------------------------------
-Merk:               EasyInvoice (beeldmerk met woordelementen)
-Houder:             Creditline B.V., Bussum (NL)
-Inschrijvingsnr.:   1485323   | Basis: Benelux
-Ingeschreven:       22-08-2023 | Geldig tot: 07-06-2033
-Klassen:            9, 35, 42  | Status: ingeschreven (R-teken toegestaan)
+=====================================================
+2) "AMSTERDAM" → BUSSUM
+=====================================================
+Zichtbare teksten gecorrigeerd:
+  - contact.blade.php   : adres → "Torenlaan 5B, 1402 AT Bussum"
+  - over-ons.blade.php  : "...mensen in Amsterdam" → "...mensen in Bussum"
+  - landing.blade.php   : "servers in Amsterdam" → "servers in de Europese Unie"
+                          (klopt met het privacybeleid; "servers in Bussum" zou
+                          onjuist zijn — dat is je kantoor, niet je datacenter)
+  - landing.blade.php   : fictieve demo-klant "Amsterdam" → "Hilversum"
+  - DatabaseSeeder.php  : stad van het demo-bedrijf → Bussum
 
-==================================================
-NIEUW: INTERACTIEVE DEMO VAN DE ONLINE OMGEVING
-==================================================
-De knop "Bekijk de demo" op de homepage linkte naar #functies (deed niets).
-Die wijst nu naar een echte, klikbare demo op /demo.
+BEWUST NIET gewijzigd (dit is de tijdzone, geen vestigingsplaats):
+  - config/app.php      : 'timezone' => 'Europe/Amsterdam'   (correct voor NL)
+  - routes/console.php  : ->timezone('Europe/Amsterdam')     (correct)
 
-Wat is toegevoegd:
-- resources/views/marketing/demo.blade.php  (NIEUW)
-  Een zelfstandige, full-screen demo van de EasyInvoice-omgeving in jouw
-  huisstijl. Klikbare sidebar met: Dashboard, Facturen, Klanten, Producten,
-  Incasso, Statistieken en Bedrijf. Met KPI's, omzetgrafiek, facturenlijst
-  met filters, een uitklapbare factuurweergave (regels, btw 21%, totaal),
-  klanten- en productlijst, incasso-kanban en statistieken.
-  Alles draait client-side met fictieve voorbeeldgegevens (bedrijf
-  "Jansen Webdesign") - er wordt niets opgeslagen. Volledig responsive.
 
-- routes/web.php  (1 regel toegevoegd, direct onder de home-route):
-      Route::view('/demo', 'marketing.demo')->name('demo');
+=====================================================
+3) WACHTWOORD VERGETEN (nieuw)
+=====================================================
+Volledige, veilige flow via Laravel's ingebouwde password-broker
+(de tabel password_reset_tokens bestaat al in je migraties).
 
-- resources/views/landing.blade.php  (knop "Bekijk de demo"):
-      href="#functies"   ->   href="{{ route('demo') }}"
+Nieuw:
+  - app/Http/Controllers/Auth/PasswordResetLinkController.php  (link aanvragen)
+  - app/Http/Controllers/Auth/NewPasswordController.php         (nieuw wachtwoord)
+  - app/Notifications/ResetPasswordNotification.php             (NL reset-mail)
+  - resources/js/Pages/Auth/ForgotPassword.vue
+  - resources/js/Pages/Auth/ResetPassword.vue
+Gewijzigd:
+  - routes/web.php      : routes password.request / .email / .reset / .store
+                          (met rate-limiting 5/min)
+  - Login.vue           : "Wachtwoord vergeten?"-link naast "30 dagen onthouden"
+  - AuthenticatedSessionController: canResetPassword = true
+  - User.php            : reset-mail wordt in het Nederlands verstuurd
 
-Pas je deze handmatig toe? Dan zijn dit de enige twee mini-wijzigingen
-(1 regel in web.php, 1 attribuut in landing.blade.php). demo.blade.php is
-volledig nieuw en hoeft alleen geplaatst te worden.
+Werking: op /login klik je "Wachtwoord vergeten?" → e-mail invoeren → je krijgt
+een link (60 min geldig) → nieuw wachtwoord instellen → inloggen.
+Om geen bestaande accounts te verraden tonen we altijd dezelfde neutrale melding.
 
-==================================================
-NIEUW: JURIDISCHE PAGINA'S GECORRIGEERD
-==================================================
-De live pagina's hadden in de BODY nog oude dummygegevens
-("EasyInvoice B.V., Amsterdam, KvK 87654321"). De footer was al goed.
-Deze drie pagina's zijn herschreven met de juiste gegevens en in
-dezelfde huisstijl (extends layouts.marketing). Drop-in, vervangt de
-bestaande bestanden:
+BELANGRIJK: hiervoor moet e-mail werken (je Resend/mail-config). De reset-mail
+gaat via je standaard mailer. Test 'm even na de deploy.
 
-- resources/views/marketing/voorwaarden.blade.php
-- resources/views/marketing/privacy.blade.php
-- resources/views/marketing/cookies.blade.php
 
-Wat is gecorrigeerd / toegevoegd:
-- Aanbieder/verwerkingsverantwoordelijke: Creditline B.V., Bussum,
-  KvK 59683198, BTW NL853603108B01 (handelend onder EasyInvoice®).
-- Duidelijk bedrijfsblok bovenaan elke pagina.
-- Contact-e-mail overal: hallo@easyinvoice.nl (komt overeen met web.php).
-- Voorwaarden: aansprakelijkheid nu op naam van Creditline B.V.;
-  extra artikel "Toepasselijk recht" (NL recht) toegevoegd.
-- Privacy: nette verwerkingsverantwoordelijke + sectie "Delen met derden"
-  (Stripe als betaalprovider, EU-hosting) + verwijzing Autoriteit
-  Persoonsgegevens.
-- Datum "Laatst bijgewerkt" naar 14 juni 2026.
-- De voorbeeldtekst-disclaimer ("laat controleren door jurist") is
-  bewust behouden.
+=====================================================
+4) VOORBEELDTEKST WEG
+=====================================================
+De "Dit is een voorbeeldtekst..."-regel is verwijderd uit:
+  - voorwaarden.blade.php, privacy.blade.php, cookies.blade.php
 
-Let op: dit blijven voorbeeldteksten. Laat ze voor productie nakijken
-door een jurist.
+
+=====================================================
+INSTELLEN IN RAILWAY (Variables)
+=====================================================
+  APP_VERSION=v1.0.0
+  SESSION_SECURE_COOKIE=true
+  # Turnstile (bot-bescherming) — leeg laten = uit, invullen = aan:
+  TURNSTILE_SITEKEY=
+  TURNSTILE_SECRET=
+  VITE_TURNSTILE_SITEKEY=      (zelfde waarde als SITEKEY; nodig bij de build)
+
+
+=====================================================
+NOG OPEN (niet in dit pakket)
+=====================================================
+De MOBIELE NAVIGATIE-fix (hamburgermenu) uit een eerdere ZIP zit nog NIET in
+deze repo — je marketing-layout heeft nog geen 'nav-toggle'. Op smalle schermen
+lopen "Inloggen" + "Start gratis" daardoor nog over de brand heen. Zeg het even,
+dan lever ik die fix passend op je huidige marketing-layout mee.
+
+Draai voor de zekerheid `php -l` over de PHP-bestanden aan jouw kant (kon ik in
+de sandbox niet). De haakjes/structuur zijn hier wel gecontroleerd.

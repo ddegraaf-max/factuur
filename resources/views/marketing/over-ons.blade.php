@@ -17,7 +17,7 @@
     <div class="prose">
       <h2>Onze missie</h2>
       <p>We willen dat elke Nederlandse ondernemer met een gerust hart kan factureren en sneller betaald krijgt — zonder een boekhouddiploma of een duur abonnement.</p>
-      <p>Daarom bouwen we de eenvoudigste facturatietool van Nederland. Eén heldere prijs, alle functies die je écht nodig hebt, en ondersteuning van echte mensen in Amsterdam.</p>
+      <p>Daarom bouwen we de eenvoudigste facturatietool van Nederland. Eén heldere prijs, alle functies die je écht nodig hebt, en ondersteuning van echte mensen in Bussum.</p>
     </div>
   </div>
 </section>

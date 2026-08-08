@@ -55,10 +55,13 @@ const submit = () => {
           <div v-if="form.errors.password" class="field-error">{{ form.errors.password }}</div>
         </div>
 
-        <label class="remember-row">
-          <input type="checkbox" v-model="form.remember" />
-          <span>30 dagen onthouden</span>
-        </label>
+        <div class="login-row" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <label class="remember-row">
+            <input type="checkbox" v-model="form.remember" />
+            <span>30 dagen onthouden</span>
+          </label>
+          <a :href="route('password.request')" style="font-size:13px;">Wachtwoord vergeten?</a>
+        </div>
 
         <Turnstile :sitekey="turnstileSitekey"
                    @verified="t => form['cf-turnstile-response'] = t"

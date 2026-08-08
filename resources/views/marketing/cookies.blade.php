@@ -51,7 +51,6 @@
     <h2>Meer informatie</h2>
     <p>Lees ook ons <a href="{{ route('privacy') }}">privacybeleid</a> voor hoe we met je persoonsgegevens omgaan. Vragen? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
 
-    <div class="disclaimer">Dit is een voorbeeldtekst en vormt geen juridisch advies.</div>
   </div>
 </section>
 @endsection

@@ -78,7 +78,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Adres</div><div style="font-weight:600;">Amsterdam, Nederland</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Adres</div><div style="font-weight:600;">Torenlaan 5B, 1402 AT Bussum</div></div>
         </div>
       </div>
       <div class="contact-card" style="margin-top:16px;">

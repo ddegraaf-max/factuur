@@ -35,7 +35,7 @@ class DatabaseSeeder extends Seeder
             'website' => 'https://vriesdesign.nl',
             'address_line' => 'Keizersgracht 124',
             'postal_code' => '1015 CW',
-            'city' => 'Amsterdam',
+            'city' => 'Bussum',
             'country' => 'NL',
             'brand_color' => '#E8231F',
             'default_payment_terms' => 30,
