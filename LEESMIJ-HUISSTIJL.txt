@@ -1,0 +1,42 @@
+EASYINVOICE — HUISSTIJL & FACTUUR-PREVIEW (drop-in voor 'factuur'-repo)
+======================================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+(De Vue-wijziging wordt in de build meegenomen.)
+
+WAT ER VERANDERT
+----------------
+1) LIVE VOORBEELD OP DE HUISSTIJL-PAGINA — nu compleet én strakker
+   resources/js/Pages/Settings/Brand.vue
+   De preview toonde eerder maar een fractie. Nu bevatten alle drie de
+   lay-outs (Modern / Klassiek / Minimaal) ALLE wettelijk verplichte velden:
+     • Afzender: bedrijfsnaam, adres, KvK, BTW-nummer
+     • Afnemer (voorbeeldklant): naam + adres
+     • Factuurnummer, factuurdatum én vervaldatum
+     • Regels met omschrijving, aantal, stuksprijs, BTW% en bedrag
+     • Subtotaal, BTW 21% en "Te betalen"
+     • Betaalregel met je IBAN + betaaltermijn + factuurnummer
+     • Voetnoot
+   De datums en betaaltermijn lopen mee met je eigen instellingen; alle
+   bedrijfsgegevens komen uit je bedrijfsprofiel. De drie stijlen zijn nu
+   duidelijk onderscheidend en verzorgd.
+
+   Belangrijk: dit is de PREVIEW. Je échte factuur-PDF's
+   (resources/views/pdf/invoice-*.blade.php) bevatten deze velden al —
+   de preview sluit daar nu op aan (wat-je-ziet-is-wat-je-krijgt).
+
+2) VOETNOOT AUTOMATISCH INGEVULD
+   - Het voetnoot-veld op de Huisstijl-pagina is nu voor-ingevuld met een
+     nette standaardtekst (aanpasbaar). Klik "Opslaan" om die te bewaren.
+   - Nieuwe accounts krijgen deze voetnoot automatisch:
+     app/Http/Controllers/Auth/RegisteredUserController.php
+
+   Standaardtekst:
+   "Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de
+    betaaltermijn te voldoen onder vermelding van het factuurnummer.
+    Heeft u vragen over deze factuur? Neem gerust contact met ons op."
+
+TIP
+---
+Wil je de drie PDF-stijlen zelf ook een visuele opfrisser geven (zodat ze
+1-op-1 met deze strakkere preview matchen)? Dat kan ik als losse update
+leveren. Draai voor de zekerheid `php -l` over RegisteredUserController.php.

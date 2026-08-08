@@ -7,12 +7,14 @@ const props = defineProps({
   company: Object,
 });
 
+const defaultFooter = 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.';
+
 const form = useForm({
   brand_color: props.company.brand_color || '#E8231F',
   accent_color: props.company.accent_color || '#1C1917',
   invoice_template: props.company.invoice_template || 'modern',
   invoice_font: props.company.invoice_font || 'sans',
-  invoice_footer: props.company.invoice_footer || '',
+  invoice_footer: props.company.invoice_footer || defaultFooter,
   logo_scale: props.company.logo_scale || 100,
   logo: null,
 });
@@ -35,6 +37,25 @@ const templates = [
   { value: 'classic', name: 'Klassiek', desc: 'Formeel, gelijnd' },
   { value: 'minimal', name: 'Minimaal', desc: 'Veel ruimte, rustig' },
 ];
+
+const nf = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const companyAddr = computed(() => [props.company.postal_code, props.company.city].filter(Boolean).join(' '));
+const footerText = computed(() => form.invoice_footer || defaultFooter);
+const _today = new Date();
+const _fmt = (d) => d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+const _terms = props.company.default_payment_terms || 30;
+const pv = {
+  number: '2026-0007',
+  date: _fmt(_today),
+  due: _fmt(new Date(_today.getTime() + _terms * 86400000)),
+  terms: _terms,
+  customer: { name: 'Voorbeeldklant B.V.', addr: 'Keizersgracht 123', city: '1015 CJ Amsterdam' },
+  lines: [
+    { desc: 'Webdesign basispakket', qty: 1, price: 1250, vat: 21 },
+    { desc: 'Hosting jaarpakket', qty: 1, price: 180, vat: 21 },
+  ],
+  subtotal: 1430, vat: 300.30, total: 1730.30,
+};
 
 const onLogoChange = (e) => {
   const file = e.target.files[0];
@@ -224,27 +245,52 @@ const removeLogo = () => {
                 <img v-if="previewLogo" :src="previewLogo" class="pv-logo" :style="logoStyleModern" alt="" />
                 <div v-else class="pv-logo-mark">{{ (company.name || 'E')[0] }}</div>
                 <div class="pv-company-name">{{ company.name }}</div>
-                <div class="pv-company-addr">{{ company.address_line || 'Voorbeeldstraat 1' }}</div>
+                <div class="pv-company-addr">
+                  <template v-if="company.address_line">{{ company.address_line }}<br></template>
+                  <template v-if="companyAddr">{{ companyAddr }}</template>
+                </div>
               </div>
               <div style="text-align:right;">
                 <div class="pv-doctype">FACTUUR</div>
-                <div class="pv-num">2026-0007</div>
+                <div class="pv-num">{{ pv.number }}</div>
               </div>
             </div>
             <div class="pv-body">
+              <div class="pv-parties">
+                <div class="pv-party">
+                  <div class="pv-party-label">Van</div>
+                  <div class="pv-party-name">{{ company.name }}</div>
+                  <div v-if="company.kvk_number">KVK {{ company.kvk_number }}</div>
+                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                </div>
+                <div class="pv-party">
+                  <div class="pv-party-label">Factuur aan</div>
+                  <div class="pv-party-name">{{ pv.customer.name }}</div>
+                  <div>{{ pv.customer.addr }}</div>
+                  <div>{{ pv.customer.city }}</div>
+                </div>
+              </div>
+              <div class="pv-meta">
+                <div><span>Factuurdatum</span><strong>{{ pv.date }}</strong></div>
+                <div><span>Vervaldatum</span><strong>{{ pv.due }}</strong></div>
+              </div>
               <table class="pv-lines">
-                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Bedrag</th></tr></thead>
+                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Stuksprijs</th><th class="c">BTW</th><th class="r">Bedrag</th></tr></thead>
                 <tbody>
-                  <tr><td>Webdesign basispakket</td><td class="r">1</td><td class="r">€ 1.250,00</td></tr>
-                  <tr><td>Hosting jaarpakket</td><td class="r">1</td><td class="r">€ 180,00</td></tr>
+                  <tr v-for="(l, i) in pv.lines" :key="i">
+                    <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="c">{{ l.vat }}%</td><td class="r">{{ nf(l.qty * l.price) }}</td>
+                  </tr>
                 </tbody>
               </table>
               <div class="pv-totals">
-                <div><span>Subtotaal</span><span>€ 1.430,00</span></div>
-                <div><span>BTW 21%</span><span>€ 300,30</span></div>
-                <div class="pv-grand"><span>Totaal</span><span>€ 1.730,30</span></div>
+                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
               </div>
-              <div v-if="form.invoice_footer" class="pv-footer">{{ form.invoice_footer }}</div>
+              <div v-if="company.iban" class="pv-pay-note">
+                Gelieve het bedrag binnen {{ pv.terms }} dagen te voldoen op {{ company.iban }} t.n.v. {{ company.name }} o.v.v. factuurnummer {{ pv.number }}.
+              </div>
+              <div class="pv-footer">{{ footerText }}</div>
             </div>
           </template>
 
@@ -254,27 +300,47 @@ const removeLogo = () => {
               <div style="text-align:center;">
                 <img v-if="previewLogo" :src="previewLogo" class="pv-logo-c" :style="logoStyleClassic" alt="" />
                 <div class="pv-classic-title">FACTUUR</div>
-                <div class="pv-classic-sub">{{ company.name }} · 2026-0007</div>
+                <div class="pv-classic-sub">{{ company.name }} · {{ pv.number }}</div>
               </div>
             </div>
-            <div class="pv-classic-meta">
-              <div><strong>Aan:</strong> Klant Voorbeeld B.V.</div>
-              <div><strong>Datum:</strong> 26 mei 2026</div>
-            </div>
             <div class="pv-body">
+              <div class="pv-parties">
+                <div class="pv-party">
+                  <div class="pv-party-label">Afzender</div>
+                  <div class="pv-party-name">{{ company.name }}</div>
+                  <div v-if="company.address_line">{{ company.address_line }}</div>
+                  <div v-if="companyAddr">{{ companyAddr }}</div>
+                  <div v-if="company.kvk_number">KVK {{ company.kvk_number }}</div>
+                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                </div>
+                <div class="pv-party" style="text-align:right;">
+                  <div class="pv-party-label">Aan</div>
+                  <div class="pv-party-name">{{ pv.customer.name }}</div>
+                  <div>{{ pv.customer.addr }}</div>
+                  <div>{{ pv.customer.city }}</div>
+                </div>
+              </div>
+              <div class="pv-classic-meta">
+                <div><strong>Factuurdatum:</strong> {{ pv.date }}</div>
+                <div><strong>Vervaldatum:</strong> {{ pv.due }}</div>
+              </div>
               <table class="pv-lines pv-lines-classic">
-                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs</th><th class="r">Totaal</th></tr></thead>
+                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs</th><th class="c">BTW</th><th class="r">Totaal</th></tr></thead>
                 <tbody>
-                  <tr><td>Webdesign basispakket</td><td class="r">1</td><td class="r">€ 1.250,00</td><td class="r">€ 1.250,00</td></tr>
-                  <tr><td>Hosting jaarpakket</td><td class="r">1</td><td class="r">€ 180,00</td><td class="r">€ 180,00</td></tr>
+                  <tr v-for="(l, i) in pv.lines" :key="i">
+                    <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="c">{{ l.vat }}%</td><td class="r">{{ nf(l.qty * l.price) }}</td>
+                  </tr>
                 </tbody>
               </table>
               <div class="pv-totals pv-totals-classic">
-                <div><span>Subtotaal</span><span>€ 1.430,00</span></div>
-                <div><span>BTW 21%</span><span>€ 300,30</span></div>
-                <div class="pv-grand"><span>Totaal</span><span>€ 1.730,30</span></div>
+                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
               </div>
-              <div v-if="form.invoice_footer" class="pv-footer pv-footer-classic">{{ form.invoice_footer }}</div>
+              <div v-if="company.iban" class="pv-pay-note">
+                Gelieve het bedrag binnen {{ pv.terms }} dagen te voldoen op {{ company.iban }} o.v.v. factuurnummer {{ pv.number }}.
+              </div>
+              <div class="pv-footer pv-footer-classic">{{ footerText }}</div>
             </div>
           </template>
 
@@ -283,23 +349,41 @@ const removeLogo = () => {
             <div class="pv-minimal-header">
               <img v-if="previewLogo" :src="previewLogo" class="pv-logo" :style="logoStyleModern" alt="" />
               <div class="pv-minimal-title">Factuur</div>
-              <div class="pv-minimal-num">2026-0007 · 26 mei 2026</div>
+              <div class="pv-minimal-num">{{ pv.number }} · {{ pv.date }}</div>
             </div>
             <div class="pv-body">
-              <div class="pv-minimal-from">
-                <div style="color:#9a9a9a;font-size:9px;text-transform:uppercase;letter-spacing:0.06em;">Van</div>
-                <div>{{ company.name }}</div>
+              <div class="pv-parties">
+                <div class="pv-party">
+                  <div class="pv-party-label">Van</div>
+                  <div class="pv-party-name">{{ company.name }}</div>
+                  <div v-if="companyAddr">{{ companyAddr }}</div>
+                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                </div>
+                <div class="pv-party">
+                  <div class="pv-party-label">Aan</div>
+                  <div class="pv-party-name">{{ pv.customer.name }}</div>
+                  <div>{{ pv.customer.city }}</div>
+                </div>
+              </div>
+              <div class="pv-meta">
+                <div><span>Vervaldatum</span><strong>{{ pv.due }}</strong></div>
               </div>
               <table class="pv-lines pv-lines-minimal">
                 <tbody>
-                  <tr><td>Webdesign basispakket</td><td class="r">€ 1.250,00</td></tr>
-                  <tr><td>Hosting jaarpakket</td><td class="r">€ 180,00</td></tr>
+                  <tr v-for="(l, i) in pv.lines" :key="i">
+                    <td>{{ l.desc }}</td><td class="r">{{ nf(l.qty * l.price) }}</td>
+                  </tr>
                 </tbody>
               </table>
               <div class="pv-totals pv-totals-minimal">
-                <div class="pv-grand"><span>Totaal</span><span>€ 1.730,30</span></div>
+                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
               </div>
-              <div v-if="form.invoice_footer" class="pv-footer">{{ form.invoice_footer }}</div>
+              <div v-if="company.iban" class="pv-pay-note">
+                Betaling binnen {{ pv.terms }} dagen op {{ company.iban }} o.v.v. {{ pv.number }}.
+              </div>
+              <div class="pv-footer">{{ footerText }}</div>
             </div>
           </template>
         </div>
@@ -544,4 +628,27 @@ const removeLogo = () => {
 }
 .pv-minimal .pv-lines-minimal td:first-child { color: var(--text-2); }
 .pv-minimal .pv-grand { border-top: 2px solid var(--brand); padding-top: 10px; }
+
+/* ---- Gedeelde velden (afzender/afnemer, meta, betaalregel) ---- */
+.pv-lines .c { text-align: center; }
+.pv-parties { display: flex; gap: 20px; margin-bottom: 12px; }
+.pv-parties .pv-party { flex: 1; font-size: 10px; color: var(--text-3); line-height: 1.5; }
+.pv-party-label { font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.07em; color: #b7b3ae; margin-bottom: 3px; }
+.pv-party-name { font-weight: 700; color: var(--text); font-size: 11px; }
+.pv-meta { display: flex; gap: 24px; margin-bottom: 10px; font-size: 10px; }
+.pv-meta > div { display: flex; flex-direction: column; }
+.pv-meta span { color: var(--text-3); font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+.pv-meta strong { font-weight: 600; color: var(--text); }
+.pv-pay-note { margin-top: 12px; padding: 8px 10px; background: #faf7f2; border-left: 2px solid var(--brand); border-radius: 4px; font-size: 9px; color: var(--text-2); line-height: 1.5; }
+
+/* Modern: meta met dunne lijnen */
+.pv-modern .pv-meta { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 8px 0; }
+/* Classic: meta binnen body i.p.v. volle breedte */
+.pv-classic .pv-parties { border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.pv-classic .pv-classic-meta { padding: 10px 0; margin-bottom: 6px; border-bottom: 1px solid var(--border); }
+.pv-classic .pv-pay-note { background: transparent; border-left: none; border-top: 1px solid var(--border); border-radius: 0; padding: 8px 0 0; }
+/* Minimal: rustiger */
+.pv-minimal .pv-parties { gap: 28px; margin-bottom: 16px; }
+.pv-minimal .pv-pay-note { background: transparent; border-left: none; padding: 10px 0 0; color: var(--text-3); }
+.pv-minimal .pv-meta { margin-top: 2px; }
 </style>

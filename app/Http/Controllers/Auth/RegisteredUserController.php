@@ -61,6 +61,7 @@ class RegisteredUserController extends Controller
                 'brand_color' => '#E8231F',
                 'default_payment_terms' => 30,
                 'invoice_number_format' => '{year}-{sequence:4}',
+                'invoice_footer' => 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.',
                 'invoice_template' => 'modern',
                 'invoice_font' => 'sans',
                 'price_mode' => 'excl',
