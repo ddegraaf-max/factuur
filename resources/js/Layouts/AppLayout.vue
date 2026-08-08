@@ -7,6 +7,7 @@ import EasyAgent from '@/Components/EasyAgent.vue';
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 const company = computed(() => page.props.auth.company);
+const version = computed(() => page.props.version);
 
 const initials = computed(() => {
   const parts = (user.value?.name ?? '').trim().split(/\s+/);
@@ -112,6 +113,8 @@ const logout = () => {
           <button class="user-menu-item" @click.stop="logout">Uitloggen</button>
         </div>
       </div>
+
+      <div class="sidebar-version" :title="'Softwareversie ' + version">{{ version }}</div>
     </aside>
 
     <div class="main">
@@ -303,6 +306,7 @@ table { border-collapse: collapse; width: 100%; }
 .user-info { flex: 1; min-width: 0; }
 .user-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-co { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-version { padding: 8px 16px 4px; font-size: 11px; color: var(--text-4); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }
 .user-menu {
   position: absolute;
   bottom: calc(100% + 4px);

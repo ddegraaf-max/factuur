@@ -1,0 +1,38 @@
+EASYINVOICE — VERSIENUMMER (drop-in voor 'factuur'-repo)
+========================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+WAT ER VERANDERT
+----------------
+- De softwareversie heet nu "Easy 1.0.0" (i.p.v. v1.0.0).
+- De versie wordt nu OOK in het klantportaal getoond: onderin de zijbalk,
+  net onder je account/bedrijf. Zo ziet elke gebruiker met welke versie
+  hij werkt. (Stond eerder alleen in de marketing-footer + inlogpagina —
+  daarom leek het "niet te werken" in de app.)
+- config/app.php            : standaardversie = "Easy 1.0.0"
+- app/Http/Middleware/HandleInertiaRequests.php : deelt de versie met de
+  hele Vue-app (zodat de portal 'm kan tonen — voor de zekerheid meegeleverd).
+- resources/js/Layouts/AppLayout.vue : toont de versie in de zijbalk.
+- .env.example              : APP_VERSION="Easy 1.0.0"
+
+VERSIE OPHOGEN BIJ EEN (ZACHTE) UPDATE
+--------------------------------------
+Er is één plek om het nummer te wijzigen — kies wat je makkelijker vindt:
+
+  A) In Railway → Variables:   APP_VERSION="Easy 1.0.1"
+     (geen code nodig; wint altijd van de standaard)
+  B) Of in code: config/app.php, de regel 'version' => env('APP_VERSION', 'Easy 1.0.1')
+
+Afspraak (semver):
+  - Zachte update / kleine fix : laatste cijfer omhoog   Easy 1.0.0 -> 1.0.1 -> 1.0.2
+  - Nieuwe functie            : middelste cijfer omhoog  Easy 1.0.x -> 1.1.0
+  - Grote wijziging           : eerste cijfer omhoog     Easy 1.x   -> 2.0.0
+
+Na de deploy zie je het nieuwe nummer meteen in de portal en de footer —
+zo weet je zeker dat de update live staat.
+
+TIP (optioneel, automatisch bewijs van deploy)
+Wil je dat er zónder handmatig ophogen tóch zichtbaar iets verandert per
+deploy? Railway zet automatisch de variabele RAILWAY_GIT_COMMIT_SHA klaar.
+Ik kan die als klein "build"-label achter de versie tonen (bijv.
+"Easy 1.0.0 · 3f9a1c2"), dat elke deploy meeloopt. Zeg het maar.
