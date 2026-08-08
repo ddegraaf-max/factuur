@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\StatusController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IncassoController;
@@ -39,7 +40,7 @@ Route::get('/helpcentrum/{slug}', function (string $slug) {
         'articles' => $articles,
     ]);
 })->name('help.article');
-Route::view('/status', 'marketing.status')->name('status');
+Route::get('/status', [StatusController::class, 'index'])->name('status');
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
 Route::view('/privacy', 'marketing.privacy')->name('privacy');
 Route::view('/cookies', 'marketing.cookies')->name('cookies');

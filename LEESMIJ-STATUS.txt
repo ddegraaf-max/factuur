@@ -1,0 +1,46 @@
+EASYINVOICE — LIVE STATUSPAGINA (drop-in voor de 'factuur'-repo)
+================================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+WAT ER VERANDERT
+----------------
+De statuspagina was statisch (vaste datum 7 juni, verzonnen uptime 99,98%
+en nep-incidenten). Die is vervangen door een LIVE versie.
+
+NIEUW:
+  - app/Http/Controllers/StatusController.php
+    Controleert bij elke paginaweergave echt:
+      • Database         (select 1)
+      • Opslag/bijlagen  (schrijf + lees + verwijder testbestand op 'local')
+      • Cache            (schrijf + lees + verwijder)
+      • E-mail           (is er een provider geconfigureerd: Resend of SMTP)
+      • PDF-engine       (dompdf aanwezig)
+    En leidt daaruit af: Webapplicatie, Inloggen & 2FA, Facturen & PDF,
+    Herinneringen & incasso.
+
+GEWIJZIGD:
+  - resources/views/marketing/status.blade.php
+    • "Laatst gecontroleerd" = het echte moment van openen (live).
+    • Per onderdeel groen "Operationeel" of rood "Storing".
+    • Banner wordt rood met "Storing bij een of meer onderdelen" zodra er
+      iets misgaat.
+    • De verzonnen uptime (99,98%) en incidentgeschiedenis zijn VERWIJDERD.
+  - routes/web.php
+    • /status draait nu via StatusController i.p.v. een statische view.
+
+BELANGRIJK — routes/web.php
+---------------------------
+Deze routes/web.php is gebaseerd op de vorige update (met Turnstile,
+rate-limiting en wachtwoord-vergeten) PLUS de status-wijziging. Pas je dit
+pakket ná de vorige update toe, dan overschrijf je routes/web.php gewoon —
+alles zit erin.
+
+OVER UPTIME-CIJFERS
+-------------------
+Een echt uptime-percentage (bijv. "99,9% laatste 90 dagen") kan niet uit
+één live-check komen; daarvoor is meetgeschiedenis nodig. Wil je dat later
+toch? Dan is een externe uptime-monitor (die je site elke minuut pingt) de
+eenvoudigste weg — die cijfers kunnen we dan tonen of naar linken.
+
+Tip: `php -l` lokaal draaien over StatusController.php en routes/web.php
+(kon ik in de sandbox niet; haakjes/structuur zijn wel gecontroleerd).
