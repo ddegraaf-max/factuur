@@ -12,3 +12,8 @@ Artisan::command('inspire', function () {
 Schedule::command('trials:remind')
     ->dailyAt('09:00')
     ->timezone('Europe/Amsterdam');
+
+// Dagelijks: verstuur betalingsherinneringen en aanmaningen voor achterstallige facturen.
+Schedule::command('invoices:remind')
+    ->dailyAt('08:00')
+    ->timezone('Europe/Amsterdam');

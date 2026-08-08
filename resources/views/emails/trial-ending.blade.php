@@ -51,7 +51,7 @@
                     <div class="days-label">{{ $daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
                 </div>
 
-                <p>Voor maar <strong>€10 per maand</strong> (excl. btw) houd je volledige toegang tot alles:</p>
+                <p>Voor maar <strong>€ 12,10 per maand</strong> (incl. btw) houd je volledige toegang tot alles:</p>
                 <ul class="feats">
                     <li>Onbeperkt facturen, klanten en producten</li>
                     <li>BTW automatisch · herinneringen · incasso</li>

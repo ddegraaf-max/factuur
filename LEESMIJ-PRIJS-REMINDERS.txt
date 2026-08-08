@@ -1,0 +1,61 @@
+EASYINVOICE — PRIJS € 12,10 INCL. BTW + AUTOMATISCHE HERINNERINGEN
+==================================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+VOLGORDE: pas eerst het incasso-pakket toe (dat bevat het reminder-logboek
+en de reminderteksten) en dan dit pakket. Draai daarna:
+   php artisan migrate      (als je 'm nog niet had gedraaid)
+
+
+1) PRIJS OVERAL € 12,10 INCL. 21% BTW
+-------------------------------------
+Alle abonnementsprijzen van EasyInvoice tonen nu "€ 12,10 per maand
+(incl. 21% btw)" i.p.v. €10. Aangepast in:
+  - marketing-layout (meta-titel, omschrijving, footer)
+  - landing (hero, prijssectie, CTA-regels, meta)
+  - voorwaarden, FAQ
+  - inlogpagina
+  - de e-mails: proef-bijna-afgelopen, proef-afgelopen, abonnement-opgezegd
+Bewust NIET aangepast: de demo-productprijzen en de concurrentievergelijkingen
+(€8-€25, Moneybird €18) — dat zijn geen EasyInvoice-prijzen.
+
+
+2) AUTOMATISCHE HERINNERINGEN & AANMANINGEN (cron)
+--------------------------------------------------
+Nieuw:
+  - app/Services/ReminderService.php     (bepaalt per factuur de juiste stap)
+  - app/Mail/PaymentReminderMail.php     (+ resources/views/emails/payment-reminder.blade.php)
+  - app/Console/Commands/SendPaymentReminders.php   (command: invoices:remind)
+  - routes/console.php                   (dagelijks om 08:00)
+
+Wat het doet: elke dag worden achterstallige facturen nagelopen. Op basis van
+je instellingen (Instellingen -> Herinneringen: timing + teksten) wordt op het
+juiste moment de eerstvolgende herinnering of aanmaning per e-mail naar de
+klant gestuurd — mét de factuur als PDF — en vastgelegd in het logboek
+(reminder_logs). Dat logboek vult meteen ook het "verloop" in het
+incasso-dossier.
+
+Regels/beveiligingen:
+  - Alleen facturen met status verzonden/deels/achterstallig en een openstaand
+    bedrag > 0 (negatief alleen als je dat aanzet).
+  - Er moet een e-mailadres bij de klant/factuur staan.
+  - Per factuur maximaal één stap per dag (geen spam).
+  - Facturen waarvan een stap meer dan 60 dagen te laat zou zijn, worden
+    overgeslagen (voorkomt dat oude facturen bij het aanzetten een lawine
+    aan mails krijgen).
+
+>>> BELANGRIJK — de cron moet draaien op Railway <<<
+Laravel's planner draait niet vanzelf. Kies één van deze:
+  A) Een Railway "Cron"/scheduled service die elke minuut draait:
+        php artisan schedule:run
+     (dan vuurt invoices:remind automatisch dagelijks om 08:00)
+  B) Of een dagelijkse Railway-cron die direct draait:
+        php artisan invoices:remind
+
+Test: maak een testfactuur met een vervaldatum in het verleden en een
+klant-e-mailadres, draai handmatig `php artisan invoices:remind`, en
+controleer of de herinnering aankomt en in het verloop verschijnt.
+
+
+Nog op de planning: de PDF-opfrisser van de drie factuurstijlen.
+Tip: draai lokaal `php -l` over de PHP-bestanden.

@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'EasyInvoice — Facturatie zonder gedoe vanaf €10/maand')
-@section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf €10 per maand.')
+@section('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10/maand incl. btw')
+@section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw).')
 
 @section('content')
 
@@ -153,7 +153,7 @@
     <div class="eyebrow">Voor Nederlandse ondernemers</div>
     <h1>Facturatie <span class="accent">zonder gedoe.</span></h1>
     <p class="hero-sub">
-      Stuur facturen, beheer je klanten en houd je BTW automatisch bij. Speciaal voor ZZP'ers en MKB — voor <b style="color:var(--text);font-weight:600;">maar €10 per maand</b>.
+      Stuur facturen, beheer je klanten en houd je BTW automatisch bij. Speciaal voor ZZP'ers en MKB — voor <b style="color:var(--text);font-weight:600;">maar € 12,10 per maand (incl. 21% btw)</b>.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -165,7 +165,7 @@
       </a>
     </div>
     <div class="hero-trust">
-      Geen creditcard nodig · 14 dagen gratis · Daarna <b>€10/maand</b>
+      Geen creditcard nodig · 14 dagen gratis · Daarna <b>€ 12,10/maand incl. btw</b>
     </div>
 
     <!-- APP MOCKUP — geanimeerd, realistisch dashboard -->
@@ -679,7 +679,7 @@
           <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="faq-content">
-          Alles. Voor €10 per maand (excl. BTW) krijg je het volledige product — onbeperkt facturen, klanten, producten, incasso, AI-assistent, alle functies. We geloven niet in betaalmuren voor basisfuncties.
+          Alles. Voor € 12,10 per maand (incl. 21% btw) krijg je het volledige product — onbeperkt facturen, klanten, producten, incasso, AI-assistent, alle functies. We geloven niet in betaalmuren voor basisfuncties.
         </div>
       </details>
     </div>
@@ -698,7 +698,7 @@
       Start 14 dagen gratis
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
-    <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna €10/maand</div>
+    <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna € 12,10/maand incl. btw</div>
   </div>
 </section>
 

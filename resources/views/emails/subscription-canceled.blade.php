@@ -52,7 +52,7 @@
                     <p>Tot die datum houd je volledige toegang. Daarna stopt je abonnement automatisch. <strong>Je account, facturen en gegevens blijven bewaard</strong>.</p>
                 @endif
 
-                <p>Van gedachten veranderd? Je kunt met één klik weer verder — voor <strong>€10 per maand</strong> (excl. btw) heb je meteen weer alles:</p>
+                <p>Van gedachten veranderd? Je kunt met één klik weer verder — voor <strong>€ 12,10 per maand</strong> (incl. btw) heb je meteen weer alles:</p>
                 <ul class="feats">
                     <li>Onbeperkt facturen, klanten en producten</li>
                     <li>BTW automatisch · herinneringen · incasso</li>

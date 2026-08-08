@@ -47,7 +47,7 @@
                     <div class="notice-sub">Sluit een abonnement af om weer verder te gaan</div>
                 </div>
 
-                <p>Voor maar <strong>€10 per maand</strong> (excl. btw) heb je meteen weer volledige toegang tot alles:</p>
+                <p>Voor maar <strong>€ 12,10 per maand</strong> (incl. btw) heb je meteen weer volledige toegang tot alles:</p>
                 <ul class="feats">
                     <li>Onbeperkt facturen, klanten en producten</li>
                     <li>BTW automatisch · herinneringen · incasso</li>
