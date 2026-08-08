@@ -1,0 +1,59 @@
+EASYINVOICE — FACTUUR VERSTUREN (CC/BCC) + CHANGELOG + PDF-OPFRISSER
+====================================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+!! NA DEPLOY VERPLICHT: database migreren !!
+   php artisan migrate
+   (voegt de kolom 'accountant_email' toe aan companies)
+
+
+1) FACTUUR WORDT NU ÉCHT GEMAILD (met CC en BCC)
+------------------------------------------------
+Belangrijk: bij "verstuur factuur" werd de factuur voorheen NIET gemaild —
+alleen de status werd op 'verstuurd' gezet. Dat is nu gebouwd:
+  - TO  : de klant (het e-mailadres op de factuur)
+  - CC  : jijzelf — "Kopie naar jezelf" of anders je bedrijfs-e-mailadres
+  - BCC : je boekhoudkantoor (onzichtbaar voor de klant)
+De factuur gaat mee als PDF-bijlage, met een nette begeleidende e-mail.
+
+Nieuw veld: in Instellingen -> Bedrijfsgegevens staat nu een kaart
+"Facturen versturen" met:
+  - Kopie naar jezelf (CC)
+  - Boekhoudkantoor (BCC)
+
+Gewijzigd/nieuw:
+  - database/migrations/..._add_accountant_email_to_companies.php
+  - app/Mail/InvoiceMail.php + resources/views/emails/invoice.blade.php
+  - app/Services/InvoiceManager.php   (verstuurt de mail met CC/BCC)
+  - app/Models/Company.php            (veld accountant_email)
+  - app/Http/Controllers/SettingsController.php (validatie)
+  - resources/js/Pages/Settings/Company.vue (de twee velden)
+
+Let op:
+  - De factuur wordt alleen gemaild als er een e-mailadres bij de klant staat.
+  - E-mail moet werken (je Resend-config). Test één keer met een testfactuur.
+  - Company.php en SettingsController.php in dit pakket zijn de VOLLEDIGE versie
+    (bevatten ook de reminderteksten uit het incasso-pakket). Gewoon overschrijven.
+
+
+2) CHANGELOG -> "EASY"-VERSIES
+------------------------------
+De "Wat is nieuw"-pagina gebruikte nog v2.4 / v2.3 enз. Dat is nu consistent
+met je versienaam:
+  15 mei 2026  -> Easy 1.0.0
+  2 april 2026 -> Easy 0.9
+  10 maart 2026-> Easy 0.8
+  5 februari 2026 -> Easy 0.7
+
+
+3) PDF-OPFRISSER (3 stijlen)
+----------------------------
+De factuur-PDF's zijn visueel opgefrist (alleen vormgeving; alle gegevens en
+velden blijven gelijk):
+  - Modern  : strak, met een duidelijke merk-"Te betalen"-balk, nette meta-rij
+              en een merk-getinte betaalregel.
+  - Klassiek: zachtere lijnen, rustiger ogend, formele uitstraling behouden.
+  - Minimaal: subtiel verfijnde lijnen, veel witruimte.
+
+Tip: draai lokaal `php -l` over de PHP-bestanden en controleer één test-PDF
+per stijl (dompdf kan iets afwijken van de browser).

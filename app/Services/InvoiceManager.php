@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
+use App\Mail\InvoiceMail;
 use App\Models\Customer;
 use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class InvoiceManager
 {
@@ -108,7 +112,7 @@ class InvoiceManager
             throw new \DomainException('Alleen concepten kunnen worden verstuurd.');
         }
 
-        return DB::transaction(function () use ($invoice) {
+        $invoice = DB::transaction(function () use ($invoice) {
             if (! $invoice->number) {
                 $invoice->number = $this->numbers->generate(
                     $invoice->company,
@@ -121,6 +125,55 @@ class InvoiceManager
 
             return $invoice;
         });
+
+        $this->emailInvoice($invoice);
+
+        return $invoice;
+    }
+
+    /**
+     * Mail de factuur (met PDF) naar de klant.
+     *  - TO  : de klant
+     *  - CC  : jouw eigen kopie-adres (of je bedrijfs-e-mail)
+     *  - BCC : je boekhoudkantoor (indien ingesteld)
+     * Faalt de mail, dan blijft de factuur gewoon 'verstuurd' en loggen we de fout.
+     */
+    protected function emailInvoice(Invoice $invoice): void
+    {
+        try {
+            if (! $invoice->customer_email) {
+                return;
+            }
+
+            $company = $invoice->company;
+            $invoice->load('lines');
+
+            $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
+                ? $company->invoice_template
+                : 'modern';
+
+            $pdf = Pdf::loadView("pdf.invoice-{$template}", [
+                'invoice' => $invoice,
+                'company' => $company,
+            ])->setPaper('a4')->output();
+
+            $mail = Mail::to($invoice->customer_email);
+
+            $cc = $company->copy_email ?: $company->email;
+            if ($cc && strcasecmp($cc, $invoice->customer_email) !== 0) {
+                $mail->cc($cc);
+            }
+            if (! empty($company->accountant_email)) {
+                $mail->bcc($company->accountant_email);
+            }
+
+            $mail->send(new InvoiceMail($invoice, $pdf));
+        } catch (\Throwable $e) {
+            Log::error('Factuur mailen mislukt', [
+                'invoice' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     protected function syncLines(Invoice $invoice, array $lines): void

@@ -44,6 +44,7 @@ class SettingsController extends Controller
             'default_send_method' => ['nullable', 'in:email,post,both'],
             'results_per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
             'copy_email' => ['nullable', 'email'],
+            'accountant_email' => ['nullable', 'email'],
             'daily_notification_enabled' => ['nullable', 'boolean'],
             'daily_notification_email' => ['nullable', 'email'],
             'default_payment_terms' => ['required', 'integer', 'min:0', 'max:365'],

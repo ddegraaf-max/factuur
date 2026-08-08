@@ -31,7 +31,7 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 mei 2026 · v2.4</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 mei 2026 · Easy 1.0.0</div>
         <h3>EASY-assistent: je slimme hulp</h3>
         <ul class="tl-list">
           <li>Stel vragen over je administratie en krijg direct antwoord.</li>
@@ -42,7 +42,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 2 april 2026 · v2.3</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 2 april 2026 · Easy 0.9</div>
         <h3>Incassotraject in fases</h3>
         <ul class="tl-list">
           <li>Gefaseerd traject: herinnering → aanmaning → incasso.</li>
@@ -53,7 +53,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 maart 2026 · v2.2</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 maart 2026 · Easy 0.8</div>
         <h3>Creditfacturen &amp; deelbetalingen</h3>
         <ul class="tl-list">
           <li>Maak in één klik een creditnota op een bestaande factuur.</li>
@@ -63,7 +63,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 5 februari 2026 · v2.1</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 5 februari 2026 · Easy 0.7</div>
         <h3>Nieuwe factuursjablonen</h3>
         <ul class="tl-list">
           <li>Modern sjabloon met meer ruimte voor je huisstijl.</li>

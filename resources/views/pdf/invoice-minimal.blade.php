@@ -64,7 +64,7 @@
   .lines th.right { text-align: right; }
   .lines td {
     padding: 14px 0;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #EFEEEC;
     font-size: 10pt;
     vertical-align: top;
   }

@@ -1,0 +1,37 @@
+@php
+    $open = number_format((float) $invoice->total - (float) $invoice->paid_total, 2, ',', '.');
+    $total = number_format((float) $invoice->total, 2, ',', '.');
+    $terms = (int) ($invoice->payment_terms ?? $company->default_payment_terms ?? 14);
+@endphp
+<!DOCTYPE html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="margin:0;background:#f5f5f4;font-family:Arial,Helvetica,sans-serif;color:#1c1917;">
+  <div style="max-width:600px;margin:0 auto;padding:24px;">
+    <div style="background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+      <div style="padding:20px 24px;border-bottom:1px solid #e7e5e4;">
+        <div style="font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+      </div>
+      <div style="padding:24px;font-size:14px;line-height:1.7;">
+        <p style="margin:0 0 14px;">Beste {{ $invoice->customer_name }},</p>
+        <p style="margin:0 0 14px;">
+          Hierbij ontvangt u factuur <strong>{{ $invoice->number }}</strong> van {{ optional($invoice->invoice_date)->format('d-m-Y') }}
+          voor een bedrag van <strong>€ {{ $total }}</strong>. De factuur vindt u als PDF in de bijlage.
+        </p>
+        <p style="margin:0 0 14px;">
+          Wij verzoeken u het bedrag binnen <strong>{{ $terms }} dagen</strong> te voldoen
+          @if($company->iban)op <strong>{{ $company->iban }}</strong> t.n.v. {{ $company->name }}@endif
+          onder vermelding van factuurnummer <strong>{{ $invoice->number }}</strong>.
+        </p>
+        @if($company->invoice_footer)
+          <p style="margin:16px 0 0;color:#78716c;font-size:13px;line-height:1.6;">{{ $company->invoice_footer }}</p>
+        @endif
+        <p style="margin:18px 0 0;">Met vriendelijke groet,<br>{{ $company->name }}</p>
+      </div>
+    </div>
+    <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
+      Verzonden via EasyInvoice namens {{ $company->name }}.
+    </p>
+  </div>
+</body>
+</html>

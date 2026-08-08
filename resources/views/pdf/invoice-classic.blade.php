@@ -42,7 +42,7 @@
 
   /* Party block — bordered */
   .party-block {
-    border: 1px solid #888;
+    border: 1px solid #D6D3D1;
     padding: 12px 14px;
     margin-bottom: 18px;
   }
@@ -55,7 +55,7 @@
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 16px;
-    border: 1px solid #6b6b6b;
+    border: 1px solid #D6D3D1;
   }
   .lines th {
     background: {{ $company->brand_color }};
@@ -70,7 +70,7 @@
   .lines th.center { text-align: center; }
   .lines td {
     padding: 8px 10px;
-    border: 1px solid #c0c0c0;
+    border: 1px solid #E7E5E4;
     font-size: 10pt;
     vertical-align: top;
   }
@@ -88,7 +88,7 @@
   .totals tr td {
     padding: 5px 8px;
     font-size: 10pt;
-    border-bottom: 1px solid #c0c0c0;
+    border-bottom: 1px solid #E7E5E4;
   }
   .totals .label { color: #333; }
   .totals .value { text-align: right; font-weight: 500; }
@@ -100,8 +100,8 @@
     font-size: 12pt;
   }
 
-  .notes { clear: both; margin-top: 36px; padding: 12px 14px; border: 1px solid #ccc; background: #fafafa; font-size: 9.5pt; font-style: italic; }
-  .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 9pt; color: #555; text-align: center; font-style: italic; }
+  .notes { clear: both; margin-top: 36px; padding: 12px 14px; border: 1px solid #E7E5E4; background: #FAFAF9; font-size: 9.5pt; font-style: italic; }
+  .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #E7E5E4; font-size: 9pt; color: #78716C; text-align: center; font-style: italic; }
   .badge { display: inline-block; padding: 2px 8px; border: 1px solid #B45309; font-size: 8pt; font-weight: 600; color: #B45309; }
 </style>
 </head>

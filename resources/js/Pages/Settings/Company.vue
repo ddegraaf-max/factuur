@@ -13,6 +13,8 @@ const form = useForm({
   vat_number: props.company.vat_number ?? '',
   iban: props.company.iban ?? '',
   email: props.company.email ?? '',
+  copy_email: props.company.copy_email ?? '',
+  accountant_email: props.company.accountant_email ?? '',
   phone: props.company.phone ?? '',
   website: props.company.website ?? '',
   address_line: props.company.address_line ?? '',
@@ -93,6 +95,30 @@ const submit = () => form.patch(route('settings.company.update'));
           <div class="form-group" style="margin:0;">
             <label>Website</label>
             <input type="url" v-model="form.website" maxlength="255" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header"><div class="card-title">Facturen versturen</div></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--text-3);line-height:1.6;margin:0 0 14px;">
+            Wanneer je een factuur verstuurt, gaat deze naar de klant. Hieronder stel je in wie
+            automatisch een kopie ontvangt: jijzelf (CC) en je boekhoudkantoor (BCC, onzichtbaar voor de klant).
+          </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Kopie naar jezelf (CC)</label>
+              <input type="email" v-model="form.copy_email" maxlength="255" placeholder="jij@bedrijf.nl">
+              <div v-if="form.errors.copy_email" class="field-error">{{ form.errors.copy_email }}</div>
+              <div class="muted">Leeg = je bedrijfs-e-mailadres.</div>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label>Boekhoudkantoor (BCC)</label>
+              <input type="email" v-model="form.accountant_email" maxlength="255" placeholder="administratie@kantoor.nl">
+              <div v-if="form.errors.accountant_email" class="field-error">{{ form.errors.accountant_email }}</div>
+              <div class="muted">Onzichtbaar voor de klant.</div>
+            </div>
           </div>
         </div>
       </div>

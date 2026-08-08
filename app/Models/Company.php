@@ -18,7 +18,7 @@ class Company extends Model
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
         'numbering_settings', 'price_mode', 'fiscal_year_start',
         'default_send_method', 'results_per_page',
-        'copy_email', 'daily_notification_enabled', 'daily_notification_email',
+        'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings',
         'default_payment_terms', 'invoice_footer', 'invoice_number_format',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
