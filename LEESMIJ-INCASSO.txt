@@ -1,0 +1,61 @@
+EASYINVOICE — INCASSO (echte Armaere) + REMINDER-TEKSTEN
+========================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+
+!! NA DEPLOY VERPLICHT: database migreren !!
+   php artisan migrate
+   (maakt de tabel 'reminder_logs' aan voor het dossier-verloop)
+
+
+1) INCASSO — ECHTE PARTNER ARMAERE
+----------------------------------
+- De verzonnen "No cure, no pay tot €5.000" en het nep-telefoonnummer/portal
+  zijn WEG. De incasso-portalpagina toont nu alleen echte info: de naam en
+  het aanleveradres.
+- Bij overdracht van een achterstallige factuur gaat er nu AUTOMATISCH een
+  COMPLEET DOSSIER per e-mail naar de incassopartner:
+     TO : j.backers@armaere.nl
+     CC : info@creditline.nl
+  De mail bevat:
+     • crediteur- en debiteurgegevens
+     • factuurgegevens + openstaand bedrag
+     • verloop (verstuurde herinneringen/aanmaningen + ontvangen betalingen)
+     • de factuur als PDF-bijlage + alle bijlagen uit het originele dossier
+  De opdrachtbevestiging door de klant geldt als akkoord voor overdracht;
+  dat staat ook in de dossiermail vermeld.
+
+  Adressen aanpassen kan (optioneel) via Railway → Variables:
+     INCASSO_CLAIMS_EMAIL=j.backers@armaere.nl
+     INCASSO_CC=info@creditline.nl
+     INCASSO_PARTNER_NAME=Armaere Gerechtsdeurwaarders
+  (Zonder deze variabelen worden bovenstaande standaarden gebruikt.)
+
+  Let op: e-mail moet werken (je Resend-config). Test de overdracht één keer
+  met een testfactuur en controleer of de dossiermail aankomt.
+
+
+2) HERINNERING- & AANMANING-TEKSTEN
+-----------------------------------
+- In Instellingen → Herinneringen staat nu een extra kaart "Teksten" met een
+  onderwerp + bericht voor de HERINNERING en voor de AANMANING.
+- Er staan nette standaardteksten in (Nederlands), met variabelen die
+  automatisch worden ingevuld:
+     {klant} {factuurnummer} {factuurdatum} {vervaldatum}
+     {bedrag} {openstaand} {termijn} {iban} {bedrijf}
+- De teksten worden opgeslagen bij de overige herinneringsinstellingen.
+
+
+BELANGRIJK — WAT ER NOG NIET IN ZIT (volgende stap)
+---------------------------------------------------
+De AUTOMATISCHE VERZENDING van herinneringen/aanmaningen bestond nog niet
+(er was alleen het schema + nu de teksten). Deze update voegt de teksten en
+het logboek toe, maar de daadwerkelijke automatische verzending op schema
+(een dagelijkse cron die de juiste factuur op het juiste moment mailt en in
+reminder_logs bijschrijft) lever ik als de DIRECT volgende stap. Zodra die
+draait, vult zich ook automatisch het "verloop" in het incasso-dossier.
+
+Tot die tijd: het incasso-dossier werkt volledig (factuur + bijlagen +
+betalingen), alleen het herinnerings-verloop is nog leeg omdat er nog geen
+herinneringen automatisch zijn verstuurd.
+
+Tip: draai lokaal `php artisan migrate` en `php -l` over de PHP-bestanden.

@@ -99,6 +99,32 @@ const submit = () => form.patch(route('settings.reminders.update'), { preserveSc
         </div>
       </div>
 
+      <div class="card" style="margin-top:14px;">
+        <div class="card-header"><div class="card-title">Teksten</div></div>
+        <div class="card-body" style="padding:18px 20px;">
+          <p class="txt-help">
+            Deze teksten worden verstuurd. Gebruik variabelen — ze worden automatisch ingevuld:
+            <code>{klant}</code> <code>{factuurnummer}</code> <code>{factuurdatum}</code>
+            <code>{vervaldatum}</code> <code>{bedrag}</code> <code>{openstaand}</code>
+            <code>{termijn}</code> <code>{iban}</code> <code>{bedrijf}</code>
+          </p>
+
+          <div class="txt-block">
+            <div class="txt-label">Herinnering — onderwerp</div>
+            <input type="text" v-model="form.reminder_subject" />
+            <div class="txt-label">Herinnering — bericht</div>
+            <textarea v-model="form.reminder_body" rows="8"></textarea>
+          </div>
+
+          <div class="txt-block">
+            <div class="txt-label">Aanmaning — onderwerp</div>
+            <input type="text" v-model="form.warning_subject" />
+            <div class="txt-label">Aanmaning — bericht</div>
+            <textarea v-model="form.warning_body" rows="8"></textarea>
+          </div>
+        </div>
+      </div>
+
       <div class="tl-preview-card">
         <div class="tl-title">Hoe werken betalingsherinneringen op basis van jouw instellingen?</div>
         <div class="reminder-timeline">
@@ -142,4 +168,11 @@ const submit = () => form.patch(route('settings.reminders.update'), { preserveSc
 .tl-row.warning .tl-dot { background: var(--brand); }
 .tl-day { font-weight: 600; min-width: 50px; }
 .tl-row.sub .tl-day { font-weight: 500; }
+
+.txt-help { font-size: 12.5px; color: var(--text-3); line-height: 1.8; margin: 0 0 18px; }
+.txt-help code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11.5px; color: var(--text-2); }
+.txt-block { margin-bottom: 20px; }
+.txt-block:last-child { margin-bottom: 0; }
+.txt-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); margin: 12px 0 6px; }
+.txt-block input, .txt-block textarea { width: 100%; }
 </style>

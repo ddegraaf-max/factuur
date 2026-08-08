@@ -42,9 +42,8 @@ const phaseLabels = {
         <div class="sub">{{ handler.tagline }}</div>
       </div>
       <div class="contacts">
-        <div>📞 <b>{{ handler.phone }}</b></div>
-        <div>✉ {{ handler.email }}</div>
-        <div>🌐 {{ handler.portal }}</div>
+        <div>✉ <b>{{ handler.email }}</b></div>
+        <div style="opacity:.7;font-size:12px;margin-top:4px;">Nieuwe dossiers worden automatisch<br>per e-mail aangeleverd.</div>
       </div>
     </div>
 

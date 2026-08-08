@@ -66,6 +66,10 @@ class Company extends Model
             'negative_outstanding'  => false,
             'reminder_delay'        => 0,
             'warning_delay'         => 0,
+            'reminder_subject' => 'Herinnering: factuur {factuurnummer} is nog niet voldaan',
+            'reminder_body' => "Beste {klant},\n\nUit onze administratie blijkt dat factuur {factuurnummer} van {factuurdatum} nog niet is voldaan. De vervaldatum was {vervaldatum}.\n\nWaarschijnlijk is dit aan uw aandacht ontsnapt. Wij verzoeken u vriendelijk het openstaande bedrag van {openstaand} binnen {termijn} dagen over te maken op {iban} t.n.v. {bedrijf}, onder vermelding van factuurnummer {factuurnummer}.\n\nHeeft u de betaling inmiddels gedaan? Dan kunt u deze herinnering als niet verzonden beschouwen.\n\nMet vriendelijke groet,\n{bedrijf}",
+            'warning_subject' => 'Aanmaning: laatste verzoek tot betaling van factuur {factuurnummer}',
+            'warning_body' => "Beste {klant},\n\nOndanks onze eerdere herinnering(en) staat factuur {factuurnummer} van {factuurdatum} nog steeds open. Het openstaande bedrag bedraagt {openstaand}.\n\nWij verzoeken u dringend dit bedrag binnen {termijn} dagen te voldoen op {iban} t.n.v. {bedrijf}, onder vermelding van factuurnummer {factuurnummer}. Blijft betaling uit, dan zijn wij genoodzaakt de vordering — verhoogd met de wettelijke incassokosten en rente — over te dragen aan onze incassopartner.\n\nMet vriendelijke groet,\n{bedrijf}",
         ];
         return array_replace($defaults, $this->reminder_settings ?? []);
     }

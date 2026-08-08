@@ -60,6 +60,7 @@ class Invoice extends Model
     public function customer(): BelongsTo { return $this->belongsTo(Customer::class)->withoutGlobalScope('company'); }
     public function lines(): HasMany { return $this->hasMany(InvoiceLine::class)->orderBy('sort_order'); }
     public function payments(): HasMany { return $this->hasMany(Payment::class); }
+    public function reminderLogs(): HasMany { return $this->hasMany(ReminderLog::class)->orderBy('sent_at'); }
     public function attachments(): MorphMany { return $this->morphMany(Attachment::class, 'attachable'); }
     public function creditNotes(): HasMany { return $this->hasMany(Invoice::class, 'credits_invoice_id'); }
     public function originalInvoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'credits_invoice_id')->withoutGlobalScope('company'); }

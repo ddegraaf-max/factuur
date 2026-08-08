@@ -41,11 +41,9 @@ class IncassoController extends Controller
                 'oldest_days' => $oldest,
             ],
             'handler' => [
-                'name' => 'Armaere Gerechtsdeurwaarders',
-                'phone' => '+31 88 100 1000',
-                'email' => 'dossiers@armaere.nl',
-                'portal' => 'portal.armaere.nl',
-                'tagline' => 'Vaste deurwaarder · No cure, no pay tot € 5.000',
+                'name' => config('incasso.partner_name'),
+                'email' => config('incasso.claims_email'),
+                'tagline' => 'Gerechtsdeurwaarder · vaste incassopartner',
             ],
         ]);
     }
@@ -53,7 +51,7 @@ class IncassoController extends Controller
     public function send(Invoice $invoice)
     {
         $this->service->send($invoice);
-        return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} aangemaakt bij Armaere.");
+        return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} overgedragen aan " . config('incasso.partner_name') . " en per e-mail verzonden.");
     }
 
     public function updatePhase(Request $request, Invoice $invoice)

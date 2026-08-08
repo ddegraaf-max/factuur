@@ -146,6 +146,10 @@ class SettingsController extends Controller
             'negative_outstanding' => 'boolean',
             'reminder_delay' => 'required|integer|min:0|max:30',
             'warning_delay' => 'required|integer|min:0|max:30',
+            'reminder_subject' => 'nullable|string|max:200',
+            'reminder_body' => 'nullable|string|max:4000',
+            'warning_subject' => 'nullable|string|max:200',
+            'warning_body' => 'nullable|string|max:4000',
         ]);
         auth()->user()->company->update(['reminder_settings' => $data]);
         return back()->with('flash', 'Herinneringen opgeslagen.');
