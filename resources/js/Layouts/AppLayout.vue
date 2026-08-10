@@ -8,6 +8,7 @@ const page = usePage();
 const user = computed(() => page.props.auth.user);
 const company = computed(() => page.props.auth.company);
 const version = computed(() => page.props.version);
+const sidebarOpen = ref(false);
 
 const initials = computed(() => {
   const parts = (user.value?.name ?? '').trim().split(/\s+/);
@@ -69,7 +70,7 @@ const logout = () => {
 
 <template>
   <div class="app">
-    <aside class="sidebar">
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
       <Link :href="route('dashboard')" class="sidebar-brand">
         <img src="/images/easyinvoice-favicon-180.png" class="logo-mark" alt="EasyInvoice" />
         <span class="brand-name">EasyInvoice</span>
@@ -83,6 +84,7 @@ const logout = () => {
             :key="item.route"
             :href="route(item.route)"
             :class="['nav-item', { active: isActive(item.route) }]"
+            @click="sidebarOpen = false"
           >
             <!-- Icons -->
             <svg v-if="item.icon === 'dashboard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
@@ -116,10 +118,14 @@ const logout = () => {
 
       <div class="sidebar-version" :title="'Softwareversie ' + version">{{ version }}</div>
     </aside>
+    <div class="sidebar-overlay" v-if="sidebarOpen" @click="sidebarOpen = false"></div>
 
     <div class="main">
       <header class="topbar">
         <div class="topbar-left">
+          <button class="topbar-toggle" @click="sidebarOpen = true" aria-label="Menu openen">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
           <slot name="breadcrumb"></slot>
         </div>
         <div class="topbar-right">
@@ -574,13 +580,27 @@ table { border-collapse: collapse; width: 100%; }
 .filter-chip .count { font-family: var(--font-mono); margin-left: 4px; opacity: 0.7; }
 
 /* RESPONSIVE */
+.topbar-toggle { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; margin-left: -8px; border-radius: 8px; color: var(--text-2); cursor: pointer; flex-shrink: 0; }
+.topbar-toggle svg { width: 22px; height: 22px; }
+.topbar-toggle:hover { background: var(--surface-2); color: var(--text); }
+.sidebar-overlay { display: none; }
+
 @media (max-width: 1100px) {
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
   .app { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; z-index: 100;
+    width: 268px; max-width: 84vw; height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 10px 40px rgba(28, 25, 23, 0.18);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: block; position: fixed; inset: 0; z-index: 90; background: rgba(28, 25, 23, 0.45); }
+  .topbar-toggle { display: inline-flex; }
   .content { padding: 16px; }
-  .topbar { padding: 0 16px; }
+  .topbar { padding: 0 12px; }
 }
 </style>

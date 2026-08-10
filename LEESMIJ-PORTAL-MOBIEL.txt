@@ -1,0 +1,30 @@
+EASYINVOICE — PORTAAL MOBIEL (drop-in voor 'factuur'-repo)
+==========================================================
+Uitpakken op de ROOT van je factuur-repo, committen, deployen.
+(De Vue-wijziging wordt in de build meegenomen.)
+
+WAT ER MIS WAS
+--------------
+In het ingelogde portaal werd de zijbalk onder 760px volledig verborgen
+(.sidebar { display: none }) — zónder vervanging. Op een telefoon had je
+daardoor GEEN navigatie meer: je kon niet bij Facturen, Klanten, Instellingen enz.
+
+WAT ER NU IS
+------------
+resources/js/Layouts/AppLayout.vue
+  - Op mobiel verschijnt links in de topbar een hamburgerknop.
+  - Tik erop en de zijbalk schuift in als een net "drawer"-menu met de
+    volledige navigatie + je account + het versienummer onderin.
+  - Een donkere overlay verschijnt over de inhoud; tik ernaast (of op een
+    menu-item) en het menu sluit weer.
+  - Op desktop verandert er niets.
+
+Deze layout is gebaseerd op de versie met het versienummer in de zijbalk,
+dus die blijft behouden. Gewoon overschrijven.
+
+NOG EEN AANDACHTSPUNT (optioneel)
+---------------------------------
+Brede gegevens-tabellen (bijv. de facturenlijst) kunnen op hele kleine
+schermen horizontaal langer zijn dan het scherm. De navigatie/bediening
+werkt nu volledig; wil je dat specifieke lijsten op mobiel netjes
+in-scrollen of als kaartjes tonen, dan pak ik die pagina's gericht aan.
