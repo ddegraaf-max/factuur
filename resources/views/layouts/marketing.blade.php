@@ -77,14 +77,30 @@
   /* NAV */
   .nav { position: sticky; top: 0; z-index: 50; background: rgba(250, 250, 249, 0.85); backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--border); }
   .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
-  .nav-brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--text); }
-  .nav-brand img { width: 30px; height: 30px; border-radius: 6px; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--text); }
+  .nav-brand img { width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; }
   .nav-links { display: flex; align-items: center; gap: 6px; }
   .nav-link { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--text-2); border-radius: 8px; transition: all 0.15s; }
   .nav-link:hover { color: var(--text); background: var(--surface-2); }
   .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .nav-toggle-cb { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+  .nav-toggle { display: none; width: 44px; height: 44px; border-radius: 10px; cursor: pointer; align-items: center; justify-content: center; flex-direction: column; gap: 5px; margin-right: -8px; flex-shrink: 0; }
+  .nav-toggle:hover { background: var(--surface-2); }
+  .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: transform 0.2s, opacity 0.2s; }
+  .nav-toggle-cb:focus-visible ~ .nav-inner .nav-toggle { outline: 2px solid var(--brand); outline-offset: 2px; }
+  .nav-mobile { display: none; border-top: 1px solid var(--border); background: var(--bg); padding: 8px 24px 20px; }
+  .nav-mobile-link { display: block; padding: 13px 2px; font-size: 16px; font-weight: 500; color: var(--text-2); border-bottom: 1px solid var(--border); }
+  .nav-mobile-link:hover { color: var(--text); }
+  .nav-mobile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+  .btn-block { width: 100%; justify-content: center; }
   @media (max-width: 880px) {
     .nav-links { display: none; }
+    .nav-actions { display: none; }
+    .nav-toggle { display: flex; }
+    .nav-toggle-cb:checked ~ .nav-mobile { display: block; }
+    .nav-toggle-cb:checked ~ .nav-inner .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle-cb:checked ~ .nav-inner .nav-toggle span:nth-child(2) { opacity: 0; }
+    .nav-toggle-cb:checked ~ .nav-inner .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   }
 
   /* HERO */
@@ -430,6 +446,7 @@
 
 <!-- NAVIGATION -->
 <header class="nav">
+  <input type="checkbox" id="navToggle" class="nav-toggle-cb" aria-label="Menu openen of sluiten">
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
       <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice logo">
@@ -444,6 +461,17 @@
     <div class="nav-actions">
       <a href="{{ route('login') }}" class="btn btn-ghost">Inloggen</a>
       <a href="{{ route('register') }}" class="btn btn-primary">Start gratis →</a>
+    </div>
+    <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
+  </div>
+  <div class="nav-mobile">
+    <a href="/#functies" class="nav-mobile-link">Functies</a>
+    <a href="/#prijzen" class="nav-mobile-link">Prijzen</a>
+    <a href="/#reviews" class="nav-mobile-link">Reviews</a>
+    <a href="{{ route('faq') }}" class="nav-mobile-link">Veelgestelde vragen</a>
+    <div class="nav-mobile-actions">
+      <a href="{{ route('login') }}" class="btn btn-secondary btn-block">Inloggen</a>
+      <a href="{{ route('register') }}" class="btn btn-primary btn-block">Start gratis →</a>
     </div>
   </div>
 </header>
@@ -512,6 +540,20 @@
     </div>
   </div>
 </footer>
+
+<script>
+(function () {
+  var cb = document.getElementById('navToggle');
+  if (!cb) return;
+  var close = function () { cb.checked = false; };
+  document.querySelectorAll('.nav-mobile a').forEach(function (link) {
+    link.addEventListener('click', close);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') close();
+  });
+})();
+</script>
 
 </body>
 </html>
