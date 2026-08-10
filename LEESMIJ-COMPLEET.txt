@@ -1,0 +1,81 @@
+EASYINVOICE — COMPLETE UPDATE (definitieve drop-in)
+===================================================
+Dit is ÉÉN pakket met de nieuwste versie van ALLE wijzigingen. Volgorde maakt
+niet meer uit: pak dit uit op de ROOT van je factuur-repo, laat het alle
+bestanden overschrijven, commit en deploy. Klaar.
+
+============================================================
+STAP 1 — UITPAKKEN
+============================================================
+Uitpakken op de root van de 'factuur'-repo (waar app/, resources/, routes/,
+config/ staan). Alles overschrijven. Commit via GitHub Desktop -> Railway
+deployt.
+
+============================================================
+STAP 2 — DATABASE MIGREREN (VERPLICHT)
+============================================================
+   php artisan migrate
+Voegt toe:
+  - tabel 'reminder_logs' (verloop van herinneringen/aanmaningen)
+  - kolom 'accountant_email' op companies (BCC boekhoudkantoor)
+
+============================================================
+STAP 3 — RAILWAY VARIABELEN
+============================================================
+   APP_VERSION="Easy 1.0.0"
+   SESSION_SECURE_COOKIE=true
+   # Bot-bescherming (leeg = uit, invullen = aan; VITE_ moet gelijk zijn aan SITEKEY):
+   TURNSTILE_SITEKEY=
+   TURNSTILE_SECRET=
+   VITE_TURNSTILE_SITEKEY=
+   # Incasso (optioneel; standaarden staan al goed):
+   INCASSO_CLAIMS_EMAIL=j.backers@armaere.nl
+   INCASSO_CC=info@creditline.nl
+
+============================================================
+STAP 4 — CLOUDFLARE CACHE LEGEN  (belangrijk!)
+============================================================
+Cloudflare bewaart je pagina's. Zie je na de deploy nog de oude versie
+(bijv. "Inloggen" onder het logo op mobiel), leeg dan de cache:
+   Cloudflare dashboard -> je domein -> Caching -> Configuration -> Purge Everything
+Daarna op je telefoon hard verversen of een privé-tabblad gebruiken.
+
+Snelle check of de nieuwe versie live is (op een computer):
+   easyinvoice.nl -> rechtsklik -> Paginabroncode weergeven -> Ctrl+F op "nav-mobile"
+   Gevonden = nieuwe versie live. Niet gevonden = nog oude versie (cache/deploy).
+
+============================================================
+STAP 5 — CRON VOOR AUTOMATISCHE HERINNERINGEN
+============================================================
+Laravel's planner draait niet vanzelf op Railway. Zet één van deze:
+  A) Een scheduled service die elke minuut draait:  php artisan schedule:run
+  B) Of een dagelijkse cron die draait:             php artisan invoices:remind
+Zonder dit gaan de automatische herinneringen/aanmaningen niet uit.
+
+
+WAT ZIT ER ALLEMAAL IN (samenvatting)
+-------------------------------------
+- Mobiel: hamburgermenu op de site + uitschuifbaar menu (drawer) in het portaal.
+- Prijs overal € 12,10 per maand (incl. 21% btw).
+- Versie "Easy 1.0.0" in de footer, op de inlogpagina en in het portaal.
+- Beveiliging: Turnstile (bot-bescherming), rate-limiting op login/registratie/
+  contact/2FA, veiliger bijlagen, veilige EasyAgent-weergave, login-timing.
+- Wachtwoord vergeten (met Nederlandse herstel-mail).
+- Live statuspagina (echte checks i.p.v. verzonnen data).
+- Bedrijf gevestigd in Bussum (Amsterdam-teksten gecorrigeerd; tijdzone blijft
+  Europe/Amsterdam, dat is correct).
+- Voorbeeldtekst uit de juridische pagina's verwijderd.
+- Huisstijl: complete, strakke factuur-preview + standaard-voetnoot.
+- Facturen: worden nu ECHT gemaild naar de klant, met CC (jezelf) en
+  BCC (boekhoudkantoor) — nieuw veld bij Bedrijfsgegevens.
+- Incasso: echte partner Armaere; bij overdracht gaat automatisch een compleet
+  dossier per e-mail (factuur-PDF + bijlagen + verloop) naar
+  j.backers@armaere.nl met CC info@creditline.nl. Verzonnen "no cure no pay"
+  en nep-contactgegevens zijn verwijderd.
+- Herinneringen/aanmaningen: instelbare teksten + automatische verzending (cron)
+  + logboek dat het incasso-verloop vult.
+- Factuur-PDF's (Modern/Klassiek/Minimaal) visueel opgefrist.
+- Changelog gebruikt nu "Easy"-versies.
+- Nette invulvelden in de hele app.
+
+Tip: draai lokaal `php -l` over de PHP-bestanden als je wilt dubbelchecken.
