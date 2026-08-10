@@ -27,7 +27,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ----- Composer -----
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Niet via `COPY --from=composer:2`: dat vergt een extra image-resolutie bij
+# Docker Hub, die op de Railway-builder af en toe wegvalt ("context canceled")
+# en dan de hele build sloopt. De phar direct ophalen scheelt die afhankelijkheid
+# en kan hier wél retryen.
+RUN curl -fsSL --retry 5 --retry-all-errors \
+        https://getcomposer.org/download/latest-2.x/composer.phar -o /usr/bin/composer \
+    && chmod +x /usr/bin/composer \
+    && composer --version
 
 WORKDIR /app
 
