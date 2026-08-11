@@ -152,7 +152,7 @@ const deleteInvoice = () => {
           </div>
         </div>
 
-        <table class="inv-lines">
+        <table class="inv-lines stacked-table">
           <thead>
             <tr>
               <th style="width:55%">Omschrijving</th>
@@ -164,14 +164,14 @@ const deleteInvoice = () => {
           </thead>
           <tbody>
             <tr v-for="line in invoice.lines" :key="line.id">
-              <td>
+              <td class="cell-primary">
                 <div style="font-weight:500;margin-bottom:2px;">{{ line.description }}</div>
                 <div v-if="line.details" style="font-size:12px;color:var(--text-3);">{{ line.details }}</div>
               </td>
-              <td class="mono" style="text-align:right">{{ Number(line.quantity) }}</td>
-              <td class="mono" style="text-align:right">{{ eur(line.unit_price) }}</td>
-              <td style="text-align:center">{{ Number(line.vat_rate) }}%</td>
-              <td class="mono" style="text-align:right">{{ eur(line.line_subtotal) }}</td>
+              <td class="mono" style="text-align:right" data-label="Aantal">{{ Number(line.quantity) }}</td>
+              <td class="mono" style="text-align:right" data-label="Prijs">{{ eur(line.unit_price) }}</td>
+              <td style="text-align:center" data-label="BTW">{{ Number(line.vat_rate) }}%</td>
+              <td class="mono" style="text-align:right" data-label="Totaal">{{ eur(line.line_subtotal) }}</td>
             </tr>
           </tbody>
         </table>
@@ -199,16 +199,16 @@ const deleteInvoice = () => {
         <!-- Payments -->
         <div v-if="invoice.payments && invoice.payments.length > 0" style="margin-top:28px;">
           <div style="font-family:var(--font-display);font-weight:600;font-size:16px;margin-bottom:12px;">Betalingen</div>
-          <table class="payments-table">
+          <table class="payments-table stacked-table">
             <thead>
               <tr><th>Datum</th><th>Methode</th><th>Referentie</th><th class="right">Bedrag</th></tr>
             </thead>
             <tbody>
               <tr v-for="p in invoice.payments" :key="p.id">
-                <td>{{ p.paid_on }}</td>
-                <td>{{ p.method }}</td>
-                <td>{{ p.reference || '—' }}</td>
-                <td class="num right">{{ eur(p.amount) }}</td>
+                <td class="cell-primary">{{ p.paid_on }}</td>
+                <td data-label="Methode">{{ p.method }}</td>
+                <td data-label="Referentie">{{ p.reference || '—' }}</td>
+                <td class="num right" data-label="Bedrag">{{ eur(p.amount) }}</td>
               </tr>
             </tbody>
           </table>
@@ -314,4 +314,19 @@ const deleteInvoice = () => {
 .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); border-radius: 0 0 var(--r-lg) var(--r-lg); }
 .icon-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
 .icon-btn:hover { background: var(--surface-2); }
+
+@media (max-width: 760px) {
+  .inv-detail-header, .inv-body { padding: 20px 16px; }
+  .inv-detail-top { flex-direction: column; gap: 12px; }
+  /* Vier meta-kolommen en twee adreskolommen passen niet naast elkaar. */
+  .inv-detail-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .inv-parties { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .inv-party-line { overflow-wrap: anywhere; }
+  /* Totalen vullen de breedte i.p.v. een vaste 320px-kolom rechts. */
+  .inv-totals { width: 100%; margin-left: 0; }
+  .inv-lines td:not([data-label]):not(.cell-primary) { display: none; }
+}
+@media (max-width: 400px) {
+  .inv-detail-meta { grid-template-columns: minmax(0, 1fr); }
+}
 </style>

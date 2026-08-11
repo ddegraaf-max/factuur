@@ -160,4 +160,15 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
 .backup-codes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 22px; padding: 18px 22px; background: var(--surface-2); border-radius: 10px; }
 .backup-code { font-family: var(--font-mono); font-size: 15px; font-weight: 600; }
 .backup-code .n { color: var(--text-4); font-weight: 400; margin-right: 6px; }
+
+@media (max-width: 760px) {
+  /* QR boven de uitleg i.p.v. ernaast. */
+  .qr-layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .wizard-stepper { flex-wrap: wrap; gap: 8px 12px; }
+  .wizard-footer { flex-wrap: wrap; }
+  .backup-codes { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  /* 6 × 52px + 5 × 10px gap = 362px en past niet; laat de vakjes meekrimpen. */
+  .pin-input { display: flex; gap: 8px; width: 100%; }
+  .pin-input input { flex: 1 1 0; min-width: 0; width: auto; font-size: 22px; height: 54px; }
+}
 </style>

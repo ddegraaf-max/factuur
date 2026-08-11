@@ -46,7 +46,7 @@ const submit = () => router.patch(route('settings.numbering.update'), { numberin
           Je kunt automatisch het jaartal of de maand in het voorvoegsel gebruiken. Gebruik hiervoor:
           <code>{jaar}</code> of <code>{maand}</code>.
         </div>
-        <table class="numbering-table">
+        <table class="numbering-table stacked-table">
           <thead>
             <tr>
               <th></th>
@@ -57,10 +57,10 @@ const submit = () => router.patch(route('settings.numbering.update'), { numberin
           </thead>
           <tbody>
             <tr v-for="row in rows" :key="row.key">
-              <td><b>{{ row.label }}</b></td>
-              <td><input type="text" v-model="state.numbering[row.key].prefix" maxlength="10" class="mono" /></td>
-              <td><input type="number" v-model.number="state.numbering[row.key].start" min="1" /></td>
-              <td><span class="next-pill">{{ next(row.key) }}</span></td>
+              <td class="cell-primary"><b>{{ row.label }}</b></td>
+              <td data-label="Voorvoegsel"><input type="text" v-model="state.numbering[row.key].prefix" maxlength="10" class="mono" /></td>
+              <td data-label="Beginnen op"><input type="number" v-model.number="state.numbering[row.key].start" min="1" /></td>
+              <td data-label="Volgend nummer"><span class="next-pill">{{ next(row.key) }}</span></td>
             </tr>
           </tbody>
         </table>
@@ -76,5 +76,10 @@ const submit = () => router.patch(route('settings.numbering.update'), { numberin
 .numbering-table th { text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; color: var(--text-3); }
 .numbering-table td { padding: 8px 10px; }
 .numbering-table input { height: 36px; }
+@media (max-width: 760px) {
+  /* In de gestapelde weergave staan label en veld naast elkaar; het veld
+     mag de resterende ruimte vullen. */
+  .numbering-table td > input { flex: 1 1 auto; min-width: 0; max-width: 180px; }
+}
 .next-pill { display: inline-block; padding: 6px 12px; background: var(--surface-2); border: 1px dashed var(--border); border-radius: 6px; font-family: var(--font-mono); font-weight: 600; }
 </style>

@@ -134,7 +134,7 @@ const quick = (q) => send(q);
 .easy-fab { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: white; border: 2px solid white; box-shadow: 0 8px 24px rgba(232,35,31,.35); cursor: pointer; z-index: 90; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
 .pulse { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; background: #FCD34D; color: #1F2937; border-radius: 100px; border: 2px solid white; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
 .overlay { position: fixed; inset: 0; background: rgba(28,25,23,.3); z-index: 100; }
-.panel { position: fixed; top: 0; right: 0; width: 420px; height: 100vh; background: var(--bg); z-index: 101; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(28,25,23,.12); transform: translateX(100%); transition: transform .25s; }
+.panel { position: fixed; top: 0; right: 0; width: min(420px, 100vw); height: 100vh; background: var(--bg); z-index: 101; display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(28,25,23,.12); transform: translateX(100%); transition: transform .25s; }
 .panel.open { transform: translateX(0); }
 .header { padding: 18px 20px; background: linear-gradient(135deg, var(--brand), var(--brand-dark)); color: white; display: flex; align-items: center; justify-content: space-between; }
 .identity { display: flex; align-items: center; gap: 12px; }

@@ -175,4 +175,12 @@ const submit = () => form.patch(route('settings.reminders.update'), { preserveSc
 .txt-block:last-child { margin-bottom: 0; }
 .txt-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); margin: 12px 0 6px; }
 .txt-block input, .txt-block textarea { width: 100%; }
+
+@media (max-width: 760px) {
+  /* Label boven de instelling i.p.v. een vaste kolom van 280px ernaast. */
+  .setting-line { grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: flex-start; }
+  .setting-line > div { flex-wrap: wrap; }
+  .setting-line select { max-width: 100%; }
+  .tl-row { flex-wrap: wrap; gap: 6px 10px; }
+}
 </style>

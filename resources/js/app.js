@@ -2,11 +2,25 @@ import './bootstrap';
 import '../css/app.css';
 
 import { createApp, h } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'EasyInvoice';
+
+// Vangnet: als een Inertia-bezoek een gewone HTML-pagina terugkrijgt (bijv. een
+// Blade-route zoals de homepage, of een sessie die verlopen is), toont Inertia
+// standaard een debug-modal met de pagina in een iframe. Dat willen we niet in
+// productie: doe in plaats daarvan een normale, volledige paginanavigatie.
+router.on('invalid', (event) => {
+    event.preventDefault();
+    const url = event.detail.response?.config?.url;
+    if (url) {
+        window.location.href = url;
+    } else {
+        window.location.reload();
+    }
+});
 
 createInertiaApp({
     title: (title) => title ? `${title} · ${appName}` : appName,

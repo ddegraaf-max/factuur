@@ -134,8 +134,18 @@ a { color: inherit; text-decoration: none; }
   border-color: var(--brand);
   box-shadow: 0 0 0 3px var(--brand-tint);
 }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+/* minmax(0, 1fr) + min-width:0 op de velden: invoervelden hebben van zichzelf
+   een intrinsieke minimumbreedte (~145px), waardoor een rij van twee kolommen
+   niet onder ~300px kan krimpen en de hele pagina zijwaarts gaat scrollen. */
+.form-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.form-group { min-width: 0; }
+.form-group input,
+.form-group select,
+.form-group textarea { min-width: 0; max-width: 100%; }
+@media (max-width: 560px) {
+  .form-row, .form-row-3 { grid-template-columns: minmax(0, 1fr); }
+}
 .field-error { color: var(--brand); font-size: 12px; margin-top: 4px; }
 .muted { color: var(--text-4); font-weight: 400; font-size: 12px; }
 
@@ -361,7 +371,10 @@ a { color: inherit; text-decoration: none; }
   width: 48px;
   height: 56px;
   padding: 0;
-  flex: 0 0 auto;
+  /* Mag meekrimpen op smalle telefoons, maar nooit breder dan 48px worden. */
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 48px;
   text-align: center;
   font-family: var(--font-mono);
   font-size: 24px;
@@ -415,6 +428,6 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 480px) {
-  .otp-input { width: 42px; height: 50px; font-size: 20px; }
+  .otp-input { width: 42px; max-width: 42px; height: 50px; font-size: 20px; }
   .otp-group { gap: 8px; }
 }

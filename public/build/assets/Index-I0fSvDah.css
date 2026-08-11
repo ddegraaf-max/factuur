@@ -1,0 +1,1 @@
+.product-desc{font-size:12px;color:var(--text-3);margin-top:2px;max-width:480px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}@media (max-width: 760px){.product-desc{max-width:none;white-space:normal;font-weight:400}}

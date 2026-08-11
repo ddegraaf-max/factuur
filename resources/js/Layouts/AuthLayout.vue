@@ -1,15 +1,17 @@
 <script setup>
-import { Link, usePage } from '@inertiajs/vue3';
+import { usePage } from '@inertiajs/vue3';
 const version = usePage().props.version;
 </script>
 
 <template>
   <div class="auth-shell">
     <div class="auth-hero">
-      <Link href="/" class="auth-logo">
+      <!-- Let op: gewone <a>, geen Inertia <Link>. De homepage is een Blade-pagina
+           (geen Inertia-response); met <Link> toont Inertia een debug-modal i.p.v. te navigeren. -->
+      <a href="/" class="auth-logo">
         <img src="/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice" />
         <span>EasyInvoice</span>
-      </Link>
+      </a>
       <div class="auth-tagline">
         <slot name="hero">
           <h2>Facturen maken zonder gedoe</h2>
@@ -28,9 +30,12 @@ const version = usePage().props.version;
 .auth-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* minmax(0, ...) zodat de kolommen mogen krimpen; met kale 1fr krijgen ze de
+     min-content-breedte van het formulier en scrolt de pagina zijwaarts. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   background: var(--bg);
 }
+.auth-hero, .auth-form-pane { min-width: 0; }
 .auth-hero {
   background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
   color: white;
@@ -93,7 +98,12 @@ const version = usePage().props.version;
   padding: 40px;
 }
 @media (max-width: 880px) {
-  .auth-shell { grid-template-columns: 1fr; }
+  .auth-shell { grid-template-columns: minmax(0, 1fr); }
   .auth-hero { padding: 40px 30px; min-height: 260px; }
+}
+@media (max-width: 560px) {
+  .auth-hero { padding: 28px 18px; min-height: 0; }
+  .auth-form-pane { padding: 24px 14px 40px; align-items: flex-start; }
+  .auth-tagline h2 { font-size: 26px; }
 }
 </style>

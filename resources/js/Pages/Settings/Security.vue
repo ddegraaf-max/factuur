@@ -93,7 +93,13 @@ const copyCodes = () => {
 </template>
 
 <style scoped>
-.security-status-card { display: grid; grid-template-columns: 72px 1fr auto; gap: 22px; align-items: center; padding: 22px 26px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--text-4); border-radius: 12px; margin-bottom: 18px; }
+.security-status-card { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 22px; align-items: center; padding: 22px 26px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--text-4); border-radius: 12px; margin-bottom: 18px; }
+@media (max-width: 760px) {
+  /* Icoon + tekst boven elkaar; de knop eronder over de volle breedte. */
+  .security-status-card { grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 18px; }
+  .security-status-card > :last-child { grid-column: 1 / -1; }
+  .status-title { font-size: 17px; flex-wrap: wrap; }
+}
 .security-status-card.active { border-left-color: var(--success); background: linear-gradient(180deg, var(--success-bg) 0%, var(--surface) 100%); }
 .security-status-icon { width: 64px; height: 64px; border-radius: 16px; background: var(--surface-2); color: var(--text-4); display: inline-flex; align-items: center; justify-content: center; }
 .security-status-card.active .security-status-icon { background: var(--success-bg); color: var(--success); }

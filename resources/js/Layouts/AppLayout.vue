@@ -216,7 +216,9 @@ table { border-collapse: collapse; width: 100%; }
 /* ============ APP SHELL ============ */
 .app {
   display: grid;
-  grid-template-columns: 248px 1fr;
+  /* minmax(0, 1fr) i.p.v. 1fr: anders krijgt de kolom de min-content-breedte van
+     de inhoud (brede tabellen) en wordt de hele pagina horizontaal scrollbaar. */
+  grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100vh;
 }
 .sidebar {
@@ -335,7 +337,7 @@ table { border-collapse: collapse; width: 100%; }
 .user-menu-item:hover { background: var(--surface-2); }
 
 /* MAIN */
-.main { background: var(--bg); }
+.main { background: var(--bg); min-width: 0; }
 .topbar {
   height: 64px;
   background: var(--surface);
@@ -510,6 +512,56 @@ table { border-collapse: collapse; width: 100%; }
 .data-table .num { font-family: var(--font-mono); font-weight: 500; font-variant-numeric: tabular-nums; }
 .data-table .right { text-align: right; }
 
+/* Op mobiel wordt elke tabelrij een kaartje: label links, waarde rechts.
+   Zo past alles binnen het scherm en scrol je alleen naar beneden.
+   De labels komen uit het data-label-attribuut op elke <td>; de cel met
+   .cell-primary wordt de titel van het kaartje.
+   Geldt voor .data-table en voor elke tabel met .stacked-table. */
+@media (max-width: 760px) {
+  .data-table, .stacked-table { display: block; font-size: 14px; }
+  .data-table thead, .stacked-table thead { display: none; }
+  .data-table tbody, .data-table tr, .data-table td,
+  .stacked-table tbody, .stacked-table tr, .stacked-table td { display: block; }
+  .data-table tr, .stacked-table tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .data-table td, .stacked-table td {
+    padding: 0;
+    border: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 24px;
+    text-align: left;
+  }
+  .data-table td + td, .stacked-table td + td { margin-top: 6px; }
+  .data-table td::before, .stacked-table td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+  }
+  /* De eerste cel is de titel van het kaartje: volle breedte, zonder label. */
+  .data-table td.cell-primary, .stacked-table td.cell-primary {
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  .data-table td.cell-primary::before, .stacked-table td.cell-primary::before { content: none; }
+  /* Cel zonder label en zonder titelrol (bijv. het chevron-pijltje) valt weg. */
+  .data-table td:not([data-label]):not(.cell-primary),
+  .stacked-table td:not([data-label]):not(.cell-primary) { display: none; }
+  /* De waarde mag afbreken; het label niet. */
+  .data-table td > *, .stacked-table td > * { min-width: 0; }
+}
+
 /* PILLS */
 .pill {
   display: inline-flex;
@@ -589,7 +641,7 @@ table { border-collapse: collapse; width: 100%; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
 }
 @media (max-width: 760px) {
-  .app { grid-template-columns: 1fr; }
+  .app { grid-template-columns: minmax(0, 1fr); }
   .sidebar {
     position: fixed; top: 0; left: 0; z-index: 100;
     width: 268px; max-width: 84vw; height: 100vh;
@@ -602,5 +654,7 @@ table { border-collapse: collapse; width: 100%; }
   .topbar-toggle { display: inline-flex; }
   .content { padding: 16px; }
   .topbar { padding: 0 12px; }
+  /* Zoekveld op een eigen regel; naast de filterknoppen bleef er "Zoe..." over. */
+  .filter-search { flex: 1 0 100%; max-width: none; }
 }
 </style>

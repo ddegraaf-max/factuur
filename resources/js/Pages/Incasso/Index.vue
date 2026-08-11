@@ -88,13 +88,13 @@ const phaseLabels = {
         </thead>
         <tbody>
           <tr v-for="c in cases" :key="c.id">
-            <td class="mono">{{ c.incasso_reference }}</td>
-            <td class="mono"><Link :href="route('invoices.show', c.id)">{{ c.number }}</Link></td>
-            <td>{{ c.customer_name }}</td>
-            <td>{{ formatDate(c.incasso_sent_at) }}</td>
-            <td>{{ c.days_at_armaere }} dagen</td>
-            <td><span class="pill pill-incasso">{{ phaseLabels[c.incasso_phase] || c.incasso_phase }}</span></td>
-            <td class="right num">{{ eur(c.remaining) }}</td>
+            <td class="mono cell-primary">{{ c.incasso_reference }}</td>
+            <td class="mono" data-label="Factuur"><Link :href="route('invoices.show', c.id)">{{ c.number }}</Link></td>
+            <td data-label="Klant">{{ c.customer_name }}</td>
+            <td data-label="Overdracht">{{ formatDate(c.incasso_sent_at) }}</td>
+            <td data-label="Looptijd">{{ c.days_at_armaere }} dagen</td>
+            <td data-label="Fase"><span class="pill pill-incasso">{{ phaseLabels[c.incasso_phase] || c.incasso_phase }}</span></td>
+            <td class="right num" data-label="Openstaand">{{ eur(c.remaining) }}</td>
           </tr>
         </tbody>
       </table>
@@ -111,10 +111,19 @@ const phaseLabels = {
 .sub { font-size: 13px; color: #D1D5DB; }
 .contacts { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #D1D5DB; }
 .contacts b { color: white; }
-.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
 .stat-card .lbl { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
 .stat-card .val { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
 .empty { padding: 80px 20px; text-align: center; }
 .pill-incasso { color: #FBBF24; background: #1F2937; border: 1px solid #374151; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+
+@media (max-width: 760px) {
+  /* Icoon, naam en contactgegevens onder elkaar i.p.v. drie kolommen. */
+  .armaere-card { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 20px; }
+  .name { font-size: 19px; }
+  /* Lange e-mailadressen mogen afbreken, anders duwen ze de pagina breder. */
+  .contacts { overflow-wrap: anywhere; }
+  .stat-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
 </style>

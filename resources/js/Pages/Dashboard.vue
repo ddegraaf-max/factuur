@@ -126,11 +126,11 @@ const greeting = () => {
             </thead>
             <tbody>
               <tr v-for="inv in recent_invoices" :key="inv.id" @click="router.visit(route('invoices.show', inv.id))">
-                <td class="num">{{ inv.number || '—' }}</td>
-                <td>{{ inv.customer_name }}</td>
-                <td>{{ inv.invoice_date }}</td>
-                <td><StatusPill :status="inv.status" /></td>
-                <td class="num right">{{ eur(inv.total) }}</td>
+                <td class="num cell-primary">{{ inv.number || '—' }}</td>
+                <td data-label="Klant">{{ inv.customer_name }}</td>
+                <td data-label="Datum">{{ inv.invoice_date }}</td>
+                <td data-label="Status"><StatusPill :status="inv.status" /></td>
+                <td class="num right" data-label="Bedrag">{{ eur(inv.total) }}</td>
               </tr>
             </tbody>
           </table>
@@ -201,7 +201,7 @@ const greeting = () => {
 <style>
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 28px;
 }
@@ -234,10 +234,16 @@ const greeting = () => {
 .kpi-meta .change-up { color: var(--success); font-weight: 600; }
 .kpi-meta .change-down { color: var(--brand); font-weight: 600; }
 
-.row-2 { display: grid; grid-template-columns: 1fr 380px; gap: 20px; }
+.row-2 { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; }
 @media (max-width: 1100px) {
-  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-  .row-2 { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .row-2 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .kpi-grid { gap: 10px; margin-bottom: 20px; }
+  .kpi-card { padding: 14px; }
+  .kpi-label { font-size: 12px; margin-bottom: 6px; }
+  .kpi-value { font-size: 22px; }
 }
 
 .quick-action {

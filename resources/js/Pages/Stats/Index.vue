@@ -81,20 +81,20 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
           </thead>
           <tbody>
             <tr v-for="(c, i) in list" :key="c.customer_id">
-              <td class="num">#{{ i + 1 }}</td>
-              <td>{{ c.customer_name }}<span v-if="c.customer_city" class="city"> · {{ c.customer_city }}</span></td>
-              <td class="right num">{{ c.invoice_count }}<span v-if="c.credit_count" class="muted-red">−{{ c.credit_count }}</span></td>
-              <td class="right num" :class="{ neg: c.ex_vat < 0 }">{{ c.ex_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.ex_vat)) }}</td>
-              <td class="right num" :class="{ neg: c.vat < 0 }">{{ c.vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.vat)) }}</td>
-              <td class="right num bold" :class="{ neg: c.inc_vat < 0 }">{{ c.inc_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.inc_vat)) }}</td>
+              <td class="num rank-cell">#{{ i + 1 }}</td>
+              <td class="cell-primary">{{ c.customer_name }}<span v-if="c.customer_city" class="city"> · {{ c.customer_city }}</span></td>
+              <td class="right num" data-label="Facturen">{{ c.invoice_count }}<span v-if="c.credit_count" class="muted-red">−{{ c.credit_count }}</span></td>
+              <td class="right num" data-label="Excl. BTW" :class="{ neg: c.ex_vat < 0 }">{{ c.ex_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.ex_vat)) }}</td>
+              <td class="right num" data-label="BTW" :class="{ neg: c.vat < 0 }">{{ c.vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.vat)) }}</td>
+              <td class="right num bold" data-label="Incl. BTW" :class="{ neg: c.inc_vat < 0 }">{{ c.inc_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.inc_vat)) }}</td>
             </tr>
             <tr class="total-row">
-              <td></td>
-              <td>Totaal</td>
-              <td class="right num">{{ totals.invoice_count + totals.credit_count }}</td>
-              <td class="right num">{{ eur(totals.ex_vat) }}</td>
-              <td class="right num">{{ eur(totals.vat) }}</td>
-              <td class="right num bold">{{ eur(totals.inc_vat) }}</td>
+              <td class="rank-cell"></td>
+              <td class="cell-primary">Totaal</td>
+              <td class="right num" data-label="Facturen">{{ totals.invoice_count + totals.credit_count }}</td>
+              <td class="right num" data-label="Excl. BTW">{{ eur(totals.ex_vat) }}</td>
+              <td class="right num" data-label="BTW">{{ eur(totals.vat) }}</td>
+              <td class="right num bold" data-label="Incl. BTW">{{ eur(totals.inc_vat) }}</td>
             </tr>
           </tbody>
         </table>
@@ -108,7 +108,7 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
 .tab { padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text-3); border-radius: 7px; cursor: pointer; }
 .tab:hover { color: var(--text); }
 .tab.active { background: var(--text); color: white; }
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
 .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
 .kpi.tint { background: var(--brand-tint); border-color: var(--brand-border); }
 .kpi .lbl { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
@@ -129,4 +129,23 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
 .muted-red { color: var(--brand); font-size: 11px; margin-left: 4px; }
 .total-row { background: var(--surface-2); font-weight: 600; }
 .bold { font-weight: 600; }
+
+@media (max-width: 760px) {
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi { padding: 14px; }
+  .kpi .val { font-size: 18px; }
+  /* Naam boven, balk + bedrag eronder: 180px + 140px past niet naast elkaar. */
+  .bar-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 10px;
+    padding: 12px 0;
+  }
+  .bar-label { grid-column: 1 / -1; }
+  .bar-amount { font-size: 13px; white-space: nowrap; }
+  .year-tabs { width: 100%; overflow-x: auto; }
+  .tab { padding: 8px 12px; white-space: nowrap; }
+}
+@media (max-width: 400px) {
+  .kpi-grid { grid-template-columns: minmax(0, 1fr); }
+}
 </style>

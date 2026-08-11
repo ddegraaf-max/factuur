@@ -61,15 +61,15 @@ watch(search, (v) => {
         </thead>
         <tbody>
           <tr v-for="p in products.data" :key="p.id" @click="router.visit(route('products.edit', p.id))">
-            <td>
+            <td class="cell-primary">
               <div style="font-weight:500;">{{ p.name }}</div>
-              <div v-if="p.description" style="font-size:12px;color:var(--text-3);margin-top:2px;max-width:480px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.description }}</div>
+              <div v-if="p.description" class="product-desc">{{ p.description }}</div>
             </td>
-            <td class="mono" style="color:var(--text-3);font-size:12px;">{{ p.sku || '—' }}</td>
-            <td>{{ p.unit }}</td>
-            <td class="num right">{{ eur(p.price) }}</td>
-            <td class="num">{{ Number(p.vat_rate) }}%</td>
-            <td>
+            <td class="mono" style="color:var(--text-3);font-size:12px;" data-label="SKU">{{ p.sku || '—' }}</td>
+            <td data-label="Eenheid">{{ p.unit }}</td>
+            <td class="num right" data-label="Prijs">{{ eur(p.price) }}</td>
+            <td class="num" data-label="BTW">{{ Number(p.vat_rate) }}%</td>
+            <td data-label="Status">
               <span v-if="p.is_active" class="pill pill-paid" style="font-size:10px;">Actief</span>
               <span v-else class="pill pill-draft" style="font-size:10px;">Inactief</span>
             </td>
@@ -90,3 +90,19 @@ watch(search, (v) => {
     </div>
   </AppLayout>
 </template>
+
+<style>
+.product-desc {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  max-width: 480px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 760px) {
+  /* In de kaartweergave mag de omschrijving gewoon over meerdere regels. */
+  .product-desc { max-width: none; white-space: normal; font-weight: 400; }
+}
+</style>

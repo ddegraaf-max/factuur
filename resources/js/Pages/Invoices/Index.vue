@@ -78,12 +78,12 @@ const setStatus = (s) => {
         </thead>
         <tbody>
           <tr v-for="inv in invoices.data" :key="inv.id" @click="router.visit(route('invoices.show', inv.id))">
-            <td class="num">{{ inv.number || '— concept —' }}</td>
-            <td>{{ inv.customer_name }}</td>
-            <td>{{ inv.invoice_date_label }}</td>
-            <td>{{ inv.due_date_label || '—' }}</td>
-            <td><StatusPill :status="inv.status" :days-overdue="inv.days_overdue" /></td>
-            <td class="num right">{{ eur(inv.total) }}</td>
+            <td class="num cell-primary">{{ inv.number || '— concept —' }}</td>
+            <td data-label="Klant">{{ inv.customer_name }}</td>
+            <td data-label="Datum">{{ inv.invoice_date_label }}</td>
+            <td data-label="Vervaldatum">{{ inv.due_date_label || '—' }}</td>
+            <td data-label="Status"><StatusPill :status="inv.status" :days-overdue="inv.days_overdue" /></td>
+            <td class="num right" data-label="Bedrag">{{ eur(inv.total) }}</td>
             <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg></td>
           </tr>
         </tbody>

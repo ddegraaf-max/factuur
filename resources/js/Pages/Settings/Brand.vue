@@ -393,8 +393,14 @@ const removeLogo = () => {
 </template>
 
 <style scoped>
-.huisstijl-layout { display: grid; grid-template-columns: 460px 1fr; gap: 24px; align-items: flex-start; }
-.huisstijl-settings { display: flex; flex-direction: column; gap: 14px; }
+.huisstijl-layout { display: grid; grid-template-columns: minmax(0, 460px) minmax(0, 1fr); gap: 24px; align-items: flex-start; }
+.huisstijl-settings { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+@media (max-width: 1000px) {
+  /* Instellingen boven, live voorbeeld eronder — naast elkaar past niet meer. */
+  .huisstijl-layout { grid-template-columns: minmax(0, 1fr); }
+  .preview-pane { position: static; }
+  .preview-frame { max-width: 420px; }
+}
 .logo-preview { max-width: 200px; max-height: 80px; display: block; }
 .logo-upload-zone { display: block; padding: 28px; border: 2px dashed var(--border); border-radius: 10px; text-align: center; cursor: pointer; background: var(--surface-2); }
 .logo-upload-zone:hover { border-color: var(--brand); background: var(--brand-tint); }

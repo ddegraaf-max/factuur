@@ -152,4 +152,16 @@ const setType = (v) => {
 .cs-item { font-size: 11px; }
 .cs-label { color: var(--text-4); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 2px; }
 .cs-value { font-size: 13px; font-weight: 600; }
+
+@media (max-width: 760px) {
+  /* Op mobiel de klantnaam over twee regels laten lopen in plaats van
+     afkappen met '...' — anders is de naam onleesbaar. */
+  .customer-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+  .customer-grid { grid-template-columns: minmax(0, 1fr); }
+}
 </style>

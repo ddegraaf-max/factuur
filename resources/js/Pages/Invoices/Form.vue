@@ -206,8 +206,11 @@ const submit = (action) => {
                 <div></div>
               </div>
 
+              <!-- De .line-field-wrappers zijn op desktop 'display: contents', dus
+                   de velden blijven gewoon kolommen van .line-row. Op mobiel worden
+                   het blokken met een eigen label (uit data-label). -->
               <div v-for="(line, i) in form.lines" :key="i" class="line-row">
-                <div>
+                <div class="line-desc">
                   <div class="line-desc-row">
                     <select v-if="products.length > 0" v-model="line.product_id" @change="applyProduct(line, $event.target.value)" class="product-select" title="Kies product">
                       <option :value="null">— Eigen regel —</option>
@@ -217,12 +220,20 @@ const submit = (action) => {
                   </div>
                   <textarea v-model="line.details" placeholder="Toelichting (optioneel)" rows="1" class="line-details"></textarea>
                 </div>
-                <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
-                <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
-                <select v-model.number="line.vat_rate">
-                  <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
-                </select>
-                <div class="num line-total">{{ eur(lineTotal(line)) }}</div>
+                <div class="line-field" data-label="Aantal">
+                  <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
+                </div>
+                <div class="line-field" data-label="Prijs">
+                  <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
+                </div>
+                <div class="line-field" data-label="BTW">
+                  <select v-model.number="line.vat_rate">
+                    <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
+                  </select>
+                </div>
+                <div class="line-field line-total-field" data-label="Totaal">
+                  <div class="num line-total">{{ eur(lineTotal(line)) }}</div>
+                </div>
                 <button class="li-remove" @click="removeLine(i)" :disabled="form.lines.length === 1" type="button">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
@@ -284,17 +295,20 @@ const submit = (action) => {
 <style>
 .form-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: minmax(0, 1fr) 320px;
   gap: 20px;
 }
+.form-main, .form-sidebar { min-width: 0; }
 @media (max-width: 1100px) {
-  .form-layout { grid-template-columns: 1fr; }
+  .form-layout { grid-template-columns: minmax(0, 1fr); }
 }
+/* Wrappers zijn op desktop onzichtbaar voor de grid-layout. */
+.line-field { display: contents; }
 
 .lines-grid { width: 100%; }
 .lines-header {
   display: grid;
-  grid-template-columns: 1fr 80px 110px 90px 110px 32px;
+  grid-template-columns: minmax(0, 1fr) 80px 110px 90px 110px 32px;
   gap: 8px;
   font-size: 11px;
   font-weight: 600;
@@ -306,16 +320,20 @@ const submit = (action) => {
 }
 .line-row {
   display: grid;
-  grid-template-columns: 1fr 80px 110px 90px 110px 32px;
+  /* minmax(0, 1fr): zonder dat krijgt de omschrijvingskolom de min-content-breedte
+     van de productselect + het invoerveld, en loopt de regel buiten de kaart. */
+  grid-template-columns: minmax(0, 1fr) 80px 110px 90px 110px 32px;
   gap: 8px;
   align-items: start;
   padding: 12px 4px;
   border-bottom: 1px solid var(--border);
 }
 .line-row:last-child { border-bottom: none; }
-.line-desc-row { display: flex; gap: 6px; }
+.line-desc { min-width: 0; }
+.line-desc-row { display: flex; gap: 6px; min-width: 0; }
 .line-desc-row select.product-select {
-  flex: 0 0 130px;
+  flex: 0 1 130px;
+  min-width: 0;
   height: 34px;
   padding: 0 8px;
   font-size: 12px;
@@ -324,7 +342,8 @@ const submit = (action) => {
   color: var(--text-3);
 }
 .line-desc-row input {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   height: 34px;
   padding: 0 10px;
   font-size: 13px;
@@ -398,6 +417,48 @@ const submit = (action) => {
   border-radius: 6px;
 }
 .add-line-btn:hover { background: var(--brand-tint); }
+
+/* ===== Factuurregels op mobiel: elke regel wordt een blok met labels ===== */
+@media (max-width: 760px) {
+  .lines-header { display: none; }
+  .line-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px 10px;
+    padding: 16px 0;
+  }
+  .line-desc { grid-column: 1 / -1; min-width: 0; }
+  .line-desc-row { flex-direction: column; gap: 8px; }
+  .line-desc-row select.product-select { flex: 0 0 auto; width: 100%; height: 38px; font-size: 13px; }
+  .line-desc-row input { height: 38px; }
+  .line-field { display: block; min-width: 0; }
+  .line-field::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .line-field input, .line-field select { width: 100%; height: 38px; }
+  .line-total-field { grid-column: 1 / -1; }
+  .line-total-field .line-total {
+    justify-content: flex-start;
+    padding: 0;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .li-remove {
+    grid-column: 1 / -1;
+    justify-self: start;
+    width: auto;
+    padding: 0 10px;
+    gap: 6px;
+    border: 1px solid var(--border);
+  }
+  .li-remove::after { content: 'Regel verwijderen'; font-size: 13px; }
+}
 
 /* Sidebar totals */
 .totals-card { position: sticky; top: 88px; }
