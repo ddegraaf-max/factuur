@@ -71,7 +71,12 @@
 
         <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">Bijlagen</h3>
         <p style="font-size:13px;color:#44403c;margin:0;line-height:1.6;">
-          Factuur ({{ $invoice->number }}.pdf)@if($invoice->attachments->count()) en {{ $invoice->attachments->count() }} meegestuurde bijlage(n) uit het originele dossier@endif zijn als bijlage toegevoegd.
+          {{-- Geen @endif direct achter een woordteken ("dossier@endif"): Blade
+               herkent die directive dan niet en de template parset niet meer. --}}
+          @php
+              $extra = $invoice->attachments->count();
+          @endphp
+          Factuur ({{ $invoice->number }}.pdf){{ $extra ? " en {$extra} meegestuurde bijlage(n) uit het originele dossier" : '' }} zijn als bijlage toegevoegd.
         </p>
 
         <p style="margin:22px 0 0;font-size:13px;color:#78716c;line-height:1.6;">

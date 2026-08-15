@@ -170,7 +170,10 @@
 
 <div class="validity">
   Deze offerte is geldig tot en met <strong>{{ $quote->valid_until->translatedFormat('j F Y') }}</strong>.
-  Ga je akkoord? Laat het ons weten via een reply op deze e-mail@if($company->phone) of bel {{ $company->phone }}@endif —
+  {{-- Let op: geen @if direct achter een woordteken plakken ("e-mail@if"). Blade
+       compileert die directive dan niet, waardoor de bijbehorende @endif als
+       weesje overblijft en de template niet meer parset. --}}
+  Ga je akkoord? Laat het ons weten via een reply op deze e-mail{{ $company->phone ? ' of bel '.$company->phone : '' }} —
   dan zetten wij de offerte om in een opdracht. Genoemde bedragen zijn exclusief btw, tenzij anders vermeld.
 </div>
 
