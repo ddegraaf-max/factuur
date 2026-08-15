@@ -15,7 +15,6 @@
   .road-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 12px; }
   .road-card h4 { font-size: 16px; margin-bottom: 4px; }
   .road-card p { color: var(--text-2); font-size: 14px; margin: 0; line-height: 1.55; }
-  .road-new { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; background: var(--success); border-radius: 100px; padding: 2px 8px; margin-left: 8px; vertical-align: 2px; }
 </style>
 @endpush
 
@@ -44,9 +43,9 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
-        <div class="road-card"><h4>Terugkerende facturen<span class="road-new">Nieuw</span></h4><p>Automatisch periodiek factureren voor abonnementen en vaste diensten.</p></div>
-        <div class="road-card"><h4>UBL / e-facturatie<span class="road-new">Nieuw</span></h4><p>Elke factuur als UBL 2.1 (NLCIUS) — te downloaden én automatisch als bijlage in de factuurmail.</p></div>
-        <div class="road-card"><h4>Export naar boekhouder<span class="road-new">Nieuw</span></h4><p>CSV-export met BTW per tarief, klaar voor je accountant.</p></div>
+        <div class="road-card"><h4>Terugkerende facturen</h4><p>Automatisch periodiek factureren voor abonnementen en vaste diensten.</p></div>
+        <div class="road-card"><h4>UBL / e-facturatie</h4><p>Elke factuur als UBL 2.1 (NLCIUS) — te downloaden én automatisch als bijlage in de factuurmail.</p></div>
+        <div class="road-card"><h4>Export naar boekhouder</h4><p>CSV-export met BTW per tarief, klaar voor je accountant.</p></div>
         <div class="road-card"><h4>EASY-assistent</h4><p>Slimme assistent die met je meedenkt.</p></div>
         <div class="road-card"><h4>Incasso in fases</h4><p>Gefaseerd incassotraject.</p></div>
         <div class="road-card"><h4>Creditfacturen</h4><p>Creditnota's en deelbetalingen.</p></div>
