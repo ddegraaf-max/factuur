@@ -17,6 +17,7 @@ class InvoiceMail extends Mailable
     public function __construct(
         public Invoice $invoice,
         public string $pdf,
+        public ?string $ubl = null,
     ) {}
 
     public function envelope(): Envelope
@@ -39,10 +40,18 @@ class InvoiceMail extends Mailable
 
     public function attachments(): array
     {
-        $name = ($this->invoice->number ?: 'factuur-' . $this->invoice->id) . '.pdf';
+        $base = $this->invoice->number ?: 'factuur-' . $this->invoice->id;
 
-        return [
-            Attachment::fromData(fn () => $this->pdf, $name)->withMime('application/pdf'),
+        $attachments = [
+            Attachment::fromData(fn () => $this->pdf, $base . '.pdf')->withMime('application/pdf'),
         ];
+
+        // E-facturatie: UBL 2.1 (NLCIUS) meesturen zodat boekhoudpakketten
+        // de factuur automatisch kunnen inlezen.
+        if ($this->ubl) {
+            $attachments[] = Attachment::fromData(fn () => $this->ubl, $base . '-ubl.xml')->withMime('application/xml');
+        }
+
+        return $attachments;
     }
 }

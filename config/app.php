@@ -2,7 +2,7 @@
 
 return [
     'name' => env('APP_NAME', 'EasyInvoice'),
-    'version' => env('APP_VERSION', 'Easy 1.0.0'),
+    'version' => env('APP_VERSION', 'Easy 1.1.0'),
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),

@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Services\InvoiceManager;
+use App\Services\UblGenerator;
 use App\Services\VatCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -203,6 +204,21 @@ class InvoiceController extends Controller
 
         $filename = ($invoice->number ?: "concept-{$invoice->id}") . '.pdf';
         return $pdf->stream($filename);
+    }
+
+    public function ubl(Invoice $invoice, UblGenerator $generator): HttpResponse|RedirectResponse
+    {
+        if ($invoice->status === 'draft') {
+            return back()->withErrors(['ubl' => 'Verstuur de factuur eerst; concepten hebben nog geen factuurnummer.']);
+        }
+
+        $invoice->load('lines');
+        $xml = $generator->generate($invoice);
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$generator->filename($invoice).'"',
+        ]);
     }
 
     public function recordPayment(Request $request, Invoice $invoice): RedirectResponse

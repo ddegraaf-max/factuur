@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.1.0</div>
+        <h3>Terugkerende facturen, e-facturatie (UBL) &amp; export voor je boekhouder</h3>
+        <ul class="tl-list">
+          <li><b>Terugkerende facturen</b> — zet elke factuur met één klik om in een terugkerend profiel. EasyInvoice factureert daarna automatisch per week, maand, kwartaal, half jaar of jaar: als concept om zelf te controleren, of direct verstuurd.</li>
+          <li><b>UBL / e-facturatie</b> — elke verstuurde factuur bevat nu automatisch een UBL 2.1-bijlage (NLCIUS), die boekhoudpakketten direct kunnen inlezen. Ook los te downloaden op de factuurpagina.</li>
+          <li><b>Export naar boekhouder</b> — download al je facturen als CSV met grondslag en BTW per tarief én controletotalen. Kies zelf de periode, bijvoorbeeld per kwartaal voor de BTW-aangifte.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 mei 2026 · Easy 1.0.0</div>
         <h3>EASY-assistent: je slimme hulp</h3>
         <ul class="tl-list">

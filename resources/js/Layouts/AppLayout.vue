@@ -28,6 +28,7 @@ const nav = [
     title: 'Verkoop',
     items: [
       { name: 'Facturen', route: 'invoices.index', icon: 'invoice' },
+      { name: 'Terugkerend', route: 'recurring.index', icon: 'repeat', badge: 'Nieuw' },
       { name: 'Klanten', route: 'customers.index', icon: 'users' },
       { name: 'Producten', route: 'products.index', icon: 'box' },
       { name: 'Incasso', route: 'incasso.index', icon: 'gavel' },
@@ -37,6 +38,7 @@ const nav = [
     title: 'Rapporten',
     items: [
       { name: 'Klantomzet', route: 'stats.index', icon: 'chart' },
+      { name: 'Export boekhouder', route: 'export.index', icon: 'download', badge: 'Nieuw' },
     ],
   },
   {
@@ -99,7 +101,10 @@ const logout = () => {
             <svg v-else-if="item.icon === 'bell'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <svg v-else-if="item.icon === 'shield'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <svg v-else-if="item.icon === 'card'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <svg v-else-if="item.icon === 'repeat'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            <svg v-else-if="item.icon === 'download'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             {{ item.name }}
+            <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
           </Link>
         </div>
       </nav>
@@ -288,6 +293,39 @@ table { border-collapse: collapse; width: 100%; }
   border-radius: 0 2px 2px 0;
 }
 .nav-item svg { width: 18px; height: 18px; stroke-width: 1.75; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--brand);
+  padding: 2px 7px;
+  border-radius: 100px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+/* ============ MODALS (globaal — gebruikt op meerdere pagina's) ============ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,0.4);
+  z-index: 100;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding: 60px 20px; overflow-y: auto;
+}
+.modal {
+  background: var(--surface); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 540px;
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); border-radius: 0 0 var(--r-lg) var(--r-lg); }
+.icon-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
+.icon-btn:hover { background: var(--surface-2); }
 
 .sidebar-user {
   border-top: 1px solid var(--border);

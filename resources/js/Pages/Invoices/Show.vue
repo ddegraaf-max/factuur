@@ -11,6 +11,34 @@ const props = defineProps({
 });
 
 const showPaymentModal = ref(false);
+const showRecurringModal = ref(false);
+
+// Standaard eerstvolgende factuurdatum: één maand na de factuurdatum.
+const suggestNextDate = () => {
+  const base = new Date(props.invoice.invoice_date);
+  const anchorDay = base.getDate();
+  const next = new Date(base.getFullYear(), base.getMonth() + 1, 1);
+  const daysInMonth = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+  next.setDate(Math.min(anchorDay, daysInMonth));
+  const today = new Date();
+  const pick = next > today ? next : today;
+  return `${pick.getFullYear()}-${String(pick.getMonth() + 1).padStart(2, '0')}-${String(pick.getDate()).padStart(2, '0')}`;
+};
+
+const recurringForm = useForm({
+  frequency: 'monthly',
+  next_run_on: suggestNextDate(),
+  end_date: '',
+  auto_send: false,
+});
+
+const createRecurring = () => {
+  recurringForm
+    .transform((data) => ({ ...data, end_date: data.end_date || null }))
+    .post(route('invoices.recurring.store', props.invoice.id), {
+      onSuccess: () => { showRecurringModal.value = false; },
+    });
+};
 
 const paymentForm = useForm({
   amount: props.invoice.remaining,
@@ -67,6 +95,14 @@ const deleteInvoice = () => {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           PDF
         </a>
+        <a v-if="invoice.status !== 'draft'" :href="route('invoices.ubl', invoice.id)" class="btn btn-secondary btn-sm" title="Download als UBL 2.1 (e-factuur, NLCIUS)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          UBL
+        </a>
+        <button v-if="!invoice.is_credit" class="btn btn-secondary btn-sm" title="Maak hier een terugkerende factuur van" @click="showRecurringModal = true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Maak terugkerend
+        </button>
         <template v-if="invoice.status === 'draft'">
           <Link :href="route('invoices.edit', invoice.id)" class="btn btn-secondary btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><polygon points="18.5 2.5 21.5 5.5 12 15 9 15 9 12 18.5 2.5"/></svg>
@@ -257,6 +293,61 @@ const deleteInvoice = () => {
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showPaymentModal = false">Annuleren</button>
             <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">Registreren</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recurring modal -->
+    <div v-if="showRecurringModal" class="modal-overlay" @click.self="showRecurringModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Maak terugkerend</div>
+          <button class="icon-btn" @click="showRecurringModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;line-height:1.6;">
+            De regels van deze factuur worden elke periode automatisch opnieuw gefactureerd
+            aan <b>{{ invoice.customer_name }}</b>. Beheren doe je via <b>Verkoop → Terugkerend</b>.
+          </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Frequentie</label>
+              <select v-model="recurringForm.frequency">
+                <option value="weekly">Wekelijks</option>
+                <option value="monthly">Maandelijks</option>
+                <option value="quarterly">Per kwartaal</option>
+                <option value="halfyearly">Per half jaar</option>
+                <option value="yearly">Jaarlijks</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Eerste factuurdatum</label>
+              <input type="date" v-model="recurringForm.next_run_on">
+              <div v-if="recurringForm.errors.next_run_on" class="field-error">{{ recurringForm.errors.next_run_on }}</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Stopt automatisch na<span class="label-hint">(optioneel)</span></label>
+            <input type="date" v-model="recurringForm.end_date">
+            <div v-if="recurringForm.errors.end_date" class="field-error">{{ recurringForm.errors.end_date }}</div>
+          </div>
+          <div class="form-group">
+            <label>Wijze</label>
+            <select v-model="recurringForm.auto_send">
+              <option :value="false">Als concept klaarzetten (zelf controleren en versturen)</option>
+              <option :value="true">Direct versturen naar de klant</option>
+            </select>
+          </div>
+          <div v-if="recurringForm.errors.recurring" class="field-error">{{ recurringForm.errors.recurring }}</div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showRecurringModal = false">Annuleren</button>
+            <button class="btn btn-primary btn-sm" @click="createRecurring" :disabled="recurringForm.processing">Profiel aanmaken</button>
           </div>
         </div>
       </div>

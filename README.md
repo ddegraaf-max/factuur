@@ -210,7 +210,7 @@ resources/
 
 **iDEAL/Mollie betalingen** — Nog niet ingebouwd. Aanbeveling: `mollie/laravel-mollie` koppelen aan de Payment-controller voor automatische verwerking.
 
-**Peppol/UBL** — Nog niet ingebouwd, op de roadmap.
+**Peppol/UBL** — UBL 2.1 (NLCIUS) is ingebouwd: elke definitieve factuur is te downloaden als UBL (`/invoices/{id}/ubl`) en wordt automatisch als XML-bijlage met de factuurmail meegestuurd (`App\Services\UblGenerator`). Verzending via het Peppol-netwerk (access point) staat op de roadmap.
 
 **Herinneringen-job** — De settings worden opgeslagen, maar de scheduled job die ze daadwerkelijk verzendt moet nog worden gecodeerd. Stub:
 

@@ -36,6 +36,9 @@ class InvoiceManager
             $totals = $this->vat->calculateInvoice($lines);
 
             $invoice = Invoice::create([
+                // Expliciet meegeven: bij het genereren via de console (terugkerende
+                // facturen) is er geen ingelogde gebruiker die dit automatisch invult.
+                'company_id' => $customer->company_id,
                 'customer_id' => $customer->id,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
@@ -157,6 +160,18 @@ class InvoiceManager
                 'company' => $company,
             ])->setPaper('a4')->output();
 
+            // E-facturatie: UBL-bijlage genereren. Mislukt dit, dan gaat de
+            // factuurmail gewoon (alleen met PDF) de deur uit.
+            $ubl = null;
+            try {
+                $ubl = app(UblGenerator::class)->generate($invoice);
+            } catch (\Throwable $e) {
+                Log::warning('UBL-bijlage genereren mislukt', [
+                    'invoice' => $invoice->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             $mail = Mail::to($invoice->customer_email);
 
             $cc = $company->copy_email ?: $company->email;
@@ -167,7 +182,7 @@ class InvoiceManager
                 $mail->bcc($company->accountant_email);
             }
 
-            $mail->send(new InvoiceMail($invoice, $pdf));
+            $mail->send(new InvoiceMail($invoice, $pdf, $ubl));
         } catch (\Throwable $e) {
             Log::error('Factuur mailen mislukt', [
                 'invoice' => $invoice->id,

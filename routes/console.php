@@ -17,3 +17,8 @@ Schedule::command('trials:remind')
 Schedule::command('invoices:remind')
     ->dailyAt('08:00')
     ->timezone('Europe/Amsterdam');
+
+// Dagelijks: genereer facturen uit terugkerende profielen die aan de beurt zijn.
+Schedule::command('invoices:generate-recurring')
+    ->dailyAt('07:00')
+    ->timezone('Europe/Amsterdam');

@@ -13,9 +13,11 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\IncassoController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
@@ -136,7 +138,18 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+    Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
     Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('invoices.payments.store');
+
+    // Terugkerende facturen
+    Route::get('terugkerend', [RecurringInvoiceController::class, 'index'])->name('recurring.index');
+    Route::post('invoices/{invoice}/recurring', [RecurringInvoiceController::class, 'store'])->name('invoices.recurring.store');
+    Route::patch('terugkerend/{recurring}', [RecurringInvoiceController::class, 'update'])->name('recurring.update');
+    Route::delete('terugkerend/{recurring}', [RecurringInvoiceController::class, 'destroy'])->name('recurring.destroy');
+
+    // Export naar boekhouder
+    Route::get('export', [ExportController::class, 'index'])->name('export.index');
+    Route::get('export/download', [ExportController::class, 'download'])->name('export.download');
 
     // Credit notes
     Route::post('invoices/{invoice}/credit', [CreditNoteController::class, 'store'])->name('invoices.credit.store');
