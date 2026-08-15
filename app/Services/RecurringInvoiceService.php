@@ -26,9 +26,11 @@ class RecurringInvoiceService
      */
     public function runDue(): int
     {
+        // Demo-omgevingen slaan we over: die mogen niets naar buiten sturen.
         $due = RecurringInvoice::query()
             ->where('active', true)
             ->whereDate('next_run_on', '<=', today())
+            ->whereHas('company', fn ($q) => $q->where('is_demo', false))
             ->with('customer')
             ->get();
 

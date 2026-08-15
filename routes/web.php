@@ -13,6 +13,7 @@ use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DemoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\IncassoController;
 use App\Http\Controllers\InvoiceController;
@@ -24,7 +25,14 @@ use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('home');
-Route::view('/demo', 'marketing.demo')->name('demo');
+
+// ---------- DEMO-OMGEVING ----------
+// Elke bezoeker krijgt een eigen sandbox met voorbeeldgegevens en ziet daarin
+// de échte applicatie. Zie App\Http\Middleware\DemoMode voor de beveiliging.
+Route::get('/demo', [DemoController::class, 'show'])->name('demo');
+Route::post('/demo', [DemoController::class, 'start'])
+    ->middleware('throttle:10,1')->name('demo.start');
+Route::post('/demo/verlaten', [DemoController::class, 'stop'])->name('demo.stop');
 
 // ---------- PUBLIEKE MARKETINGPAGINA'S ----------
 Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq');

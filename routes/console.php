@@ -22,3 +22,6 @@ Schedule::command('invoices:remind')
 Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')
     ->timezone('Europe/Amsterdam');
+
+// Elk uur: ruim verlopen demo-omgevingen op.
+Schedule::command('demo:cleanup')->hourly();

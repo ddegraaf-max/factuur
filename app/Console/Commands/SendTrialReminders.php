@@ -19,6 +19,7 @@ class SendTrialReminders extends Command
         $days = (int) $this->option('days');
 
         $companies = Company::query()
+            ->where('is_demo', false)                    // demo-omgevingen krijgen geen post
             ->whereNull('subscription_ends_at')          // nog geen betaald abonnement
             ->whereNull('trial_reminder_sent_at')        // nog geen herinnering verstuurd
             ->whereNull('trial_reminder_email_id')       // niet al via Resend ingepland

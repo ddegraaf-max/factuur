@@ -12,7 +12,8 @@ class Company extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'trading_name', 'kvk_number', 'vat_number', 'iban',
+        'name', 'is_demo', 'demo_expires_at',
+        'trading_name', 'kvk_number', 'vat_number', 'iban',
         'email', 'phone', 'website',
         'address_line', 'postal_code', 'city', 'country', 'currency',
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
@@ -27,6 +28,8 @@ class Company extends Model
     ];
 
     protected $casts = [
+        'is_demo' => 'boolean',
+        'demo_expires_at' => 'datetime',
         'default_payment_terms' => 'integer',
         'fiscal_year_start' => 'integer',
         'results_per_page' => 'integer',

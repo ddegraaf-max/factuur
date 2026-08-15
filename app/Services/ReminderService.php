@@ -21,11 +21,13 @@ class ReminderService
         $sent = 0;
 
         // In console-context grijpt de company-scope niet, dus we zien alle facturen.
+        // Demo-omgevingen slaan we over: daaruit mag nooit echte post vertrekken.
         $invoices = Invoice::query()
             ->where('is_credit', false)
             ->whereIn('status', ['sent', 'partial', 'overdue'])
             ->whereNotNull('due_date')
             ->whereDate('due_date', '<', now())
+            ->whereHas('company', fn ($q) => $q->where('is_demo', false))
             ->with(['company', 'lines'])
             ->get();
 

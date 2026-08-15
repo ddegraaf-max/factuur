@@ -55,7 +55,14 @@ const nav = [
 ];
 
 const subscription = computed(() => page.props.subscription || {});
-const showTrialBanner = computed(() => subscription.value.status === 'trialing');
+const isDemo = computed(() => !!page.props.demo);
+// In de demo is de proefperiode-balk alleen ruis; de demobalk staat er al.
+const showTrialBanner = computed(() => !isDemo.value && subscription.value.status === 'trialing');
+
+// De demo verlaten gaat via een gewoon formulier (dus een volledige
+// paginanavigatie): we landen op de marketingsite of het registratieformulier,
+// en dat zijn geen Inertia-pagina's.
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
 const isActive = (routeName) => {
   return route().current(routeName) || route().current(routeName.replace('.index', '.*'));
@@ -137,6 +144,25 @@ const logout = () => {
           <slot name="topbar-actions"></slot>
         </div>
       </header>
+
+      <div v-if="isDemo" class="demo-banner">
+        <span class="demo-chip">Demo</span>
+        <span class="demo-text">
+          Je bekijkt de <strong>echte EasyInvoice</strong> met voorbeeldgegevens. Klik gerust overal op —
+          er wordt niets verstuurd naar echte klanten.
+        </span>
+        <div class="demo-actions">
+          <form method="POST" :action="route('demo.stop')">
+            <input type="hidden" name="_token" :value="csrfToken">
+            <button type="submit" class="demo-leave">Demo verlaten</button>
+          </form>
+          <form method="POST" :action="route('demo.stop')">
+            <input type="hidden" name="_token" :value="csrfToken">
+            <input type="hidden" name="to" value="register">
+            <button type="submit" class="demo-cta">Start 14 dagen gratis</button>
+          </form>
+        </div>
+      </div>
 
       <div v-if="showTrialBanner" class="trial-banner">
         <span class="trial-banner-text">
@@ -393,6 +419,62 @@ table { border-collapse: collapse; width: 100%; }
 .breadcrumb { font-size: 13px; color: var(--text-3); }
 .breadcrumb-current { color: var(--text); font-weight: 500; }
 .content { padding: 32px; max-width: 1400px; margin: 0 auto; }
+
+/* DEMO BANNER */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 11px 24px;
+  background: linear-gradient(100deg, var(--brand-tint) 0%, var(--surface) 70%);
+  border-bottom: 1px solid var(--brand-border);
+  color: var(--brand-darker);
+  font-size: 13.5px;
+}
+.demo-chip {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  background: var(--brand);
+  padding: 3px 9px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+.demo-text { flex: 1; min-width: 200px; }
+.demo-text strong { font-weight: 700; }
+.demo-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.demo-leave {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--brand-border);
+  background: var(--surface);
+  color: var(--brand-dark);
+  font-size: 13px;
+  font-weight: 600;
+}
+.demo-leave:hover { background: var(--brand-tint); }
+.demo-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: var(--r-sm);
+  background: var(--brand);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.demo-cta:hover { background: var(--brand-dark); }
+@media (max-width: 760px) {
+  .demo-banner { padding: 10px 12px; gap: 10px; }
+  .demo-actions { margin-left: 0; width: 100%; }
+  .demo-actions form { flex: 1; }
+  .demo-cta, .demo-leave { width: 100%; justify-content: center; }
+}
 
 /* TRIAL BANNER */
 .trial-banner {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\DemoMode;
 use App\Http\Middleware\EnsureSubscriptionActive;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -15,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
+            // Vóór Inertia: zet de demo-omgeving in veilige modus (geen echte
+            // e-mail, geen betaalroutes) voordat er iets wordt afgehandeld.
+            DemoMode::class,
             HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
