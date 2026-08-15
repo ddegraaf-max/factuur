@@ -36,6 +36,13 @@ class DemoCleaner
                 DB::table('invoices')->where('company_id', $company->id)->delete();
             }
 
+            $quoteIds = DB::table('quotes')->where('company_id', $company->id)->pluck('id');
+            if ($quoteIds->isNotEmpty()) {
+                DB::table('quote_lines')->whereIn('quote_id', $quoteIds)->delete();
+                DB::table('quotes')->where('company_id', $company->id)->delete();
+            }
+            DB::table('quote_sequences')->where('company_id', $company->id)->delete();
+
             DB::table('recurring_invoices')->where('company_id', $company->id)->delete();
             DB::table('products')->where('company_id', $company->id)->delete();
             DB::table('customers')->where('company_id', $company->id)->delete();

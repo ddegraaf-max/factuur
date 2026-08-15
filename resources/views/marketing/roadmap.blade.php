@@ -39,10 +39,13 @@
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
-        <div class="road-card"><h4>Offertes</h4><p>Offertes maken en met één klik omzetten naar een factuur.</p></div>
+        <div class="road-card"><h4>BTW-overzicht per kwartaal</h4><p>In één oogopslag zien hoeveel btw je over je omzet moet afdragen.</p></div>
+        <div class="road-card"><h4>Klantportaal</h4><p>Je klant bekijkt zijn facturen online — en jij ziet wanneer ze zijn geopend.</p></div>
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Offertes</h4><p>Offertes maken, versturen en met één klik omzetten naar een factuur.</p></div>
+        <div class="road-card"><h4>Dagelijks overzicht</h4><p>Elke ochtend een mail met wat er die dag om aandacht vraagt.</p></div>
         <div class="road-card"><h4>Terugkerende facturen</h4><p>Automatisch periodiek factureren voor abonnementen en vaste diensten.</p></div>
         <div class="road-card"><h4>UBL / e-facturatie</h4><p>Elke factuur als UBL 2.1 (NLCIUS) — te downloaden én automatisch als bijlage in de factuurmail.</p></div>
         <div class="road-card"><h4>Export naar boekhouder</h4><p>CSV-export met BTW per tarief, klaar voor je accountant.</p></div>

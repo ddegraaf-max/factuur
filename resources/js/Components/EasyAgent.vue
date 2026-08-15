@@ -13,6 +13,14 @@ const urgent = computed(() => insights.value.filter(i => ['danger', 'warning'].i
 
 const eur = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+/**
+ * Berichten markeren nadruk met **sterretjes** in plaats van HTML.
+ * Hier splitsen we die op: de oneven stukken worden vet. Vue schrijft elk stuk
+ * als tekst weg, dus een klantnaam met < of > kan nooit als code uitgevoerd
+ * worden — met v-html zou dat wél kunnen.
+ */
+const parts = (text) => String(text ?? '').split('**');
+
 const toggle = () => {
   open.value = !open.value;
   if (open.value && !initialized.value) {
@@ -20,7 +28,7 @@ const toggle = () => {
     const userName = (page.props.auth?.user?.name || '').split(' ')[0] || 'daar';
     messages.value.push({
       from: 'bot',
-      text: `Hoi <b>${userName}</b>! Ik ben <b>EASY</b>, je administratie-assistent. Vraag bijvoorbeeld naar <b>openstaand</b>, <b>achterstallig</b> of je <b>topklanten</b>.`,
+      text: `Hoi **${userName}**! Ik ben **EASY**, je administratie-assistent. Vraag bijvoorbeeld naar **openstaand**, **achterstallig** of je **topklanten**.`,
     });
   }
 };
@@ -36,35 +44,36 @@ const respond = (input) => {
   }
   if (q.includes('openstaand') || q.includes('open ') || q.endsWith('open')) {
     return data.outstanding
-      ? `Er staat in totaal <span class="amt">${eur(data.outstanding.total)}</span> open, verdeeld over <b>${data.outstanding.count}</b> facturen.`
+      ? `Er staat in totaal **${eur(data.outstanding.total)}** open, verdeeld over **${data.outstanding.count}** facturen.`
       : 'Geen openstaande facturen.';
   }
   if (q.includes('achterstall') || q.includes('te laat')) {
     return data.overdue
-      ? `Er zijn <b>${data.overdue.count}</b> achterstallige facturen voor <span class="amt">${eur(data.overdue.total)}</span>.`
+      ? `Er zijn **${data.overdue.count}** achterstallige facturen voor **${eur(data.overdue.total)}**.`
       : 'Geen achterstallige facturen op dit moment. 👌';
   }
   if (q.includes('incasso') || q.includes('armaere')) {
     return data.incasso
-      ? `Bij Armaere liggen <b>${data.incasso.count}</b> dossiers voor <span class="amt">${eur(data.incasso.total)}</span>.`
+      ? `Bij Armaere liggen **${data.incasso.count}** dossiers voor **${eur(data.incasso.total)}**.`
       : 'Geen actieve incasso-dossiers.';
   }
   if (q.includes('btw') || q.includes('aangifte')) {
     return data.vat
-      ? `Te dragen BTW voor Q${data.vat.quarter}: <span class="amt">${eur(data.vat.amount)}</span>. Deadline: ${data.vat.deadline}.`
+      ? `Te dragen BTW voor Q${data.vat.quarter}: **${eur(data.vat.amount)}**.\nDeadline: ${data.vat.deadline}.`
       : 'BTW-gegevens niet beschikbaar.';
   }
   if (q.includes('top') || q.includes('beste klant')) {
     if (data.top_customers?.length) {
-      return 'Top klanten dit jaar (excl. BTW):<ul>' + data.top_customers.slice(0,3)
-        .map(c => `<li><b>${c.name}</b> — <span class="amt">${eur(c.total)}</span></li>`).join('') + '</ul>';
+      // Regels gescheiden door een newline; de bubbel toont die dankzij pre-wrap.
+      return 'Top klanten dit jaar (excl. BTW):\n' + data.top_customers.slice(0, 3)
+        .map(c => `· ${c.name} — **${eur(c.total)}**`).join('\n');
     }
     return 'Nog geen omzetgegevens.';
   }
   if (q.includes('help') || q === '?') {
     return 'Ik kan je informeren over: openstaand, achterstallig, incasso, BTW-aangifte, topklanten en omzet. Vraag het me in normale taal.';
   }
-  return 'Daar weet ik nog niet veel over. Probeer een vraag over <b>openstaand</b>, <b>achterstallig</b>, <b>incasso</b>, <b>BTW</b> of <b>topklanten</b>.';
+  return 'Daar weet ik nog niet veel over. Probeer een vraag over **openstaand**, **achterstallig**, **incasso**, **BTW** of **topklanten**.';
 };
 
 const send = (text) => {
@@ -103,14 +112,22 @@ const quick = (q) => send(q);
         <div class="section-label">Wat ik vandaag voor je zie</div>
         <div v-for="ins in insights" :key="ins.title" class="insight" :class="ins.severity">
           <div class="ins-title">{{ ins.title }}</div>
-          <div class="ins-detail" style="white-space: pre-wrap;">{{ ins.detail }}</div>
+          <div class="ins-detail" style="white-space: pre-wrap;">
+            <template v-for="(part, p) in parts(ins.detail)" :key="p">
+              <b v-if="p % 2" class="amt">{{ part }}</b><template v-else>{{ part }}</template>
+            </template>
+          </div>
         </div>
       </div>
 
       <div v-if="messages.length" class="messages">
         <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.from">
           <div v-if="m.from === 'bot'" class="msg-avatar">E</div>
-          <div class="bubble" style="white-space: pre-wrap;">{{ m.text }}</div>
+          <div class="bubble" style="white-space: pre-wrap;">
+            <template v-for="(part, p) in parts(m.text)" :key="p">
+              <b v-if="p % 2">{{ part }}</b><template v-else>{{ part }}</template>
+            </template>
+          </div>
         </div>
       </div>
     </div>

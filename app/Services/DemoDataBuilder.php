@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Models\Quote;
 use App\Models\RecurringInvoice;
 use App\Models\ReminderLog;
 use App\Models\User;
@@ -47,6 +48,7 @@ class DemoDataBuilder
             $this->createProducts($company);
             $invoices = $this->createInvoices($company, $customers);
             $this->createRecurring($company, $customers, $invoices);
+            $this->createQuotes($company, $customers);
 
             return $user;
         });
@@ -457,6 +459,94 @@ class DemoDataBuilder
         }
 
         return $invoice;
+    }
+
+    /** Offertes in verschillende stadia, zodat de hele flow zichtbaar is. */
+    protected function createQuotes(Company $company, array $customers): void
+    {
+        $year = now()->year;
+
+        $specs = [
+            // [klant, status, dagen geleden, geldig (dagen), referentie, regels]
+            ['smile', 'sent', 5, 30, 'Praktijkwebsite', [
+                ['Website ontwerp & realisatie', 1, 1650],
+                ['Logo & huisstijl', 1, 480],
+                ['Hosting (managed)', 12, 12.50],
+            ]],
+            ['janssen', 'accepted', 22, 30, 'Doorontwikkeling portaal', [
+                ['Uurtarief development', 24, 75],
+            ]],
+            ['lumen', 'expired', 68, 21, 'Campagnepagina', [
+                ['Website ontwerp & realisatie', 1, 1650],
+                ['SEO-pakket Start', 3, 225],
+            ]],
+        ];
+
+        foreach ($specs as $i => [$customerKey, $status, $daysAgo, $validDays, $reference, $lines]) {
+            $customer = $customers[$customerKey];
+            $quoteDate = now()->subDays($daysAgo);
+
+            $normalized = array_map(fn ($l) => [
+                'description' => $l[0],
+                'quantity' => $l[1],
+                'unit_price' => $l[2],
+                'vat_rate' => 21,
+            ], $lines);
+
+            $totals = $this->vat->calculateInvoice($normalized);
+
+            $quote = Quote::create([
+                'company_id' => $company->id,
+                'customer_id' => $customer->id,
+                'number' => sprintf('OFF-%d-%04d', $year, $i + 1),
+                'status' => $status,
+                'reference' => $reference,
+                'quote_date' => $quoteDate,
+                'valid_until' => $quoteDate->copy()->addDays($validDays),
+
+                'customer_name' => $customer->name,
+                'customer_address_line' => $customer->address_line,
+                'customer_postal_code' => $customer->postal_code,
+                'customer_city' => $customer->city,
+                'customer_country' => $customer->country,
+                'customer_vat_number' => $customer->vat_number,
+                'customer_kvk_number' => $customer->kvk_number,
+                'customer_email' => $customer->email,
+
+                'subtotal' => $totals['subtotal'],
+                'vat_total' => $totals['vat_total'],
+                'total' => $totals['total'],
+                'vat_breakdown' => $totals['vat_breakdown'],
+
+                'intro' => 'Naar aanleiding van ons gesprek doen wij je graag het volgende voorstel.',
+                'footer' => $company->invoice_footer,
+                'sent_at' => $quoteDate->copy()->addHours(10),
+                'accepted_at' => $status === 'accepted' ? $quoteDate->copy()->addDays(4) : null,
+            ]);
+
+            foreach ($normalized as $index => $line) {
+                $calc = $this->vat->calculateLine($line['quantity'], $line['unit_price'], $line['vat_rate']);
+                $quote->lines()->create([
+                    'sort_order' => $index,
+                    'description' => $line['description'],
+                    'quantity' => $line['quantity'],
+                    'unit' => 'stuk',
+                    'unit_price' => $line['unit_price'],
+                    'vat_rate' => $line['vat_rate'],
+                    'line_subtotal' => $calc['subtotal'],
+                    'line_vat' => $calc['vat'],
+                    'line_total' => $calc['total'],
+                ]);
+            }
+        }
+
+        DB::table('quote_sequences')->insert([
+            'company_id' => $company->id,
+            'year' => $year,
+            'last_number' => count($specs),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**

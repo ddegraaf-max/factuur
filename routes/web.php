@@ -18,6 +18,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\IncassoController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SettingsController;
@@ -149,6 +150,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
     Route::post('invoices/{invoice}/herinnering', [InvoiceController::class, 'remind'])->name('invoices.remind');
     Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('invoices.payments.store');
+
+    // Offertes
+    Route::resource('offertes', QuoteController::class)
+        ->parameters(['offertes' => 'quote'])
+        ->names('quotes');
+    Route::post('offertes/{quote}/versturen', [QuoteController::class, 'send'])->name('quotes.send');
+    Route::get('offertes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
+    Route::post('offertes/{quote}/accepteren', [QuoteController::class, 'accept'])->name('quotes.accept');
+    Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');
+    Route::post('offertes/{quote}/naar-factuur', [QuoteController::class, 'convert'])->name('quotes.convert');
 
     // Terugkerende facturen
     Route::get('terugkerend', [RecurringInvoiceController::class, 'index'])->name('recurring.index');

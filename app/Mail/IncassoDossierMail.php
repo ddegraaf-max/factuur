@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -26,8 +27,13 @@ class IncassoDossierMail extends Mailable
     public function envelope(): Envelope
     {
         $ref = $this->invoice->incasso_reference ?: ('factuur ' . $this->invoice->number);
+        $company = $this->invoice->company;
+        $replyTo = $company?->email ?: $company?->copy_email;
 
+        // De deurwaarder moet de schuldeiser direct kunnen bereiken.
         return new Envelope(
+            from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
+            replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: 'Nieuwe incasso-opdracht ' . $ref . ' — ' . $this->invoice->customer_name,
         );
     }

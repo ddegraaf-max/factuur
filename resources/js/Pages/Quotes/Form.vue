@@ -2,30 +2,28 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur, parseDutchNumber } from '@/format.js';
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 
 const props = defineProps({
-  invoice: Object,
+  quote: Object,
   customers: Array,
   products: Array,
   vat_rates: Array,
-  preselect_customer_id: { type: [String, Number], default: null },
   price_mode: { type: String, default: 'excl' },
+  default_valid_days: { type: Number, default: 30 },
+  preselect_customer_id: { type: [String, Number], default: null },
 });
 
-const isEdit = computed(() => !!props.invoice);
-
-// 'incl' = de ondernemer typt de prijs die de klant betaalt (bruto).
-// De opslag blijft altijd netto; de server rekent dat terug.
+const isEdit = computed(() => !!props.quote);
 const inclMode = computed(() => props.price_mode === 'incl');
 const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
 
-/** Toon de prijs zoals de gebruiker hem invoert: bruto in incl-modus. */
+const today = new Date().toISOString().slice(0, 10);
+
+/** Toon de prijs zoals hij is ingevoerd: bruto in incl-modus. */
 const displayPrice = (line) => {
   const qty = Number(line.quantity) || 0;
   if (props.price_mode === 'incl') {
-    // Bestaande regel: leid de brutoprijs af uit het regeltotaal, dan zie je
-    // exact terug wat er ooit is ingetypt (ook bij meerdere stuks).
     if (line.line_total != null && qty > 0) {
       return Math.round((Number(line.line_total) / qty) * 100) / 100;
     }
@@ -34,16 +32,22 @@ const displayPrice = (line) => {
   return Number(line.unit_price);
 };
 
-const today = new Date().toISOString().slice(0, 10);
+const daysBetween = (from, to) => {
+  const ms = new Date(to).getTime() - new Date(from).getTime();
+  return Math.max(1, Math.round(ms / 86400000));
+};
 
 const form = useForm({
-  customer_id: props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
-  invoice_date: props.invoice?.invoice_date ?? today,
-  payment_terms: props.invoice?.payment_terms ?? 30,
-  reference: props.invoice?.reference ?? '',
-  notes: props.invoice?.notes ?? '',
-  lines: props.invoice?.lines?.length > 0
-    ? props.invoice.lines.map(l => ({
+  customer_id: props.quote?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  quote_date: props.quote?.quote_date?.slice(0, 10) ?? today,
+  valid_days: props.quote
+    ? daysBetween(props.quote.quote_date, props.quote.valid_until)
+    : props.default_valid_days,
+  reference: props.quote?.reference ?? '',
+  intro: props.quote?.intro ?? '',
+  notes: props.quote?.notes ?? '',
+  lines: props.quote?.lines?.length > 0
+    ? props.quote.lines.map(l => ({
         product_id: l.product_id,
         description: l.description,
         details: l.details ?? '',
@@ -52,24 +56,13 @@ const form = useForm({
         unit_price: displayPrice(l),
         vat_rate: Number(l.vat_rate),
       }))
-    : [{
-        product_id: null,
-        description: '',
-        details: '',
-        quantity: 1,
-        unit: 'stuk',
-        unit_price: 0,
-        vat_rate: 21,
-      }],
+    : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21 }],
   action: 'draft',
 });
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
-/**
- * Rekent één regel door — dezelfde volgorde als VatCalculator op de server,
- * zodat het scherm en de opgeslagen factuur tot op de cent gelijk zijn.
- */
+/** Zelfde volgorde als VatCalculator op de server. */
 const calcLine = (line) => {
   const qty = parseDutchNumber(line.quantity);
   const price = parseDutchNumber(line.unit_price);
@@ -117,16 +110,14 @@ const totals = computed(() => {
 
 const lineTotal = (line) => calcLine(line).total;
 
+const validUntilLabel = computed(() => {
+  const d = new Date(form.quote_date);
+  d.setDate(d.getDate() + Number(form.valid_days || 0));
+  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+});
+
 const addLine = () => {
-  form.lines.push({
-    product_id: null,
-    description: '',
-    details: '',
-    quantity: 1,
-    unit: 'stuk',
-    unit_price: 0,
-    vat_rate: 21,
-  });
+  form.lines.push({ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21 });
 };
 
 const removeLine = (i) => {
@@ -141,50 +132,39 @@ const applyProduct = (line, productId) => {
     line.details = p.description ?? '';
     line.unit = p.unit;
     line.vat_rate = Number(p.vat_rate);
-    // Productprijzen staan netto opgeslagen; in incl-modus tonen we ze bruto.
     line.unit_price = inclMode.value
-      ? Math.round(Number(p.price) * (1 + Number(p.vat_rate) / 100) * 100) / 100
+      ? r2(Number(p.price) * (1 + Number(p.vat_rate) / 100))
       : Number(p.price);
   }
 };
 
-const selectedCustomer = computed(() => {
-  return props.customers.find(c => c.id === Number(form.customer_id));
-});
-
-// When customer changes, auto-update payment terms if not edited
-watch(() => form.customer_id, (id) => {
-  const c = props.customers.find(c => c.id === Number(id));
-  if (c?.payment_terms) form.payment_terms = c.payment_terms;
-});
-
 const submit = (action) => {
   form.action = action;
   if (isEdit.value) {
-    form.put(route('invoices.update', props.invoice.id));
+    form.put(route('quotes.update', props.quote.id));
   } else {
-    form.post(route('invoices.store'));
+    form.post(route('quotes.store'));
   }
 };
 </script>
 
 <template>
-  <Head :title="isEdit ? 'Factuur bewerken' : 'Nieuwe factuur'" />
+  <Head :title="isEdit ? 'Offerte bewerken' : 'Nieuwe offerte'" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Verkoop / <Link :href="route('invoices.index')" style="color:var(--text-3);">Facturen</Link> /
+        Verkoop / <Link :href="route('quotes.index')" style="color:var(--text-3);">Offertes</Link> /
         <span class="breadcrumb-current">{{ isEdit ? 'Bewerken' : 'Nieuw' }}</span>
       </div>
     </template>
 
     <div class="page-header">
       <div>
-        <Link :href="route('invoices.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
+        <Link :href="route('quotes.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           Terug
         </Link>
-        <h1 class="page-title">{{ isEdit ? 'Factuur bewerken' : 'Nieuwe factuur' }}</h1>
+        <h1 class="page-title">{{ isEdit ? 'Offerte bewerken' : 'Nieuwe offerte' }}</h1>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" :disabled="form.processing" @click="submit('draft')">
@@ -200,7 +180,7 @@ const submit = (action) => {
     <div class="form-layout">
       <div class="form-main">
         <div class="card">
-          <div class="card-header"><div class="card-title">Klant &amp; details</div></div>
+          <div class="card-header"><div class="card-title">Klant &amp; geldigheid</div></div>
           <div class="card-body">
             <div class="form-row">
               <div class="form-group">
@@ -216,32 +196,35 @@ const submit = (action) => {
               </div>
               <div class="form-group">
                 <label>Referentie<span class="label-hint">(optioneel)</span></label>
-                <input type="text" v-model="form.reference" placeholder="PROJ-2026-001" maxlength="255">
+                <input type="text" v-model="form.reference" placeholder="Bijv. Verbouwing kantoor" maxlength="255">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Factuurdatum *</label>
-                <input type="date" v-model="form.invoice_date" required>
-                <div v-if="form.errors.invoice_date" class="field-error">{{ form.errors.invoice_date }}</div>
+                <label>Offertedatum *</label>
+                <input type="date" v-model="form.quote_date" required>
+                <div v-if="form.errors.quote_date" class="field-error">{{ form.errors.quote_date }}</div>
               </div>
               <div class="form-group">
-                <label>Betalingstermijn (dagen) *</label>
-                <input type="number" v-model="form.payment_terms" min="0" max="365" required>
+                <label>Geldig gedurende (dagen) *</label>
+                <input type="number" v-model.number="form.valid_days" min="1" max="365" required>
+                <div style="font-size:11px;color:var(--text-4);margin-top:4px;">Geldig tot en met {{ validUntilLabel }}</div>
+                <div v-if="form.errors.valid_days" class="field-error">{{ form.errors.valid_days }}</div>
               </div>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label>Begeleidende tekst<span class="label-hint">(bovenaan de offerte)</span></label>
+              <textarea v-model="form.intro" rows="3" maxlength="2000" placeholder="Bijv. Naar aanleiding van ons gesprek doen wij je graag het volgende voorstel…"></textarea>
             </div>
           </div>
         </div>
 
-        <!-- Lines -->
+        <!-- Regels -->
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Factuurregels</div>
-              <div class="card-subtitle">
-                {{ inclMode ? 'Je typt prijzen inclusief btw' : 'Je typt prijzen exclusief btw' }}
-                · aan te passen bij Instellingen → Bedrijfsgegevens
-              </div>
+              <div class="card-title">Offerteregels</div>
+              <div class="card-subtitle">{{ inclMode ? 'Je typt prijzen inclusief btw' : 'Je typt prijzen exclusief btw' }}</div>
             </div>
           </div>
           <div class="card-body">
@@ -255,9 +238,6 @@ const submit = (action) => {
                 <div></div>
               </div>
 
-              <!-- De .line-field-wrappers zijn op desktop 'display: contents', dus
-                   de velden blijven gewoon kolommen van .line-row. Op mobiel worden
-                   het blokken met een eigen label (uit data-label). -->
               <div v-for="(line, i) in form.lines" :key="i" class="line-row">
                 <div class="line-desc">
                   <div class="line-desc-row">
@@ -265,9 +245,9 @@ const submit = (action) => {
                       <option :value="null">— Eigen regel —</option>
                       <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
-                    <input type="text" v-model="line.description" placeholder="Omschrijving" required>
+                    <input type="text" v-model="line.description" placeholder="Omschrijving" maxlength="500">
                   </div>
-                  <textarea v-model="line.details" placeholder="Toelichting (optioneel)" rows="1" class="line-details"></textarea>
+                  <textarea v-model="line.details" class="line-details" rows="1" placeholder="Toelichting (optioneel)"></textarea>
                 </div>
                 <div class="line-field" data-label="Aantal">
                   <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
@@ -289,6 +269,8 @@ const submit = (action) => {
               </div>
             </div>
 
+            <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
+
             <button class="add-line-btn" @click="addLine" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Regel toevoegen
@@ -297,46 +279,32 @@ const submit = (action) => {
         </div>
 
         <div class="card" style="margin-top:16px;">
-          <div class="card-header"><div class="card-title">Opmerking voor klant</div></div>
+          <div class="card-header"><div class="card-title">Opmerking</div></div>
           <div class="card-body">
             <div class="form-group" style="margin:0;">
-              <textarea v-model="form.notes" placeholder="Optioneel — verschijnt onderaan de factuur" rows="3"></textarea>
+              <textarea v-model="form.notes" rows="3" placeholder="Bijv. voorwaarden, planning of aannames bij dit voorstel"></textarea>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Sidebar with totals -->
-      <aside class="form-sidebar">
+      <div class="form-sidebar">
         <div class="card totals-card">
-          <div class="card-header"><div class="card-title">Overzicht</div></div>
+          <div class="card-header"><div class="card-title">Totaal</div></div>
           <div class="card-body">
-            <div class="total-row" v-for="b in totals.breakdown" :key="b.rate">
-              <span>Excl. BTW ({{ b.rate }}%)</span>
-              <span class="mono">{{ eur(b.subtotal) }}</span>
-            </div>
-            <div class="total-row sep"><span>Subtotaal</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
-            <div class="total-row" v-for="b in totals.breakdown" :key="'vat-' + b.rate">
+            <div class="total-row"><span>Subtotaal</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
+            <div v-for="b in totals.breakdown" :key="b.rate" class="total-row">
               <span>BTW {{ b.rate }}%</span>
               <span class="mono">{{ eur(b.vat) }}</span>
             </div>
             <div class="total-row grand"><span>Totaal</span><span class="mono">{{ eur(totals.total) }}</span></div>
-          </div>
-        </div>
 
-        <div v-if="selectedCustomer" class="card" style="margin-top:12px;">
-          <div class="card-header"><div class="card-title">Klantgegevens</div></div>
-          <div class="card-body" style="font-size:13px;line-height:1.7;">
-            <div style="font-weight:600;">{{ selectedCustomer.name }}</div>
-            <div v-if="selectedCustomer.address_line" style="color:var(--text-3);">{{ selectedCustomer.address_line }}</div>
-            <div v-if="selectedCustomer.postal_code || selectedCustomer.city" style="color:var(--text-3);">
-              {{ selectedCustomer.postal_code }} {{ selectedCustomer.city }}
+            <div style="margin-top:18px;font-size:12px;color:var(--text-3);line-height:1.6;">
+              De offerte krijgt pas een definitief nummer zodra je hem verstuurt.
             </div>
-            <div v-if="selectedCustomer.kvk_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;margin-top:4px;">KVK {{ selectedCustomer.kvk_number }}</div>
-            <div v-if="selectedCustomer.vat_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;">BTW {{ selectedCustomer.vat_number }}</div>
           </div>
         </div>
-      </aside>
+      </div>
     </div>
   </AppLayout>
 </template>

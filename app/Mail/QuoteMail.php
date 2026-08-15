@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Invoice;
+use App\Models\Quote;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -11,46 +11,42 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PaymentReminderMail extends Mailable
+class QuoteMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public string $subjectLine,
-        public string $bodyText,
-        public Invoice $invoice,
+        public Quote $quote,
         public string $pdf,
     ) {}
 
     public function envelope(): Envelope
     {
-        $company = $this->invoice->company;
+        $company = $this->quote->company;
         $replyTo = $company?->email ?: $company?->copy_email;
 
-        // Afzendernaam = de ondernemer; een herinnering van een onbekende
-        // afzender wordt niet betaald. Antwoorden komen bij hem terecht.
+        // Afzendernaam = de ondernemer, antwoorden gaan rechtstreeks naar hem.
         return new Envelope(
             from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
-            subject: $this->subjectLine,
+            subject: 'Offerte '.$this->quote->number.' — '.($company->name ?? 'EasyInvoice'),
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.payment-reminder',
+            view: 'emails.quote',
             with: [
-                'bodyText' => $this->bodyText,
-                'invoice' => $this->invoice,
-                'company' => $this->invoice->company,
+                'quote' => $this->quote,
+                'company' => $this->quote->company,
             ],
         );
     }
 
     public function attachments(): array
     {
-        $name = ($this->invoice->number ?: 'factuur-' . $this->invoice->id) . '.pdf';
+        $name = ($this->quote->number ?: 'offerte-'.$this->quote->id).'.pdf';
 
         return [
             Attachment::fromData(fn () => $this->pdf, $name)->withMime('application/pdf'),

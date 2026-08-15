@@ -18,7 +18,9 @@ class EasyInsightsService
             $insights[] = [
                 'severity' => 'danger',
                 'title' => $overdue->count() . ' achterstallige factu' . ($overdue->count() === 1 ? 'ur' : 'ren'),
-                'detail' => 'Totaal openstaand: <span class="amt">€ ' . number_format($total, 2, ',', '.') . '</span>',
+                // Nadruk met **sterretjes**, niet met HTML: de frontend zet dit
+                // veilig om naar vet zonder de tekst als opmaak te vertrouwen.
+                'detail' => 'Totaal openstaand: **€ ' . number_format($total, 2, ',', '.') . '**',
             ];
         }
 

@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.2.0</div>
+        <h3>Offertes — van voorstel naar factuur in één klik</h3>
+        <ul class="tl-list">
+          <li>Maak een offerte met dezelfde regels, producten en btw-berekening als een factuur.</li>
+          <li>Versturen gaat per e-mail met een eigen offerte-PDF in je huisstijl, inclusief geldigheidsdatum.</li>
+          <li>Houd bij wat de klant besloot: geaccepteerd, afgewezen of verlopen — offertes verlopen automatisch.</li>
+          <li>Akkoord? Eén klik en de offerte wordt een concept-factuur.</li>
+          <li>Daarnaast: een <strong>dagelijks overzicht</strong> in je mailbox, een knop om zelf een <strong>herinnering</strong> te sturen, en de mogelijkheid om <strong>prijzen inclusief btw</strong> in te voeren.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.1.0</div>
         <h3>Terugkerende facturen, e-facturatie (UBL) &amp; export voor je boekhouder</h3>
         <ul class="tl-list">
