@@ -50,7 +50,13 @@ class IncassoController extends Controller
 
     public function send(Invoice $invoice)
     {
-        $this->service->send($invoice);
+        try {
+            $this->service->send($invoice);
+        } catch (\DomainException $e) {
+            // Bijv. al bij incasso, al betaald, of een creditnota.
+            return back()->withErrors(['incasso' => $e->getMessage()]);
+        }
+
         return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} overgedragen aan " . config('incasso.partner_name') . " en per e-mail verzonden.");
     }
 

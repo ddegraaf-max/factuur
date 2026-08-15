@@ -1,9 +1,9 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 import { eur } from '@/format.js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   invoice: Object,
@@ -12,6 +12,78 @@ const props = defineProps({
 
 const showPaymentModal = ref(false);
 const showRecurringModal = ref(false);
+const showCreditModal = ref(false);
+
+// Foutmeldingen die niet bij één invoerveld horen (incasso, creditnota, UBL…).
+const page = usePage();
+const pageError = computed(() => {
+  const e = page.props.errors || {};
+  return e.incasso || e.credit || e.ubl || e.status || e.delete || null;
+});
+
+/* ---------- Creditnota ---------- */
+const canCredit = computed(() =>
+  !props.invoice.is_credit && ['sent', 'partial', 'overdue', 'paid', 'incasso'].includes(props.invoice.status)
+);
+
+const creditForm = useForm({ kind: 'full' });
+
+const createCredit = () => {
+  creditForm.post(route('invoices.credit.store', props.invoice.id), {
+    onSuccess: () => { showCreditModal.value = false; },
+  });
+};
+
+const finalizeCredit = () => {
+  if (confirm('Creditnota definitief maken? Er wordt een definitief creditnotanummer toegekend.')) {
+    router.post(route('invoices.credit.finalize', props.invoice.id));
+  }
+};
+
+/* ---------- Incasso ---------- */
+const phaseLabels = {
+  minnelijk: 'Minnelijk traject',
+  gerechtelijk: 'Gerechtelijke procedure',
+  executie: 'Executie',
+};
+
+const canIncasso = computed(() =>
+  !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
+);
+
+const sendToIncasso = () => {
+  const msg = `Factuur ${props.invoice.number} overdragen aan de incassopartner?\n\n`
+    + 'Het volledige dossier (factuur, betalingen en het herinneringsverloop) wordt per e-mail verstuurd. '
+    + 'Dit kun je niet ongedaan maken.';
+  if (confirm(msg)) {
+    router.post(route('incasso.send', props.invoice.id), {}, { preserveScroll: true });
+  }
+};
+
+/* ---------- Bijlagen ---------- */
+const fileInput = ref(null);
+const uploadForm = useForm({ files: [] });
+
+const uploadFiles = (event) => {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+
+  uploadForm.files = files;
+  uploadForm.post(route('invoices.attachments.store', props.invoice.id), {
+    forceFormData: true,
+    preserveScroll: true,
+    onFinish: () => {
+      uploadForm.reset();
+      if (fileInput.value) fileInput.value.value = '';
+    },
+  });
+};
+
+const removeAttachment = (att) => {
+  if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
+    router.delete(route('attachments.destroy', att.id), { preserveScroll: true });
+  }
+};
 
 // Standaard eerstvolgende factuurdatum: één maand na de factuurdatum.
 const suggestNextDate = () => {
@@ -114,11 +186,28 @@ const deleteInvoice = () => {
             Versturen
           </button>
         </template>
+        <button v-if="canCredit" class="btn btn-secondary btn-sm" title="Maak een creditnota op deze factuur" @click="showCreditModal = true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+          Creditnota
+        </button>
+        <button v-if="canIncasso" class="btn btn-secondary btn-sm" title="Draag deze factuur over aan de incassopartner" @click="sendToIncasso">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
+          Naar incasso
+        </button>
+        <button v-if="invoice.is_credit && invoice.status === 'draft'" class="btn btn-primary btn-sm" @click="finalizeCredit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Creditnota definitief maken
+        </button>
         <button v-if="['sent','partial','overdue'].includes(invoice.status)" class="btn btn-primary btn-sm" @click="showPaymentModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           Betaling registreren
         </button>
       </div>
+    </div>
+
+    <div v-if="pageError" class="inv-alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ pageError }}
     </div>
 
     <div class="inv-detail">
@@ -232,6 +321,86 @@ const deleteInvoice = () => {
           {{ invoice.notes }}
         </div>
 
+        <!-- Incasso-dossier -->
+        <div v-if="invoice.status === 'incasso'" class="inc-panel">
+          <div class="inc-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
+            <div>
+              <div class="inc-title">Overgedragen aan incasso</div>
+              <div class="inc-sub">{{ invoice.incasso_handler }}</div>
+            </div>
+            <Link :href="route('incasso.index')" class="btn btn-secondary btn-sm">Alle dossiers</Link>
+          </div>
+          <div class="inc-meta">
+            <div><span class="inv-meta-label">Dossiernummer</span><span class="mono">{{ invoice.incasso_reference }}</span></div>
+            <div><span class="inv-meta-label">Overgedragen op</span><span>{{ invoice.incasso_sent_at_label || '—' }}</span></div>
+            <div><span class="inv-meta-label">Fase</span><span>{{ phaseLabels[invoice.incasso_phase] || invoice.incasso_phase }}</span></div>
+          </div>
+        </div>
+
+        <!-- Creditnota's op deze factuur -->
+        <div v-if="invoice.credit_notes && invoice.credit_notes.length > 0" style="margin-top:28px;">
+          <div class="sect-title">Creditnota's op deze factuur</div>
+          <table class="payments-table stacked-table">
+            <thead>
+              <tr><th>Nummer</th><th>Datum</th><th>Status</th><th class="right">Bedrag</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="c in invoice.credit_notes" :key="c.id" style="cursor:pointer" @click="router.get(route('invoices.show', c.id))">
+                <td class="cell-primary mono">{{ c.number || 'Concept' }}</td>
+                <td data-label="Datum">{{ c.invoice_date_label }}</td>
+                <td data-label="Status"><StatusPill :status="c.status" /></td>
+                <td class="num right" data-label="Bedrag">{{ eur(c.total) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Gecrediteerde factuur (bij een creditnota) -->
+        <div v-if="invoice.is_credit && invoice.original_invoice" style="margin-top:28px;">
+          <div class="sect-title">Hoort bij factuur</div>
+          <Link :href="route('invoices.show', invoice.original_invoice.id)" class="btn btn-secondary btn-sm">
+            {{ invoice.original_invoice.number }} bekijken →
+          </Link>
+        </div>
+
+        <!-- Bijlagen -->
+        <div style="margin-top:28px;">
+          <div class="sect-head">
+            <div class="sect-title" style="margin:0;">Bijlagen</div>
+            <div>
+              <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadFiles">
+              <button class="btn btn-secondary btn-sm" :disabled="uploadForm.processing" @click="fileInput?.click()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                {{ uploadForm.processing ? 'Bezig met uploaden…' : 'Bestand toevoegen' }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="uploadForm.errors.files || uploadForm.errors['files.0']" class="field-error" style="margin-bottom:10px;">
+            {{ uploadForm.errors.files || uploadForm.errors['files.0'] }}
+          </div>
+
+          <div v-if="!invoice.attachments || invoice.attachments.length === 0" class="att-empty">
+            Nog geen bijlagen. Voeg bijvoorbeeld een opdrachtbevestiging, urenoverzicht of foto toe —
+            deze gaan mee in het incassodossier. PDF, PNG, JPG of WEBP, max. 10 MB per bestand.
+          </div>
+
+          <div v-else class="att-list">
+            <div v-for="att in invoice.attachments" :key="att.id" class="att-row">
+              <span class="att-icon" :class="'att-' + att.kind">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              <div class="att-info">
+                <a :href="route('attachments.show', att.id)" target="_blank" class="att-name">{{ att.filename }}</a>
+                <div class="att-meta">{{ att.size_formatted }} · toegevoegd op {{ att.uploaded_at_label }}</div>
+              </div>
+              <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">Download</a>
+              <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">Verwijder</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Payments -->
         <div v-if="invoice.payments && invoice.payments.length > 0" style="margin-top:28px;">
           <div style="font-family:var(--font-display);font-weight:600;font-size:16px;margin-bottom:12px;">Betalingen</div>
@@ -293,6 +462,47 @@ const deleteInvoice = () => {
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showPaymentModal = false">Annuleren</button>
             <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">Registreren</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Creditnota modal -->
+    <div v-if="showCreditModal" class="modal-overlay" @click.self="showCreditModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Creditnota maken</div>
+          <button class="icon-btn" @click="showCreditModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;line-height:1.6;">
+            Een creditnota corrigeert factuur <b>{{ invoice.number }}</b> van {{ invoice.customer_name }}.
+            De oorspronkelijke factuur blijft ongewijzigd bestaan — zo blijft je administratie kloppen.
+          </p>
+
+          <label class="credit-opt" :class="{ on: creditForm.kind === 'full' }">
+            <input type="radio" value="full" v-model="creditForm.kind">
+            <div>
+              <div class="credit-opt-title">Volledig crediteren</div>
+              <div class="credit-opt-sub">Het hele bedrag van {{ eur(invoice.total) }} wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer.</div>
+            </div>
+          </label>
+
+          <label class="credit-opt" :class="{ on: creditForm.kind === 'partial' }">
+            <input type="radio" value="partial" v-model="creditForm.kind">
+            <div>
+              <div class="credit-opt-title">Gedeeltelijk crediteren</div>
+              <div class="credit-opt-sub">Je opent een concept waarin je zelf de regels en bedragen aanpast. Pas daarna maak je hem definitief.</div>
+            </div>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showCreditModal = false">Annuleren</button>
+            <button class="btn btn-primary btn-sm" @click="createCredit" :disabled="creditForm.processing">Creditnota maken</button>
           </div>
         </div>
       </div>
@@ -380,6 +590,45 @@ const deleteInvoice = () => {
 .inv-total-row .label { color: var(--text-2); }
 .inv-total-row .value { font-weight: 500; }
 .inv-total-row.grand { border-top: 2px solid var(--text); padding-top: 14px; margin-top: 8px; font-weight: 700; font-size: 18px; }
+/* Foutmelding boven de factuur */
+.inv-alert { display: flex; align-items: center; gap: 10px; background: var(--brand-tint); border: 1px solid var(--brand-border); color: var(--brand-darker); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13.5px; }
+.inv-alert svg { width: 18px; height: 18px; flex: none; }
+
+/* Keuzeblokken in de creditnota-modal */
+.credit-opt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }
+.credit-opt:hover { background: var(--surface-2); }
+.credit-opt.on { border-color: var(--brand); background: var(--brand-tint); }
+.credit-opt input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
+.credit-opt-title { font-weight: 600; font-size: 14px; }
+.credit-opt-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+
+/* Sectiekoppen binnen de factuur */
+.sect-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin-bottom: 12px; }
+.sect-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+
+/* Incasso-paneel */
+.inc-panel { margin-top: 28px; background: #1F2937; color: #fff; border-radius: 12px; padding: 18px 20px; }
+.inc-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.inc-head svg { width: 26px; height: 26px; color: #FCD34D; flex: none; }
+.inc-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
+.inc-sub { font-size: 13px; color: #D1D5DB; }
+.inc-head .btn { margin-left: auto; }
+.inc-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.inc-meta > div { display: flex; flex-direction: column; gap: 3px; }
+.inc-meta .inv-meta-label { color: #9CA3AF; }
+.inc-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+
+/* Bijlagen */
+.att-empty { color: var(--text-3); font-size: 13px; line-height: 1.6; background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 10px; padding: 16px 18px; }
+.att-list { display: flex; flex-direction: column; gap: 8px; }
+.att-row { display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.att-icon { width: 34px; height: 34px; border-radius: 8px; background: var(--surface-2); color: var(--text-3); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.att-icon svg { width: 17px; height: 17px; }
+.att-info { flex: 1; min-width: 0; }
+.att-name { font-weight: 600; font-size: 13.5px; color: var(--text); word-break: break-word; }
+.att-name:hover { color: var(--brand); }
+.att-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
 .payments-table { font-size: 13px; }
 .payments-table th { background: var(--surface-2); padding: 8px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }
 .payments-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); }

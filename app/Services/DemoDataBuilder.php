@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Attachment;
 use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Invoice;
@@ -306,6 +307,16 @@ class DemoDataBuilder
         ]);
         $made['incasso'] = $incasso;
 
+        // Bijlage bij het incassodossier — laat zien hoe bewijsstukken meegaan.
+        $this->attachSample(
+            $company,
+            $incasso,
+            'Opdrachtbevestiging Coöperatie Groen.pdf',
+            'Opdrachtbevestiging',
+            'Hierbij bevestigen wij de opdracht voor de voorjaarscampagne, conform offerte en '
+                .'akkoord per e-mail. Betaling binnen 30 dagen na factuurdatum.'
+        );
+
         // --- Creditnota op een betaalde factuur ---
         $original = $made['paid1'];
         $credit = $this->makeInvoice($company, $customers['stoepje'], [
@@ -446,6 +457,41 @@ class DemoDataBuilder
         }
 
         return $invoice;
+    }
+
+    /**
+     * Hang een klein voorbeeld-PDF'je aan een factuur, zodat de bijlagenfunctie
+     * in de demo ook echt iets laat zien.
+     */
+    protected function attachSample(Company $company, Invoice $invoice, string $filename, string $title, string $body): void
+    {
+        try {
+            $html = sprintf(
+                '<html><body style="font-family:sans-serif;padding:40px;">'
+                .'<h1 style="font-size:20px;">%s</h1>'
+                .'<p style="font-size:13px;line-height:1.6;color:#333;">%s</p>'
+                .'<p style="font-size:12px;color:#777;margin-top:40px;">%s — voorbeelddocument uit de EasyInvoice-demo.</p>'
+                .'</body></html>',
+                e($title),
+                e($body),
+                e($company->name)
+            );
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)->setPaper('a4')->output();
+
+            Attachment::create([
+                'company_id' => $company->id,
+                'attachable_type' => Invoice::class,
+                'attachable_id' => $invoice->id,
+                'filename' => $filename,
+                'mime_type' => 'application/pdf',
+                'size_bytes' => strlen($pdf),
+                'file_data' => base64_encode($pdf),
+            ]);
+        } catch (\Throwable $e) {
+            // Een ontbrekende voorbeeldbijlage mag de demo nooit blokkeren.
+            \Illuminate\Support\Facades\Log::warning('Demo-bijlage maken mislukt', ['error' => $e->getMessage()]);
+        }
     }
 
     protected function uniqueKvk(): string

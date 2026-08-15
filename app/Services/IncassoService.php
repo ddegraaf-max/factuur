@@ -9,7 +9,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class IncassoService
 {
@@ -71,10 +70,11 @@ class IncassoService
 
             $files = [];
             foreach ($invoice->attachments as $att) {
-                if (Storage::disk('local')->exists($att->storage_path)) {
+                $contents = $att->contents();
+                if ($contents !== null) {
                     $files[] = [
                         'name' => $att->filename,
-                        'data' => Storage::disk('local')->get($att->storage_path),
+                        'data' => $contents,
                         'mime' => $att->mime_type ?: 'application/octet-stream',
                     ];
                 }

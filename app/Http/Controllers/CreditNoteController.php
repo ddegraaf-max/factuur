@@ -16,7 +16,11 @@ class CreditNoteController extends Controller
         $kind = $request->input('kind', 'full');
         if (! in_array($kind, ['full', 'partial'])) abort(422, 'Invalid kind');
 
-        $credit = $this->service->createFromInvoice($invoice, $kind);
+        try {
+            $credit = $this->service->createFromInvoice($invoice, $kind);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['credit' => $e->getMessage()]);
+        }
 
         // For full credit: also send immediately (so it has a number)
         if ($kind === 'full') {

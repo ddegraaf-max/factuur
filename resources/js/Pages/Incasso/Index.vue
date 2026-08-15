@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
@@ -7,6 +7,13 @@ defineProps({
   stats: Object,
   handler: Object,
 });
+
+// De fase bepaalt hoe ver het traject is: eerst minnelijk (schikken), dan via
+// de rechter, en ten slotte executie (beslag).
+const changePhase = (invoice, phase) => {
+  if (!phase || phase === invoice.incasso_phase) return;
+  router.patch(route('incasso.phase', invoice.id), { phase }, { preserveScroll: true });
+};
 
 const eur = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const formatDate = (s) => s ? new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -64,7 +71,12 @@ const phaseLabels = {
 
     <div v-if="cases.length === 0" class="card empty">
       <div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:6px;">Geen actieve dossiers</div>
-      <div style="color:var(--text-3);">Achterstallige facturen kun je via de detailpagina overdragen aan Armaere.</div>
+      <div style="color:var(--text-3);margin-bottom:18px;">
+        Open een achterstallige factuur en klik daar op <b>“Naar incasso”</b> om het dossier over te dragen aan {{ handler.name }}.
+      </div>
+      <Link :href="route('invoices.index', { status: 'overdue' })" class="btn btn-primary btn-sm" style="display:inline-flex;">
+        Bekijk verlopen facturen
+      </Link>
     </div>
 
     <div v-else class="card">
@@ -93,7 +105,11 @@ const phaseLabels = {
             <td data-label="Klant">{{ c.customer_name }}</td>
             <td data-label="Overdracht">{{ formatDate(c.incasso_sent_at) }}</td>
             <td data-label="Looptijd">{{ c.days_at_armaere }} dagen</td>
-            <td data-label="Fase"><span class="pill pill-incasso">{{ phaseLabels[c.incasso_phase] || c.incasso_phase }}</span></td>
+            <td data-label="Fase">
+              <select class="phase-select" :value="c.incasso_phase" @change="changePhase(c, $event.target.value)">
+                <option v-for="(label, value) in phaseLabels" :key="value" :value="value">{{ label }}</option>
+              </select>
+            </td>
             <td class="right num" data-label="Openstaand">{{ eur(c.remaining) }}</td>
           </tr>
         </tbody>
@@ -117,6 +133,20 @@ const phaseLabels = {
 .stat-card .val { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
 .empty { padding: 80px 20px; text-align: center; }
 .pill-incasso { color: #FBBF24; background: #1F2937; border: 1px solid #374151; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+.phase-select {
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  max-width: 100%;
+}
+.phase-select:hover { border-color: var(--border-strong); }
+.phase-select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
 
 @media (max-width: 760px) {
   /* Icoon, naam en contactgegevens onder elkaar i.p.v. drie kolommen. */

@@ -14,13 +14,19 @@ class Attachment extends Model
 
     protected $fillable = [
         'company_id', 'attachable_type', 'attachable_id',
-        'filename', 'mime_type', 'size_bytes', 'storage_path',
+        'filename', 'mime_type', 'size_bytes', 'storage_path', 'file_data',
         'uploaded_by_user_id',
     ];
 
     protected $casts = [
         'size_bytes' => 'integer',
     ];
+
+    /**
+     * De inhoud hoort nooit in een JSON-antwoord terecht te komen; die zou de
+     * paginadata onnodig met megabytes opblazen.
+     */
+    protected $hidden = ['file_data'];
 
     protected static function booted(): void
     {
@@ -43,6 +49,26 @@ class Attachment extends Model
     public function attachable(): MorphTo { return $this->morphTo(); }
     public function company(): BelongsTo { return $this->belongsTo(Company::class); }
     public function uploadedBy(): BelongsTo { return $this->belongsTo(User::class, 'uploaded_by_user_id'); }
+
+    /**
+     * De ruwe bestandsinhoud.
+     *
+     * Nieuwe bijlagen staan in de database (file_data). Bijlagen van vóór die
+     * omschakeling staan mogelijk nog op schijf — die lezen we hier ook, zolang
+     * het bestand er nog is.
+     */
+    public function contents(): ?string
+    {
+        if ($this->file_data) {
+            return base64_decode($this->file_data, true) ?: null;
+        }
+
+        if ($this->storage_path && \Illuminate\Support\Facades\Storage::disk('local')->exists($this->storage_path)) {
+            return \Illuminate\Support\Facades\Storage::disk('local')->get($this->storage_path);
+        }
+
+        return null;
+    }
 
     public function getKindAttribute(): string
     {
