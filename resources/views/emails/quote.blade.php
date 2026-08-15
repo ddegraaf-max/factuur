@@ -1,5 +1,6 @@
 @php
     $eur = fn ($n) => '€ ' . number_format((float) $n, 2, ',', '.');
+    $logo = $company->logoBinary();
 @endphp
 <!DOCTYPE html>
 <html lang="nl">
@@ -32,6 +33,10 @@
 <div class="wrapper">
     <div class="container">
         <div class="header">
+            @if($logo && isset($message))
+                <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}"
+                     alt="{{ $company->name }}" style="max-height:40px;max-width:200px;display:block;border:0;margin-bottom:8px;background:#fff;padding:4px 8px;border-radius:6px;">
+            @endif
             <div class="co">{{ $company->name }}</div>
             <div class="kind">Offerte {{ $quote->number }}</div>
         </div>

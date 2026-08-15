@@ -79,6 +79,38 @@ class Company extends Model
         return array_replace($defaults, $this->reminder_settings ?? []);
     }
 
+    /**
+     * Het logo als ruwe bytes, klaar om als inline bijlage in een e-mail mee te
+     * sturen. Een data:-URL rechtstreeks in een <img> werkt namelijk niet:
+     * Gmail en Outlook strippen die weg, waardoor de klant een kapot plaatje
+     * ziet. Via $message->embedData() wordt het een cid:-verwijzing, en dat
+     * tonen alle mailprogramma's wel.
+     *
+     * @return array{data: string, mime: string, name: string}|null
+     */
+    public function logoBinary(): ?array
+    {
+        if (! $this->logo_data || ! str_starts_with($this->logo_data, 'data:')) {
+            return null;
+        }
+
+        [$meta, $encoded] = array_pad(explode(',', $this->logo_data, 2), 2, null);
+        if (! $encoded) {
+            return null;
+        }
+
+        $mime = preg_match('#^data:([\w/+.-]+);base64$#', (string) $meta, $m) ? $m[1] : 'image/png';
+        $bytes = base64_decode($encoded, true);
+
+        if (! $bytes) {
+            return null;
+        }
+
+        $extension = explode('/', $mime)[1] ?? 'png';
+
+        return ['data' => $bytes, 'mime' => $mime, 'name' => 'logo.'.$extension];
+    }
+
     public function getFullAddressAttribute(): string
     {
         return collect([

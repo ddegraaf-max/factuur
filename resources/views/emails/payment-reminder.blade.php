@@ -1,3 +1,6 @@
+@php
+    $logo = $company->logoBinary();
+@endphp
 <!DOCTYPE html>
 <html lang="nl">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
@@ -5,7 +8,12 @@
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <div style="background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
       <div style="padding:20px 24px;border-bottom:1px solid #e7e5e4;">
-        <div style="font-family:Arial,sans-serif;font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+        @if($logo && isset($message))
+          <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}"
+               alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
+        @else
+          <div style="font-family:Arial,sans-serif;font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+        @endif
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;color:#1c1917;white-space:pre-wrap;">{{ $bodyText }}</div>
       <div style="padding:0 24px 22px;">

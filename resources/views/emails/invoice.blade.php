@@ -2,6 +2,7 @@
     $open = number_format((float) $invoice->total - (float) $invoice->paid_total, 2, ',', '.');
     $total = number_format((float) $invoice->total, 2, ',', '.');
     $terms = (int) ($invoice->payment_terms ?? $company->default_payment_terms ?? 14);
+    $logo = $company->logoBinary();
 @endphp
 <!DOCTYPE html>
 <html lang="nl">
@@ -10,7 +11,12 @@
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <div style="background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
       <div style="padding:20px 24px;border-bottom:1px solid #e7e5e4;">
-        <div style="font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+        @if($logo && isset($message))
+          <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}"
+               alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
+        @else
+          <div style="font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+        @endif
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;">
         <p style="margin:0 0 14px;">Beste {{ $invoice->customer_name }},</p>
@@ -19,7 +25,13 @@
           voor een bedrag van <strong>€ {{ $total }}</strong>. De factuur vindt u als PDF in de bijlage.
         </p>
         <p style="margin:0 0 14px;">
-          Wij verzoeken u het bedrag binnen <strong>{{ $terms }} dagen</strong> te voldoen
+          Wij verzoeken u het bedrag
+          @if($invoice->due_date)
+            uiterlijk <strong>{{ $invoice->due_date->translatedFormat('j F Y') }}</strong>
+          @else
+            binnen <strong>{{ $terms }} dagen</strong>
+          @endif
+          te voldoen
           @if($company->iban)op <strong>{{ $company->iban }}</strong> t.n.v. {{ $company->name }}@endif
           onder vermelding van factuurnummer <strong>{{ $invoice->number }}</strong>.
         </p>
