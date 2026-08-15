@@ -41,7 +41,6 @@ class SettingsController extends Controller
             // New preference fields — all optional so older forms keep working
             'price_mode' => ['nullable', 'in:excl,incl'],
             'fiscal_year_start' => ['nullable', 'integer', 'min:1', 'max:12'],
-            'default_send_method' => ['nullable', 'in:email,post,both'],
             'results_per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
             'copy_email' => ['nullable', 'email'],
             'accountant_email' => ['nullable', 'email'],
@@ -59,6 +58,12 @@ class SettingsController extends Controller
 
         // Drop nulls so we don't overwrite existing values with null
         $data = array_filter($data, fn ($v) => $v !== null);
+
+        // Dit veld moet je juist wél kunnen leegmaken (dan valt de dagmail terug
+        // op het bedrijfs-e-mailadres); een leeg veld komt als null binnen.
+        if ($request->has('daily_notification_email')) {
+            $data['daily_notification_email'] = $request->input('daily_notification_email') ?: null;
+        }
 
         $company->update($data);
         return back()->with('flash', 'Bedrijfsgegevens opgeslagen.');

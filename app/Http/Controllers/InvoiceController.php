@@ -86,6 +86,7 @@ class InvoiceController extends Controller
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => VatCalculator::availableRates(),
             'preselect_customer_id' => $request->input('customer_id'),
+            'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
         ]);
     }
 
@@ -104,7 +105,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice): Response
     {
-        $invoice->load('lines', 'payments', 'customer', 'attachments', 'creditNotes');
+        $invoice->load('lines', 'payments', 'customer', 'attachments', 'creditNotes', 'reminderLogs');
         if ($invoice->is_credit) {
             $invoice->load('originalInvoice');
         }
@@ -124,6 +125,14 @@ class InvoiceController extends Controller
                     'kind' => $a->kind,
                     'size_formatted' => $a->size_formatted,
                     'uploaded_at_label' => $a->created_at?->translatedFormat('j M Y'),
+                ]),
+                'reminder_logs' => $invoice->reminderLogs->map(fn ($r) => [
+                    'id' => $r->id,
+                    'type' => $r->type,
+                    'kind' => $r->kind,
+                    'sent_to' => $r->sent_to,
+                    'amount_open' => (float) $r->amount_open,
+                    'sent_at_label' => $r->sent_at?->translatedFormat('j M Y, H:i'),
                 ]),
                 'credit_notes' => $invoice->creditNotes->map(fn ($c) => [
                     'id' => $c->id,
@@ -153,6 +162,7 @@ class InvoiceController extends Controller
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => VatCalculator::availableRates(),
+            'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
         ]);
     }
 
@@ -219,6 +229,24 @@ class InvoiceController extends Controller
             'Content-Type' => 'application/xml; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="'.$generator->filename($invoice).'"',
         ]);
+    }
+
+    public function remind(Invoice $invoice, \App\Services\ReminderService $reminders): RedirectResponse
+    {
+        try {
+            $label = $reminders->sendManual($invoice);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['reminder' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Handmatige herinnering mislukt', [
+                'invoice' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['reminder' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+        }
+
+        return back()->with('flash', "{$label} verstuurd naar {$invoice->customer_email}.");
     }
 
     public function recordPayment(Request $request, Invoice $invoice): RedirectResponse

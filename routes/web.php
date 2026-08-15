@@ -147,6 +147,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
+    Route::post('invoices/{invoice}/herinnering', [InvoiceController::class, 'remind'])->name('invoices.remind');
     Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('invoices.payments.store');
 
     // Terugkerende facturen

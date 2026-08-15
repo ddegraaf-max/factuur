@@ -16,13 +16,29 @@ class VatCalculator
     /**
      * Calculate a single line's totals.
      *
-     * @param  float  $quantity
-     * @param  float  $unitPrice  Excluding VAT
-     * @param  float  $vatRate    Percentage, e.g. 21.0
+     * @param  float   $quantity
+     * @param  float   $unitPrice  Excluding VAT (mode 'excl') or including VAT (mode 'incl')
+     * @param  float   $vatRate    Percentage, e.g. 21.0
+     * @param  string  $mode       'excl' (default) or 'incl'
      * @return array{subtotal: float, vat: float, total: float}
      */
-    public function calculateLine(float $quantity, float $unitPrice, float $vatRate): array
+    public function calculateLine(float $quantity, float $unitPrice, float $vatRate, string $mode = 'excl'): array
     {
+        if ($mode === 'incl') {
+            // De klant typt brutobedragen. Reken vanaf het regeltotaal terug,
+            // niet vanaf de stuksprijs: anders loopt het bij meerdere stuks
+            // centen uit de pas met wat de klant op de factuur ziet staan.
+            $total = $this->round($quantity * $unitPrice);
+            $subtotal = $this->round($total / (1 + $vatRate / 100));
+            $vat = $this->round($total - $subtotal);
+
+            return [
+                'subtotal' => $subtotal,
+                'vat' => $vat,
+                'total' => $total,
+            ];
+        }
+
         $subtotal = $this->round($quantity * $unitPrice);
         $vat = $this->round($subtotal * ($vatRate / 100));
         $total = $this->round($subtotal + $vat);
@@ -35,13 +51,25 @@ class VatCalculator
     }
 
     /**
+     * Zet een brutostuksprijs (incl. btw) om naar de nettoprijs die we opslaan.
+     * In de database staat `unit_price` altijd exclusief btw — zo blijven de
+     * PDF, de UBL-factuur en de boekhoudexport kloppen, ongeacht hoe de
+     * ondernemer zijn prijzen invoert.
+     */
+    public function netUnitPrice(float $grossUnitPrice, float $vatRate): float
+    {
+        return $this->round($grossUnitPrice / (1 + $vatRate / 100));
+    }
+
+    /**
      * Calculate invoice totals from an array of lines.
      * Each line must have: quantity, unit_price, vat_rate.
      *
-     * @param  array  $lines
+     * @param  array   $lines
+     * @param  string  $mode  'excl' (prijzen exclusief btw) of 'incl'
      * @return array{subtotal: float, vat_total: float, total: float, vat_breakdown: array<string,float>}
      */
-    public function calculateInvoice(array $lines): array
+    public function calculateInvoice(array $lines, string $mode = 'excl'): array
     {
         $subtotal = 0.0;
         $vatTotal = 0.0;
@@ -52,7 +80,7 @@ class VatCalculator
             $price = (float) ($line['unit_price'] ?? 0);
             $rate = (float) ($line['vat_rate'] ?? 0);
 
-            $lineCalc = $this->calculateLine($qty, $price, $rate);
+            $lineCalc = $this->calculateLine($qty, $price, $rate, $mode);
             $subtotal += $lineCalc['subtotal'];
             $vatTotal += $lineCalc['vat'];
 

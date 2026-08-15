@@ -33,7 +33,8 @@ class InvoiceManager
             $paymentTerms = (int) ($data['payment_terms'] ?? $customer->payment_terms ?? $customer->company->default_payment_terms ?? 30);
 
             $lines = $data['lines'] ?? [];
-            $totals = $this->vat->calculateInvoice($lines);
+            $mode = $this->priceMode($customer->company);
+            $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $invoice = Invoice::create([
                 // Expliciet meegeven: bij het genereren via de console (terugkerende
@@ -66,7 +67,7 @@ class InvoiceManager
                 'footer' => $customer->company->invoice_footer,
             ]);
 
-            $this->syncLines($invoice, $lines);
+            $this->syncLines($invoice, $lines, $mode);
 
             return $invoice->fresh('lines');
         });
@@ -80,7 +81,8 @@ class InvoiceManager
 
         return DB::transaction(function () use ($invoice, $data) {
             $lines = $data['lines'] ?? [];
-            $totals = $this->vat->calculateInvoice($lines);
+            $mode = $this->priceMode($invoice->company);
+            $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $invoiceDate = isset($data['invoice_date'])
                 ? Carbon::parse($data['invoice_date'])
@@ -100,7 +102,7 @@ class InvoiceManager
             ]);
 
             $invoice->lines()->delete();
-            $this->syncLines($invoice, $lines);
+            $this->syncLines($invoice, $lines, $mode);
 
             return $invoice->fresh('lines');
         });
@@ -191,13 +193,24 @@ class InvoiceManager
         }
     }
 
-    protected function syncLines(Invoice $invoice, array $lines): void
+    /** 'incl' wanneer de ondernemer zijn prijzen inclusief btw invoert. */
+    protected function priceMode(?\App\Models\Company $company): string
+    {
+        return ($company?->price_mode === 'incl') ? 'incl' : 'excl';
+    }
+
+    protected function syncLines(Invoice $invoice, array $lines, string $mode = 'excl'): void
     {
         foreach ($lines as $index => $line) {
             $qty = (float) ($line['quantity'] ?? 1);
             $price = (float) ($line['unit_price'] ?? 0);
             $rate = (float) ($line['vat_rate'] ?? 0);
-            $calc = $this->vat->calculateLine($qty, $price, $rate);
+            $calc = $this->vat->calculateLine($qty, $price, $rate, $mode);
+
+            // In de database staat de stuksprijs altijd exclusief btw.
+            $storedPrice = $mode === 'incl'
+                ? $this->vat->netUnitPrice($price, $rate)
+                : $price;
 
             $invoice->lines()->create([
                 'product_id' => $line['product_id'] ?? null,
@@ -206,7 +219,7 @@ class InvoiceManager
                 'details' => $line['details'] ?? null,
                 'quantity' => $qty,
                 'unit' => $line['unit'] ?? 'stuk',
-                'unit_price' => $price,
+                'unit_price' => $storedPrice,
                 'vat_rate' => $rate,
                 'line_subtotal' => $calc['subtotal'],
                 'line_vat' => $calc['vat'],

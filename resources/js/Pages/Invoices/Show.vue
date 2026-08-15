@@ -18,7 +18,7 @@ const showCreditModal = ref(false);
 const page = usePage();
 const pageError = computed(() => {
   const e = page.props.errors || {};
-  return e.incasso || e.credit || e.ubl || e.status || e.delete || null;
+  return e.incasso || e.credit || e.reminder || e.ubl || e.status || e.delete || null;
 });
 
 /* ---------- Creditnota ---------- */
@@ -50,6 +50,19 @@ const phaseLabels = {
 const canIncasso = computed(() =>
   !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
 );
+
+/* ---------- Handmatige herinnering ---------- */
+const canRemind = computed(() =>
+  !props.invoice.is_credit
+  && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
+  && !!props.invoice.customer_email
+);
+
+const sendReminder = () => {
+  if (confirm(`Herinnering sturen naar ${props.invoice.customer_email}?`)) {
+    router.post(route('invoices.remind', props.invoice.id), {}, { preserveScroll: true });
+  }
+};
 
 const sendToIncasso = () => {
   const msg = `Factuur ${props.invoice.number} overdragen aan de incassopartner?\n\n`
@@ -186,6 +199,10 @@ const deleteInvoice = () => {
             Versturen
           </button>
         </template>
+        <button v-if="canRemind" class="btn btn-secondary btn-sm" title="Stuur nu een herinnering naar de klant" @click="sendReminder">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          Herinnering sturen
+        </button>
         <button v-if="canCredit" class="btn btn-secondary btn-sm" title="Maak een creditnota op deze factuur" @click="showCreditModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
           Creditnota
@@ -362,6 +379,21 @@ const deleteInvoice = () => {
           <Link :href="route('invoices.show', invoice.original_invoice.id)" class="btn btn-secondary btn-sm">
             {{ invoice.original_invoice.number }} bekijken →
           </Link>
+        </div>
+
+        <!-- Herinneringsverloop -->
+        <div v-if="invoice.reminder_logs && invoice.reminder_logs.length > 0" style="margin-top:28px;">
+          <div class="sect-title">Verstuurde herinneringen</div>
+          <div class="rem-trail">
+            <div v-for="r in invoice.reminder_logs" :key="r.id" class="rem-row">
+              <span class="rem-dot" :class="r.kind === 'warning' ? 'warn' : ''"></span>
+              <div class="rem-info">
+                <div class="rem-type">{{ r.type }}</div>
+                <div class="rem-meta">{{ r.sent_at_label }} · naar {{ r.sent_to }}</div>
+              </div>
+              <div class="num rem-amt">{{ eur(r.amount_open) }}</div>
+            </div>
+          </div>
         </div>
 
         <!-- Bijlagen -->
@@ -617,6 +649,17 @@ const deleteInvoice = () => {
 .inc-meta > div { display: flex; flex-direction: column; gap: 3px; }
 .inc-meta .inv-meta-label { color: #9CA3AF; }
 .inc-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+
+/* Herinneringsverloop */
+.rem-trail { display: flex; flex-direction: column; gap: 2px; }
+.rem-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.rem-row:last-child { border-bottom: none; }
+.rem-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--info); flex: none; }
+.rem-dot.warn { background: var(--brand); }
+.rem-info { flex: 1; min-width: 0; }
+.rem-type { font-weight: 600; font-size: 13.5px; }
+.rem-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; overflow-wrap: anywhere; }
+.rem-amt { font-size: 13px; color: var(--text-2); white-space: nowrap; }
 
 /* Bijlagen */
 .att-empty { color: var(--text-3); font-size: 13px; line-height: 1.6; background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 10px; padding: 16px 18px; }

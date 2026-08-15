@@ -23,5 +23,10 @@ Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')
     ->timezone('Europe/Amsterdam');
 
+// Elke ochtend: het dagoverzicht voor bedrijven die dat aan hebben staan.
+Schedule::command('summaries:send')
+    ->dailyAt('08:30')
+    ->timezone('Europe/Amsterdam');
+
 // Elk uur: ruim verlopen demo-omgevingen op.
 Schedule::command('demo:cleanup')->hourly();

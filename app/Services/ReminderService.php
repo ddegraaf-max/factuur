@@ -47,6 +47,55 @@ class ReminderService
         return $sent;
     }
 
+    /**
+     * Verstuur handmatig de eerstvolgende herinnering of aanmaning voor één
+     * factuur — los van het dagelijkse schema. Handig als een klant belt of
+     * je er zelf eentje tussendoor wilt sturen.
+     *
+     * @throws \DomainException  met een uitlegbare reden wanneer het niet kan
+     */
+    public function sendManual(Invoice $invoice): string
+    {
+        $company = $invoice->company;
+
+        if ($invoice->is_credit) {
+            throw new \DomainException('Voor een creditnota versturen we geen herinnering.');
+        }
+        if (! $invoice->customer_email) {
+            throw new \DomainException('Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.');
+        }
+        if ($invoice->status === 'draft') {
+            throw new \DomainException('Verstuur de factuur eerst; een concept kan nog geen herinnering krijgen.');
+        }
+
+        $remaining = (float) $invoice->total - (float) $invoice->paid_total;
+        if ($remaining <= 0) {
+            throw new \DomainException('Deze factuur staat niet meer open.');
+        }
+
+        // Bepaal welke stap aan de beurt is: eerst de herinneringen, dan de aanmaningen.
+        $r = $company->resolved_reminders;
+        $numReminders = (int) ($r['num_reminders'] ?? 2);
+        $sentReminders = ReminderLog::where('invoice_id', $invoice->id)->where('kind', 'reminder')->count();
+        $sentWarnings = ReminderLog::where('invoice_id', $invoice->id)->where('kind', 'warning')->count();
+
+        if ($sentReminders < $numReminders) {
+            $kind = 'reminder';
+            $label = $this->label($sentReminders + 1, 'herinnering');
+            $termijn = (int) ($r['payment_term_reminder'] ?? 2);
+        } else {
+            $kind = 'warning';
+            $label = $this->label($sentWarnings + 1, 'aanmaning');
+            $termijn = (int) ($r['payment_term_warning'] ?? 1);
+        }
+
+        if (! $this->sendStep($invoice, $company, $kind, $label, $termijn, $remaining)) {
+            throw new \DomainException('Er staat geen tekst ingesteld voor dit bericht. Vul die aan bij Instellingen → Herinneringen.');
+        }
+
+        return $label;
+    }
+
     private function processInvoice(Invoice $invoice): bool
     {
         $company = $invoice->company;

@@ -25,6 +25,9 @@ const form = useForm({
   default_payment_terms: props.company.default_payment_terms ?? 30,
   invoice_footer: props.company.invoice_footer ?? '',
   invoice_number_format: props.company.invoice_number_format ?? '{year}-{sequence:4}',
+  price_mode: props.company.price_mode ?? 'excl',
+  daily_notification_enabled: !!props.company.daily_notification_enabled,
+  daily_notification_email: props.company.daily_notification_email ?? '',
 });
 
 const submit = () => form.patch(route('settings.company.update'));
@@ -175,12 +178,57 @@ const submit = () => form.patch(route('settings.company.update'));
               <input type="text" v-model="form.brand_color" maxlength="7" class="mono" style="width:120px;">
             </div>
           </div>
+          <div class="form-group">
+            <label>Prijzen invoeren</label>
+            <select v-model="form.price_mode">
+              <option value="excl">Exclusief btw — ik typ nettobedragen</option>
+              <option value="incl">Inclusief btw — ik typ de prijs die de klant betaalt</option>
+            </select>
+            <div style="font-size:11px;color:var(--text-4);margin-top:4px;">
+              Handig voor webshops, horeca en andere particuliere verkoop. De factuur zelf toont altijd
+              netto, btw én totaal — dat is wettelijk verplicht.
+            </div>
+          </div>
           <div class="form-group" style="margin:0;">
             <label>Standaard voetnoot<span class="label-hint">(onderaan elke factuur)</span></label>
             <textarea v-model="form.invoice_footer" rows="3" placeholder="Bijv. betalingsvoorwaarden, BTW-mededelingen..."></textarea>
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Dagelijks overzicht</div>
+            <div class="card-subtitle">Elke ochtend een mailtje met wat er die dag om aandacht vraagt</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <label class="toggle-row">
+            <input type="checkbox" v-model="form.daily_notification_enabled">
+            <div>
+              <div class="toggle-title">Stuur mij elke ochtend een overzicht</div>
+              <div class="toggle-sub">
+                Vervallen facturen, betalingen van gisteren, wat er binnen een week vervalt en
+                concepten die nog klaarstaan. Is er niets te melden, dan krijg je ook geen mail.
+              </div>
+            </div>
+          </label>
+
+          <div class="form-group" style="margin:16px 0 0;" v-if="form.daily_notification_enabled">
+            <label>Stuur naar<span class="label-hint">(leeg = je bedrijfs-e-mailadres)</span></label>
+            <input type="email" v-model="form.daily_notification_email" maxlength="255" placeholder="jij@bedrijf.nl">
+            <div v-if="form.errors.daily_notification_email" class="field-error">{{ form.errors.daily_notification_email }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
+
+<style scoped>
+.toggle-row { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
+.toggle-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand); flex: none; }
+.toggle-title { font-weight: 600; font-size: 14px; }
+.toggle-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.55; }
+</style>

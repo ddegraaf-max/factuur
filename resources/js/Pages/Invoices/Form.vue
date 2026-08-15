@@ -10,9 +10,29 @@ const props = defineProps({
   products: Array,
   vat_rates: Array,
   preselect_customer_id: { type: [String, Number], default: null },
+  price_mode: { type: String, default: 'excl' },
 });
 
 const isEdit = computed(() => !!props.invoice);
+
+// 'incl' = de ondernemer typt de prijs die de klant betaalt (bruto).
+// De opslag blijft altijd netto; de server rekent dat terug.
+const inclMode = computed(() => props.price_mode === 'incl');
+const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
+
+/** Toon de prijs zoals de gebruiker hem invoert: bruto in incl-modus. */
+const displayPrice = (line) => {
+  const qty = Number(line.quantity) || 0;
+  if (props.price_mode === 'incl') {
+    // Bestaande regel: leid de brutoprijs af uit het regeltotaal, dan zie je
+    // exact terug wat er ooit is ingetypt (ook bij meerdere stuks).
+    if (line.line_total != null && qty > 0) {
+      return Math.round((Number(line.line_total) / qty) * 100) / 100;
+    }
+    return Math.round(Number(line.unit_price) * (1 + Number(line.vat_rate) / 100) * 100) / 100;
+  }
+  return Number(line.unit_price);
+};
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -29,7 +49,7 @@ const form = useForm({
         details: l.details ?? '',
         quantity: Number(l.quantity),
         unit: l.unit,
-        unit_price: Number(l.unit_price),
+        unit_price: displayPrice(l),
         vat_rate: Number(l.vat_rate),
       }))
     : [{
@@ -44,40 +64,58 @@ const form = useForm({
   action: 'draft',
 });
 
-const totals = computed(() => {
-  let subtotal = 0;
-  const breakdown = {};
-  for (const line of form.lines) {
-    const qty = parseDutchNumber(line.quantity);
-    const price = parseDutchNumber(line.unit_price);
-    const rate = Number(line.vat_rate) || 0;
-    const lineSubtotal = qty * price;
-    subtotal += lineSubtotal;
-    const key = rate.toFixed(2);
-    if (!breakdown[key]) breakdown[key] = { rate, subtotal: 0, vat: 0 };
-    breakdown[key].subtotal += lineSubtotal;
-    breakdown[key].vat += lineSubtotal * (rate / 100);
-  }
-  let vatTotal = 0;
-  for (const k in breakdown) {
-    breakdown[k].vat = Math.round(breakdown[k].vat * 100) / 100;
-    breakdown[k].subtotal = Math.round(breakdown[k].subtotal * 100) / 100;
-    vatTotal += breakdown[k].vat;
-  }
-  return {
-    subtotal: Math.round(subtotal * 100) / 100,
-    vat_total: Math.round(vatTotal * 100) / 100,
-    total: Math.round((subtotal + vatTotal) * 100) / 100,
-    breakdown: Object.values(breakdown).filter(b => b.subtotal > 0),
-  };
-});
+const r2 = (n) => Math.round(n * 100) / 100;
 
-const lineTotal = (line) => {
+/**
+ * Rekent één regel door — dezelfde volgorde als VatCalculator op de server,
+ * zodat het scherm en de opgeslagen factuur tot op de cent gelijk zijn.
+ */
+const calcLine = (line) => {
   const qty = parseDutchNumber(line.quantity);
   const price = parseDutchNumber(line.unit_price);
   const rate = Number(line.vat_rate) || 0;
-  return qty * price * (1 + rate / 100);
+
+  if (inclMode.value) {
+    const total = r2(qty * price);
+    const sub = r2(total / (1 + rate / 100));
+    return { rate, subtotal: sub, vat: r2(total - sub), total };
+  }
+
+  const sub = r2(qty * price);
+  const vat = r2(sub * (rate / 100));
+  return { rate, subtotal: sub, vat, total: r2(sub + vat) };
 };
+
+const totals = computed(() => {
+  let subtotal = 0;
+  let vatTotal = 0;
+  const breakdown = {};
+
+  for (const line of form.lines) {
+    const c = calcLine(line);
+    subtotal += c.subtotal;
+    vatTotal += c.vat;
+
+    const key = c.rate.toFixed(2);
+    if (!breakdown[key]) breakdown[key] = { rate: c.rate, subtotal: 0, vat: 0 };
+    breakdown[key].subtotal += c.subtotal;
+    breakdown[key].vat += c.vat;
+  }
+
+  for (const k in breakdown) {
+    breakdown[k].vat = r2(breakdown[k].vat);
+    breakdown[k].subtotal = r2(breakdown[k].subtotal);
+  }
+
+  return {
+    subtotal: r2(subtotal),
+    vat_total: r2(vatTotal),
+    total: r2(subtotal + vatTotal),
+    breakdown: Object.values(breakdown).filter(b => b.subtotal !== 0),
+  };
+});
+
+const lineTotal = (line) => calcLine(line).total;
 
 const addLine = () => {
   form.lines.push({
@@ -102,8 +140,11 @@ const applyProduct = (line, productId) => {
     line.description = p.name;
     line.details = p.description ?? '';
     line.unit = p.unit;
-    line.unit_price = Number(p.price);
     line.vat_rate = Number(p.vat_rate);
+    // Productprijzen staan netto opgeslagen; in incl-modus tonen we ze bruto.
+    line.unit_price = inclMode.value
+      ? Math.round(Number(p.price) * (1 + Number(p.vat_rate) / 100) * 100) / 100
+      : Number(p.price);
   }
 };
 
@@ -194,13 +235,21 @@ const submit = (action) => {
 
         <!-- Lines -->
         <div class="card" style="margin-top:16px;">
-          <div class="card-header"><div class="card-title">Factuurregels</div></div>
+          <div class="card-header">
+            <div>
+              <div class="card-title">Factuurregels</div>
+              <div class="card-subtitle">
+                {{ inclMode ? 'Je typt prijzen inclusief btw' : 'Je typt prijzen exclusief btw' }}
+                · aan te passen bij Instellingen → Bedrijfsgegevens
+              </div>
+            </div>
+          </div>
           <div class="card-body">
             <div class="lines-grid">
               <div class="lines-header">
                 <div>Omschrijving</div>
                 <div style="text-align:right;">Aantal</div>
-                <div style="text-align:right;">Prijs</div>
+                <div style="text-align:right;">{{ priceLabel }}</div>
                 <div>BTW</div>
                 <div style="text-align:right;">Totaal</div>
                 <div></div>
@@ -223,7 +272,7 @@ const submit = (action) => {
                 <div class="line-field" data-label="Aantal">
                   <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
                 </div>
-                <div class="line-field" data-label="Prijs">
+                <div class="line-field" :data-label="priceLabel">
                   <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
                 </div>
                 <div class="line-field" data-label="BTW">
