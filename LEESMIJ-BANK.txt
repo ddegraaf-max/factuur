@@ -1,0 +1,52 @@
+EASYINVOICE — BANK & TRANSACTIES
+================================
+
+WAT IS HET
+----------
+Nieuw menu "Bank → Transacties": bankafschriften importeren en elke
+transactie met één klik koppelen aan een factuur (ontvangsten) of
+inkoopfactuur (afschrijvingen). Bij het koppelen wordt automatisch een
+betaling geboekt.
+
+IMPORTEREN
+----------
+- Sleep (of kies) een bankafschrift: CAMT.053 (ISO 20022 XML) of MT940
+  (structured) — beide te downloaden bij alle Nederlandse banken (ING,
+  Rabobank, ABN AMRO, bunq, Knab, Triodos, SNS…).
+- Dubbele transacties worden herkend (hash op datum+bedrag+IBAN+
+  omschrijving) en overgeslagen; hetzelfde bestand twee keer uploaden
+  kan dus geen kwaad.
+
+KOPPELEN
+--------
+- SUGGESTIES: per open transactie zoekt Easy de beste match op
+  (1) factuurnummer in de omschrijving, (2) exact bedrag gelijk aan het
+  openstaande bedrag, (3) klantnaam. De suggestie staat er met redenen
+  bij ("factuurnr. + bedrag + naam"); de keuzelijst staat er alvast op.
+- ONTVANGSTEN → factuur: boekt een betaling (bank, kind='payment') op
+  de boekingsdatum. Is de transactie hoger dan het openstaande bedrag,
+  dan wordt alleen het openstaande deel geboekt (met melding).
+- AFSCHRIJVINGEN → inkoopfactuur: zet die op betaald per boekingsdatum.
+- NEGEREN voor privé/interne overboekingen; alles is terug te draaien
+  via Ontkoppelen/Herstellen (de geboekte betaling wordt dan verwijderd
+  en de factuur herrekend).
+- Tabs: Open / Verwerkt / Genegeerd (= het "archief").
+
+AUTOMATISCHE BANKKOPPELING (PSD2)
+---------------------------------
+De pagina toont een "In voorbereiding"-kaart. Aanbevolen aanbieder:
+GoCardless Bank Account Data (voorheen Nordigen) — gratis alternatief
+voor Ponto (dat ~€5/maand per rekening kost), dekt alle grote NL-banken.
+De datastructuur (bank_transactions + matching) is er al op voorbereid:
+een koppeling hoeft alleen transacties aan te leveren.
+
+TECHNIEK
+--------
+- Migratie: create_bank_transactions_table (uniek op company+import_hash).
+- Nieuw: BankTransaction-model (company-scope), BankStatementParser
+  (CAMT.053 via DOM namespace-onafhankelijk; MT940 met :61:/:86:-parser
+  en /NAME//IBAN/-extractie), BankController, Vue-pagina Bank/Index.
+- Rollen: boekhouder is automatisch alleen-lezen (readonly-middleware).
+- End-to-end getest: beide formaten geparsed, import, suggestie
+  (factuurnr+bedrag+naam), koppelen → factuur betaald, ontkoppelen →
+  betaling teruggedraaid.

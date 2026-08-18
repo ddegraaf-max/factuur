@@ -216,6 +216,14 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::patch('terugkerend/{recurring}', [RecurringInvoiceController::class, 'update'])->name('recurring.update');
     Route::delete('terugkerend/{recurring}', [RecurringInvoiceController::class, 'destroy'])->name('recurring.destroy');
 
+    // Bank & transacties (afschriften importeren en koppelen)
+    Route::get('bank', [\App\Http\Controllers\BankController::class, 'index'])->name('bank.index');
+    Route::post('bank/upload', [\App\Http\Controllers\BankController::class, 'upload'])->name('bank.upload');
+    Route::post('bank/{transaction}/factuur', [\App\Http\Controllers\BankController::class, 'matchInvoice'])->name('bank.match.invoice');
+    Route::post('bank/{transaction}/inkoop', [\App\Http\Controllers\BankController::class, 'matchPurchase'])->name('bank.match.purchase');
+    Route::post('bank/{transaction}/negeren', [\App\Http\Controllers\BankController::class, 'ignore'])->name('bank.ignore');
+    Route::post('bank/{transaction}/herstel', [\App\Http\Controllers\BankController::class, 'restore'])->name('bank.restore');
+
     // Inkoopfacturen / crediteuren
     Route::get('inkoop', [PurchaseInvoiceController::class, 'index'])->name('purchases.index');
     Route::get('inkoop/nieuw', [PurchaseInvoiceController::class, 'create'])->name('purchases.create');

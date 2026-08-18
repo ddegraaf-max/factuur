@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.5.0</div>
+        <h3>Bank &amp; transacties — afschriften importeren en koppelen</h3>
+        <ul class="tl-list">
+          <li><b>Bankafschriften importeren</b> — sleep je CAMT.053- of MT940-bestand (te downloaden bij elke Nederlandse bank) in het nieuwe Bank-menu. Dubbele transacties worden automatisch overgeslagen.</li>
+          <li><b>Slimme koppel-suggesties</b> — Easy herkent factuurnummer, bedrag en klantnaam in de omschrijving en stelt de juiste factuur voor. Eén klik en de betaling is geboekt.</li>
+          <li><b>Ook voor inkoop</b> — afschrijvingen koppel je aan inkoopfacturen, die daarmee direct op betaald staan.</li>
+          <li><b>Alles terug te draaien</b> — verwerkte transacties kun je ontkoppelen (de betaling wordt teruggedraaid) en genegeerde weer herstellen.</li>
+          <li>De <b>automatische bankkoppeling</b> (PSD2, dagelijkse import) is in voorbereiding — zonder maandkosten per rekening.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.4.0</div>
         <h3>Slimmere factuurpagina, verrekeningen &amp; bijlagen voor de klant</h3>
         <ul class="tl-list">
