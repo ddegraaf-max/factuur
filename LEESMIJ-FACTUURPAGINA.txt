@@ -1,0 +1,46 @@
+EASYINVOICE — FACTUURPAGINA-UITBREIDING + TERMIJN-BUGFIX
+========================================================
+
+BUGFIX BETALINGSTERMIJN
+-----------------------
+Het factuurformulier stond hard op 30 dagen en negeerde de standaard-
+betalingstermijn uit Instellingen → Bedrijfsgegevens. Nu geldt:
+  termijn van de klant → anders je bedrijfsstandaard → anders 30.
+Ook bij het wisselen van klant valt het formulier netjes terug op je
+eigen standaard in plaats van de oude waarde te laten staan.
+
+NIEUW OP DE FACTUURPAGINA
+-------------------------
+1. DUPLICEREN — knop "Dupliceren" maakt een nieuw concept met dezelfde
+   klant en regels (datum = vandaag, vervaldatum op basis van de
+   termijn). Handig voor herhaalklussen.
+
+2. VOORVERTONING — schakel bovenin de factuur tussen "Factuurregels"
+   en "Voorvertoning (PDF)": de echte factuur-PDF in beeld zonder
+   te downloaden.
+
+3. INPLANNEN — plan een concept in voor automatische verzending op een
+   datum naar keuze (vanaf morgen). Een blauwe banner toont de geplande
+   datum, met een annuleerknop. De dagelijkse taak
+   invoices:send-scheduled (07:30) maakt de factuur definitief en
+   verstuurt hem; demo-omgevingen worden overgeslagen.
+
+4. INTERNE NOTITIE — geel notitieveld op de factuurpagina, met badge
+   "niet zichtbaar voor de klant". Komt nooit op de PDF, in de mail of
+   in het portaal.
+
+5. HISTORIE — tijdlijn met alles wat er met de factuur gebeurde:
+   aangemaakt, verstuurd, eerste inzage door de klant, herinneringen en
+   aanmaningen, ontvangen betalingen, volledig betaald, incasso en
+   creditnota's. Met tellers bovenaan (1× verstuurd, 2× herinnering,
+   1× aanmaning).
+
+TECHNIEK
+--------
+- Migratie: invoices.internal_notes (text) + invoices.scheduled_send_on
+  (date).
+- Nieuw command: invoices:send-scheduled + registratie in
+  routes/console.php (dagelijks 07:30, Europe/Amsterdam).
+- Routes: dupliceren, notitie, inplannen/annuleren.
+- Historie wordt server-side samengesteld uit bestaande gegevens —
+  geen extra opslag.

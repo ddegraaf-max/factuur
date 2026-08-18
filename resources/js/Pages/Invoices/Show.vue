@@ -154,6 +154,48 @@ const sendInvoice = () => {
   router.post(route('invoices.send', props.invoice.id));
 };
 
+/* ---------- Voorvertoning (PDF) ---------- */
+const viewMode = ref('regels');
+
+/* ---------- Dupliceren ---------- */
+const duplicateInvoice = () => {
+  if (confirm('Kopie maken van deze factuur als nieuw concept?')) {
+    router.post(route('invoices.duplicate', props.invoice.id));
+  }
+};
+
+/* ---------- Inplannen ---------- */
+const showScheduleModal = ref(false);
+const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+const scheduleForm = useForm({ send_on: props.invoice.scheduled_send_on || tomorrow });
+
+const scheduleInvoice = () => {
+  scheduleForm.post(route('invoices.schedule', props.invoice.id), {
+    preserveScroll: true,
+    onSuccess: () => { showScheduleModal.value = false; },
+  });
+};
+
+const unschedule = () => {
+  if (confirm('Inplanning annuleren? De factuur blijft dan een concept.')) {
+    router.delete(route('invoices.unschedule', props.invoice.id), { preserveScroll: true });
+  }
+};
+
+/* ---------- Interne notitie ---------- */
+const noteForm = useForm({ internal_notes: props.invoice.internal_notes || '' });
+const noteDirty = computed(() => noteForm.internal_notes !== (props.invoice.internal_notes || ''));
+const saveNote = () => noteForm.patch(route('invoices.notes.update', props.invoice.id), { preserveScroll: true });
+
+/* ---------- Historie ---------- */
+const reminderCounts = computed(() => {
+  const logs = props.invoice.reminder_logs || [];
+  return {
+    reminders: logs.filter(l => l.kind !== 'warning').length,
+    warnings: logs.filter(l => l.kind === 'warning').length,
+  };
+});
+
 /* ---------- Klantenportaal / inzagelog ---------- */
 const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload', attachment: 'Bijlage gedownload' };
 const showAllViews = ref(false);
@@ -211,6 +253,10 @@ const deleteInvoice = () => {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           UBL
         </a>
+        <button class="btn btn-secondary btn-sm" title="Maak een kopie als nieuw concept" @click="duplicateInvoice">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Dupliceren
+        </button>
         <button v-if="!invoice.is_credit" class="btn btn-secondary btn-sm" title="Maak hier een terugkerende factuur van" @click="showRecurringModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           Maak terugkerend
@@ -221,6 +267,10 @@ const deleteInvoice = () => {
             Bewerken
           </Link>
           <button class="btn btn-danger btn-sm" @click="deleteInvoice">Verwijder</button>
+          <button v-if="!invoice.scheduled_send_on" class="btn btn-secondary btn-sm" title="Automatisch versturen op een datum die jij kiest" @click="showScheduleModal = true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Inplannen
+          </button>
           <button class="btn btn-primary btn-sm" @click="sendInvoice">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
             Versturen
@@ -252,6 +302,19 @@ const deleteInvoice = () => {
     <div v-if="pageError" class="inv-alert">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       {{ pageError }}
+    </div>
+    <div v-if="$page.props.errors?.schedule" class="inv-alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ $page.props.errors.schedule }}
+    </div>
+
+    <!-- Ingepland: wordt automatisch verstuurd -->
+    <div v-if="invoice.scheduled_send_on_label && invoice.status === 'draft'" class="sched-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <div>
+        Deze factuur wordt <strong>automatisch verstuurd op {{ invoice.scheduled_send_on_label }}</strong> (in de ochtend).
+      </div>
+      <button type="button" class="link-btn" style="margin-left:auto;flex:none;" @click="unschedule">Annuleren</button>
     </div>
 
     <div class="inv-detail">
@@ -291,7 +354,20 @@ const deleteInvoice = () => {
         </div>
       </div>
 
+      <!-- Wissel tussen de regels en een PDF-voorvertoning -->
+      <div class="view-toggle-bar">
+        <div class="view-toggle">
+          <button type="button" :class="{ active: viewMode === 'regels' }" @click="viewMode = 'regels'">Factuurregels</button>
+          <button type="button" :class="{ active: viewMode === 'preview' }" @click="viewMode = 'preview'">Voorvertoning (PDF)</button>
+        </div>
+      </div>
+
       <div class="inv-body">
+        <div v-if="viewMode === 'preview'" class="inv-preview">
+          <iframe :src="route('invoices.pdf', invoice.id)" title="Voorvertoning van de factuur-PDF"></iframe>
+        </div>
+
+        <div v-show="viewMode === 'regels'">
         <div class="inv-parties">
           <div>
             <div class="inv-party-label">Van</div>
@@ -364,6 +440,7 @@ const deleteInvoice = () => {
           <div style="margin-bottom:8px;color:var(--text-2);font-weight:500;">Opmerking</div>
           {{ invoice.notes }}
         </div>
+        </div><!-- /v-show regels -->
 
         <!-- Incasso-dossier -->
         <div v-if="invoice.status === 'incasso'" class="inc-panel">
@@ -453,6 +530,55 @@ const deleteInvoice = () => {
             >
               {{ showAllViews ? 'Toon minder' : `Toon alle ${(invoice.views || []).length} inzagemomenten` }}
             </button>
+          </div>
+        </div>
+
+        <!-- Interne notitie -->
+        <div style="margin-top:28px;">
+          <div class="sect-head">
+            <div class="sect-title" style="margin:0;display:flex;align-items:center;gap:10px;">
+              Interne notitie
+              <span class="note-badge">niet zichtbaar voor de klant</span>
+            </div>
+            <button v-if="noteDirty" class="btn btn-primary btn-sm" :disabled="noteForm.processing" @click="saveNote">
+              {{ noteForm.processing ? 'Opslaan…' : 'Notitie opslaan' }}
+            </button>
+          </div>
+          <textarea
+            v-model="noteForm.internal_notes"
+            class="note-area"
+            rows="3"
+            maxlength="5000"
+            placeholder="Bijv. afspraken met de klant, status van het werk, waarom deze factuur afwijkt…"
+          ></textarea>
+        </div>
+
+        <!-- Historie -->
+        <div v-if="invoice.history && invoice.history.length" style="margin-top:28px;">
+          <div class="sect-head">
+            <div class="sect-title" style="margin:0;">Historie</div>
+            <div class="hist-props">
+              <span class="hist-chip" :class="{ on: !!invoice.sent_at_label }">{{ invoice.sent_at_label ? '1× verstuurd' : 'Nog niet verstuurd' }}</span>
+              <span v-if="reminderCounts.reminders" class="hist-chip on">{{ reminderCounts.reminders }}× herinnering</span>
+              <span v-if="reminderCounts.warnings" class="hist-chip warn">{{ reminderCounts.warnings }}× aanmaning</span>
+            </div>
+          </div>
+          <div class="hist-trail">
+            <div v-for="(e, i) in invoice.history" :key="i" class="hist-row">
+              <span class="hist-icon">
+                <svg v-if="e.icon === 'plus'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg v-else-if="e.icon === 'send'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <svg v-else-if="e.icon === 'eye'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg v-else-if="e.icon === 'bell'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                <svg v-else-if="e.icon === 'alert'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <svg v-else-if="e.icon === 'euro'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/></svg>
+                <svg v-else-if="e.icon === 'check'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg v-else-if="e.icon === 'gavel'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
+                <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </span>
+              <div class="hist-label">{{ e.label }}</div>
+              <div class="hist-ts">{{ e.ts_label }}</div>
+            </div>
           </div>
         </div>
 
@@ -630,6 +756,37 @@ const deleteInvoice = () => {
       </div>
     </div>
 
+    <!-- Inplannen modal -->
+    <div v-if="showScheduleModal" class="modal-overlay" @click.self="showScheduleModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Factuur inplannen</div>
+          <button class="icon-btn" @click="showScheduleModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;line-height:1.6;">
+            Op de gekozen datum wordt deze factuur 's ochtends automatisch definitief gemaakt
+            en per e-mail verstuurd naar <b>{{ invoice.customer_email || 'de klant' }}</b>.
+            Tot die tijd blijft het een concept dat je kunt aanpassen of annuleren.
+          </p>
+          <div class="form-group">
+            <label>Versturen op *</label>
+            <input type="date" v-model="scheduleForm.send_on" :min="tomorrow">
+            <div v-if="scheduleForm.errors.send_on" class="field-error">{{ scheduleForm.errors.send_on }}</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showScheduleModal = false">Annuleren</button>
+            <button class="btn btn-primary btn-sm" :disabled="scheduleForm.processing" @click="scheduleInvoice">Inplannen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Recurring modal -->
     <div v-if="showRecurringModal" class="modal-overlay" @click.self="showRecurringModal = false">
       <div class="modal">
@@ -739,6 +896,66 @@ const deleteInvoice = () => {
 .inc-meta > div { display: flex; flex-direction: column; gap: 3px; }
 .inc-meta .inv-meta-label { color: #9CA3AF; }
 .inc-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+
+/* Ingepland-banner */
+.sched-banner {
+  display: flex; align-items: center; gap: 11px;
+  background: var(--info-bg); border: 1px solid var(--info-border); color: var(--info);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+  font-size: 13.5px; line-height: 1.5;
+}
+.sched-banner svg { width: 18px; height: 18px; flex: none; }
+
+/* Wissel factuurregels / PDF-voorvertoning */
+.view-toggle-bar { display: flex; justify-content: center; padding: 14px 16px 0; }
+.view-toggle {
+  display: flex; gap: 3px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 9px; padding: 3px;
+}
+.view-toggle button {
+  font-size: 12.5px; font-weight: 600; color: var(--text-3);
+  padding: 6px 16px; border-radius: 7px;
+}
+.view-toggle button.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.inv-preview {
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: var(--surface-2);
+}
+.inv-preview iframe { display: block; width: 100%; height: 860px; border: none; }
+
+/* Interne notitie */
+.note-badge {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border);
+  border-radius: 100px; padding: 2px 9px;
+}
+.note-area { width: 100%; font-size: 13.5px; line-height: 1.6; background: #FFFBEB; border-color: var(--warning-border); }
+.note-area:focus { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-bg); }
+
+/* Historie */
+.hist-props { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.hist-chip {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+  background: var(--surface-2); color: var(--text-3); border: 1px solid var(--border-strong);
+}
+.hist-chip.on { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
+.hist-chip.warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+.hist-trail { display: flex; flex-direction: column; }
+.hist-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.hist-row:last-child { border-bottom: none; }
+.hist-icon {
+  width: 28px; height: 28px; border-radius: 100px; flex: none;
+  background: var(--surface-2); color: var(--text-3);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.hist-icon svg { width: 14px; height: 14px; }
+.hist-label { flex: 1; min-width: 0; color: var(--text-2); overflow-wrap: anywhere; }
+.hist-ts { font-size: 12px; color: var(--text-4); white-space: nowrap; }
 
 /* Inzage door klant */
 .view-status { display: flex; align-items: flex-start; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }

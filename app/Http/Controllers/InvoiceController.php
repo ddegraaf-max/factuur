@@ -88,6 +88,7 @@ class InvoiceController extends Controller
             'vat_rates' => VatCalculator::availableRates(),
             'preselect_customer_id' => $request->input('customer_id'),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
+            'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
         ]);
     }
 
@@ -121,7 +122,10 @@ class InvoiceController extends Controller
                 'invoice_date_label' => $invoice->invoice_date->translatedFormat('j M Y'),
                 'due_date_label' => $invoice->due_date?->translatedFormat('j M Y'),
                 'sent_at_label' => $invoice->sent_at?->translatedFormat('j M Y, H:i'),
+                'scheduled_send_on' => $invoice->scheduled_send_on?->format('Y-m-d'),
+                'scheduled_send_on_label' => $invoice->scheduled_send_on?->translatedFormat('j F Y'),
                 'first_viewed_at_label' => $invoice->first_viewed_at?->translatedFormat('j M Y, H:i'),
+                'history' => $this->history($invoice),
                 'portal_url' => $invoice->portalUrl(),
                 'views' => $invoice->views->map(fn ($v) => [
                     'id' => $v->id,
@@ -177,6 +181,7 @@ class InvoiceController extends Controller
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => VatCalculator::availableRates(),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
+            'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
         ]);
     }
 
@@ -203,6 +208,72 @@ class InvoiceController extends Controller
     {
         $this->manager->send($invoice);
         return back()->with('flash', "Factuur {$invoice->number} verstuurd.");
+    }
+
+    /** Maak een nieuw concept met dezelfde klant en regels. */
+    public function duplicate(Invoice $invoice): RedirectResponse
+    {
+        $invoice->load('lines');
+        $terms = (int) ($invoice->payment_terms ?: (auth()->user()->company?->default_payment_terms ?? 30));
+
+        $copy = $invoice->replicate([
+            'number', 'portal_token', 'status', 'paid_total', 'paid_at',
+            'sent_at', 'scheduled_send_on', 'first_viewed_at',
+            'incasso_sent_at', 'incasso_reference', 'incasso_handler', 'incasso_phase',
+            'is_credit', 'credits_invoice_id',
+        ]);
+        $copy->status = 'draft';
+        $copy->is_credit = false;
+        $copy->invoice_date = now();
+        $copy->due_date = now()->addDays($terms);
+        $copy->save();
+
+        foreach ($invoice->lines as $line) {
+            $copy->lines()->create($line->only([
+                'product_id', 'sort_order', 'description', 'details', 'quantity',
+                'unit', 'unit_price', 'vat_rate', 'line_subtotal', 'line_vat', 'line_total',
+            ]));
+        }
+
+        return redirect()->route('invoices.edit', $copy)
+            ->with('flash', "Kopie aangemaakt van factuur {$invoice->number}. Controleer en verstuur wanneer je klaar bent.");
+    }
+
+    /** Interne notitie — alleen zichtbaar in de app, nooit voor de klant. */
+    public function updateInternalNotes(Request $request, Invoice $invoice): RedirectResponse
+    {
+        $data = $request->validate([
+            'internal_notes' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        $invoice->update(['internal_notes' => $data['internal_notes'] ?: null]);
+
+        return back()->with('flash', 'Interne notitie opgeslagen.');
+    }
+
+    /** Plan een concept in om automatisch te versturen. */
+    public function schedule(Request $request, Invoice $invoice): RedirectResponse
+    {
+        if ($invoice->status !== 'draft') {
+            return back()->withErrors(['schedule' => 'Alleen concepten kunnen worden ingepland.']);
+        }
+
+        $data = $request->validate([
+            'send_on' => ['required', 'date', 'after_or_equal:tomorrow'],
+        ], [
+            'send_on.after_or_equal' => 'Kies een datum vanaf morgen — vandaag versturen doe je met de knop "Versturen".',
+        ]);
+
+        $invoice->update(['scheduled_send_on' => $data['send_on']]);
+
+        return back()->with('flash', 'Factuur ingepland voor ' . $invoice->fresh()->scheduled_send_on->translatedFormat('j F Y') . '.');
+    }
+
+    public function unschedule(Invoice $invoice): RedirectResponse
+    {
+        $invoice->update(['scheduled_send_on' => null]);
+
+        return back()->with('flash', 'Inplanning geannuleerd — de factuur blijft een concept.');
     }
 
     public function destroy(Invoice $invoice): RedirectResponse
@@ -277,6 +348,48 @@ class InvoiceController extends Controller
 
         Payment::create(array_merge($data, ['invoice_id' => $invoice->id]));
         return back()->with('flash', 'Betaling geregistreerd.');
+    }
+
+    /**
+     * Historie van de factuur: alle gebeurtenissen uit bestaande gegevens
+     * samengesteld tot één tijdlijn (nieuwste eerst).
+     */
+    protected function history(Invoice $invoice): array
+    {
+        $events = collect();
+        $push = function ($ts, string $icon, string $label) use ($events) {
+            if ($ts) {
+                $events->push(['ts' => $ts->toIso8601String(), 'label_ts' => $ts->translatedFormat('j M Y' . ($ts->format('H:i') !== '00:00' ? ', H:i' : '')), 'icon' => $icon, 'label' => $label]);
+            }
+        };
+
+        $push($invoice->created_at, 'plus', 'Aangemaakt');
+        $push($invoice->sent_at, 'send', 'Verstuurd' . ($invoice->customer_email ? " naar {$invoice->customer_email}" : ''));
+        $push($invoice->first_viewed_at, 'eye', 'Voor het eerst bekeken door de klant');
+
+        foreach ($invoice->reminderLogs as $log) {
+            $push($log->sent_at, $log->kind === 'warning' ? 'alert' : 'bell', "{$log->type} verstuurd naar {$log->sent_to}");
+        }
+
+        foreach ($invoice->payments as $payment) {
+            $push($payment->paid_on, 'euro', 'Betaling ontvangen: € ' . number_format((float) $payment->amount, 2, ',', '.'));
+        }
+
+        if ($invoice->status === 'paid') {
+            $push($invoice->paid_at, 'check', 'Volledig betaald');
+        }
+
+        $push($invoice->incasso_sent_at, 'gavel', 'Overgedragen aan incasso' . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));
+
+        foreach ($invoice->creditNotes as $credit) {
+            $push($credit->created_at, 'credit', 'Creditnota ' . ($credit->number ?: '(concept)') . ' aangemaakt');
+        }
+
+        return $events->sortByDesc('ts')->values()->map(fn ($e) => [
+            'icon' => $e['icon'],
+            'label' => $e['label'],
+            'ts_label' => $e['label_ts'],
+        ])->all();
     }
 
     protected function validated(Request $request): array

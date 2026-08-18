@@ -21,8 +21,8 @@ class Invoice extends Model
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',
         'subtotal', 'vat_total', 'total', 'paid_total', 'vat_breakdown',
-        'notes', 'footer',
-        'sent_at', 'first_viewed_at', 'paid_at',
+        'notes', 'footer', 'internal_notes',
+        'sent_at', 'scheduled_send_on', 'first_viewed_at', 'paid_at',
         'incasso_sent_at', 'incasso_reference', 'incasso_handler', 'incasso_phase',
     ];
 
@@ -31,6 +31,7 @@ class Invoice extends Model
         'invoice_date' => 'date',
         'due_date' => 'date',
         'sent_at' => 'datetime',
+        'scheduled_send_on' => 'date',
         'first_viewed_at' => 'datetime',
         'paid_at' => 'datetime',
         'incasso_sent_at' => 'datetime',

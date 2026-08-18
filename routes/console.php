@@ -23,6 +23,11 @@ Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: verstuur concept-facturen die voor vandaag zijn ingepland.
+Schedule::command('invoices:send-scheduled')
+    ->dailyAt('07:30')
+    ->timezone('Europe/Amsterdam');
+
 // Elke ochtend: het dagoverzicht voor bedrijven die dat aan hebben staan.
 Schedule::command('summaries:send')
     ->dailyAt('08:30')

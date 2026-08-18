@@ -195,6 +195,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
     Route::post('invoices/{invoice}/herinnering', [InvoiceController::class, 'remind'])->name('invoices.remind');
     Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('invoices.payments.store');
+    Route::post('invoices/{invoice}/dupliceren', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
+    Route::patch('invoices/{invoice}/notitie', [InvoiceController::class, 'updateInternalNotes'])->name('invoices.notes.update');
+    Route::post('invoices/{invoice}/inplannen', [InvoiceController::class, 'schedule'])->name('invoices.schedule');
+    Route::delete('invoices/{invoice}/inplannen', [InvoiceController::class, 'unschedule'])->name('invoices.unschedule');
 
     // Offertes
     Route::resource('offertes', QuoteController::class)

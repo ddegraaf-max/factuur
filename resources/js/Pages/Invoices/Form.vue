@@ -11,6 +11,7 @@ const props = defineProps({
   vat_rates: Array,
   preselect_customer_id: { type: [String, Number], default: null },
   price_mode: { type: String, default: 'excl' },
+  default_payment_terms: { type: Number, default: 30 },
 });
 
 const isEdit = computed(() => !!props.invoice);
@@ -39,7 +40,8 @@ const today = new Date().toISOString().slice(0, 10);
 const form = useForm({
   customer_id: props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
   invoice_date: props.invoice?.invoice_date ?? today,
-  payment_terms: props.invoice?.payment_terms ?? 30,
+  // Standaardtermijn uit Instellingen → Bedrijfsgegevens (klant kan afwijken).
+  payment_terms: props.invoice?.payment_terms ?? props.default_payment_terms ?? 30,
   reference: props.invoice?.reference ?? '',
   notes: props.invoice?.notes ?? '',
   lines: props.invoice?.lines?.length > 0
@@ -152,10 +154,10 @@ const selectedCustomer = computed(() => {
   return props.customers.find(c => c.id === Number(form.customer_id));
 });
 
-// When customer changes, auto-update payment terms if not edited
+// Bij klantwissel: diens eigen betalingstermijn, anders je bedrijfsstandaard.
 watch(() => form.customer_id, (id) => {
   const c = props.customers.find(c => c.id === Number(id));
-  if (c?.payment_terms) form.payment_terms = c.payment_terms;
+  form.payment_terms = c?.payment_terms ?? props.default_payment_terms ?? 30;
 });
 
 /* ---------- Bijlagen (meesturen met de factuurmail + klantenportaal) ---------- */
