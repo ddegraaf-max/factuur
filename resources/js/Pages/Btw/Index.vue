@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
+import { router, Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 
@@ -57,17 +57,23 @@ const rateRows = [
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div>
         <strong>Aangifte {{ dueQuarter.label }} {{ year }} staat open.</strong>
-        Dien de aangifte in en betaal <strong>{{ amount(dueQuarter.vat) }}</strong>
-        uiterlijk <strong>{{ dueQuarter.deadline_label }}</strong> bij de Belastingdienst.
+        <template v-if="dueQuarter.balance >= 0">
+          Dien de aangifte in en betaal per saldo <strong>{{ amount(dueQuarter.balance) }}</strong>
+          uiterlijk <strong>{{ dueQuarter.deadline_label }}</strong> bij de Belastingdienst.
+        </template>
+        <template v-else>
+          Dien de aangifte in vóór <strong>{{ dueQuarter.deadline_label }}</strong> —
+          je krijgt per saldo <strong>{{ amount(dueQuarter.balance) }}</strong> terug.
+        </template>
       </div>
     </div>
 
     <!-- Jaartotalen -->
     <div class="kpi-grid">
       <div class="kpi"><div class="lbl">Omzet excl. BTW · {{ year }}</div><div class="val">{{ amount(totals.base) }}</div><div class="meta">{{ totals.invoice_count }} facturen<span v-if="totals.credit_count"> · {{ totals.credit_count }} creditnota's</span></div></div>
-      <div class="kpi"><div class="lbl">BTW hoog tarief (1a)</div><div class="val">{{ amount(totals.rates['21'].vat) }}</div><div class="meta">over {{ amount(totals.rates['21'].base) }} grondslag</div></div>
-      <div class="kpi"><div class="lbl">BTW laag tarief (1b)</div><div class="val">{{ amount(totals.rates['9'].vat) }}</div><div class="meta">over {{ amount(totals.rates['9'].base) }} grondslag</div></div>
-      <div class="kpi tint"><div class="lbl">Af te dragen · {{ year }}</div><div class="val brand">{{ amount(totals.vat) }}</div><div class="meta">totale BTW over vier kwartalen</div></div>
+      <div class="kpi"><div class="lbl">BTW over je omzet</div><div class="val">{{ amount(totals.vat) }}</div><div class="meta">rubriek 1a + 1b</div></div>
+      <div class="kpi"><div class="lbl">Voorbelasting (5b)</div><div class="val">{{ amount(totals.input_vat) }}</div><div class="meta">uit {{ totals.purchase_count }} ingeboekte inkoopfacturen</div></div>
+      <div class="kpi tint"><div class="lbl">{{ totals.balance < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }} · {{ year }}</div><div class="val brand">{{ amount(totals.balance) }}</div><div class="meta">BTW omzet minus voorbelasting</div></div>
     </div>
 
     <div v-if="totals.invoice_count === 0 && totals.credit_count === 0" class="btw-empty-note">
@@ -93,8 +99,8 @@ const rateRows = [
         </div>
 
         <div class="btw-card-amount">
-          <div class="btw-card-amount-label">Af te dragen</div>
-          <div class="btw-card-amount-value" :class="{ neg: q.vat < 0 }">{{ amount(q.vat) }}</div>
+          <div class="btw-card-amount-label">{{ q.balance < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }}</div>
+          <div class="btw-card-amount-value" :class="{ neg: q.balance < 0 }">{{ amount(q.balance) }}</div>
         </div>
 
         <table class="btw-table">
@@ -117,17 +123,27 @@ const rateRows = [
                 <template v-else>{{ amount(q.rates[row.key].vat) }}</template>
               </td>
             </tr>
-            <tr class="btw-total-row">
-              <td>Totaal</td>
+            <tr class="btw-subtotal-row">
+              <td>BTW over omzet</td>
               <td class="right num" :class="{ neg: q.base < 0 }">{{ amount(q.base) }}</td>
               <td class="right num" :class="{ neg: q.vat < 0 }">{{ amount(q.vat) }}</td>
+            </tr>
+            <tr>
+              <td><span class="btw-rubriek">5b</span> Voorbelasting (inkoop)</td>
+              <td class="right num muted-cell">{{ q.purchase_count }} {{ q.purchase_count === 1 ? 'factuur' : 'facturen' }}</td>
+              <td class="right num vat-in">− {{ amount(q.input_vat) }}</td>
+            </tr>
+            <tr class="btw-total-row">
+              <td>{{ q.balance < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }}</td>
+              <td></td>
+              <td class="right num" :class="{ neg: q.balance < 0 }">{{ amount(q.balance) }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="btw-card-foot">
           <span>
-            {{ q.invoice_count }} {{ q.invoice_count === 1 ? 'factuur' : 'facturen' }}<span v-if="q.credit_count"> · {{ q.credit_count }} creditnota's</span>
+            {{ q.invoice_count }} {{ q.invoice_count === 1 ? 'verkoopfactuur' : 'verkoopfacturen' }}<span v-if="q.credit_count"> · {{ q.credit_count }} creditnota's</span>
           </span>
           <span v-if="q.status !== 'future'" class="btw-deadline" :class="{ urgent: q.declaration_due }">
             Aangifte vóór {{ q.deadline_label }}
@@ -138,8 +154,9 @@ const rateRows = [
 
     <p class="btw-disclaimer">
       Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's.
-      Voorbelasting (rubriek 5b) over je inkoop en kosten staat niet in EasyInvoice — trek die
-      zelf af in de aangifte. Controleer de cijfers altijd samen met je boekhouder.
+      De voorbelasting (rubriek 5b) komt uit je
+      <Link :href="route('purchases.index')" style="color:var(--brand);font-weight:500;">ingeboekte inkoopfacturen</Link>
+      — dat cijfer is dus zo volledig als je inboekt. Controleer de cijfers altijd samen met je boekhouder.
     </p>
   </AppLayout>
 </template>
@@ -219,6 +236,9 @@ const rateRows = [
   background: var(--surface-3); border-radius: 5px;
   font-size: 10.5px; font-weight: 700; color: var(--text-2);
 }
+.btw-subtotal-row td { font-weight: 600; }
+.muted-cell { color: var(--text-4); font-size: 11.5px; font-family: var(--font-body); }
+.vat-in { color: var(--success); font-weight: 600; }
 .btw-total-row td { font-weight: 700; border-bottom: none; padding-top: 11px; }
 
 .btw-card-foot {

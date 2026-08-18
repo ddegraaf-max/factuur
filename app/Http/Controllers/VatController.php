@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Models\PurchaseInvoice;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -17,9 +18,11 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  *   rubriek 1a — leveringen/diensten belast met hoog tarief (21%)
  *   rubriek 1b — leveringen/diensten belast met laag tarief (9%)
  *   rubriek 1e — leveringen/diensten belast met 0%
+ *   rubriek 5b — voorbelasting (BTW op ingeboekte inkoopfacturen)
  *
  * Grondslag en BTW komen uit de factuurregels (factuurstelsel: geteld in het
- * kwartaal van de factuurdatum). Creditnota's tellen negatief mee.
+ * kwartaal van de factuurdatum). Creditnota's tellen negatief mee. Het saldo
+ * (af te dragen minus voorbelasting) is wat er per kwartaal betaald wordt.
  */
 class VatController extends Controller
 {
@@ -98,11 +101,27 @@ class VatController extends Controller
             }
         }
 
+        // Voorbelasting (rubriek 5b): BTW op ingeboekte inkoopfacturen,
+        // eveneens geteld in het kwartaal van de factuurdatum.
+        $inputVat = [1 => 0.0, 2 => 0.0, 3 => 0.0, 4 => 0.0];
+        $purchaseCounts = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
+        PurchaseInvoice::whereYear('invoice_date', $year)
+            ->get(['invoice_date', 'vat_total'])
+            ->each(function ($p) use (&$inputVat, &$purchaseCounts) {
+                $q = (int) ceil($p->invoice_date->month / 3);
+                $inputVat[$q] += (float) $p->vat_total;
+                $purchaseCounts[$q]++;
+            });
+
         $now = now();
         $monthsLabels = [1 => 'jan – mrt', 2 => 'apr – jun', 3 => 'jul – sep', 4 => 'okt – dec'];
 
         $result = [];
-        $yearTotals = ['rates' => $emptyRates(), 'base' => 0.0, 'vat' => 0.0, 'invoice_count' => 0, 'credit_count' => 0];
+        $yearTotals = [
+            'rates' => $emptyRates(), 'base' => 0.0, 'vat' => 0.0,
+            'input_vat' => 0.0, 'balance' => 0.0,
+            'invoice_count' => 0, 'credit_count' => 0, 'purchase_count' => 0,
+        ];
 
         foreach ($quarters as $q => $data) {
             $start = Carbon::create($year, ($q - 1) * 3 + 1, 1)->startOfDay();
@@ -129,8 +148,10 @@ class VatController extends Controller
             }
             $yearTotals['base'] += $base;
             $yearTotals['vat'] += $vat;
+            $yearTotals['input_vat'] += $inputVat[$q];
             $yearTotals['invoice_count'] += $data['invoice_count'];
             $yearTotals['credit_count'] += $data['credit_count'];
+            $yearTotals['purchase_count'] += $purchaseCounts[$q];
 
             $result[] = [
                 'quarter' => $q,
@@ -143,8 +164,11 @@ class VatController extends Controller
                 'rates' => $rates,
                 'base' => round($base, 2),
                 'vat' => round($vat, 2),
+                'input_vat' => round($inputVat[$q], 2),
+                'balance' => round($vat - $inputVat[$q], 2),
                 'invoice_count' => $data['invoice_count'],
                 'credit_count' => $data['credit_count'],
+                'purchase_count' => $purchaseCounts[$q],
             ];
         }
 
@@ -156,6 +180,8 @@ class VatController extends Controller
         }
         $yearTotals['base'] = round($yearTotals['base'], 2);
         $yearTotals['vat'] = round($yearTotals['vat'], 2);
+        $yearTotals['input_vat'] = round($yearTotals['input_vat'], 2);
+        $yearTotals['balance'] = round($yearTotals['vat'] - $yearTotals['input_vat'], 2);
 
         return [
             'quarters' => $result,

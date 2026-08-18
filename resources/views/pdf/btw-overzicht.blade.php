@@ -41,6 +41,7 @@
   table.lines th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.05em; color: #78716C; padding: 5px 6px; border-bottom: 1px solid #D6D3D1; background: #FAFAF9; }
   table.lines td { padding: 6px; border-bottom: 1px solid #E7E5E4; }
   table.lines .right { text-align: right; }
+  table.lines .subtotal td { font-weight: 600; }
   table.lines .total td { font-weight: 700; border-bottom: none; }
   .rubriek { display: inline-block; background: #EFEEEC; border-radius: 4px; padding: 0 4px; font-size: 7.5pt; font-weight: 700; margin-right: 5px; }
   .foot-note { color: #78716C; font-size: 8pt; margin-top: 6px; }
@@ -66,9 +67,9 @@
   <table class="kpis">
     <tr>
       <td class="kpi"><div class="lbl">Omzet excl. BTW</div><div class="val">{{ $money($totals['base']) }}</div></td>
-      <td class="kpi"><div class="lbl">BTW 21% (1a)</div><div class="val">{{ $money($totals['rates']['21']['vat']) }}</div></td>
-      <td class="kpi"><div class="lbl">BTW 9% (1b)</div><div class="val">{{ $money($totals['rates']['9']['vat']) }}</div></td>
-      <td class="kpi tint"><div class="lbl">Af te dragen {{ $year }}</div><div class="val">{{ $money($totals['vat']) }}</div></td>
+      <td class="kpi"><div class="lbl">BTW over omzet</div><div class="val">{{ $money($totals['vat']) }}</div></td>
+      <td class="kpi"><div class="lbl">Voorbelasting (5b)</div><div class="val">{{ $money($totals['input_vat']) }}</div></td>
+      <td class="kpi tint"><div class="lbl">{{ $totals['balance'] < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }} {{ $year }}</div><div class="val">{{ $money($totals['balance']) }}</div></td>
     </tr>
   </table>
 
@@ -82,7 +83,7 @@
           </td>
           <td class="q-status">
             {{ $statusLabels[$q['status']] ?? '' }}@if($q['declaration_due']) — aangifte vóór {{ $q['deadline_label'] }}@endif<br>
-            <span class="q-vat">{{ $money($q['vat']) }}</span>
+            <span class="q-vat">{{ $money($q['balance']) }}</span>
           </td>
         </tr>
       </table>
@@ -103,16 +104,26 @@
               <td class="right">{{ $row['key'] === '0' ? '—' : $money($q['rates'][$row['key']]['vat']) }}</td>
             </tr>
           @endforeach
-          <tr class="total">
-            <td>Totaal</td>
+          <tr class="subtotal">
+            <td>BTW over omzet</td>
             <td class="right">{{ $money($q['base']) }}</td>
             <td class="right">{{ $money($q['vat']) }}</td>
+          </tr>
+          <tr>
+            <td><span class="rubriek">5b</span> Voorbelasting (inkoop)</td>
+            <td class="right" style="color:#78716C;">{{ $q['purchase_count'] }} {{ $q['purchase_count'] === 1 ? 'factuur' : 'facturen' }}</td>
+            <td class="right">− {{ $money($q['input_vat']) }}</td>
+          </tr>
+          <tr class="total">
+            <td>{{ $q['balance'] < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }}</td>
+            <td class="right"></td>
+            <td class="right">{{ $money($q['balance']) }}</td>
           </tr>
         </tbody>
       </table>
 
       <div class="foot-note">
-        {{ $q['invoice_count'] }} {{ $q['invoice_count'] === 1 ? 'factuur' : 'facturen' }}@if($q['credit_count']) · {{ $q['credit_count'] }} creditnota's @endif
+        {{ $q['invoice_count'] }} {{ $q['invoice_count'] === 1 ? 'verkoopfactuur' : 'verkoopfacturen' }}@if($q['credit_count']) · {{ $q['credit_count'] }} creditnota's @endif
         @if($q['status'] !== 'future') · aangifte en betaling uiterlijk {{ $q['deadline_label'] }} @endif
       </div>
     </div>
@@ -120,7 +131,7 @@
 
   <div class="disclaimer">
     Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's in EasyInvoice.
-    Voorbelasting (rubriek 5b) over inkoop en kosten is hierin niet opgenomen.
+    De voorbelasting (rubriek 5b) komt uit de ingeboekte inkoopfacturen en is dus zo volledig als de inkoopadministratie.
     Dit overzicht is een hulpmiddel — controleer de cijfers met je boekhouder voordat je aangifte doet.
   </div>
 </body>

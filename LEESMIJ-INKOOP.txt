@@ -1,0 +1,61 @@
+EASYINVOICE — INKOOPFACTUREN / CREDITEUREN
+==========================================
+
+WAT IS HET
+----------
+Nieuw menu "Inkoop → Inkoopfacturen": binnengekomen facturen van
+leveranciers inboeken — handmatig, of met een foto/PDF van de bon erbij.
+De BTW hieruit is de voorbelasting (rubriek 5b) en telt automatisch mee
+in het BTW-overzicht per kwartaal.
+
+INBOEKEN
+--------
+- Leverancier (met autocomplete van eerder gebruikte namen),
+  factuurnummer van de leverancier, kostencategorie (vaste lijst:
+  inkoop, software, auto, huisvesting, enz.), factuurdatum, vervaldatum.
+- Bedragen per BTW-tarief (21% / 9% / 0%), met twee invoerstanden:
+  · "Excl. BTW invoeren" — BTW wordt voorgerekend, maar blijft
+    aanpasbaar (bonnen ronden weleens anders af);
+  · "Incl. BTW invoeren" — typ het totaalbedrag van de bon over en
+    wij rekenen de grondslag en BTW terug.
+- Meerdere tarieven op één bon kan (regels toevoegen).
+- "Al betaald"-vinkje met betaaldatum en betaalwijze.
+- FOTO/UPLOAD: bestand kiezen óf direct een foto maken (op mobiel opent
+  de camera). De foto verschijnt groot naast het formulier, zodat je
+  overtypt terwijl je de bon ziet. PDF, PNG, JPG of WEBP, max 10 MB,
+  max 10 bestanden. Opslag in de database (zelfde systeem als
+  factuurbijlagen — deploy-proof op Railway).
+
+OVERZICHT (CREDITEUREN)
+-----------------------
+- KPI's: openstaand bij leveranciers, waarvan over de vervaldatum,
+  voorbelasting dit kwartaal, kosten dit jaar excl. BTW.
+- Balkje "Openstaand per leverancier" (top 5).
+- Filters Alle/Open/Vervallen/Betaald + zoeken op leverancier, nummer
+  of categorie. Paperclip-icoon als er een bon bij zit.
+- Detailpagina met de bon groot in beeld (foto of PDF), BTW-uitsplitsing,
+  "Markeer als betaald", heropenen, bewerken, verwijderen, bijlagen
+  toevoegen.
+- CSV-EXPORT voor de boekhouder (zelfde opzet als de verkoopexport:
+  puntkomma's, decimale komma, grondslag/BTW per tarief, totaalregel).
+
+KOPPELING BTW-AANGIFTE
+----------------------
+Het BTW-overzicht (Rapporten → BTW-aangifte) toont nu per kwartaal ook:
+  · rubriek 5b — voorbelasting uit de ingeboekte inkoopfacturen
+  · "Per saldo te betalen" (of "Terug te ontvangen" bij negatief saldo)
+De waarschuwing bij een openstaande aangifte en de PDF-download rekenen
+ook met het saldo. Op de detailpagina van een inkoopfactuur staat een
+groene regel die dit uitlegt, met link naar het BTW-overzicht.
+
+TECHNIEK
+--------
+- Migratie: create_purchase_invoices_table (bedragen + vat_lines JSON).
+- Nieuw: PurchaseInvoice-model (company-scope zoals de rest),
+  PurchaseInvoiceController (CRUD + betaald/heropen + bijlagen + CSV),
+  Vue-pagina's Inkoop/Index, Inkoop/Form, Inkoop/Show.
+- Bijlagen hergebruiken het bestaande polymorfe attachments-systeem
+  (bekijken/downloaden/verwijderen via de bestaande routes).
+- VatController berekent 5b + saldo; Btw-pagina en -PDF bijgewerkt.
+- DemoCleaner ruimt inkoopfacturen + bijlagen van demo-omgevingen op.
+- Routes onder /inkoop, in de bestaande auth + subscribed-middleware.

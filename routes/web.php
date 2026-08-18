@@ -20,6 +20,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\Portal\PortalAuthController;
 use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PurchaseInvoiceController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SecurityController;
@@ -197,6 +198,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('invoices/{invoice}/recurring', [RecurringInvoiceController::class, 'store'])->name('invoices.recurring.store');
     Route::patch('terugkerend/{recurring}', [RecurringInvoiceController::class, 'update'])->name('recurring.update');
     Route::delete('terugkerend/{recurring}', [RecurringInvoiceController::class, 'destroy'])->name('recurring.destroy');
+
+    // Inkoopfacturen / crediteuren
+    Route::get('inkoop', [PurchaseInvoiceController::class, 'index'])->name('purchases.index');
+    Route::get('inkoop/nieuw', [PurchaseInvoiceController::class, 'create'])->name('purchases.create');
+    Route::get('inkoop/export', [PurchaseInvoiceController::class, 'csv'])->name('purchases.csv');
+    Route::post('inkoop', [PurchaseInvoiceController::class, 'store'])->name('purchases.store');
+    Route::get('inkoop/{purchase}', [PurchaseInvoiceController::class, 'show'])->name('purchases.show');
+    Route::get('inkoop/{purchase}/bewerken', [PurchaseInvoiceController::class, 'edit'])->name('purchases.edit');
+    Route::patch('inkoop/{purchase}', [PurchaseInvoiceController::class, 'update'])->name('purchases.update');
+    Route::delete('inkoop/{purchase}', [PurchaseInvoiceController::class, 'destroy'])->name('purchases.destroy');
+    Route::post('inkoop/{purchase}/betaald', [PurchaseInvoiceController::class, 'markPaid'])->name('purchases.paid');
+    Route::post('inkoop/{purchase}/heropen', [PurchaseInvoiceController::class, 'reopen'])->name('purchases.reopen');
+    Route::post('inkoop/{purchase}/bijlagen', [PurchaseInvoiceController::class, 'storeAttachments'])->name('purchases.attachments.store');
 
     // Export naar boekhouder
     Route::get('export', [ExportController::class, 'index'])->name('export.index');

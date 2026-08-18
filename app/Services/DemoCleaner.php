@@ -36,6 +36,15 @@ class DemoCleaner
                 DB::table('invoices')->where('company_id', $company->id)->delete();
             }
 
+            $purchaseIds = DB::table('purchase_invoices')->where('company_id', $company->id)->pluck('id');
+            if ($purchaseIds->isNotEmpty()) {
+                DB::table('attachments')
+                    ->where('attachable_type', \App\Models\PurchaseInvoice::class)
+                    ->whereIn('attachable_id', $purchaseIds)
+                    ->delete();
+                DB::table('purchase_invoices')->where('company_id', $company->id)->delete();
+            }
+
             $quoteIds = DB::table('quotes')->where('company_id', $company->id)->pluck('id');
             if ($quoteIds->isNotEmpty()) {
                 DB::table('quote_lines')->whereIn('quote_id', $quoteIds)->delete();
