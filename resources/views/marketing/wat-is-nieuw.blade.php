@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.4.0</div>
+        <h3>Slimmere factuurpagina, verrekeningen &amp; bijlagen voor de klant</h3>
+        <ul class="tl-list">
+          <li><b>Verrekening "reeds doorgestort"</b> — al doorgestorte deelbetalingen komen op de factuur-PDF in mindering op het te betalen bedrag, mét vermelding — zonder effect op je totaal, omzet of BTW. Ook achteraf toe te voegen.</li>
+          <li><b>Afboeken zonder BTW-effect</b> — wikkel een factuur af bij een betalingsverschil of kwijtschelding, zonder creditnota en zonder dat je aangifte verandert.</li>
+          <li><b>Factuurpagina vernieuwd</b> — dupliceren, PDF-voorvertoning naast de regels, facturen inplannen voor automatische verzending, een interne notitie (nooit zichtbaar voor de klant) en een volledige historie-tijdlijn.</li>
+          <li><b>Bijlagen voor de klant</b> — voeg bestanden toe bij het opstellen; per bijlage kies je of hij met de factuurmail meegaat en in het klantenportaal staat. Downloads verschijnen in het inzagelog.</li>
+          <li>Bugfix: de standaard-betalingstermijn uit je instellingen wordt nu echt gebruikt in het factuurformulier.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 augustus 2026 · Easy 1.3.0</div>
         <h3>Klantenportaal, complete BTW-aangifte, inkoopfacturen &amp; teamrollen</h3>
         <ul class="tl-list">

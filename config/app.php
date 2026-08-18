@@ -2,7 +2,9 @@
 
 return [
     'name' => env('APP_NAME', 'EasyInvoice'),
-    'version' => env('APP_VERSION', 'Easy 1.3.0'),
+    // Versienummer komt bewust uit de code (niet uit een env-variabele):
+    // zo loopt hij automatisch mee met elke deploy. Bijwerken bij elke release.
+    'version' => 'Easy 1.4.0',
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
