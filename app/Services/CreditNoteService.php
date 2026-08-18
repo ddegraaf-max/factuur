@@ -18,7 +18,12 @@ class CreditNoteService
         }
 
         return DB::transaction(function () use ($original, $kind) {
-            $credit = $original->replicate(['number', 'status', 'paid_total', 'paid_at', 'sent_at', 'first_viewed_at']);
+            // portal_token is uniek per factuur en mag dus nooit mee-gekopieerd
+            // worden; scheduled_send_on evenmin (een creditnota plan je niet in).
+            $credit = $original->replicate([
+                'number', 'status', 'paid_total', 'paid_at', 'sent_at', 'first_viewed_at',
+                'portal_token', 'scheduled_send_on',
+            ]);
             $credit->is_credit = true;
             $credit->credits_invoice_id = $original->id;
             $credit->status = 'draft';

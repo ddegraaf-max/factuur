@@ -63,6 +63,14 @@
         "sort-packages": true,
         "allow-plugins": {
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.2.27"
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
         }
     }
 }
