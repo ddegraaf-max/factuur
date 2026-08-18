@@ -1,0 +1,43 @@
+EASYINVOICE — BTW-OVERZICHT PER KWARTAAL
+========================================
+
+WAT IS HET
+----------
+Nieuwe pagina onder Rapporten → "BTW-aangifte": per kwartaal precies de
+cijfers die je nodig hebt voor de aangifte omzetbelasting.
+
+WAT ZIE JE
+----------
+- Vier kwartaalkaarten (Q1 t/m Q4) met per kwartaal:
+  · rubriek 1a — grondslag en BTW hoog tarief (21%)
+  · rubriek 1b — grondslag en BTW laag tarief (9%)
+  · rubriek 1e — grondslag nultarief (0%)
+  · totaal af te dragen + aantal facturen/creditnota's
+- Status per kwartaal: Afgerond / Loopt nu / Nog niet begonnen.
+- Staat een aangiftetermijn open (kwartaal voorbij, deadline nog niet)?
+  Dan kleurt de kaart en verschijnt bovenaan een waarschuwing met bedrag
+  en uiterste datum (Q1 → 30 april, Q2 → 31 juli, Q3 → 31 oktober,
+  Q4 → 31 januari).
+- Jaartotalen bovenaan + jaartabs om terug te bladeren.
+- Knop "Download PDF": hetzelfde overzicht als nette PDF voor de eigen
+  administratie of de boekhouder.
+
+REKENREGELS
+-----------
+- Factuurstelsel: geteld in het kwartaal van de FACTUURDATUM.
+- Alle verstuurde facturen tellen mee (ook nog niet betaalde);
+  concepten en geannuleerde niet. Creditnota's tellen negatief.
+- Grondslag en BTW komen uit de factuurregels (zelfde bron als de
+  boekhouder-export).
+- Voorbelasting (rubriek 5b) zit niet in EasyInvoice; de pagina en de
+  PDF vermelden dat expliciet.
+
+TECHNIEK
+--------
+- Nieuw: app/Http/Controllers/VatController.php, Vue-pagina
+  resources/js/Pages/Btw/Index.vue, PDF-template
+  resources/views/pdf/btw-overzicht.blade.php.
+- Routes: GET /btw (vat.index) en GET /btw/pdf (vat.pdf), binnen de
+  bestaande auth + subscribed-middleware.
+- Menu-item "BTW-aangifte" in de zijbalk onder Rapporten.
+- Geen migraties nodig.

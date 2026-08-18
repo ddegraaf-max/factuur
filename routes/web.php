@@ -220,6 +220,10 @@ Route::middleware(['auth'])->group(function () {
     // Stats
     Route::get('stats', [StatsController::class, 'index'])->name('stats.index');
 
+    // BTW-overzicht per kwartaal (voor de aangifte omzetbelasting)
+    Route::get('btw', [\App\Http\Controllers\VatController::class, 'index'])->name('vat.index');
+    Route::get('btw/pdf', [\App\Http\Controllers\VatController::class, 'pdf'])->name('vat.pdf');
+
     // Settings
     Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
     Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
