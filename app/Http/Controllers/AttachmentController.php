@@ -19,6 +19,7 @@ class AttachmentController extends Controller
         $request->validate([
             'files' => 'required|array|max:10',
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+            'for_customer' => ['nullable', 'boolean'],
         ], [
             'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
             'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
@@ -35,11 +36,26 @@ class AttachmentController extends Controller
                 'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
                 'size_bytes' => $file->getSize(),
                 'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                'for_customer' => $request->boolean('for_customer'),
             ]);
             $added++;
         }
 
         return back()->with('flash', "{$added} bijlage(n) toegevoegd.");
+    }
+
+    /** Zet een bijlage op "voor de klant" (meesturen + portaal) of weer intern. */
+    public function update(Request $request, Attachment $attachment)
+    {
+        $data = $request->validate([
+            'for_customer' => ['required', 'boolean'],
+        ]);
+
+        $attachment->update(['for_customer' => $data['for_customer']]);
+
+        return back()->with('flash', $data['for_customer']
+            ? 'Bijlage is nu zichtbaar voor de klant (mail + portaal).'
+            : 'Bijlage is nu alleen intern zichtbaar.');
     }
 
     public function show(Attachment $attachment): Response

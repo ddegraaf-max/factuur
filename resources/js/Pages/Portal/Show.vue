@@ -137,6 +137,21 @@ const isOpen = computed(() =>
         </div>
       </div>
 
+      <!-- Bijlagen van de afzender -->
+      <div v-if="invoice.attachments && invoice.attachments.length" class="pi-payments">
+        <div class="pi-sect-title">Bijlagen bij deze factuur</div>
+        <div v-for="att in invoice.attachments" :key="att.id" class="pi-att-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <div class="pi-att-info">
+            <div class="pi-att-name">{{ att.filename }}</div>
+            <div class="pi-att-meta">{{ att.size_formatted }}</div>
+          </div>
+          <a :href="route('portal.invoice.attachment', [invoice.token, att.id])" class="btn btn-secondary" style="height:34px;padding:0 14px;font-size:13px;">
+            Download
+          </a>
+        </div>
+      </div>
+
       <!-- Betalingen -->
       <div v-if="invoice.payments && invoice.payments.length" class="pi-payments">
         <div class="pi-sect-title">Ontvangen betalingen</div>
@@ -260,6 +275,15 @@ const isOpen = computed(() =>
 .pi-pay-due { margin-top: 14px; font-size: 13px; color: var(--text-2); }
 
 .pi-payments { padding: 22px 32px 0; }
+.pi-att-row {
+  display: flex; align-items: center; gap: 12px;
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 14px; margin-bottom: 8px;
+}
+.pi-att-row > svg { width: 20px; height: 20px; color: var(--text-3); flex: none; }
+.pi-att-info { flex: 1; min-width: 0; }
+.pi-att-name { font-weight: 600; font-size: 13.5px; word-break: break-word; }
+.pi-att-meta { font-size: 12px; color: var(--text-3); margin-top: 1px; }
 .pi-sect-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 10px; }
 .pi-payment-row {
   display: flex; align-items: center; gap: 10px;

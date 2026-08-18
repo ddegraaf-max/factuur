@@ -158,9 +158,43 @@ watch(() => form.customer_id, (id) => {
   if (c?.payment_terms) form.payment_terms = c.payment_terms;
 });
 
+/* ---------- Bijlagen (meesturen met de factuurmail + klantenportaal) ---------- */
+const fileInput = ref(null);
+const files = ref([]); // { file, name, size, forCustomer }
+
+const addFiles = (event) => {
+  for (const file of Array.from(event.target.files || [])) {
+    files.value.push({ file, name: file.name, size: file.size, forCustomer: true });
+  }
+  event.target.value = '';
+};
+
+const removeFile = (i) => files.value.splice(i, 1);
+
+const formatSize = (b) => b < 1024 * 1024 ? (b / 1024).toFixed(0) + ' KB' : (b / 1024 / 1024).toFixed(1) + ' MB';
+
+const fileError = computed(() => {
+  const key = Object.keys(form.errors).find(k => k === 'files' || k.startsWith('files'));
+  return key ? form.errors[key] : null;
+});
+
 const submit = (action) => {
   form.action = action;
-  if (isEdit.value) {
+
+  // Met bijlagen moet het verzoek als multipart-formulier (met method-spoofing
+  // voor bewerken); zonder bijlagen blijft alles zoals het was.
+  if (files.value.length > 0) {
+    form
+      .transform((data) => ({
+        ...data,
+        files: files.value.map(f => f.file),
+        files_for_customer: files.value.map(f => (f.forCustomer ? '1' : '0')),
+        ...(isEdit.value ? { _method: 'put' } : {}),
+      }))
+      .post(isEdit.value ? route('invoices.update', props.invoice.id) : route('invoices.store'), {
+        forceFormData: true,
+      });
+  } else if (isEdit.value) {
     form.put(route('invoices.update', props.invoice.id));
   } else {
     form.post(route('invoices.store'));
@@ -304,6 +338,48 @@ const submit = (action) => {
             </div>
           </div>
         </div>
+
+        <!-- Bijlagen -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Bijlagen</div>
+              <div class="card-subtitle">Bijv. een urenoverzicht of specificatie — gaat mee met de factuurmail en staat in het klantenportaal</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" @click="fileInput?.click()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Bestand toevoegen
+            </button>
+          </div>
+          <div class="card-body">
+            <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="addFiles">
+
+            <div v-if="fileError" class="field-error" style="margin-bottom:10px;">{{ fileError }}</div>
+
+            <div v-if="files.length === 0" class="fa-empty">
+              Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand, 10 bestanden per factuur.
+            </div>
+
+            <div v-for="(f, i) in files" :key="i" class="fa-row">
+              <span class="fa-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              <div class="fa-info">
+                <div class="fa-name">{{ f.name }}</div>
+                <div class="fa-meta">{{ formatSize(f.size) }}</div>
+              </div>
+              <label class="fa-check" :title="f.forCustomer ? 'Gaat mee met de factuurmail en is zichtbaar in het portaal' : 'Alleen intern — de klant ziet dit bestand niet'">
+                <input type="checkbox" v-model="f.forCustomer">
+                Meesturen naar klant
+              </label>
+              <button type="button" class="li-remove" @click="removeFile(i)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+
+            <p v-if="isEdit" class="fa-note">Eerder toegevoegde bijlagen bekijk en beheer je op de factuurpagina.</p>
+          </div>
+        </div>
       </div>
 
       <!-- Sidebar with totals -->
@@ -342,3 +418,38 @@ const submit = (action) => {
 </template>
 
 <style src="../document-form.css"></style>
+
+<style scoped>
+/* Bijlagen bij het opstellen */
+.fa-empty {
+  color: var(--text-3); font-size: 12.5px; line-height: 1.6;
+  background: var(--surface-2); border: 1px dashed var(--border-strong);
+  border-radius: 9px; padding: 12px 15px;
+}
+.fa-row {
+  display: flex; align-items: center; gap: 11px;
+  border: 1px solid var(--border); border-radius: 9px;
+  padding: 9px 12px; margin-bottom: 8px;
+}
+.fa-icon {
+  width: 32px; height: 32px; border-radius: 7px; flex: none;
+  background: var(--surface-2); color: var(--text-3);
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.fa-icon svg { width: 16px; height: 16px; }
+.fa-info { flex: 1; min-width: 0; }
+.fa-name { font-weight: 600; font-size: 13px; word-break: break-word; }
+.fa-meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+.fa-check {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12.5px; color: var(--text-2); font-weight: 500;
+  cursor: pointer; white-space: nowrap; flex: none;
+}
+.fa-check input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; }
+.fa-note { font-size: 12px; color: var(--text-4); margin-top: 8px; }
+
+@media (max-width: 560px) {
+  .fa-row { flex-wrap: wrap; }
+  .fa-check { white-space: normal; }
+}
+</style>

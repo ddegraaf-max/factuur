@@ -75,13 +75,14 @@ const sendToIncasso = () => {
 
 /* ---------- Bijlagen ---------- */
 const fileInput = ref(null);
-const uploadForm = useForm({ files: [] });
+const uploadForm = useForm({ files: [], for_customer: false });
 
 const uploadFiles = (event) => {
   const files = Array.from(event.target.files || []);
   if (!files.length) return;
 
   uploadForm.files = files;
+  uploadForm.for_customer = uploadForCustomer.value;
   uploadForm.post(route('invoices.attachments.store', props.invoice.id), {
     forceFormData: true,
     preserveScroll: true,
@@ -96,6 +97,13 @@ const removeAttachment = (att) => {
   if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
     router.delete(route('attachments.destroy', att.id), { preserveScroll: true });
   }
+};
+
+// Nieuwe uploads standaard intern; via het vinkje gaan ze naar de klant.
+const uploadForCustomer = ref(false);
+
+const toggleForCustomer = (att) => {
+  router.patch(route('attachments.update', att.id), { for_customer: !att.for_customer }, { preserveScroll: true });
 };
 
 // Standaard eerstvolgende factuurdatum: één maand na de factuurdatum.
@@ -147,7 +155,7 @@ const sendInvoice = () => {
 };
 
 /* ---------- Klantenportaal / inzagelog ---------- */
-const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload' };
+const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload', attachment: 'Bijlage gedownload' };
 const showAllViews = ref(false);
 const visibleViews = computed(() => {
   const views = props.invoice.views || [];
@@ -467,7 +475,11 @@ const deleteInvoice = () => {
         <div style="margin-top:28px;">
           <div class="sect-head">
             <div class="sect-title" style="margin:0;">Bijlagen</div>
-            <div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <label class="att-upload-check" title="Aangevinkt: de bijlage is zichtbaar in het klantenportaal (en gaat mee als de factuur nog verstuurd wordt)">
+                <input type="checkbox" v-model="uploadForCustomer">
+                Voor de klant
+              </label>
               <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadFiles">
               <button class="btn btn-secondary btn-sm" :disabled="uploadForm.processing" @click="fileInput?.click()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -481,8 +493,10 @@ const deleteInvoice = () => {
           </div>
 
           <div v-if="!invoice.attachments || invoice.attachments.length === 0" class="att-empty">
-            Nog geen bijlagen. Voeg bijvoorbeeld een opdrachtbevestiging, urenoverzicht of foto toe —
-            deze gaan mee in het incassodossier. PDF, PNG, JPG of WEBP, max. 10 MB per bestand.
+            Nog geen bijlagen. Voeg bijvoorbeeld een urenoverzicht of opdrachtbevestiging toe.
+            Met het vinkje "Voor de klant" gaat een bijlage mee met de factuurmail en staat hij in het
+            klantenportaal; interne bijlagen gaan alleen mee in het incassodossier.
+            PDF, PNG, JPG of WEBP, max. 10 MB per bestand.
           </div>
 
           <div v-else class="att-list">
@@ -494,6 +508,15 @@ const deleteInvoice = () => {
                 <a :href="route('attachments.show', att.id)" target="_blank" class="att-name">{{ att.filename }}</a>
                 <div class="att-meta">{{ att.size_formatted }} · toegevoegd op {{ att.uploaded_at_label }}</div>
               </div>
+              <button
+                class="att-customer-chip"
+                :class="{ on: att.for_customer }"
+                :title="att.for_customer ? 'Zichtbaar voor de klant (factuurmail + portaal) — klik om intern te maken' : 'Alleen intern — klik om zichtbaar te maken voor de klant'"
+                @click="toggleForCustomer(att)"
+              >
+                <svg v-if="att.for_customer" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                {{ att.for_customer ? 'Voor de klant' : 'Intern' }}
+              </button>
               <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">Download</a>
               <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">Verwijder</button>
             </div>
@@ -749,6 +772,17 @@ const deleteInvoice = () => {
 .att-name { font-weight: 600; font-size: 13.5px; color: var(--text); word-break: break-word; }
 .att-name:hover { color: var(--brand); }
 .att-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.att-upload-check { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-2); font-weight: 500; cursor: pointer; }
+.att-upload-check input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; }
+.att-customer-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+  padding: 4px 10px; border-radius: 100px;
+  background: var(--surface-2); color: var(--text-3);
+  border: 1px solid var(--border-strong);
+  flex: none; cursor: pointer;
+}
+.att-customer-chip.on { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
 
 .payments-table { font-size: 13px; }
 .payments-table th { background: var(--surface-2); padding: 8px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }

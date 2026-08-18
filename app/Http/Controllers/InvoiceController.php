@@ -96,6 +96,10 @@ class InvoiceController extends Controller
         $data = $this->validated($request);
         $invoice = $this->manager->create($data);
 
+        // Bijlagen eerst opslaan: bij "direct versturen" moeten ze met de
+        // factuurmail mee kunnen.
+        $this->saveAttachments($request, $invoice);
+
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
             return redirect()->route('invoices.show', $invoice)->with('flash', "Factuur {$invoice->number} verstuurd.");
@@ -133,6 +137,7 @@ class InvoiceController extends Controller
                     'filename' => $a->filename,
                     'kind' => $a->kind,
                     'size_formatted' => $a->size_formatted,
+                    'for_customer' => (bool) $a->for_customer,
                     'uploaded_at_label' => $a->created_at?->translatedFormat('j M Y'),
                 ]),
                 'reminder_logs' => $invoice->reminderLogs->map(fn ($r) => [
@@ -183,6 +188,8 @@ class InvoiceController extends Controller
 
         $data = $this->validated($request);
         $this->manager->update($invoice, $data);
+
+        $this->saveAttachments($request, $invoice);
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
@@ -289,6 +296,31 @@ class InvoiceController extends Controller
             'lines.*.unit_price' => ['required', 'numeric', 'min:0'],
             'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
             'action' => ['nullable', 'in:draft,send'],
+            'files' => ['nullable', 'array', 'max:10'],
+            'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+            'files_for_customer' => ['nullable', 'array'],
+            'files_for_customer.*' => ['in:0,1'],
+        ], [
+            'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
+            'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
         ]);
+    }
+
+    /** Bijlagen die bij het opstellen zijn toegevoegd (met per bestand: voor de klant of intern). */
+    protected function saveAttachments(Request $request, Invoice $invoice): void
+    {
+        $flags = $request->input('files_for_customer', []);
+
+        foreach ($request->file('files', []) as $i => $file) {
+            \App\Models\Attachment::create([
+                'attachable_type' => Invoice::class,
+                'attachable_id' => $invoice->id,
+                'filename' => $file->getClientOriginalName(),
+                'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
+                'size_bytes' => $file->getSize(),
+                'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                'for_customer' => ($flags[$i] ?? '1') === '1',
+            ]);
+        }
     }
 }

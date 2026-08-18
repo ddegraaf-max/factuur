@@ -70,6 +70,19 @@ class PortalController extends Controller
         $invoice->load('lines', 'payments');
         $company = $invoice->company;
 
+        // Alleen bijlagen die expliciet voor de klant zijn gemarkeerd.
+        $customerAttachments = $invoice->attachments()
+            ->withoutGlobalScope('company')
+            ->where('for_customer', true)
+            ->get()
+            ->map(fn ($a) => [
+                'id' => $a->id,
+                'filename' => $a->filename,
+                'kind' => $a->kind,
+                'size_formatted' => $a->size_formatted,
+            ])
+            ->values();
+
         return Inertia::render('Portal/Show', [
             'invoice' => array_merge($this->invoiceSummary($invoice), [
                 'reference' => $invoice->reference,
@@ -98,6 +111,7 @@ class PortalController extends Controller
                     'paid_on_label' => $p->paid_on?->translatedFormat('j M Y'),
                     'amount' => (float) $p->amount,
                 ]),
+                'attachments' => $customerAttachments,
             ]),
             'company' => [
                 'name' => $company?->name,
@@ -140,6 +154,41 @@ class PortalController extends Controller
         ])->setPaper('a4');
 
         return $pdf->download(($invoice->number ?: 'factuur') . '.pdf');
+    }
+
+    /** Bijlage downloaden vanuit het portaal — alleen voor-de-klant-bestanden. */
+    public function attachment(Request $request, string $token, string $attachmentId): HttpResponse|RedirectResponse
+    {
+        abort_unless(ctype_digit($attachmentId), 404);
+        $invoice = $this->findByToken($token);
+
+        $email = PortalAuthController::verifiedEmail($request);
+        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
+            return redirect()->route('portal.invoice', $token);
+        }
+
+        $file = $invoice->attachments()
+            ->withoutGlobalScope('company')
+            ->where('for_customer', true)
+            ->where('id', $attachmentId)
+            ->first();
+        abort_if(! $file, 404);
+
+        $contents = $file->contents();
+        abort_if($contents === null, 404);
+
+        $this->logView($request, $invoice, 'attachment');
+
+        return response($contents, 200, [
+            'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => \Symfony\Component\HttpFoundation\HeaderUtils::makeDisposition(
+                \Symfony\Component\HttpFoundation\HeaderUtils::DISPOSITION_ATTACHMENT,
+                $file->filename,
+                'bijlage'
+            ),
+            'Content-Length' => (string) strlen($contents),
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     /* ===================== Helpers ===================== */

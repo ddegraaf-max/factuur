@@ -120,6 +120,8 @@ Route::prefix('portaal')->name('portal.')->group(function () {
         ->middleware('throttle:30,1')->name('invoice');
     Route::get('/f/{token}/pdf', [PortalController::class, 'pdf'])
         ->middleware('throttle:15,1')->name('invoice.pdf');
+    Route::get('/f/{token}/bijlage/{attachment}', [PortalController::class, 'attachment'])
+        ->middleware('throttle:20,1')->name('invoice.attachment');
 });
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
@@ -240,6 +242,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
     // Attachments
     Route::post('invoices/{invoice}/attachments', [AttachmentController::class, 'store'])->name('invoices.attachments.store');
+    Route::patch('attachments/{attachment}', [AttachmentController::class, 'update'])->name('attachments.update');
     Route::get('attachments/{attachment}', [AttachmentController::class, 'show'])->name('attachments.show');
     Route::get('attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('attachments.download');
     Route::delete('attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');

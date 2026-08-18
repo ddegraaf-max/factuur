@@ -47,7 +47,9 @@ BEVEILIGING
 - Sessie wordt vernieuwd na verificatie (tegen session fixation) en
   verloopt automatisch na 12 uur.
 - De klant ziet uitsluitend facturen van het geverifieerde e-mailadres;
-  concepten en bijlagen zijn nooit zichtbaar.
+  concepten zijn nooit zichtbaar. Bijlagen alleen wanneer ze expliciet
+  als "voor de klant" zijn gemarkeerd (zie LEESMIJ-FACTUURBIJLAGEN.txt);
+  interne bijlagen blijven onzichtbaar.
 
 TECHNIEK
 --------

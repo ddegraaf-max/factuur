@@ -15,11 +15,12 @@ class Attachment extends Model
     protected $fillable = [
         'company_id', 'attachable_type', 'attachable_id',
         'filename', 'mime_type', 'size_bytes', 'storage_path', 'file_data',
-        'uploaded_by_user_id',
+        'for_customer', 'uploaded_by_user_id',
     ];
 
     protected $casts = [
         'size_bytes' => 'integer',
+        'for_customer' => 'boolean',
     ];
 
     /**

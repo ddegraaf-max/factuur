@@ -70,6 +70,33 @@ class InvoiceMail extends Mailable
             $attachments[] = Attachment::fromData(fn () => $this->ubl, $base . '-ubl.xml')->withMime('application/xml');
         }
 
+        // Bijlagen die de gebruiker voor de klant heeft gemarkeerd (bijv. een
+        // urenoverzicht of specificatie). Met een totaalbudget zodat de mail
+        // bezorgbaar blijft; wat niet past, blijft bereikbaar via het portaal.
+        $budget = 15 * 1024 * 1024;
+        $customerFiles = $this->invoice->attachments()
+            ->withoutGlobalScope('company')
+            ->where('for_customer', true)
+            ->orderBy('id')
+            ->get();
+
+        foreach ($customerFiles as $file) {
+            $contents = $file->contents();
+            if ($contents === null) {
+                continue;
+            }
+            if (strlen($contents) > $budget) {
+                \Illuminate\Support\Facades\Log::warning('Factuurbijlage te groot voor de mail; alleen via portaal beschikbaar', [
+                    'invoice' => $this->invoice->id,
+                    'attachment' => $file->id,
+                ]);
+                continue;
+            }
+            $budget -= strlen($contents);
+            $attachments[] = Attachment::fromData(fn () => $contents, $file->filename)
+                ->withMime($file->mime_type ?: 'application/octet-stream');
+        }
+
         return $attachments;
     }
 }

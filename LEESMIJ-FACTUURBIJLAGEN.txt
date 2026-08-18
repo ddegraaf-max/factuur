@@ -1,0 +1,44 @@
+EASYINVOICE — BIJLAGEN BIJ EEN FACTUUR
+======================================
+
+WAT IS HET
+----------
+Bestanden toevoegen aan een factuur — al tijdens het opstellen — en per
+bijlage bepalen of hij naar de klant gaat of intern blijft.
+
+VOOR DE GEBRUIKER
+-----------------
+- NIEUW/BEWERKEN: het factuurformulier heeft nu een blok "Bijlagen".
+  Voeg bestanden toe (PDF, PNG, JPG, WEBP; max 10 MB per stuk, 10 per
+  factuur) terwijl je de factuur opstelt. Per bestand staat een vinkje
+  "Meesturen naar klant" (standaard aan).
+- FACTUURPAGINA: elke bijlage heeft een klikbaar label "Voor de klant" /
+  "Intern". Bij het uploaden kies je met een vinkje direct de juiste
+  stand (standaard intern, zoals het altijd was — bijv. incassobewijs).
+
+WAT DOET "VOOR DE KLANT"
+------------------------
+1. De bijlage gaat mee met de factuurmail (naast de factuur-PDF en de
+   UBL). Totaalbudget 15 MB per mail — past een bestand niet meer, dan
+   wordt het overgeslagen en gelogd; via het portaal blijft het altijd
+   bereikbaar.
+2. De bijlage staat in het klantenportaal bij de factuur, met een eigen
+   beveiligde downloadlink. Elke download wordt gelogd in het inzagelog
+   ("Bijlage gedownload") zodat je ziet dat de klant hem heeft opgehaald.
+
+Interne bijlagen veranderen niet: onzichtbaar voor de klant, gaan alleen
+mee in het incassodossier.
+
+TECHNIEK
+--------
+- Migratie: attachments.for_customer (boolean, default false — bestaande
+  bijlagen blijven intern).
+- InvoiceController accepteert uploads bij store/update (vóór het
+  versturen, zodat "opslaan en versturen" ze direct meeneemt).
+- AttachmentController: upload met for_customer-vlag + PATCH-route om
+  het label om te zetten.
+- InvoiceMail voegt klantbijlagen toe met een 15 MB-totaalbudget.
+- PortalController: bijlagenlijst + downloadroute
+  (/portaal/f/{token}/bijlage/{id}), alleen geverifieerd en alleen
+  for_customer-bestanden; download komt in het inzagelog als event
+  "attachment".
