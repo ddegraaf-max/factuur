@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\TwoFactorChallengeController;
+use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\CreditNoteController;
 use App\Http\Controllers\StripeWebhookController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\RecurringInvoiceController;
 use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('home');
@@ -146,6 +148,11 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:6,1')
         ->name('verification.resend');
 
+    // Teamuitnodiging accepteren (collega of boekhouder)
+    Route::get('uitnodiging/{token}', [InvitationController::class, 'show'])->name('invitation.show');
+    Route::post('uitnodiging/{token}', [InvitationController::class, 'accept'])
+        ->middleware('throttle:10,1')->name('invitation.accept');
+
     // Wachtwoord vergeten / opnieuw instellen
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
@@ -156,14 +163,18 @@ Route::middleware('guest')->group(function () {
 });
 
 // ---------- AUTHENTICATED ----------
-Route::middleware(['auth'])->group(function () {
+// 'readonly': de boekhouder-rol mag alles inzien maar niets wijzigen.
+Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     // Abonnement (ook bereikbaar wanneer de proefperiode/het abonnement is verlopen)
     Route::get('abonnement', [BillingController::class, 'show'])->name('billing.show');
-    Route::post('abonnement/afrekenen', [BillingController::class, 'checkout'])->name('billing.checkout');
     Route::get('abonnement/gelukt', [BillingController::class, 'success'])->name('billing.success');
-    Route::post('abonnement/beheren', [BillingController::class, 'portal'])->name('billing.portal');
+    // Afrekenen en beheren raakt echt geld: alleen de beheerder.
+    Route::post('abonnement/afrekenen', [BillingController::class, 'checkout'])
+        ->middleware('role:owner')->name('billing.checkout');
+    Route::post('abonnement/beheren', [BillingController::class, 'portal'])
+        ->middleware('role:owner')->name('billing.portal');
 
     // Alles hieronder vereist een actieve proefperiode of abonnement.
     Route::middleware('subscribed')->group(function () {
@@ -212,9 +223,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('inkoop/{purchase}/heropen', [PurchaseInvoiceController::class, 'reopen'])->name('purchases.reopen');
     Route::post('inkoop/{purchase}/bijlagen', [PurchaseInvoiceController::class, 'storeAttachments'])->name('purchases.attachments.store');
 
-    // Export naar boekhouder
-    Route::get('export', [ExportController::class, 'index'])->name('export.index');
-    Route::get('export/download', [ExportController::class, 'download'])->name('export.download');
+    // Export naar boekhouder (rapporten: beheerder + boekhouder)
+    Route::middleware('role:owner,accountant')->group(function () {
+        Route::get('export', [ExportController::class, 'index'])->name('export.index');
+        Route::get('export/download', [ExportController::class, 'download'])->name('export.download');
+    });
 
     // Credit notes
     Route::post('invoices/{invoice}/credit', [CreditNoteController::class, 'store'])->name('invoices.credit.store');
@@ -231,26 +244,40 @@ Route::middleware(['auth'])->group(function () {
     Route::get('attachments/{attachment}/download', [AttachmentController::class, 'download'])->name('attachments.download');
     Route::delete('attachments/{attachment}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
-    // Stats
-    Route::get('stats', [StatsController::class, 'index'])->name('stats.index');
+    // Rapporten: beheerder + boekhouder
+    Route::middleware('role:owner,accountant')->group(function () {
+        Route::get('stats', [StatsController::class, 'index'])->name('stats.index');
 
-    // BTW-overzicht per kwartaal (voor de aangifte omzetbelasting)
-    Route::get('btw', [\App\Http\Controllers\VatController::class, 'index'])->name('vat.index');
-    Route::get('btw/pdf', [\App\Http\Controllers\VatController::class, 'pdf'])->name('vat.pdf');
+        // BTW-overzicht per kwartaal (voor de aangifte omzetbelasting)
+        Route::get('btw', [\App\Http\Controllers\VatController::class, 'index'])->name('vat.index');
+        Route::get('btw/pdf', [\App\Http\Controllers\VatController::class, 'pdf'])->name('vat.pdf');
+    });
 
-    // Settings
-    Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
-    Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+    // Settings (alleen de beheerder)
+    Route::middleware('role:owner')->group(function () {
+        Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
+        Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
 
-    Route::get('settings/brand', [SettingsController::class, 'brand'])->name('settings.brand');
-    Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');
-    Route::delete('settings/brand/logo', [SettingsController::class, 'removeLogo'])->name('settings.brand.logo.remove');
+        Route::get('settings/brand', [SettingsController::class, 'brand'])->name('settings.brand');
+        Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');
+        Route::delete('settings/brand/logo', [SettingsController::class, 'removeLogo'])->name('settings.brand.logo.remove');
 
-    Route::get('settings/numbering', [SettingsController::class, 'numbering'])->name('settings.numbering');
-    Route::patch('settings/numbering', [SettingsController::class, 'updateNumbering'])->name('settings.numbering.update');
+        Route::get('settings/numbering', [SettingsController::class, 'numbering'])->name('settings.numbering');
+        Route::patch('settings/numbering', [SettingsController::class, 'updateNumbering'])->name('settings.numbering.update');
 
-    Route::get('settings/reminders', [SettingsController::class, 'reminders'])->name('settings.reminders');
-    Route::patch('settings/reminders', [SettingsController::class, 'updateReminders'])->name('settings.reminders.update');
+        Route::get('settings/reminders', [SettingsController::class, 'reminders'])->name('settings.reminders');
+        Route::patch('settings/reminders', [SettingsController::class, 'updateReminders'])->name('settings.reminders.update');
+
+        // Team: collega's en boekhouder uitnodigen, rollen beheren
+        Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team');
+        Route::post('settings/team/uitnodigen', [TeamController::class, 'invite'])
+            ->middleware('throttle:10,1')->name('settings.team.invite');
+        Route::patch('settings/team/{member}', [TeamController::class, 'updateRole'])->name('settings.team.role');
+        Route::delete('settings/team/{member}', [TeamController::class, 'removeUser'])->name('settings.team.remove');
+        Route::post('settings/team/uitnodiging/{invitation}/opnieuw', [TeamController::class, 'resendInvite'])
+            ->middleware('throttle:10,1')->name('settings.team.invite.resend');
+        Route::delete('settings/team/uitnodiging/{invitation}', [TeamController::class, 'revokeInvite'])->name('settings.team.invite.revoke');
+    });
 
     // Security / 2FA
     Route::get('settings/security', [SecurityController::class, 'index'])->name('settings.security');

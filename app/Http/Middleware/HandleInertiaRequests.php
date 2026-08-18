@@ -22,6 +22,17 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'company' => $request->user()?->company,
+                // Rechten voor de interface (de routes dwingen dit óók af):
+                // beheerder = alles; medewerker = verkoop + inkoop;
+                // boekhouder = alleen inzien + rapporten/exports.
+                'can' => $request->user() ? [
+                    'write' => ! $request->user()->isAccountant(),
+                    'reports' => $request->user()->hasRole('owner', 'accountant'),
+                    'settings' => $request->user()->isOwner(),
+                    'team' => $request->user()->isOwner(),
+                    'billing' => $request->user()->isOwner(),
+                ] : null,
+                'role_label' => $request->user()?->roleLabel(),
             ],
             'flash' => fn () => [
                 'flash' => $request->session()->get('flash'),

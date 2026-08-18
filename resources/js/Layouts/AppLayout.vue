@@ -17,7 +17,9 @@ const initials = computed(() => {
   return (first + last).toUpperCase();
 });
 
-const nav = [
+// Per item bepaalt 'can' welke rol het ziet (zie auth.can in HandleInertiaRequests).
+// De routes dwingen dezelfde regels server-side af — dit is alleen de zichtbaarheid.
+const rawNav = [
   {
     title: 'Overzicht',
     items: [
@@ -44,23 +46,34 @@ const nav = [
   {
     title: 'Rapporten',
     items: [
-      { name: 'Klantomzet', route: 'stats.index', icon: 'chart' },
-      { name: 'BTW-aangifte', route: 'vat.index', icon: 'percent' },
-      { name: 'Export boekhouder', route: 'export.index', icon: 'download' },
+      { name: 'Klantomzet', route: 'stats.index', icon: 'chart', can: 'reports' },
+      { name: 'BTW-aangifte', route: 'vat.index', icon: 'percent', can: 'reports' },
+      { name: 'Export boekhouder', route: 'export.index', icon: 'download', can: 'reports' },
     ],
   },
   {
     title: 'Instellingen',
     items: [
-      { name: 'Bedrijfsgegevens', route: 'settings.company', icon: 'settings' },
-      { name: 'Huisstijl', route: 'settings.brand', icon: 'palette' },
-      { name: 'Nummering', route: 'settings.numbering', icon: 'hash' },
-      { name: 'Herinneringen', route: 'settings.reminders', icon: 'bell' },
+      { name: 'Bedrijfsgegevens', route: 'settings.company', icon: 'settings', can: 'settings' },
+      { name: 'Huisstijl', route: 'settings.brand', icon: 'palette', can: 'settings' },
+      { name: 'Nummering', route: 'settings.numbering', icon: 'hash', can: 'settings' },
+      { name: 'Herinneringen', route: 'settings.reminders', icon: 'bell', can: 'settings' },
+      { name: 'Team', route: 'settings.team', icon: 'users', can: 'team', badge: 'Nieuw' },
       { name: 'Beveiliging', route: 'settings.security', icon: 'shield' },
-      { name: 'Abonnement', route: 'billing.show', icon: 'card' },
+      { name: 'Abonnement', route: 'billing.show', icon: 'card', can: 'billing' },
     ],
   },
 ];
+
+const can = computed(() => page.props.auth.can || {});
+const nav = computed(() =>
+  rawNav
+    .map(section => ({
+      ...section,
+      items: section.items.filter(item => !item.can || can.value[item.can]),
+    }))
+    .filter(section => section.items.length > 0)
+);
 
 const subscription = computed(() => page.props.subscription || {});
 const isDemo = computed(() => !!page.props.demo);
@@ -152,7 +165,12 @@ const logout = () => {
           <slot name="breadcrumb"></slot>
         </div>
         <div class="topbar-right">
-          <slot name="topbar-actions"></slot>
+          <!-- Boekhouder-rol is alleen-lezen: geen aanmaak-/opslaknoppen tonen. -->
+          <span v-if="can.write === false" class="readonly-badge" title="Je kunt alles inzien en exporteren, maar niets wijzigen.">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            Alleen inzien
+          </span>
+          <slot v-else name="topbar-actions"></slot>
         </div>
       </header>
 
@@ -691,6 +709,21 @@ table { border-collapse: collapse; width: 100%; }
   .stacked-table td:not([data-label]):not(.cell-primary) { display: none; }
   /* De waarde mag afbreken; het label niet. */
   .data-table td > *, .stacked-table td > * { min-width: 0; }
+}
+
+/* Alleen-lezen-badge (boekhouder) */
+.readonly-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  padding: 5px 12px;
+  cursor: help;
 }
 
 /* PILLS */

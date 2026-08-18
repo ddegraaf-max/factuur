@@ -40,6 +40,38 @@ class User extends Authenticatable
         return $this->belongsTo(Company::class);
     }
 
+    /* ===================== ROLLEN ===================== */
+
+    public const ROLES = ['owner', 'staff', 'accountant'];
+
+    public const ROLE_LABELS = [
+        'owner' => 'Beheerder',
+        'staff' => 'Medewerker',
+        'accountant' => 'Boekhouder (alleen inzien)',
+    ];
+
+    /** Beheerder: volledige toegang, inclusief instellingen, abonnement en team. */
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    /** Boekhouder: mag alles inzien en rapporten/exports gebruiken, niets wijzigen. */
+    public function isAccountant(): bool
+    {
+        return $this->role === 'accountant';
+    }
+
+    public function hasRole(string ...$roles): bool
+    {
+        return in_array($this->role, $roles, true);
+    }
+
+    public function roleLabel(): string
+    {
+        return self::ROLE_LABELS[$this->role] ?? $this->role;
+    }
+
     /** Stuur de wachtwoord-reset e-mail in het Nederlands. */
     public function sendPasswordResetNotification($token): void
     {

@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Middleware\AccountantReadOnly;
 use App\Http\Middleware\DemoMode;
 use App\Http\Middleware\EnsurePortalVerified;
+use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\EnsureSubscriptionActive;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -28,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'subscribed' => EnsureSubscriptionActive::class,
             'turnstile' => VerifyTurnstile::class,
             'portal.verified' => EnsurePortalVerified::class,
+            'role' => EnsureRole::class,
+            'readonly' => AccountantReadOnly::class,
         ]);
 
         // Stripe-webhook stuurt geen CSRF-token mee.
