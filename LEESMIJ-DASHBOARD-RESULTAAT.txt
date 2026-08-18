@@ -1,0 +1,48 @@
+EASYINVOICE — RESULTAAT PER MAAND (DASHBOARD)
+=============================================
+
+WAT IS HET
+----------
+De oude "Omzet per maand"-staafgrafiek op het dashboard is vervangen door
+een volwaardige resultaatgrafiek: omzet, inkoop en winst per maand, met
+vorig jaar als vergelijking.
+
+WAT ZIE JE
+----------
+- Drie kerncijfers bovenaan: omzet, inkoop en winst over jan t/m de
+  huidige maand, met een groen/rood groeipercentage ten opzichte van
+  dezelfde periode vorig jaar.
+- Paneel 1: per maand twee balken naast elkaar — omzet (rood) en
+  inkoop (blauw) — met de omzet van vorig jaar als grijze stippellijn.
+- Paneel 2: de winst per maand als balken vanaf een nullijn — groen
+  omhoog bij winst, rood omlaag bij verlies — met de winst van vorig
+  jaar als stippellijn.
+- Eén tooltip per maand met alle cijfers (omzet, inkoop, winst én
+  vorig jaar); de maandkolom licht op bij hover.
+- Nog geen inkoop ingeboekt? Dan staat er een hint met link naar de
+  inkoopmodule. Geen cijfers van vorig jaar? Dan verdwijnen de
+  stippellijnen en de vergelijking vanzelf.
+
+REKENREGELS
+-----------
+- Kalenderjaar (jan–dec), berekend op factuurdatum, excl. BTW.
+- Creditnota's tellen negatief mee in de omzet (dat deed de oude
+  grafiek niet — die telde ze per ongeluk als omzet óp). Ook de
+  KPI "Omzet deze maand" is hierop gecorrigeerd.
+- Inkoop = alle ingeboekte inkoopfacturen (excl. BTW).
+- Winst = omzet − inkoop per maand.
+
+ONTWERP
+-------
+- Kleuren gecontroleerd op kleurenblind-onderscheid (omzet-rood vs
+  inkoop-blauw ruim voldoende contrastverschil); winst/verlies is
+  dubbel gecodeerd: richting (boven/onder de nullijn) én kleur.
+- Eén as, geen dubbele schalen; rustige hulplijnen met ronde
+  aswaarden (€ 5k, € 10k).
+
+TECHNIEK
+--------
+- Nieuw: resources/js/Components/ResultChart.vue.
+- DashboardController levert result_chart (12 maanden × dit + vorig
+  jaar, plus periode-totalen); Postgres EXTRACT(MONTH ...)-groepering.
+- Geen migraties nodig.

@@ -38,6 +38,7 @@
           <li><b>BTW-aangifte per kwartaal</b> — per kwartaal precies wat je invult bij de Belastingdienst: rubriek 1a, 1b en 1e, mét voorbelasting (5b) en het saldo dat je per kwartaal betaalt. Inclusief deadline-waarschuwing en PDF-download voor je administratie.</li>
           <li><b>Inkoopfacturen (crediteuren)</b> — boek binnengekomen facturen in, handmatig of met een foto van de bon (op je telefoon opent direct de camera). De BTW telt automatisch mee als voorbelasting in je aangifte, en je ziet altijd wat er bij leveranciers openstaat.</li>
           <li><b>Team &amp; rollen</b> — nodig collega's of je boekhouder gratis uit met een eigen rol: beheerder, medewerker of boekhouder (alleen inzien). Rechten worden ook server-side afgedwongen.</li>
+          <li><b>Winst per maand op je dashboard</b> — de omzetgrafiek toont nu ook je inkoop en de winst (of het verlies) per maand, met vorig jaar als stippellijn erdoorheen zodat je de groei direct ziet.</li>
         </ul>
       </article>
 

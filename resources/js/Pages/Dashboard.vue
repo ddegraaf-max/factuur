@@ -2,24 +2,14 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
+import ResultChart from '@/Components/ResultChart.vue';
 import { eur } from '@/format.js';
-import { computed } from 'vue';
 
 const props = defineProps({
   kpis: Object,
   recent_invoices: Array,
-  monthly_revenue: Array,
+  result_chart: Object,
 });
-
-const maxRevenue = computed(() => {
-  const max = Math.max(...props.monthly_revenue.map(m => m.value), 1);
-  return max;
-});
-
-const barHeight = (value) => {
-  const pct = (value / maxRevenue.value) * 100;
-  return Math.max(pct, 2) + '%';
-};
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -177,24 +167,8 @@ const greeting = () => {
       </div>
     </div>
 
-    <!-- Revenue chart -->
-    <div class="card" style="margin-top:20px;">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Omzet per maand</div>
-          <div class="card-subtitle">Exclusief BTW · laatste 12 maanden</div>
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <div class="bars">
-          <div v-for="(m, i) in monthly_revenue" :key="i" class="bar-col">
-            <div class="bar-value">{{ m.value > 0 ? eur(m.value) : '' }}</div>
-            <div class="bar" :style="{ height: barHeight(m.value) }"></div>
-            <div class="bar-label">{{ m.month }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Resultaat per maand: omzet, inkoop & winst vs vorig jaar -->
+    <ResultChart :chart="result_chart" />
   </AppLayout>
 </template>
 
@@ -265,50 +239,4 @@ const greeting = () => {
 .qa-title { font-weight: 500; font-size: 14px; }
 .qa-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; }
 
-.chart-wrap { padding: 24px 24px 20px; }
-.bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  height: 200px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 4px;
-  position: relative;
-}
-.bar-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-  justify-content: flex-end;
-  position: relative;
-}
-.bar {
-  width: 60%;
-  background: var(--brand);
-  border-radius: 3px 3px 0 0;
-  transition: opacity 0.2s;
-  min-height: 2px;
-}
-.bar-col:hover .bar { opacity: 0.8; }
-.bar-value {
-  position: absolute;
-  bottom: 100%;
-  font-size: 10px;
-  font-family: var(--font-mono);
-  color: var(--text-3);
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.15s;
-  margin-bottom: 4px;
-}
-.bar-col:hover .bar-value { opacity: 1; }
-.bar-label {
-  position: absolute;
-  top: calc(100% + 6px);
-  font-size: 11px;
-  color: var(--text-3);
-  white-space: nowrap;
-}
 </style>
