@@ -1,6 +1,8 @@
 @php
-    $open = number_format((float) $invoice->total - (float) $invoice->paid_total, 2, ',', '.');
+    $openRaw = (float) $invoice->total - (float) $invoice->paid_total;
+    $open = number_format($openRaw, 2, ',', '.');
     $total = number_format((float) $invoice->total, 2, ',', '.');
+    $settled = number_format((float) $invoice->paid_total, 2, ',', '.');
     $terms = (int) ($invoice->payment_terms ?? $company->default_payment_terms ?? 14);
     $logo = $company->logoBinary();
 @endphp
@@ -24,8 +26,19 @@
           Hierbij ontvangt u factuur <strong>{{ $invoice->number }}</strong> van {{ optional($invoice->invoice_date)->format('d-m-Y') }}
           voor een bedrag van <strong>€ {{ $total }}</strong>. De factuur vindt u als PDF in de bijlage.
         </p>
+        @if($invoice->paid_total > 0 && $openRaw > 0.009)
+          <p style="margin:0 0 14px;">
+            Hierop is reeds <strong>€ {{ $settled }}</strong> verrekend/doorgestort;
+            het te betalen bedrag is <strong>€ {{ $open }}</strong>.
+          </p>
+        @elseif($invoice->paid_total > 0)
+          <p style="margin:0 0 14px;">
+            Het volledige bedrag is reeds verrekend/doorgestort — u hoeft niets meer te betalen.
+          </p>
+        @endif
+        @if($openRaw > 0.009)
         <p style="margin:0 0 14px;">
-          Wij verzoeken u het bedrag
+          Wij verzoeken u het {{ $invoice->paid_total > 0 ? 'resterende bedrag' : 'bedrag' }}
           @if($invoice->due_date)
             uiterlijk <strong>{{ $invoice->due_date->translatedFormat('j F Y') }}</strong>
           @else
@@ -35,6 +48,7 @@
           @if($company->iban)op <strong>{{ $company->iban }}</strong> t.n.v. {{ $company->name }}@endif
           onder vermelding van factuurnummer <strong>{{ $invoice->number }}</strong>.
         </p>
+        @endif
         @if($invoice->portal_token)
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 6px;">
             <tr>

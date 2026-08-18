@@ -675,6 +675,7 @@ const deleteInvoice = () => {
                 <td class="cell-primary">{{ p.paid_on?.slice(0, 10) }}</td>
                 <td data-label="Methode">
                   <span v-if="p.kind === 'write_off'" class="writeoff-chip">Afboeking</span>
+                  <span v-else-if="p.kind === 'advance'" class="advance-chip">Doorgestort</span>
                   <template v-else>{{ payMethodLabels[p.method] || p.method }}</template>
                 </td>
                 <td data-label="Referentie">{{ p.reference || '—' }}</td>
@@ -703,6 +704,13 @@ const deleteInvoice = () => {
               <div class="credit-opt-sub">Er is echt geld binnengekomen (bank, contant, pin…).</div>
             </div>
           </label>
+          <label class="credit-opt" :class="{ on: paymentForm.kind === 'advance' }">
+            <input type="radio" value="advance" v-model="paymentForm.kind">
+            <div>
+              <div class="credit-opt-title">Verrekening · reeds doorgestort</div>
+              <div class="credit-opt-sub">Een al doorgestort bedrag dat op de factuur in mindering komt op "Te betalen". Verschijnt op de PDF; totaal en BTW blijven gelijk.</div>
+            </div>
+          </label>
           <label class="credit-opt" :class="{ on: paymentForm.kind === 'write_off' }">
             <input type="radio" value="write_off" v-model="paymentForm.kind">
             <div>
@@ -710,6 +718,12 @@ const deleteInvoice = () => {
               <div class="credit-opt-sub">Wikkel (een deel van) de factuur af zonder geld — bijv. een betalingsverschil, kwijtschelding of oninbaar bedrag.</div>
             </div>
           </label>
+
+          <div v-if="paymentForm.kind === 'advance'" class="writeoff-note" style="background:var(--info-bg);border-color:var(--info-border);color:var(--info);">
+            De verrekening verschijnt als aftrekpost op de factuur-PDF ("reeds doorgestort") en verlaagt
+            het te betalen bedrag. Je omzet en BTW veranderen <b>niet</b>. Download de PDF opnieuw of
+            stuur de factuur daarna — de regel staat er automatisch op.
+          </div>
 
           <div v-if="paymentForm.kind === 'write_off'" class="writeoff-note">
             Een afboeking verandert <b>niets</b> aan je omzet of BTW-aangifte — de factuur telt
@@ -724,7 +738,7 @@ const deleteInvoice = () => {
               <div v-if="paymentForm.errors.amount" class="field-error">{{ paymentForm.errors.amount }}</div>
             </div>
             <div class="form-group">
-              <label>{{ paymentForm.kind === 'write_off' ? 'Datum *' : 'Betaaldatum *' }}</label>
+              <label>{{ paymentForm.kind === 'payment' ? 'Betaaldatum *' : 'Datum *' }}</label>
               <input type="date" v-model="paymentForm.paid_on">
             </div>
           </div>
@@ -740,7 +754,10 @@ const deleteInvoice = () => {
             <div v-if="paymentForm.errors.method" class="field-error">{{ paymentForm.errors.method }}</div>
           </div>
           <div class="form-group">
-            <label>{{ paymentForm.kind === 'write_off' ? 'Reden' : 'Referentie' }}<span class="label-hint">{{ paymentForm.kind === 'write_off' ? '(bijv. betalingsverschil, kwijtgescholden)' : '(bijv. bankregel-omschrijving)' }}</span></label>
+            <label>
+              {{ paymentForm.kind === 'payment' ? 'Referentie' : 'Omschrijving' }}
+              <span class="label-hint">{{ { payment: '(bijv. bankregel-omschrijving)', advance: '(verschijnt op de PDF, bijv. "Reeds doorgestort 11-08")', write_off: '(bijv. betalingsverschil, kwijtgescholden)' }[paymentForm.kind] }}</span>
+            </label>
             <input type="text" v-model="paymentForm.reference" maxlength="255">
           </div>
         </div>
@@ -749,7 +766,7 @@ const deleteInvoice = () => {
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showPaymentModal = false">Annuleren</button>
             <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">
-              {{ paymentForm.kind === 'write_off' ? 'Afboeken' : 'Registreren' }}
+              {{ { payment: 'Registreren', advance: 'Verrekenen', write_off: 'Afboeken' }[paymentForm.kind] }}
             </button>
           </div>
         </div>
@@ -925,6 +942,11 @@ const deleteInvoice = () => {
   display: inline-flex; align-items: center;
   font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
   background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border);
+}
+.advance-chip {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+  background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border);
 }
 
 /* Keuzeblokken in de creditnota-modal */

@@ -159,7 +159,21 @@
       <tr><td class="label">BTW {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€ {{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
     @endforeach
   @endif
-  <tr class="grand-row"><td>Te betalen</td><td class="value brand">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+  @php
+    // Verrekeningen ("reeds doorgestort"): verlagen het te betalen bedrag,
+    // maar niet het factuurtotaal of de BTW.
+    $pdfAdvances = $invoice->payments()->where('kind', 'advance')->orderBy('paid_on')->get();
+    $pdfPayable = max((float) $invoice->total - (float) $pdfAdvances->sum('amount'), 0);
+  @endphp
+  @if($pdfAdvances->isNotEmpty())
+    <tr><td class="label">Totaal incl. btw</td><td class="value">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+    @foreach($pdfAdvances as $adv)
+      <tr><td class="label">{{ $adv->reference ?: 'Reeds doorgestort' }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">− € {{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
+    @endforeach
+    <tr class="grand-row"><td>Te betalen</td><td class="value brand">€ {{ number_format($pdfPayable, 2, ',', '.') }}</td></tr>
+  @else
+    <tr class="grand-row"><td>Te betalen</td><td class="value brand">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+  @endif
 </table>
 
 <div style="clear:both;"></div>

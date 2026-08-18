@@ -106,12 +106,15 @@ class PortalController extends Controller
                     'vat_rate' => (float) $l->vat_rate,
                     'line_subtotal' => (float) $l->line_subtotal,
                 ]),
-                // Alleen échte betalingen tonen; interne afboekingen zijn niet
-                // iets wat de klant hoeft te zien.
-                'payments' => $invoice->payments->where('kind', 'payment')->map(fn ($p) => [
+                // Betalingen en verrekeningen ("reeds doorgestort") tonen —
+                // interne afboekingen niet.
+                'payments' => $invoice->payments->whereIn('kind', ['payment', 'advance'])->map(fn ($p) => [
                     'id' => $p->id,
                     'paid_on_label' => $p->paid_on?->translatedFormat('j M Y'),
                     'amount' => (float) $p->amount,
+                    'label' => $p->kind === 'advance'
+                        ? ($p->reference ?: 'Verrekend / reeds doorgestort')
+                        : 'Betaling ontvangen',
                 ])->values(),
                 'attachments' => $customerAttachments,
             ]),

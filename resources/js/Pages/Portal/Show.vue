@@ -157,7 +157,7 @@ const isOpen = computed(() =>
         <div class="pi-sect-title">Ontvangen betalingen</div>
         <div v-for="p in invoice.payments" :key="p.id" class="pi-payment-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>{{ p.paid_on_label }}</span>
+          <span>{{ p.paid_on_label }} · {{ p.label }}</span>
           <span class="mono" style="margin-left:auto;">{{ eur(p.amount) }}</span>
         </div>
       </div>

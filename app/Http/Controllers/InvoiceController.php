@@ -97,9 +97,15 @@ class InvoiceController extends Controller
         $data = $this->validated($request);
         $invoice = $this->manager->create($data);
 
-        // Bijlagen eerst opslaan: bij "direct versturen" moeten ze met de
-        // factuurmail mee kunnen.
+        // Bijlagen en verrekeningen eerst opslaan: bij "direct versturen"
+        // moeten ze op de PDF en in de factuurmail terechtkomen.
         $this->saveAttachments($request, $invoice);
+
+        try {
+            $this->syncAdvances($request, $invoice);
+        } catch (\DomainException $e) {
+            return redirect()->route('invoices.edit', $invoice)->withErrors(['advances' => $e->getMessage()]);
+        }
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
@@ -177,6 +183,11 @@ class InvoiceController extends Controller
 
         return Inertia::render('Invoices/Form', [
             'invoice' => $invoice,
+            'advances' => $invoice->payments()->where('kind', 'advance')->orderBy('paid_on')->get()->map(fn ($p) => [
+                'description' => $p->reference,
+                'date' => $p->paid_on?->format('Y-m-d'),
+                'amount' => (float) $p->amount,
+            ])->values(),
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => VatCalculator::availableRates(),
@@ -195,6 +206,12 @@ class InvoiceController extends Controller
         $this->manager->update($invoice, $data);
 
         $this->saveAttachments($request, $invoice);
+
+        try {
+            $this->syncAdvances($request, $invoice->fresh());
+        } catch (\DomainException $e) {
+            return back()->withErrors(['advances' => $e->getMessage()]);
+        }
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
@@ -339,7 +356,7 @@ class InvoiceController extends Controller
     public function recordPayment(Request $request, Invoice $invoice): RedirectResponse
     {
         $data = $request->validate([
-            'kind' => ['nullable', 'in:payment,write_off'],
+            'kind' => ['nullable', 'in:payment,write_off,advance'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:' . ($invoice->remaining_amount + 0.01)],
             'paid_on' => ['required', 'date'],
             'method' => ['nullable', 'required_if:kind,payment', 'in:bank_transfer,ideal,cash,card,other'],
@@ -361,9 +378,11 @@ class InvoiceController extends Controller
             'notes' => $data['notes'] ?? null,
         ]);
 
-        return back()->with('flash', $kind === 'write_off'
-            ? 'Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.'
-            : 'Betaling geregistreerd.');
+        return back()->with('flash', match ($kind) {
+            'write_off' => 'Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.',
+            'advance' => 'Verrekening geregistreerd — de PDF toont het bedrag als "reeds doorgestort"; omzet en BTW blijven ongewijzigd.',
+            default => 'Betaling geregistreerd.',
+        });
     }
 
     /**
@@ -388,9 +407,13 @@ class InvoiceController extends Controller
         }
 
         foreach ($invoice->payments as $payment) {
+            $label = match ($payment->kind) {
+                'write_off' => 'Afgeboekt: € ',
+                'advance' => 'Verrekend / reeds doorgestort: € ',
+                default => 'Betaling ontvangen: € ',
+            };
             $push($payment->paid_on, $payment->kind === 'write_off' ? 'credit' : 'euro',
-                ($payment->kind === 'write_off' ? 'Afgeboekt: € ' : 'Betaling ontvangen: € ')
-                . number_format((float) $payment->amount, 2, ',', '.'));
+                $label . number_format((float) $payment->amount, 2, ',', '.'));
         }
 
         if ($invoice->status === 'paid') {
@@ -431,10 +454,48 @@ class InvoiceController extends Controller
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
             'files_for_customer' => ['nullable', 'array'],
             'files_for_customer.*' => ['in:0,1'],
+            // Verrekeningen: al doorgestorte deelbetalingen die op de factuur
+            // in mindering komen op het te betalen bedrag (niet op de BTW).
+            'advances' => ['nullable', 'array', 'max:10'],
+            'advances.*.description' => ['required', 'string', 'max:190'],
+            'advances.*.date' => ['nullable', 'date'],
+            'advances.*.amount' => ['required', 'numeric', 'min:0.01'],
         ], [
             'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
             'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
+            'advances.*.description' => 'Geef elke verrekening een omschrijving (bijv. "Reeds doorgestort").',
+            'advances.*.amount' => 'Vul bij elke verrekening een bedrag in.',
         ]);
+    }
+
+    /**
+     * Verrekeningen ("reeds doorgestort") synchroniseren als advance-betalingen.
+     * Ze verlagen het te betalen bedrag — nooit het factuurtotaal of de BTW.
+     */
+    protected function syncAdvances(Request $request, Invoice $invoice): void
+    {
+        if (! $request->exists('advances')) {
+            return;
+        }
+
+        $rows = collect($request->input('advances', []));
+        if ($rows->sum('amount') > (float) $invoice->total + 0.009) {
+            throw new \DomainException('De verrekeningen zijn samen hoger dan het factuurtotaal.');
+        }
+
+        // Via de modellen verwijderen zodat paid_total netjes wordt herrekend.
+        $invoice->payments()->where('kind', 'advance')->get()->each->delete();
+
+        foreach ($rows as $row) {
+            Payment::create([
+                'invoice_id' => $invoice->id,
+                'kind' => 'advance',
+                'amount' => $row['amount'],
+                'paid_on' => $row['date'] ?? now()->toDateString(),
+                'method' => 'bank_transfer',
+                'reference' => $row['description'],
+            ]);
+        }
     }
 
     /** Bijlagen die bij het opstellen zijn toegevoegd (met per bestand: voor de klant of intern). */

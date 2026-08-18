@@ -6,6 +6,7 @@ import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   invoice: Object,
+  advances: { type: Array, default: () => [] }, // bestaande verrekeningen (bewerken)
   customers: Array,
   products: Array,
   vat_rates: Array,
@@ -64,6 +65,9 @@ const form = useForm({
         vat_rate: 21,
       }],
   action: 'draft',
+  // Verrekeningen: al doorgestorte deelbetalingen die op de factuur in
+  // mindering komen op "Te betalen" — niet op het totaal of de BTW.
+  advances: props.advances.map(a => ({ ...a })),
 });
 
 const r2 = (n) => Math.round(n * 100) / 100;
@@ -158,6 +162,23 @@ const selectedCustomer = computed(() => {
 watch(() => form.customer_id, (id) => {
   const c = props.customers.find(c => c.id === Number(id));
   form.payment_terms = c?.payment_terms ?? props.default_payment_terms ?? 30;
+});
+
+/* ---------- Verrekeningen (reeds doorgestort) ---------- */
+const addAdvance = () => {
+  form.advances.push({ description: 'Reeds doorgestort', date: today, amount: null });
+};
+const removeAdvance = (i) => form.advances.splice(i, 1);
+
+const advancesTotal = computed(() =>
+  form.advances.reduce((sum, a) => sum + (parseDutchNumber(a.amount) || 0), 0)
+);
+const payable = computed(() => r2(totals.value.total - advancesTotal.value));
+
+const advanceError = computed(() => {
+  if (form.errors.advances) return form.errors.advances;
+  const key = Object.keys(form.errors).find(k => k.startsWith('advances.'));
+  return key ? form.errors[key] : null;
 });
 
 /* ---------- Bijlagen (meesturen met de factuurmail + klantenportaal) ---------- */
@@ -341,6 +362,34 @@ const submit = (action) => {
           </div>
         </div>
 
+        <!-- Verrekeningen / reeds doorgestort -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Verrekening · reeds doorgestort</div>
+              <div class="card-subtitle">Al doorgestorte deelbetalingen komen op de factuur in mindering op "Te betalen" — je totaal en BTW veranderen niet</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" @click="addAdvance">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Verrekening toevoegen
+            </button>
+          </div>
+          <div v-if="form.advances.length > 0 || advanceError" class="card-body">
+            <div v-if="advanceError" class="field-error" style="margin-bottom:10px;">{{ advanceError }}</div>
+            <div v-for="(adv, i) in form.advances" :key="i" class="adv-row">
+              <input type="text" v-model="adv.description" placeholder="Bijv. Reeds doorgestort" maxlength="190">
+              <input type="date" v-model="adv.date">
+              <input type="number" v-model="adv.amount" step="0.01" min="0.01" placeholder="0,00">
+              <button type="button" class="li-remove" @click="removeAdvance(i)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div v-if="advancesTotal > totals.total + 0.009" class="field-error" style="margin-top:4px;">
+              De verrekeningen (€ {{ advancesTotal.toFixed(2) }}) zijn samen hoger dan het factuurtotaal.
+            </div>
+          </div>
+        </div>
+
         <!-- Bijlagen -->
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
@@ -399,6 +448,16 @@ const submit = (action) => {
               <span class="mono">{{ eur(b.vat) }}</span>
             </div>
             <div class="total-row grand"><span>Totaal</span><span class="mono">{{ eur(totals.total) }}</span></div>
+            <template v-if="advancesTotal > 0">
+              <div class="total-row" style="color:var(--warning);">
+                <span>Verrekend / doorgestort</span>
+                <span class="mono">− {{ eur(advancesTotal) }}</span>
+              </div>
+              <div class="total-row grand" style="border-top-width:1px;">
+                <span>Te betalen</span>
+                <span class="mono">{{ eur(payable) }}</span>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -449,6 +508,17 @@ const submit = (action) => {
 }
 .fa-check input { width: 15px; height: 15px; accent-color: var(--brand); cursor: pointer; }
 .fa-note { font-size: 12px; color: var(--text-4); margin-top: 8px; }
+
+/* Verrekeningsregels */
+.adv-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px 140px 32px;
+  gap: 8px; align-items: center; margin-bottom: 8px;
+}
+.adv-row input { min-width: 0; }
+@media (max-width: 560px) {
+  .adv-row { grid-template-columns: minmax(0, 1fr) 32px; }
+}
 
 @media (max-width: 560px) {
   .fa-row { flex-wrap: wrap; }

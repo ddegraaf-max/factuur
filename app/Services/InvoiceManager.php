@@ -130,6 +130,9 @@ class InvoiceManager
             if (! $invoice->portal_token) {
                 $invoice->portal_token = bin2hex(random_bytes(32));
             }
+            // Vooraf verrekende bedragen (reeds doorgestort) meenemen in de
+            // status: deels of zelfs volledig voldaan bij versturen.
+            $invoice->refreshStatus();
             $invoice->save();
 
             return $invoice;

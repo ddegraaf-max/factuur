@@ -1,0 +1,55 @@
+EASYINVOICE — VERREKENING / REEDS DOORGESTORT
+=============================================
+
+WAT IS HET
+----------
+Deelbetalingen die al aan de klant zijn doorgestort, komen op de factuur
+in mindering op het TE BETALEN bedrag — met vermelding op de factuur —
+zonder enig effect op het factuurtotaal, de omzet of de BTW.
+
+Op de factuur-PDF verschijnt dan onder de totalen:
+
+    Totaal incl. btw            €  7.137,50
+    Reeds doorgestort (11-08)   −€ 2.000,00
+    ─────────────────────────────────────────
+    Te betalen                  €  5.137,50
+
+De BTW wordt over het volledige factuurbedrag berekend (factuurstelsel);
+de verrekening is puur een aftrek op wat er nog betaald moet worden.
+
+WAAR VOER JE HET IN
+-------------------
+1. BIJ HET OPSTELLEN (nieuw/bewerken): blok "Verrekening · reeds
+   doorgestort" — meerdere regels met omschrijving, datum en bedrag.
+   Het totalenpaneel toont direct "Verrekend −€x" en "Te betalen".
+   Validatie: verrekeningen kunnen nooit hoger zijn dan het totaal.
+2. ACHTERAF (factuurpagina → Betaling registreren): derde optie
+   "Verrekening · reeds doorgestort". De PDF wordt bij elke download
+   opnieuw opgebouwd, dus de regel staat er direct op.
+
+DOORWERKING
+-----------
+- Factuurmail: meldt "Hierop is reeds € X verrekend/doorgestort; het te
+  betalen bedrag is € Y" (of "u hoeft niets meer te betalen" bij volledig
+  verrekend — het betaalverzoek verdwijnt dan).
+- Status: een verstuurde factuur met verrekening staat direct op "Deels
+  betaald" (of "Betaald" bij volledige verrekening); herinneringen
+  rekenen automatisch met het juiste openstaande bedrag.
+- Klantenportaal: de klant ziet de verrekening in de betalingenlijst
+  ("Verrekend / reeds doorgestort") en het juiste te betalen bedrag.
+- Factuurpagina: blauw "Doorgestort"-label in de betalingen en een eigen
+  regel in de historie.
+- Boekhouder-export: nieuwe kolom "Doorgestort/verrekend" naast
+  "Betaald" en "Afgeboekt".
+- BTW-overzicht, klantomzet en dashboard: ongewijzigd — die rekenen op
+  factuurregels/factuurdatum.
+
+TECHNIEK
+--------
+- Hergebruikt payments.kind (nieuwe waarde 'advance') — geen migratie
+  nodig.
+- PDF-sjablonen (modern/classic/minimal), factuurmail, InvoiceManager
+  (status na verzenden), InvoiceController (invoer + validatie),
+  ExportController en het portaal zijn bijgewerkt.
+- End-to-end getest in de lokale omgeving: PDF ×3, mail, statusverloop
+  en openstaand bedrag.
