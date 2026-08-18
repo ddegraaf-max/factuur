@@ -233,5 +233,77 @@ return [
             ],
         ],
 
+        // ---------- KLANTENPORTAAL ----------
+        'klantenportaal-inzagelog' => [
+            'category' => 'Klantenportaal',
+            'title' => 'Het klantenportaal en het inzagelog',
+            'intro' => 'Je klant bekijkt facturen online via een beveiligde link — en jij ziet precies óf en wanneer je factuur is bekeken.',
+            'sections' => [
+                ['Hoe je klant de factuur bekijkt', [
+                    'In elke factuurmail en betalingsherinnering staat de knop "Bekijk factuur online". Voor de veiligheid bevestigt je klant eerst zijn e-mailadres met een eenmalige 6-cijferige code (10 minuten geldig). Daarna ziet hij de factuur, de betaalstatus, de betaalinstructies en kan hij de PDF downloaden.',
+                    'Je klant kan ook rechtstreeks inloggen op /portaal met zijn e-mailadres — daar staan alle facturen die naar dat adres zijn verstuurd.',
+                ]],
+                ['Het inzagelog', [
+                    'Op de factuurpagina zie je onder "Inzage door klant" wanneer de factuur voor het eerst is bekeken en elk volgend inzagemoment, inclusief PDF-downloads. In de facturenlijst verschijnt een groen oogje zodra een factuur is bekeken.',
+                    'Met "Kopieer portaallink" deel je de beveiligde link ook zelf, bijvoorbeeld via WhatsApp.',
+                ]],
+            ],
+        ],
+
+        // ---------- BTW & RAPPORTEN ----------
+        'btw-aangifte-per-kwartaal' => [
+            'category' => 'BTW & rapporten',
+            'title' => 'Je BTW-aangifte per kwartaal',
+            'intro' => 'Onder Rapporten → BTW-aangifte staat per kwartaal precies wat je invult bij de Belastingdienst.',
+            'sections' => [
+                ['Wat je ziet', [
+                    'Per kwartaal: de grondslag en BTW per tarief (rubriek 1a en 1b), het nultarief (1e), de voorbelasting uit je ingeboekte inkoopfacturen (5b) en het saldo dat je per kwartaal betaalt of terugkrijgt.',
+                    'Is een kwartaal voorbij maar de aangiftetermijn nog niet? Dan kleurt de kaart en zie je bovenaan een waarschuwing met het bedrag en de uiterste datum.',
+                ]],
+                ['Goed om te weten', [
+                    'De cijfers worden berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota\'s. De voorbelasting is zo volledig als je inkoopadministratie — boek dus al je inkoop in.',
+                    'Met "Download PDF" bewaar je het overzicht voor je administratie of stuur je het naar je boekhouder.',
+                ]],
+            ],
+        ],
+
+        // ---------- INKOOP ----------
+        'inkoopfacturen-inboeken' => [
+            'category' => 'Inkoop',
+            'title' => 'Inkoopfacturen inboeken (ook met een foto)',
+            'intro' => 'Boek binnengekomen facturen van leveranciers in — de BTW telt automatisch mee als voorbelasting in je aangifte.',
+            'sections' => [
+                ['Inboeken', [
+                    'Ga naar Inkoop → Inkoopfacturen → "Inkoopfactuur inboeken". Vul de leverancier (met suggesties uit eerdere boekingen), het factuurnummer, de kostencategorie en de bedragen in. Je kunt bedragen exclusief óf inclusief BTW invoeren — EasyInvoice rekent het andere bedrag uit.',
+                ]],
+                ['Met een foto of PDF', [
+                    'Voeg een foto of PDF van de bon toe: kies een bestand of tik op "Foto maken" (op je telefoon opent direct de camera). De foto verschijnt groot naast het formulier, zodat je overtypt terwijl je de bon ziet.',
+                ]],
+                ['Betalen en bijhouden', [
+                    'Markeer facturen als betaald met datum en betaalwijze. Op het overzicht zie je wat er bij leveranciers openstaat, wat er over de vervaldatum is en hoeveel voorbelasting je dit kwartaal hebt opgebouwd. Via "CSV-export" download je alles voor je boekhouder.',
+                ]],
+            ],
+        ],
+
+        // ---------- SAMENWERKEN ----------
+        'team-en-rollen' => [
+            'category' => 'Samenwerken',
+            'title' => 'Collega\'s en je boekhouder uitnodigen (rollen)',
+            'intro' => 'Werk met meerdere mensen in dezelfde omgeving, ieder met eigen rechten — extra gebruikers kosten niets.',
+            'sections' => [
+                ['Uitnodigen', [
+                    'Ga naar Instellingen → Team, vul het e-mailadres in en kies een rol. De genodigde ontvangt een e-mail met een beveiligde link (7 dagen geldig), kiest zelf een wachtwoord en zit direct in jouw omgeving.',
+                ]],
+                ['De drie rollen', [
+                    'Beheerder: volledige toegang, inclusief instellingen, abonnement en teambeheer.',
+                    'Medewerker: het dagelijkse werk — offertes, facturen, klanten, producten en inkoop. Geen instellingen, rapporten of abonnement.',
+                    'Boekhouder (alleen inzien): mag alles bekijken en juist wél de rapporten en exports gebruiken, maar niets wijzigen.',
+                ]],
+                ['Beheren', [
+                    'Als beheerder pas je rollen aan of verwijder je teamleden. Er blijft altijd minstens één beheerder over, en openstaande uitnodigingen kun je opnieuw versturen of intrekken.',
+                ]],
+            ],
+        ],
+
     ],
 ];

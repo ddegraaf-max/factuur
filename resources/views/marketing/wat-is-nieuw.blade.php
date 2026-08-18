@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 augustus 2026 · Easy 1.3.0</div>
+        <h3>Klantenportaal, complete BTW-aangifte, inkoopfacturen &amp; teamrollen</h3>
+        <ul class="tl-list">
+          <li><b>Klantenportaal</b> — je klant bekijkt zijn facturen voortaan ook online, via een beveiligde link in de factuurmail (met eenmalige toegangscode per e-mail). Jij ziet in een inzagelog precies óf en wanneer je factuur is bekeken — inclusief een groen oogje in je facturenlijst.</li>
+          <li><b>BTW-aangifte per kwartaal</b> — per kwartaal precies wat je invult bij de Belastingdienst: rubriek 1a, 1b en 1e, mét voorbelasting (5b) en het saldo dat je per kwartaal betaalt. Inclusief deadline-waarschuwing en PDF-download voor je administratie.</li>
+          <li><b>Inkoopfacturen (crediteuren)</b> — boek binnengekomen facturen in, handmatig of met een foto van de bon (op je telefoon opent direct de camera). De BTW telt automatisch mee als voorbelasting in je aangifte, en je ziet altijd wat er bij leveranciers openstaat.</li>
+          <li><b>Team &amp; rollen</b> — nodig collega's of je boekhouder gratis uit met een eigen rol: beheerder, medewerker of boekhouder (alleen inzien). Rechten worden ook server-side afgedwongen.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.2.0</div>
         <h3>Offertes — van voorstel naar factuur in één klik</h3>
         <ul class="tl-list">

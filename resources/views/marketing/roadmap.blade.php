@@ -34,24 +34,23 @@
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
         <div class="road-card"><h4>Koppeling met de bank</h4><p>Betalingen automatisch matchen via een PSD2-koppeling.</p></div>
-        <div class="road-card"><h4>Meerdere gebruikers</h4><p>Collega's toegang geven met eigen rechten.</p></div>
         <div class="road-card"><h4>Verzending via Peppol</h4><p>E-facturen rechtstreeks afleveren via het Peppol-netwerk.</p></div>
+        <div class="road-card"><h4>Bonnetjes automatisch herkennen</h4><p>Foto van de bon uploaden en de bedragen automatisch laten invullen (scan &amp; herken).</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
-        <div class="road-card"><h4>BTW-overzicht per kwartaal</h4><p>In één oogopslag zien hoeveel btw je over je omzet moet afdragen.</p></div>
-        <div class="road-card"><h4>Klantportaal</h4><p>Je klant bekijkt zijn facturen online — en jij ziet wanneer ze zijn geopend.</p></div>
+        <div class="road-card"><h4>Boekhoudkoppelingen</h4><p>Directe koppeling met pakketten als Twinfield, e-Boekhouden en Exact.</p></div>
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Klantenportaal</h4><p>Je klant bekijkt zijn facturen online via een beveiligde link — en jij ziet in het inzagelog wanneer ze zijn geopend.</p></div>
+        <div class="road-card"><h4>BTW-aangifte per kwartaal</h4><p>Rubriek 1a, 1b en 1e plus voorbelasting (5b) en het saldo per kwartaal — met PDF-download.</p></div>
+        <div class="road-card"><h4>Inkoopfacturen (crediteuren)</h4><p>Inkoop inboeken, handmatig of met een foto van de bon. De BTW telt mee als voorbelasting.</p></div>
+        <div class="road-card"><h4>Team &amp; rollen</h4><p>Collega's en je boekhouder gratis uitnodigen, ieder met eigen rechten.</p></div>
         <div class="road-card"><h4>Offertes</h4><p>Offertes maken, versturen en met één klik omzetten naar een factuur.</p></div>
-        <div class="road-card"><h4>Dagelijks overzicht</h4><p>Elke ochtend een mail met wat er die dag om aandacht vraagt.</p></div>
         <div class="road-card"><h4>Terugkerende facturen</h4><p>Automatisch periodiek factureren voor abonnementen en vaste diensten.</p></div>
         <div class="road-card"><h4>UBL / e-facturatie</h4><p>Elke factuur als UBL 2.1 (NLCIUS) — te downloaden én automatisch als bijlage in de factuurmail.</p></div>
-        <div class="road-card"><h4>Export naar boekhouder</h4><p>CSV-export met BTW per tarief, klaar voor je accountant.</p></div>
-        <div class="road-card"><h4>EASY-assistent</h4><p>Slimme assistent die met je meedenkt.</p></div>
-        <div class="road-card"><h4>Incasso in fases</h4><p>Gefaseerd incassotraject.</p></div>
-        <div class="road-card"><h4>Creditfacturen</h4><p>Creditnota's en deelbetalingen.</p></div>
+        <div class="road-card"><h4>Export naar boekhouder</h4><p>CSV-export van verkoop én inkoop met BTW per tarief, klaar voor je accountant.</p></div>
       </div>
     </div>
   </div>

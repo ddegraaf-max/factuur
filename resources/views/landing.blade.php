@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
 @section('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10/maand incl. btw')
-@section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw).')
+@section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW-aangifte, inkoop, klantenportaal en incasso vanaf € 12,10 per maand (incl. 21% btw).')
 
 @section('content')
 
@@ -474,10 +474,34 @@
 
       <div class="feature-card">
         <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div class="feature-title">Klantenportaal met inzagelog</div>
+        <div class="feature-desc">Je klant bekijkt en downloadt facturen online via een beveiligde link. Jij ziet precies óf en wanneer je factuur is bekeken.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
-        <div class="feature-title">BTW automatisch</div>
-        <div class="feature-desc">21%, 9% en 0% per regel. Per kwartaal een aangifte-overzicht klaar — gewoon overnemen op MijnBelastingdienst.</div>
+        <div class="feature-title">BTW-aangifte klaar</div>
+        <div class="feature-desc">Per kwartaal rubriek 1a, 1b en 1e plus voorbelasting (5b) en het saldo — gewoon overnemen op MijnBelastingdienst.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="feature-title">Inkoop met een foto</div>
+        <div class="feature-desc">Boek inkoopfacturen in met een foto van de bon — de BTW telt automatisch mee als voorbelasting in je aangifte.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div class="feature-title">Team &amp; rollen</div>
+        <div class="feature-desc">Nodig collega's of je boekhouder gratis uit, ieder met eigen rechten: beheerder, medewerker of alleen inzien.</div>
       </div>
 
       <div class="feature-card">
@@ -550,7 +574,10 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt facturen en creditnota's</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt klanten en producten</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Eigen huisstijl op factuur en PDF</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-rapport per kwartaal</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Klantenportaal met inzagelog</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-aangifte per kwartaal incl. voorbelasting</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Inkoopfacturen inboeken (ook met foto)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gratis extra gebruikers met eigen rollen</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Automatische herinneringen en aanmaningen</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Incasso via Armaere Gerechtsdeurwaarders</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-assistent EASY</li>
@@ -669,7 +696,7 @@
           <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="faq-content">
-          Ja. Je kunt je boekhouder toegang geven tot je administratie, en BTW-overzichten, factuurregels en omzetrapporten exporteren naar Excel of CSV. Een directe koppeling met Twinfield, e-Boekhouden en Exact volgt later dit jaar.
+          Ja. Nodig je boekhouder gratis uit met een eigen "alleen inzien"-rol: die ziet dan je hele administratie, het BTW-overzicht en alle exports (CSV van verkoop én inkoop), maar kan niets wijzigen. Een directe koppeling met Twinfield, e-Boekhouden en Exact volgt later dit jaar.
         </div>
       </details>
 

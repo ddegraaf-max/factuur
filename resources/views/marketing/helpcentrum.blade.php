@@ -67,6 +67,20 @@
         <a class="help-link" href="{{ route('help.article', 'sjabloon-kiezen') }}">Een sjabloon kiezen →</a>
       </div>
       <div class="info-card">
+        <div class="ic-emoji">📊</div>
+        <h3>Inkoop &amp; BTW</h3>
+        <p style="margin-bottom:12px;">Inkoop inboeken en je BTW-aangifte per kwartaal.</p>
+        <a class="help-link" href="{{ route('help.article', 'inkoopfacturen-inboeken') }}">Inkoopfacturen inboeken (ook met foto) →</a>
+        <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je BTW-aangifte per kwartaal →</a>
+      </div>
+      <div class="info-card">
+        <div class="ic-emoji">🤝</div>
+        <h3>Samenwerken &amp; klantenportaal</h3>
+        <p style="margin-bottom:12px;">Teamrollen en facturen online laten inzien.</p>
+        <a class="help-link" href="{{ route('help.article', 'team-en-rollen') }}">Collega's en boekhouder uitnodigen →</a>
+        <a class="help-link" href="{{ route('help.article', 'klantenportaal-inzagelog') }}">Het klantenportaal en inzagelog →</a>
+      </div>
+      <div class="info-card">
         <div class="ic-emoji">🔒</div>
         <h3>Account &amp; beveiliging</h3>
         <p style="margin-bottom:12px;">Wachtwoord en tweestapsverificatie.</p>

@@ -47,7 +47,11 @@
       <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:32px 0 14px;">Facturen &amp; BTW</h3>
       <details class="faq-item">
         <summary>Wordt BTW automatisch berekend? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Ja, per factuurregel kies je 21%, 9% of 0%. Het totaal en de BTW worden automatisch berekend, met een aangifte-overzicht per kwartaal.</div>
+        <div class="faq-content">Ja, per factuurregel kies je 21%, 9% of 0%. Per kwartaal staat je aangifte klaar: rubriek 1a, 1b en 1e, plus de voorbelasting (5b) uit je ingeboekte inkoopfacturen en het saldo dat je moet betalen — inclusief deadline-waarschuwing en PDF-download.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Kan ik ook mijn inkoopfacturen bijhouden? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Ja. Boek binnengekomen facturen van leveranciers in — handmatig of met een foto van de bon (op je telefoon opent direct de camera). Je ziet wat er bij leveranciers openstaat en de BTW telt automatisch mee als voorbelasting in je aangifte.</div>
       </details>
       <details class="faq-item">
         <summary>Wat als ik onder de KOR-regeling val? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -56,6 +60,20 @@
       <details class="faq-item">
         <summary>Voldoen de facturen aan de eisen van de Belastingdienst? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
         <div class="faq-content">Ja, inclusief doorlopende nummering per jaar en alle verplichte gegevens. Ook creditnota's voldoen aan de Nederlandse boekhoudregels.</div>
+      </details>
+
+      <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:32px 0 14px;">Samenwerken &amp; klantenportaal</h3>
+      <details class="faq-item">
+        <summary>Kunnen collega's ook in EasyInvoice werken? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Ja, en extra gebruikers kosten niets. Nodig collega's uit via Instellingen → Team en kies per persoon een rol: beheerder (alles), medewerker (het dagelijkse werk, zonder instellingen en rapporten) of boekhouder (alles inzien, niets wijzigen).</div>
+      </details>
+      <details class="faq-item">
+        <summary>Kan mijn boekhouder meekijken? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Ja, gratis. De boekhouder-rol mag je hele administratie inzien en juist wél de rapporten en exports gebruiken (klantomzet, BTW-overzicht, CSV van verkoop en inkoop), maar kan niets aanmaken of wijzigen.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Ziet mijn klant de factuur ook online? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Ja. In elke factuurmail staat een knop "Bekijk factuur online" met een beveiligde link. Voor de zekerheid bevestigt je klant eerst zijn e-mailadres met een eenmalige code. Jij ziet daarna in het inzagelog precies óf en wanneer de factuur is bekeken en gedownload.</div>
       </details>
 
       <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:32px 0 14px;">Betalingen, incasso &amp; veiligheid</h3>
