@@ -106,11 +106,13 @@ class PortalController extends Controller
                     'vat_rate' => (float) $l->vat_rate,
                     'line_subtotal' => (float) $l->line_subtotal,
                 ]),
-                'payments' => $invoice->payments->map(fn ($p) => [
+                // Alleen échte betalingen tonen; interne afboekingen zijn niet
+                // iets wat de klant hoeft te zien.
+                'payments' => $invoice->payments->where('kind', 'payment')->map(fn ($p) => [
                     'id' => $p->id,
                     'paid_on_label' => $p->paid_on?->translatedFormat('j M Y'),
                     'amount' => (float) $p->amount,
-                ]),
+                ])->values(),
                 'attachments' => $customerAttachments,
             ]),
             'company' => [

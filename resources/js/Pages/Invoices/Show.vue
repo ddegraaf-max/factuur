@@ -3,7 +3,7 @@ import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 import { eur } from '@/format.js';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   invoice: Object,
@@ -134,11 +134,17 @@ const createRecurring = () => {
 };
 
 const paymentForm = useForm({
+  kind: 'payment',
   amount: props.invoice.remaining,
   paid_on: new Date().toISOString().slice(0, 10),
   method: 'bank_transfer',
   reference: '',
   notes: '',
+});
+
+// Bij afboeken is het restbedrag vrijwel altijd wat je wilt wegboeken.
+watch(() => paymentForm.kind, (kind) => {
+  if (kind === 'write_off') paymentForm.amount = props.invoice.remaining;
 });
 
 const recordPayment = () => {
@@ -148,6 +154,14 @@ const recordPayment = () => {
       paymentForm.reset();
     },
   });
+};
+
+const payMethodLabels = {
+  bank_transfer: 'Bankoverschrijving',
+  ideal: 'iDEAL',
+  cash: 'Contant',
+  card: 'Pinpas / creditcard',
+  other: 'Anders',
 };
 
 const sendInvoice = () => {
@@ -658,8 +672,11 @@ const deleteInvoice = () => {
             </thead>
             <tbody>
               <tr v-for="p in invoice.payments" :key="p.id">
-                <td class="cell-primary">{{ p.paid_on }}</td>
-                <td data-label="Methode">{{ p.method }}</td>
+                <td class="cell-primary">{{ p.paid_on?.slice(0, 10) }}</td>
+                <td data-label="Methode">
+                  <span v-if="p.kind === 'write_off'" class="writeoff-chip">Afboeking</span>
+                  <template v-else>{{ payMethodLabels[p.method] || p.method }}</template>
+                </td>
                 <td data-label="Referentie">{{ p.reference || '—' }}</td>
                 <td class="num right" data-label="Bedrag">{{ eur(p.amount) }}</td>
               </tr>
@@ -679,18 +696,39 @@ const deleteInvoice = () => {
           </button>
         </div>
         <div class="modal-body">
-          <div class="form-row">
+          <label class="credit-opt" :class="{ on: paymentForm.kind === 'payment' }">
+            <input type="radio" value="payment" v-model="paymentForm.kind">
+            <div>
+              <div class="credit-opt-title">Betaling ontvangen</div>
+              <div class="credit-opt-sub">Er is echt geld binnengekomen (bank, contant, pin…).</div>
+            </div>
+          </label>
+          <label class="credit-opt" :class="{ on: paymentForm.kind === 'write_off' }">
+            <input type="radio" value="write_off" v-model="paymentForm.kind">
+            <div>
+              <div class="credit-opt-title">Afboeken (geen betaling)</div>
+              <div class="credit-opt-sub">Wikkel (een deel van) de factuur af zonder geld — bijv. een betalingsverschil, kwijtschelding of oninbaar bedrag.</div>
+            </div>
+          </label>
+
+          <div v-if="paymentForm.kind === 'write_off'" class="writeoff-note">
+            Een afboeking verandert <b>niets</b> aan je omzet of BTW-aangifte — de factuur telt
+            gewoon mee zoals hij is verstuurd. Wil je de BTW juist terugvragen (bijv. bij een
+            oninbare factuur)? Maak dan een <b>creditnota</b> in plaats van een afboeking.
+          </div>
+
+          <div class="form-row" style="margin-top:14px;">
             <div class="form-group">
               <label>Bedrag *</label>
               <input type="number" v-model="paymentForm.amount" step="0.01" min="0.01" :max="invoice.remaining">
               <div v-if="paymentForm.errors.amount" class="field-error">{{ paymentForm.errors.amount }}</div>
             </div>
             <div class="form-group">
-              <label>Betaaldatum *</label>
+              <label>{{ paymentForm.kind === 'write_off' ? 'Datum *' : 'Betaaldatum *' }}</label>
               <input type="date" v-model="paymentForm.paid_on">
             </div>
           </div>
-          <div class="form-group">
+          <div v-if="paymentForm.kind === 'payment'" class="form-group">
             <label>Methode *</label>
             <select v-model="paymentForm.method">
               <option value="bank_transfer">Bankoverschrijving</option>
@@ -699,9 +737,10 @@ const deleteInvoice = () => {
               <option value="card">Pinpas / creditcard</option>
               <option value="other">Anders</option>
             </select>
+            <div v-if="paymentForm.errors.method" class="field-error">{{ paymentForm.errors.method }}</div>
           </div>
           <div class="form-group">
-            <label>Referentie<span class="label-hint">(bijv. bankregel-omschrijving)</span></label>
+            <label>{{ paymentForm.kind === 'write_off' ? 'Reden' : 'Referentie' }}<span class="label-hint">{{ paymentForm.kind === 'write_off' ? '(bijv. betalingsverschil, kwijtgescholden)' : '(bijv. bankregel-omschrijving)' }}</span></label>
             <input type="text" v-model="paymentForm.reference" maxlength="255">
           </div>
         </div>
@@ -709,7 +748,9 @@ const deleteInvoice = () => {
           <div></div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showPaymentModal = false">Annuleren</button>
-            <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">Registreren</button>
+            <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">
+              {{ paymentForm.kind === 'write_off' ? 'Afboeken' : 'Registreren' }}
+            </button>
           </div>
         </div>
       </div>
@@ -872,6 +913,19 @@ const deleteInvoice = () => {
 /* Foutmelding boven de factuur */
 .inv-alert { display: flex; align-items: center; gap: 10px; background: var(--brand-tint); border: 1px solid var(--brand-border); color: var(--brand-darker); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13.5px; }
 .inv-alert svg { width: 18px; height: 18px; flex: none; }
+
+/* Afboeken */
+.writeoff-note {
+  margin-top: 4px;
+  background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning);
+  border-radius: 9px; padding: 11px 14px;
+  font-size: 12.5px; line-height: 1.6;
+}
+.writeoff-chip {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+  background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border);
+}
 
 /* Keuzeblokken in de creditnota-modal */
 .credit-opt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: border-color .15s, background .15s; }

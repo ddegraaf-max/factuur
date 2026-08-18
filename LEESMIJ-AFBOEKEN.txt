@@ -1,0 +1,38 @@
+EASYINVOICE — AFBOEKEN (BETALING ZONDER BTW-EFFECT)
+===================================================
+
+WAT IS HET
+----------
+Bij "Betaling registreren" op een factuur kies je nu uit twee smaken:
+
+  BETALING ONTVANGEN  — er is echt geld binnengekomen (bank, pin, contant).
+  AFBOEKEN            — wikkel (een deel van) de factuur af zónder geld:
+                        betalingsverschil, kwijtschelding of oninbaar.
+
+Beide sluiten de factuur (status wordt betaald zodra het restbedrag nul
+is), maar een afboeking raakt je omzet en BTW-aangifte NIET — die rekenen
+op de factuurregels (factuurstelsel), niet op betalingen.
+
+Let op (staat ook in het scherm): wil je bij een oninbare factuur de BTW
+juist TERUGVRAGEN, gebruik dan een creditnota — die verlaagt omzet én BTW.
+Een afboeking is voor gevallen waarin de factuur gewoon moet blijven staan
+zoals hij is.
+
+WAAR ZIE JE HET
+---------------
+- Factuurpagina → Betalingen: afboekingen krijgen een oranje "Afboeking"-
+  label (echte betalingen tonen de betaalwijze). Ook de historie-tijdlijn
+  maakt onderscheid ("Betaling ontvangen" vs "Afgeboekt").
+- Boekhouder-export (CSV): de kolom "Betaald" bevat voortaan alleen echt
+  ontvangen geld; er is een nieuwe kolom "Afgeboekt". Totalenregel idem.
+- Klantenportaal: afboekingen zijn intern — de klant ziet ze niet als
+  "ontvangen betaling", alleen de status van de factuur.
+
+TECHNIEK
+--------
+- Migratie: payments.kind ('payment' | 'write_off', default 'payment') —
+  bestaande betalingen blijven gewone betalingen.
+- InvoiceController@recordPayment gevalideerd op kind; bij afboeken is
+  geen betaalwijze nodig en wordt het restbedrag voorgesteld.
+- BTW-overzicht, klantomzet en dashboard waren al gebaseerd op
+  factuurregels/factuurdatum en zijn niet gewijzigd.

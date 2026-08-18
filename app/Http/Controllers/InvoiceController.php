@@ -339,15 +339,31 @@ class InvoiceController extends Controller
     public function recordPayment(Request $request, Invoice $invoice): RedirectResponse
     {
         $data = $request->validate([
+            'kind' => ['nullable', 'in:payment,write_off'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:' . ($invoice->remaining_amount + 0.01)],
             'paid_on' => ['required', 'date'],
-            'method' => ['required', 'in:bank_transfer,ideal,cash,card,other'],
+            'method' => ['nullable', 'required_if:kind,payment', 'in:bank_transfer,ideal,cash,card,other'],
             'reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        Payment::create(array_merge($data, ['invoice_id' => $invoice->id]));
-        return back()->with('flash', 'Betaling geregistreerd.');
+        // Afboeking: wikkelt (een deel van) de factuur af zonder echt geld —
+        // en zonder effect op omzet of BTW (die rekenen op de factuurregels).
+        $kind = $data['kind'] ?? 'payment';
+
+        Payment::create([
+            'invoice_id' => $invoice->id,
+            'kind' => $kind,
+            'amount' => $data['amount'],
+            'paid_on' => $data['paid_on'],
+            'method' => $kind === 'write_off' ? 'other' : ($data['method'] ?? 'bank_transfer'),
+            'reference' => $data['reference'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ]);
+
+        return back()->with('flash', $kind === 'write_off'
+            ? 'Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.'
+            : 'Betaling geregistreerd.');
     }
 
     /**
@@ -372,7 +388,9 @@ class InvoiceController extends Controller
         }
 
         foreach ($invoice->payments as $payment) {
-            $push($payment->paid_on, 'euro', 'Betaling ontvangen: € ' . number_format((float) $payment->amount, 2, ',', '.'));
+            $push($payment->paid_on, $payment->kind === 'write_off' ? 'credit' : 'euro',
+                ($payment->kind === 'write_off' ? 'Afgeboekt: € ' : 'Betaling ontvangen: € ')
+                . number_format((float) $payment->amount, 2, ',', '.'));
         }
 
         if ($invoice->status === 'paid') {
