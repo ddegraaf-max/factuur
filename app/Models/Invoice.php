@@ -14,7 +14,7 @@ class Invoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id', 'customer_id', 'number', 'reference', 'status',
+        'company_id', 'customer_id', 'number', 'portal_token', 'reference', 'status',
         'is_credit', 'credits_invoice_id',
         'invoice_date', 'due_date', 'payment_terms',
         'customer_name', 'customer_address_line', 'customer_postal_code',
@@ -64,6 +64,29 @@ class Invoice extends Model
     public function attachments(): MorphMany { return $this->morphMany(Attachment::class, 'attachable'); }
     public function creditNotes(): HasMany { return $this->hasMany(Invoice::class, 'credits_invoice_id'); }
     public function originalInvoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'credits_invoice_id')->withoutGlobalScope('company'); }
+    public function views(): HasMany { return $this->hasMany(InvoiceView::class)->orderByDesc('viewed_at'); }
+
+    /**
+     * Zorgt dat de factuur een geheime portaal-token heeft en geeft die terug.
+     * Wordt aangeroepen bij het versturen (factuurmail en herinneringen).
+     */
+    public function ensurePortalToken(): string
+    {
+        if (! $this->portal_token) {
+            $this->portal_token = bin2hex(random_bytes(32));
+            $this->saveQuietly();
+        }
+
+        return $this->portal_token;
+    }
+
+    /** Volledige URL van deze factuur in het klantenportaal (of null zonder token). */
+    public function portalUrl(): ?string
+    {
+        return $this->portal_token
+            ? route('portal.invoice', $this->portal_token)
+            : null;
+    }
 
     public function getRemainingAmountAttribute(): float
     {

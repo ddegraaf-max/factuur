@@ -126,6 +126,10 @@ class InvoiceManager
             }
             $invoice->status = 'sent';
             $invoice->sent_at = now();
+            // Geheime link voor het klantenportaal ("Bekijk factuur online").
+            if (! $invoice->portal_token) {
+                $invoice->portal_token = bin2hex(random_bytes(32));
+            }
             $invoice->save();
 
             return $invoice;

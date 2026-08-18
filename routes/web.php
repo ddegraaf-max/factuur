@@ -17,6 +17,8 @@ use App\Http\Controllers\DemoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\IncassoController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\Portal\PortalAuthController;
+use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\RecurringInvoiceController;
@@ -87,6 +89,35 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
 })->middleware(['throttle:5,1', 'turnstile'])->name('contact.send');
+
+// ---------- KLANTENPORTAAL ----------
+// Voor de klánten van onze gebruikers: facturen online inzien en downloaden.
+// Inloggen zonder wachtwoord, maar met twee stappen (e-mail + 6-cijferige
+// code) en stevige rate-limiting. Elke inzage wordt gelogd zodat de
+// ondernemer ziet of zijn factuur is bekeken.
+Route::prefix('portaal')->name('portal.')->group(function () {
+    Route::get('/', [PortalAuthController::class, 'show'])->name('login');
+    Route::post('/code', [PortalAuthController::class, 'requestCode'])
+        ->middleware(['throttle:8,1', 'turnstile'])->name('code.request');
+
+    Route::get('/verificatie', [PortalAuthController::class, 'showVerify'])->name('verify.show');
+    Route::post('/verificatie/stuur', [PortalAuthController::class, 'sendCode'])
+        ->middleware('throttle:8,1')->name('code.send');
+    Route::post('/verificatie', [PortalAuthController::class, 'verify'])
+        ->middleware('throttle:10,1')->name('verify');
+
+    Route::post('/uitloggen', [PortalAuthController::class, 'logout'])->name('logout');
+
+    Route::get('/overzicht', [PortalController::class, 'index'])
+        ->middleware('portal.verified')->name('index');
+
+    // Beveiligde factuurlink uit de e-mail (verificatie zit in de controller,
+    // zodat de codestap de factuurcontext kent).
+    Route::get('/f/{token}', [PortalController::class, 'show'])
+        ->middleware('throttle:30,1')->name('invoice');
+    Route::get('/f/{token}/pdf', [PortalController::class, 'pdf'])
+        ->middleware('throttle:15,1')->name('invoice.pdf');
+});
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');

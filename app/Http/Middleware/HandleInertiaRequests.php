@@ -32,6 +32,11 @@ class HandleInertiaRequests extends Middleware
             ],
         ]);
 
+        // Klantenportaal: het geverifieerde e-mailadres voor de portaal-layout.
+        if ($request->routeIs('portal.*')) {
+            $shared['portal_email'] = \App\Http\Controllers\Portal\PortalAuthController::verifiedEmail($request);
+        }
+
         // Share EASY insights data only when authenticated (lazy load)
         if ($request->user()) {
             $shared['easy_insights'] = fn () => app(EasyInsightsService::class)->gather();

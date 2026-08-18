@@ -82,7 +82,15 @@ const setStatus = (s) => {
             <td data-label="Klant">{{ inv.customer_name }}</td>
             <td data-label="Datum">{{ inv.invoice_date_label }}</td>
             <td data-label="Vervaldatum">{{ inv.due_date_label || '—' }}</td>
-            <td data-label="Status"><StatusPill :status="inv.status" :days-overdue="inv.days_overdue" /></td>
+            <td data-label="Status">
+              <span style="display:inline-flex;align-items:center;gap:7px;">
+                <StatusPill :status="inv.status" :days-overdue="inv.days_overdue" />
+                <svg v-if="inv.viewed_label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;">
+                  <title>Bekeken door klant op {{ inv.viewed_label }}</title>
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                </svg>
+              </span>
+            </td>
             <td class="num right" data-label="Bedrag">{{ eur(inv.total) }}</td>
             <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg></td>
           </tr>

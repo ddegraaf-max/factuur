@@ -1,0 +1,63 @@
+EASYINVOICE — KLANTENPORTAAL
+============================
+
+WAT IS HET
+----------
+Een beveiligde online omgeving waarin de KLANT van de ondernemer zijn facturen
+kan bekijken en downloaden, mét een inzagelog zodat de ondernemer ziet óf en
+wanneer zijn factuur is bekeken.
+
+VOOR DE KLANT (van de ondernemer)
+---------------------------------
+- In elke factuurmail en betalingsherinnering staat nu de knop
+  "Bekijk factuur online" met een geheime, unieke link (/portaal/f/{token},
+  256 bits entropie — niet te raden).
+- Klik op de link → eerst een verificatiestap: er wordt een 6-cijferige code
+  naar het e-mailadres van de factuur gestuurd. Pas na het invoeren van de
+  code is de factuur zichtbaar (bezit van de link alléén is dus niet genoeg).
+- Ook rechtstreeks inloggen kan via /portaal: e-mailadres invullen → code
+  ontvangen → overzicht van álle facturen die naar dat adres zijn gestuurd
+  (met openstaand bedrag, statussen en vervaldatums).
+- De factuurpagina toont de huisstijl van de afzender (logo + merkkleur),
+  alle factuurregels, betaalstatus, een duidelijk "zo betaal je"-blok
+  (IBAN, t.n.v., o.v.v.), ontvangen betalingen en een PDF-downloadknop.
+
+INZAGELOG VOOR DE ONDERNEMER
+----------------------------
+- Op de factuurpagina in de app staat een nieuw blok "Inzage door klant":
+  groen "Voor het eerst bekeken op …" of grijs "Nog niet bekeken".
+- Daaronder het volledige log: elke keer bekijken en elke PDF-download,
+  met datum/tijd en IP-adres. (Refreshes binnen 30 minuten in dezelfde
+  sessie tellen als één keer kijken, zodat het log leesbaar blijft.)
+- In de facturenlijst verschijnt een groen oogje zodra de klant de factuur
+  heeft bekeken (met datum/tijd als tooltip).
+- Met "Kopieer portaallink" deel je de beveiligde link ook zelf, bijv.
+  via WhatsApp.
+
+BEVEILIGING
+-----------
+- Twee stappen: bezit van de link/het e-mailadres + eenmalige 6-cijferige
+  code per e-mail (10 minuten geldig, max. 5 pogingen, daarna nieuwe code).
+- Codes worden gehasht bewaard, nooit leesbaar opgeslagen.
+- Rate-limiting op alles: codes aanvragen (max 3 per 10 min per adres én
+  per IP), codes controleren, factuurlinks openen. Plus Cloudflare
+  Turnstile op het inlogformulier (als de keys zijn ingesteld).
+- Geen accountsprobing: het antwoord is altijd hetzelfde, of een adres nu
+  facturen heeft of niet.
+- Sessie wordt vernieuwd na verificatie (tegen session fixation) en
+  verloopt automatisch na 12 uur.
+- De klant ziet uitsluitend facturen van het geverifieerde e-mailadres;
+  concepten en bijlagen zijn nooit zichtbaar.
+
+TECHNIEK
+--------
+- Migraties: invoices.portal_token (uniek, met backfill voor bestaande
+  verstuurde facturen) + nieuwe tabel invoice_views.
+- Nieuw: PortalAuthController, PortalController, EnsurePortalVerified
+  (alias portal.verified), PortalCodeMail + e-mailtemplate, InvoiceView-model,
+  Vue-pagina's Portal/Login, Portal/Verify, Portal/Index, Portal/Show en
+  PortalLayout.
+- Token wordt aangemaakt bij het versturen van de factuur (InvoiceManager)
+  en zo nodig bij herinneringen (ReminderService).
+- Draait volledig mee in de bestaande deploy; na deploy draaien de
+  migraties automatisch mee zoals altijd.

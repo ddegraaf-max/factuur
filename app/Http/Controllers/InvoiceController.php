@@ -54,6 +54,7 @@ class InvoiceController extends Controller
             'status' => $i->status,
             'is_credit' => (bool) $i->is_credit,
             'days_overdue' => $i->days_overdue,
+            'viewed_label' => $i->first_viewed_at?->translatedFormat('j M Y, H:i'),
             'total' => (float) $i->total,
             'paid_total' => (float) $i->paid_total,
             'attachments_count' => $i->attachments_count,
@@ -105,7 +106,7 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice): Response
     {
-        $invoice->load('lines', 'payments', 'customer', 'attachments', 'creditNotes', 'reminderLogs');
+        $invoice->load('lines', 'payments', 'customer', 'attachments', 'creditNotes', 'reminderLogs', 'views');
         if ($invoice->is_credit) {
             $invoice->load('originalInvoice');
         }
@@ -116,6 +117,14 @@ class InvoiceController extends Controller
                 'invoice_date_label' => $invoice->invoice_date->translatedFormat('j M Y'),
                 'due_date_label' => $invoice->due_date?->translatedFormat('j M Y'),
                 'sent_at_label' => $invoice->sent_at?->translatedFormat('j M Y, H:i'),
+                'first_viewed_at_label' => $invoice->first_viewed_at?->translatedFormat('j M Y, H:i'),
+                'portal_url' => $invoice->portalUrl(),
+                'views' => $invoice->views->map(fn ($v) => [
+                    'id' => $v->id,
+                    'event' => $v->event,
+                    'viewed_at_label' => $v->viewed_at?->translatedFormat('j M Y, H:i'),
+                    'ip_address' => $v->ip_address,
+                ]),
                 'incasso_sent_at_label' => $invoice->incasso_sent_at?->translatedFormat('j M Y'),
                 'days_overdue' => $invoice->days_overdue,
                 'remaining' => $invoice->remaining_amount,

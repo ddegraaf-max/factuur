@@ -35,6 +35,22 @@
           @if($company->iban)op <strong>{{ $company->iban }}</strong> t.n.v. {{ $company->name }}@endif
           onder vermelding van factuurnummer <strong>{{ $invoice->number }}</strong>.
         </p>
+        @if($invoice->portal_token)
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 6px;">
+            <tr>
+              <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+                <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
+                   style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+                  Bekijk factuur online&nbsp;&nbsp;→
+                </a>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:0 0 14px;color:#78716c;font-size:12.5px;line-height:1.6;">
+            In de beveiligde online omgeving ziet u de factuur, de betaalstatus en kunt u de PDF opnieuw downloaden.
+            Voor uw veiligheid bevestigt u eerst uw e-mailadres met een eenmalige code.
+          </p>
+        @endif
         @if($company->invoice_footer)
           <p style="margin:16px 0 0;color:#78716c;font-size:13px;line-height:1.6;">{{ $company->invoice_footer }}</p>
         @endif

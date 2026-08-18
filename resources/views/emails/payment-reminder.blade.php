@@ -17,6 +17,18 @@
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;color:#1c1917;white-space:pre-wrap;">{{ $bodyText }}</div>
       <div style="padding:0 24px 22px;">
+        @if($invoice->portal_token)
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 14px;">
+            <tr>
+              <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+                <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
+                   style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+                  Bekijk factuur online&nbsp;&nbsp;→
+                </a>
+              </td>
+            </tr>
+          </table>
+        @endif
         <p style="font-size:12.5px;color:#78716c;margin:0;">De betreffende factuur ({{ $invoice->number }}) is als PDF bijgevoegd.</p>
       </div>
     </div>

@@ -146,6 +146,25 @@ const sendInvoice = () => {
   router.post(route('invoices.send', props.invoice.id));
 };
 
+/* ---------- Klantenportaal / inzagelog ---------- */
+const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload' };
+const showAllViews = ref(false);
+const visibleViews = computed(() => {
+  const views = props.invoice.views || [];
+  return showAllViews.value ? views : views.slice(0, 5);
+});
+
+const linkCopied = ref(false);
+const copyPortalLink = async () => {
+  try {
+    await navigator.clipboard.writeText(props.invoice.portal_url);
+    linkCopied.value = true;
+    setTimeout(() => { linkCopied.value = false; }, 2000);
+  } catch {
+    prompt('Kopieer de portaallink:', props.invoice.portal_url);
+  }
+};
+
 const deleteInvoice = () => {
   if (confirm('Concept verwijderen?')) {
     router.delete(route('invoices.destroy', props.invoice.id));
@@ -379,6 +398,54 @@ const deleteInvoice = () => {
           <Link :href="route('invoices.show', invoice.original_invoice.id)" class="btn btn-secondary btn-sm">
             {{ invoice.original_invoice.number }} bekijken →
           </Link>
+        </div>
+
+        <!-- Inzage door de klant (klantenportaal) -->
+        <div v-if="invoice.status !== 'draft'" style="margin-top:28px;">
+          <div class="sect-head">
+            <div class="sect-title" style="margin:0;">Inzage door klant</div>
+            <button v-if="invoice.portal_url" class="btn btn-secondary btn-sm" @click="copyPortalLink">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              {{ linkCopied ? 'Gekopieerd!' : 'Kopieer portaallink' }}
+            </button>
+          </div>
+
+          <div class="view-status" :class="invoice.first_viewed_at_label ? 'seen' : 'unseen'">
+            <svg v-if="invoice.first_viewed_at_label" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            <div>
+              <div class="view-status-title">
+                <template v-if="invoice.first_viewed_at_label">Voor het eerst bekeken op {{ invoice.first_viewed_at_label }}</template>
+                <template v-else>Nog niet bekeken door de klant</template>
+              </div>
+              <div class="view-status-sub">
+                <template v-if="invoice.first_viewed_at_label">
+                  De klant heeft de factuur {{ (invoice.views || []).length }}× ingezien via het beveiligde portaal.
+                </template>
+                <template v-else>
+                  Zodra de klant de factuur opent via de link in de e-mail, zie je dat hier direct terug.
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="visibleViews.length" class="rem-trail" style="margin-top:10px;">
+            <div v-for="v in visibleViews" :key="v.id" class="rem-row">
+              <span class="rem-dot" :class="v.event === 'pdf' ? '' : 'view'"></span>
+              <div class="rem-info">
+                <div class="rem-type">{{ viewEventLabels[v.event] || v.event }}</div>
+                <div class="rem-meta">{{ v.viewed_at_label }}<template v-if="v.ip_address"> · IP {{ v.ip_address }}</template></div>
+              </div>
+            </div>
+            <button
+              v-if="(invoice.views || []).length > 5"
+              class="link-btn"
+              style="align-self:flex-start;margin-top:6px;"
+              @click="showAllViews = !showAllViews"
+            >
+              {{ showAllViews ? 'Toon minder' : `Toon alle ${(invoice.views || []).length} inzagemomenten` }}
+            </button>
+          </div>
         </div>
 
         <!-- Herinneringsverloop -->
@@ -649,6 +716,17 @@ const deleteInvoice = () => {
 .inc-meta > div { display: flex; flex-direction: column; gap: 3px; }
 .inc-meta .inv-meta-label { color: #9CA3AF; }
 .inc-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+
+/* Inzage door klant */
+.view-status { display: flex; align-items: flex-start; gap: 12px; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+.view-status svg { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+.view-status.seen { background: var(--success-bg); border-color: var(--success-border); }
+.view-status.seen svg, .view-status.seen .view-status-title { color: var(--success); }
+.view-status.unseen { background: var(--surface-2); }
+.view-status.unseen svg { color: var(--text-4); }
+.view-status-title { font-weight: 600; font-size: 13.5px; }
+.view-status-sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.rem-dot.view { background: var(--success); }
 
 /* Herinneringsverloop */
 .rem-trail { display: flex; flex-direction: column; gap: 2px; }

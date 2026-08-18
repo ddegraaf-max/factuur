@@ -193,6 +193,9 @@ class ReminderService
             'company' => $company,
         ])->setPaper('a4')->output();
 
+        // Ook vanuit een herinnering moet de klant naar het portaal kunnen.
+        $invoice->ensurePortalToken();
+
         Mail::to($invoice->customer_email)
             ->send(new PaymentReminderMail($subject, $body, $invoice, $pdf));
 
