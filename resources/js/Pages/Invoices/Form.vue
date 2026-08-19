@@ -13,6 +13,7 @@ const props = defineProps({
   preselect_customer_id: { type: [String, Number], default: null },
   price_mode: { type: String, default: 'excl' },
   default_payment_terms: { type: Number, default: 30 },
+  brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
 });
 
 const isEdit = computed(() => !!props.invoice);
@@ -40,6 +41,7 @@ const today = new Date().toISOString().slice(0, 10);
 
 const form = useForm({
   customer_id: props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  brand_profile_id: props.invoice?.brand_profile_id ?? null,
   invoice_date: props.invoice?.invoice_date ?? today,
   // Standaardtermijn uit Instellingen → Bedrijfsgegevens (klant kan afwijken).
   payment_terms: props.invoice?.payment_terms ?? props.default_payment_terms ?? 30,
@@ -286,6 +288,16 @@ const submit = (action) => {
                 <label>Betalingstermijn (dagen) *</label>
                 <input type="number" v-model="form.payment_terms" min="0" max="365" required>
               </div>
+            </div>
+            <div v-if="brand_profiles.length" class="form-row">
+              <div class="form-group">
+                <label>Factureren als<span class="label-hint">(handelsnaam op de factuur)</span></label>
+                <select v-model="form.brand_profile_id">
+                  <option :value="null">Standaard huisstijl</option>
+                  <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
+                </select>
+              </div>
+              <div class="form-group"></div>
             </div>
           </div>
         </div>

@@ -69,6 +69,7 @@ class RecurringInvoiceController extends Controller
 
         RecurringInvoice::create([
             'customer_id' => $invoice->customer_id,
+            'brand_profile_id' => $invoice->brand_profile_id,
             'source_invoice_id' => $invoice->id,
             'frequency' => $data['frequency'],
             'start_date' => $data['next_run_on'],

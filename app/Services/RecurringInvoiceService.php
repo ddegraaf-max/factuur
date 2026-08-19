@@ -73,6 +73,7 @@ class RecurringInvoiceService
         $invoice = $this->manager->create([
             'company_id' => $profile->company_id,
             'customer_id' => $profile->customer_id,
+            'brand_profile_id' => $profile->brand_profile_id,
             'invoice_date' => $profile->next_run_on->toDateString(),
             'payment_terms' => $profile->payment_terms,
             'reference' => $profile->reference,

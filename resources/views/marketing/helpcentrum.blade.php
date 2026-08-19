@@ -66,6 +66,7 @@
         <p style="margin-bottom:12px;">Logo, kleuren en sjablonen.</p>
         <a class="help-link" href="{{ route('help.article', 'logo-uploaden') }}">Je logo uploaden →</a>
         <a class="help-link" href="{{ route('help.article', 'sjabloon-kiezen') }}">Een sjabloon kiezen →</a>
+        <a class="help-link" href="{{ route('help.article', 'meerdere-handelsnamen') }}">Meerdere handelsnamen →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">📊</div>

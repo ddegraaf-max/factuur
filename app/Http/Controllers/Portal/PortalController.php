@@ -68,7 +68,9 @@ class PortalController extends Controller
         $this->logView($request, $invoice, 'viewed');
 
         $invoice->load('lines', 'payments');
-        $company = $invoice->company;
+        // Het portaal toont de huisstijl van de handelsnaam waaronder de
+        // factuur is verstuurd; KvK/BTW/IBAN blijven van de juridische entiteit.
+        $company = $invoice->brandedCompany();
 
         // Alleen bijlagen die expliciet voor de klant zijn gemarkeerd.
         $customerAttachments = $invoice->attachments()
@@ -147,7 +149,7 @@ class PortalController extends Controller
         $this->logView($request, $invoice, 'pdf');
 
         $invoice->load('lines');
-        $company = $invoice->company;
+        $company = $invoice->brandedCompany();
 
         $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
             ? $company->invoice_template

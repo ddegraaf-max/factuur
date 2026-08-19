@@ -24,7 +24,8 @@ class PaymentReminderMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $company = $this->invoice->company;
+        // Afzendernaam volgt de handelsnaam waaronder de factuur is verstuurd.
+        $company = $this->invoice->brandedCompany();
         $replyTo = $company?->email ?: $company?->copy_email;
 
         // Afzendernaam = de ondernemer; een herinnering van een onbekende
@@ -43,7 +44,7 @@ class PaymentReminderMail extends Mailable
             with: [
                 'bodyText' => $this->bodyText,
                 'invoice' => $this->invoice,
-                'company' => $this->invoice->company,
+                'company' => $this->invoice->brandedCompany(),
             ],
         );
     }

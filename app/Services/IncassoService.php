@@ -56,7 +56,9 @@ class IncassoService
     private function emailDossier(Invoice $invoice): void
     {
         try {
-            $company = $invoice->company;
+            // De factuur-PDF in het dossier is het document zoals de klant
+            // hem kent: onder de gekozen handelsnaam.
+            $company = $invoice->brandedCompany();
             $invoice->load(['lines', 'payments', 'reminderLogs', 'attachments']);
 
             $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)

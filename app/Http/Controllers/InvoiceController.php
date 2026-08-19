@@ -89,6 +89,7 @@ class InvoiceController extends Controller
             'preselect_customer_id' => $request->input('customer_id'),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
+            'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -146,6 +147,7 @@ class InvoiceController extends Controller
         return Inertia::render('Invoices/Show', [
             'peppol' => $peppol,
             'invoice' => array_merge($invoice->toArray(), [
+                'brand_profile_name' => $invoice->brandProfile?->name,
                 'invoice_date_label' => $invoice->invoice_date->translatedFormat('j M Y'),
                 'due_date_label' => $invoice->due_date?->translatedFormat('j M Y'),
                 'sent_at_label' => $invoice->sent_at?->translatedFormat('j M Y, H:i'),
@@ -214,6 +216,7 @@ class InvoiceController extends Controller
             'vat_rates' => VatCalculator::availableRates(),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
+            'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -326,7 +329,7 @@ class InvoiceController extends Controller
     public function pdf(Invoice $invoice): HttpResponse
     {
         $invoice->load('lines');
-        $company = auth()->user()->company;
+        $company = $invoice->brandedCompany();
 
         $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
             ? $company->invoice_template
@@ -459,6 +462,8 @@ class InvoiceController extends Controller
     {
         return $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
+            // De manager controleert dat het profiel van het eigen bedrijf is.
+            'brand_profile_id' => ['nullable', 'integer', 'exists:brand_profiles,id'],
             'invoice_date' => ['required', 'date'],
             'payment_terms' => ['required', 'integer', 'min:0', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],

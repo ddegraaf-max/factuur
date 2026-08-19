@@ -301,6 +301,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');
         Route::delete('settings/brand/logo', [SettingsController::class, 'removeLogo'])->name('settings.brand.logo.remove');
 
+        // Handelsnamen: meerdere huisstijlen onder één administratie
+        Route::get('settings/handelsnamen', [\App\Http\Controllers\BrandProfileController::class, 'index'])->name('settings.brands');
+        Route::post('settings/handelsnamen', [\App\Http\Controllers\BrandProfileController::class, 'store'])->name('settings.brands.store');
+        Route::post('settings/handelsnamen/{profile}', [\App\Http\Controllers\BrandProfileController::class, 'update'])->name('settings.brands.update');
+        Route::delete('settings/handelsnamen/{profile}', [\App\Http\Controllers\BrandProfileController::class, 'destroy'])->name('settings.brands.destroy');
+
         Route::get('settings/numbering', [SettingsController::class, 'numbering'])->name('settings.numbering');
         Route::patch('settings/numbering', [SettingsController::class, 'updateNumbering'])->name('settings.numbering.update');
 

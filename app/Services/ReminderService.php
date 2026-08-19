@@ -180,17 +180,21 @@ class ReminderService
             return false; // geen tekst ingesteld -> niet versturen
         }
 
-        $vars = $this->vars($invoice, $company, $termijn, $remaining);
+        // De klant kent de factuur onder de gekozen handelsnaam — dus ook de
+        // herinnering (tekstvariabelen én PDF-bijlage) gebruikt die huisstijl.
+        $branded = $invoice->brandedCompany();
+
+        $vars = $this->vars($invoice, $branded, $termijn, $remaining);
         $subject = strtr($subjectTpl, $vars);
         $body = strtr($bodyTpl, $vars);
 
-        $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
-            ? $company->invoice_template
+        $template = in_array($branded->invoice_template, ['modern', 'classic', 'minimal'], true)
+            ? $branded->invoice_template
             : 'modern';
 
         $pdf = Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,
-            'company' => $company,
+            'company' => $branded,
         ])->setPaper('a4')->output();
 
         // Ook vanuit een herinnering moet de klant naar het portaal kunnen.

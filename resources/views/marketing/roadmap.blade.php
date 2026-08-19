@@ -42,6 +42,7 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Meerdere handelsnamen</h4><p>Factureer onder verschillende handelsnamen, elk met eigen logo, kleur en sjabloon — binnen één administratie.</p></div>
         <div class="road-card"><h4>Urenregistratie</h4><p>Uren schrijven per klant of project — handmatig of met de timer — en met één klik omzetten naar een conceptfactuur.</p></div>
         <div class="road-card"><h4>Bonnetjes automatisch herkennen</h4><p>Foto van de bon maken en de leverancier, datum en bedragen automatisch laten invullen (scan &amp; herken met AI).</p></div>
         <div class="road-card"><h4>Verzending via Peppol</h4><p>Automatische bereikbaarheidscheck en e-facturen (NLCIUS) rechtstreeks afleveren via het Peppol-netwerk.</p></div>

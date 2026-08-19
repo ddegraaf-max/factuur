@@ -1,0 +1,64 @@
+EASYINVOICE — MEERDERE HANDELSNAMEN
+===================================
+
+WAT IS HET
+----------
+Factureren onder verschillende handelsnamen, elk met een eigen huisstijl,
+binnen één administratie. Nieuw menu-item: Instellingen → Handelsnamen.
+
+Per handelsnaam stel je in:
+  - de naam (zo staat de afzender op de factuur)
+  - een eigen logo (base64 in de database, met grootte-schuif)
+  - een factuurkleur
+  - een factuursjabloon (modern/klassiek/minimaal)
+  - een eigen voetnoot
+Wat leeg blijft valt terug op de standaard huisstijl van het bedrijf.
+Zonder eigen logo toont de factuur een letter-embleem in de gekozen
+kleur — bewust NIET het logo van het hoofdbedrijf (verkeerd merk).
+
+FACTUREREN ALS
+--------------
+Zodra er minstens één handelsnaam bestaat, verschijnt op het factuur-
+formulier de keuze "Factureren als". De gekozen huisstijl geldt overal
+waar de klant de factuur ziet:
+  - de PDF (alle drie de sjablonen)
+  - de factuurmail: afzendernaam, onderwerp én de mail zelf
+  - betalingsherinneringen en aanmaningen (tekstvariabelen + PDF-bijlage)
+  - het klantenportaal (pagina en PDF-download)
+  - het incassodossier bevat de factuur-PDF zoals de klant hem kent
+Terugkerende profielen onthouden de handelsnaam; gegenereerde facturen
+erven hem. Dupliceren en creditnota's nemen hem automatisch mee
+(replicate kopieert het veld). Op de factuurpagina staat in de kop
+"· als <handelsnaam>".
+
+ÉÉN ADMINISTRATIE (bewust ontwerp)
+----------------------------------
+KvK-nummer, BTW-nummer, IBAN, adres en de factuurnummering blijven
+altijd van de juridische entiteit — dat is fiscaal zo vereist en staat
+ook zo op de factuur. De UBL/Peppol-e-factuur blijft eveneens op de
+juridische naam staan. Alleen de presentatie (naam/logo/kleur/sjabloon/
+voetnoot) verschilt per handelsnaam.
+
+VERWIJDEREN
+-----------
+Een handelsnaam verwijderen kan altijd; bestaande facturen vallen dan
+terug op de standaard huisstijl (database: nullOnDelete). De interface
+waarschuwt hoeveel facturen dat raakt.
+
+TECHNIEK
+--------
+- Migratie: brand_profiles + invoices.brand_profile_id +
+  recurring_invoices.brand_profile_id (beide nullOnDelete).
+- Nieuw: app/Models/BrandProfile.php (company-scope, logo_data hidden
+  net als bij Company), app/Http/Controllers/BrandProfileController.php,
+  resources/js/Pages/Settings/Handelsnamen.vue.
+- Kern: Invoice::brandedCompany() — een niet-opgeslagen kopie van het
+  bedrijf met de profielvelden eroverheen. Alle PDF/mail/portaal-plekken
+  gebruiken die in plaats van $invoice->company.
+- InvoiceManager accepteert brand_profile_id (aanmaken en bijwerken;
+  de voetnoot-snapshot volgt het profiel) en controleert dat het profiel
+  bij hetzelfde bedrijf hoort.
+- Routes: settings.brands (alleen beheerder), factuurvalidatie
+  brand_profile_id.
+- Demo-omgeving: handelsnaam "Vries Digital" (blauw, minimaal sjabloon)
+  op de laatste twee facturen.

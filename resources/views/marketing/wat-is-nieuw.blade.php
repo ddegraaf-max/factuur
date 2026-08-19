@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.10.0</div>
+        <h3>Meerdere handelsnamen — factureer onder verschillende merken</h3>
+        <ul class="tl-list">
+          <li><b>Eigen huisstijl per handelsnaam</b> — voeg bij Instellingen → Handelsnamen je handelsnamen toe, elk met een eigen logo, factuurkleur, sjabloon en voetnoot. Bij het maken van een factuur kies je simpelweg "Factureren als …".</li>
+          <li><b>Overal consequent</b> — de PDF, de factuurmail (inclusief afzendernaam), de betalingsherinneringen en het klantenportaal volgen automatisch de huisstijl van de gekozen handelsnaam. Ook terugkerende facturen onthouden 'm.</li>
+          <li><b>Eén administratie</b> — KvK, BTW-nummer, IBAN en je factuurnummering blijven gewoon één geheel; alleen de presentatie verschilt. Op de factuurpagina zie je altijd onder welke naam er is gefactureerd.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.9.0</div>
         <h3>Urenregistratie — uren schrijven en met één klik factureren</h3>
         <ul class="tl-list">

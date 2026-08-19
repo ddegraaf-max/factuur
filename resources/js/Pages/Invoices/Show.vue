@@ -264,6 +264,7 @@ const deleteInvoice = () => {
         <p class="page-subtitle">
           <template v-if="invoice.status === 'draft'">Concept · nog niet verstuurd</template>
           <template v-else-if="invoice.sent_at_label">Verstuurd op {{ invoice.sent_at_label }}</template>
+          <template v-if="invoice.brand_profile_name"> · als <b>{{ invoice.brand_profile_name }}</b></template>
         </p>
       </div>
       <div class="page-actions">

@@ -32,6 +32,14 @@ class InvoiceManager
                 : now();
             $paymentTerms = (int) ($data['payment_terms'] ?? $customer->payment_terms ?? $customer->company->default_payment_terms ?? 30);
 
+            // Handelsnaam: alleen een profiel van hetzelfde bedrijf telt
+            // (zonder global scope, want dit draait ook via de console).
+            $profile = ! empty($data['brand_profile_id'])
+                ? \App\Models\BrandProfile::withoutGlobalScope('company')
+                    ->where('company_id', $customer->company_id)
+                    ->find($data['brand_profile_id'])
+                : null;
+
             $lines = $data['lines'] ?? [];
             $mode = $this->priceMode($customer->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
@@ -41,6 +49,7 @@ class InvoiceManager
                 // facturen) is er geen ingelogde gebruiker die dit automatisch invult.
                 'company_id' => $customer->company_id,
                 'customer_id' => $customer->id,
+                'brand_profile_id' => $profile?->id,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
                 'invoice_date' => $invoiceDate,
@@ -64,7 +73,9 @@ class InvoiceManager
                 'vat_breakdown' => $totals['vat_breakdown'],
 
                 'notes' => $data['notes'] ?? null,
-                'footer' => $customer->company->invoice_footer,
+                'footer' => ($profile && filled($profile->invoice_footer))
+                    ? $profile->invoice_footer
+                    : $customer->company->invoice_footer,
             ]);
 
             $this->syncLines($invoice, $lines, $mode);
@@ -89,7 +100,24 @@ class InvoiceManager
                 : $invoice->invoice_date;
             $paymentTerms = (int) ($data['payment_terms'] ?? $invoice->payment_terms);
 
-            $invoice->update([
+            // Handelsnaam wijzigen mag zolang het een concept is; de voetnoot
+            // schuift mee naar die van het nieuwe profiel (of het bedrijf).
+            $brandChanges = [];
+            if (array_key_exists('brand_profile_id', $data)) {
+                $profile = ! empty($data['brand_profile_id'])
+                    ? \App\Models\BrandProfile::withoutGlobalScope('company')
+                        ->where('company_id', $invoice->company_id)
+                        ->find($data['brand_profile_id'])
+                    : null;
+                $brandChanges = [
+                    'brand_profile_id' => $profile?->id,
+                    'footer' => ($profile && filled($profile->invoice_footer))
+                        ? $profile->invoice_footer
+                        : $invoice->company->invoice_footer,
+                ];
+            }
+
+            $invoice->update($brandChanges + [
                 'reference' => $data['reference'] ?? $invoice->reference,
                 'invoice_date' => $invoiceDate,
                 'due_date' => $invoiceDate->copy()->addDays($paymentTerms),
@@ -157,7 +185,8 @@ class InvoiceManager
                 return;
             }
 
-            $company = $invoice->company;
+            // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
+            $company = $invoice->brandedCompany();
             $invoice->load('lines');
 
             $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)

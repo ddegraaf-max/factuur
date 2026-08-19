@@ -188,6 +188,17 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 6b. Handelsnaam met eigen huisstijl: de laatste twee facturen zijn
+        // "als Vries Digital" verstuurd (demo van meerdere handelsnamen).
+        $brand = \App\Models\BrandProfile::create([
+            'company_id' => $company->id,
+            'name' => 'Vries Digital',
+            'brand_color' => '#2563EB',
+            'invoice_template' => 'minimal',
+        ]);
+        Invoice::orderByDesc('id')->limit(2)->get()
+            ->each(fn ($i) => $i->update(['brand_profile_id' => $brand->id]));
+
         // 7. Demo-urenregistratie: open uren die klaarstaan om te factureren.
         $company->update(['default_hourly_rate' => 85.00]);
         $timeEntries = [

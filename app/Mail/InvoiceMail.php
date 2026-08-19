@@ -23,7 +23,8 @@ class InvoiceMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $company = $this->invoice->company;
+        // Onder een handelsnaam? Dan is dát de afzendernaam die de klant ziet.
+        $company = $this->invoice->brandedCompany();
 
         // De ontvanger doet zaken met de ondernemer, niet met EasyInvoice: zet
         // diens bedrijfsnaam als afzender. Het e-mailadres blijft van
@@ -51,7 +52,7 @@ class InvoiceMail extends Mailable
             view: 'emails.invoice',
             with: [
                 'invoice' => $this->invoice,
-                'company' => $this->invoice->company,
+                'company' => $this->invoice->brandedCompany(),
             ],
         );
     }

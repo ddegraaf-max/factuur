@@ -21,7 +21,7 @@ class RecurringInvoice extends Model
     ];
 
     protected $fillable = [
-        'company_id', 'customer_id', 'source_invoice_id',
+        'company_id', 'customer_id', 'brand_profile_id', 'source_invoice_id',
         'frequency', 'start_date', 'next_run_on', 'end_date',
         'auto_send', 'active',
         'reference', 'notes', 'payment_terms', 'lines',
