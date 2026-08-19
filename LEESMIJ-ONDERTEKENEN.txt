@@ -1,0 +1,57 @@
+EASYINVOICE — OFFERTES DIGITAAL ONDERTEKENEN
+============================================
+
+WAT IS HET
+----------
+De klant geeft akkoord op een offerte met een digitale handtekening in
+het klantenportaal — geen geprint papier, geen scanner.
+
+- In de offertemail staat de knop "Bekijk en onderteken online"
+  (Engelstalige klanten zien "View and sign online").
+- De klant verifieert zijn e-mailadres met een eenmalige code (zelfde
+  beveiliging als het factuurportaal), ziet de volledige offerte en
+  ondertekent in een tekenveld (muis of vinger, werkt ook op mobiel).
+- Afwijzen kan ook, met een optionele toelichting voor de ondernemer.
+- Na ondertekening: offerte → geaccepteerd, de ondernemer krijgt direct
+  een mail ("Offerte X is digitaal ondertekend 🎉" of "... afgewezen"),
+  en kan met één klik omzetten naar een factuur.
+- Op de offertepagina staat een knop "Kopieer ondertekenlink" om de
+  beveiligde link ook via bijv. WhatsApp te delen.
+
+RECHTSGELDIGHEID (bewijsdossier)
+--------------------------------
+Vastgelegd bij ondertekening: geverifieerd e-mailadres, ingevulde naam,
+de handtekening (PNG), tijdstip en IP-adres. Dit dossier staat als
+groene kaart op de interne offertepagina, en de handtekening + naam +
+tijdstip komen ook op de offerte-PDF (vertaald via de documenttaal).
+Daarmee is dit een "gewone elektronische handtekening" met sterk
+bewijs — voor offertes ruimschoots voldoende (vergelijkbaar met wat
+Moneybird/WeFact doen).
+
+BEVEILIGING
+-----------
+- Zelfde model als het factuurportaal: bezit van de geheime link
+  (64 tekens) + verificatie van het e-mailadres met een code.
+- Ondertekenen/afwijzen kan alleen met geverifieerd e-mailadres dat
+  gelijk is aan het klantadres van de offerte, en alleen in de statussen
+  verstuurd/verlopen (concepten zijn onbereikbaar).
+- Handtekening-invoer wordt gevalideerd (PNG-data-URL, maximaal 200 KB).
+- Alles is beperkt met rate-limiting.
+
+TECHNIEK
+--------
+- Migratie: quotes.portal_token (uniek) + signed_name, signature_data,
+  signed_at, signed_ip, signed_email, decline_reason.
+- Nieuw: app/Http/Controllers/Portal/PortalQuoteController.php
+  (show/sign/decline/pdf), resources/js/Pages/Portal/QuoteShow.vue
+  (met eigen canvas-tekenveld, geen externe library),
+  app/Mail/QuoteDecisionMail.php + emails/quote-decision.blade.php.
+- QuoteManager::send() zet voortaan een portal_token; bestaande al
+  verstuurde offertes krijgen er een zodra ze opnieuw worden verstuurd
+  (of via de kopieerknop die ensurePortalToken aanroept — nee: de
+  kopieerknop toont alleen bestaande links; oude offertes vóór deze
+  release hebben dus geen link tot een volgende verzending).
+- Routes: portal.quote(+.pdf/.sign/.decline) binnen de portaalgroep,
+  met throttling.
+- De offerte-PDF toont het handtekeningblok in plaats van de
+  geldigheidstekst zodra er is ondertekend.

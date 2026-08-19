@@ -2,7 +2,7 @@
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   quote: Object,
@@ -40,6 +40,18 @@ const reject = () => {
 const convert = () => {
   if (confirm('Van deze offerte een concept-factuur maken? De offerte blijft bewaard.')) {
     router.post(route('quotes.convert', props.quote.id));
+  }
+};
+
+/* ---------- Ondertekenlink kopiëren ---------- */
+const signLinkCopied = ref(false);
+const copySignLink = async () => {
+  try {
+    await navigator.clipboard.writeText(props.quote.portal_url);
+    signLinkCopied.value = true;
+    setTimeout(() => { signLinkCopied.value = false; }, 2500);
+  } catch (e) {
+    prompt('Kopieer de link handmatig:', props.quote.portal_url);
   }
 };
 
@@ -116,6 +128,27 @@ const destroy = () => {
       <div class="decide-actions">
         <button class="btn btn-primary btn-sm" @click="convert">Omzetten naar factuur</button>
       </div>
+    </div>
+
+    <!-- Digitale handtekening: het bewijsdossier -->
+    <div v-if="quote.signed_at_label" class="sig-card">
+      <div class="sig-info">
+        <div class="sig-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+          Digitaal ondertekend
+        </div>
+        <div class="sig-line">Door <strong>{{ quote.signed_name }}</strong> op {{ quote.signed_at_label }}</div>
+        <div class="sig-meta">Geverifieerd e-mailadres: {{ quote.signed_email }} · IP: {{ quote.signed_ip }}</div>
+      </div>
+      <img v-if="quote.signature_data" :src="quote.signature_data" alt="Handtekening" class="sig-img">
+    </div>
+
+    <!-- Ondertekenlink delen (bijv. via WhatsApp) -->
+    <div v-if="quote.portal_url && ['sent', 'expired'].includes(quote.status)" class="sig-share">
+      <span>Je klant kan de offerte online bekijken en <b>digitaal ondertekenen</b> via de beveiligde link uit de mail.</span>
+      <button type="button" class="btn btn-secondary btn-sm" @click="copySignLink">
+        {{ signLinkCopied ? 'Gekopieerd ✓' : 'Kopieer ondertekenlink' }}
+      </button>
     </div>
 
     <div v-if="quote.invoice" class="decide accepted">
@@ -251,6 +284,22 @@ const destroy = () => {
 .inv-total-row .label { color: var(--text-2); }
 .inv-total-row .value { font-weight: 500; }
 .inv-total-row.grand { border-top: 2px solid var(--text); padding-top: 14px; margin-top: 8px; font-weight: 700; font-size: 18px; }
+
+.sig-card {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+  background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px;
+  padding: 14px 18px; margin-bottom: 16px;
+}
+.sig-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--success); }
+.sig-line { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+.sig-meta { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.sig-img { max-height: 54px; max-width: 200px; background: #fff; border: 1px solid var(--success-border); border-radius: 8px; padding: 4px 10px; }
+
+.sig-share {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  background: var(--surface); border: 1px dashed var(--border-strong, #D6D3D1); border-radius: 12px;
+  padding: 12px 18px; margin-bottom: 16px; font-size: 13px; color: var(--text-2);
+}
 
 @media (max-width: 760px) {
   .inv-detail-header, .inv-body { padding: 20px 16px; }

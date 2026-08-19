@@ -378,6 +378,24 @@ return [
             ],
         ],
 
+        'offertes-digitaal-ondertekenen' => [
+            'category' => 'Samenwerken',
+            'title' => 'Offertes digitaal laten ondertekenen',
+            'intro' => 'Je klant geeft akkoord met een digitale handtekening in het beveiligde portaal — rechtsgeldig, zonder printen en scannen.',
+            'sections' => [
+                ['Zo werkt het voor je klant', [
+                    'In de offertemail staat de knop "Bekijk en onderteken online". Je klant bevestigt eerst zijn e-mailadres met een eenmalige code (dezelfde beveiliging als het factuurportaal), ziet de volledige offerte en zet zijn handtekening in het tekenveld — met de muis of gewoon met een vinger op de telefoon. Naam invullen, akkoord aanvinken, klaar.',
+                    'Liever niet akkoord? Afwijzen kan ook, met een toelichting die jij te lezen krijgt.',
+                ]],
+                ['Rechtsgeldig bewijsdossier', [
+                    'Bij de handtekening legt EasyInvoice vast: het geverifieerde e-mailadres, de ingevulde naam, de handtekening zelf, het tijdstip en het IP-adres. Dat dossier zie je op de offertepagina, en de handtekening komt ook op de offerte-PDF te staan — die kan je klant direct downloaden voor zijn eigen administratie.',
+                ]],
+                ['En daarna', [
+                    'Jij krijgt direct een e-mail zodra er is ondertekend (of afgewezen). De offerte springt op geaccepteerd en je zet hem met één klik om naar een conceptfactuur. Handig: op de offertepagina kun je de ondertekenlink ook kopiëren om hem bijvoorbeeld via WhatsApp te sturen.',
+                ]],
+            ],
+        ],
+
         'meerdere-administraties' => [
             'category' => 'Account',
             'title' => 'Meerdere administraties onder één inlog',

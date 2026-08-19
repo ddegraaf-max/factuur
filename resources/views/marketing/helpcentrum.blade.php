@@ -82,6 +82,7 @@
         <div class="ic-emoji">🤝</div>
         <h3>Samenwerken &amp; klantenportaal</h3>
         <p style="margin-bottom:12px;">Teamrollen en facturen online laten inzien.</p>
+        <a class="help-link" href="{{ route('help.article', 'offertes-digitaal-ondertekenen') }}">Offertes digitaal laten ondertekenen →</a>
         <a class="help-link" href="{{ route('help.article', 'team-en-rollen') }}">Collega's en boekhouder uitnodigen →</a>
         <a class="help-link" href="{{ route('help.article', 'klantenportaal-inzagelog') }}">Het klantenportaal en inzagelog →</a>
       </div>

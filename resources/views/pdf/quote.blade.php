@@ -168,10 +168,20 @@
 
 @if($quote->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($quote->notes)) !!}</div>@endif
 
-<div class="validity">
-  {!! __('doc.quote_valid_note', ['date' => e($quote->valid_until->translatedFormat('j F Y'))]) !!}
-  {!! __('doc.quote_accept_note', ['phone' => $company->phone ? __('doc.quote_accept_phone', ['phone' => e($company->phone)]) : '']) !!}
-</div>
+@if($quote->signed_at)
+  {{-- Digitaal ondertekend: het akkoord staat zwart-op-wit op het document. --}}
+  <div class="validity" style="border-color: #16A34A;">
+    {!! __('doc.signed_by', ['name' => e($quote->signed_name), 'date' => e($quote->signed_at->translatedFormat('j F Y, H:i'))]) !!}
+    @if(extension_loaded('gd') && $quote->signature_data)
+      <div style="margin-top: 8px;"><img src="{{ $quote->signature_data }}" style="max-height: 60px; max-width: 220px;" alt=""></div>
+    @endif
+  </div>
+@else
+  <div class="validity">
+    {!! __('doc.quote_valid_note', ['date' => e($quote->valid_until->translatedFormat('j F Y'))]) !!}
+    {!! __('doc.quote_accept_note', ['phone' => $company->phone ? __('doc.quote_accept_phone', ['phone' => e($company->phone)]) : '']) !!}
+  </div>
+@endif
 
 @if($quote->footer)<div class="footer">{!! nl2br(e($quote->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
 

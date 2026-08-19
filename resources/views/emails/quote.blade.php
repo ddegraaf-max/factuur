@@ -64,6 +64,19 @@
                 @endif
             </table>
 
+            @if ($quote->portal_token)
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px auto 4px;">
+                    <tr>
+                        <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+                            <a href="{{ route('portal.quote', $quote->portal_token) }}"
+                               style="display:inline-block;padding:13px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
+                                {{ __('doc.mail_view_quote') }}&nbsp;&nbsp;→
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            @endif
+
             <div class="valid">
                 {!! __('doc.mail_quote_agree') !!}
             </div>

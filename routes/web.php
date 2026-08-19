@@ -125,6 +125,16 @@ Route::prefix('portaal')->name('portal.')->group(function () {
     // Betaallink: start een iDEAL-betaling via het Mollie-account van de afzender.
     Route::post('/f/{token}/betalen', [PortalController::class, 'pay'])
         ->middleware('throttle:10,1')->name('invoice.pay');
+
+    // Offertes: bekijken, downloaden en digitaal ondertekenen of afwijzen.
+    Route::get('/o/{token}', [\App\Http\Controllers\Portal\PortalQuoteController::class, 'show'])
+        ->middleware('throttle:30,1')->name('quote');
+    Route::get('/o/{token}/pdf', [\App\Http\Controllers\Portal\PortalQuoteController::class, 'pdf'])
+        ->middleware('throttle:15,1')->name('quote.pdf');
+    Route::post('/o/{token}/onderteken', [\App\Http\Controllers\Portal\PortalQuoteController::class, 'sign'])
+        ->middleware('throttle:10,1')->name('quote.sign');
+    Route::post('/o/{token}/afwijzen', [\App\Http\Controllers\Portal\PortalQuoteController::class, 'decline'])
+        ->middleware('throttle:10,1')->name('quote.decline');
 });
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------

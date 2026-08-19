@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.16.0</div>
+        <h3>Offertes digitaal ondertekenen</h3>
+        <ul class="tl-list">
+          <li><b>Akkoord in twee minuten</b> — in de offertemail staat "Bekijk en onderteken online". Je klant opent de offerte in het beveiligde portaal, zet zijn handtekening in het tekenveld (met muis of vinger) en klaar — geen geprint papier, geen scanner.</li>
+          <li><b>Rechtsgeldig bewijsdossier</b> — bij de handtekening worden het geverifieerde e-mailadres, de naam, het tijdstip en het IP-adres vastgelegd. De handtekening komt óók op de offerte-PDF te staan.</li>
+          <li><b>Direct door naar de factuur</b> — jij krijgt meteen een mailtje ("Offerte is ondertekend 🎉"), de offerte springt op geaccepteerd en je zet hem met één klik om naar een factuur. Afwijzen kan ook, met een toelichting die jij te zien krijgt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.15.0</div>
         <h3>Betaallink op de factuur — betaald worden met iDEAL</h3>
         <ul class="tl-list">

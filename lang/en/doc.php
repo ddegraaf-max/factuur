@@ -72,4 +72,6 @@ return [
     'mail_quote_number' => 'Quotation number',
     'mail_date' => 'Date',
     'mail_quote_agree' => '<strong>Ready to go ahead?</strong> Simply reply to this e-mail and we will turn the quotation into an assignment. Questions or changes? Just let us know.',
+    'mail_view_quote' => 'View and sign online',
+    'signed_by' => 'Digitally signed by <strong>:name</strong> on :date.',
 ];

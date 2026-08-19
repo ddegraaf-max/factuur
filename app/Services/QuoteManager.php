@@ -144,6 +144,10 @@ class QuoteManager
             }
             $quote->status = 'sent';
             $quote->sent_at = now();
+            // Geheime link voor het portaal: bekijken én digitaal ondertekenen.
+            if (! $quote->portal_token) {
+                $quote->portal_token = bin2hex(random_bytes(32));
+            }
             $quote->save();
 
             return $quote;

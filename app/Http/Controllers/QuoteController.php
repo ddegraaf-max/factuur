@@ -99,6 +99,8 @@ class QuoteController extends Controller
                 'status_label' => $quote->status_label,
                 'days_left' => $quote->days_left,
                 'brand_profile_name' => $quote->brandProfile?->name,
+                'signed_at_label' => $quote->signed_at?->translatedFormat('j F Y, H:i'),
+                'portal_url' => $quote->portalUrl(),
                 'invoice' => $quote->invoice ? [
                     'id' => $quote->invoice->id,
                     'number' => $quote->invoice->number,

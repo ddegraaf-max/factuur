@@ -22,7 +22,7 @@ class Quote extends Model
     ];
 
     protected $fillable = [
-        'company_id', 'customer_id', 'brand_profile_id', 'number', 'reference', 'status',
+        'company_id', 'customer_id', 'brand_profile_id', 'number', 'portal_token', 'reference', 'status',
         'quote_date', 'valid_until', 'language',
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
@@ -30,6 +30,7 @@ class Quote extends Model
         'subtotal', 'vat_total', 'total', 'vat_breakdown',
         'intro', 'notes', 'footer',
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
+        'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
     ];
 
     protected $casts = [
@@ -38,6 +39,7 @@ class Quote extends Model
         'sent_at' => 'datetime',
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
+        'signed_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',
@@ -63,6 +65,24 @@ class Quote extends Model
     public function customer(): BelongsTo { return $this->belongsTo(Customer::class)->withoutGlobalScope('company'); }
     public function lines(): HasMany { return $this->hasMany(QuoteLine::class)->orderBy('sort_order'); }
     public function invoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'converted_invoice_id')->withoutGlobalScope('company'); }
+
+    /** Geheime link voor het klantenportaal (bekijken en ondertekenen). */
+    public function ensurePortalToken(): string
+    {
+        if (! $this->portal_token) {
+            $this->portal_token = bin2hex(random_bytes(32));
+            $this->saveQuietly();
+        }
+
+        return $this->portal_token;
+    }
+
+    public function portalUrl(): ?string
+    {
+        return $this->portal_token
+            ? route('portal.quote', $this->portal_token)
+            : null;
+    }
 
     public function getStatusLabelAttribute(): string
     {

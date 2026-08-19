@@ -73,4 +73,6 @@ return [
     'mail_quote_number' => 'Offertenummer',
     'mail_date' => 'Datum',
     'mail_quote_agree' => '<strong>Akkoord?</strong> Beantwoord deze e-mail — dan zetten we de offerte om in een opdracht. Vragen of iets aanpassen kan natuurlijk ook.',
+    'mail_view_quote' => 'Bekijk en onderteken online',
+    'signed_by' => 'Digitaal ondertekend door <strong>:name</strong> op :date.',
 ];
