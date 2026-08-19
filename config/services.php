@@ -34,6 +34,12 @@ return [
         'storecove_token' => env('STORECOVE_API_TOKEN'),
         'legal_entity_id' => env('STORECOVE_LEGAL_ENTITY_ID'),
     ],
+    // Bonnetjes automatisch herkennen via Claude (Anthropic). Zonder key
+    // blijft de scanknop op het inkoopformulier verborgen.
+    'anthropic' => [
+        'key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-opus-5'),
+    ],
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

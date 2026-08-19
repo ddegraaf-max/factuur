@@ -1,0 +1,62 @@
+EASYINVOICE — BONNETJES AUTOMATISCH HERKENNEN (SCAN & HERKEN)
+==============================================================
+
+WAT IS HET
+----------
+Bij het inboeken van een inkoopfactuur maak je een foto van de bon (of
+upload je een PDF) en klik je op "Scan & herken". De AI (Claude van
+Anthropic) leest het document en vult het formulier automatisch in:
+
+  - leverancier en factuurnummer/bonnummer
+  - factuurdatum en (indien vermeld) vervaldatum
+  - de bedragen per BTW-tarief (21/9/0), als grondslag + BTW-bedrag
+  - de best passende kostencategorie en een korte omschrijving
+
+De bon staat groot naast het formulier, dus je controleert de waarden in
+één oogopslag. Telt de som van de herkende regels niet op tot het totaal
+op de bon, dan verschijnt automatisch een waarschuwing.
+
+ACTIVEREN
+---------
+Zet in Railway één variabele:
+
+    ANTHROPIC_API_KEY=<key van console.anthropic.com>
+
+Zonder key blijft de scanknop volledig verborgen (het endpoint geeft dan
+een 404) en werkt het handmatig inboeken zoals altijd. Optioneel:
+ANTHROPIC_MODEL om een ander model te kiezen (standaard claude-opus-5).
+
+Kosten: je betaalt Anthropic per scan (een bon is grofweg € 0,01–0,05,
+afhankelijk van de grootte van de foto). Het endpoint is beperkt tot
+10 scans per minuut per gebruiker.
+
+HOE HET WERKT
+-------------
+- Frontend (Inkoop/Form.vue): grote foto's worden vóór het uploaden in de
+  browser verkleind (max 2048 px, JPEG) — sneller op mobiel en ruim binnen
+  de limieten van de AI. PDF's gaan ongewijzigd mee.
+- Backend: POST inkoop/scan → ReceiptScanService stuurt het bestand met
+  een vast JSON-schema (structured output) naar de Anthropic API via de
+  officiële PHP SDK (anthropic-ai/sdk). Het model MOET dat schema volgen,
+  dus het antwoord is altijd machinaal leesbaar.
+- Alle waarden worden server-side gevalideerd (datums, tarieven alleen
+  0/9/21, categorie alleen uit de vaste lijst, tekstlengtes) voordat ze
+  naar het formulier gaan. Er wordt bij het scannen niets opgeslagen —
+  opslaan gaat gewoon via het bestaande formulier.
+- Weigert een veiligheidsfilter de aanvraag, dan probeert de API het
+  automatisch opnieuw op een terugvalmodel (fallbacks: default).
+
+FOUTAFHANDELING
+---------------
+- Geen bon/factuur op de foto → "Dit lijkt geen bon of factuur te zijn."
+- Onleesbaar of geen bedragen → vriendelijk verzoek om een scherpere foto.
+- Storing/limiet bij de AI-dienst → nette Nederlandse melding, details in
+  de log. Het formulier blijft altijd gewoon handmatig invulbaar.
+
+TECHNIEK
+--------
+- Nieuw: app/Services/ReceiptScanService.php, route purchases.scan
+  (throttle 10/min), scan_enabled-prop op het inkoopformulier.
+- Composer: anthropic-ai/sdk toegevoegd (officiële SDK).
+- Config: services.anthropic (key + model) in config/services.php.
+- Geen database-wijzigingen.

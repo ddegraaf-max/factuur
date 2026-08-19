@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Attachment;
 use App\Models\PurchaseInvoice;
+use App\Services\ReceiptScanService;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -124,6 +126,7 @@ class PurchaseInvoiceController extends Controller
             'purchase' => null,
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::CATEGORIES,
+            'scan_enabled' => app(ReceiptScanService::class)->enabled(),
         ]);
     }
 
@@ -178,6 +181,7 @@ class PurchaseInvoiceController extends Controller
             ]),
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::CATEGORIES,
+            'scan_enabled' => app(ReceiptScanService::class)->enabled(),
         ]);
     }
 
@@ -221,6 +225,37 @@ class PurchaseInvoiceController extends Controller
         $purchase->update(['status' => 'open', 'paid_at' => null, 'payment_method' => null]);
 
         return back()->with('flash', 'Factuur staat weer open.');
+    }
+
+    /**
+     * Scan & herken: lees een foto of PDF van een bon met AI en geef de
+     * herkende formulierwaarden terug. De gebruiker controleert ze daarna
+     * gewoon in het formulier — er wordt hier niets opgeslagen.
+     */
+    public function scan(Request $request, ReceiptScanService $scanner): JsonResponse
+    {
+        abort_unless($scanner->enabled(), 404);
+
+        $request->validate([
+            'file' => ['required', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+        ], [
+            'file.required' => 'Voeg eerst een foto of PDF van de bon toe.',
+            'file.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden kunnen worden gescand.',
+            'file.max' => 'Het bestand mag maximaal 10 MB groot zijn.',
+        ]);
+
+        $file = $request->file('file');
+
+        try {
+            $result = $scanner->scan(
+                file_get_contents($file->getRealPath()),
+                $file->getMimeType() ?? 'application/octet-stream',
+            );
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['result' => $result]);
     }
 
     public function storeAttachments(Request $request, PurchaseInvoice $purchase): RedirectResponse

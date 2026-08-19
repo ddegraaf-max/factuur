@@ -279,6 +279,9 @@ return [
                 ['Met een foto of PDF', [
                     'Voeg een foto of PDF van de bon toe: kies een bestand of tik op "Foto maken" (op je telefoon opent direct de camera). De foto verschijnt groot naast het formulier, zodat je overtypt terwijl je de bon ziet.',
                 ]],
+                ['Scan & herken (automatisch invullen)', [
+                    'Na het toevoegen van een foto of PDF verschijnt de knop "Scan & herken". De AI leest de bon en vult de leverancier, het factuurnummer, de datum en de bedragen per BTW-tarief automatisch in — jij controleert ze met de bon ernaast. Klopt het totaal van de herkende regels niet met de bon, dan zie je direct een waarschuwing.',
+                ]],
                 ['Betalen en bijhouden', [
                     'Markeer facturen als betaald met datum en betaalwijze. Op het overzicht zie je wat er bij leveranciers openstaat, wat er over de vervaldatum is en hoeveel voorbelasting je dit kwartaal hebt opgebouwd. Via "CSV-export" download je alles voor je boekhouder.',
                 ]],

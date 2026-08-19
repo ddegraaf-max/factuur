@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.8.0</div>
+        <h3>Bonnetjes automatisch herkennen (scan &amp; herken)</h3>
+        <ul class="tl-list">
+          <li><b>Foto maken, klaar</b> — maak bij het inboeken van een inkoopfactuur een foto van de bon (of upload een PDF) en klik op <b>Scan &amp; herken</b>. De AI leest leverancier, factuurnummer, datum en de bedragen per BTW-tarief en vult het formulier voor je in.</li>
+          <li><b>Jij houdt de controle</b> — de bon staat groot naast het formulier, zodat je de ingevulde waarden in één oogopslag controleert. Klopt het totaal niet met de bon, dan krijg je automatisch een waarschuwing.</li>
+          <li>Grote foto's worden vóór het versturen verkleind, zodat het scannen ook op mobiel vlot werkt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.7.0</div>
         <h3>Verzending via Peppol</h3>
         <ul class="tl-list">

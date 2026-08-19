@@ -241,6 +241,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('inkoop/nieuw', [PurchaseInvoiceController::class, 'create'])->name('purchases.create');
     Route::get('inkoop/export', [PurchaseInvoiceController::class, 'csv'])->name('purchases.csv');
     Route::post('inkoop', [PurchaseInvoiceController::class, 'store'])->name('purchases.store');
+    // Bon scannen met AI (zonder ANTHROPIC_API_KEY geeft dit een 404)
+    Route::post('inkoop/scan', [PurchaseInvoiceController::class, 'scan'])
+        ->middleware('throttle:10,1')->name('purchases.scan');
     Route::get('inkoop/{purchase}', [PurchaseInvoiceController::class, 'show'])->name('purchases.show');
     Route::get('inkoop/{purchase}/bewerken', [PurchaseInvoiceController::class, 'edit'])->name('purchases.edit');
     Route::patch('inkoop/{purchase}', [PurchaseInvoiceController::class, 'update'])->name('purchases.update');

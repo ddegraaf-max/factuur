@@ -2,12 +2,14 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
+import axios from 'axios';
 import { computed, onBeforeUnmount, ref } from 'vue';
 
 const props = defineProps({
   purchase: Object,     // null bij nieuw
   suppliers: Array,     // eerder gebruikte leveranciersnamen (autocomplete)
   categories: Array,
+  scan_enabled: Boolean, // bonnetjes scannen met AI (alleen met ANTHROPIC_API_KEY)
 });
 
 const isEdit = computed(() => !!props.purchase);
@@ -121,6 +123,71 @@ const formatSize = (b) => b < 1024 * 1024 ? (b / 1024).toFixed(0) + ' KB' : (b /
 const removeExistingAttachment = (att) => {
   if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
     router.delete(route('attachments.destroy', att.id), { preserveScroll: true, preserveState: false });
+  }
+};
+
+/* ---------- Scan & herken (AI) ---------- */
+const scanning = ref(false);
+const scanError = ref('');
+const scanNotice = ref('');
+const scanWarning = ref('');
+
+// De eerste foto of PDF in de lijst wordt gescand (meestal is er maar één).
+const scannable = computed(() =>
+  files.value.find(f => f.file.type === 'application/pdf' || f.file.type.startsWith('image/'))
+);
+
+// Grote foto's eerst verkleinen: sneller uploaden en ruim binnen de AI-limieten.
+const prepareForScan = (file) => new Promise((resolve) => {
+  if (file.type === 'application/pdf' || file.size < 1.5 * 1024 * 1024) return resolve(file);
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    URL.revokeObjectURL(url);
+    const scale = Math.min(1, 2048 / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob(
+      (blob) => resolve(blob ? new File([blob], 'bon.jpg', { type: 'image/jpeg' }) : file),
+      'image/jpeg',
+      0.85
+    );
+  };
+  img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+  img.src = url;
+});
+
+const applyScan = (r) => {
+  if (r.supplier_name) form.supplier_name = r.supplier_name;
+  if (r.supplier_reference) form.supplier_reference = r.supplier_reference;
+  if (r.invoice_date) form.invoice_date = r.invoice_date;
+  if (r.due_date) form.due_date = r.due_date;
+  if (r.category) form.category = r.category;
+  if (r.notes && !form.notes) form.notes = r.notes;
+  amountMode.value = 'excl';
+  form.rows = r.vat_lines.map(l => ({ amount: Number(l.base), rate: Number(l.rate), vat: Number(l.vat) }));
+};
+
+const scanReceipt = async () => {
+  const entry = scannable.value;
+  if (!entry || scanning.value) return;
+  scanning.value = true;
+  scanError.value = ''; scanNotice.value = ''; scanWarning.value = '';
+  try {
+    const payload = await prepareForScan(entry.file);
+    const fd = new FormData();
+    fd.append('file', payload, payload.name || entry.name);
+    const { data } = await axios.post(route('purchases.scan'), fd);
+    applyScan(data.result);
+    scanNotice.value = 'Gegevens van de bon overgenomen — controleer ze even voor je opslaat.';
+    scanWarning.value = data.result.warning || '';
+  } catch (e) {
+    scanError.value = e.response?.data?.message
+      || 'Scannen is niet gelukt. Probeer het opnieuw of vul de gegevens handmatig in.';
+  } finally {
+    scanning.value = false;
   }
 };
 
@@ -321,6 +388,19 @@ const fileError = computed(() => {
               </div>
               <div v-if="fileError" class="field-error" style="margin-top:8px;">{{ fileError }}</div>
 
+              <!-- Scan & herken: AI leest de bon en vult het formulier in -->
+              <div v-if="scan_enabled && scannable" class="pf-scan">
+                <button type="button" class="btn btn-primary btn-sm" :disabled="scanning" @click="scanReceipt">
+                  <svg v-if="!scanning" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                  <svg v-else class="pf-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>
+                  {{ scanning ? 'Bon wordt gelezen…' : 'Scan & herken' }}
+                </button>
+                <span class="pf-scan-hint">De gegevens en bedragen worden automatisch ingevuld — jij controleert ze.</span>
+              </div>
+              <div v-if="scanNotice" class="pf-scan-msg pf-scan-ok">{{ scanNotice }}</div>
+              <div v-if="scanWarning" class="pf-scan-msg pf-scan-warn">{{ scanWarning }}</div>
+              <div v-if="scanError" class="field-error" style="margin-top:8px;">{{ scanError }}</div>
+
               <!-- Nieuwe uploads -->
               <div v-for="(f, idx) in files" :key="idx" class="pf-file">
                 <img v-if="f.previewUrl" :src="f.previewUrl" class="pf-thumb" alt="">
@@ -400,6 +480,14 @@ const fileError = computed(() => {
 
 .pf-hint { font-size: 12.5px; color: var(--text-3); line-height: 1.6; margin-bottom: 14px; }
 .pf-upload-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pf-scan { margin-top: 12px; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pf-scan-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.5; flex: 1; min-width: 140px; }
+.pf-scan-msg { margin-top: 8px; font-size: 12.5px; border-radius: 8px; padding: 8px 10px; line-height: 1.5; }
+.pf-scan-ok { background: var(--success-bg); color: var(--success); }
+.pf-scan-warn { background: rgba(217, 119, 6, 0.1); color: #b45309; }
+.pf-spin { animation: pf-rotate 0.9s linear infinite; }
+@keyframes pf-rotate { to { transform: rotate(360deg); } }
 
 .pf-file { display: flex; align-items: center; gap: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; margin-top: 10px; }
 .pf-thumb { width: 42px; height: 42px; border-radius: 7px; object-fit: cover; flex: none; background: var(--surface-2); }
