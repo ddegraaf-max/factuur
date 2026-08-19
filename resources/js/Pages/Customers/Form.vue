@@ -1,13 +1,68 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import axios from 'axios';
 
 const props = defineProps({
   customer: Object,
+  kvk_enabled: { type: Boolean, default: false },
 });
 
 const isEdit = computed(() => !!props.customer);
+
+/* ---------- KvK-register zoeken ---------- */
+const kvkQuery = ref('');
+const kvkResults = ref([]);
+const kvkSearching = ref(false);
+const kvkFilling = ref(null);
+const kvkError = ref(null);
+const kvkSearched = ref(false);
+
+const typeLabels = { hoofdvestiging: 'Hoofdvestiging', nevenvestiging: 'Nevenvestiging', rechtspersoon: 'Rechtspersoon' };
+
+const kvkSearch = async () => {
+  const q = kvkQuery.value.trim();
+  if (q.length < 2 || kvkSearching.value) return;
+  kvkSearching.value = true;
+  kvkError.value = null;
+  try {
+    const { data } = await axios.get(route('kvk.search'), { params: { q } });
+    kvkResults.value = data.results || [];
+    kvkError.value = data.error || null;
+    kvkSearched.value = true;
+  } catch {
+    kvkError.value = 'Zoeken mislukt — probeer het zo opnieuw.';
+  } finally {
+    kvkSearching.value = false;
+  }
+};
+
+const kvkPick = async (result) => {
+  kvkFilling.value = result.kvk_number;
+  try {
+    // Basisprofiel voor het volledige adres; lukt dat niet, dan gebruiken we
+    // wat het zoekresultaat al weet (naam, straat, plaats).
+    const { data } = await axios.get(route('kvk.profile', result.kvk_number));
+    const p = data.result;
+
+    form.name = (p?.name || result.name) ?? form.name;
+    form.kvk_number = (p?.kvk_number || result.kvk_number) ?? form.kvk_number;
+    form.address_line = p?.address_line ?? result.street ?? form.address_line;
+    form.postal_code = p?.postal_code ?? form.postal_code;
+    form.city = p?.city ?? result.city ?? form.city;
+    form.country = 'NL';
+    form.type = 'business';
+
+    kvkResults.value = [];
+    kvkQuery.value = '';
+    kvkSearched.value = false;
+  } catch {
+    kvkError.value = 'Gegevens ophalen mislukt — vul het formulier handmatig in.';
+  } finally {
+    kvkFilling.value = null;
+  }
+};
 
 const form = useForm({
   name: props.customer?.name ?? '',
@@ -67,6 +122,54 @@ const remove = () => {
     </div>
 
     <div class="single-col">
+      <!-- KvK-register zoeken -->
+      <div v-if="kvk_enabled" class="card kvk-card">
+        <div class="card-body">
+          <div class="kvk-head">
+            <span class="kvk-logo">KvK</span>
+            <div>
+              <div class="kvk-title">Zoek in het Handelsregister</div>
+              <div class="kvk-sub">Typ een bedrijfsnaam of KvK-nummer — kies het bedrijf en de gegevens worden ingevuld.</div>
+            </div>
+          </div>
+          <div class="kvk-search">
+            <input
+              type="text"
+              v-model="kvkQuery"
+              placeholder="Bijv. 'Bakkerij Janssen' of 68750110"
+              maxlength="100"
+              @keydown.enter.prevent="kvkSearch"
+            >
+            <button type="button" class="btn btn-primary" :disabled="kvkSearching || kvkQuery.trim().length < 2" @click="kvkSearch">
+              {{ kvkSearching ? 'Zoeken…' : 'Zoeken' }}
+            </button>
+          </div>
+          <div v-if="kvkError" class="field-error" style="margin-top:8px;">{{ kvkError }}</div>
+
+          <div v-if="kvkResults.length" class="kvk-results">
+            <button
+              v-for="r in kvkResults"
+              :key="r.kvk_number + (r.name || '')"
+              type="button"
+              class="kvk-result"
+              :disabled="kvkFilling !== null"
+              @click="kvkPick(r)"
+            >
+              <div class="kvk-result-main">
+                <div class="kvk-result-name">{{ r.name }}</div>
+                <div class="kvk-result-meta">
+                  KvK {{ r.kvk_number }}<template v-if="r.city"> · {{ r.street ? r.street + ', ' : '' }}{{ r.city }}</template>
+                </div>
+              </div>
+              <span class="kvk-type">{{ kvkFilling === r.kvk_number ? 'Ophalen…' : (typeLabels[r.type] || r.type) }}</span>
+            </button>
+          </div>
+          <div v-else-if="kvkSearched && !kvkSearching && !kvkError" class="kvk-empty">
+            Geen bedrijven gevonden — controleer de spelling of vul het formulier handmatig in.
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header"><div class="card-title">Algemeen</div></div>
         <div class="card-body">
@@ -190,4 +293,36 @@ const remove = () => {
 }
 .type-opt:hover:not(.active) { color: var(--text); }
 .type-opt.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+
+/* KvK-zoeker */
+.kvk-card { margin-bottom: 16px; border-color: var(--info-border); }
+.kvk-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.kvk-logo {
+  width: 40px; height: 40px; border-radius: 9px; flex: none;
+  background: #21145F; color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 13px;
+}
+.kvk-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+.kvk-sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.kvk-search { display: flex; gap: 8px; }
+.kvk-search input { flex: 1; }
+.kvk-results { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.kvk-result {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; text-align: left;
+  border: 1px solid var(--border); border-radius: 9px;
+  padding: 10px 14px; background: var(--surface);
+  transition: border-color 0.15s, background 0.15s;
+}
+.kvk-result:hover:not(:disabled) { border-color: var(--brand); background: var(--brand-tint); }
+.kvk-result:disabled { opacity: 0.6; cursor: wait; }
+.kvk-result-name { font-weight: 600; font-size: 13.5px; }
+.kvk-result-meta { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.kvk-type {
+  flex: none; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--surface-2); color: var(--text-3);
+  border: 1px solid var(--border-strong); border-radius: 100px; padding: 3px 9px;
+}
+.kvk-empty { margin-top: 10px; font-size: 12.5px; color: var(--text-3); }
 </style>

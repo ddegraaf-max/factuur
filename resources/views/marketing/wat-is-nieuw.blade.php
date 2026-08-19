@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.6.0</div>
+        <h3>Klanten toevoegen via het KvK-register</h3>
+        <ul class="tl-list">
+          <li><b>Zoek in het Handelsregister</b> — typ bij een nieuwe klant een bedrijfsnaam of KvK-nummer en kies het juiste bedrijf uit de lijst.</li>
+          <li><b>Automatisch ingevuld</b> — bedrijfsnaam, KvK-nummer, adres, postcode en plaats staan direct goed, rechtstreeks uit de officiële KvK API. Geen typfouten meer in je klantgegevens.</li>
+          <li>Werkt met de gratis KvK Zoeken API; het volledige vestigingsadres komt uit het Basisprofiel (optioneel).</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.5.0</div>
         <h3>Bank &amp; transacties — afschriften importeren en koppelen</h3>
         <ul class="tl-list">

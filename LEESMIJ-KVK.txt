@@ -1,0 +1,45 @@
+EASYINVOICE — KVK-REGISTER KOPPELING
+====================================
+
+WAT IS HET
+----------
+Bij het aanmaken (of bewerken) van een zakelijke klant staat bovenaan het
+formulier een KvK-zoeker: typ een bedrijfsnaam of KvK-nummer, kies het
+bedrijf uit de lijst, en naam + KvK-nummer + adres + postcode + plaats
+worden automatisch ingevuld vanuit het officiële Handelsregister.
+
+HOE HET WERKT
+-------------
+- Zoeken gaat via de officiële KvK Zoeken API (v2). Resultaten tonen
+  naam, plaats en het type (hoofdvestiging / nevenvestiging).
+  Rechtspersoon-regels die dubbelen met een vestiging worden ontdubbeld.
+- Bij het kiezen wordt het Basisprofiel opgehaald voor het volledige
+  bezoekadres (straat + huisnummer + postcode + plaats). Is het
+  Basisprofiel niet beschikbaar, dan vult Easy wat het zoekresultaat al
+  weet (naam, straat, plaats) — nooit een foutmelding richting gebruiker.
+- Zoekresultaten worden 5 minuten gecachet, profielen 1 uur (scheelt
+  API-verbruik). Endpoints zijn ge-rate-limit (30/min per gebruiker).
+
+INSTELLEN (RAILWAY-VARIABELEN)
+------------------------------
+1. Maak een gratis account op developers.kvk.nl en vraag de
+   "Zoeken API" aan (gratis). Optioneel ook "Basisprofiel API" voor het
+   volledige adres (kost per raadpleging een paar cent bij de KvK).
+2. Zet in Railway: KVK_API_KEY=<jouw key>
+3. Zonder key blijft de KvK-zoeker volledig verborgen — niets breekt.
+
+TESTEN ZONDER ECHTE KEY
+-----------------------
+KVK_API_BASE=https://api.kvk.nl/test
+KVK_API_KEY=l7xx1f2691f2520d487b902f4e0b57a0b197  (publieke testkey)
+Zoek dan op "test" of nummer 68750110 (Test BV Donald).
+
+TECHNIEK
+--------
+- Nieuw: app/Services/KvkService.php (zoeken + basisprofiel, caching,
+  nette foutafhandeling), app/Http/Controllers/KvkController.php
+  (JSON-endpoints), KvK-zoekblok in Customers/Form.vue.
+- Config: services.kvk (key + base) — gedocumenteerd in .env.example.
+- End-to-end getest tegen de officiële KvK-testomgeving: zoeken op naam
+  en nummer, ontdubbeling, volledig adres, lege resultaten.
+- Geen migraties nodig.

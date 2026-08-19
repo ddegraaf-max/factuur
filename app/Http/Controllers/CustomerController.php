@@ -53,6 +53,7 @@ class CustomerController extends Controller
     {
         return Inertia::render('Customers/Form', [
             'customer' => null,
+            'kvk_enabled' => app(\App\Services\KvkService::class)->enabled(),
         ]);
     }
 
@@ -67,6 +68,7 @@ class CustomerController extends Controller
     {
         return Inertia::render('Customers/Form', [
             'customer' => $customer,
+            'kvk_enabled' => app(\App\Services\KvkService::class)->enabled(),
         ]);
     }
 

@@ -21,6 +21,12 @@ return [
         'sitekey' => env('TURNSTILE_SITEKEY'),
         'secret' => env('TURNSTILE_SECRET'),
     ],
+    // KvK API (developers.kvk.nl). Zonder key blijft de KvK-zoeker verborgen.
+    // Testomgeving: KVK_API_BASE=https://api.kvk.nl/test met de publieke testkey.
+    'kvk' => [
+        'key' => env('KVK_API_KEY'),
+        'base' => rtrim(env('KVK_API_BASE', 'https://api.kvk.nl'), '/'),
+    ],
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

@@ -185,6 +185,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Customers
         Route::resource('customers', CustomerController::class);
 
+        // KvK-register doorzoeken (voor het klantformulier)
+        Route::get('kvk/zoeken', [\App\Http\Controllers\KvkController::class, 'search'])
+            ->middleware('throttle:30,1')->name('kvk.search');
+        Route::get('kvk/profiel/{kvkNumber}', [\App\Http\Controllers\KvkController::class, 'profile'])
+            ->middleware('throttle:30,1')->name('kvk.profile');
+
     // Products
     Route::resource('products', ProductController::class);
 
