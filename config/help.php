@@ -358,6 +358,24 @@ return [
             ],
         ],
 
+        'vaste-lasten' => [
+            'category' => 'Inkoop',
+            'title' => 'Vaste lasten automatisch inboeken',
+            'intro' => 'Huur, software-abonnementen, verzekeringen: stel ze eenmalig in en Easy boekt ze voortaan automatisch in als inkoopfactuur.',
+            'sections' => [
+                ['Een vaste last aanmaken', [
+                    'Ga naar Inkoop → Vaste lasten en klik op "Nieuwe vaste last". Vul de leverancier, categorie, frequentie (wekelijks t/m jaarlijks), de datum van de volgende inboeking en het bedrag per periode in. Vinkje "direct op betaald zetten" aan voor kosten via automatische incasso — de inboeking krijgt dan meteen de juiste betaalstatus en betaalwijze.',
+                    'Sneller: open een bestaande inkoopfactuur en klik op "Maak terugkerend" — dezelfde kosten worden dan voortaan maandelijks ingeboekt (frequentie daarna aan te passen).',
+                ]],
+                ['Wat er automatisch gebeurt', [
+                    'Elke ochtend boekt Easy de vaste lasten in die aan de beurt zijn, als gewone inkoopfactuur met de notitie "Automatisch ingeboekt". De BTW telt direct mee als voorbelasting (rubriek 5b) in je BTW-overzicht, en de kosten verschijnen in je dashboards en het jaaroverzicht. Stond de app een tijdje stil, dan worden gemiste periodes dag voor dag ingehaald.',
+                ]],
+                ['Beheren', [
+                    'Pauzeren en hervatten kan met één klik; een einddatum stopt het profiel vanzelf (handig bij opzeggingen). Verwijder je een profiel, dan blijven de al ingeboekte inkoopfacturen gewoon bewaard. Maandprofielen houden vast aan de dag van de startdatum — gestart op de 31e wordt in februari de 28e en in maart weer de 31e.',
+                ]],
+            ],
+        ],
+
         // ---------- UREN ----------
         'urenregistratie' => [
             'category' => 'Uren',

@@ -23,6 +23,11 @@ Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: boek vaste lasten in uit terugkerende-inkoopprofielen.
+Schedule::command('purchases:generate-recurring')
+    ->dailyAt('07:10')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: verstuur concept-facturen die voor vandaag zijn ingepland.
 Schedule::command('invoices:send-scheduled')
     ->dailyAt('07:30')

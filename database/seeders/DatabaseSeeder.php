@@ -277,6 +277,31 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->companies()->attach($second->id, ['role' => 'owner']);
 
+        // 10. Vaste lasten: twee terugkerende-inkoopprofielen als voorbeeld.
+        \App\Models\RecurringPurchase::create([
+            'company_id' => $company->id,
+            'supplier_name' => 'KPN Zakelijk',
+            'category' => 'Telefoon & internet',
+            'frequency' => 'monthly',
+            'start_date' => now()->startOfMonth()->toDateString(),
+            'next_run_on' => now()->startOfMonth()->addMonthNoOverflow()->toDateString(),
+            'vat_lines' => [['base' => 45.00, 'rate' => 21.0, 'vat' => 9.45]],
+            'auto_paid' => true,
+            'payment_method' => 'direct_debit',
+        ]);
+        \App\Models\RecurringPurchase::create([
+            'company_id' => $company->id,
+            'supplier_name' => 'Adobe Creative Cloud',
+            'category' => 'Software & ICT',
+            'frequency' => 'monthly',
+            'start_date' => now()->subMonths(2)->startOfMonth()->addDays(14)->toDateString(),
+            'next_run_on' => now()->addDays(9)->toDateString(),
+            'vat_lines' => [['base' => 65.28, 'rate' => 21.0, 'vat' => 13.71]],
+            'auto_paid' => true,
+            'payment_method' => 'card',
+            'notes' => 'Alle apps-abonnement',
+        ]);
+
         Auth::logout();
 
         $this->command->info('✓ Demo company: Vries Design B.V.');

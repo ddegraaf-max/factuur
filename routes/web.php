@@ -298,6 +298,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('inkoop/{purchase}/heropen', [PurchaseInvoiceController::class, 'reopen'])->name('purchases.reopen');
     Route::post('inkoop/{purchase}/bijlagen', [PurchaseInvoiceController::class, 'storeAttachments'])->name('purchases.attachments.store');
 
+    // Vaste lasten: terugkerende inkoop automatisch inboeken
+    Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');
+    Route::post('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'store'])->name('purchases.recurring.store');
+    Route::patch('vaste-lasten/{profile}', [\App\Http\Controllers\RecurringPurchaseController::class, 'update'])->name('purchases.recurring.update');
+    Route::delete('vaste-lasten/{profile}', [\App\Http\Controllers\RecurringPurchaseController::class, 'destroy'])->name('purchases.recurring.destroy');
+    Route::post('inkoop/{purchase}/terugkerend', [\App\Http\Controllers\RecurringPurchaseController::class, 'createFromPurchase'])->name('purchases.recurring.from');
+
     // Export naar boekhouder (rapporten: beheerder + boekhouder)
     Route::middleware('role:owner,accountant')->group(function () {
         Route::get('export', [ExportController::class, 'index'])->name('export.index');

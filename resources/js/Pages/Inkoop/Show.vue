@@ -45,6 +45,12 @@ const destroy = () => {
   }
 };
 
+const makeRecurring = () => {
+  if (confirm(`"${props.purchase.supplier_name}" voortaan automatisch maandelijks inboeken als vaste last?\n\nDe frequentie kun je daarna nog aanpassen.`)) {
+    router.post(route('purchases.recurring.from', props.purchase.id));
+  }
+};
+
 /* ---------- Bijlagen ---------- */
 const fileInput = ref(null);
 const uploadForm = useForm({ files: [] });
@@ -109,6 +115,10 @@ const previewAttachment = computed(() =>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><polygon points="18.5 2.5 21.5 5.5 12 15 9 15 9 12 18.5 2.5"/></svg>
           Bewerken
         </Link>
+        <button class="btn btn-secondary btn-sm" title="Boek deze kosten voortaan automatisch periodiek in" @click="makeRecurring">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          Maak terugkerend
+        </button>
         <button class="btn btn-danger btn-sm" @click="destroy">Verwijder</button>
       </div>
     </div>

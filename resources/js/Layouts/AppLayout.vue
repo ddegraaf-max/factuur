@@ -32,7 +32,7 @@ const rawNav = [
       { name: 'Offertes', route: 'quotes.index', icon: 'quote' },
       { name: 'Facturen', route: 'invoices.index', icon: 'invoice' },
       { name: 'Uren', route: 'hours.index', icon: 'clock' },
-      { name: 'Ritten', route: 'trips.index', icon: 'car', badge: 'Nieuw' },
+      { name: 'Ritten', route: 'trips.index', icon: 'car' },
       { name: 'Terugkerend', route: 'recurring.index', icon: 'repeat' },
       { name: 'Klanten', route: 'customers.index', icon: 'users' },
       { name: 'Producten', route: 'products.index', icon: 'box' },
@@ -43,6 +43,7 @@ const rawNav = [
     title: 'Inkoop',
     items: [
       { name: 'Inkoopfacturen', route: 'purchases.index', icon: 'receipt' },
+      { name: 'Vaste lasten', route: 'purchases.recurring.index', icon: 'repeat', badge: 'Nieuw' },
     ],
   },
   {
@@ -65,7 +66,7 @@ const rawNav = [
     items: [
       { name: 'Bedrijfsgegevens', route: 'settings.company', icon: 'settings', can: 'settings' },
       { name: 'Huisstijl', route: 'settings.brand', icon: 'palette', can: 'settings' },
-      { name: 'Handelsnamen', route: 'settings.brands', icon: 'tag', can: 'settings', badge: 'Nieuw' },
+      { name: 'Handelsnamen', route: 'settings.brands', icon: 'tag', can: 'settings' },
       { name: 'Nummering', route: 'settings.numbering', icon: 'hash', can: 'settings' },
       { name: 'Herinneringen', route: 'settings.reminders', icon: 'bell', can: 'settings' },
       { name: 'Team', route: 'settings.team', icon: 'users', can: 'team' },

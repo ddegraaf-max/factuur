@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.19.0</div>
+        <h3>Vaste lasten — terugkerende inkoop automatisch inboeken</h3>
+        <ul class="tl-list">
+          <li><b>Eén keer instellen, nooit meer vergeten</b> — huur, software-abonnementen, verzekeringen: zet ze klaar als vaste last (wekelijks t/m jaarlijks) en Easy boekt ze voortaan automatisch in als inkoopfactuur. De BTW telt vanzelf mee als voorbelasting in je aangifte.</li>
+          <li><b>Incasso? Direct op betaald</b> — vaste lasten via automatische incasso worden meteen als betaald ingeboekt, met de juiste betaalwijze. Pauzeren, een einddatum of aanpassen kan altijd.</li>
+          <li><b>Snelstart vanaf een bestaande factuur</b> — op elke inkoopfactuur staat nu "Maak terugkerend": één klik en dezelfde kosten worden voortaan maandelijks ingeboekt. Gemiste periodes worden automatisch ingehaald.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.18.0</div>
         <h3>Jaaroverzicht — omzet, kosten en resultaat in één rapport</h3>
         <ul class="tl-list">

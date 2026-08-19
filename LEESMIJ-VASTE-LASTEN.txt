@@ -1,0 +1,52 @@
+EASYINVOICE — VASTE LASTEN (TERUGKERENDE INKOOP)
+================================================
+
+WAT IS HET
+----------
+Terugkerende kosten (huur, software, verzekeringen, telefoon) worden
+automatisch periodiek ingeboekt als inkoopfactuur. Nieuw menu-item:
+Inkoop → Vaste lasten.
+
+- PROFIEL: leverancier, categorie, frequentie (wekelijks, maandelijks,
+  per kwartaal, per half jaar, jaarlijks), datum volgende inboeking,
+  optionele einddatum, bedragregels per BTW-tarief (zelfde vorm als
+  inkoopfacturen) en notities.
+- INCASSO: "direct op betaald zetten" (standaard aan) boekt de factuur
+  meteen als betaald in, met de gekozen betaalwijze (standaard
+  automatische incasso).
+- SNELSTART: op elke inkoopfactuur staat de knop "Maak terugkerend" —
+  één klik en dezelfde kosten (leverancier, categorie, bedragen,
+  betaalwijze) worden voortaan maandelijks ingeboekt, startend één
+  maand na de factuurdatum.
+- BEHEER: pauzeren/hervatten, bewerken, verwijderen (al ingeboekte
+  facturen blijven bewaard), teller + laatste inboeking zichtbaar.
+
+PLANNING (zelfde semantiek als terugkerende verkoopfacturen)
+-------------------------------------------------------------
+- Dagelijks om 07:10 draait purchases:generate-recurring.
+- Per run maximaal één inboeking per profiel; gemiste periodes worden
+  dag-voor-dag ingehaald (next_run_on schuift per frequentiestap op).
+- Maand-gebaseerde frequenties ankeren op de dag van de startdatum:
+  gestart op de 31e → februari de 28e, maart weer de 31e.
+- Einddatum gepasseerd → profiel wordt automatisch gedeactiveerd.
+
+EFFECT IN DE REST VAN EASY
+--------------------------
+De inboekingen zijn gewone inkoopfacturen: de BTW telt mee als
+voorbelasting (rubriek 5b) in het BTW-overzicht, de kosten lopen mee in
+het dashboard, de CSV-export en het jaaroverzicht, en banktransacties
+kunnen er gewoon aan worden gekoppeld.
+
+TECHNIEK
+--------
+- Migratie: recurring_purchases (vat_lines json, auto_paid,
+  payment_method, planning-velden).
+- Nieuw: app/Models/RecurringPurchase.php (frequentie-/ankerlogica
+  gespiegeld aan RecurringInvoice), app/Services/
+  RecurringPurchaseService.php (runDue/generate), console-commando
+  purchases:generate-recurring (gepland 07:10 Europe/Amsterdam),
+  RecurringPurchaseController, resources/js/Pages/Inkoop/Terugkerend.vue.
+- Routes: purchases.recurring.index/store/update/destroy + de
+  snelstart purchases.recurring.from op de inkoopfactuur.
+- Demo-omgeving: twee voorbeeldprofielen (KPN Zakelijk € 45/mnd incasso,
+  Adobe Creative Cloud € 65,28/mnd creditcard).
