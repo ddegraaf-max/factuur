@@ -361,6 +361,23 @@ return [
             ],
         ],
 
+        'meerdere-administraties' => [
+            'category' => 'Account',
+            'title' => 'Meerdere administraties onder één inlog',
+            'intro' => 'Beheer meerdere bedrijven — elk met eigen KvK, klanten, facturen en nummering — en wissel moeiteloos via het menu linksonder.',
+            'sections' => [
+                ['Een administratie toevoegen', [
+                    'Klik linksonder op je naam en kies "Administraties beheren", of ga direct naar /administraties. Met "Nieuwe administratie" start je een extra bedrijf: vul de naam en het KvK-nummer in en je wordt automatisch beheerder. De nieuwe administratie begint met een eigen gratis proefperiode van 14 dagen en een eigen abonnement, en je wisselt er direct naartoe om de bedrijfsgegevens aan te vullen.',
+                ]],
+                ['Wisselen', [
+                    'Klik linksonder op je naam: onder "Administraties" staan al je bedrijven, met een vinkje bij de actieve. Eén klik en je zit in de andere administratie — met de klanten, facturen, huisstijl en instellingen van dát bedrijf. Administraties zien elkaars gegevens nooit, en je rol kan per administratie verschillen.',
+                ]],
+                ['Eén inlog voor je boekhouder of collega', [
+                    'Nodig je via Instellingen → Team iemand uit die al een EasyInvoice-account heeft, dan hoeft die geen nieuw account te maken: de uitnodigingslink koppelt jouw administratie aan zijn bestaande inlog. Zo werkt een boekhouder met één inlog voor al zijn klanten.',
+                ]],
+            ],
+        ],
+
         // ---------- SAMENWERKEN ----------
         'team-en-rollen' => [
             'category' => 'Samenwerken',

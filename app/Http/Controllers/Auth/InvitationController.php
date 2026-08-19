@@ -33,6 +33,9 @@ class InvitationController extends Controller
             'company' => $invitation?->company?->name,
             'roleLabel' => $invitation ? (User::ROLE_LABELS[$invitation->role] ?? $invitation->role) : null,
             'invitedBy' => $invitation?->invitedBy?->name,
+            // Bestaat er al een account op dit adres? Dan geen naam/wachtwoord
+            // vragen, maar de administratie aan die inlog koppelen.
+            'existing' => (bool) ($invitation && User::where('email', $invitation->email)->exists()),
         ]);
     }
 
@@ -46,10 +49,22 @@ class InvitationController extends Controller
             ]);
         }
 
-        if (User::where('email', $invitation->email)->exists()) {
-            throw ValidationException::withMessages([
-                'name' => 'Er bestaat al een account met dit e-mailadres.',
-            ]);
+        // Bestaand account? Dan wordt deze administratie aan die inlog
+        // gekoppeld — de geheime link op het eigen e-mailadres is daarvoor
+        // het bewijs (zelfde vertrouwensmodel als een wachtwoord-reset).
+        $existing = User::where('email', $invitation->email)->first();
+        if ($existing) {
+            if (! $existing->isMemberOf($invitation->company)) {
+                $existing->companies()->attach($invitation->company_id, ['role' => $invitation->role]);
+            }
+            $existing->switchToCompany($invitation->company);
+            $invitation->update(['accepted_at' => now()]);
+
+            Auth::login($existing);
+            $request->session()->regenerate();
+
+            return redirect()->route('dashboard')
+                ->with('flash', ($invitation->company?->name ?? 'De administratie') . ' is aan je account gekoppeld — je kunt altijd wisselen via het menu linksonder.');
         }
 
         $data = $request->validate([
@@ -67,6 +82,7 @@ class InvitationController extends Controller
             'role' => $invitation->role,
         ]);
         $user->forceFill(['email_verified_at' => now()])->save();
+        $user->companies()->attach($invitation->company_id, ['role' => $invitation->role]);
 
         $invitation->update(['accepted_at' => now()]);
 

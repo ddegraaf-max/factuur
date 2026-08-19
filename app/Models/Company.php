@@ -54,6 +54,8 @@ class Company extends Model
     ];
 
     public function users(): HasMany { return $this->hasMany(User::class); }
+    /** Alle leden van deze administratie (lidmaatschappen, met rol per lid). */
+    public function members(): \Illuminate\Database\Eloquent\Relations\BelongsToMany { return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps(); }
     public function customers(): HasMany { return $this->hasMany(Customer::class); }
     public function products(): HasMany { return $this->hasMany(Product::class); }
     public function invoices(): HasMany { return $this->hasMany(Invoice::class); }

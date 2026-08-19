@@ -88,6 +88,7 @@
         <div class="ic-emoji">🔒</div>
         <h3>Account &amp; beveiliging</h3>
         <p style="margin-bottom:12px;">Wachtwoord en tweestapsverificatie.</p>
+        <a class="help-link" href="{{ route('help.article', 'meerdere-administraties') }}">Meerdere administraties →</a>
         <a class="help-link" href="{{ route('help.article', '2fa-instellen') }}">2FA instellen →</a>
         <a class="help-link" href="{{ route('help.article', 'wachtwoord-wijzigen') }}">Je wachtwoord wijzigen →</a>
       </div>

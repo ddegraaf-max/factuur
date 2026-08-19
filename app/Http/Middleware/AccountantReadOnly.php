@@ -22,6 +22,10 @@ class AccountantReadOnly
         'settings.security.verify',
         'settings.security.disable',
         'settings.security.recovery',
+        // Administraties zijn van de gebruiker zelf: ook een boekhouder mag
+        // wisselen tussen zijn administraties of er een voor zichzelf starten.
+        'administrations.switch',
+        'administrations.store',
     ];
 
     public function handle(Request $request, Closure $next): Response

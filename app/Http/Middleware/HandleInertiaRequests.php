@@ -33,6 +33,12 @@ class HandleInertiaRequests extends Middleware
                     'billing' => $request->user()->isOwner(),
                 ] : null,
                 'role_label' => $request->user()?->roleLabel(),
+                // Alle administraties van deze gebruiker, voor de wisselaar
+                // in de zijbalk (klein lijstje: alleen id + naam).
+                'administrations' => $request->user()
+                    ? $request->user()->companies()->orderBy('name')->get(['companies.id', 'companies.name'])
+                        ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])
+                    : [],
             ],
             'flash' => fn () => [
                 'flash' => $request->session()->get('flash'),

@@ -102,6 +102,15 @@ const flash = computed(() => page.props.flash || {});
 
 const userMenuOpen = ref(false);
 
+/* ---------- Administraties (wisselaar) ---------- */
+const administrations = computed(() => page.props.auth.administrations || []);
+const hasMultipleAdministrations = computed(() => administrations.value.length > 1);
+
+const switchAdministration = (a) => {
+  if (a.id === company.value?.id) { userMenuOpen.value = false; return; }
+  router.post(route('administrations.switch', a.id));
+};
+
 const logout = () => {
   router.post(route('logout'));
 };
@@ -160,6 +169,22 @@ const logout = () => {
           <div class="user-co">{{ company?.name }}</div>
         </div>
         <div v-if="userMenuOpen" class="user-menu">
+          <template v-if="hasMultipleAdministrations">
+            <div class="user-menu-label">Administraties</div>
+            <button
+              v-for="a in administrations"
+              :key="a.id"
+              class="user-menu-item"
+              :class="{ 'is-active-admin': a.id === company?.id }"
+              @click.stop="switchAdministration(a)"
+            >
+              <svg v-if="a.id === company?.id" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex:none;"><polyline points="20 6 9 17 4 12"/></svg>
+              <span v-else style="width:12px;flex:none;"></span>
+              <span class="admin-name">{{ a.name }}</span>
+            </button>
+            <div class="user-menu-sep"></div>
+          </template>
+          <Link :href="route('administrations.index')" class="user-menu-item">Administraties beheren</Link>
           <Link :href="route('settings.security')" class="user-menu-item">Beveiliging</Link>
           <button class="user-menu-item" @click.stop="logout">Uitloggen</button>
         </div>
@@ -441,6 +466,15 @@ table { border-collapse: collapse; width: 100%; }
   cursor: pointer;
 }
 .user-menu-item:hover { background: var(--surface-2); }
+.user-menu-label {
+  padding: 8px 14px 4px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-4);
+}
+.user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+.user-menu-item.is-active-admin { font-weight: 600; color: var(--brand-darker); }
+.user-menu-item .admin-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-menu-item svg, .user-menu-item .admin-name { vertical-align: middle; }
+.user-menu-item.is-active-admin, .user-menu button.user-menu-item { display: flex; align-items: center; gap: 8px; }
 
 /* MAIN */
 .main { background: var(--bg); min-width: 0; }

@@ -5,6 +5,7 @@ import AuthLayout from '@/Layouts/AuthLayout.vue';
 const props = defineProps({
   valid: Boolean,
   token: String,
+  existing: Boolean, // er bestaat al een account op dit e-mailadres
   email: String,
   company: String,
   roleLabel: String,
@@ -40,7 +41,21 @@ const submit = () => {
     </template>
 
     <div class="login-form-card">
-      <template v-if="valid">
+      <template v-if="valid && existing">
+        <div class="login-form-title">Administratie koppelen</div>
+        <div class="login-form-sub">
+          Je hebt al een EasyInvoice-account op <strong>{{ email }}</strong>.
+          Koppel <strong>{{ company }}</strong> ({{ roleLabel }}) aan die inlog —
+          je wisselt daarna moeiteloos tussen je administraties.
+        </div>
+        <form @submit.prevent="submit">
+          <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
+            {{ form.processing ? 'Bezig…' : 'Koppel aan mijn account' }}
+          </button>
+          <div v-if="form.errors.name" class="field-error" style="margin-top:8px;">{{ form.errors.name }}</div>
+        </form>
+      </template>
+      <template v-else-if="valid">
         <div class="login-form-title">Account aanmaken</div>
         <div class="login-form-sub">
           Voor <strong>{{ email }}</strong> · {{ roleLabel }} bij <strong>{{ company }}</strong>

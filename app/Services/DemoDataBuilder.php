@@ -105,6 +105,7 @@ class DemoDataBuilder
         ]);
 
         $user->forceFill(['email_verified_at' => now()])->save();
+        $user->companies()->attach($company->id, ['role' => 'owner']);
 
         return $user;
     }

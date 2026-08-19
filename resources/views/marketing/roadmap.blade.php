@@ -33,7 +33,7 @@
     <div class="road-grid">
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
-        <div class="road-card"><h4>Meerdere administraties</h4><p>Meerdere bedrijven (eigen KvK en nummering) beheren onder één inlog en moeiteloos wisselen.</p></div>
+        <div class="road-card"><h4>Betaallink op de factuur</h4><p>Klanten laten betalen met iDEAL via een betaallink in de factuurmail en het klantenportaal.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -42,6 +42,7 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Meerdere administraties</h4><p>Meerdere bedrijven (eigen KvK en nummering) onder één inlog — met wisselen in twee klikken.</p></div>
         <div class="road-card"><h4>Facturen &amp; offertes in het Engels</h4><p>Per klant kiezen voor Engelstalige documenten en e-mails — voor internationale opdrachtgevers.</p></div>
         <div class="road-card"><h4>Kilometerregistratie</h4><p>Zakelijke ritten bijhouden en de kilometervergoeding met één klik doorbelasten — of bewaren voor je eigen administratie.</p></div>
         <div class="road-card"><h4>Meerdere handelsnamen</h4><p>Offertes en facturen versturen onder verschillende handelsnamen, elk met eigen logo, kleur en sjabloon — binnen één administratie.</p></div>

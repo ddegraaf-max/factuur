@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.14.0</div>
+        <h3>Meerdere administraties onder één inlog</h3>
+        <ul class="tl-list">
+          <li><b>Meerdere bedrijven, één account</b> — start extra administraties (elk met eigen KvK, klanten, facturen, huisstijl én eigen nummering) en wissel moeiteloos via het menu linksonder. Elke administratie heeft een eigen abonnement en start met een eigen gratis proefperiode.</li>
+          <li><b>Strikt gescheiden</b> — administraties zien elkaars gegevens nooit; je rol kan per administratie verschillen (beheerder in de één, boekhouder in de ander).</li>
+          <li><b>Eén inlog voor je boekhouder</b> — wordt iemand met een bestaand EasyInvoice-account uitgenodigd, dan koppelt die administratie zich aan diezelfde inlog. Ideaal voor boekhouders die voor meerdere klanten werken.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.13.0</div>
         <h3>Facturen en offertes in het Engels</h3>
         <ul class="tl-list">

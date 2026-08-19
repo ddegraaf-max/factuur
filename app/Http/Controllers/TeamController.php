@@ -24,17 +24,19 @@ class TeamController extends Controller
     {
         $me = $request->user();
 
-        $users = User::where('company_id', $me->company_id)
-            ->orderBy('created_at')
+        // Leden via de lidmaatschappen: iemand kan in meerdere administraties
+        // zitten, dus de rol komt uit het lidmaatschap (pivot), niet de user.
+        $users = $me->company->members()
+            ->orderBy('company_user.created_at')
             ->get()
             ->map(fn ($u) => [
                 'id' => $u->id,
                 'name' => $u->name,
                 'email' => $u->email,
-                'role' => $u->role,
+                'role' => $u->pivot->role,
                 'is_self' => $u->id === $me->id,
                 'two_factor' => $u->hasTwoFactorEnabled(),
-                'joined_label' => $u->created_at?->translatedFormat('j M Y'),
+                'joined_label' => $u->pivot->created_at?->translatedFormat('j M Y'),
             ]);
 
         $invitations = Invitation::where('company_id', $me->company_id)
@@ -70,9 +72,12 @@ class TeamController extends Controller
 
         $email = mb_strtolower(trim($data['email']));
 
-        if (User::where('email', $email)->exists()) {
+        // Een bestaand account is prima (die persoon koppelt deze administratie
+        // dan aan zijn inlog) — maar geen dubbele lidmaatschappen.
+        $existing = User::where('email', $email)->first();
+        if ($existing && $existing->isMemberOf($me->company)) {
             throw ValidationException::withMessages([
-                'email' => 'Er bestaat al een EasyInvoice-account met dit e-mailadres. Eén e-mailadres kan maar bij één bedrijf horen.',
+                'email' => 'Deze persoon is al lid van deze administratie.',
             ]);
         }
 
@@ -107,7 +112,8 @@ class TeamController extends Controller
     public function updateRole(Request $request, User $member): RedirectResponse
     {
         $me = $request->user();
-        abort_unless($member->company_id === $me->company_id, 404);
+        $membership = $me->company->members()->whereKey($member->id)->first();
+        abort_unless($membership, 404);
 
         $data = $request->validate([
             'role' => ['required', 'in:owner,staff,accountant'],
@@ -117,11 +123,16 @@ class TeamController extends Controller
             return back()->with('error', 'Je kunt je eigen rol niet aanpassen — vraag een andere beheerder.');
         }
 
-        if ($member->isOwner() && $data['role'] !== 'owner' && $this->ownerCount($me->company_id) === 1) {
+        if ($membership->pivot->role === 'owner' && $data['role'] !== 'owner' && $this->ownerCount($me->company_id) === 1) {
             return back()->with('error', 'Er moet minstens één beheerder overblijven.');
         }
 
-        $member->update(['role' => $data['role']]);
+        $me->company->members()->updateExistingPivot($member->id, ['role' => $data['role']]);
+
+        // Is dit ook zijn actieve administratie, dan schuift de actieve rol mee.
+        if ($member->company_id === $me->company_id) {
+            $member->update(['role' => $data['role']]);
+        }
 
         return back()->with('flash', "Rol van {$member->name} aangepast naar " . User::ROLE_LABELS[$data['role']] . '.');
     }
@@ -129,17 +140,29 @@ class TeamController extends Controller
     public function removeUser(Request $request, User $member): RedirectResponse
     {
         $me = $request->user();
-        abort_unless($member->company_id === $me->company_id, 404);
+        $membership = $me->company->members()->whereKey($member->id)->first();
+        abort_unless($membership, 404);
 
         if ($member->id === $me->id) {
             return back()->with('error', 'Je kunt jezelf niet verwijderen.');
         }
 
-        if ($member->isOwner() && $this->ownerCount($me->company_id) === 1) {
+        if ($membership->pivot->role === 'owner' && $this->ownerCount($me->company_id) === 1) {
             return back()->with('error', 'Er moet minstens één beheerder overblijven.');
         }
 
-        $member->delete();
+        $me->company->members()->detach($member->id);
+
+        // Heeft diegene nog andere administraties, dan blijft het account
+        // bestaan en wisselt het naar de eerstvolgende; anders vervalt het.
+        if ($member->company_id === $me->company_id) {
+            $next = $member->companies()->orderBy('name')->first();
+            if ($next) {
+                $member->switchToCompany($next);
+            } else {
+                $member->delete();
+            }
+        }
 
         return back()->with('flash', "{$member->name} is verwijderd uit het team.");
     }
@@ -171,6 +194,9 @@ class TeamController extends Controller
 
     private function ownerCount(int $companyId): int
     {
-        return User::where('company_id', $companyId)->where('role', 'owner')->count();
+        return \Illuminate\Support\Facades\DB::table('company_user')
+            ->where('company_id', $companyId)
+            ->where('role', 'owner')
+            ->count();
     }
 }

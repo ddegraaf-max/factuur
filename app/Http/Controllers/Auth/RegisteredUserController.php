@@ -73,12 +73,17 @@ class RegisteredUserController extends Controller
                 'trial_ends_at' => now()->addDays(14),
             ]);
 
-            return User::create([
+            $user = User::create([
                 'name' => $data['firstName'] . ' ' . $data['lastName'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'company_id' => $company->id,
             ]);
+
+            // Lidmaatschap vastleggen (meerdere administraties per gebruiker).
+            $user->companies()->attach($company->id, ['role' => $user->role ?: 'owner']);
+
+            return $user;
         });
 
         $code = $user->generateVerificationCode();

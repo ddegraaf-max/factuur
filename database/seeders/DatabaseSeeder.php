@@ -53,6 +53,9 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
+        // Lidmaatschap vastleggen (meerdere administraties per gebruiker).
+        $user->companies()->attach($company->id, ['role' => 'owner']);
+
         // Authenticate so scoped models get company_id auto-assigned
         Auth::login($user);
 
@@ -244,6 +247,22 @@ class DatabaseSeeder extends Seeder
                 'billable' => $t['billable'] ?? true,
             ]);
         }
+
+        // 9. Tweede administratie onder dezelfde inlog (demo van het wisselen).
+        $second = Company::create([
+            'name' => 'Vries Fotografie',
+            'kvk_number' => '76543210',
+            'email' => 'foto@vriesdesign.nl',
+            'country' => 'NL',
+            'currency' => 'EUR',
+            'brand_color' => '#0E7490',
+            'default_payment_terms' => 14,
+            'invoice_number_format' => 'FOTO-{year}-{sequence:3}',
+            'invoice_template' => 'minimal',
+            'price_mode' => 'excl',
+            'trial_ends_at' => now()->addDays(14),
+        ]);
+        $user->companies()->attach($second->id, ['role' => 'owner']);
 
         Auth::logout();
 

@@ -35,9 +35,42 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /** De ACTIEVE administratie (alle company-scoping leest dit veld). */
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /** Alle administraties waarvan deze gebruiker lid is, met rol per administratie. */
+    public function companies(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Company::class)->withPivot('role')->withTimestamps();
+    }
+
+    /** Is deze gebruiker lid van de administratie? */
+    public function isMemberOf(Company $company): bool
+    {
+        return $this->companies()->whereKey($company->id)->exists();
+    }
+
+    /**
+     * Wissel naar een andere administratie: het actieve bedrijf én de rol
+     * dáárin worden op de gebruiker gezet, zodat alle bestaande scoping en
+     * rolcontroles gewoon blijven werken.
+     */
+    public function switchToCompany(Company $company): bool
+    {
+        $membership = $this->companies()->whereKey($company->id)->first();
+        if (! $membership) {
+            return false;
+        }
+
+        $this->forceFill([
+            'company_id' => $company->id,
+            'role' => $membership->pivot->role ?: 'staff',
+        ])->save();
+
+        return true;
     }
 
     /* ===================== ROLLEN ===================== */

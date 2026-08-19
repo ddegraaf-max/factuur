@@ -178,6 +178,14 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('abonnement/beheren', [BillingController::class, 'portal'])
         ->middleware('role:owner')->name('billing.portal');
 
+    // Administraties: meerdere bedrijven onder één inlog. Ook bereikbaar als
+    // de proefperiode van de actieve administratie is verlopen — wisselen
+    // naar (of aanmaken van) een andere administratie moet altijd kunnen.
+    Route::get('administraties', [\App\Http\Controllers\AdministrationController::class, 'index'])->name('administrations.index');
+    Route::post('administraties', [\App\Http\Controllers\AdministrationController::class, 'store'])
+        ->middleware('throttle:5,1')->name('administrations.store');
+    Route::post('administraties/wissel/{company}', [\App\Http\Controllers\AdministrationController::class, 'switch'])->name('administrations.switch');
+
     // Alles hieronder vereist een actieve proefperiode of abonnement.
     Route::middleware('subscribed')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

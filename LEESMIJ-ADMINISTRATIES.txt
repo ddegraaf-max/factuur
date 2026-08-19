@@ -1,0 +1,54 @@
+EASYINVOICE — MEERDERE ADMINISTRATIES
+=====================================
+
+WAT IS HET
+----------
+Meerdere bedrijven beheren onder één inlog en moeiteloos wisselen. Elke
+administratie is een volledig eigen bedrijf: eigen KvK, klanten,
+facturen, offertes, uren, ritten, huisstijl, handelsnamen, nummering én
+een eigen abonnement (met eigen proefperiode van 14 dagen).
+
+- WISSELEN: klik linksonder op je naam — onder "Administraties" staan al
+  je bedrijven met een vinkje bij de actieve. Eén klik en je zit in de
+  andere administratie. Wisselen werkt óók als de proefperiode van de
+  actieve administratie is verlopen.
+- AANMAKEN: "Administraties beheren" (of /administraties) → "Nieuwe
+  administratie": naam + KvK-nummer (8 cijfers, uniek) + optioneel
+  BTW-nummer. Je wordt automatisch beheerder en wisselt direct.
+- ROLLEN PER ADMINISTRATIE: je kunt beheerder zijn in de één en
+  boekhouder (alleen-inzien) in de ander. Ook een boekhouder mag
+  wisselen en een eigen administratie starten.
+- ÉÉN INLOG VOOR DE BOEKHOUDER: wordt een e-mailadres uitgenodigd dat al
+  een EasyInvoice-account heeft, dan maakt de uitnodigingslink geen
+  nieuw account maar koppelt hij de administratie aan die inlog (zelfde
+  vertrouwensmodel als een wachtwoord-reset: de geheime link kwam op dat
+  adres binnen). De oude blokkade "één e-mailadres = één bedrijf" is weg.
+
+ARCHITECTUUR (bewust minimaal-invasief)
+---------------------------------------
+- Nieuwe koppeltabel company_user (company_id, user_id, role) met een
+  backfill voor alle bestaande gebruikers.
+- users.company_id blijft de ACTIEVE administratie en users.role de rol
+  dáárin; bij het wisselen worden beide bijgewerkt vanuit het
+  lidmaatschap. Daardoor blijven ALLE bestaande company-scopes,
+  rolcontroles en middleware ongewijzigd werken.
+- Teambeheer draait nu op de lidmaatschappen: ledenlijst, rol wijzigen
+  en verwijderen gaan via de pivot. Verwijder je iemand die deze
+  administratie actief had, dan wisselt diens account automatisch naar
+  een andere administratie — of wordt het verwijderd als er geen is.
+- Abonnement/proefperiode blijven per bedrijf (companies), dus elke
+  administratie rekent apart af. Voor extra administraties worden geen
+  Resend-proefmails ingepland (die flow blijft van de registratie).
+
+TECHNIEK
+--------
+- Migratie: company_user + backfill (rol uit users.role, standaard owner).
+- Nieuw: app/Http/Controllers/AdministrationController.php,
+  resources/js/Pages/Settings/Administraties.vue, wisselaar in het
+  gebruikersmenu (AppLayout), User::companies()/isMemberOf()/
+  switchToCompany(), Company::members().
+- Routes: administrations.index/store/switch — binnen auth maar BUITEN
+  'subscribed', en op de whitelist van de boekhouder-middleware.
+- Registratie, uitnodigingen en de demo-omgeving leggen lidmaatschappen
+  vast; de demo-inlog heeft een tweede administratie ("Vries Fotografie")
+  zodat het wisselen direct te zien is.
