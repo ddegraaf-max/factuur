@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.13.0</div>
+        <h3>Facturen en offertes in het Engels</h3>
+        <ul class="tl-list">
+          <li><b>Taal per klant</b> — zet op de klantkaart de taal op Engels en alles wat die klant ontvangt is Engelstalig: de factuur- en offerte-PDF (alle sjablonen), de begeleidende e-mails én de datums ("19 August 2026").</li>
+          <li><b>Slim vastgelegd</b> — de taal wordt per document vastgelegd bij het aanmaken. Verander je de klantinstelling later, dan blijven eerder verstuurde facturen exact zoals de klant ze kreeg. Ook creditnota's, herinnering-bijlagen en het incassodossier volgen de documenttaal.</li>
+          <li>Je eigen teksten (omschrijvingen, notities, voetnoot) blijven zoals jij ze typt — jij bepaalt de taal daarvan zelf. Bedragen houden de vertrouwde notatie (€ 1.234,56).</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.12.0</div>
         <h3>Handelsnamen nu ook op offertes</h3>
         <ul class="tl-list">

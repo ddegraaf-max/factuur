@@ -3,11 +3,11 @@
     $logo = $company->logoBinary();
 @endphp
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offerte {{ $quote->number }}</title>
+    <title>{{ __('doc.quote_tc') }} {{ $quote->number }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -38,35 +38,34 @@
                      alt="{{ $company->name }}" style="max-height:40px;max-width:200px;display:block;border:0;margin-bottom:8px;background:#fff;padding:4px 8px;border-radius:6px;">
             @endif
             <div class="co">{{ $company->name }}</div>
-            <div class="kind">Offerte {{ $quote->number }}</div>
+            <div class="kind">{{ __('doc.quote_tc') }} {{ $quote->number }}</div>
         </div>
 
         <div class="body">
-            <h1>Beste {{ $quote->customer_name }},</h1>
+            <h1>{{ __('doc.mail_greeting', ['name' => $quote->customer_name]) }}</h1>
 
             @if ($quote->intro)
                 <p>{!! nl2br(e($quote->intro)) !!}</p>
             @else
-                <p>Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.</p>
+                <p>{{ __('doc.mail_quote_intro_default') }}</p>
             @endif
 
             <div class="amount-box">
                 <div class="amount">{{ $eur($quote->total) }}</div>
-                <div class="amount-lbl">totaal incl. btw</div>
+                <div class="amount-lbl">{{ __('doc.mail_quote_total_lbl') }}</div>
             </div>
 
             <table class="meta">
-                <tr><td>Offertenummer</td><td>{{ $quote->number }}</td></tr>
-                <tr><td>Datum</td><td>{{ $quote->quote_date->translatedFormat('j F Y') }}</td></tr>
-                <tr><td>Geldig tot</td><td>{{ $quote->valid_until->translatedFormat('j F Y') }}</td></tr>
+                <tr><td>{{ __('doc.mail_quote_number') }}</td><td>{{ $quote->number }}</td></tr>
+                <tr><td>{{ __('doc.mail_date') }}</td><td>{{ $quote->quote_date->translatedFormat('j F Y') }}</td></tr>
+                <tr><td>{{ __('doc.valid_until') }}</td><td>{{ $quote->valid_until->translatedFormat('j F Y') }}</td></tr>
                 @if ($quote->reference)
-                    <tr><td>Referentie</td><td>{{ $quote->reference }}</td></tr>
+                    <tr><td>{{ __('doc.reference') }}</td><td>{{ $quote->reference }}</td></tr>
                 @endif
             </table>
 
             <div class="valid">
-                <strong>Akkoord?</strong> Beantwoord deze e-mail — dan zetten we de offerte om in een opdracht.
-                Vragen of iets aanpassen kan natuurlijk ook.
+                {!! __('doc.mail_quote_agree') !!}
             </div>
 
             @if ($quote->notes)
@@ -76,7 +75,7 @@
 
         <div class="footer">
             {{ $company->name }}
-            @if ($company->kvk_number) · KVK {{ $company->kvk_number }} @endif
+            @if ($company->kvk_number) · {{ __('doc.coc') }} {{ $company->kvk_number }} @endif
             @if ($company->email) · {{ $company->email }} @endif
         </div>
     </div>

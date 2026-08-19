@@ -1,0 +1,75 @@
+<?php
+
+/**
+ * Teksten op klantdocumenten (factuur- en offerte-PDF's en -mails).
+ * De taal volgt het document (invoices.language / quotes.language, een
+ * momentopname van de klantinstelling) — zie App\Support\DocumentLocale.
+ */
+return [
+    // Documenttitels
+    'invoice' => 'FACTUUR',
+    'invoice_tc' => 'Factuur',
+    'quote' => 'OFFERTE',
+    'quote_tc' => 'Offerte',
+    'draft' => 'CONCEPT',
+    'draft_tc' => 'Concept',
+
+    // Partijen en meta
+    'to' => 'Aan',
+    'from' => 'Van',
+    'for' => 'Voor',
+    'addressee' => 'Geadresseerde',
+    'coc' => 'KVK',
+    'vat_no' => 'BTW',
+    'invoice_date' => 'Factuurdatum',
+    'due_date' => 'Vervaldatum',
+    'quote_date' => 'Offertedatum',
+    'valid_until' => 'Geldig tot',
+    'reference' => 'Referentie',
+
+    // Regels en totalen
+    'description' => 'Omschrijving',
+    'quantity' => 'Aantal',
+    'price' => 'Prijs',
+    'vat' => 'BTW',
+    'total' => 'Totaal',
+    'subtotal' => 'Subtotaal',
+    'total_incl_vat' => 'Totaal incl. btw',
+    'already_settled' => 'Reeds doorgestort',
+    'amount_due' => 'Te betalen',
+    'note' => 'Opmerking',
+
+    // Betaalinstructie op de factuur
+    'pay_instruction' => 'Gelieve het bedrag binnen <strong>:days dagen</strong> over te maken naar <strong>:iban</strong> ten name van <strong>:name</strong>',
+    'pay_reference' => ' onder vermelding van factuurnummer <strong>:number</strong>',
+
+    // Geldigheid op de offerte
+    'quote_valid_note' => 'Deze offerte is geldig tot en met <strong>:date</strong>.',
+    'quote_accept_note' => 'Ga je akkoord? Laat het ons weten via een reply op deze e-mail:phone — dan zetten wij de offerte om in een opdracht. Genoemde bedragen zijn exclusief btw, tenzij anders vermeld.',
+    'quote_accept_phone' => ' of bel :phone',
+
+    // Factuurmail
+    'mail_invoice_subject' => 'Factuur :number — :company',
+    'mail_greeting' => 'Beste :name,',
+    'mail_invoice_intro' => 'Hierbij ontvangt u factuur <strong>:number</strong> van :date voor een bedrag van <strong>€ :total</strong>. De factuur vindt u als PDF in de bijlage.',
+    'mail_settled_partial' => 'Hierop is reeds <strong>€ :settled</strong> verrekend/doorgestort; het te betalen bedrag is <strong>€ :open</strong>.',
+    'mail_settled_full' => 'Het volledige bedrag is reeds verrekend/doorgestort — u hoeft niets meer te betalen.',
+    'mail_the_amount' => 'het bedrag',
+    'mail_remaining_amount' => 'het resterende bedrag',
+    'mail_by_date' => 'uiterlijk <strong>:date</strong>',
+    'mail_within_days' => 'binnen <strong>:days dagen</strong>',
+    'mail_to_account' => ' op <strong>:iban</strong> t.n.v. :name',
+    'mail_pay_request' => 'Wij verzoeken u :amount :deadline te voldoen:account onder vermelding van factuurnummer <strong>:number</strong>.',
+    'mail_view_invoice' => 'Bekijk factuur online',
+    'mail_portal_hint' => 'In de beveiligde online omgeving ziet u de factuur, de betaalstatus en kunt u de PDF opnieuw downloaden. Voor uw veiligheid bevestigt u eerst uw e-mailadres met een eenmalige code.',
+    'mail_regards' => 'Met vriendelijke groet,',
+    'mail_sent_via' => 'Verzonden via EasyInvoice namens :name.',
+
+    // Offertemail
+    'mail_quote_subject' => 'Offerte :number — :company',
+    'mail_quote_intro_default' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
+    'mail_quote_total_lbl' => 'totaal incl. btw',
+    'mail_quote_number' => 'Offertenummer',
+    'mail_date' => 'Datum',
+    'mail_quote_agree' => '<strong>Akkoord?</strong> Beantwoord deze e-mail — dan zetten we de offerte om in een opdracht. Vragen of iets aanpassen kan natuurlijk ook.',
+];

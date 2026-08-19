@@ -44,12 +44,18 @@ class InvoiceManager
             $mode = $this->priceMode($customer->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
+            // Documenttaal: momentopname van de klantinstelling (of expliciet
+            // meegegeven, bijv. bij het omzetten van een offerte).
+            $language = $data['language'] ?? $customer->language ?? 'nl';
+            $language = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
+
             $invoice = Invoice::create([
                 // Expliciet meegeven: bij het genereren via de console (terugkerende
                 // facturen) is er geen ingelogde gebruiker die dit automatisch invult.
                 'company_id' => $customer->company_id,
                 'customer_id' => $customer->id,
                 'brand_profile_id' => $profile?->id,
+                'language' => $language,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
                 'invoice_date' => $invoiceDate,
@@ -185,48 +191,57 @@ class InvoiceManager
                 return;
             }
 
-            // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
-            $company = $invoice->brandedCompany();
-            $invoice->load('lines');
-
-            $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
-                ? $company->invoice_template
-                : 'modern';
-
-            $pdf = Pdf::loadView("pdf.invoice-{$template}", [
-                'invoice' => $invoice,
-                'company' => $company,
-            ])->setPaper('a4')->output();
-
-            // E-facturatie: UBL-bijlage genereren. Mislukt dit, dan gaat de
-            // factuurmail gewoon (alleen met PDF) de deur uit.
-            $ubl = null;
-            try {
-                $ubl = app(UblGenerator::class)->generate($invoice);
-            } catch (\Throwable $e) {
-                Log::warning('UBL-bijlage genereren mislukt', [
-                    'invoice' => $invoice->id,
-                    'error' => $e->getMessage(),
-                ]);
-            }
-
-            $mail = Mail::to($invoice->customer_email);
-
-            $cc = $company->copy_email ?: $company->email;
-            if ($cc && strcasecmp($cc, $invoice->customer_email) !== 0) {
-                $mail->cc($cc);
-            }
-            if (! empty($company->accountant_email)) {
-                $mail->bcc($company->accountant_email);
-            }
-
-            $mail->send(new InvoiceMail($invoice, $pdf, $ubl));
+            // PDF én mail in de taal van het document (nl of en).
+            \App\Support\DocumentLocale::using($invoice->language, function () use ($invoice) {
+                $this->renderAndMail($invoice);
+            });
         } catch (\Throwable $e) {
             Log::error('Factuur mailen mislukt', [
                 'invoice' => $invoice->id,
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /** Bouwt de PDF (+ UBL) en verstuurt de factuurmail — binnen de documenttaal. */
+    protected function renderAndMail(Invoice $invoice): void
+    {
+        // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
+        $company = $invoice->brandedCompany();
+        $invoice->load('lines');
+
+        $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
+            ? $company->invoice_template
+            : 'modern';
+
+        $pdf = Pdf::loadView("pdf.invoice-{$template}", [
+            'invoice' => $invoice,
+            'company' => $company,
+        ])->setPaper('a4')->output();
+
+        // E-facturatie: UBL-bijlage genereren. Mislukt dit, dan gaat de
+        // factuurmail gewoon (alleen met PDF) de deur uit.
+        $ubl = null;
+        try {
+            $ubl = app(UblGenerator::class)->generate($invoice);
+        } catch (\Throwable $e) {
+            Log::warning('UBL-bijlage genereren mislukt', [
+                'invoice' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        $mail = Mail::to($invoice->customer_email);
+
+        $cc = $company->copy_email ?: $company->email;
+        if ($cc && strcasecmp($cc, $invoice->customer_email) !== 0) {
+            $mail->cc($cc);
+        }
+        if (! empty($company->accountant_email)) {
+            $mail->bcc($company->accountant_email);
+        }
+
+        $mail->send(new InvoiceMail($invoice, $pdf, $ubl));
     }
 
     /** 'incl' wanneer de ondernemer zijn prijzen inclusief btw invoert. */

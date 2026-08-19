@@ -30,7 +30,10 @@ class QuoteMail extends Mailable
         return new Envelope(
             from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
-            subject: 'Offerte '.$this->quote->number.' — '.($company->name ?? 'EasyInvoice'),
+            subject: __('doc.mail_quote_subject', [
+                'number' => $this->quote->number,
+                'company' => $company->name ?? 'EasyInvoice',
+            ]),
         );
     }
 

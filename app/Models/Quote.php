@@ -23,7 +23,7 @@ class Quote extends Model
 
     protected $fillable = [
         'company_id', 'customer_id', 'brand_profile_id', 'number', 'reference', 'status',
-        'quote_date', 'valid_until',
+        'quote_date', 'valid_until', 'language',
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',

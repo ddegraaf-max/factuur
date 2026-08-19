@@ -45,6 +45,7 @@
         <a class="help-link" href="{{ route('help.article', 'btw-per-regel') }}">BTW per regel instellen →</a>
         <a class="help-link" href="{{ route('help.article', 'creditfactuur-maken') }}">Een creditfactuur maken →</a>
         <a class="help-link" href="{{ route('help.article', 'factuurnummering') }}">Factuurnummering aanpassen →</a>
+        <a class="help-link" href="{{ route('help.article', 'facturen-in-het-engels') }}">Facturen in het Engels →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">💸</div>

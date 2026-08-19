@@ -155,10 +155,10 @@ class PortalController extends Controller
             ? $company->invoice_template
             : 'modern';
 
-        $pdf = Pdf::loadView("pdf.invoice-{$template}", [
+        $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,
             'company' => $company,
-        ])->setPaper('a4');
+        ])->setPaper('a4'));
 
         return $pdf->download(($invoice->number ?: 'factuur') . '.pdf');
     }

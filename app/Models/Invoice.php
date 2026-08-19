@@ -17,7 +17,7 @@ class Invoice extends Model
     protected $fillable = [
         'company_id', 'customer_id', 'brand_profile_id', 'number', 'portal_token', 'reference', 'status',
         'is_credit', 'credits_invoice_id',
-        'invoice_date', 'due_date', 'payment_terms',
+        'invoice_date', 'due_date', 'payment_terms', 'language',
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',

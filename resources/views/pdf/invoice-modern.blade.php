@@ -94,9 +94,9 @@
       </div>
     </td>
     <td style="text-align:right;">
-      <div class="doc-title brand">FACTUUR</div>
+      <div class="doc-title brand">{{ __('doc.invoice') }}</div>
       <div class="doc-number">
-        @if($invoice->number){{ $invoice->number }}@else<span class="badge">CONCEPT</span>@endif
+        @if($invoice->number){{ $invoice->number }}@else<span class="badge">{{ __('doc.draft') }}</span>@endif
       </div>
     </td>
   </tr>
@@ -105,22 +105,22 @@
 <table class="parties">
   <tr>
     <td>
-      <div class="party-label">Aan</div>
+      <div class="party-label">{{ __('doc.to') }}</div>
       <div class="party-name">{{ $invoice->customer_name }}</div>
       @if($invoice->customer_address_line)<div class="party-line">{{ $invoice->customer_address_line }}</div>@endif
       @if($invoice->customer_postal_code || $invoice->customer_city)
         <div class="party-line">{{ $invoice->customer_postal_code }} {{ $invoice->customer_city }}</div>
       @endif
-      @if($invoice->customer_kvk_number)<div class="party-line">KVK {{ $invoice->customer_kvk_number }}</div>@endif
-      @if($invoice->customer_vat_number)<div class="party-line">BTW {{ $invoice->customer_vat_number }}</div>@endif
+      @if($invoice->customer_kvk_number)<div class="party-line">{{ __('doc.coc') }} {{ $invoice->customer_kvk_number }}</div>@endif
+      @if($invoice->customer_vat_number)<div class="party-line">{{ __('doc.vat_no') }} {{ $invoice->customer_vat_number }}</div>@endif
     </td>
     <td>
       <table class="meta-table">
-        <tr><td class="meta-label">Factuurdatum</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>
-        <tr><td class="meta-label">Vervaldatum</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>
-        @if($invoice->reference)<tr><td class="meta-label">Referentie</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
-        @if($company->kvk_number)<tr><td class="meta-label">KVK</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
-        @if($company->vat_number)<tr><td class="meta-label">BTW</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
+        <tr><td class="meta-label">{{ __('doc.invoice_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>
+        <tr><td class="meta-label">{{ __('doc.due_date') }}</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>
+        @if($invoice->reference)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
+        @if($company->kvk_number)<tr><td class="meta-label">{{ __('doc.coc') }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
+        @if($company->vat_number)<tr><td class="meta-label">{{ __('doc.vat_no') }}</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
       </table>
     </td>
   </tr>
@@ -129,11 +129,11 @@
 <table class="lines">
   <thead>
     <tr>
-      <th style="width:50%;">Omschrijving</th>
-      <th class="right" style="width:10%;">Aantal</th>
-      <th class="right" style="width:14%;">Prijs</th>
-      <th class="center" style="width:8%;">BTW</th>
-      <th class="right" style="width:18%;">Totaal</th>
+      <th style="width:50%;">{{ __('doc.description') }}</th>
+      <th class="right" style="width:10%;">{{ __('doc.quantity') }}</th>
+      <th class="right" style="width:14%;">{{ __('doc.price') }}</th>
+      <th class="center" style="width:8%;">{{ __('doc.vat') }}</th>
+      <th class="right" style="width:18%;">{{ __('doc.total') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -153,10 +153,10 @@
 </table>
 
 <table class="totals">
-  <tr><td class="label">Subtotaal</td><td class="value">€ {{ number_format($invoice->subtotal, 2, ',', '.') }}</td></tr>
+  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">€ {{ number_format($invoice->subtotal, 2, ',', '.') }}</td></tr>
   @if(is_array($invoice->vat_breakdown))
     @foreach($invoice->vat_breakdown as $rate => $amount)
-      <tr><td class="label">BTW {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€ {{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€ {{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
     @endforeach
   @endif
   @php
@@ -166,20 +166,20 @@
     $pdfPayable = max((float) $invoice->total - (float) $pdfAdvances->sum('amount'), 0);
   @endphp
   @if($pdfAdvances->isNotEmpty())
-    <tr><td class="label">Totaal incl. btw</td><td class="value">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+    <tr><td class="label">{{ __('doc.total_incl_vat') }}</td><td class="value">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
     @foreach($pdfAdvances as $adv)
-      <tr><td class="label">{{ $adv->reference ?: 'Reeds doorgestort' }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">− € {{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">− € {{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
     @endforeach
-    <tr class="grand-row"><td>Te betalen</td><td class="value brand">€ {{ number_format($pdfPayable, 2, ',', '.') }}</td></tr>
+    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value brand">€ {{ number_format($pdfPayable, 2, ',', '.') }}</td></tr>
   @else
-    <tr class="grand-row"><td>Te betalen</td><td class="value brand">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value brand">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
   @endif
 </table>
 
 <div style="clear:both;"></div>
 
-@if($invoice->notes)<div class="notes"><strong>Opmerking:</strong><br>{!! nl2br(e($invoice->notes)) !!}</div>@endif
-@if($company->iban)<div class="notes">Gelieve het bedrag binnen <strong>{{ $invoice->payment_terms }} dagen</strong> over te maken naar <strong>{{ $company->iban }}</strong> ten name van <strong>{{ $company->name }}</strong>@if($invoice->number) onder vermelding van factuurnummer <strong>{{ $invoice->number }}</strong>@endif.</div>@endif
+@if($invoice->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($invoice->notes)) !!}</div>@endif
+@if($company->iban)<div class="notes">{!! __('doc.pay_instruction', ['days' => (int) $invoice->payment_terms, 'iban' => e($company->iban), 'name' => e($company->name)]) !!}@if($invoice->number){!! __('doc.pay_reference', ['number' => e($invoice->number)]) !!}@endif.</div>@endif
 @if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
 
 </body>

@@ -34,7 +34,10 @@ class InvoiceMail extends Mailable
         return new Envelope(
             from: new Address(config('mail.from.address'), $company->name ?: config('mail.from.name')),
             replyTo: array_filter([$this->companyReplyTo($company)]),
-            subject: 'Factuur ' . $this->invoice->number . ' — ' . ($company->name ?? 'EasyInvoice'),
+            subject: __('doc.mail_invoice_subject', [
+                'number' => $this->invoice->number,
+                'company' => $company->name ?? 'EasyInvoice',
+            ]),
         );
     }
 

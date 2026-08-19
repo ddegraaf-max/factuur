@@ -77,6 +77,7 @@ const form = useForm({
   postal_code: props.customer?.postal_code ?? '',
   city: props.customer?.city ?? '',
   country: props.customer?.country ?? 'NL',
+  language: props.customer?.language ?? 'nl',
   payment_terms: props.customer?.payment_terms ?? null,
   hourly_rate: props.customer?.hourly_rate ?? null,
   notes: props.customer?.notes ?? '',
@@ -273,6 +274,13 @@ const remove = () => {
       <div class="card" style="margin-top:16px;">
         <div class="card-header"><div class="card-title">Voorkeuren</div></div>
         <div class="card-body">
+          <div class="form-group">
+            <label>Taal van factuur &amp; offerte<span class="label-hint">(PDF en e-mail aan deze klant)</span></label>
+            <select v-model="form.language">
+              <option value="nl">Nederlands</option>
+              <option value="en">Engels</option>
+            </select>
+          </div>
           <div class="form-group">
             <label>Betalingstermijn<span class="label-hint">(laat leeg voor standaard van bedrijf)</span></label>
             <input type="number" v-model="form.payment_terms" min="0" max="365" placeholder="Standaard">

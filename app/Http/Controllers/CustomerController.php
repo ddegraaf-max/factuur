@@ -102,6 +102,7 @@ class CustomerController extends Controller
             'postal_code' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:100'],
             'country' => ['required', 'string', 'size:2'],
+            'language' => ['nullable', 'in:nl,en'],
             'payment_terms' => ['nullable', 'integer', 'min:0', 'max:365'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'notes' => ['nullable', 'string'],

@@ -306,6 +306,24 @@ return [
             ],
         ],
 
+        'facturen-in-het-engels' => [
+            'category' => 'Facturen',
+            'title' => 'Facturen en offertes in het Engels',
+            'intro' => 'Voor internationale opdrachtgevers: zet de taal op de klantkaart op Engels en alle documenten en e-mails aan die klant zijn Engelstalig.',
+            'sections' => [
+                ['Instellen', [
+                    'Open de klant en zet bij Voorkeuren "Taal van factuur & offerte" op Engels. Vanaf dat moment zijn nieuwe facturen en offertes voor deze klant Engelstalig: de PDF (alle sjablonen), de begeleidende e-mail — inclusief onderwerpregel — en de datums ("19 August 2026").',
+                ]],
+                ['Wat er precies vertaald wordt', [
+                    'Alle vaste teksten: kopjes als factuurdatum en vervaldatum, de tabelkoppen, totalen, de betaalinstructie en de portaalknop. Je eigen teksten — regel-omschrijvingen, notities, de begeleidende offertetekst en je voetnoot — blijven zoals jij ze typt: die schrijf je voor een Engelse klant dus zelf in het Engels. Bedragen houden de Europese notatie (€ 1.234,56).',
+                    'Ook de PDF-bijlage bij betalingsherinneringen en het incassodossier gebruiken de documenttaal. De teksten van herinneringen zelf komen uit je eigen sjablonen (Instellingen → Herinneringen) — pas die aan als veel van je klanten Engelstalig zijn.',
+                ]],
+                ['Per document vastgelegd', [
+                    'De taal wordt bij het aanmaken op het document vastgelegd. Wijzig je de klantinstelling later, dan veranderen eerder gemaakte facturen en offertes dus niet — de klant houdt precies wat hij ontving. Creditnota\'s erven de taal van de oorspronkelijke factuur, en een offerte die je omzet naar een factuur houdt zijn taal.',
+                ]],
+            ],
+        ],
+
         // ---------- UREN ----------
         'urenregistratie' => [
             'category' => 'Uren',

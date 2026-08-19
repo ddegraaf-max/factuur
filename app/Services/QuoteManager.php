@@ -40,10 +40,15 @@ class QuoteManager
             $lines = $data['lines'] ?? [];
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
+            // Documenttaal: momentopname van de klantinstelling.
+            $language = $customer->language ?? 'nl';
+            $language = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
+
             $quote = Quote::create([
                 'company_id' => $company->id,
                 'customer_id' => $customer->id,
                 'brand_profile_id' => $profile?->id,
+                'language' => $language,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
                 'quote_date' => $quoteDate,
@@ -204,8 +209,9 @@ class QuoteManager
 
             $invoice = $this->invoices->create([
                 'customer_id' => $quote->customer_id,
-                // De factuur gaat onder dezelfde handelsnaam de deur uit.
+                // De factuur gaat onder dezelfde handelsnaam én taal de deur uit.
                 'brand_profile_id' => $quote->brand_profile_id,
+                'language' => $quote->language,
                 'invoice_date' => now()->toDateString(),
                 'reference' => $quote->reference ?: ('Offerte '.$quote->number),
                 'notes' => $quote->notes,
@@ -281,29 +287,36 @@ class QuoteManager
                 return;
             }
 
-            // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
-            $company = $quote->brandedCompany();
-            $quote->load('lines');
-
-            $pdf = Pdf::loadView('pdf.quote', [
-                'quote' => $quote,
-                'company' => $company,
-            ])->setPaper('a4')->output();
-
-            $mail = Mail::to($quote->customer_email);
-
-            $cc = $company->copy_email ?: $company->email;
-            if ($cc && strcasecmp($cc, $quote->customer_email) !== 0) {
-                $mail->cc($cc);
-            }
-
-            $mail->send(new QuoteMail($quote, $pdf));
+            // PDF én mail in de taal van het document (nl of en).
+            \App\Support\DocumentLocale::using($quote->language, fn () => $this->renderAndMail($quote));
         } catch (\Throwable $e) {
             Log::error('Offerte mailen mislukt', [
                 'quote' => $quote->id,
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    /** Bouwt de offerte-PDF en verstuurt de mail — binnen de documenttaal. */
+    protected function renderAndMail(Quote $quote): void
+    {
+        // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
+        $company = $quote->brandedCompany();
+        $quote->load('lines');
+
+        $pdf = Pdf::loadView('pdf.quote', [
+            'quote' => $quote,
+            'company' => $company,
+        ])->setPaper('a4')->output();
+
+        $mail = Mail::to($quote->customer_email);
+
+        $cc = $company->copy_email ?: $company->email;
+        if ($cc && strcasecmp($cc, $quote->customer_email) !== 0) {
+            $mail->cc($cc);
+        }
+
+        $mail->send(new QuoteMail($quote, $pdf));
     }
 
     /** Brutostuksprijs afgeleid uit het regeltotaal — precies wat er is ingetypt. */

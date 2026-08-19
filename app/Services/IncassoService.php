@@ -65,10 +65,10 @@ class IncassoService
                 ? $company->invoice_template
                 : 'modern';
 
-            $pdf = Pdf::loadView("pdf.invoice-{$template}", [
+            $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
                 'invoice' => $invoice,
                 'company' => $company,
-            ])->setPaper('a4')->output();
+            ])->setPaper('a4')->output());
 
             $files = [];
             foreach ($invoice->attachments as $att) {

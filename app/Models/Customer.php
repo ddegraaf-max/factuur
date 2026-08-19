@@ -15,7 +15,7 @@ class Customer extends Model
     protected $fillable = [
         'company_id', 'name', 'type', 'contact_name', 'email', 'phone',
         'kvk_number', 'vat_number', 'peppol_id',
-        'address_line', 'postal_code', 'city', 'country',
+        'address_line', 'postal_code', 'city', 'country', 'language',
         'payment_terms', 'hourly_rate', 'notes',
     ];
 

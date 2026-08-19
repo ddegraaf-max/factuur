@@ -192,10 +192,12 @@ class ReminderService
             ? $branded->invoice_template
             : 'modern';
 
-        $pdf = Pdf::loadView("pdf.invoice-{$template}", [
+        // De PDF-bijlage in de taal van de factuur; de herinneringstekst zelf
+        // komt uit de eigen sjablonen van de ondernemer (Instellingen).
+        $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,
             'company' => $branded,
-        ])->setPaper('a4')->output();
+        ])->setPaper('a4')->output());
 
         // Ook vanuit een herinnering moet de klant naar het portaal kunnen.
         $invoice->ensurePortalToken();

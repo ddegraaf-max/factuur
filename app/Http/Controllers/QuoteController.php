@@ -195,10 +195,10 @@ class QuoteController extends Controller
     {
         $quote->load('lines');
 
-        $pdf = Pdf::loadView('pdf.quote', [
+        $pdf = \App\Support\DocumentLocale::using($quote->language, fn () => Pdf::loadView('pdf.quote', [
             'quote' => $quote,
             'company' => $quote->brandedCompany(),
-        ])->setPaper('a4');
+        ])->setPaper('a4'));
 
         return $pdf->stream(($quote->number ?: "concept-{$quote->id}").'.pdf');
     }

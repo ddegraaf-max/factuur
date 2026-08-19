@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * Engelstalige documentteksten — voor klanten met taalinstelling "Engels".
+ * Bedragen houden bewust de Europese notatie (€ 1.234,56).
+ */
+return [
+    // Documenttitels
+    'invoice' => 'INVOICE',
+    'invoice_tc' => 'Invoice',
+    'quote' => 'QUOTATION',
+    'quote_tc' => 'Quotation',
+    'draft' => 'DRAFT',
+    'draft_tc' => 'Draft',
+
+    // Partijen en meta
+    'to' => 'To',
+    'from' => 'From',
+    'for' => 'For',
+    'addressee' => 'Addressee',
+    'coc' => 'CoC',
+    'vat_no' => 'VAT',
+    'invoice_date' => 'Invoice date',
+    'due_date' => 'Due date',
+    'quote_date' => 'Quotation date',
+    'valid_until' => 'Valid until',
+    'reference' => 'Reference',
+
+    // Regels en totalen
+    'description' => 'Description',
+    'quantity' => 'Qty',
+    'price' => 'Price',
+    'vat' => 'VAT',
+    'total' => 'Total',
+    'subtotal' => 'Subtotal',
+    'total_incl_vat' => 'Total incl. VAT',
+    'already_settled' => 'Already settled',
+    'amount_due' => 'Amount due',
+    'note' => 'Note',
+
+    // Betaalinstructie op de factuur
+    'pay_instruction' => 'Please transfer the amount within <strong>:days days</strong> to <strong>:iban</strong> in the name of <strong>:name</strong>',
+    'pay_reference' => ', quoting invoice number <strong>:number</strong>',
+
+    // Geldigheid op de offerte
+    'quote_valid_note' => 'This quotation is valid until <strong>:date</strong>.',
+    'quote_accept_note' => 'Would you like to go ahead? Simply reply to this e-mail:phone and we will turn the quotation into an assignment. All amounts are exclusive of VAT unless stated otherwise.',
+    'quote_accept_phone' => ' or call :phone',
+
+    // Factuurmail
+    'mail_invoice_subject' => 'Invoice :number — :company',
+    'mail_greeting' => 'Dear :name,',
+    'mail_invoice_intro' => 'Please find attached invoice <strong>:number</strong> dated :date for the amount of <strong>€ :total</strong>.',
+    'mail_settled_partial' => 'An amount of <strong>€ :settled</strong> has already been settled; the amount due is <strong>€ :open</strong>.',
+    'mail_settled_full' => 'The full amount has already been settled — no further payment is required.',
+    'mail_the_amount' => 'the amount',
+    'mail_remaining_amount' => 'the remaining amount',
+    'mail_by_date' => 'by <strong>:date</strong> at the latest',
+    'mail_within_days' => 'within <strong>:days days</strong>',
+    'mail_to_account' => ' to <strong>:iban</strong> in the name of :name',
+    'mail_pay_request' => 'We kindly request that you pay :amount :deadline:account, quoting invoice number <strong>:number</strong>.',
+    'mail_view_invoice' => 'View invoice online',
+    'mail_portal_hint' => 'In the secure online environment you can view the invoice and its payment status, and download the PDF again. For your security, you will first confirm your e-mail address with a one-time code.',
+    'mail_regards' => 'Kind regards,',
+    'mail_sent_via' => 'Sent via EasyInvoice on behalf of :name.',
+
+    // Offertemail
+    'mail_quote_subject' => 'Quotation :number — :company',
+    'mail_quote_intro_default' => 'Please find our quotation attached as a PDF.',
+    'mail_quote_total_lbl' => 'total incl. VAT',
+    'mail_quote_number' => 'Quotation number',
+    'mail_date' => 'Date',
+    'mail_quote_agree' => '<strong>Ready to go ahead?</strong> Simply reply to this e-mail and we will turn the quotation into an assignment. Questions or changes? Just let us know.',
+];

@@ -94,9 +94,9 @@
       </div>
     </td>
     <td style="text-align:right;">
-      <div class="doc-title brand">OFFERTE</div>
+      <div class="doc-title brand">{{ __('doc.quote') }}</div>
       <div class="doc-number">
-        @if($quote->number){{ $quote->number }}@else<span class="badge">CONCEPT</span>@endif
+        @if($quote->number){{ $quote->number }}@else<span class="badge">{{ __('doc.draft') }}</span>@endif
       </div>
     </td>
   </tr>
@@ -105,22 +105,22 @@
 <table class="parties">
   <tr>
     <td>
-      <div class="party-label">Voor</div>
+      <div class="party-label">{{ __('doc.for') }}</div>
       <div class="party-name">{{ $quote->customer_name }}</div>
       @if($quote->customer_address_line)<div class="party-line">{{ $quote->customer_address_line }}</div>@endif
       @if($quote->customer_postal_code || $quote->customer_city)
         <div class="party-line">{{ $quote->customer_postal_code }} {{ $quote->customer_city }}</div>
       @endif
-      @if($quote->customer_kvk_number)<div class="party-line">KVK {{ $quote->customer_kvk_number }}</div>@endif
-      @if($quote->customer_vat_number)<div class="party-line">BTW {{ $quote->customer_vat_number }}</div>@endif
+      @if($quote->customer_kvk_number)<div class="party-line">{{ __('doc.coc') }} {{ $quote->customer_kvk_number }}</div>@endif
+      @if($quote->customer_vat_number)<div class="party-line">{{ __('doc.vat_no') }} {{ $quote->customer_vat_number }}</div>@endif
     </td>
     <td>
       <table class="meta-table">
-        <tr><td class="meta-label">Offertedatum</td><td class="meta-value">{{ $quote->quote_date->translatedFormat('j F Y') }}</td></tr>
-        <tr><td class="meta-label">Geldig tot</td><td class="meta-value">{{ $quote->valid_until->translatedFormat('j F Y') }}</td></tr>
-        @if($quote->reference)<tr><td class="meta-label">Referentie</td><td class="meta-value">{{ $quote->reference }}</td></tr>@endif
-        @if($company->kvk_number)<tr><td class="meta-label">KVK</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
-        @if($company->vat_number)<tr><td class="meta-label">BTW</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
+        <tr><td class="meta-label">{{ __('doc.quote_date') }}</td><td class="meta-value">{{ $quote->quote_date->translatedFormat('j F Y') }}</td></tr>
+        <tr><td class="meta-label">{{ __('doc.valid_until') }}</td><td class="meta-value">{{ $quote->valid_until->translatedFormat('j F Y') }}</td></tr>
+        @if($quote->reference)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $quote->reference }}</td></tr>@endif
+        @if($company->kvk_number)<tr><td class="meta-label">{{ __('doc.coc') }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
+        @if($company->vat_number)<tr><td class="meta-label">{{ __('doc.vat_no') }}</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
       </table>
     </td>
   </tr>
@@ -131,11 +131,11 @@
 <table class="lines">
   <thead>
     <tr>
-      <th style="width:50%;">Omschrijving</th>
-      <th class="right" style="width:10%;">Aantal</th>
-      <th class="right" style="width:14%;">Prijs</th>
-      <th class="center" style="width:8%;">BTW</th>
-      <th class="right" style="width:18%;">Totaal</th>
+      <th style="width:50%;">{{ __('doc.description') }}</th>
+      <th class="right" style="width:10%;">{{ __('doc.quantity') }}</th>
+      <th class="right" style="width:14%;">{{ __('doc.price') }}</th>
+      <th class="center" style="width:8%;">{{ __('doc.vat') }}</th>
+      <th class="right" style="width:18%;">{{ __('doc.total') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -155,26 +155,22 @@
 </table>
 
 <table class="totals">
-  <tr><td class="label">Subtotaal</td><td class="value">€ {{ number_format($quote->subtotal, 2, ',', '.') }}</td></tr>
+  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">€ {{ number_format($quote->subtotal, 2, ',', '.') }}</td></tr>
   @if(is_array($quote->vat_breakdown))
     @foreach($quote->vat_breakdown as $rate => $amount)
-      <tr><td class="label">BTW {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€ {{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€ {{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
     @endforeach
   @endif
-  <tr class="grand-row"><td>Totaal</td><td class="value brand">€ {{ number_format($quote->total, 2, ',', '.') }}</td></tr>
+  <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value brand">€ {{ number_format($quote->total, 2, ',', '.') }}</td></tr>
 </table>
 
 <div style="clear:both;"></div>
 
-@if($quote->notes)<div class="notes"><strong>Opmerking:</strong><br>{!! nl2br(e($quote->notes)) !!}</div>@endif
+@if($quote->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($quote->notes)) !!}</div>@endif
 
 <div class="validity">
-  Deze offerte is geldig tot en met <strong>{{ $quote->valid_until->translatedFormat('j F Y') }}</strong>.
-  {{-- Let op: geen @if direct achter een woordteken plakken ("e-mail@if"). Blade
-       compileert die directive dan niet, waardoor de bijbehorende @endif als
-       weesje overblijft en de template niet meer parset. --}}
-  Ga je akkoord? Laat het ons weten via een reply op deze e-mail{{ $company->phone ? ' of bel '.$company->phone : '' }} —
-  dan zetten wij de offerte om in een opdracht. Genoemde bedragen zijn exclusief btw, tenzij anders vermeld.
+  {!! __('doc.quote_valid_note', ['date' => e($quote->valid_until->translatedFormat('j F Y'))]) !!}
+  {!! __('doc.quote_accept_note', ['phone' => $company->phone ? __('doc.quote_accept_phone', ['phone' => e($company->phone)]) : '']) !!}
 </div>
 
 @if($quote->footer)<div class="footer">{!! nl2br(e($quote->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif

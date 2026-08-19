@@ -1,0 +1,47 @@
+EASYINVOICE — FACTUREN EN OFFERTES IN HET ENGELS
+================================================
+
+WAT IS HET
+----------
+Per klant een documenttaal (Nederlands of Engels). Nieuw veld op de
+klantkaart bij Voorkeuren: "Taal van factuur & offerte". Staat die op
+Engels, dan is alles wat de klant ontvangt Engelstalig:
+
+  - de factuur-PDF (alle drie de sjablonen: modern, klassiek, minimaal)
+  - de offerte-PDF
+  - de factuur- en offertemail, inclusief onderwerpregel
+    ("Invoice 2026-0042 — Vries Design B.V.")
+  - datums in tekstvorm ("19 August 2026" i.p.v. "19 augustus 2026")
+  - de PDF-bijlage bij betalingsherinneringen en in het incassodossier
+
+BEWUSTE KEUZES
+--------------
+- MOMENTOPNAME PER DOCUMENT: de taal wordt bij het aanmaken op de
+  factuur/offerte vastgelegd (invoices.language, quotes.language).
+  Wijzigt de klantinstelling later, dan blijven verstuurde documenten
+  exact zoals de klant ze kreeg. Creditnota's erven de taal van de
+  oorspronkelijke factuur (replicate); offerte → factuur houdt de taal.
+- EIGEN TEKSTEN BLIJVEN VAN DE ONDERNEMER: regelomschrijvingen,
+  notities, intro's en voetnoten worden niet vertaald — die typ je
+  zelf in de taal van de klant.
+- BEDRAGEN houden de Europese notatie (€ 1.234,56) — geen dubbelzinnige
+  decimaaltekens in de boekhouding.
+- HERINNERINGSTEKSTEN komen uit de eigen sjablonen van de ondernemer
+  (Instellingen → Herinneringen) en worden dus niet automatisch
+  vertaald; de PDF-bijlage wél. Het klantenportaal blijft voorlopig
+  Nederlands (mogelijke vervolgstap).
+- UBL/Peppol is taalneutraal (XML) en verandert niet.
+
+TECHNIEK
+--------
+- Migratie: customers.language, invoices.language, quotes.language
+  (allemaal default 'nl').
+- Taalbestanden: lang/nl/doc.php + lang/en/doc.php — alle vaste teksten
+  van de PDF- en mailsjablonen als __('doc.…')-sleutels.
+- app/Support/DocumentLocale.php: voert een render/mail uit in de
+  documenttaal (app-locale + Carbon-locale voor translatedFormat) en
+  herstelt daarna netjes de oorspronkelijke taal — de app zelf blijft
+  gewoon Nederlands.
+- Gewrapt: InvoiceManager (mail), QuoteManager (mail), InvoiceController
+  en QuoteController (PDF), portaal-PDF, herinnerings-PDF, incasso-PDF.
+- Demo-omgeving: klant "NorthStar Consulting" staat op Engels.
