@@ -12,6 +12,7 @@ const props = defineProps({
   price_mode: { type: String, default: 'excl' },
   default_valid_days: { type: Number, default: 30 },
   preselect_customer_id: { type: [String, Number], default: null },
+  brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
 });
 
 const isEdit = computed(() => !!props.quote);
@@ -39,6 +40,7 @@ const daysBetween = (from, to) => {
 
 const form = useForm({
   customer_id: props.quote?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  brand_profile_id: props.quote?.brand_profile_id ?? null,
   quote_date: props.quote?.quote_date?.slice(0, 10) ?? today,
   valid_days: props.quote
     ? daysBetween(props.quote.quote_date, props.quote.valid_until)
@@ -211,6 +213,16 @@ const submit = (action) => {
                 <div style="font-size:11px;color:var(--text-4);margin-top:4px;">Geldig tot en met {{ validUntilLabel }}</div>
                 <div v-if="form.errors.valid_days" class="field-error">{{ form.errors.valid_days }}</div>
               </div>
+            </div>
+            <div v-if="brand_profiles.length" class="form-row">
+              <div class="form-group">
+                <label>Offerte als<span class="label-hint">(handelsnaam op de offerte)</span></label>
+                <select v-model="form.brand_profile_id">
+                  <option :value="null">Standaard huisstijl</option>
+                  <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
+                </select>
+              </div>
+              <div class="form-group"></div>
             </div>
             <div class="form-group" style="margin:0;">
               <label>Begeleidende tekst<span class="label-hint">(bovenaan de offerte)</span></label>

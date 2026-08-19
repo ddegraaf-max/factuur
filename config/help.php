@@ -297,8 +297,8 @@ return [
                 ['Handelsnamen toevoegen', [
                     'Ga naar Instellingen → Handelsnamen en voeg een handelsnaam toe. Per handelsnaam kies je een eigen logo, factuurkleur, sjabloon en voetnoot. Wat je leeg laat, valt terug op je standaard huisstijl. Zonder eigen logo toont de factuur een letter-embleem — bewust niet het logo van je hoofdbedrijf.',
                 ]],
-                ['Factureren als', [
-                    'Bij het maken van een factuur verschijnt (zodra je minstens één handelsnaam hebt) de keuze "Factureren als". De PDF, de factuurmail — inclusief de afzendernaam die je klant ziet — de betalingsherinneringen en het klantenportaal volgen automatisch die huisstijl. Maak je van de factuur een terugkerend profiel, dan onthoudt dat de handelsnaam.',
+                ['Factureren en offreren als', [
+                    'Bij het maken van een factuur of offerte verschijnt (zodra je minstens één handelsnaam hebt) de keuze "Factureren als" of "Offerte als". De PDF, de mail — inclusief de afzendernaam die je klant ziet — de betalingsherinneringen en het klantenportaal volgen automatisch die huisstijl. Zet je een offerte om naar een factuur, dan erft die de handelsnaam; terugkerende profielen onthouden hem ook.',
                 ]],
                 ['Eén administratie', [
                     'Juridisch verandert er niets: je KvK-nummer, BTW-nummer, IBAN en factuurnummering blijven die van je bedrijf, en alles telt mee in dezelfde BTW-aangifte en rapporten. Verwijder je een handelsnaam, dan vallen de bestaande facturen terug op je standaard huisstijl.',

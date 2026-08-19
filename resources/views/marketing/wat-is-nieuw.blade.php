@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.12.0</div>
+        <h3>Handelsnamen nu ook op offertes</h3>
+        <ul class="tl-list">
+          <li><b>Offerte als …</b> — kies bij het maken van een offerte onder welke handelsnaam die de deur uitgaat. De offerte-PDF, de voorvertoning en de offertemail (inclusief afzendernaam) volgen automatisch die huisstijl.</li>
+          <li><b>Van offerte tot factuur in dezelfde huisstijl</b> — zet je een geaccepteerde offerte om naar een factuur, dan erft die automatisch de handelsnaam. Je klant ziet van offerte tot betaling één consistent merk.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.11.0</div>
         <h3>Kilometerregistratie — ritten bijhouden en doorbelasten</h3>
         <ul class="tl-list">

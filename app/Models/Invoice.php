@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Invoice extends Model
 {
     use HasFactory;
+    use \App\Models\Concerns\HasBrandProfile;
 
     protected $fillable = [
         'company_id', 'customer_id', 'brand_profile_id', 'number', 'portal_token', 'reference', 'status',
@@ -59,7 +60,6 @@ class Invoice extends Model
 
     public function company(): BelongsTo { return $this->belongsTo(Company::class); }
     public function customer(): BelongsTo { return $this->belongsTo(Customer::class)->withoutGlobalScope('company'); }
-    public function brandProfile(): BelongsTo { return $this->belongsTo(BrandProfile::class)->withoutGlobalScope('company'); }
     public function lines(): HasMany { return $this->hasMany(InvoiceLine::class)->orderBy('sort_order'); }
     public function payments(): HasMany { return $this->hasMany(Payment::class); }
     public function reminderLogs(): HasMany { return $this->hasMany(ReminderLog::class)->orderBy('sent_at'); }
@@ -67,40 +67,6 @@ class Invoice extends Model
     public function creditNotes(): HasMany { return $this->hasMany(Invoice::class, 'credits_invoice_id'); }
     public function originalInvoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'credits_invoice_id')->withoutGlobalScope('company'); }
     public function views(): HasMany { return $this->hasMany(InvoiceView::class)->orderByDesc('viewed_at'); }
-
-    /**
-     * De bedrijfsgegevens zoals ze op déze factuur horen: is er een
-     * handelsnaam gekozen, dan gaan naam, logo, kleur en sjabloon daarvan
-     * eroverheen. Juridische velden (KvK, BTW-nummer, IBAN, adres) blijven
-     * altijd van het bedrijf zelf. De kopie wordt nooit opgeslagen.
-     */
-    public function brandedCompany(): ?Company
-    {
-        $company = $this->company;
-        $profile = $this->brandProfile;
-        if (! $company || ! $profile) {
-            return $company;
-        }
-
-        $branded = $company->replicate();
-        $branded->name = $profile->name;
-        // Eigen logo van de handelsnaam — heeft die er geen, dan bewust ook
-        // niet het logo van het hoofdbedrijf (verkeerd merk op de factuur).
-        $branded->logo_data = $profile->logo_data;
-        $branded->logo_path = null;
-        $branded->logo_scale = $profile->logo_scale ?? 100;
-        if ($profile->brand_color) {
-            $branded->brand_color = $profile->brand_color;
-        }
-        if ($profile->invoice_template) {
-            $branded->invoice_template = $profile->invoice_template;
-        }
-        if (filled($profile->invoice_footer)) {
-            $branded->invoice_footer = $profile->invoice_footer;
-        }
-
-        return $branded;
-    }
 
     /**
      * Zorgt dat de factuur een geheime portaal-token heeft en geeft die terug.

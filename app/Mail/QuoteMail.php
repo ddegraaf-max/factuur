@@ -22,7 +22,8 @@ class QuoteMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $company = $this->quote->company;
+        // Onder een handelsnaam? Dan is dát de afzendernaam die de klant ziet.
+        $company = $this->quote->brandedCompany();
         $replyTo = $company?->email ?: $company?->copy_email;
 
         // Afzendernaam = de ondernemer, antwoorden gaan rechtstreeks naar hem.
@@ -39,7 +40,7 @@ class QuoteMail extends Mailable
             view: 'emails.quote',
             with: [
                 'quote' => $this->quote,
-                'company' => $this->quote->company,
+                'company' => $this->quote->brandedCompany(),
             ],
         );
     }

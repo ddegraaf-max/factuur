@@ -72,6 +72,7 @@ const destroy = () => {
           <template v-else-if="quote.status === 'accepted'">Geaccepteerd op {{ quote.accepted_at_label }}</template>
           <template v-else-if="quote.status === 'rejected'">Afgewezen op {{ quote.rejected_at_label }}</template>
           <template v-else-if="quote.sent_at_label">Verstuurd op {{ quote.sent_at_label }}</template>
+          <template v-if="quote.brand_profile_name"> · als <b>{{ quote.brand_profile_name }}</b></template>
         </p>
       </div>
       <div class="page-actions">

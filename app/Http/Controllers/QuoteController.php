@@ -98,13 +98,15 @@ class QuoteController extends Controller
                 'rejected_at_label' => $quote->rejected_at?->translatedFormat('j M Y'),
                 'status_label' => $quote->status_label,
                 'days_left' => $quote->days_left,
+                'brand_profile_name' => $quote->brandProfile?->name,
                 'invoice' => $quote->invoice ? [
                     'id' => $quote->invoice->id,
                     'number' => $quote->invoice->number,
                     'status' => $quote->invoice->status,
                 ] : null,
             ]),
-            'company' => auth()->user()->company,
+            // De offertevoorvertoning toont de huisstijl van de handelsnaam.
+            'company' => $quote->brandedCompany(),
         ]);
     }
 
@@ -195,7 +197,7 @@ class QuoteController extends Controller
 
         $pdf = Pdf::loadView('pdf.quote', [
             'quote' => $quote,
-            'company' => auth()->user()->company,
+            'company' => $quote->brandedCompany(),
         ])->setPaper('a4');
 
         return $pdf->stream(($quote->number ?: "concept-{$quote->id}").'.pdf');
@@ -227,6 +229,7 @@ class QuoteController extends Controller
             'vat_rates' => VatCalculator::availableRates(),
             'price_mode' => $company?->price_mode ?? 'excl',
             'default_valid_days' => $company?->quote_valid_days ?? 30,
+            'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
         ];
     }
 
@@ -234,6 +237,8 @@ class QuoteController extends Controller
     {
         return $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
+            // De manager controleert dat het profiel van het eigen bedrijf is.
+            'brand_profile_id' => ['nullable', 'integer', 'exists:brand_profiles,id'],
             'quote_date' => ['required', 'date'],
             'valid_days' => ['required', 'integer', 'min:1', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],

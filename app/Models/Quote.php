@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Quote extends Model
 {
     use HasFactory;
+    use \App\Models\Concerns\HasBrandProfile;
 
     public const STATUSES = [
         'draft' => 'Concept',
@@ -21,7 +22,7 @@ class Quote extends Model
     ];
 
     protected $fillable = [
-        'company_id', 'customer_id', 'number', 'reference', 'status',
+        'company_id', 'customer_id', 'brand_profile_id', 'number', 'reference', 'status',
         'quote_date', 'valid_until',
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',

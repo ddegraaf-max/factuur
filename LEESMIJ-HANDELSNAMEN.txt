@@ -16,20 +16,23 @@ Wat leeg blijft valt terug op de standaard huisstijl van het bedrijf.
 Zonder eigen logo toont de factuur een letter-embleem in de gekozen
 kleur — bewust NIET het logo van het hoofdbedrijf (verkeerd merk).
 
-FACTUREREN ALS
---------------
+FACTUREREN (EN OFFREREN) ALS
+----------------------------
 Zodra er minstens één handelsnaam bestaat, verschijnt op het factuur-
-formulier de keuze "Factureren als". De gekozen huisstijl geldt overal
-waar de klant de factuur ziet:
-  - de PDF (alle drie de sjablonen)
-  - de factuurmail: afzendernaam, onderwerp én de mail zelf
+formulier de keuze "Factureren als" en op het offerteformulier "Offerte
+als". De gekozen huisstijl geldt overal waar de klant het document ziet:
+  - de factuur-PDF (alle drie de sjablonen) én de offerte-PDF
+  - de factuur- en offertemail: afzendernaam, onderwerp én de mail zelf
   - betalingsherinneringen en aanmaningen (tekstvariabelen + PDF-bijlage)
   - het klantenportaal (pagina en PDF-download)
   - het incassodossier bevat de factuur-PDF zoals de klant hem kent
-Terugkerende profielen onthouden de handelsnaam; gegenereerde facturen
-erven hem. Dupliceren en creditnota's nemen hem automatisch mee
-(replicate kopieert het veld). Op de factuurpagina staat in de kop
-"· als <handelsnaam>".
+Zet je een offerte om naar een factuur, dan erft de factuur de
+handelsnaam — van offerte tot betaling één consistent merk. Terugkerende
+profielen onthouden de handelsnaam; gegenereerde facturen erven hem.
+Dupliceren en creditnota's nemen hem automatisch mee (replicate kopieert
+het veld). Op de factuur- en offertepagina staat in de kop
+"· als <handelsnaam>". De gedeelde logica zit in de trait
+app/Models/Concerns/HasBrandProfile.php (Invoice + Quote).
 
 ÉÉN ADMINISTRATIE (bewust ontwerp)
 ----------------------------------

@@ -30,12 +30,20 @@ class QuoteManager
             $quoteDate = isset($data['quote_date']) ? Carbon::parse($data['quote_date']) : now();
             $validDays = (int) ($data['valid_days'] ?? $company->quote_valid_days ?? 30);
 
+            // Handelsnaam: alleen een profiel van hetzelfde bedrijf telt.
+            $profile = ! empty($data['brand_profile_id'])
+                ? \App\Models\BrandProfile::withoutGlobalScope('company')
+                    ->where('company_id', $company->id)
+                    ->find($data['brand_profile_id'])
+                : null;
+
             $lines = $data['lines'] ?? [];
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $quote = Quote::create([
                 'company_id' => $company->id,
                 'customer_id' => $customer->id,
+                'brand_profile_id' => $profile?->id,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
                 'quote_date' => $quoteDate,
@@ -57,7 +65,9 @@ class QuoteManager
 
                 'intro' => $data['intro'] ?? null,
                 'notes' => $data['notes'] ?? null,
-                'footer' => $company->invoice_footer,
+                'footer' => ($profile && filled($profile->invoice_footer))
+                    ? $profile->invoice_footer
+                    : $company->invoice_footer,
             ]);
 
             $this->syncLines($quote, $lines, $mode);
@@ -80,7 +90,24 @@ class QuoteManager
             $quoteDate = isset($data['quote_date']) ? Carbon::parse($data['quote_date']) : $quote->quote_date;
             $validDays = (int) ($data['valid_days'] ?? $quote->quote_date->diffInDays($quote->valid_until));
 
-            $quote->update([
+            // Handelsnaam wijzigen; de voetnoot schuift mee naar die van het
+            // nieuwe profiel (of terug naar de standaard van het bedrijf).
+            $brandChanges = [];
+            if (array_key_exists('brand_profile_id', $data)) {
+                $profile = ! empty($data['brand_profile_id'])
+                    ? \App\Models\BrandProfile::withoutGlobalScope('company')
+                        ->where('company_id', $quote->company_id)
+                        ->find($data['brand_profile_id'])
+                    : null;
+                $brandChanges = [
+                    'brand_profile_id' => $profile?->id,
+                    'footer' => ($profile && filled($profile->invoice_footer))
+                        ? $profile->invoice_footer
+                        : $quote->company->invoice_footer,
+                ];
+            }
+
+            $quote->update($brandChanges + [
                 'reference' => $data['reference'] ?? $quote->reference,
                 'quote_date' => $quoteDate,
                 'valid_until' => $quoteDate->copy()->addDays($validDays),
@@ -177,6 +204,8 @@ class QuoteManager
 
             $invoice = $this->invoices->create([
                 'customer_id' => $quote->customer_id,
+                // De factuur gaat onder dezelfde handelsnaam de deur uit.
+                'brand_profile_id' => $quote->brand_profile_id,
                 'invoice_date' => now()->toDateString(),
                 'reference' => $quote->reference ?: ('Offerte '.$quote->number),
                 'notes' => $quote->notes,
@@ -252,7 +281,8 @@ class QuoteManager
                 return;
             }
 
-            $company = $quote->company;
+            // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf).
+            $company = $quote->brandedCompany();
             $quote->load('lines');
 
             $pdf = Pdf::loadView('pdf.quote', [
