@@ -223,6 +223,28 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 8. Demo-kilometerregistratie: ritten om door te belasten + eigen administratie.
+        $trips = [
+            ['customer' => 0, 'from' => 'Bussum', 'to' => 'Amsterdam', 'round_trip' => true, 'km' => 62.0, 'days_ago' => 4, 'description' => 'Kick-off website redesign'],
+            ['customer' => 3, 'from' => 'Bussum', 'to' => 'Amsterdam', 'round_trip' => true, 'km' => 58.4, 'days_ago' => 3, 'description' => 'Presentatie logo-concepten'],
+            ['customer' => 7, 'from' => 'Bussum', 'to' => 'Amsterdam Zuidas', 'round_trip' => false, 'km' => 28.5, 'days_ago' => 1, 'description' => 'Adviesgesprek'],
+            ['customer' => null, 'from' => 'Bussum', 'to' => 'Utrecht', 'round_trip' => true, 'km' => 71.0, 'days_ago' => 6, 'description' => 'Netwerkbijeenkomst', 'billable' => false],
+        ];
+        foreach ($trips as $t) {
+            \App\Models\Trip::create([
+                'company_id' => $company->id,
+                'user_id' => $user->id,
+                'customer_id' => $t['customer'] !== null ? $customerModels[$t['customer']]->id : null,
+                'trip_date' => now()->subDays($t['days_ago'])->toDateString(),
+                'from_location' => $t['from'],
+                'to_location' => $t['to'],
+                'round_trip' => $t['round_trip'],
+                'description' => $t['description'],
+                'kilometers' => $t['km'],
+                'billable' => $t['billable'] ?? true,
+            ]);
+        }
+
         Auth::logout();
 
         $this->command->info('✓ Demo company: Vries Design B.V.');

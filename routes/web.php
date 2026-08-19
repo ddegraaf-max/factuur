@@ -231,6 +231,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::patch('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'update'])->name('hours.update');
     Route::delete('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'destroy'])->name('hours.destroy');
 
+    // Kilometerregistratie: ritten bijhouden en doorbelasten
+    Route::get('ritten', [\App\Http\Controllers\TripController::class, 'index'])->name('trips.index');
+    Route::post('ritten', [\App\Http\Controllers\TripController::class, 'store'])->name('trips.store');
+    Route::post('ritten/factureren', [\App\Http\Controllers\TripController::class, 'invoice'])->name('trips.invoice');
+    Route::patch('ritten/{trip}', [\App\Http\Controllers\TripController::class, 'update'])->name('trips.update');
+    Route::delete('ritten/{trip}', [\App\Http\Controllers\TripController::class, 'destroy'])->name('trips.destroy');
+
     // Terugkerende facturen
     Route::get('terugkerend', [RecurringInvoiceController::class, 'index'])->name('recurring.index');
     Route::post('invoices/{invoice}/recurring', [RecurringInvoiceController::class, 'store'])->name('invoices.recurring.store');

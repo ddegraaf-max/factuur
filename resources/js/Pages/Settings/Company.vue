@@ -24,6 +24,7 @@ const form = useForm({
   brand_color: props.company.brand_color ?? '#E8231F',
   default_payment_terms: props.company.default_payment_terms ?? 30,
   default_hourly_rate: props.company.default_hourly_rate ?? null,
+  default_km_rate: props.company.default_km_rate ?? 0.23,
   invoice_footer: props.company.invoice_footer ?? '',
   invoice_number_format: props.company.invoice_number_format ?? '{year}-{sequence:4}',
   price_mode: props.company.price_mode ?? 'excl',
@@ -172,9 +173,15 @@ const submit = () => form.patch(route('settings.company.update'));
               </div>
             </div>
           </div>
-          <div class="form-group">
-            <label>Standaard uurtarief<span class="label-hint">(voor de urenregistratie — per klant of urenregel te overschrijven)</span></label>
-            <input type="number" v-model="form.default_hourly_rate" min="0" step="0.01" placeholder="Bijv. 75,00" style="max-width:200px;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Standaard uurtarief<span class="label-hint">(urenregistratie — per klant of regel te overschrijven)</span></label>
+              <input type="number" v-model="form.default_hourly_rate" min="0" step="0.01" placeholder="Bijv. 75,00">
+            </div>
+            <div class="form-group">
+              <label>Kilometervergoeding<span class="label-hint">(per km — € 0,23 is het onbelaste tarief)</span></label>
+              <input type="number" v-model="form.default_km_rate" min="0" step="0.01" placeholder="0,23">
+            </div>
           </div>
           <div class="form-group">
             <label>Huisstijlkleur</label>

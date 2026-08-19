@@ -33,7 +33,7 @@
     <div class="road-grid">
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
-        <div class="road-card"><h4>Kilometerregistratie</h4><p>Zakelijke ritten bijhouden en de kilometervergoeding meenemen op de factuur of in je administratie.</p></div>
+        <div class="road-card"><h4>Facturen in het Engels</h4><p>Per klant kiezen voor een Engelstalige factuur en factuurmail — voor internationale opdrachtgevers.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -42,6 +42,7 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Kilometerregistratie</h4><p>Zakelijke ritten bijhouden en de kilometervergoeding met één klik doorbelasten — of bewaren voor je eigen administratie.</p></div>
         <div class="road-card"><h4>Meerdere handelsnamen</h4><p>Factureer onder verschillende handelsnamen, elk met eigen logo, kleur en sjabloon — binnen één administratie.</p></div>
         <div class="road-card"><h4>Urenregistratie</h4><p>Uren schrijven per klant of project — handmatig of met de timer — en met één klik omzetten naar een conceptfactuur.</p></div>
         <div class="road-card"><h4>Bonnetjes automatisch herkennen</h4><p>Foto van de bon maken en de leverancier, datum en bedragen automatisch laten invullen (scan &amp; herken met AI).</p></div>

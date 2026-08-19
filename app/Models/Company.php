@@ -21,7 +21,7 @@ class Company extends Model
         'default_send_method', 'results_per_page',
         'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings',
-        'default_payment_terms', 'default_hourly_rate', 'invoice_footer', 'invoice_number_format',
+        'default_payment_terms', 'default_hourly_rate', 'default_km_rate', 'invoice_footer', 'invoice_number_format',
         'quote_number_format', 'quote_valid_days',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
         'subscription_status', 'subscription_ends_at', 'subscription_cancel_emailed_at',

@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.11.0</div>
+        <h3>Kilometerregistratie — ritten bijhouden en doorbelasten</h3>
+        <ul class="tl-list">
+          <li><b>Ritten registreren</b> — datum, van–naar, afstand en het doel van de rit. Vink "retour" aan en de terugreis telt automatisch mee. Het nieuwe menu-item Ritten staat naast Uren.</li>
+          <li><b>Doorbelasten met één klik</b> — alle openstaande ritten van een klant worden gebundeld op één conceptfactuur, als nette reiskostenregels met datum en afstand ("Reiskosten: Bussum – Amsterdam (retour), 62 km").</li>
+          <li><b>Of alleen voor je administratie</b> — ritten zonder klant of zonder doorbelasting bewaar je als kilometeradministratie voor je aangifte, met totalen per maand en per jaar.</li>
+          <li>Het standaardtarief staat op <b>€ 0,23 per km</b> (het onbelaste tarief van de Belastingdienst) en is per bedrijf en per rit aan te passen.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.10.0</div>
         <h3>Meerdere handelsnamen — factureer onder verschillende merken</h3>
         <ul class="tl-list">

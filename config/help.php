@@ -326,6 +326,23 @@ return [
             ],
         ],
 
+        'kilometerregistratie' => [
+            'category' => 'Uren',
+            'title' => 'Zakelijke ritten bijhouden en doorbelasten',
+            'intro' => 'Registreer je zakelijke kilometers — belast ze door aan je klant of bewaar ze als kilometeradministratie voor je aangifte.',
+            'sections' => [
+                ['Ritten registreren', [
+                    'Ga naar Verkoop → Ritten. Vul datum, vertrek en bestemming, de afstand en eventueel het doel van de rit in. Vink "retour" aan en de terugreis telt automatisch mee. Koppel een klant als je de rit wilt doorbelasten; zonder klant (of met "doorbelasten" uitgevinkt) telt de rit alleen mee in je eigen kilometeradministratie.',
+                ]],
+                ['Tarief', [
+                    'Het standaardtarief staat op € 0,23 per kilometer — het onbelaste tarief van de Belastingdienst. Je past het aan bij Instellingen → Bedrijfsgegevens, en per rit kun je altijd een afwijkend tarief invullen.',
+                ]],
+                ['Doorbelasten', [
+                    'In het blok "Klaar om te factureren" zie je per klant de openstaande ritten, kilometers en het bedrag. Eén klik maakt een conceptfactuur met per rit een reiskostenregel: "Reiskosten: Bussum – Amsterdam (retour)", de datum en het aantal kilometers. Gefactureerde ritten worden vergrendeld en linken naar de factuur; verwijder je het concept, dan komen ze weer vrij.',
+                ]],
+            ],
+        ],
+
         // ---------- SAMENWERKEN ----------
         'team-en-rollen' => [
             'category' => 'Samenwerken',

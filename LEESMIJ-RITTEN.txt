@@ -1,0 +1,53 @@
+EASYINVOICE — KILOMETERREGISTRATIE
+==================================
+
+WAT IS HET
+----------
+Zakelijke ritten bijhouden en de kilometervergoeding met één klik
+doorbelasten aan de klant — of alleen bewaren als kilometeradministratie
+voor de eigen aangifte. Nieuw menu-item: Verkoop → Ritten (naast Uren).
+
+- RIT REGISTREREN: datum, klant (optioneel), van–naar, afstand, doel.
+  Vink "retour" aan en de terugreis telt automatisch mee (het formulier
+  toont direct het totaal). Afstand typ je met komma of punt.
+- TARIEF: standaard € 0,23 per km — het onbelaste tarief van de
+  Belastingdienst. Aan te passen bij Instellingen → Bedrijfsgegevens
+  (nieuw veld "Kilometervergoeding") en per rit te overschrijven.
+  Anders dan bij uren is er altijd een tarief, dus factureren kan nooit
+  stuklopen op een ontbrekend tarief.
+- FACTUREREN: het blok "Klaar om te factureren" toont per klant de
+  openstaande ritten, kilometers en het bedrag. Eén klik bundelt alles
+  op een conceptfactuur via de bestaande InvoiceManager: per rit één
+  regel — "Reiskosten: Bussum – Amsterdam (retour)", detail = datum +
+  doel, aantal = kilometers, eenheid "km", 21% BTW (doorbelaste
+  reiskosten volgen de hoofdprestatie).
+- EIGEN ADMINISTRATIE: ritten zonder klant of met "doorbelasten" uit
+  krijgen de status "Eigen administratie" — ze tellen mee in de
+  maand-/jaartotalen maar komen nooit op een factuur.
+- VERGRENDELING: gefactureerde ritten zijn niet meer te bewerken en
+  linken naar hun factuur; wordt de conceptfactuur verwijderd, dan
+  komen ze automatisch weer vrij (database: nullOnDelete).
+
+STATISTIEKEN & FILTERS
+----------------------
+Bovenaan: kilometers deze maand, dit jaar, en het openstaande bedrag
+aan reiskosten. Filters: status (open/gefactureerd/alles), periode en
+klant. Gepagineerd (50 per pagina).
+
+ROLLEN
+------
+Medewerkers registreren gewoon ritten mee; de boekhouder (alleen-inzien)
+kan alles bekijken maar niets wijzigen (bestaande readonly-middleware).
+
+TECHNIEK
+--------
+- Migratie: trips (kilometers decimal(8,1), retour-vlag informatief,
+  totaal incl. retour opgeslagen) + companies.default_km_rate
+  (default 0.23).
+- Nieuw: app/Models/Trip.php (company-scope, scopes open/billable,
+  effectiveRate/amount/lineDescription), TripController,
+  resources/js/Pages/Ritten/Index.vue.
+- Routes: trips.index/store/update/destroy en trips.invoice, binnen
+  auth + subscribed.
+- Demo-omgeving: vier voorbeeldritten (waarvan één eigen administratie),
+  zodat het factureren-blok direct leeft.
