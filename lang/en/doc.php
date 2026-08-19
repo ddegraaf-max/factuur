@@ -60,6 +60,7 @@ return [
     'mail_to_account' => ' to <strong>:iban</strong> in the name of :name',
     'mail_pay_request' => 'We kindly request that you pay :amount :deadline:account, quoting invoice number <strong>:number</strong>.',
     'mail_view_invoice' => 'View invoice online',
+    'mail_view_pay_invoice' => 'View and pay online (iDEAL)',
     'mail_portal_hint' => 'In the secure online environment you can view the invoice and its payment status, and download the PDF again. For your security, you will first confirm your e-mail address with a one-time code.',
     'mail_regards' => 'Kind regards,',
     'mail_sent_via' => 'Sent via EasyInvoice on behalf of :name.',

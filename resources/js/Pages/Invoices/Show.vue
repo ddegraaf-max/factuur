@@ -219,7 +219,7 @@ const reminderCounts = computed(() => {
 });
 
 /* ---------- Klantenportaal / inzagelog ---------- */
-const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload', attachment: 'Bijlage gedownload' };
+const viewEventLabels = { viewed: 'Factuur bekeken', pdf: 'PDF gedownload', attachment: 'Bijlage gedownload', payment_started: 'Online betaling gestart' };
 const showAllViews = ref(false);
 const visibleViews = computed(() => {
   const views = props.invoice.views || [];

@@ -1,0 +1,60 @@
+EASYINVOICE — BETAALLINK OP DE FACTUUR (iDEAL VIA MOLLIE)
+=========================================================
+
+WAT IS HET
+----------
+Klanten betalen het openstaande factuurbedrag direct met iDEAL:
+  - in de factuurmail verandert de portaalknop in
+    "Bekijk en betaal online (iDEAL)" (ook in het Engels vertaald)
+  - in het klantenportaal staat een betaalknop met het openstaande
+    bedrag (deelbetalingen/verrekeningen automatisch afgetrokken)
+  - na het afronden bij de bank wordt de betaling automatisch als
+    gewone Payment (methode iDEAL) op de factuur geboekt; status en
+    openstaand bedrag springen direct bij
+  - elke betaalpoging staat in het inzagelog ("Online betaling gestart")
+
+ACTIVEREN (per administratie)
+-----------------------------
+Instellingen → Bedrijfsgegevens → "Online betalingen — iDEAL via Mollie":
+plak daar de API-key van het eigen Mollie-account (mollie.com →
+Developers → API-keys; test_… om proef te draaien, live_… voor echt).
+Het geld gaat rechtstreeks naar de rekening van de ondernemer —
+EasyInvoice zit er niet tussen. Zonder key is de hele functie
+onzichtbaar. Loskoppelen kan met één vinkje.
+
+BEWUSTE KEUZES / VEILIGHEID
+---------------------------
+- EIGEN MOLLIE-ACCOUNT per administratie (zoals WeFact/Moneybird):
+  geen geldstromen via EasyInvoice, geen PSP-verantwoordelijkheid.
+- De Mollie-key wordt VERSLEUTELD opgeslagen (encrypted cast) en staat
+  op $hidden — hij gaat nooit mee naar de browser. De interface ziet
+  alleen "gekoppeld ja/nee".
+- De webhook (POST /webhooks/mollie) krijgt alleen een betalings-id;
+  de echte status halen we zelf bij Mollie op met de key van de
+  administratie. Een vervalst verzoek kan dus hooguit een statuscheck
+  uitlokken. Altijd 200 terug (anders blijft Mollie herhalen).
+- DUBBELE BOEKING ONMOGELIJK: markPaid is idempotent — per betaalpoging
+  (online_payments-regel) wordt maximaal één Payment geboekt
+  (payment_id-koppeling).
+- GEEN WEBHOOK NODIG OM TE WERKEN: bij terugkeer uit de checkout (en
+  bij elke portaalweergave met openstaande betaalpogingen) checkt Easy
+  zelf de status bij Mollie. De webhook is de snelle route, de
+  statuscheck de vangrail. Lokaal (localhost) wordt de webhook-URL
+  weggelaten — Mollie accepteert die toch niet.
+- Open betaalpogingen voor hetzelfde bedrag worden hervat in plaats
+  van gedupliceerd (checkout_url bewaard).
+- Betalen kan alleen binnen het geverifieerde portaal (e-mail + code),
+  op openstaande facturen (verstuurd/deels betaald/vervallen).
+
+TECHNIEK
+--------
+- Migratie: online_payments (mollie_id uniek, status, method,
+  payment_id → geboekte Payment) + companies.mollie_api_key (text,
+  encrypted cast).
+- Nieuw: app/Services/MolliePaymentService.php (payable/checkoutUrl/
+  sync/markPaid), app/Http/Controllers/MollieWebhookController.php,
+  portaalroute portal.invoice.pay + webhook /webhooks/mollie
+  (CSRF-uitzondering in bootstrap/app.php, naast Stripe).
+- Mollie-methodes worden gemapt op de bestaande betaalwijzen
+  (ideal/card/direct_debit/bank_transfer/other).
+- Demo/seed: geen key nodig; de functie blijft daar verborgen.

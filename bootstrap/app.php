@@ -34,9 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'readonly' => AccountantReadOnly::class,
         ]);
 
-        // Stripe-webhook stuurt geen CSRF-token mee.
+        // Webhooks van buitenaf sturen geen CSRF-token mee.
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
+            'webhooks/mollie',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

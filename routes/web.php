@@ -122,10 +122,17 @@ Route::prefix('portaal')->name('portal.')->group(function () {
         ->middleware('throttle:15,1')->name('invoice.pdf');
     Route::get('/f/{token}/bijlage/{attachment}', [PortalController::class, 'attachment'])
         ->middleware('throttle:20,1')->name('invoice.attachment');
+    // Betaallink: start een iDEAL-betaling via het Mollie-account van de afzender.
+    Route::post('/f/{token}/betalen', [PortalController::class, 'pay'])
+        ->middleware('throttle:10,1')->name('invoice.pay');
 });
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+
+// ---------- MOLLIE WEBHOOK (publiek, geen CSRF) ----------
+Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
+    ->middleware('throttle:120,1')->name('mollie.webhook');
 
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {

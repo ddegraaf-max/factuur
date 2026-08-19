@@ -4,6 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
   company: Object,
+  mollie_connected: Boolean, // is er een Mollie-koppeling? (de key zelf blijft geheim)
 });
 
 const form = useForm({
@@ -25,6 +26,8 @@ const form = useForm({
   default_payment_terms: props.company.default_payment_terms ?? 30,
   default_hourly_rate: props.company.default_hourly_rate ?? null,
   default_km_rate: props.company.default_km_rate ?? 0.23,
+  mollie_api_key: '',
+  mollie_disconnect: false,
   invoice_footer: props.company.invoice_footer ?? '',
   invoice_number_format: props.company.invoice_number_format ?? '{year}-{sequence:4}',
   price_mode: props.company.price_mode ?? 'excl',
@@ -200,6 +203,27 @@ const submit = () => form.patch(route('settings.company.update'));
               Handig voor webshops, horeca en andere particuliere verkoop. De factuur zelf toont altijd
               netto, btw én totaal — dat is wettelijk verplicht.
             </div>
+          </div>
+          <div class="form-group">
+            <label>Online betalingen — iDEAL via Mollie<span class="label-hint">(betaallink in de factuurmail en het klantenportaal)</span></label>
+            <div v-if="mollie_connected" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--success);font-weight:600;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Mollie gekoppeld — klanten kunnen online betalen
+              </span>
+              <label class="checkbox-row" style="margin:0;">
+                <input type="checkbox" v-model="form.mollie_disconnect">
+                <span>Koppeling verwijderen</span>
+              </label>
+            </div>
+            <template v-else>
+              <input type="password" v-model="form.mollie_api_key" placeholder="live_... of test_..." autocomplete="off" style="max-width:340px;">
+              <div style="font-size:11px;color:var(--text-4);margin-top:4px;line-height:1.6;">
+                Plak hier de API-key van je eigen <b>Mollie</b>-account (mollie.com → Developers → API-keys).
+                Betalingen gaan rechtstreeks naar jouw rekening; wij zitten er niet tussen.
+              </div>
+            </template>
+            <div v-if="form.errors.mollie_api_key" class="field-error">{{ form.errors.mollie_api_key }}</div>
           </div>
           <div class="form-group" style="margin:0;">
             <label>Standaard voetnoot<span class="label-hint">(onderaan elke factuur)</span></label>

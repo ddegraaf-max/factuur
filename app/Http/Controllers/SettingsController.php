@@ -13,6 +13,9 @@ class SettingsController extends Controller
     {
         return Inertia::render('Settings/Company', [
             'company' => auth()->user()->company,
+            // De key zelf blijft geheim (hidden); de interface hoeft alleen te
+            // weten óf er een Mollie-koppeling is.
+            'mollie_connected' => filled(auth()->user()->company->mollie_api_key),
         ]);
     }
 
@@ -49,6 +52,8 @@ class SettingsController extends Controller
             'default_payment_terms' => ['required', 'integer', 'min:0', 'max:365'],
             'default_hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'default_km_rate' => ['nullable', 'numeric', 'min:0', 'max:99'],
+            'mollie_api_key' => ['nullable', 'string', 'max:100', 'regex:/^(test|live)_\w+$/'],
+            'mollie_disconnect' => ['nullable', 'boolean'],
             // Legacy invoice fields still accepted from older Company form
             'invoice_footer' => ['nullable', 'string'],
             'invoice_number_format' => ['nullable', 'string', 'max:50'],
@@ -66,6 +71,15 @@ class SettingsController extends Controller
         if ($request->has('daily_notification_email')) {
             $data['daily_notification_email'] = $request->input('daily_notification_email') ?: null;
         }
+
+        // Mollie: een leeg veld betekent "niet wijzigen" — de bestaande key
+        // blijft dan staan. Loskoppelen gaat expliciet via mollie_disconnect.
+        if (! empty($data['mollie_disconnect'])) {
+            $data['mollie_api_key'] = null;
+        } elseif (empty($data['mollie_api_key'])) {
+            unset($data['mollie_api_key']);
+        }
+        unset($data['mollie_disconnect']);
 
         $company->update($data);
         return back()->with('flash', 'Bedrijfsgegevens opgeslagen.');

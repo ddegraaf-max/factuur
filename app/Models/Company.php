@@ -13,7 +13,7 @@ class Company extends Model
 
     protected $fillable = [
         'name', 'is_demo', 'demo_expires_at',
-        'trading_name', 'kvk_number', 'vat_number', 'iban',
+        'trading_name', 'kvk_number', 'vat_number', 'iban', 'mollie_api_key',
         'email', 'phone', 'website',
         'address_line', 'postal_code', 'city', 'country', 'currency',
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
@@ -34,9 +34,12 @@ class Company extends Model
      * logo echt nodig is (Huisstijl-pagina, portaal, e-mails) wordt het
      * expliciet opgevraagd via makeVisible() of directe attribuut-toegang.
      */
-    protected $hidden = ['logo_data'];
+    // logo_data is te zwaar voor elke response; de Mollie-key is geheim en
+    // mag nooit naar de browser (auth.company wordt op élke pagina gedeeld).
+    protected $hidden = ['logo_data', 'mollie_api_key'];
 
     protected $casts = [
+        'mollie_api_key' => 'encrypted',
         'is_demo' => 'boolean',
         'demo_expires_at' => 'datetime',
         'default_payment_terms' => 'integer',

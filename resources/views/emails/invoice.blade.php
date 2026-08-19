@@ -56,7 +56,7 @@
               <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
                 <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
                    style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
-                  {{ __('doc.mail_view_invoice') }}&nbsp;&nbsp;→
+                  {{ (filled($company->mollie_api_key ?? null) && $openRaw > 0.009) ? __('doc.mail_view_pay_invoice') : __('doc.mail_view_invoice') }}&nbsp;&nbsp;→
                 </a>
               </td>
             </tr>

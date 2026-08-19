@@ -1,6 +1,6 @@
 <script setup>
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
 import PortalLayout from '@/Layouts/PortalLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 import { eur } from '@/format.js';
@@ -8,6 +8,7 @@ import { eur } from '@/format.js';
 const props = defineProps({
   invoice: Object,
   company: Object,
+  payment: { type: Object, default: () => ({ enabled: false, just_returned: false }) },
 });
 
 const email = computed(() => usePage().props.portal_email || null);
@@ -16,6 +17,23 @@ const brand = computed(() => props.company.brand_color || '#E8231F');
 
 const isOpen = computed(() =>
   !props.invoice.is_credit && ['sent', 'partial', 'overdue', 'incasso'].includes(props.invoice.status)
+);
+
+/* ---------- Online betalen (iDEAL via Mollie) ---------- */
+const paying = ref(false);
+const startPayment = () => {
+  if (paying.value) return;
+  paying.value = true;
+  // De server antwoordt met een externe redirect naar de Mollie-checkout.
+  router.post(route('portal.invoice.pay', props.invoice.token), {}, {
+    onFinish: () => { paying.value = false; },
+  });
+};
+
+// Net terug van de betaalpagina maar nog niet betaald? Dan is de betaling
+// waarschijnlijk geannuleerd of nog in verwerking.
+const returnedUnpaid = computed(() =>
+  props.payment.just_returned && props.invoice.remaining > 0.009
 );
 </script>
 
@@ -114,6 +132,20 @@ const isOpen = computed(() =>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           Zo betaal je deze factuur
         </div>
+
+        <!-- Direct online betalen (iDEAL) -->
+        <div v-if="payment.enabled" class="pi-ideal">
+          <button type="button" class="pi-ideal-btn" :style="{ background: brand }" :disabled="paying" @click="startPayment">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            {{ paying ? 'Bezig…' : `Betaal ${eur(invoice.remaining)} met iDEAL` }}
+          </button>
+          <div class="pi-ideal-hint">Veilig betalen via je eigen bank — de betaling wordt direct op de factuur verwerkt.</div>
+          <div v-if="returnedUnpaid" class="pi-ideal-note">
+            De betaling is nog niet afgerond. Nog niet gelukt of geannuleerd? Probeer het gerust opnieuw,
+            of maak het bedrag handmatig over met de gegevens hieronder.
+          </div>
+        </div>
+
         <div class="pi-pay-grid">
           <div>
             <div class="pi-meta-label">Te betalen</div>
@@ -271,6 +303,21 @@ const isOpen = computed(() =>
 .pi-pay-title { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 14px; }
 .pi-pay-title svg { width: 18px; height: 18px; color: var(--text-3); }
 .pi-pay-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+
+.pi-ideal { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px dashed var(--border); }
+.pi-ideal-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  color: #fff; font-weight: 700; font-size: 15px;
+  padding: 13px 24px; border-radius: 10px; cursor: pointer; border: none;
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.18);
+}
+.pi-ideal-btn:hover:not(:disabled) { filter: brightness(0.92); }
+.pi-ideal-btn:disabled { opacity: 0.6; cursor: wait; }
+.pi-ideal-hint { font-size: 12.5px; color: var(--text-3); margin-top: 8px; }
+.pi-ideal-note {
+  margin-top: 12px; font-size: 13px; color: #92400E;
+  background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 8px; padding: 10px 14px; line-height: 1.5;
+}
 .pi-pay-amount { font-family: var(--font-display); font-weight: 700; font-size: 20px; letter-spacing: -0.01em; }
 .pi-pay-due { margin-top: 14px; font-size: 13px; color: var(--text-2); }
 

@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.15.0</div>
+        <h3>Betaallink op de factuur — betaald worden met iDEAL</h3>
+        <ul class="tl-list">
+          <li><b>Klanten betalen in twee klikken</b> — in de factuurmail staat "Bekijk en betaal online", en in het klantenportaal betaalt je klant het openstaande bedrag direct met iDEAL. De betaling wordt automatisch op de factuur geboekt en de status springt op betaald.</li>
+          <li><b>Jouw eigen Mollie-account</b> — koppel je Mollie API-key bij Instellingen → Bedrijfsgegevens. Het geld gaat rechtstreeks naar jouw rekening; EasyInvoice zit er niet tussen en rekent er niets voor.</li>
+          <li><b>Slim en veilig</b> — deelbetalingen worden verrekend (de knop toont altijd het resterende bedrag), betaalpogingen zie je terug in het inzagelog, en de key wordt versleuteld opgeslagen.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.14.0</div>
         <h3>Meerdere administraties onder één inlog</h3>
         <ul class="tl-list">

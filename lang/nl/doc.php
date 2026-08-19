@@ -61,6 +61,7 @@ return [
     'mail_to_account' => ' op <strong>:iban</strong> t.n.v. :name',
     'mail_pay_request' => 'Wij verzoeken u :amount :deadline te voldoen:account onder vermelding van factuurnummer <strong>:number</strong>.',
     'mail_view_invoice' => 'Bekijk factuur online',
+    'mail_view_pay_invoice' => 'Bekijk en betaal online (iDEAL)',
     'mail_portal_hint' => 'In de beveiligde online omgeving ziet u de factuur, de betaalstatus en kunt u de PDF opnieuw downloaden. Voor uw veiligheid bevestigt u eerst uw e-mailadres met een eenmalige code.',
     'mail_regards' => 'Met vriendelijke groet,',
     'mail_sent_via' => 'Verzonden via EasyInvoice namens :name.',

@@ -67,6 +67,22 @@ class PortalController extends Controller
 
         $this->logView($request, $invoice, 'viewed');
 
+        // Online betalingen: net terug van Mollie (of webhook nog onderweg)?
+        // Check dan de actuele status, zodat de betaling direct zichtbaar is.
+        $mollie = app(\App\Services\MolliePaymentService::class);
+        $pendingOnline = \App\Models\OnlinePayment::where('invoice_id', $invoice->id)
+            ->whereIn('status', ['open', 'pending'])
+            ->where('created_at', '>=', now()->subDays(2))
+            ->get();
+        foreach ($pendingOnline as $op) {
+            try {
+                $mollie->sync($op);
+            } catch (\Throwable $e) {
+                // Mollie even onbereikbaar — de pagina laadt gewoon.
+            }
+        }
+
+        $invoice->refresh();
         $invoice->load('lines', 'payments');
         // Het portaal toont de huisstijl van de handelsnaam waaronder de
         // factuur is verstuurd; KvK/BTW/IBAN blijven van de juridische entiteit.
@@ -120,6 +136,11 @@ class PortalController extends Controller
                 ])->values(),
                 'attachments' => $customerAttachments,
             ]),
+            // Betaallink (iDEAL): alleen als de afzender Mollie heeft gekoppeld.
+            'payment' => [
+                'enabled' => $mollie->payable($invoice),
+                'just_returned' => $request->boolean('betaald'),
+            ],
             'company' => [
                 'name' => $company?->name,
                 'address_line' => $company?->address_line,
@@ -134,6 +155,28 @@ class PortalController extends Controller
                 'logo_data' => $company?->logo_data,
             ],
         ]);
+    }
+
+    /** Start een online betaling (iDEAL via Mollie) en stuur door naar de checkout. */
+    public function pay(Request $request, string $token): HttpResponse|RedirectResponse
+    {
+        $invoice = $this->findByToken($token);
+
+        $email = PortalAuthController::verifiedEmail($request);
+        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
+            return redirect()->route('portal.invoice', $token);
+        }
+
+        try {
+            $checkoutUrl = app(\App\Services\MolliePaymentService::class)->checkoutUrl($invoice);
+        } catch (\DomainException $e) {
+            return redirect()->route('portal.invoice', $token)->with('error', $e->getMessage());
+        }
+
+        $this->logView($request, $invoice, 'payment_started');
+
+        // Externe redirect vanuit een Inertia-POST: 409 + X-Inertia-Location.
+        return Inertia::location($checkoutUrl);
     }
 
     /** PDF downloaden vanuit het portaal (en die download loggen). */

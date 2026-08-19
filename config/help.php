@@ -306,6 +306,23 @@ return [
             ],
         ],
 
+        'betaallink-ideal' => [
+            'category' => 'Betalingen',
+            'title' => 'Betaald worden met iDEAL (betaallink)',
+            'intro' => 'Laat klanten het openstaande bedrag direct met iDEAL betalen vanuit de factuurmail en het klantenportaal — via je eigen Mollie-account.',
+            'sections' => [
+                ['Mollie koppelen', [
+                    'Maak een gratis account op mollie.com en kopieer je API-key (Developers → API-keys). Plak die bij Instellingen → Bedrijfsgegevens onder "Online betalingen". Het geld gaat rechtstreeks naar jouw rekening — EasyInvoice zit er niet tussen en rekent er niets voor (Mollie rekent per transactie een klein bedrag, zie mollie.com/pricing). Met een test_-key kun je eerst veilig proefdraaien.',
+                ]],
+                ['Zo betaalt je klant', [
+                    'In de factuurmail verandert de knop in "Bekijk en betaal online (iDEAL)". In het beveiligde klantenportaal staat een betaalknop met het openstaande bedrag — deelbetalingen en verrekeningen worden automatisch afgetrokken. Na het afronden bij de bank wordt de betaling direct op de factuur geboekt en springt de status op betaald (of deels betaald).',
+                ]],
+                ['Goed om te weten', [
+                    'Elke betaalpoging zie je terug in het inzagelog van de factuur ("Online betaling gestart"). Wordt een betaling geannuleerd, dan kan de klant het gewoon opnieuw proberen of alsnog handmatig overmaken. De betaalknop verschijnt alleen op openstaande facturen; per administratie koppel je een eigen Mollie-account.',
+                ]],
+            ],
+        ],
+
         'facturen-in-het-engels' => [
             'category' => 'Facturen',
             'title' => 'Facturen en offertes in het Engels',
