@@ -16,6 +16,20 @@ RUN install-php-extensions \
     exif \
     opcache
 
+# ----- PHP-productie-instellingen -----
+# validate_timestamps=0 is veilig: de code in een container wijzigt nooit na
+# de deploy. Scheelt per request het her-checken (en zonder opcache zelfs
+# her-compileren) van duizenden PHP-bestanden.
+RUN { \
+        echo 'opcache.enable=1'; \
+        echo 'opcache.memory_consumption=192'; \
+        echo 'opcache.interned_strings_buffer=24'; \
+        echo 'opcache.max_accelerated_files=20000'; \
+        echo 'opcache.validate_timestamps=0'; \
+        echo 'realpath_cache_size=4096K'; \
+        echo 'realpath_cache_ttl=600'; \
+    } > "${PHP_INI_DIR:-/usr/local/etc/php}/conf.d/zz-production.ini"
+
 # ----- System tools + Node.js for frontend build -----
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -79,4 +93,7 @@ EXPOSE 8080
 
 # Default: serve /app/public via FrankenPHP php-server.
 # Migrations run via railway.json preDeployCommand.
-CMD ["sh", "-c", "frankenphp php-server --listen :${PORT:-8080} --root /app/public"]
+# Bij het opstarten eerst de Laravel-caches opbouwen (config + views), zodat
+# niet elke request het hele framework opnieuw hoeft te configureren. Faalt
+# een cache-stap, dan start de server gewoon zonder (|| true).
+CMD ["sh", "-c", "php artisan config:cache || true; php artisan view:cache || true; frankenphp php-server --listen :${PORT:-8080} --root /app/public"]

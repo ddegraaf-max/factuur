@@ -28,6 +28,14 @@ class Company extends Model
         'stripe_customer_id', 'stripe_subscription_id',
     ];
 
+    /**
+     * Het logo (base64-data-URL, kan honderden KB's zijn) hoort niet in elke
+     * Inertia-response: auth.company wordt op élke pagina meegestuurd. Waar het
+     * logo echt nodig is (Huisstijl-pagina, portaal, e-mails) wordt het
+     * expliciet opgevraagd via makeVisible() of directe attribuut-toegang.
+     */
+    protected $hidden = ['logo_data'];
+
     protected $casts = [
         'is_demo' => 'boolean',
         'demo_expires_at' => 'datetime',

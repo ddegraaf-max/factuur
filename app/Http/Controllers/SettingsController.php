@@ -93,7 +93,9 @@ class SettingsController extends Controller
     public function brand()
     {
         return Inertia::render('Settings/Brand', [
-            'company' => auth()->user()->company,
+            // logo_data staat standaard op hidden (te zwaar voor elke response);
+            // hier is het juist nodig voor de voorvertoning.
+            'company' => auth()->user()->company->makeVisible('logo_data'),
         ]);
     }
 

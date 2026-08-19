@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 19 augustus 2026 · Easy 1.6.1</div>
+        <h3>Sneller laden</h3>
+        <ul class="tl-list">
+          <li>Serveroptimalisaties (PHP-opcache en voorgecachte configuratie/templates) en een fors kleinere paginapayload — het bedrijfslogo wordt niet langer bij elke pagina meegestuurd.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.6.0</div>
         <h3>Klanten toevoegen via het KvK-register</h3>
         <ul class="tl-list">
