@@ -56,8 +56,9 @@ class TimeEntryController extends Controller
             'minutes' => $e->minutes,
             'hourly_rate' => $e->hourly_rate !== null ? (float) $e->hourly_rate : null,
             'effective_rate' => $e->effectiveRate(),
-            'amount' => $e->billable ? $e->amount() : null,
+            'amount' => ($e->billable && ! $e->time_card_id) ? $e->amount() : null,
             'billable' => $e->billable,
+            'time_card_id' => $e->time_card_id,
             'user_name' => $e->user?->name,
             'invoice_id' => $e->invoice_id,
             'invoice_number' => $e->invoice?->number,
@@ -110,14 +111,40 @@ class TimeEntryController extends Controller
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'hourly_rate']),
             'projects' => TimeEntry::whereNotNull('project')->select('project')->distinct()->orderBy('project')->limit(100)->pluck('project'),
             'default_hourly_rate' => $company->default_hourly_rate !== null ? (float) $company->default_hourly_rate : null,
+            // Strippenkaarten: tegoeden per klant (voor het beheerblok en de
+            // "wordt afgeschreven van..."-hint bij het schrijven).
+            'time_cards' => \App\Models\TimeCard::with('customer:id,name', 'invoice:id,number,status')
+                ->withSum('entries', 'minutes')
+                ->orderBy('id')
+                ->get()
+                ->map(fn ($c) => [
+                    'id' => $c->id,
+                    'customer_id' => $c->customer_id,
+                    'customer_name' => $c->customer?->name,
+                    'name' => $c->name,
+                    'total_minutes' => $c->total_minutes,
+                    'used_minutes' => (int) ($c->entries_sum_minutes ?? 0),
+                    'remaining_minutes' => max(0, $c->total_minutes - (int) ($c->entries_sum_minutes ?? 0)),
+                    'price' => (float) $c->price,
+                    'valid_until' => $c->valid_until?->format('Y-m-d'),
+                    'valid_until_label' => $c->valid_until?->translatedFormat('j M Y'),
+                    'expired' => $c->valid_until ? $c->valid_until->isPast() : false,
+                    'invoice_id' => $c->invoice_id,
+                    'invoice_number' => $c->invoice?->number,
+                ]),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        TimeEntry::create($this->validated($request));
+        $entry = TimeEntry::create($this->validated($request));
 
-        return back()->with('flash', 'Uren geschreven.');
+        // Strippenkaart: automatisch afschrijven zolang het tegoed toereikend is.
+        \App\Models\TimeCard::apply($entry);
+
+        return back()->with('flash', $entry->fresh()->time_card_id
+            ? 'Uren geschreven en afgeschreven van de strippenkaart.'
+            : 'Uren geschreven.');
     }
 
     public function update(Request $request, TimeEntry $entry): RedirectResponse
@@ -127,6 +154,9 @@ class TimeEntryController extends Controller
         }
 
         $entry->update($this->validated($request));
+
+        // Dekking herbeoordelen: past de regel nog op de kaart (of juist nu wel)?
+        \App\Models\TimeCard::apply($entry->fresh());
 
         return back()->with('flash', 'Uren bijgewerkt.');
     }
@@ -271,6 +301,9 @@ class TimeEntryController extends Controller
             'minutes' => min($minutes, 1440),
             'timer_started_at' => null,
         ]);
+
+        // Ook timeruren tellen af van een eventuele strippenkaart.
+        \App\Models\TimeCard::apply($timer->fresh());
 
         return $timer;
     }

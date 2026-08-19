@@ -361,6 +361,23 @@ return [
             ],
         ],
 
+        'strippenkaarten' => [
+            'category' => 'Uren',
+            'title' => 'Strippenkaarten: vooraf betaalde urenbundels',
+            'intro' => 'Verkoop een urenbundel vooraf — geschreven uren tellen automatisch af van het tegoed en komen nooit dubbel op een factuur.',
+            'sections' => [
+                ['Een strippenkaart verkopen', [
+                    'Ga naar Verkoop → Uren en klik op "Nieuwe strippenkaart". Kies de klant, het aantal uren en de bundelprijs (en eventueel een geldigheidsdatum). Met "Factureer" maak je direct de conceptfactuur voor de bundel — één regel met het tegoed erop, die je zoals altijd controleert en verstuurt.',
+                ]],
+                ['Automatisch aftellen', [
+                    'Schrijf je daarna uren voor die klant (handmatig of met de timer), dan worden ze automatisch van het tegoed afgeschreven — je ziet het al bij het invoeren ("wordt afgeschreven van…"). Gedekte uren krijgen de status "Strippenkaart" en verschijnen niet meer in "Klaar om te factureren": ze zijn immers al betaald. Per kaart zie je een balkje met het gebruikte en resterende tegoed.',
+                ]],
+                ['Spelregels', [
+                    'Een urenregel wordt alleen afgeschreven als hij volledig in het resterende tegoed past — anders blijft hij gewoon factureerbaar, zodat er nooit halve afschrijvingen ontstaan. Een verlopen kaart schrijft niet meer af (bestaande afschrijvingen blijven staan). Verwijder je een kaart, dan komen de gedekte uren weer als factureerbare uren in de lijst.',
+                ]],
+            ],
+        ],
+
         'kilometerregistratie' => [
             'category' => 'Uren',
             'title' => 'Zakelijke ritten bijhouden en doorbelasten',

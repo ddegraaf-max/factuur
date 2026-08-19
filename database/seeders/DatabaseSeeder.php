@@ -226,6 +226,19 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 7b. Strippenkaart: TechFlow kocht een urenbundel — de geschreven uren
+        // hierboven worden er automatisch van afgeschreven.
+        $card = \App\Models\TimeCard::create([
+            'company_id' => $company->id,
+            'customer_id' => $customerModels[0]->id,
+            'name' => 'Strippenkaart 10 uur',
+            'total_minutes' => 600,
+            'price' => 850.00,
+        ]);
+        \App\Models\TimeEntry::billable()->where('customer_id', $customerModels[0]->id)
+            ->orderBy('work_date')->orderBy('id')->get()
+            ->each(fn ($entry) => \App\Models\TimeCard::apply($entry));
+
         // 8. Demo-kilometerregistratie: ritten om door te belasten + eigen administratie.
         $trips = [
             ['customer' => 0, 'from' => 'Bussum', 'to' => 'Amsterdam', 'round_trip' => true, 'km' => 62.0, 'days_ago' => 4, 'description' => 'Kick-off website redesign'],

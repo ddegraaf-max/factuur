@@ -13,6 +13,7 @@ const props = defineProps({
   customers: Array,            // { id, name, hourly_rate }
   projects: Array,             // eerder gebruikte projectnamen
   default_hourly_rate: Number, // standaardtarief van het bedrijf (of null)
+  time_cards: { type: Array, default: () => [] }, // strippenkaarten (tegoeden per klant)
 });
 
 /* ---------- Duur: minuten <-> invoer ---------- */
@@ -126,6 +127,51 @@ const stopTimer = () => {
   router.post(route('hours.timer.stop'), {}, { preserveScroll: true });
 };
 
+/* ---------- Strippenkaarten ---------- */
+const showCardForm = ref(false);
+const cardForm = useForm({
+  customer_id: null,
+  hours: '',
+  price: '',
+  name: '',
+  valid_until: '',
+});
+
+const submitCard = () => {
+  cardForm
+    .transform((data) => ({
+      customer_id: data.customer_id,
+      hours: parseFloat(String(data.hours).replace(',', '.')) || 0,
+      price: parseFloat(String(data.price).replace(',', '.')) || 0,
+      name: data.name || null,
+      valid_until: data.valid_until || null,
+    }))
+    .post(route('timecards.store'), {
+      preserveScroll: true,
+      onSuccess: () => { showCardForm.value = false; cardForm.reset(); },
+    });
+};
+
+const invoiceCard = (card) => {
+  if (confirm(`Conceptfactuur maken voor "${card.name}" (${eur(card.price)})?`)) {
+    router.post(route('timecards.invoice', card.id));
+  }
+};
+
+const removeCard = (card) => {
+  if (confirm(`Strippenkaart "${card.name}" verwijderen?\n\nDe gedekte uren komen dan weer als factureerbare uren in de lijst.`)) {
+    router.delete(route('timecards.destroy', card.id), { preserveScroll: true });
+  }
+};
+
+// Hint bij het urenschrijven: wordt dit afgeschreven van een strippenkaart?
+const activeCardForForm = computed(() => {
+  if (!form.customer_id) return null;
+  return props.time_cards.find(c =>
+    c.customer_id === form.customer_id && !c.expired && c.remaining_minutes > 0
+  ) || null;
+});
+
 /* ---------- Factureren ---------- */
 const invoiceCustomer = (row) => {
   const amountLabel = row.amount != null ? ` (${eur(row.amount)})` : '';
@@ -229,6 +275,9 @@ const totalOpenAmount = computed(() => {
             <div v-if="form.errors.hourly_rate" class="field-error">{{ form.errors.hourly_rate }}</div>
           </div>
           <div class="entry-form-actions">
+            <span v-if="activeCardForForm && form.billable" class="card-hint">
+              Wordt afgeschreven van <b>{{ activeCardForForm.name }}</b> (nog {{ dur(activeCardForForm.remaining_minutes) }} tegoed)
+            </span>
             <label class="checkbox-row" style="margin:0;">
               <input type="checkbox" v-model="form.billable">
               <span>Factureerbaar</span>
@@ -243,6 +292,85 @@ const totalOpenAmount = computed(() => {
           </div>
         </form>
       </div>
+    </div>
+
+    <!-- Strippenkaarten (vooraf betaalde urenbundels) -->
+    <div v-if="time_cards.length || showCardForm" class="card" style="margin-bottom:16px;">
+      <div class="card-body">
+        <div class="entry-form-title">
+          Strippenkaarten
+          <button v-if="!showCardForm" type="button" class="btn btn-secondary btn-sm" @click="showCardForm = true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Nieuwe strippenkaart
+          </button>
+        </div>
+
+        <!-- Nieuwe kaart -->
+        <form v-if="showCardForm" @submit.prevent="submitCard" class="tc-form">
+          <div class="form-group">
+            <label>Klant *</label>
+            <select v-model="cardForm.customer_id">
+              <option :value="null">— Kies een klant —</option>
+              <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
+            </select>
+            <div v-if="cardForm.errors.customer_id" class="field-error">{{ cardForm.errors.customer_id }}</div>
+          </div>
+          <div class="form-group narrow">
+            <label>Aantal uur *</label>
+            <input type="text" v-model="cardForm.hours" placeholder="Bijv. 10" inputmode="decimal">
+            <div v-if="cardForm.errors.hours" class="field-error">{{ cardForm.errors.hours }}</div>
+          </div>
+          <div class="form-group narrow">
+            <label>Bundelprijs *<span class="label-hint">€ excl.</span></label>
+            <input type="text" v-model="cardForm.price" placeholder="Bijv. 850" inputmode="decimal">
+            <div v-if="cardForm.errors.price" class="field-error">{{ cardForm.errors.price }}</div>
+          </div>
+          <div class="form-group">
+            <label>Naam<span class="label-hint">(op de factuur)</span></label>
+            <input type="text" v-model="cardForm.name" maxlength="190" placeholder="Strippenkaart 10 uur">
+          </div>
+          <div class="form-group narrow">
+            <label>Geldig tot<span class="label-hint">(optioneel)</span></label>
+            <input type="date" v-model="cardForm.valid_until">
+            <div v-if="cardForm.errors.valid_until" class="field-error">{{ cardForm.errors.valid_until }}</div>
+          </div>
+          <div class="tc-form-actions">
+            <button type="button" class="btn btn-secondary" @click="showCardForm = false">Annuleren</button>
+            <button type="submit" class="btn btn-primary" :disabled="cardForm.processing">
+              {{ cardForm.processing ? 'Bezig…' : 'Strippenkaart aanmaken' }}
+            </button>
+          </div>
+        </form>
+
+        <!-- Kaarten -->
+        <div v-for="c in time_cards" :key="c.id" class="tc-row">
+          <div class="tc-info">
+            <div class="tc-name">
+              {{ c.name }} <span class="muted">· {{ c.customer_name }}</span>
+              <span v-if="c.expired" class="pill pill-overdue" style="margin-left:6px;">Verlopen</span>
+              <span v-else-if="c.remaining_minutes === 0" class="pill pill-muted" style="margin-left:6px;">Op</span>
+            </div>
+            <div class="tc-bar"><div class="tc-fill" :style="{ width: Math.min(100, c.used_minutes / c.total_minutes * 100) + '%' }"></div></div>
+            <div class="tc-meta">
+              {{ dur(c.used_minutes) }} gebruikt van {{ dur(c.total_minutes) }} uur — nog <b>{{ dur(c.remaining_minutes) }}</b> tegoed
+              <template v-if="c.valid_until_label"> · geldig tot {{ c.valid_until_label }}</template>
+              <template v-if="c.invoice_id"> · <Link :href="route('invoices.show', c.invoice_id)" style="color:var(--brand-dark);">{{ c.invoice_number || 'conceptfactuur' }}</Link></template>
+            </div>
+          </div>
+          <div class="tc-actions">
+            <button v-if="!c.invoice_id" type="button" class="btn btn-primary btn-sm" @click="invoiceCard(c)">Factureer {{ eur(c.price) }}</button>
+            <button type="button" class="icon-btn" title="Verwijderen" @click="removeCard(c)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else style="margin-bottom:16px;text-align:right;">
+      <button type="button" class="btn btn-secondary btn-sm" @click="showCardForm = true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Strippenkaart verkopen (vooraf betaalde uren)
+      </button>
     </div>
 
     <!-- Met één klik factureren -->
@@ -310,6 +438,7 @@ const totalOpenAmount = computed(() => {
               <Link v-if="e.invoice_id" :href="route('invoices.show', e.invoice_id)" class="pill pill-paid" style="text-decoration:none;">
                 {{ e.invoice_number || 'Conceptfactuur' }}
               </Link>
+              <span v-else-if="e.time_card_id" class="pill pill-card" title="Afgeschreven van een strippenkaart — al betaald">Strippenkaart</span>
               <span v-else-if="!e.billable" class="pill pill-muted">Niet-factureerbaar</span>
               <span v-else class="pill pill-sent">Open</span>
             </td>
@@ -381,6 +510,25 @@ const totalOpenAmount = computed(() => {
 }
 
 .pill-muted { background: var(--surface-2); color: var(--text-3); }
+.pill-card { background: #EDE9FE; color: #6D28D9; }
+
+.card-hint { font-size: 12px; color: #6D28D9; background: #EDE9FE; border-radius: 7px; padding: 5px 10px; }
+
+.tc-form { display: grid; grid-template-columns: minmax(0, 1fr) 110px 130px minmax(0, 1fr) 150px; gap: 12px; align-items: start; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px dashed var(--border); }
+.tc-form-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; }
+.tc-row { display: flex; align-items: center; gap: 16px; padding: 11px 0; border-top: 1px solid var(--border); }
+.tc-row:first-of-type { border-top: none; }
+.tc-info { flex: 1; min-width: 0; }
+.tc-name { font-weight: 600; font-size: 13.5px; }
+.tc-bar { height: 8px; background: var(--surface-2); border-radius: 5px; margin: 7px 0 5px; max-width: 420px; }
+.tc-fill { height: 100%; background: linear-gradient(90deg, #8B5CF6, #6D28D9); border-radius: 5px; }
+.tc-meta { font-size: 12px; color: var(--text-3); }
+.tc-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+
+@media (max-width: 900px) {
+  .tc-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tc-row { flex-wrap: wrap; }
+}
 .row-actions { white-space: nowrap; text-align: right; }
 .icon-btn { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
 .icon-btn:hover { background: var(--surface-2); color: var(--brand-dark); }

@@ -1,0 +1,51 @@
+EASYINVOICE — STRIPPENKAARTEN & TEGOEDEN
+========================================
+
+WAT IS HET
+----------
+Vooraf betaalde urenbundels per klant, beheerd op de urenpagina
+(Verkoop → Uren, blok "Strippenkaarten").
+
+- AANMAKEN: klant + aantal uren + bundelprijs (+ optionele naam en
+  geldigheidsdatum). Bestaande open uren van de klant worden meteen
+  gedekt (oudste eerst).
+- FACTUREREN: één klik maakt de conceptfactuur voor de bundel — één
+  regel ("Strippenkaart 10 uur", detail "Vooraf betaald tegoed: 10 uur,
+  geldig tot …", stuksprijs = bundelprijs, 21% BTW). Eenmalig per kaart;
+  de kaart linkt daarna naar de factuur.
+- AFTELLEN: elke geschreven urenregel (ook timeruren) wordt automatisch
+  van het tegoed afgeschreven zolang hij er VOLLEDIG in past. Bij het
+  invoeren zie je al "wordt afgeschreven van … (nog X:XX tegoed)".
+- GEDEKTE UREN zijn afgehandeld: status-pil "Strippenkaart" (paars),
+  geen bedrag, en ze verschijnen nooit in "Klaar om te factureren" —
+  dubbel factureren kan dus niet.
+- BALKJE per kaart: gebruikt/totaal/resterend, plus "Op" of "Verlopen".
+
+SPELREGELS (bewust ontwerp)
+---------------------------
+- GEEN HALVE AFSCHRIJVINGEN: past een regel niet meer volledig in het
+  resterende tegoed, dan blijft hij gewoon factureerbaar. Voorspelbaar,
+  geen gesplitste urenregels.
+- HERBEOORDELING bij bewerken: wijzigt de klant, de duur of de
+  factureerbaarheid van een regel, dan wordt de dekking opnieuw bepaald
+  (loskoppelen als het niet meer past, dekken als het nu wél past).
+- VERLOPEN kaarten schrijven niet meer af; bestaande dekkingen blijven
+  staan (dat werk is immers al betaald).
+- VERWIJDEREN van een kaart geeft de gedekte uren weer vrij als
+  factureerbare uren (nullOnDelete) — de interface waarschuwt daarvoor.
+  De verkoopfactuur blijft gewoon bestaan.
+- Meerdere kaarten per klant kan; de oudste met voldoende tegoed dekt.
+
+TECHNIEK
+--------
+- Migratie: time_cards (total_minutes, price, valid_until, invoice_id)
+  + time_entries.time_card_id (nullOnDelete).
+- Kern: TimeCard::apply(TimeEntry) — de volledige (her)beoordeling van
+  de dekking, aangeroepen bij schrijven, bewerken en timer-stop.
+- TimeEntry::scopeBillable sluit gedekte regels uit, waardoor het
+  "Klaar om te factureren"-blok, de statistiek "Nog te factureren" en
+  hours.invoice automatisch kloppen.
+- Nieuw: app/Models/TimeCard.php, app/Http/Controllers/
+  TimeCardController.php (store/invoice/destroy), routes timecards.*.
+- Demo-omgeving: TechFlow heeft een "Strippenkaart 10 uur" (€ 850)
+  waar de bestaande demo-uren al van zijn afgeschreven.

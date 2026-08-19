@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.17.0</div>
+        <h3>Strippenkaarten &amp; tegoeden</h3>
+        <ul class="tl-list">
+          <li><b>Urenbundels vooraf verkopen</b> — maak op de urenpagina een strippenkaart aan (bijv. 10 uur voor € 850), factureer 'm met één klik, en het tegoed staat klaar.</li>
+          <li><b>Automatisch aftellen</b> — geschreven uren (ook timeruren) worden automatisch van het tegoed afgeschreven. Je ziet per kaart een balkje met wat er is gebruikt en wat er nog over is, en gedekte uren komen nooit dubbel op een factuur.</li>
+          <li><b>Voorspelbaar</b> — past een urenregel niet meer volledig in het resterende tegoed, dan blijft hij gewoon factureerbaar. Optioneel geef je een kaart een geldigheidsdatum; daarna schrijft hij niet meer af.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.16.0</div>
         <h3>Offertes digitaal ondertekenen</h3>
         <ul class="tl-list">

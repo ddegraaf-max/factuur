@@ -256,6 +256,11 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::patch('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'update'])->name('hours.update');
     Route::delete('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'destroy'])->name('hours.destroy');
 
+    // Strippenkaarten: vooraf betaalde urenbundels per klant
+    Route::post('uren/strippenkaarten', [\App\Http\Controllers\TimeCardController::class, 'store'])->name('timecards.store');
+    Route::post('uren/strippenkaarten/{card}/factureren', [\App\Http\Controllers\TimeCardController::class, 'invoice'])->name('timecards.invoice');
+    Route::delete('uren/strippenkaarten/{card}', [\App\Http\Controllers\TimeCardController::class, 'destroy'])->name('timecards.destroy');
+
     // Kilometerregistratie: ritten bijhouden en doorbelasten
     Route::get('ritten', [\App\Http\Controllers\TripController::class, 'index'])->name('trips.index');
     Route::post('ritten', [\App\Http\Controllers\TripController::class, 'store'])->name('trips.store');

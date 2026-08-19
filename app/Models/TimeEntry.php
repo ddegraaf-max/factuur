@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TimeEntry extends Model
 {
     protected $fillable = [
-        'company_id', 'user_id', 'customer_id', 'invoice_id',
+        'company_id', 'user_id', 'customer_id', 'invoice_id', 'time_card_id',
         'work_date', 'project', 'description', 'minutes',
         'hourly_rate', 'billable', 'timer_started_at',
     ];
@@ -50,6 +50,7 @@ class TimeEntry extends Model
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function customer(): BelongsTo { return $this->belongsTo(Customer::class)->withoutGlobalScope('company'); }
     public function invoice(): BelongsTo { return $this->belongsTo(Invoice::class)->withoutGlobalScope('company'); }
+    public function timeCard(): BelongsTo { return $this->belongsTo(TimeCard::class)->withoutGlobalScope('company'); }
 
     /** Nog niet gefactureerd en geen lopende timer. */
     public function scopeOpen(Builder $query): Builder
@@ -57,10 +58,14 @@ class TimeEntry extends Model
         return $query->whereNull('invoice_id')->whereNull('timer_started_at');
     }
 
-    /** Factureerbaar: open, aan een klant gekoppeld en op factureerbaar gezet. */
+    /**
+     * Factureerbaar: open, aan een klant gekoppeld, op factureerbaar gezet
+     * én niet al gedekt door een strippenkaart (dan is hij al betaald).
+     */
     public function scopeBillable(Builder $query): Builder
     {
-        return $query->open()->where('billable', true)->whereNotNull('customer_id')->where('minutes', '>', 0);
+        return $query->open()->where('billable', true)->whereNotNull('customer_id')
+            ->whereNull('time_card_id')->where('minutes', '>', 0);
     }
 
     public function getHoursAttribute(): float
