@@ -1,0 +1,46 @@
+EASYINVOICE — VERZENDING VIA PEPPOL
+===================================
+
+WAT IS HET
+----------
+E-facturen (UBL/NLCIUS) rechtstreeks afleveren in het boekhoudpakket van
+de klant via het Peppol-netwerk — zonder mailbox ertussen. In twee lagen:
+
+1. BEREIKBAARHEIDSCHECK (werkt direct, geen account nodig)
+   Easy controleert via de openbare Peppol Directory of de klant is
+   aangesloten op Peppol, op basis van het KvK-nummer (deelnemers-ID
+   0106:kvknummer) of een eigen Peppol-ID op de klantkaart.
+   - Op de factuurpagina verschijnt een ⚡-badge "Klant bereikbaar via
+     Peppol" (check wordt per klant een week gecachet).
+   - Op de klantkaart (bewerken) zit een handmatige checkknop.
+
+2. AFLEVEREN (activeren met een provider-account)
+   Daadwerkelijk versturen kan uitsluitend via een gecertificeerd Peppol
+   Access Point. Easy gebruikt daarvoor Storecove (storecove.com):
+   - Maak een Storecove-account, registreer je bedrijf als verzender
+     (legal entity) en zet in Railway:
+        STORECOVE_API_TOKEN=<token>
+        STORECOVE_LEGAL_ENTITY_ID=<id>
+   - Daarna verschijnt op verstuurde facturen (bij bereikbare klanten)
+     de knop "⚡ Via Peppol afleveren". De bestaande UBL-generator
+     (NLCIUS) levert het document; de referentie en het tijdstip komen
+     in de historie en als groene badge op de factuur.
+   - Zonder keys blijft de verzendknop verborgen; de check werkt altijd.
+
+FOUTAFHANDELING
+---------------
+- Directory onbereikbaar → pagina laadt gewoon, oude checkwaarde blijft.
+- Verzending geweigerd (validatie), ongeldige token of storing → nette
+  Nederlandse foutmelding boven de factuur, details in de log.
+
+TECHNIEK
+--------
+- Migratie: customers.peppol_id/peppol_available/peppol_checked_at +
+  invoices.peppol_sent_at/peppol_reference/peppol_status.
+- Nieuw: app/Services/PeppolService.php, PeppolController, routes
+  customers.peppol.check + invoices.peppol.send (throttled).
+- Getest tegen de échte Peppol Directory: geregistreerde deelnemer
+  (Ricoh NL, 0106:40045058) → true; niet-geregistreerd nummer → false;
+  caching op de klant; verzend-guards zonder configuratie.
+- Let op: 0106:99999999 is een geregistreerde TESTdeelnemer op het
+  netwerk — handig om de badge te demonstreren (KvK 99999999 invullen).

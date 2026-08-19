@@ -72,6 +72,7 @@ const form = useForm({
   phone: props.customer?.phone ?? '',
   kvk_number: props.customer?.kvk_number ?? '',
   vat_number: props.customer?.vat_number ?? '',
+  peppol_id: props.customer?.peppol_id ?? '',
   address_line: props.customer?.address_line ?? '',
   postal_code: props.customer?.postal_code ?? '',
   city: props.customer?.city ?? '',
@@ -220,6 +221,18 @@ const remove = () => {
             <div class="form-group">
               <label>BTW-nummer</label>
               <input type="text" v-model="form.vat_number" maxlength="20" placeholder="NL123456789B01">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Peppol-ID<span class="muted" style="margin-left:6px;">(optioneel — standaard afgeleid van het KvK-nummer)</span></label>
+              <input type="text" v-model="form.peppol_id" maxlength="50" placeholder="0106:12345678">
+              <div v-if="form.errors.peppol_id" class="field-error">{{ form.errors.peppol_id }}</div>
+            </div>
+            <div class="form-group" v-if="isEdit" style="display:flex;align-items:flex-end;">
+              <button type="button" class="btn btn-secondary" style="width:100%;" @click="router.post(route('customers.peppol.check', customer.id), {}, { preserveScroll: true })">
+                ⚡ Check Peppol-bereikbaarheid
+              </button>
             </div>
           </div>
         </div>

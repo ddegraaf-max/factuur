@@ -14,13 +14,15 @@ class Customer extends Model
 
     protected $fillable = [
         'company_id', 'name', 'type', 'contact_name', 'email', 'phone',
-        'kvk_number', 'vat_number',
+        'kvk_number', 'vat_number', 'peppol_id',
         'address_line', 'postal_code', 'city', 'country',
         'payment_terms', 'notes',
     ];
 
     protected $casts = [
         'payment_terms' => 'integer',
+        'peppol_available' => 'boolean',
+        'peppol_checked_at' => 'datetime',
     ];
 
     protected static function booted(): void

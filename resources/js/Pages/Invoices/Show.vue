@@ -8,7 +8,15 @@ import { computed, ref, watch } from 'vue';
 const props = defineProps({
   invoice: Object,
   company: Object,
+  peppol: { type: Object, default: null },
 });
+
+/* ---------- Peppol ---------- */
+const sendPeppol = () => {
+  if (confirm('Factuur via het Peppol-netwerk afleveren in het boekhoudpakket van de klant?')) {
+    router.post(route('invoices.peppol.send', props.invoice.id), {}, { preserveScroll: true });
+  }
+};
 
 const showPaymentModal = ref(false);
 const showRecurringModal = ref(false);
@@ -18,7 +26,7 @@ const showCreditModal = ref(false);
 const page = usePage();
 const pageError = computed(() => {
   const e = page.props.errors || {};
-  return e.incasso || e.credit || e.reminder || e.ubl || e.status || e.delete || null;
+  return e.incasso || e.credit || e.reminder || e.ubl || e.status || e.delete || e.peppol || null;
 });
 
 /* ---------- Creditnota ---------- */
@@ -290,6 +298,14 @@ const deleteInvoice = () => {
             Versturen
           </button>
         </template>
+        <button
+          v-if="peppol?.available && peppol?.sending_enabled && invoice.status !== 'draft' && !peppol?.sent_at_label"
+          class="btn btn-secondary btn-sm"
+          title="Lever de e-factuur (UBL) rechtstreeks af in het boekhoudpakket van de klant"
+          @click="sendPeppol"
+        >
+          ⚡ Via Peppol afleveren
+        </button>
         <button v-if="canRemind" class="btn btn-secondary btn-sm" title="Stuur nu een herinnering naar de klant" @click="sendReminder">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           Herinnering sturen
@@ -336,8 +352,14 @@ const deleteInvoice = () => {
         <div class="inv-detail-top">
           <div>
             <div class="inv-number">{{ invoice.number || '— concept —' }}</div>
-            <div style="margin-top:8px;">
+            <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
+              <span v-if="peppol?.sent_at_label" class="peppol-chip on" :title="`Afgeleverd via Peppol op ${peppol.sent_at_label}`">
+                ⚡ Via Peppol afgeleverd
+              </span>
+              <span v-else-if="peppol?.available" class="peppol-chip" :title="`Deze klant is aangesloten op het Peppol-netwerk (${peppol.participant_id})`">
+                ⚡ Klant bereikbaar via Peppol
+              </span>
             </div>
           </div>
           <div style="text-align:right">
@@ -930,6 +952,15 @@ const deleteInvoice = () => {
 /* Foutmelding boven de factuur */
 .inv-alert { display: flex; align-items: center; gap: 10px; background: var(--brand-tint); border: 1px solid var(--brand-border); color: var(--brand-darker); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13.5px; }
 .inv-alert svg { width: 18px; height: 18px; flex: none; }
+
+/* Peppol */
+.peppol-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+  background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border);
+  cursor: help;
+}
+.peppol-chip.on { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
 
 /* Afboeken */
 .writeoff-note {

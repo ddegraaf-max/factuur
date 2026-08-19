@@ -123,7 +123,28 @@ class InvoiceController extends Controller
         }
         $company = auth()->user()->company;
 
+        // Peppol: is deze klant bereikbaar (gecachte weekcheck) en is de
+        // verzendkant geconfigureerd?
+        $peppol = null;
+        if (! $invoice->is_credit && $invoice->customer) {
+            $peppolService = app(\App\Services\PeppolService::class);
+            $available = null;
+            try {
+                $available = $peppolService->checkCustomer($invoice->customer);
+            } catch (\Throwable $e) {
+                // Directory onbereikbaar — geen blocker voor de pagina.
+            }
+            $peppol = [
+                'participant_id' => $peppolService->participantId($invoice->customer),
+                'available' => $available,
+                'sending_enabled' => $peppolService->sendingEnabled(),
+                'sent_at_label' => $invoice->peppol_sent_at?->translatedFormat('j M Y, H:i'),
+                'reference' => $invoice->peppol_reference,
+            ];
+        }
+
         return Inertia::render('Invoices/Show', [
+            'peppol' => $peppol,
             'invoice' => array_merge($invoice->toArray(), [
                 'invoice_date_label' => $invoice->invoice_date->translatedFormat('j M Y'),
                 'due_date_label' => $invoice->due_date?->translatedFormat('j M Y'),
@@ -400,6 +421,7 @@ class InvoiceController extends Controller
 
         $push($invoice->created_at, 'plus', 'Aangemaakt');
         $push($invoice->sent_at, 'send', 'Verstuurd' . ($invoice->customer_email ? " naar {$invoice->customer_email}" : ''));
+        $push($invoice->peppol_sent_at, 'send', 'Afgeleverd via het Peppol-netwerk' . ($invoice->peppol_reference ? " (ref. {$invoice->peppol_reference})" : ''));
         $push($invoice->first_viewed_at, 'eye', 'Voor het eerst bekeken door de klant');
 
         foreach ($invoice->reminderLogs as $log) {

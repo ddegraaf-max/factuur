@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.7.0</div>
+        <h3>Verzending via Peppol</h3>
+        <ul class="tl-list">
+          <li><b>Peppol-bereikbaarheid</b> — Easy controleert automatisch (via de officiële Peppol Directory) of je klant is aangesloten op het Peppol-netwerk. Is dat zo, dan zie je een ⚡-badge op de factuur.</li>
+          <li><b>E-factuur rechtstreeks afleveren</b> — met één klik lever je de UBL-factuur (NLCIUS) af in het boekhoudpakket van je klant, via een gecertificeerd Peppol Access Point. Geen mailbox ertussen, geen overtypen bij de ontvanger.</li>
+          <li>Eigen Peppol-ID per klant instelbaar (standaard afgeleid van het KvK-nummer); afleveringen verschijnen in de historie van de factuur.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 19 augustus 2026 · Easy 1.6.1</div>
         <h3>Sneller laden</h3>
         <ul class="tl-list">

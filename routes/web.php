@@ -185,6 +185,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Customers
         Route::resource('customers', CustomerController::class);
 
+        // Peppol: bereikbaarheid checken + facturen afleveren
+        Route::post('customers/{customer}/peppol-check', [\App\Http\Controllers\PeppolController::class, 'check'])
+            ->middleware('throttle:20,1')->name('customers.peppol.check');
+        Route::post('invoices/{invoice}/peppol', [\App\Http\Controllers\PeppolController::class, 'send'])
+            ->middleware('throttle:10,1')->name('invoices.peppol.send');
+
         // KvK-register doorzoeken (voor het klantformulier)
         Route::get('kvk/zoeken', [\App\Http\Controllers\KvkController::class, 'search'])
             ->middleware('throttle:30,1')->name('kvk.search');

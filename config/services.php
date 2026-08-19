@@ -27,6 +27,13 @@ return [
         'key' => env('KVK_API_KEY'),
         'base' => rtrim(env('KVK_API_BASE', 'https://api.kvk.nl'), '/'),
     ],
+    // Peppol-verzending via Storecove (storecove.com). De bereikbaarheids-
+    // check via de openbare Peppol Directory werkt altijd; daadwerkelijk
+    // afleveren kan pas met een token + legal entity id.
+    'peppol' => [
+        'storecove_token' => env('STORECOVE_API_TOKEN'),
+        'legal_entity_id' => env('STORECOVE_LEGAL_ENTITY_ID'),
+    ],
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

@@ -33,7 +33,6 @@
     <div class="road-grid">
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
-        <div class="road-card"><h4>Verzending via Peppol</h4><p>E-facturen rechtstreeks afleveren via het Peppol-netwerk.</p></div>
         <div class="road-card"><h4>Bonnetjes automatisch herkennen</h4><p>Foto van de bon uploaden en de bedragen automatisch laten invullen (scan &amp; herken).</p></div>
       </div>
       <div>
@@ -43,6 +42,8 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Verzending via Peppol</h4><p>Automatische bereikbaarheidscheck en e-facturen (NLCIUS) rechtstreeks afleveren via het Peppol-netwerk.</p></div>
+        <div class="road-card"><h4>KvK-koppeling</h4><p>Klanten toevoegen door het Handelsregister te doorzoeken — gegevens automatisch ingevuld.</p></div>
         <div class="road-card"><h4>Bank &amp; transacties</h4><p>Bankafschriften importeren (CAMT.053/MT940) en transacties met één klik koppelen aan facturen en inkoop.</p></div>
         <div class="road-card"><h4>Klantenportaal</h4><p>Je klant bekijkt zijn facturen online via een beveiligde link — en jij ziet in het inzagelog wanneer ze zijn geopend.</p></div>
         <div class="road-card"><h4>BTW-aangifte per kwartaal</h4><p>Rubriek 1a, 1b en 1e plus voorbelasting (5b) en het saldo per kwartaal — met PDF-download.</p></div>

@@ -97,6 +97,7 @@ class CustomerController extends Controller
             'phone' => ['nullable', 'string', 'max:50'],
             'kvk_number' => ['nullable', 'string', 'max:20'],
             'vat_number' => ['nullable', 'string', 'max:20'],
+            'peppol_id' => ['nullable', 'string', 'max:50', 'regex:/^\d{4}:[\w.\-]+$/'],
             'address_line' => ['nullable', 'string', 'max:255'],
             'postal_code' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:100'],
