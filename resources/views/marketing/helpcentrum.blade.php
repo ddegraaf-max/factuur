@@ -78,6 +78,7 @@
         <p style="margin-bottom:12px;">Inkoop inboeken en je BTW-aangifte per kwartaal.</p>
         <a class="help-link" href="{{ route('help.article', 'inkoopfacturen-inboeken') }}">Inkoopfacturen inboeken (ook met foto) →</a>
         <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je BTW-aangifte per kwartaal →</a>
+        <a class="help-link" href="{{ route('help.article', 'jaaroverzicht') }}">Het jaaroverzicht (omzet, kosten, resultaat) →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🤝</div>

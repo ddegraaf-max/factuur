@@ -341,6 +341,23 @@ return [
             ],
         ],
 
+        'jaaroverzicht' => [
+            'category' => 'Rapporten',
+            'title' => 'Het jaaroverzicht: omzet, kosten en resultaat',
+            'intro' => 'Alles uit je facturatie in één rapport — de basis voor je aangifte inkomstenbelasting of voor je boekhouder.',
+            'sections' => [
+                ['Wat erin staat', [
+                    'Ga naar Rapporten → Jaaroverzicht. Je ziet per jaar de omzet (exclusief btw, op factuurdatum, creditnota\'s tellen negatief, concepten niet mee), de kosten per categorie uit je ingeboekte inkoopfacturen, en de kilometeraftrek: al je geregistreerde zakelijke kilometers × € 0,23 (het tarief voor privévervoermiddelen). Onderaan de streep: het resultaat per kwartaal en per jaar, vergeleken met vorig jaar.',
+                ]],
+                ['PDF voor je boekhouder', [
+                    'Met "Download PDF" krijg je het complete overzicht — inclusief kilometeradministratie en een toelichting op de grondslagen — als één document om mee te sturen naar je boekhouder.',
+                ]],
+                ['Wat je boekhouder nog toevoegt', [
+                    'Het jaaroverzicht is bewust géén complete fiscale winst-en-verliesrekening. Wat er nog bij komt voor de aangifte inkomstenbelasting: afschrijvingen op bedrijfsmiddelen (zoals een bus of apparatuur), eventuele loonkosten, bijtelling bij een zakelijke auto, voorraadmutaties en de ondernemersaftrekken (zelfstandigenaftrek, startersaftrek, MKB-winstvrijstelling). Die vragen fiscale keuzes die bij een boekhouder of belastingadviseur thuishoren — het rapport benoemt dit ook zelf, zodat er nooit een half beeld ontstaat.',
+                ]],
+            ],
+        ],
+
         // ---------- UREN ----------
         'urenregistratie' => [
             'category' => 'Uren',

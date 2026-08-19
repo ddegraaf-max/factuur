@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.18.0</div>
+        <h3>Jaaroverzicht — omzet, kosten en resultaat in één rapport</h3>
+        <ul class="tl-list">
+          <li><b>Je hele jaar in één oogopslag</b> — omzet (excl. btw, creditnota's verrekend), kosten per categorie, de kilometeraftrek (€ 0,23/km) en het resultaat, per kwartaal én vergeleken met vorig jaar.</li>
+          <li><b>PDF voor je boekhouder</b> — download het complete overzicht en stuur het mee: alles uit je facturatie in één document, inclusief kilometeradministratie.</li>
+          <li><b>Eerlijk over wat het is</b> — dit is de basis voor je aangifte inkomstenbelasting, geen complete fiscale winst-en-verliesrekening. Het rapport benoemt expliciet wat je boekhouder nog toevoegt: afschrijvingen, eventuele loonkosten, bijtelling en de ondernemersaftrekken.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.17.0</div>
         <h3>Strippenkaarten &amp; tegoeden</h3>
         <ul class="tl-list">

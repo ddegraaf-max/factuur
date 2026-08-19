@@ -56,6 +56,7 @@ const rawNav = [
     items: [
       { name: 'Klantomzet', route: 'stats.index', icon: 'chart', can: 'reports' },
       { name: 'BTW-aangifte', route: 'vat.index', icon: 'percent', can: 'reports' },
+      { name: 'Jaaroverzicht', route: 'yearreport.index', icon: 'chart', can: 'reports', badge: 'Nieuw' },
       { name: 'Export boekhouder', route: 'export.index', icon: 'download', can: 'reports' },
     ],
   },

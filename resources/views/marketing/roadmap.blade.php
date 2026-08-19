@@ -33,7 +33,7 @@
     <div class="road-grid">
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
-        <div class="road-card"><h4>Jaaroverzicht &amp; winst-en-verliesrekening</h4><p>Een compleet jaaroverzicht met omzet, kosten en winst — klaar voor je aangifte inkomstenbelasting.</p></div>
+        <div class="road-card"><h4>Terugkerende inkoop</h4><p>Vaste lasten (huur, software, verzekeringen) automatisch periodiek inboeken als inkoopfactuur.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -42,6 +42,7 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Jaaroverzicht</h4><p>Omzet, kosten en resultaat per kwartaal, met kilometeraftrek en PDF voor je boekhouder — de basis voor je aangifte.</p></div>
         <div class="road-card"><h4>Strippenkaarten &amp; tegoeden</h4><p>Vooraf betaalde urenbundels verkopen; geschreven uren tellen automatisch af van het tegoed.</p></div>
         <div class="road-card"><h4>Offertes digitaal ondertekenen</h4><p>Klanten geven akkoord met een digitale handtekening in het portaal — met bewijsdossier en de handtekening op de PDF.</p></div>
         <div class="road-card"><h4>Betaallink op de factuur</h4><p>Klanten betalen met iDEAL vanuit de factuurmail en het klantenportaal — via je eigen Mollie-account, direct geboekt op de factuur.</p></div>

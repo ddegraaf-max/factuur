@@ -1,0 +1,45 @@
+EASYINVOICE — JAAROVERZICHT
+===========================
+
+WAT IS HET
+----------
+Rapporten → Jaaroverzicht: omzet, kosten en resultaat uit de facturatie,
+per kwartaal en per jaar, met vergelijking t.o.v. vorig jaar en een
+PDF-download voor de boekhouder.
+
+GRONDSLAGEN (exact gedefinieerd)
+--------------------------------
+- OMZET: alle verstuurde facturen (niet concept/geannuleerd) op
+  factuurdatum (factuurstelsel), exclusief BTW; creditnota's negatief.
+- KOSTEN: ingeboekte inkoopfacturen op factuurdatum, exclusief BTW,
+  uitgesplitst per kostencategorie (grootste eerst).
+- KILOMETERAFTREK: alle geregistreerde zakelijke ritten × het geldende
+  tarief per rit (standaard € 0,23/km — de vergoeding voor privé-
+  vervoermiddelen), incl. aantal km en ritten als kilometeradministratie.
+- RESULTAAT = omzet − kosten − kilometeraftrek.
+
+BEWUSTE POSITIONERING — GEEN FISCALE W&V
+-----------------------------------------
+De roadmapkaart sprak van "klaar voor de aangifte inkomstenbelasting";
+dat is bewust NIET zo gebouwd en ook zo teruggeschaald in alle teksten.
+Een facturatiepakket kan een fiscale winst-en-verliesrekening niet 100%
+correct maken: afschrijvingen op bedrijfsmiddelen (bijv. een bus),
+loonkosten, bijtelling privégebruik, voorraadmutaties en de
+ondernemersaftrekken (zelfstandigenaftrek, startersaftrek,
+MKB-winstvrijstelling) vergen gegevens en fiscale keuzes die Easy niet
+heeft. In plaats van dat te doen alsof, zegt het rapport het zelf:
+een geel toelichtingskader op de pagina én in de PDF benoemt expliciet
+wat de boekhouder nog toevoegt. Zo is het overzicht 100% correct in wat
+het WEL claimt: een volledig en kloppend overzicht van de facturatie-
+administratie.
+
+TECHNIEK
+--------
+- Nieuw: app/Http/Controllers/YearReportController.php,
+  resources/js/Pages/Reports/Jaaroverzicht.vue,
+  resources/views/pdf/jaaroverzicht.blade.php.
+- Routes: yearreport.index + yearreport.pdf, binnen de rapportgroep
+  (beheerder + boekhouder). Menu-item onder Rapporten.
+- Jaarselectie op basis van de vroegste factuur-/inkoopdatum
+  (databaseonafhankelijk — geen EXTRACT, werkt op Postgres én SQLite).
+- Geen database-wijzigingen.
