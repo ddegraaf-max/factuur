@@ -288,6 +288,26 @@ return [
             ],
         ],
 
+        // ---------- UREN ----------
+        'urenregistratie' => [
+            'category' => 'Uren',
+            'title' => 'Uren schrijven en met één klik factureren',
+            'intro' => 'Houd gewerkte uren bij per klant of project — handmatig of met de timer — en zet ze in één keer op een conceptfactuur.',
+            'sections' => [
+                ['Uren schrijven', [
+                    'Ga naar Verkoop → Uren. Vul datum, klant, eventueel een project, de omschrijving en de duur in. De duur typ je als "1:30" (anderhalf uur) of als decimaal "1,5" — allebei goed. De omschrijving komt straks letterlijk op de factuur.',
+                    'Liever niet achteraf invullen? Klik op "Start timer" en ga aan het werk. Bij het stoppen wordt de gewerkte tijd automatisch als urenregel opgeslagen.',
+                ]],
+                ['Uurtarieven', [
+                    'Stel één standaardtarief in bij Instellingen → Bedrijfsgegevens. Wijkt een klant af, zet dan een eigen tarief op de klantkaart. En per urenregel kun je het tarief altijd nog overschrijven — de regel gebruikt het meest specifieke tarief dat is ingevuld.',
+                ]],
+                ['Factureren', [
+                    'In het blok "Klaar om te factureren" zie je per klant hoeveel uur er openstaat en voor welk bedrag. Eén klik op "Maak factuur" bundelt alle openstaande uren van die klant op een conceptfactuur: per regel de omschrijving, de datum en het aantal uur. Je controleert het concept en verstuurt zoals je gewend bent.',
+                    'Gefactureerde uren worden vergrendeld en linken naar de factuur. Verwijder je de conceptfactuur, dan komen de uren automatisch weer vrij. Uren die je niet wilt doorbelasten zet je op "niet-factureerbaar" — die tellen wel mee in je overzicht, maar nooit op een factuur.',
+                ]],
+            ],
+        ],
+
         // ---------- SAMENWERKEN ----------
         'team-en-rollen' => [
             'category' => 'Samenwerken',

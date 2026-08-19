@@ -33,7 +33,7 @@
     <div class="road-grid">
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
-        <div class="road-card"><h4>Urenregistratie</h4><p>Gewerkte uren bijhouden per klant of project en met één klik factureren.</p></div>
+        <div class="road-card"><h4>Kilometerregistratie</h4><p>Zakelijke ritten bijhouden en de kilometervergoeding meenemen op de factuur of in je administratie.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -42,6 +42,7 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Urenregistratie</h4><p>Uren schrijven per klant of project — handmatig of met de timer — en met één klik omzetten naar een conceptfactuur.</p></div>
         <div class="road-card"><h4>Bonnetjes automatisch herkennen</h4><p>Foto van de bon maken en de leverancier, datum en bedragen automatisch laten invullen (scan &amp; herken met AI).</p></div>
         <div class="road-card"><h4>Verzending via Peppol</h4><p>Automatische bereikbaarheidscheck en e-facturen (NLCIUS) rechtstreeks afleveren via het Peppol-netwerk.</p></div>
         <div class="road-card"><h4>KvK-koppeling</h4><p>Klanten toevoegen door het Handelsregister te doorzoeken — gegevens automatisch ingevuld.</p></div>

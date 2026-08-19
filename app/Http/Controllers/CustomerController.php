@@ -103,6 +103,7 @@ class CustomerController extends Controller
             'city' => ['nullable', 'string', 'max:100'],
             'country' => ['required', 'string', 'size:2'],
             'payment_terms' => ['nullable', 'integer', 'min:0', 'max:365'],
+            'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'notes' => ['nullable', 'string'],
         ]);
     }

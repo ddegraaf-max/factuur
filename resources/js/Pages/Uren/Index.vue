@@ -1,0 +1,401 @@
+<script setup>
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
+import { eur } from '@/format.js';
+import { computed, onBeforeUnmount, ref } from 'vue';
+
+const props = defineProps({
+  entries: Object,             // paginator
+  filters: Object,             // { period, status, customer_id }
+  stats: Object,               // { week_minutes, month_minutes, open_minutes }
+  billable_by_customer: Array, // openstaande uren per klant
+  timer: Object,               // lopende timer van deze gebruiker (of null)
+  customers: Array,            // { id, name, hourly_rate }
+  projects: Array,             // eerder gebruikte projectnamen
+  default_hourly_rate: Number, // standaardtarief van het bedrijf (of null)
+});
+
+/* ---------- Duur: minuten <-> invoer ---------- */
+const dur = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, '0')}`;
+
+// Accepteert "1:30" (uren:minuten) én "1,5" of "1.5" (decimale uren).
+const parseDuration = (value) => {
+  const v = String(value ?? '').trim().replace(',', '.');
+  if (!v) return 0;
+  if (v.includes(':')) {
+    const [h, m] = v.split(':');
+    return (parseInt(h, 10) || 0) * 60 + (parseInt(m, 10) || 0);
+  }
+  const hours = parseFloat(v);
+  return isNaN(hours) ? 0 : Math.round(hours * 60);
+};
+
+/* ---------- Uren schrijven / bewerken ---------- */
+const today = new Date().toISOString().slice(0, 10);
+const editingId = ref(null);
+
+const form = useForm({
+  customer_id: props.filters.customer_id || null,
+  project: '',
+  description: '',
+  work_date: today,
+  duration: '',
+  hourly_rate: null,
+  billable: true,
+});
+
+// Placeholder toont het tarief dat gaat gelden als je niets invult.
+const ratePlaceholder = computed(() => {
+  const customer = props.customers.find(c => c.id === form.customer_id);
+  const rate = customer?.hourly_rate ?? props.default_hourly_rate;
+  return rate != null ? `${Number(rate).toFixed(2).replace('.', ',')} (standaard)` : 'bijv. 75,00';
+});
+
+const submit = () => {
+  form
+    .transform((data) => ({
+      customer_id: data.customer_id || null,
+      project: data.project || null,
+      description: data.description,
+      work_date: data.work_date,
+      minutes: parseDuration(data.duration),
+      hourly_rate: data.hourly_rate === '' || data.hourly_rate === null ? null : Number(String(data.hourly_rate).replace(',', '.')),
+      billable: data.billable,
+    }))
+    .submit(
+      editingId.value ? 'patch' : 'post',
+      editingId.value ? route('hours.update', editingId.value) : route('hours.store'),
+      {
+        preserveScroll: true,
+        onSuccess: () => {
+          editingId.value = null;
+          form.reset('project', 'description', 'duration', 'hourly_rate');
+          form.billable = true;
+        },
+      }
+    );
+};
+
+const startEdit = (e) => {
+  editingId.value = e.id;
+  form.customer_id = e.customer_id;
+  form.project = e.project || '';
+  form.description = e.description;
+  form.work_date = e.work_date;
+  form.duration = dur(e.minutes);
+  form.hourly_rate = e.hourly_rate;
+  form.billable = e.billable;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const cancelEdit = () => {
+  editingId.value = null;
+  form.reset();
+  form.work_date = today;
+};
+
+const removeEntry = (e) => {
+  if (confirm('Deze urenregel verwijderen?')) {
+    router.delete(route('hours.destroy', e.id), { preserveScroll: true });
+  }
+};
+
+/* ---------- Timer ---------- */
+const now = ref(Date.now());
+const tick = setInterval(() => { now.value = Date.now(); }, 1000);
+onBeforeUnmount(() => clearInterval(tick));
+
+const elapsed = computed(() => {
+  if (!props.timer) return '';
+  const secs = Math.max(0, Math.floor((now.value - new Date(props.timer.started_at).getTime()) / 1000));
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+});
+
+const startTimer = () => {
+  router.post(route('hours.timer.start'), {
+    customer_id: form.customer_id || null,
+    project: form.project || null,
+    description: form.description || null,
+  }, { preserveScroll: true });
+};
+
+const stopTimer = () => {
+  router.post(route('hours.timer.stop'), {}, { preserveScroll: true });
+};
+
+/* ---------- Factureren ---------- */
+const invoiceCustomer = (row) => {
+  const amountLabel = row.amount != null ? ` (${eur(row.amount)})` : '';
+  if (confirm(`Conceptfactuur maken voor ${row.customer_name} met ${dur(row.minutes)} uur${amountLabel}?`)) {
+    router.post(route('hours.invoice'), { customer_id: row.customer_id });
+  }
+};
+
+/* ---------- Filters ---------- */
+const applyFilters = (overrides = {}) => {
+  router.get(route('hours.index'), {
+    period: props.filters.period,
+    status: props.filters.status,
+    customer_id: props.filters.customer_id || undefined,
+    ...overrides,
+  }, { preserveState: true, preserveScroll: true });
+};
+
+const totalOpenAmount = computed(() => {
+  if (props.billable_by_customer.some(r => r.amount == null)) return null;
+  return props.billable_by_customer.reduce((sum, r) => sum + r.amount, 0);
+});
+</script>
+
+<template>
+  <Head title="Uren" />
+  <AppLayout>
+    <template #breadcrumb>
+      <div class="breadcrumb">Verkoop / <span class="breadcrumb-current">Uren</span></div>
+    </template>
+
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Urenregistratie</h1>
+        <p class="page-subtitle">Houd gewerkte uren bij per klant of project — en zet ze met één klik op een conceptfactuur.</p>
+      </div>
+    </div>
+
+    <!-- Lopende timer -->
+    <div v-if="timer" class="timer-bar">
+      <span class="timer-dot"></span>
+      <span class="timer-time">{{ elapsed }}</span>
+      <span class="timer-info">
+        {{ timer.description }}<template v-if="timer.customer_name"> · {{ timer.customer_name }}</template>
+      </span>
+      <button type="button" class="btn btn-primary btn-sm" @click="stopTimer">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        Stop timer
+      </button>
+    </div>
+
+    <!-- Statistieken -->
+    <div class="kpi-grid">
+      <div class="kpi"><div class="lbl">Deze week</div><div class="val">{{ dur(stats.week_minutes) }}</div><div class="meta">uur geschreven</div></div>
+      <div class="kpi"><div class="lbl">Deze maand</div><div class="val">{{ dur(stats.month_minutes) }}</div><div class="meta">uur geschreven</div></div>
+      <div class="kpi" :class="{ alert: stats.open_minutes > 0 }">
+        <div class="lbl">Nog te factureren</div>
+        <div class="val">{{ dur(stats.open_minutes) }}</div>
+        <div class="meta">{{ totalOpenAmount != null ? eur(totalOpenAmount) + ' aan open uren' : 'uur factureerbaar' }}</div>
+      </div>
+    </div>
+
+    <!-- Uren schrijven / bewerken -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-body">
+        <div class="entry-form-title">
+          {{ editingId ? 'Urenregel bewerken' : 'Uren schrijven' }}
+          <button v-if="editingId" type="button" class="btn btn-secondary btn-sm" @click="cancelEdit">Annuleren</button>
+        </div>
+        <form @submit.prevent="submit" class="entry-form">
+          <div class="form-group">
+            <label>Datum *</label>
+            <input type="date" v-model="form.work_date">
+            <div v-if="form.errors.work_date" class="field-error">{{ form.errors.work_date }}</div>
+          </div>
+          <div class="form-group">
+            <label>Klant</label>
+            <select v-model="form.customer_id">
+              <option :value="null">— Geen klant —</option>
+              <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Project<span class="label-hint">(optioneel)</span></label>
+            <input type="text" v-model="form.project" list="project-list" maxlength="100" placeholder="Bijv. Website">
+            <datalist id="project-list"><option v-for="p in projects" :key="p" :value="p" /></datalist>
+          </div>
+          <div class="form-group grow">
+            <label>Omschrijving *</label>
+            <input type="text" v-model="form.description" maxlength="500" placeholder="Wat heb je gedaan? (komt op de factuur)">
+            <div v-if="form.errors.description" class="field-error">{{ form.errors.description }}</div>
+          </div>
+          <div class="form-group narrow">
+            <label>Duur *</label>
+            <input type="text" v-model="form.duration" placeholder="1:30 of 1,5" inputmode="decimal">
+            <div v-if="form.errors.minutes" class="field-error">{{ form.errors.minutes }}</div>
+          </div>
+          <div class="form-group narrow">
+            <label>Uurtarief<span class="label-hint">€</span></label>
+            <input type="text" v-model="form.hourly_rate" :placeholder="ratePlaceholder" inputmode="decimal">
+            <div v-if="form.errors.hourly_rate" class="field-error">{{ form.errors.hourly_rate }}</div>
+          </div>
+          <div class="entry-form-actions">
+            <label class="checkbox-row" style="margin:0;">
+              <input type="checkbox" v-model="form.billable">
+              <span>Factureerbaar</span>
+            </label>
+            <button v-if="!editingId && !timer" type="button" class="btn btn-secondary" @click="startTimer" title="Start een timer met de ingevulde klant en omschrijving">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              Start timer
+            </button>
+            <button type="submit" class="btn btn-primary" :disabled="form.processing">
+              {{ form.processing ? 'Bezig…' : (editingId ? 'Opslaan' : 'Uren schrijven') }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Met één klik factureren -->
+    <div v-if="billable_by_customer.length" class="card" style="margin-bottom:16px;">
+      <div class="card-body">
+        <div class="entry-form-title" style="margin-bottom:4px;">Klaar om te factureren</div>
+        <p class="bill-hint">Alle openstaande factureerbare uren van een klant worden gebundeld op één conceptfactuur — die je daarna gewoon controleert en verstuurt.</p>
+        <div v-for="row in billable_by_customer" :key="row.customer_id" class="bill-row">
+          <span class="bill-name">{{ row.customer_name }}</span>
+          <span class="bill-meta">{{ dur(row.minutes) }} uur · {{ row.entries }} regel{{ row.entries === 1 ? '' : 's' }}</span>
+          <span class="bill-amount num">{{ row.amount != null ? eur(row.amount) : '— stel een tarief in —' }}</span>
+          <button type="button" class="btn btn-primary btn-sm" @click="invoiceCustomer(row)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Maak factuur
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <button :class="['filter-chip', { active: filters.status === 'open' }]" @click="applyFilters({ status: 'open' })">Open</button>
+      <button :class="['filter-chip', { active: filters.status === 'invoiced' }]" @click="applyFilters({ status: 'invoiced' })">Gefactureerd</button>
+      <button :class="['filter-chip', { active: filters.status === 'all' }]" @click="applyFilters({ status: 'all' })">Alles</button>
+      <span class="filter-sep"></span>
+      <select class="filter-select" :value="filters.period" @change="applyFilters({ period: $event.target.value })">
+        <option value="week">Deze week</option>
+        <option value="month">Deze maand</option>
+        <option value="year">Dit jaar</option>
+        <option value="all">Alle periodes</option>
+      </select>
+      <select class="filter-select" :value="filters.customer_id ?? ''" @change="applyFilters({ customer_id: $event.target.value || undefined })">
+        <option value="">Alle klanten</option>
+        <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
+      </select>
+    </div>
+
+    <!-- Urenlijst -->
+    <div class="card" v-if="entries.data.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Klant</th>
+            <th>Omschrijving</th>
+            <th class="right">Duur</th>
+            <th class="right">Tarief</th>
+            <th class="right">Bedrag</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="e in entries.data" :key="e.id">
+            <td data-label="Datum">{{ e.work_date_label }}</td>
+            <td data-label="Klant">{{ e.customer_name || '—' }}</td>
+            <td class="cell-primary" data-label="Omschrijving">
+              {{ e.description }}
+              <span v-if="e.project" class="muted"> · {{ e.project }}</span>
+            </td>
+            <td class="num right" data-label="Duur">{{ dur(e.minutes) }}</td>
+            <td class="num right" data-label="Tarief">{{ e.billable && e.effective_rate != null ? eur(e.effective_rate) : '—' }}</td>
+            <td class="num right" data-label="Bedrag">{{ e.amount != null ? eur(e.amount) : '—' }}</td>
+            <td data-label="Status">
+              <Link v-if="e.invoice_id" :href="route('invoices.show', e.invoice_id)" class="pill pill-paid" style="text-decoration:none;">
+                {{ e.invoice_number || 'Conceptfactuur' }}
+              </Link>
+              <span v-else-if="!e.billable" class="pill pill-muted">Niet-factureerbaar</span>
+              <span v-else class="pill pill-sent">Open</span>
+            </td>
+            <td class="row-actions">
+              <template v-if="!e.invoice_id">
+                <button type="button" class="icon-btn" title="Bewerken" @click="startEdit(e)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
+                </button>
+                <button type="button" class="icon-btn" title="Verwijderen" @click="removeEntry(e)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+              </template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination" v-if="entries.last_page > 1">
+        <Link v-for="link in entries.links" :key="link.label"
+          :href="link.url || '#'"
+          v-html="link.label"
+          :class="['page-link', { active: link.active, disabled: !link.url }]"
+          preserve-state
+        />
+      </div>
+    </div>
+    <div v-else class="card card-empty">
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen uren in deze periode</div>
+      <div>Schrijf hierboven je eerste uren, of start de timer en ga aan het werk.</div>
+    </div>
+  </AppLayout>
+</template>
+
+<style scoped>
+.kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+.kpi.alert { background: var(--brand-tint); border-color: var(--brand-border); }
+.kpi.alert .val { color: var(--brand-darker); }
+.kpi .lbl { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+.kpi .val { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
+.kpi .meta { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+.timer-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: var(--brand-tint); border: 1px solid var(--brand-border); border-radius: 12px;
+  padding: 12px 16px; margin-bottom: 16px;
+}
+.timer-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); animation: timer-pulse 1.2s ease-in-out infinite; }
+@keyframes timer-pulse { 50% { opacity: 0.3; } }
+.timer-time { font-family: var(--font-mono); font-weight: 700; font-size: 17px; color: var(--brand-darker); min-width: 84px; }
+.timer-info { flex: 1; font-size: 13px; color: var(--text-2); min-width: 120px; }
+
+.entry-form-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.entry-form { display: grid; grid-template-columns: 150px 190px 160px minmax(0, 1fr) 110px 130px; gap: 12px; align-items: start; }
+.entry-form .grow { grid-column: auto; }
+.entry-form-actions { grid-column: 1 / -1; display: flex; align-items: center; justify-content: flex-end; gap: 14px; }
+.label-hint { color: var(--text-4); font-weight: 400; font-size: 11.5px; margin-left: 5px; }
+
+.bill-hint { font-size: 12.5px; color: var(--text-3); margin-bottom: 12px; line-height: 1.6; }
+.bill-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.bill-name { font-weight: 600; font-size: 13.5px; flex: 1; min-width: 140px; }
+.bill-meta { font-size: 12.5px; color: var(--text-3); }
+.bill-amount { font-family: var(--font-mono); font-weight: 600; font-size: 13.5px; min-width: 90px; text-align: right; }
+
+.filter-sep { flex: 0 0 8px; }
+.filter-select {
+  font-size: 13px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text-2); max-width: 200px;
+}
+
+.pill-muted { background: var(--surface-2); color: var(--text-3); }
+.row-actions { white-space: nowrap; text-align: right; }
+.icon-btn { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
+.icon-btn:hover { background: var(--surface-2); color: var(--brand-dark); }
+
+@media (max-width: 1100px) {
+  .entry-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .kpi { padding: 14px; }
+  .kpi .val { font-size: 18px; }
+  .entry-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bill-row .btn { margin-left: auto; }
+}
+@media (max-width: 400px) {
+  .entry-form { grid-template-columns: minmax(0, 1fr); }
+}
+</style>

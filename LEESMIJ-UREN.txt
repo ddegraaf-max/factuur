@@ -1,0 +1,58 @@
+EASYINVOICE — URENREGISTRATIE
+=============================
+
+WAT IS HET
+----------
+Gewerkte uren bijhouden per klant of project en met één klik omzetten
+naar een conceptfactuur. Nieuw menu-item: Verkoop → Uren.
+
+- UREN SCHRIJVEN: datum, klant (optioneel), project (optioneel, met
+  suggesties uit eerdere regels), omschrijving en duur. De duur typ je
+  als "1:30" (uren:minuten) of "1,5" (decimale uren).
+- TIMER: "Start timer" gebruikt de al ingevulde klant/omschrijving en
+  begint te lopen (zichtbaar met tikkende teller bovenaan de pagina).
+  Stoppen slaat de gewerkte tijd op als urenregel (minimaal 1 minuut).
+  Eén lopende timer per gebruiker; een nieuwe start stopt de oude netjes.
+- FACTUREREN: het blok "Klaar om te factureren" toont per klant de
+  openstaande factureerbare uren en het bedrag. Eén klik maakt een
+  conceptfactuur via de bestaande InvoiceManager: één factuurregel per
+  urenregel (omschrijving, datum + project als detail, aantal uur,
+  tarief, 21% BTW). Daarna beland je direct op de conceptfactuur om te
+  controleren en versturen.
+- VERGRENDELING: gefactureerde uren zijn niet meer te bewerken of te
+  verwijderen en linken naar hun factuur. Wordt de factuur verwijderd,
+  dan komen de uren automatisch weer vrij (database: nullOnDelete).
+- NIET-FACTUREERBAAR: uren die je niet doorbelast tel je wel mee in de
+  statistieken, maar ze komen nooit op een factuur.
+
+UURTARIEVEN (drie niveaus, meest specifieke wint)
+-------------------------------------------------
+1. Tarief op de urenregel zelf (optioneel veld).
+2. Uurtarief op de klantkaart (nieuw veld bij Voorkeuren).
+3. Standaard uurtarief bij Instellingen → Bedrijfsgegevens (nieuw veld).
+Zonder enig tarief kan er niet gefactureerd worden — je krijgt dan een
+duidelijke melding waar je het kunt instellen.
+
+STATISTIEKEN & FILTERS
+----------------------
+Bovenaan: uren deze week, deze maand, en nog te factureren (uren +
+bedrag). Filters: status (open/gefactureerd/alles), periode (week/
+maand/jaar/alles) en klant. De lijst is gepagineerd (50 per pagina).
+
+ROLLEN
+------
+Medewerkers schrijven gewoon uren mee (dagelijks werk). De boekhouder
+(alleen-inzien) kan de urenlijst bekijken maar niets wijzigen — de
+bestaande readonly-middleware regelt dat.
+
+TECHNIEK
+--------
+- Migratie: time_entries (minuten als integer — geen zwevende komma's),
+  customers.hourly_rate, companies.default_hourly_rate.
+- Nieuw: app/Models/TimeEntry.php (company-scope, scopes open/billable,
+  effectiveRate/amount), app/Http/Controllers/TimeEntryController.php,
+  resources/js/Pages/Uren/Index.vue.
+- Routes: hours.index/store/update/destroy, hours.timer.start/stop,
+  hours.invoice (allemaal binnen auth + subscribed).
+- Demo-omgeving: de seeder zet zes voorbeeldregels klaar, deels met
+  eigen tarief, zodat het "Klaar om te factureren"-blok direct leeft.

@@ -40,6 +40,7 @@
         <div class="ic-emoji">🧾</div>
         <h3>Facturen</h3>
         <p style="margin-bottom:12px;">BTW, creditnota's en nummering.</p>
+        <a class="help-link" href="{{ route('help.article', 'urenregistratie') }}">Uren schrijven en factureren →</a>
         <a class="help-link" href="{{ route('help.article', 'btw-per-regel') }}">BTW per regel instellen →</a>
         <a class="help-link" href="{{ route('help.article', 'creditfactuur-maken') }}">Een creditfactuur maken →</a>
         <a class="help-link" href="{{ route('help.article', 'factuurnummering') }}">Factuurnummering aanpassen →</a>

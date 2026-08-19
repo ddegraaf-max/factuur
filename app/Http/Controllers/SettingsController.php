@@ -47,6 +47,7 @@ class SettingsController extends Controller
             'daily_notification_enabled' => ['nullable', 'boolean'],
             'daily_notification_email' => ['nullable', 'email'],
             'default_payment_terms' => ['required', 'integer', 'min:0', 'max:365'],
+            'default_hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             // Legacy invoice fields still accepted from older Company form
             'invoice_footer' => ['nullable', 'string'],
             'invoice_number_format' => ['nullable', 'string', 'max:50'],

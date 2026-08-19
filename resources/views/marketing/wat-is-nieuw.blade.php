@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.9.0</div>
+        <h3>Urenregistratie — uren schrijven en met één klik factureren</h3>
+        <ul class="tl-list">
+          <li><b>Uren schrijven per klant of project</b> — snel invoeren met datum, omschrijving en duur (typ "1:30" of "1,5"), of start de ingebouwde <b>timer</b> en ga aan het werk.</li>
+          <li><b>Met één klik factureren</b> — alle openstaande uren van een klant worden gebundeld op één conceptfactuur, met per regel de omschrijving, datum en het aantal uur. Controleren, versturen, klaar.</li>
+          <li><b>Uurtarieven zoals jij wilt</b> — één standaardtarief bij je bedrijfsgegevens, een afwijkend tarief per klant, of een eigen tarief per urenregel.</li>
+          <li>Je ziet direct hoeveel uur je deze week en maand schreef en welk bedrag er nog te factureren staat. Gefactureerde uren zijn vergrendeld en linken naar de factuur.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.8.0</div>
         <h3>Bonnetjes automatisch herkennen (scan &amp; herken)</h3>
         <ul class="tl-list">

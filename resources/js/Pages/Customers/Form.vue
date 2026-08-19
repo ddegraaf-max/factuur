@@ -78,6 +78,7 @@ const form = useForm({
   city: props.customer?.city ?? '',
   country: props.customer?.country ?? 'NL',
   payment_terms: props.customer?.payment_terms ?? null,
+  hourly_rate: props.customer?.hourly_rate ?? null,
   notes: props.customer?.notes ?? '',
 });
 
@@ -275,6 +276,10 @@ const remove = () => {
           <div class="form-group">
             <label>Betalingstermijn<span class="label-hint">(laat leeg voor standaard van bedrijf)</span></label>
             <input type="number" v-model="form.payment_terms" min="0" max="365" placeholder="Standaard">
+          </div>
+          <div class="form-group">
+            <label>Uurtarief<span class="label-hint">(voor de urenregistratie — laat leeg voor standaard van bedrijf)</span></label>
+            <input type="number" v-model="form.hourly_rate" min="0" step="0.01" placeholder="Standaard">
           </div>
           <div class="form-group" style="margin:0;">
             <label>Notities<span class="label-hint">(intern, niet zichtbaar op factuur)</span></label>

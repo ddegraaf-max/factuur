@@ -188,6 +188,30 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // 7. Demo-urenregistratie: open uren die klaarstaan om te factureren.
+        $company->update(['default_hourly_rate' => 85.00]);
+        $timeEntries = [
+            ['customer' => 0, 'project' => 'Website redesign', 'description' => 'Wireframes homepage en productpagina', 'days_ago' => 4, 'minutes' => 210],
+            ['customer' => 0, 'project' => 'Website redesign', 'description' => 'Design review met team en verwerken feedback', 'days_ago' => 2, 'minutes' => 90],
+            ['customer' => 3, 'project' => 'Huisstijl', 'description' => 'Logo-concepten uitwerken', 'days_ago' => 3, 'minutes' => 150, 'rate' => 95.00],
+            ['customer' => 3, 'project' => 'Huisstijl', 'description' => 'Kleurenpalet en typografie vastleggen', 'days_ago' => 1, 'minutes' => 75, 'rate' => 95.00],
+            ['customer' => 7, 'project' => null, 'description' => 'Adviesgesprek merkpositionering', 'days_ago' => 1, 'minutes' => 60],
+            ['customer' => 1, 'project' => null, 'description' => 'Instagram-templates bijwerken', 'days_ago' => 5, 'minutes' => 45, 'billable' => false],
+        ];
+        foreach ($timeEntries as $t) {
+            \App\Models\TimeEntry::create([
+                'company_id' => $company->id,
+                'user_id' => $user->id,
+                'customer_id' => $customerModels[$t['customer']]->id,
+                'project' => $t['project'],
+                'description' => $t['description'],
+                'work_date' => now()->subDays($t['days_ago'])->toDateString(),
+                'minutes' => $t['minutes'],
+                'hourly_rate' => $t['rate'] ?? null,
+                'billable' => $t['billable'] ?? true,
+            ]);
+        }
+
         Auth::logout();
 
         $this->command->info('✓ Demo company: Vries Design B.V.');

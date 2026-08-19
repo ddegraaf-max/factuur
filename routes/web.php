@@ -222,6 +222,15 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');
     Route::post('offertes/{quote}/naar-factuur', [QuoteController::class, 'convert'])->name('quotes.convert');
 
+    // Urenregistratie: uren schrijven, timer en met één klik factureren
+    Route::get('uren', [\App\Http\Controllers\TimeEntryController::class, 'index'])->name('hours.index');
+    Route::post('uren', [\App\Http\Controllers\TimeEntryController::class, 'store'])->name('hours.store');
+    Route::post('uren/timer/start', [\App\Http\Controllers\TimeEntryController::class, 'timerStart'])->name('hours.timer.start');
+    Route::post('uren/timer/stop', [\App\Http\Controllers\TimeEntryController::class, 'timerStop'])->name('hours.timer.stop');
+    Route::post('uren/factureren', [\App\Http\Controllers\TimeEntryController::class, 'invoice'])->name('hours.invoice');
+    Route::patch('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'update'])->name('hours.update');
+    Route::delete('uren/{entry}', [\App\Http\Controllers\TimeEntryController::class, 'destroy'])->name('hours.destroy');
+
     // Terugkerende facturen
     Route::get('terugkerend', [RecurringInvoiceController::class, 'index'])->name('recurring.index');
     Route::post('invoices/{invoice}/recurring', [RecurringInvoiceController::class, 'store'])->name('invoices.recurring.store');
