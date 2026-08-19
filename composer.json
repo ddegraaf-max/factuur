@@ -8,6 +8,7 @@
         "php": "^8.2",
         "anthropic-ai/sdk": "^0.42.0",
         "barryvdh/laravel-dompdf": "^3.0",
+        "chillerlan/php-qrcode": "^6.0",
         "inertiajs/inertia-laravel": "^1.0",
         "laravel/framework": "^11.0",
         "laravel/sanctum": "^4.0",

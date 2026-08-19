@@ -20,7 +20,7 @@ class Company extends Model
         'numbering_settings', 'price_mode', 'fiscal_year_start',
         'default_send_method', 'results_per_page',
         'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
-        'reminder_settings',
+        'reminder_settings', 'email_texts',
         'default_payment_terms', 'default_hourly_rate', 'default_km_rate', 'invoice_footer', 'invoice_number_format',
         'quote_number_format', 'quote_valid_days',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
@@ -50,6 +50,7 @@ class Company extends Model
         'daily_notification_enabled' => 'boolean',
         'numbering_settings' => 'array',
         'reminder_settings' => 'array',
+        'email_texts' => 'array',
         'trial_ends_at' => 'datetime',
         'trial_reminder_sent_at' => 'datetime',
         'subscription_ends_at' => 'datetime',
@@ -111,6 +112,18 @@ class Company extends Model
             'warning_body' => "Beste {klant},\n\nOndanks onze eerdere herinnering(en) staat factuur {factuurnummer} van {factuurdatum} nog steeds open. Het openstaande bedrag bedraagt {openstaand}.\n\nWij verzoeken u dringend dit bedrag binnen {termijn} dagen te voldoen op {iban} t.n.v. {bedrijf}, onder vermelding van factuurnummer {factuurnummer}. Blijft betaling uit, dan zijn wij genoodzaakt de vordering — verhoogd met de wettelijke incassokosten en rente — over te dragen aan onze incassopartner.\n\nMet vriendelijke groet,\n{bedrijf}",
         ];
         return array_replace($defaults, $this->reminder_settings ?? []);
+    }
+
+    /**
+     * Eigen e-mailtekst (Instellingen → E-mailteksten), of null voor de
+     * standaardtekst. Keys: invoice_subject, invoice_body, quote_subject,
+     * quote_body. Zie App\Support\MailText voor de variabelen.
+     */
+    public function emailText(string $key): ?string
+    {
+        $value = trim((string) (($this->email_texts ?? [])[$key] ?? ''));
+
+        return $value !== '' ? $value : null;
     }
 
     /**

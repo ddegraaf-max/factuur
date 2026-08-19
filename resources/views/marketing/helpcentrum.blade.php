@@ -71,6 +71,7 @@
         <a class="help-link" href="{{ route('help.article', 'logo-uploaden') }}">Je logo uploaden →</a>
         <a class="help-link" href="{{ route('help.article', 'sjabloon-kiezen') }}">Een sjabloon kiezen →</a>
         <a class="help-link" href="{{ route('help.article', 'meerdere-handelsnamen') }}">Meerdere handelsnamen →</a>
+        <a class="help-link" href="{{ route('help.article', 'e-mailteksten-aanpassen') }}">De factuur- en offertemail aanpassen →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">📊</div>
@@ -81,6 +82,7 @@
         <a class="help-link" href="{{ route('help.article', 'vaste-lasten') }}">Vaste lasten automatisch inboeken →</a>
         <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je BTW-aangifte per kwartaal →</a>
         <a class="help-link" href="{{ route('help.article', 'jaaroverzicht') }}">Het jaaroverzicht (omzet, kosten, resultaat) →</a>
+        <a class="help-link" href="{{ route('help.article', 'cashflow-prognose') }}">De cashflow-prognose →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🤝</div>

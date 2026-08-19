@@ -317,6 +317,9 @@ return [
                 ['Zo betaalt je klant', [
                     'In de factuurmail verandert de knop in "Bekijk en betaal online (iDEAL)". In het beveiligde klantenportaal staat een betaalknop met het openstaande bedrag — deelbetalingen en verrekeningen worden automatisch afgetrokken. Na het afronden bij de bank wordt de betaling direct op de factuur geboekt en springt de status op betaald (of deels betaald).',
                 ]],
+                ['QR-code op de factuur-PDF', [
+                    'Met Mollie gekoppeld staat er automatisch een QR-code naast de betaalinstructie op de factuur-PDF ("Scan & betaal"). Je klant scant de code met de telefoon, komt in het beveiligde portaal en betaalt direct via iDEAL — handig als de factuur geprint wordt of intern wordt doorgestuurd. De QR verschijnt alleen op openstaande, verstuurde facturen; op concepten, creditnota\'s en betaalde facturen niet.',
+                ]],
                 ['Goed om te weten', [
                     'Elke betaalpoging zie je terug in het inzagelog van de factuur ("Online betaling gestart"). Wordt een betaling geannuleerd, dan kan de klant het gewoon opnieuw proberen of alsnog handmatig overmaken. De betaalknop verschijnt alleen op openstaande facturen; per administratie koppel je een eigen Mollie-account.',
                 ]],
@@ -354,6 +357,41 @@ return [
                 ]],
                 ['Wat je boekhouder nog toevoegt', [
                     'Het jaaroverzicht is bewust géén complete fiscale winst-en-verliesrekening. Wat er nog bij komt voor de aangifte inkomstenbelasting: afschrijvingen op bedrijfsmiddelen (zoals een bus of apparatuur), eventuele loonkosten, bijtelling bij een zakelijke auto, voorraadmutaties en de ondernemersaftrekken (zelfstandigenaftrek, startersaftrek, MKB-winstvrijstelling). Die vragen fiscale keuzes die bij een boekhouder of belastingadviseur thuishoren — het rapport benoemt dit ook zelf, zodat er nooit een half beeld ontstaat.',
+                ]],
+            ],
+        ],
+
+        'cashflow-prognose' => [
+            'category' => 'Rapporten',
+            'title' => 'De cashflow-prognose',
+            'intro' => 'Zie in één oogopslag wat er de komende maanden naar verwachting binnenkomt en uitgaat — op basis van wat er al in Easy staat.',
+            'sections' => [
+                ['Wat je ziet', [
+                    'Ga naar Rapporten → Cashflow. Per maand (de huidige plus drie vooruit) zie je de verwachte ontvangsten en uitgaven, het netto verschil en het cumulatieve verloop. De regel "Al vervallen" toont wat er nú al opeisbaar is: facturen waarvan de vervaldatum is verstreken, en inkoop die je zelf nog moet betalen.',
+                ]],
+                ['Waar de cijfers vandaan komen', [
+                    'Ontvangsten: je openstaande facturen op hun vervaldatum, plus je terugkerende facturen (verwachte ontvangst = factuurdatum + betaaltermijn). Uitgaven: openstaande inkoopfacturen op hun vervaldatum, plus je vaste lasten op de boekingsdatum. Hoe beter je terugkerende facturen en vaste lasten zijn ingevuld, hoe scherper de prognose.',
+                ]],
+                ['Wat het bewust niet is', [
+                    'Dit is een prognose, geen banksaldo: klanten betalen soms later dan de vervaldatum, en privé-opnames, belastingen en loonkosten staan niet in EasyInvoice. Facturen in het incassotraject tellen niet mee — die ontvangst is te onzeker. Gebruik het rapport om krappe maanden vroeg te zien aankomen, niet als boekhoudkundige waarheid.',
+                ]],
+            ],
+        ],
+
+        'e-mailteksten-aanpassen' => [
+            'category' => 'Huisstijl',
+            'title' => 'De factuur- en offertemail aanpassen',
+            'intro' => 'Bepaal zelf het onderwerp en de tekst van de e-mails die met je facturen en offertes worden meegestuurd.',
+            'sections' => [
+                ['Zo werkt het', [
+                    'Ga naar Instellingen → E-mailteksten. Vul een eigen onderwerp en/of bericht in voor de factuurmail en de offertemail. Gebruik variabelen zoals {klant}, {factuurnummer}, {bedrag} en {vervaldatum} — die worden bij het versturen automatisch ingevuld. Laat je een veld leeg, dan gebruikt Easy de standaardtekst.',
+                    'Begin je factuurbericht zelf met een aanhef (bijv. "Beste {klant},"): bij een eigen tekst vervalt de standaard-aanhef. Bij de offertemail staat de aanhef er als kop automatisch boven.',
+                ]],
+                ['Wat automatisch blijft', [
+                    'De PDF-bijlage, de knop naar het klantenportaal ("Bekijk en betaal online"), verrekeningsmeldingen en je voetnoot blijven gewoon onder je tekst staan — daar hoef je niets voor te doen. Vul je bij een specifieke offerte een eigen introtekst in, dan gaat die vóór op de standaardtekst uit de instellingen.',
+                ]],
+                ['Engelstalige klanten', [
+                    'Een eigen tekst wordt letterlijk gebruikt voor álle klanten — ook klanten met taalinstelling Engels. De standaardteksten volgen wél automatisch de taal van de klant. Werk je veel internationaal, overweeg dan de standaardtekst te houden, of schrijf je eigen tekst tweetalig. De teksten van herinneringen en aanmaningen stel je apart in onder Instellingen → Herinneringen.',
                 ]],
             ],
         ],

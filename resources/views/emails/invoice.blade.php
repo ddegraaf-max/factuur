@@ -21,6 +21,11 @@
         @endif
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;">
+        @if(!empty($customBody))
+          {{-- Eigen e-mailtekst (Instellingen → E-mailteksten): vervangt
+               aanhef, intro en betaalverzoek. --}}
+          <p style="margin:0 0 14px;">{!! nl2br(e($customBody)) !!}</p>
+        @else
         <p style="margin:0 0 14px;">{{ __('doc.mail_greeting', ['name' => $invoice->customer_name]) }}</p>
         <p style="margin:0 0 14px;">
           {!! __('doc.mail_invoice_intro', [
@@ -29,6 +34,7 @@
               'total' => e($total),
           ]) !!}
         </p>
+        @endif
         @if($invoice->paid_total > 0 && $openRaw > 0.009)
           <p style="margin:0 0 14px;">
             {!! __('doc.mail_settled_partial', ['settled' => e($settled), 'open' => e($open)]) !!}
@@ -36,7 +42,7 @@
         @elseif($invoice->paid_total > 0)
           <p style="margin:0 0 14px;">{{ __('doc.mail_settled_full') }}</p>
         @endif
-        @if($openRaw > 0.009)
+        @if(empty($customBody) && $openRaw > 0.009)
         <p style="margin:0 0 14px;">
           {!! __('doc.mail_pay_request', [
               'amount' => $invoice->paid_total > 0 ? __('doc.mail_remaining_amount') : __('doc.mail_the_amount'),

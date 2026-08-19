@@ -42,6 +42,10 @@ return [
     'pay_instruction' => 'Please transfer the amount within <strong>:days days</strong> to <strong>:iban</strong> in the name of <strong>:name</strong>',
     'pay_reference' => ', quoting invoice number <strong>:number</strong>',
 
+    // QR-code betalen op de factuur
+    'pay_qr_title' => 'Scan & pay',
+    'pay_qr_hint' => 'Scan the QR code with your phone to pay this invoice online (iDEAL).',
+
     // Geldigheid op de offerte
     'quote_valid_note' => 'This quotation is valid until <strong>:date</strong>.',
     'quote_accept_note' => 'Would you like to go ahead? Simply reply to this e-mail:phone and we will turn the quotation into an assignment. All amounts are exclusive of VAT unless stated otherwise.',

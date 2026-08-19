@@ -31,13 +31,18 @@ class InvoiceMail extends Mailable
         // EasyInvoice — alleen dáárvoor zijn SPF en DKIM ingeregeld, en mailen
         // vanaf een vreemd domein belandt in de spamfilter.
         // Antwoorden gaan wél rechtstreeks naar de ondernemer.
+        // Eigen onderwerp (Instellingen → E-mailteksten), anders de standaard.
+        $customSubject = $company->emailText('invoice_subject');
+
         return new Envelope(
             from: new Address(config('mail.from.address'), $company->name ?: config('mail.from.name')),
             replyTo: array_filter([$this->companyReplyTo($company)]),
-            subject: __('doc.mail_invoice_subject', [
-                'number' => $this->invoice->number,
-                'company' => $company->name ?? 'EasyInvoice',
-            ]),
+            subject: $customSubject
+                ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::invoiceVars($this->invoice, $company))
+                : __('doc.mail_invoice_subject', [
+                    'number' => $this->invoice->number,
+                    'company' => $company->name ?? 'EasyInvoice',
+                ]),
         );
     }
 
@@ -51,11 +56,20 @@ class InvoiceMail extends Mailable
 
     public function content(): Content
     {
+        $company = $this->invoice->brandedCompany();
+
+        // Eigen tekst vervangt aanhef, intro en betaalverzoek; verrekenings-
+        // meldingen en de portaalknop blijven automatisch (gegevensgestuurd).
+        $customBody = $company->emailText('invoice_body');
+
         return new Content(
             view: 'emails.invoice',
             with: [
                 'invoice' => $this->invoice,
-                'company' => $this->invoice->brandedCompany(),
+                'company' => $company,
+                'customBody' => $customBody
+                    ? \App\Support\MailText::apply($customBody, \App\Support\MailText::invoiceVars($this->invoice, $company))
+                    : null,
             ],
         );
     }

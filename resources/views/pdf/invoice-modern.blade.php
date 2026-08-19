@@ -179,7 +179,23 @@
 <div style="clear:both;"></div>
 
 @if($invoice->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($invoice->notes)) !!}</div>@endif
-@if($company->iban)<div class="notes">{!! __('doc.pay_instruction', ['days' => (int) $invoice->payment_terms, 'iban' => e($company->iban), 'name' => e($company->name)]) !!}@if($invoice->number){!! __('doc.pay_reference', ['number' => e($invoice->number)]) !!}@endif.</div>@endif
+@php($payQr = \App\Support\PaymentQr::forInvoice($invoice))
+@if($company->iban || $payQr)
+<div class="notes">
+  <table style="width:100%; border-collapse:collapse;"><tr>
+    <td style="vertical-align:middle; padding-right:12px;">
+      @if($company->iban){!! __('doc.pay_instruction', ['days' => (int) $invoice->payment_terms, 'iban' => e($company->iban), 'name' => e($company->name)]) !!}@if($invoice->number){!! __('doc.pay_reference', ['number' => e($invoice->number)]) !!}@endif.@endif
+      @if($payQr)<div style="margin-top:6px; color:#78716C; font-size:8pt;">{{ __('doc.pay_qr_hint') }}</div>@endif
+    </td>
+    @if($payQr)
+    <td style="width:88px; text-align:center; vertical-align:middle;">
+      <img src="{{ $payQr }}" style="width:74px; height:74px;" alt="QR">
+      <div style="font-size:7pt; color:#78716C;">{{ __('doc.pay_qr_title') }}</div>
+    </td>
+    @endif
+  </tr></table>
+</div>
+@endif
 @if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
 
 </body>

@@ -46,6 +46,9 @@
 
             @if ($quote->intro)
                 <p>{!! nl2br(e($quote->intro)) !!}</p>
+            @elseif (!empty($customBody))
+                {{-- Eigen standaardtekst (Instellingen → E-mailteksten). --}}
+                <p>{!! nl2br(e($customBody)) !!}</p>
             @else
                 <p>{{ __('doc.mail_quote_intro_default') }}</p>
             @endif

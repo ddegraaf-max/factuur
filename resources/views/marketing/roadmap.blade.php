@@ -34,6 +34,7 @@
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
         <div class="road-card"><h4>BTW-aangifte direct indienen</h4><p>De kwartaalaangifte omzetbelasting rechtstreeks vanuit EasyInvoice indienen bij de Belastingdienst.</p></div>
+        <div class="road-card"><h4>Termijnfacturen</h4><p>Grote projecten in delen factureren (bijv. 30% vooraf, 70% bij oplevering) — met automatisch overzicht van wat er al gefactureerd is.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -42,6 +43,9 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>QR-code betalen</h4><p>Een scan-en-betaal QR-code op de factuur-PDF: je klant scant met de telefoon en betaalt direct via iDEAL.</p></div>
+        <div class="road-card"><h4>Cashflow-prognose</h4><p>Wat komt er de komende maanden binnen en wat gaat eruit — op basis van openstaande facturen, terugkerende facturen en vaste lasten.</p></div>
+        <div class="road-card"><h4>Aanpasbare e-mailteksten</h4><p>Eigen onderwerp en tekst voor de factuur- en offertemail, met variabelen zoals {klant} en {factuurnummer}.</p></div>
         <div class="road-card"><h4>Inkoopfacturen per e-mail</h4><p>Bonnen en facturen doorsturen naar je eigen inboek-adres — ze staan klaar in het Postvak IN, inclusief scan &amp; herken.</p></div>
         <div class="road-card"><h4>Vaste lasten</h4><p>Terugkerende kosten (huur, software, verzekeringen) automatisch periodiek inboeken als inkoopfactuur.</p></div>
         <div class="road-card"><h4>Jaaroverzicht</h4><p>Omzet, kosten en resultaat per kwartaal, met kilometeraftrek en PDF voor je boekhouder — de basis voor je aangifte.</p></div>

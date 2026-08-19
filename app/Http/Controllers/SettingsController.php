@@ -150,6 +150,46 @@ class SettingsController extends Controller
         return back()->with('flash', 'Logo verwijderd.');
     }
 
+    // ----- E-MAILTEKSTEN (factuur- en offertemail) -----
+    public function emails()
+    {
+        $company = auth()->user()->company;
+        $texts = $company->email_texts ?? [];
+
+        return Inertia::render('Settings/EmailTexts', [
+            'texts' => [
+                'invoice_subject' => $texts['invoice_subject'] ?? '',
+                'invoice_body' => $texts['invoice_body'] ?? '',
+                'quote_subject' => $texts['quote_subject'] ?? '',
+                'quote_body' => $texts['quote_body'] ?? '',
+            ],
+            // De standaardteksten (NL) als voorbeeld/placeholder in het formulier.
+            'defaults' => [
+                'invoice_subject' => 'Factuur {factuurnummer} — {bedrijf}',
+                'invoice_body' => "Beste {klant},\n\nHierbij ontvangt u factuur {factuurnummer} van {factuurdatum} voor een bedrag van {bedrag}. De factuur vindt u als PDF in de bijlage.\n\nWij verzoeken u het bedrag uiterlijk {vervaldatum} te voldoen op {iban} onder vermelding van factuurnummer {factuurnummer}.",
+                'quote_subject' => 'Offerte {offertenummer} — {bedrijf}',
+                'quote_body' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
+            ],
+        ]);
+    }
+
+    public function updateEmails(Request $request)
+    {
+        $data = $request->validate([
+            'invoice_subject' => 'nullable|string|max:200',
+            'invoice_body' => 'nullable|string|max:4000',
+            'quote_subject' => 'nullable|string|max:200',
+            'quote_body' => 'nullable|string|max:4000',
+        ]);
+
+        // Alleen ingevulde teksten bewaren; leeg = terug naar de standaard.
+        $texts = array_filter(array_map(fn ($v) => trim((string) $v), $data), fn ($v) => $v !== '');
+
+        auth()->user()->company->update(['email_texts' => $texts ?: null]);
+
+        return back()->with('flash', 'E-mailteksten opgeslagen.');
+    }
+
     // ----- REMINDERS -----
     public function reminders()
     {

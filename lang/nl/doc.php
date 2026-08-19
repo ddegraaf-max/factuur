@@ -43,6 +43,10 @@ return [
     'pay_instruction' => 'Gelieve het bedrag binnen <strong>:days dagen</strong> over te maken naar <strong>:iban</strong> ten name van <strong>:name</strong>',
     'pay_reference' => ' onder vermelding van factuurnummer <strong>:number</strong>',
 
+    // QR-code betalen op de factuur
+    'pay_qr_title' => 'Scan & betaal',
+    'pay_qr_hint' => 'Scan de QR-code met je telefoon en betaal direct online (iDEAL).',
+
     // Geldigheid op de offerte
     'quote_valid_note' => 'Deze offerte is geldig tot en met <strong>:date</strong>.',
     'quote_accept_note' => 'Ga je akkoord? Laat het ons weten via een reply op deze e-mail:phone — dan zetten wij de offerte om in een opdracht. Genoemde bedragen zijn exclusief btw, tenzij anders vermeld.',

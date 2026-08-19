@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.21.0</div>
+        <h3>QR-code betalen, cashflow-prognose &amp; eigen e-mailteksten</h3>
+        <ul class="tl-list">
+          <li><b>Scan &amp; betaal op de factuur-PDF</b> — heb je Mollie gekoppeld, dan staat er voortaan automatisch een QR-code naast de betaalinstructie op de factuur. Je klant scant met de telefoon en betaalt direct via iDEAL — ook als de factuur geprint op de deurmat ligt.</li>
+          <li><b>Cashflow-prognose</b> — nieuw rapport dat laat zien wat er de komende maanden naar verwachting binnenkomt en uitgaat: openstaande facturen op vervaldatum, terugkerende facturen, openstaande inkoop en je vaste lasten. Inclusief wat er nú al vervallen (opeisbaar) is.</li>
+          <li><b>Eigen e-mailteksten</b> — bepaal zelf het onderwerp en de tekst van je factuur- en offertemail, met variabelen zoals <b>{klant}</b>, <b>{factuurnummer}</b> en <b>{bedrag}</b>. De portaalknop en PDF-bijlage blijven automatisch staan. Leeg laten = de standaardtekst, die vanzelf de taal van de klant volgt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.20.0</div>
         <h3>Inkoopfacturen per e-mail aanleveren (Postvak IN)</h3>
         <ul class="tl-list">

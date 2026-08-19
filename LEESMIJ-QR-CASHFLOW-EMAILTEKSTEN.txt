@@ -1,0 +1,70 @@
+EASYINVOICE 1.21.0 — QR-CODE BETALEN, CASHFLOW-PROGNOSE & E-MAILTEKSTEN
+========================================================================
+
+Drie features in één release; alle drie werken direct na deploy, zonder
+nieuwe omgevingsvariabelen.
+
+1. QR-CODE BETALEN (op de factuur-PDF)
+--------------------------------------
+Heeft de administratie Mollie gekoppeld, dan staat er naast de
+betaalinstructie op de factuur-PDF automatisch een QR-code ("Scan &
+betaal"). De klant scant met de telefoon en komt in het klantenportaal,
+waar de bestaande iDEAL-betaalknop staat.
+
+Ontwerpkeuzes:
+- De QR verwijst naar de PORTAALLINK, niet naar een Mollie-checkout:
+  checkout-URL's verlopen, de portaallink toont altijd de actuele status
+  en het actuele openstaande bedrag (en na betaling gewoon "betaald").
+- Alleen op betaalbare facturen: verstuurd (portaal-token aanwezig),
+  niet-credit, status sent/partial/overdue, openstaand > 0. Concepten en
+  betaalde facturen krijgen géén QR. Zonder Mollie-key verandert er niets.
+- Genereren gebeurt lokaal (chillerlan/php-qrcode, PNG via GD) — geen
+  externe dienst, niets verlaat de server. Mislukt het genereren, dan
+  verschijnt de PDF gewoon zonder QR (nooit een kapotte factuur).
+- Werkt in alle drie de sjablonen (modern/classic/minimal) en is
+  tweetalig (nl/en) via lang/*/doc.php.
+
+2. CASHFLOW-PROGNOSE (Rapporten → Cashflow)
+-------------------------------------------
+Per maand (huidige + drie vooruit): verwachte ontvangsten, uitgaven,
+netto en cumulatief verloop, plus een regel "Al vervallen" (direct
+opeisbaar). Bronnen:
+- IN : openstaande facturen op vervaldatum + terugkerende facturen
+       (verwachte ontvangst = factuurdatum + betaaltermijn).
+- UIT: openstaande inkoopfacturen op vervaldatum + vaste lasten op de
+       boekingsdatum.
+Bewust NIET meegenomen: facturen in incasso (onzeker; wel als voetnoot
+getoond), creditnota's, en alles wat niet in Easy staat (privé-opnames,
+belastingen, loon). Het rapport zegt dat er zelf ook bij — zelfde
+eerlijke-kaders-aanpak als het jaaroverzicht. Alleen zichtbaar voor
+beheerder + boekhouder (role:owner,accountant), net als andere rapporten.
+
+3. AANPASBARE E-MAILTEKSTEN (Instellingen → E-mailteksten)
+----------------------------------------------------------
+Eigen onderwerp en tekst voor de factuurmail en de offertemail, met
+dezelfde {variabelen} als bij de herinneringen:
+- factuur: {klant} {bedrijf} {factuurnummer} {factuurdatum}
+  {vervaldatum} {bedrag} {openstaand} {iban}
+- offerte: {klant} {bedrijf} {offertenummer} {offertedatum}
+  {geldigtot} {bedrag}
+
+Gedrag:
+- Leeg = standaardtekst (die automatisch de klanttaal nl/en volgt).
+- Eigen tekst vervangt aanhef + intro + betaalverzoek van de factuurmail;
+  verrekeningsmeldingen ("reeds doorgestort"), de portaalknop en de
+  PDF-bijlage blijven automatisch staan.
+- Offertemail: een intro op de offerte zelf gaat vóór de bedrijfstekst.
+- Eigen tekst is letterlijk en dus ééntalig — de instellingenpagina
+  waarschuwt hiervoor bij Engelstalige klanten.
+- Opslag: companies.email_texts (json, zelfde patroon als
+  reminder_settings). Migratie: 2026_08_19_000015.
+
+TECHNIEK
+--------
+- Nieuw: app/Support/PaymentQr.php, app/Support/MailText.php,
+  app/Http/Controllers/CashflowController.php,
+  resources/js/Pages/Reports/Cashflow.vue,
+  resources/js/Pages/Settings/EmailTexts.vue.
+- Composer: chillerlan/php-qrcode ^6.0 toegevoegd (pure PHP + GD).
+- Routes: GET cashflow (rapportgroep), GET/PATCH settings/emailteksten
+  (alleen beheerder).

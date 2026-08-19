@@ -26,24 +26,37 @@ class QuoteMail extends Mailable
         $company = $this->quote->brandedCompany();
         $replyTo = $company?->email ?: $company?->copy_email;
 
+        // Eigen onderwerp (Instellingen → E-mailteksten), anders de standaard.
+        $customSubject = $company->emailText('quote_subject');
+
         // Afzendernaam = de ondernemer, antwoorden gaan rechtstreeks naar hem.
         return new Envelope(
             from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
-            subject: __('doc.mail_quote_subject', [
-                'number' => $this->quote->number,
-                'company' => $company->name ?? 'EasyInvoice',
-            ]),
+            subject: $customSubject
+                ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::quoteVars($this->quote, $company))
+                : __('doc.mail_quote_subject', [
+                    'number' => $this->quote->number,
+                    'company' => $company->name ?? 'EasyInvoice',
+                ]),
         );
     }
 
     public function content(): Content
     {
+        $company = $this->quote->brandedCompany();
+
+        // Eigen standaardtekst; een intro op de offerte zelf gaat vóór.
+        $customBody = $company->emailText('quote_body');
+
         return new Content(
             view: 'emails.quote',
             with: [
                 'quote' => $this->quote,
-                'company' => $this->quote->brandedCompany(),
+                'company' => $company,
+                'customBody' => $customBody
+                    ? \App\Support\MailText::apply($customBody, \App\Support\MailText::quoteVars($this->quote, $company))
+                    : null,
             ],
         );
     }

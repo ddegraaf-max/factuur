@@ -349,6 +349,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Jaaroverzicht: omzet, kosten en resultaat uit de facturatie
         Route::get('jaaroverzicht', [\App\Http\Controllers\YearReportController::class, 'index'])->name('yearreport.index');
         Route::get('jaaroverzicht/pdf', [\App\Http\Controllers\YearReportController::class, 'pdf'])->name('yearreport.pdf');
+
+        // Cashflow-prognose: verwachte ontvangsten en uitgaven per maand
+        Route::get('cashflow', [\App\Http\Controllers\CashflowController::class, 'index'])->name('cashflow.index');
     });
 
     // Settings (alleen de beheerder)
@@ -371,6 +374,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         Route::get('settings/reminders', [SettingsController::class, 'reminders'])->name('settings.reminders');
         Route::patch('settings/reminders', [SettingsController::class, 'updateReminders'])->name('settings.reminders.update');
+
+        // E-mailteksten: eigen onderwerp en tekst voor factuur- en offertemail
+        Route::get('settings/emailteksten', [SettingsController::class, 'emails'])->name('settings.emails');
+        Route::patch('settings/emailteksten', [SettingsController::class, 'updateEmails'])->name('settings.emails.update');
 
         // Team: collega's en boekhouder uitnodigen, rollen beheren
         Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team');
