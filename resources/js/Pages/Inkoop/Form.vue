@@ -10,6 +10,7 @@ const props = defineProps({
   suppliers: Array,     // eerder gebruikte leveranciersnamen (autocomplete)
   categories: Array,
   scan_enabled: Boolean, // bonnetjes scannen met AI (alleen met ANTHROPIC_API_KEY)
+  inbox_item: Object,   // aangeleverd bestand uit het Postvak IN (of null)
 });
 
 const isEdit = computed(() => !!props.purchase);
@@ -132,10 +133,12 @@ const scanError = ref('');
 const scanNotice = ref('');
 const scanWarning = ref('');
 
-// De eerste foto of PDF in de lijst wordt gescand (meestal is er maar één).
+// De eerste foto of PDF in de lijst wordt gescand (meestal is er maar één);
+// zonder eigen upload wordt het bestand uit het Postvak IN gescand.
 const scannable = computed(() =>
   files.value.find(f => f.file.type === 'application/pdf' || f.file.type.startsWith('image/'))
 );
+const canScan = computed(() => props.scan_enabled && (scannable.value || props.inbox_item));
 
 // Grote foto's eerst verkleinen: sneller uploaden en ruim binnen de AI-limieten.
 const prepareForScan = (file) => new Promise((resolve) => {
@@ -172,14 +175,20 @@ const applyScan = (r) => {
 
 const scanReceipt = async () => {
   const entry = scannable.value;
-  if (!entry || scanning.value) return;
+  if ((!entry && !props.inbox_item) || scanning.value) return;
   scanning.value = true;
   scanError.value = ''; scanNotice.value = ''; scanWarning.value = '';
   try {
-    const payload = await prepareForScan(entry.file);
-    const fd = new FormData();
-    fd.append('file', payload, payload.name || entry.name);
-    const { data } = await axios.post(route('purchases.scan'), fd);
+    let data;
+    if (entry) {
+      const payload = await prepareForScan(entry.file);
+      const fd = new FormData();
+      fd.append('file', payload, payload.name || entry.name);
+      ({ data } = await axios.post(route('purchases.scan'), fd));
+    } else {
+      // Bestand uit het Postvak IN — staat al op de server.
+      ({ data } = await axios.post(route('purchases.scan'), { inbox_id: props.inbox_item.id }));
+    }
     applyScan(data.result);
     scanNotice.value = 'Gegevens van de bon overgenomen — controleer ze even voor je opslaat.';
     scanWarning.value = data.result.warning || '';
@@ -209,6 +218,7 @@ const submit = () => {
       payment_method: data.is_paid ? data.payment_method : null,
       notes: data.notes || null,
       files: files.value.map(f => f.file),
+      inbox_id: props.inbox_item?.id ?? null,
       ...(isEdit.value ? { _method: 'patch' } : {}),
     }))
     .post(isEdit.value ? route('purchases.update', props.purchase.id) : route('purchases.store'), {
@@ -388,8 +398,23 @@ const fileError = computed(() => {
               </div>
               <div v-if="fileError" class="field-error" style="margin-top:8px;">{{ fileError }}</div>
 
+              <!-- Uit het Postvak IN: het aangeleverde bestand -->
+              <div v-if="inbox_item" class="pf-file" style="border-color:var(--brand-border);background:var(--brand-tint);">
+                <img v-if="inbox_item.is_image" :src="inbox_item.url" class="pf-thumb" alt="">
+                <span v-else class="pf-thumb pf-thumb-pdf">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </span>
+                <div class="pf-file-info">
+                  <div class="pf-file-name">{{ inbox_item.filename }}</div>
+                  <div class="pf-file-meta">
+                    uit je Postvak IN<template v-if="inbox_item.from_email"> · van {{ inbox_item.from_email }}</template>
+                    — wordt bij het inboeken als bijlage gekoppeld
+                  </div>
+                </div>
+              </div>
+
               <!-- Scan & herken: AI leest de bon en vult het formulier in -->
-              <div v-if="scan_enabled && scannable" class="pf-scan">
+              <div v-if="canScan" class="pf-scan">
                 <button type="button" class="btn btn-primary btn-sm" :disabled="scanning" @click="scanReceipt">
                   <svg v-if="!scanning" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                   <svg v-else class="pf-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>
@@ -419,6 +444,12 @@ const fileError = computed(() => {
               <!-- Grote preview van de eerste foto: overtypen met de bon ernaast -->
               <div v-if="files.find(f => f.previewUrl)" class="pf-preview">
                 <img :src="files.find(f => f.previewUrl).previewUrl" alt="Voorbeeld van de bon">
+              </div>
+              <div v-else-if="inbox_item?.is_image" class="pf-preview">
+                <img :src="inbox_item.url" alt="Voorbeeld van de aangeleverde bon">
+              </div>
+              <div v-else-if="inbox_item" class="pf-preview" style="padding:14px;text-align:center;">
+                <a :href="inbox_item.url" target="_blank" class="btn btn-secondary btn-sm">Open de aangeleverde PDF in een nieuw tabblad</a>
               </div>
 
               <!-- Bestaande bijlagen (bewerken) -->

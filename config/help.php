@@ -358,6 +358,22 @@ return [
             ],
         ],
 
+        'postvak-in' => [
+            'category' => 'Inkoop',
+            'title' => 'Inkoopfacturen per e-mail aanleveren (Postvak IN)',
+            'intro' => 'Stuur bonnen en facturen naar je eigen inboek-adres — ze staan klaar in het Postvak IN, inclusief scan & herken.',
+            'sections' => [
+                ['Je inboek-adres', [
+                    'Ga naar Inkoop → Postvak IN: daar staat je persoonlijke inboek-adres (bijv. bon-a1b2c3d4e5f6@…). Stuur of forward e-mails met een PDF of foto als bijlage naar dat adres — van jezelf, of rechtstreeks van leveranciers. Alleen de bijlagen (PDF, PNG, JPG of WEBP, max 10 MB) worden bewaard; de mailtekst niet.',
+                    'Raakt het adres bekend bij spammers? Met "Nieuw adres" genereer je direct een vers adres; het oude vervalt meteen.',
+                ]],
+                ['Inboeken vanuit het postvak', [
+                    'Elk aangeleverd bestand verschijnt als kaartje onder "Te verwerken", met een voorbeeld en de afzender. Klik op "Inboeken" en het inkoopformulier opent met het bestand er groot naast — inclusief de knop Scan & herken, die leverancier, datum en bedragen alvast invult. Bij het opslaan wordt het bestand automatisch als bijlage aan de inkoopfactuur gekoppeld en verhuist het item naar "Afgehandeld".',
+                    'Niets mee doen? Wijs het item af (blijft zichtbaar onder Afgehandeld) of verwijder het definitief.',
+                ]],
+            ],
+        ],
+
         'vaste-lasten' => [
             'category' => 'Inkoop',
             'title' => 'Vaste lasten automatisch inboeken',

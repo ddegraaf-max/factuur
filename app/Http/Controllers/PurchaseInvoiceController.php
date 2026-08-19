@@ -120,13 +120,31 @@ class PurchaseInvoiceController extends Controller
         ]);
     }
 
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        // Inboeken vanuit het Postvak IN: het aangeleverde bestand staat dan
+        // alvast naast het formulier en is direct te scannen.
+        $inboxItem = null;
+        if ($request->filled('inbox')) {
+            $item = \App\Models\PurchaseInboxItem::where('status', 'pending')->find($request->integer('inbox'));
+            if ($item) {
+                $inboxItem = [
+                    'id' => $item->id,
+                    'filename' => $item->filename,
+                    'mime_type' => $item->mime_type,
+                    'is_image' => $item->isImage(),
+                    'from_email' => $item->from_email,
+                    'url' => route('purchases.inbox.file', $item),
+                ];
+            }
+        }
+
         return Inertia::render('Inkoop/Form', [
             'purchase' => null,
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::CATEGORIES,
             'scan_enabled' => app(ReceiptScanService::class)->enabled(),
+            'inbox_item' => $inboxItem,
         ]);
     }
 
@@ -136,6 +154,23 @@ class PurchaseInvoiceController extends Controller
         $purchase = PurchaseInvoice::create($this->attributes($data));
 
         $this->saveAttachments($request, $purchase);
+
+        // Vanuit het Postvak IN? Dan wordt het aangeleverde bestand als
+        // bijlage gekoppeld en het postvak-item afgevinkt.
+        if (! empty($data['inbox_id'])) {
+            $item = \App\Models\PurchaseInboxItem::where('status', 'pending')->find($data['inbox_id']);
+            if ($item) {
+                Attachment::create([
+                    'attachable_type' => PurchaseInvoice::class,
+                    'attachable_id' => $purchase->id,
+                    'filename' => $item->filename,
+                    'mime_type' => $item->mime_type,
+                    'size_bytes' => $item->size_bytes,
+                    'file_data' => $item->file_data,
+                ]);
+                $item->update(['status' => 'processed', 'purchase_invoice_id' => $purchase->id]);
+            }
+        }
 
         return redirect()->route('purchases.show', $purchase)
             ->with('flash', 'Inkoopfactuur ingeboekt.');
@@ -237,20 +272,27 @@ class PurchaseInvoiceController extends Controller
         abort_unless($scanner->enabled(), 404);
 
         $request->validate([
-            'file' => ['required', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+            'file' => ['required_without:inbox_id', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+            'inbox_id' => ['nullable', 'integer'],
         ], [
-            'file.required' => 'Voeg eerst een foto of PDF van de bon toe.',
+            'file.required_without' => 'Voeg eerst een foto of PDF van de bon toe.',
             'file.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden kunnen worden gescand.',
             'file.max' => 'Het bestand mag maximaal 10 MB groot zijn.',
         ]);
 
-        $file = $request->file('file');
+        // Bron: een upload uit het formulier, of een bestand uit het Postvak IN.
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $bytes = file_get_contents($file->getRealPath());
+            $mime = $file->getMimeType() ?? 'application/octet-stream';
+        } else {
+            $item = \App\Models\PurchaseInboxItem::findOrFail($request->integer('inbox_id'));
+            $bytes = $item->contents();
+            $mime = $item->mime_type;
+        }
 
         try {
-            $result = $scanner->scan(
-                file_get_contents($file->getRealPath()),
-                $file->getMimeType() ?? 'application/octet-stream',
-            );
+            $result = $scanner->scan($bytes, $mime);
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -383,6 +425,7 @@ class PurchaseInvoiceController extends Controller
             'notes' => ['nullable', 'string', 'max:2000'],
             'files' => ['nullable', 'array', 'max:10'],
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+            'inbox_id' => ['nullable', 'integer'],
         ], [
             'supplier_name.required' => 'Vul de naam van de leverancier in.',
             'invoice_date.required' => 'Vul de factuurdatum in.',

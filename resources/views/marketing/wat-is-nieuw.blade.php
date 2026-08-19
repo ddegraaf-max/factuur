@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.20.0</div>
+        <h3>Inkoopfacturen per e-mail aanleveren (Postvak IN)</h3>
+        <ul class="tl-list">
+          <li><b>Je eigen inboek-adres</b> — elke administratie krijgt een uniek e-mailadres. Stuur (of forward) bonnen en facturen met een PDF of foto als bijlage en ze verschijnen automatisch in het nieuwe Postvak IN onder Inkoop. Je kunt het adres ook direct aan leveranciers geven.</li>
+          <li><b>Inboeken in twee klikken</b> — vanuit het postvak open je het inkoopformulier met het bestand er groot naast, inclusief <b>Scan &amp; herken</b>: de AI vult leverancier, datum en bedragen alvast in. Bij het opslaan wordt het bestand automatisch als bijlage gekoppeld.</li>
+          <li><b>Veilig</b> — alleen bijlagen van het juiste type tellen, het adres is uniek per administratie en met één klik te vernieuwen als het bij spammers bekend raakt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.19.0</div>
         <h3>Vaste lasten — terugkerende inkoop automatisch inboeken</h3>
         <ul class="tl-list">

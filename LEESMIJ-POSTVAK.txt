@@ -1,0 +1,53 @@
+EASYINVOICE — INKOOPFACTUREN PER E-MAIL (POSTVAK IN)
+====================================================
+
+WAT IS HET
+----------
+Elke administratie krijgt een uniek inboek-adres
+(bon-<12 tekens>@<inboekdomein>). E-mails aan dat adres met een PDF of
+foto als bijlage belanden in het nieuwe Postvak IN (Inkoop → Postvak IN):
+
+- KAARTJES met voorbeeld, afzender, onderwerp en grootte.
+- INBOEKEN: opent het gewone inkoopformulier met het bestand er groot
+  naast, inclusief Scan & herken (de bestaande AI-bonherkenning werkt
+  rechtstreeks op het aangeleverde bestand — geen nieuwe upload nodig).
+  Bij het opslaan wordt het bestand automatisch als bijlage gekoppeld
+  en het postvak-item op "afgehandeld" gezet, met link naar de factuur.
+- AFWIJZEN of definitief verwijderen kan ook.
+- NIEUW ADRES genereren met één klik (het oude vervalt) — voor als het
+  adres bij spammers bekend raakt.
+
+ACTIVEREN (eenmalige serverinstelling)
+--------------------------------------
+1. Richt een inbound-maildomein in bij een provider die inkomende mail
+   als webhook doorzet in POSTMARK-formaat (bijv. Postmark inbound:
+   maak een server met inbound-stream, stel het inbound-domein in met
+   de MX-records die Postmark geeft).
+2. Zet in Railway:
+       INBOUND_MAIL_DOMAIN=inbox.easyinvoice.nl   (jouw inbound-domein)
+       INBOUND_MAIL_SECRET=<lange willekeurige string>
+3. Stel bij de provider de webhook-URL in:
+       https://<app>/webhooks/inbound-mail/<INBOUND_MAIL_SECRET>
+Zonder deze variabelen toont het Postvak IN een nette
+"nog niet geactiveerd"-uitleg; de rest van Easy merkt er niets van.
+
+BEVEILIGING
+-----------
+- Webhook is alleen bereikbaar met het geheime URL-deel (hash_equals-
+  vergelijking) én het per-administratie unieke token in het adres.
+- Alles wat niet klopt (onbekend token, verkeerd bestandstype, te
+  groot, kapotte base64) wordt stil genegeerd met een 200 — providers
+  blijven anders eindeloos herhalen. Max 10 bijlagen per mail, 10 MB
+  per bestand; alleen PDF/PNG/JPG/WEBP.
+- Bestanden staan base64 in de database (Railway-schijf is vluchtig)
+  en zijn alleen zichtbaar binnen de eigen administratie.
+
+TECHNIEK
+--------
+- Migratie: purchase_inbox_items + companies.inbound_token (uniek).
+- Nieuw: InboundMailController (webhook, Postmark-payload),
+  PurchaseInboxController (index/file/dismiss/destroy/rotate),
+  resources/js/Pages/Inkoop/Postvak.vue.
+- PurchaseInvoiceController: create accepteert ?inbox=, scan accepteert
+  inbox_id (scant het server-bestand), store koppelt bijlage + vinkt af.
+- CSRF-uitzondering webhooks/inbound-mail/* (naast Stripe en Mollie).

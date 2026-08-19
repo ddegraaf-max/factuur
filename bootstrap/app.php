@@ -38,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
             'webhooks/mollie',
+            'webhooks/inbound-mail/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

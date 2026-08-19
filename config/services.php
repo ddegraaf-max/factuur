@@ -34,6 +34,13 @@ return [
         'storecove_token' => env('STORECOVE_API_TOKEN'),
         'legal_entity_id' => env('STORECOVE_LEGAL_ENTITY_ID'),
     ],
+    // Inkoopfacturen per e-mail aanleveren: een inbound-maildomein (bijv.
+    // Postmark inbound) POST binnenkomende mail naar onze webhook. Zonder
+    // beide variabelen blijft het Postvak IN in de "nog activeren"-stand.
+    'inbound' => [
+        'secret' => env('INBOUND_MAIL_SECRET'),   // geheim deel van de webhook-URL
+        'domain' => env('INBOUND_MAIL_DOMAIN'),   // bijv. inbox.easyinvoice.nl
+    ],
     // Bonnetjes automatisch herkennen via Claude (Anthropic). Zonder key
     // blijft de scanknop op het inkoopformulier verborgen.
     'anthropic' => [

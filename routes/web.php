@@ -144,6 +144,10 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
     ->middleware('throttle:120,1')->name('mollie.webhook');
 
+// ---------- INBOUND MAIL WEBHOOK (publiek, geen CSRF, geheim in de URL) ----------
+Route::post('/webhooks/inbound-mail/{secret}', [\App\Http\Controllers\InboundMailController::class, 'handle'])
+    ->middleware('throttle:60,1')->name('inbound.mail');
+
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -297,6 +301,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('inkoop/{purchase}/betaald', [PurchaseInvoiceController::class, 'markPaid'])->name('purchases.paid');
     Route::post('inkoop/{purchase}/heropen', [PurchaseInvoiceController::class, 'reopen'])->name('purchases.reopen');
     Route::post('inkoop/{purchase}/bijlagen', [PurchaseInvoiceController::class, 'storeAttachments'])->name('purchases.attachments.store');
+
+    // Postvak IN: per e-mail aangeleverde bonnen en facturen
+    Route::get('inkoop-postvak', [\App\Http\Controllers\PurchaseInboxController::class, 'index'])->name('purchases.inbox.index');
+    Route::get('inkoop-postvak/{item}/bestand', [\App\Http\Controllers\PurchaseInboxController::class, 'file'])->name('purchases.inbox.file');
+    Route::post('inkoop-postvak/{item}/afwijzen', [\App\Http\Controllers\PurchaseInboxController::class, 'dismiss'])->name('purchases.inbox.dismiss');
+    Route::delete('inkoop-postvak/{item}', [\App\Http\Controllers\PurchaseInboxController::class, 'destroy'])->name('purchases.inbox.destroy');
+    Route::post('inkoop-postvak/adres', [\App\Http\Controllers\PurchaseInboxController::class, 'rotateAddress'])->name('purchases.inbox.rotate');
 
     // Vaste lasten: terugkerende inkoop automatisch inboeken
     Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');

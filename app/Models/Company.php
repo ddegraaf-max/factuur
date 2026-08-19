@@ -57,6 +57,27 @@ class Company extends Model
     ];
 
     public function users(): HasMany { return $this->hasMany(User::class); }
+
+    /** Uniek inboek-adres voor het Postvak IN (bon-<token>@<inboekdomein>). */
+    public function ensureInboundToken(): string
+    {
+        if (! $this->inbound_token) {
+            do {
+                $token = bin2hex(random_bytes(6)); // 12 tekens
+            } while (static::where('inbound_token', $token)->exists());
+
+            $this->forceFill(['inbound_token' => $token])->saveQuietly();
+        }
+
+        return $this->inbound_token;
+    }
+
+    public function inboundAddress(): ?string
+    {
+        $domain = config('services.inbound.domain');
+
+        return $domain ? 'bon-' . $this->ensureInboundToken() . '@' . $domain : null;
+    }
     /** Alle leden van deze administratie (lidmaatschappen, met rol per lid). */
     public function members(): \Illuminate\Database\Eloquent\Relations\BelongsToMany { return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps(); }
     public function customers(): HasMany { return $this->hasMany(Customer::class); }
