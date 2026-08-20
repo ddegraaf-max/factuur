@@ -183,21 +183,6 @@
     .mock-kpi-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  /* TRUST STRIP */
-  .trust-strip {
-    background: var(--text);
-    color: white;
-    padding: 40px 0;
-    text-align: center;
-  }
-  .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
-  .trust-stat-num { font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 4vw, 42px); letter-spacing: -0.02em; color: white; line-height: 1; }
-  .trust-stat-num .accent { color: #FCD34D; }
-  .trust-stat-label { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 8px; }
-  @media (max-width: 720px) {
-    .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-  }
-
   /* SECTION HEADER */
   .section { padding: 90px 0; }
   .section-alt { background: white; }
@@ -295,30 +280,6 @@
   .pricing-features li { padding: 8px 0; font-size: 14.5px; color: var(--text-2); display: flex; align-items: flex-start; gap: 10px; line-height: 1.5; }
   .pricing-features li svg { width: 18px; height: 18px; color: var(--success); flex-shrink: 0; margin-top: 1px; }
   .pricing-fineprint { text-align: center; font-size: 12px; color: var(--text-3); margin-top: 14px; }
-
-  /* TESTIMONIALS */
-  .testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  @media (max-width: 900px) { .testimonials-grid { grid-template-columns: 1fr; } }
-  .testimonial {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 28px;
-    position: relative;
-  }
-  .testimonial-quote-mark {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 50px;
-    color: var(--brand-tint-2);
-    line-height: 0.8;
-    margin-bottom: 8px;
-  }
-  .testimonial-text { font-size: 15px; color: var(--text-2); line-height: 1.6; margin-bottom: 22px; }
-  .testimonial-author { display: flex; align-items: center; gap: 12px; }
-  .testimonial-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%); color: white; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 14px; flex-shrink: 0; }
-  .testimonial-author-name { font-weight: 600; font-size: 14px; }
-  .testimonial-author-role { font-size: 12px; color: var(--text-3); }
 
   /* FAQ */
   .faq-list { max-width: 760px; margin: 0 auto; }
@@ -453,9 +414,9 @@
       EasyInvoice
     </a>
     <nav class="nav-links">
+      <a href="/#waarom" class="nav-link">Waarom EasyInvoice</a>
       <a href="/#functies" class="nav-link">Functies</a>
       <a href="/#prijzen" class="nav-link">Prijzen</a>
-      <a href="/#reviews" class="nav-link">Reviews</a>
       <a href="{{ route('faq') }}" class="nav-link">Veelgestelde vragen</a>
     </nav>
     <div class="nav-actions">
@@ -465,9 +426,9 @@
     <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
   </div>
   <div class="nav-mobile">
+    <a href="/#waarom" class="nav-mobile-link">Waarom EasyInvoice</a>
     <a href="/#functies" class="nav-mobile-link">Functies</a>
     <a href="/#prijzen" class="nav-mobile-link">Prijzen</a>
-    <a href="/#reviews" class="nav-mobile-link">Reviews</a>
     <a href="{{ route('faq') }}" class="nav-mobile-link">Veelgestelde vragen</a>
     <div class="nav-mobile-actions">
       <a href="{{ route('login') }}" class="btn btn-secondary btn-block">Inloggen</a>
@@ -498,9 +459,9 @@
       <div>
         <div class="footer-col-title">Product</div>
         <ul class="footer-links">
+          <li><a href="/#waarom">Waarom EasyInvoice</a></li>
           <li><a href="/#functies">Functies</a></li>
           <li><a href="/#prijzen">Prijzen</a></li>
-          <li><a href="/#reviews">Reviews</a></li>
           <li><a href="{{ route('changelog') }}">Wat is nieuw</a></li>
           <li><a href="{{ route('roadmap') }}">Roadmap</a></li>
         </ul>

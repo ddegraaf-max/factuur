@@ -432,28 +432,6 @@
   </div>
 </section>
 
-<!-- TRUST STRIP -->
-<section class="trust-strip">
-  <div class="container trust-grid">
-    <div>
-      <div class="trust-stat-num"><span class="accent">2.500+</span></div>
-      <div class="trust-stat-label">Actieve gebruikers</div>
-    </div>
-    <div>
-      <div class="trust-stat-num"><span class="accent">€48M</span></div>
-      <div class="trust-stat-label">Aan facturen verstuurd</div>
-    </div>
-    <div>
-      <div class="trust-stat-num"><span class="accent">4,9</span>/5</div>
-      <div class="trust-stat-label">Sterren van klanten</div>
-    </div>
-    <div>
-      <div class="trust-stat-num"><span class="accent">99,9%</span></div>
-      <div class="trust-stat-label">Uptime SLA</div>
-    </div>
-  </div>
-</section>
-
 <!-- WAAROM EASYINVOICE: de drie troeven -->
 <section class="section" id="waarom">
   <div class="container">
@@ -629,57 +607,8 @@
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="section section-alt" id="reviews">
-  <div class="container">
-    <div class="section-header">
-      <div class="eyebrow" style="margin-bottom:16px;">Reviews</div>
-      <h2>Wat klanten zeggen.</h2>
-      <p>Meer dan 2.500 Nederlandse ondernemers gebruiken EasyInvoice dagelijks.</p>
-    </div>
-
-    <div class="testimonials-grid">
-      <div class="testimonial">
-        <div class="testimonial-quote-mark">"</div>
-        <div class="testimonial-text">Ik betaalde €18 per maand bij Moneybird voor functies die ik niet gebruikte. EasyInvoice doet precies wat ik nodig heb, en is zeven keer goedkoper. Heerlijk simpel.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">SV</div>
-          <div>
-            <div class="testimonial-author-name">Sander Vermeer</div>
-            <div class="testimonial-author-role">ZZP webdeveloper</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial">
-        <div class="testimonial-quote-mark">"</div>
-        <div class="testimonial-text">De incassofunctie heeft ons al meerdere keren gered. Eén klik en Armaere neemt het over — geen e-mailtjes meer naar wanbetalers. Een uitkomst voor een klein bedrijf.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">MK</div>
-          <div>
-            <div class="testimonial-author-name">Marit de Koning</div>
-            <div class="testimonial-author-role">Eigenaar Bloemstudio Lina</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial">
-        <div class="testimonial-quote-mark">"</div>
-        <div class="testimonial-text">Ik verkoop strippenkaarten van tien sessies. Vroeger: factuurtool plus een Excel om het tegoed bij te houden. Nu factureer ik de bundel met één klik en telt elke sessie vanzelf af — mijn klanten zien precies wat er nog openstaat.</div>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">TP</div>
-          <div>
-            <div class="testimonial-author-name">Tom Pieters</div>
-            <div class="testimonial-author-role">Trainer en coach</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- FAQ -->
-<section class="section" id="faq">
+<section class="section section-alt" id="faq">
   <div class="container">
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Veelgestelde vragen</div>
