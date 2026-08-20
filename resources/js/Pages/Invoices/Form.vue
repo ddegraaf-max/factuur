@@ -210,6 +210,22 @@ const fileError = computed(() => {
   return key ? form.errors[key] : null;
 });
 
+/* ---------- Zichtbare foutmeldingen bij het opslaan ---------- */
+const hasErrors = computed(() => Object.keys(form.errors).length > 0);
+
+// Fouten per factuurregel ("lines.0.description" → regel 1), zodat een
+// afgekeurde regel nooit onzichtbaar blijft.
+const lineErrorList = computed(() =>
+  form.lines
+    .map((_, i) => ({
+      line: i + 1,
+      msgs: Object.entries(form.errors)
+        .filter(([k]) => k.startsWith(`lines.${i}.`))
+        .map(([, m]) => m),
+    }))
+    .filter(e => e.msgs.length > 0)
+);
+
 const submit = (action) => {
   form.action = action;
 
@@ -263,6 +279,10 @@ const submit = (action) => {
       </div>
     </div>
 
+    <div v-if="hasErrors" class="form-error-banner">
+      Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.
+    </div>
+
     <div class="form-layout">
       <div class="form-main">
         <div class="card">
@@ -294,6 +314,7 @@ const submit = (action) => {
               <div class="form-group">
                 <label>Betalingstermijn (dagen) *</label>
                 <input type="number" v-model="form.payment_terms" min="0" max="365" required>
+                <div v-if="form.errors.payment_terms" class="field-error">{{ form.errors.payment_terms }}</div>
               </div>
             </div>
             <div v-if="brand_profiles.length" class="form-row">
@@ -367,6 +388,11 @@ const submit = (action) => {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
+            </div>
+
+            <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
+            <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
+              Regel {{ e.line }}: {{ e.msgs.join(' ') }}
             </div>
 
             <button class="add-line-btn" @click="addLine" type="button">

@@ -11,6 +11,18 @@
 @media (max-width: 1100px) {
   .form-layout { grid-template-columns: minmax(0, 1fr); }
 }
+/* Foutbalk boven het formulier: opslaan mag nooit stilletjes mislukken. */
+.form-error-banner {
+  background: var(--brand-tint);
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
 /* Wrappers zijn op desktop onzichtbaar voor de grid-layout. */
 .line-field { display: contents; }
 

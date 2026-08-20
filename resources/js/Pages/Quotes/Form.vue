@@ -143,6 +143,22 @@ const applyProduct = (line, productId) => {
   }
 };
 
+/* ---------- Zichtbare foutmeldingen bij het opslaan ---------- */
+const hasErrors = computed(() => Object.keys(form.errors).length > 0);
+
+// Fouten per offerteregel ("lines.0.description" → regel 1), zodat een
+// afgekeurde regel nooit onzichtbaar blijft.
+const lineErrorList = computed(() =>
+  form.lines
+    .map((_, i) => ({
+      line: i + 1,
+      msgs: Object.entries(form.errors)
+        .filter(([k]) => k.startsWith(`lines.${i}.`))
+        .map(([, m]) => m),
+    }))
+    .filter(e => e.msgs.length > 0)
+);
+
 const submit = (action) => {
   form.action = action;
   if (isEdit.value) {
@@ -180,6 +196,10 @@ const submit = (action) => {
           Versturen
         </button>
       </div>
+    </div>
+
+    <div v-if="hasErrors" class="form-error-banner">
+      Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.
     </div>
 
     <div class="form-layout">
@@ -289,6 +309,9 @@ const submit = (action) => {
             </div>
 
             <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
+            <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
+              Regel {{ e.line }}: {{ e.msgs.join(' ') }}
+            </div>
 
             <button class="add-line-btn" @click="addLine" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
