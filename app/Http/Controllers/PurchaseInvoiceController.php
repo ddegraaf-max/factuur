@@ -74,26 +74,26 @@ class PurchaseInvoiceController extends Controller
             'attachments_count' => $p->attachments_count,
         ]);
 
+        // Openstaand tellen we als "te betalen": het totaal minus verrekeningen
+        // (bijv. al door een deurwaarder ontvangen bedragen).
         $all = PurchaseInvoice::query();
-        $open = (clone $all)->where('status', 'open')->get(['total', 'due_date']);
+        $open = (clone $all)->where('status', 'open')->get(['total', 'due_date', 'deductions', 'supplier_name']);
         $overdue = $open->filter(fn ($p) => $p->due_date && $p->due_date->isPast());
 
         $quarterStart = now()->firstOfQuarter();
         $quarterVat = (float) PurchaseInvoice::whereDate('invoice_date', '>=', $quarterStart)->sum('vat_total');
         $yearBase = (float) PurchaseInvoice::whereYear('invoice_date', now()->year)->sum('subtotal');
 
-        // Crediteurenoverzicht: bij wie staat het meeste open?
-        $bySupplier = PurchaseInvoice::where('status', 'open')
-            ->selectRaw('supplier_name, COUNT(*) AS cnt, SUM(total) AS open_total')
-            ->groupBy('supplier_name')
-            ->orderByDesc('open_total')
-            ->limit(5)
-            ->get()
-            ->map(fn ($r) => [
-                'supplier_name' => $r->supplier_name,
-                'count' => (int) $r->cnt,
-                'open_total' => round((float) $r->open_total, 2),
-            ]);
+        // Crediteurenoverzicht: bij wie staat het meeste open (te betalen)?
+        $bySupplier = $open->groupBy('supplier_name')
+            ->map(fn ($rows, $name) => [
+                'supplier_name' => $name,
+                'count' => $rows->count(),
+                'open_total' => round($rows->sum(fn ($p) => $p->payable), 2),
+            ])
+            ->sortByDesc('open_total')
+            ->take(5)
+            ->values();
 
         $counts = [
             'all' => PurchaseInvoice::count(),
@@ -107,9 +107,9 @@ class PurchaseInvoiceController extends Controller
             'filters' => ['status' => $status, 'q' => $q],
             'counts' => $counts,
             'stats' => [
-                'open_total' => round($open->sum(fn ($p) => (float) $p->total), 2),
+                'open_total' => round($open->sum(fn ($p) => $p->payable), 2),
                 'open_count' => $open->count(),
-                'overdue_total' => round($overdue->sum(fn ($p) => (float) $p->total), 2),
+                'overdue_total' => round($overdue->sum(fn ($p) => $p->payable), 2),
                 'overdue_count' => $overdue->count(),
                 'quarter_vat' => round($quarterVat, 2),
                 'quarter_label' => 'Q' . now()->quarter . ' ' . now()->year,
@@ -153,6 +153,9 @@ class PurchaseInvoiceController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        if ($error = $this->deductionsError($data)) {
+            return back()->withErrors(['deductions' => $error]);
+        }
         $purchase = PurchaseInvoice::create($this->attributes($data));
 
         $this->saveAttachments($request, $purchase);
@@ -187,6 +190,13 @@ class PurchaseInvoiceController extends Controller
                 'invoice_date_label' => $purchase->invoice_date->translatedFormat('j F Y'),
                 'due_date_label' => $purchase->due_date?->translatedFormat('j F Y'),
                 'paid_at_label' => $purchase->paid_at?->translatedFormat('j F Y'),
+                'deductions' => collect($purchase->deductions ?? [])->map(fn ($d) => [
+                    'description' => $d['description'] ?? '',
+                    'date_label' => ! empty($d['date']) ? Carbon::parse($d['date'])->translatedFormat('j M Y') : null,
+                    'amount' => (float) ($d['amount'] ?? 0),
+                ])->values(),
+                'deductions_total' => $purchase->deductions_total,
+                'payable' => $purchase->payable,
                 'is_overdue' => $purchase->is_overdue,
                 'days_overdue' => $purchase->days_overdue,
                 'attachments' => $purchase->attachments->map(fn ($a) => [
@@ -225,6 +235,9 @@ class PurchaseInvoiceController extends Controller
     public function update(Request $request, PurchaseInvoice $purchase): RedirectResponse
     {
         $data = $this->validated($request);
+        if ($error = $this->deductionsError($data)) {
+            return back()->withErrors(['deductions' => $error]);
+        }
         $purchase->update($this->attributes($data));
 
         $this->saveAttachments($request, $purchase);
@@ -343,11 +356,11 @@ class PurchaseInvoiceController extends Controller
                 'Leverancier', 'Factuurnummer', 'Categorie', 'Factuurdatum', 'Vervaldatum',
                 'Status', 'Betaald op',
                 'Grondslag 21%', 'BTW 21%', 'Grondslag 9%', 'BTW 9%', 'Grondslag 0%',
-                'Bedrag excl. BTW', 'BTW totaal', 'Bedrag incl. BTW', 'Notities',
+                'Bedrag excl. BTW', 'BTW totaal', 'Bedrag incl. BTW', 'Verrekend', 'Te betalen', 'Notities',
             ], ';');
 
             $money = fn ($v) => number_format((float) $v, 2, ',', '');
-            $sum = ['base21' => 0.0, 'vat21' => 0.0, 'base9' => 0.0, 'vat9' => 0.0, 'base0' => 0.0, 'subtotal' => 0.0, 'vat' => 0.0, 'total' => 0.0];
+            $sum = ['base21' => 0.0, 'vat21' => 0.0, 'base9' => 0.0, 'vat9' => 0.0, 'base0' => 0.0, 'subtotal' => 0.0, 'vat' => 0.0, 'total' => 0.0, 'deducted' => 0.0, 'payable' => 0.0];
 
             foreach ($purchases as $p) {
                 $buckets = ['21' => ['base' => 0.0, 'vat' => 0.0], '9' => ['base' => 0.0, 'vat' => 0.0], '0' => ['base' => 0.0, 'vat' => 0.0]];
@@ -370,6 +383,7 @@ class PurchaseInvoiceController extends Controller
                     $money($buckets['9']['base']), $money($buckets['9']['vat']),
                     $money($buckets['0']['base']),
                     $money($p->subtotal), $money($p->vat_total), $money($p->total),
+                    $money($p->deductions_total), $money($p->payable),
                     $p->notes ?? '',
                 ], ';');
 
@@ -381,6 +395,8 @@ class PurchaseInvoiceController extends Controller
                 $sum['subtotal'] += (float) $p->subtotal;
                 $sum['vat'] += (float) $p->vat_total;
                 $sum['total'] += (float) $p->total;
+                $sum['deducted'] += $p->deductions_total;
+                $sum['payable'] += $p->payable;
             }
 
             fputcsv($out, [
@@ -388,7 +404,8 @@ class PurchaseInvoiceController extends Controller
                 $money($sum['base21']), $money($sum['vat21']),
                 $money($sum['base9']), $money($sum['vat9']),
                 $money($sum['base0']),
-                $money($sum['subtotal']), $money($sum['vat']), $money($sum['total']), '',
+                $money($sum['subtotal']), $money($sum['vat']), $money($sum['total']),
+                $money($sum['deducted']), $money($sum['payable']), '',
             ], ';');
 
             fclose($out);
@@ -421,6 +438,12 @@ class PurchaseInvoiceController extends Controller
             'vat_lines.*.base' => ['required', 'numeric', 'between:-9999999,9999999'],
             'vat_lines.*.rate' => ['required', 'numeric', 'in:0,9,21'],
             'vat_lines.*.vat' => ['required', 'numeric', 'between:-9999999,9999999'],
+            // Verrekeningen: al ontvangen of ingehouden bedragen die het te
+            // betalen bedrag verlagen (niet de kosten of de voorbelasting).
+            'deductions' => ['nullable', 'array', 'max:10'],
+            'deductions.*.description' => ['required', 'string', 'max:190'],
+            'deductions.*.date' => ['nullable', 'date'],
+            'deductions.*.amount' => ['required', 'numeric', 'min:0.01'],
             'is_paid' => ['nullable', 'boolean'],
             'paid_at' => ['nullable', 'date', 'required_if:is_paid,true'],
             'payment_method' => ['nullable', 'in:bank_transfer,ideal,cash,card,direct_debit,other'],
@@ -433,6 +456,9 @@ class PurchaseInvoiceController extends Controller
             'invoice_date.required' => 'Vul de factuurdatum in.',
             'vat_lines.required' => 'Voeg minstens één bedragregel toe.',
             'vat_lines.*.base.required' => 'Vul het bedrag exclusief BTW in.',
+            'deductions.*.description.required' => 'Geef elke verrekening een omschrijving (bijv. "Ontvangen door deurwaarder").',
+            'deductions.*.amount.required' => 'Vul bij elke verrekening een bedrag in.',
+            'deductions.*.amount.min' => 'Vul bij elke verrekening een bedrag in.',
             'paid_at.required_if' => 'Vul de betaaldatum in.',
             'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
             'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
@@ -454,6 +480,15 @@ class PurchaseInvoiceController extends Controller
             $vatTotal += $vat;
         }
 
+        $deductions = [];
+        foreach ($data['deductions'] ?? [] as $d) {
+            $deductions[] = [
+                'description' => mb_substr(trim($d['description']), 0, 190),
+                'date' => $d['date'] ?? null,
+                'amount' => round((float) $d['amount'], 2),
+            ];
+        }
+
         $isPaid = (bool) ($data['is_paid'] ?? false);
 
         return [
@@ -469,8 +504,20 @@ class PurchaseInvoiceController extends Controller
             'vat_total' => round($vatTotal, 2),
             'total' => round($subtotal + $vatTotal, 2),
             'vat_lines' => $lines,
+            'deductions' => $deductions ?: null,
             'notes' => $data['notes'] ?? null,
         ];
+    }
+
+    /** Verrekeningen mogen samen nooit boven het factuurtotaal uitkomen. */
+    protected function deductionsError(array $data): ?string
+    {
+        $total = collect($data['vat_lines'])->sum(fn ($l) => (float) $l['base'] + (float) $l['vat']);
+        $deducted = collect($data['deductions'] ?? [])->sum(fn ($d) => (float) $d['amount']);
+
+        return $deducted > round($total, 2) + 0.009
+            ? 'De verrekeningen zijn samen hoger dan het factuurtotaal.'
+            : null;
     }
 
     protected function saveAttachments(Request $request, PurchaseInvoice $purchase): void

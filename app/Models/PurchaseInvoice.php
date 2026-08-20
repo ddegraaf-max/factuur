@@ -15,7 +15,7 @@ class PurchaseInvoice extends Model
     protected $fillable = [
         'company_id', 'supplier_name', 'supplier_reference', 'category',
         'invoice_date', 'due_date', 'status', 'paid_at', 'payment_method',
-        'subtotal', 'vat_total', 'total', 'vat_lines', 'notes',
+        'subtotal', 'vat_total', 'total', 'vat_lines', 'deductions', 'notes',
     ];
 
     protected $casts = [
@@ -26,6 +26,7 @@ class PurchaseInvoice extends Model
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',
         'vat_lines' => 'array',
+        'deductions' => 'array',
     ];
 
     protected static function booted(): void
@@ -49,6 +50,18 @@ class PurchaseInvoice extends Model
     public function scopeOpen(Builder $query): Builder
     {
         return $query->where('status', 'open');
+    }
+
+    /** Som van de verrekeningen (al ontvangen/ingehouden bedragen). */
+    public function getDeductionsTotalAttribute(): float
+    {
+        return round(collect($this->deductions ?? [])->sum(fn ($d) => (float) ($d['amount'] ?? 0)), 2);
+    }
+
+    /** Wat er daadwerkelijk nog betaald moet worden aan de leverancier. */
+    public function getPayableAttribute(): float
+    {
+        return round(max((float) $this->total - $this->deductions_total, 0), 2);
     }
 
     public function getIsOverdueAttribute(): bool

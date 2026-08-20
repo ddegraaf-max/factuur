@@ -28,7 +28,7 @@ class ReceiptScanService
      *
      * @param  string  $bytes     ruwe bestandsinhoud
      * @param  string  $mimeType  application/pdf, image/png, image/jpeg of image/webp
-     * @return array{supplier_name: ?string, supplier_reference: ?string, invoice_date: ?string, due_date: ?string, category: ?string, vat_lines: list<array{base: float, rate: float, vat: float}>, total_incl: ?float, notes: ?string, warning: ?string}
+     * @return array{supplier_name: ?string, supplier_reference: ?string, invoice_date: ?string, due_date: ?string, category: ?string, vat_lines: list<array{base: float, rate: float, vat: float}>, deductions: list<array{description: string, amount: float}>, total_incl: ?float, amount_due: ?float, notes: ?string, warning: ?string}
      *
      * @throws \DomainException met een nette Nederlandse melding voor de gebruiker
      */
@@ -139,9 +139,23 @@ class ReceiptScanService
                         ],
                     ],
                     'total_incl' => $nullable(['type' => 'number', 'description' => 'Totaalbedrag inclusief BTW zoals vermeld op het document.']),
+                    'deductions' => [
+                        'type' => 'array',
+                        'description' => 'Bedragen die volgens het document al zijn ontvangen, verrekend of in mindering gebracht op het te betalen bedrag (bijv. "reeds ontvangen", "betaald bij ons", door een deurwaarder ontvangen gelden, een aanbetaling of voorschot). GEEN kortingen — die horen in de grondslag. Leeg als er niets verrekend wordt.',
+                        'items' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'description' => ['type' => 'string', 'description' => 'Korte omschrijving, bijv. "Ontvangen door deurwaarder van debiteur".'],
+                                'amount' => ['type' => 'number', 'description' => 'Het verrekende bedrag (positief getal).'],
+                            ],
+                            'required' => ['description', 'amount'],
+                            'additionalProperties' => false,
+                        ],
+                    ],
+                    'amount_due' => $nullable(['type' => 'number', 'description' => 'Het bedrag dat volgens het document daadwerkelijk nog betaald moet worden ("door u te voldoen"), als dat expliciet vermeld staat.']),
                     'notes' => $nullable(['type' => 'string', 'description' => 'Korte omschrijving van de aankoop, één zin.']),
                 ],
-                'required' => ['is_invoice', 'supplier_name', 'supplier_reference', 'invoice_date', 'due_date', 'category', 'vat_lines', 'total_incl', 'notes'],
+                'required' => ['is_invoice', 'supplier_name', 'supplier_reference', 'invoice_date', 'due_date', 'category', 'vat_lines', 'total_incl', 'deductions', 'amount_due', 'notes'],
                 'additionalProperties' => false,
             ],
         ];
@@ -159,6 +173,13 @@ class ReceiptScanService
           Staat er alleen een totaal inclusief BTW, reken dan terug met het tarief.
         - Gebruik tarief 0 ook voor vrijgestelde, verlegde of buitenlandse BTW.
         - Kortingen en statiegeld verwerk je in de grondslag, niet als aparte regel.
+        - Vermeldt het document dat er al een bedrag is ontvangen of verrekend
+          (bijv. "reeds ontvangen", "betaald bij ons", "in mindering", door een
+          deurwaarder ontvangen gelden, of een aanbetaling)? Zet dat dan in
+          "deductions" met een korte omschrijving. Zulke ontvangsten horen NIET
+          in de vat_lines: de kosten en BTW blijven daar volledig staan.
+        - Staat er expliciet een nog te betalen bedrag ("door u te voldoen"),
+          vul dan amount_due in.
         - Datums als YYYY-MM-DD. Nederlandse notatie zoals "3 aug 2026" of
           "03-08-2026" betekent 2026-08-03 (dag-maand-jaar).
         - Wat niet op het document staat of onleesbaar is: null. Verzin niets.
@@ -207,6 +228,16 @@ class ReceiptScanService
             $category = null;
         }
 
+        // Verrekeningen: al ontvangen/ingehouden bedragen van het document.
+        $deductions = [];
+        foreach (is_array($json['deductions'] ?? null) ? $json['deductions'] : [] as $d) {
+            $amount = round((float) ($d['amount'] ?? 0), 2);
+            $label = $text($d['description'] ?? null, 190);
+            if ($amount > 0) {
+                $deductions[] = ['description' => $label ?? 'Reeds ontvangen/verrekend', 'amount' => $amount];
+            }
+        }
+
         // Controle: komt de som van de regels overeen met het totaal op de bon?
         $warning = null;
         $totalIncl = isset($json['total_incl']) && is_numeric($json['total_incl']) ? round((float) $json['total_incl'], 2) : null;
@@ -221,6 +252,20 @@ class ReceiptScanService
             }
         }
 
+        // Tweede controle: klopt "te betalen" met totaal minus verrekeningen?
+        $amountDue = isset($json['amount_due']) && is_numeric($json['amount_due']) ? round((float) $json['amount_due'], 2) : null;
+        if ($warning === null && $amountDue !== null) {
+            $sum = round(array_sum(array_map(fn ($l) => $l['base'] + $l['vat'], $lines)), 2);
+            $payable = round($sum - array_sum(array_column($deductions, 'amount')), 2);
+            if (abs($payable - $amountDue) > 0.05) {
+                $warning = sprintf(
+                    'Volgens de herkende bedragen is er € %s te betalen, maar het document vermeldt € %s — controleer de bedragen en verrekeningen.',
+                    number_format($payable, 2, ',', '.'),
+                    number_format($amountDue, 2, ',', '.')
+                );
+            }
+        }
+
         return [
             'supplier_name' => $text($json['supplier_name'] ?? null, 180),
             'supplier_reference' => $text($json['supplier_reference'] ?? null, 100),
@@ -228,7 +273,9 @@ class ReceiptScanService
             'due_date' => $date($json['due_date'] ?? null),
             'category' => $category,
             'vat_lines' => $lines,
+            'deductions' => $deductions,
             'total_incl' => $totalIncl,
+            'amount_due' => $amountDue,
             'notes' => $text($json['notes'] ?? null, 500),
             'warning' => $warning,
         ];

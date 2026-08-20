@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.23.0</div>
+        <h3>Verrekening op inkoopfacturen — "te betalen" klopt nu altijd</h3>
+        <ul class="tl-list">
+          <li><b>Al ontvangen bedragen verrekenen</b> — staat er op een inkoopfactuur een al ontvangen of ingehouden bedrag (bijv. door een deurwaarder ontvangen gelden, of een aanbetaling)? Zet het als verrekening op de factuur: je kosten en voorbelasting blijven volledig staan voor de BTW-aangifte, alleen het te betalen bedrag gaat omlaag.</li>
+          <li><b>Scan &amp; herken leest verrekeningen mee</b> — vermeldt het document "reeds ontvangen" of "door u te voldoen", dan vult de AI-herkenning de verrekening automatisch in en controleert of het te betalen bedrag klopt met het document.</li>
+          <li><b>Overal het juiste bedrag</b> — de openstaand-tellers, het crediteurenoverzicht en de CSV-export voor de boekhouder rekenen voortaan met het werkelijk te betalen bedrag (nieuwe kolommen "Verrekend" en "Te betalen").</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.22.0</div>
         <h3>Vijf nieuwe functies: van termijnfacturen tot een slimmer postvak</h3>
         <ul class="tl-list">

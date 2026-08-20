@@ -134,8 +134,15 @@ const previewAttachment = computed(() =>
               <span v-else class="pill pill-sent">Open</span>
             </div>
             <div class="pu-total">
-              <div class="pu-total-label">Totaal incl. BTW</div>
-              <div class="pu-total-value">{{ eur(purchase.total) }}</div>
+              <template v-if="purchase.deductions?.length">
+                <div class="pu-total-label">Te betalen</div>
+                <div class="pu-total-value">{{ eur(purchase.payable) }}</div>
+                <div class="pu-total-sub">Totaal incl. BTW {{ eur(purchase.total) }} − verrekend {{ eur(purchase.deductions_total) }}</div>
+              </template>
+              <template v-else>
+                <div class="pu-total-label">Totaal incl. BTW</div>
+                <div class="pu-total-value">{{ eur(purchase.total) }}</div>
+              </template>
             </div>
           </div>
 
@@ -183,6 +190,18 @@ const previewAttachment = computed(() =>
                 </tr>
               </tbody>
             </table>
+
+            <!-- Verrekeningen: al ontvangen/ingehouden bedragen -->
+            <div v-if="purchase.deductions?.length" class="pu-deductions">
+              <div v-for="(d, idx) in purchase.deductions" :key="idx" class="pu-ded-row">
+                <span>{{ d.description }}<template v-if="d.date_label"> ({{ d.date_label }})</template></span>
+                <span class="num">- {{ eur(d.amount) }}</span>
+              </div>
+              <div class="pu-ded-row pu-ded-payable">
+                <span>Te betalen</span>
+                <span class="num">{{ eur(purchase.payable) }}</span>
+              </div>
+            </div>
 
             <div class="pu-vat-note">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
@@ -318,6 +337,17 @@ const previewAttachment = computed(() =>
 .pu-table .right { text-align: right; }
 .pu-table .num { font-family: var(--font-mono); }
 .pu-table .total td { font-weight: 700; border-bottom: none; }
+
+.pu-total-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; font-family: var(--font-mono); }
+
+.pu-deductions { margin-top: 10px; border-top: 1px solid var(--border); }
+.pu-ded-row {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 9px 10px; font-size: 13.5px; color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+}
+.pu-ded-row .num { font-family: var(--font-mono); }
+.pu-ded-payable { font-weight: 700; color: var(--text); border-bottom: none; }
 
 .pu-vat-note {
   display: flex; align-items: center; gap: 9px;

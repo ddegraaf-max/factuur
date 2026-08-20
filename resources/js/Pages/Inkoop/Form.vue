@@ -40,6 +40,9 @@ const form = useForm({
   invoice_date: props.purchase?.invoice_date || today,
   due_date: props.purchase?.due_date || '',
   rows: initialRows(),
+  // Verrekeningen: al ontvangen of ingehouden bedragen (bijv. door een
+  // deurwaarder ontvangen gelden) — verlagen "te betalen", niet de kosten.
+  deductions: (props.purchase?.deductions || []).map(d => ({ ...d })),
   is_paid: props.purchase ? props.purchase.status === 'paid' : false,
   paid_at: props.purchase?.paid_at || today,
   payment_method: props.purchase?.payment_method || 'bank_transfer',
@@ -91,6 +94,23 @@ const totals = computed(() => {
     vat += c.vat;
   }
   return { base: round2(base), vat: round2(vat), total: round2(base + vat) };
+});
+
+/* ---------- Verrekeningen (al ontvangen / ingehouden) ---------- */
+const addDeduction = () => {
+  form.deductions.push({ description: 'Reeds ontvangen', date: form.invoice_date || today, amount: null });
+};
+const removeDeduction = (idx) => form.deductions.splice(idx, 1);
+
+const deductionsTotal = computed(() =>
+  round2(form.deductions.reduce((sum, d) => sum + (Number(d.amount) || 0), 0))
+);
+const payable = computed(() => round2(totals.value.total - deductionsTotal.value));
+
+const deductionError = computed(() => {
+  if (form.errors.deductions) return form.errors.deductions;
+  const key = Object.keys(form.errors).find(k => k.startsWith('deductions.'));
+  return key ? form.errors[key] : null;
 });
 
 /* ---------- Bestanden (foto / PDF) ---------- */
@@ -171,6 +191,13 @@ const applyScan = (r) => {
   if (r.notes && !form.notes) form.notes = r.notes;
   amountMode.value = 'excl';
   form.rows = r.vat_lines.map(l => ({ amount: Number(l.base), rate: Number(l.rate), vat: Number(l.vat) }));
+  // Herkende verrekeningen ("reeds ontvangen"): apart invullen zodat
+  // "te betalen" klopt met het document.
+  form.deductions = (r.deductions || []).map(d => ({
+    description: d.description,
+    date: r.invoice_date || today,
+    amount: Number(d.amount),
+  }));
 };
 
 // Postvak-item dat al automatisch is herkend: voorstel meteen invullen —
@@ -223,6 +250,11 @@ const submit = () => {
         const c = lineCalc(row);
         return { base: c.base, rate: Number(row.rate) || 0, vat: c.vat };
       }),
+      deductions: data.deductions.map(d => ({
+        description: d.description,
+        date: d.date || null,
+        amount: d.amount,
+      })),
       is_paid: data.is_paid,
       paid_at: data.is_paid ? data.paid_at : null,
       payment_method: data.is_paid ? data.payment_method : null,
@@ -350,6 +382,34 @@ const fileError = computed(() => {
               <div><span>Subtotaal excl. BTW</span><span class="num">{{ eur(totals.base) }}</span></div>
               <div><span>BTW (voorbelasting)</span><span class="num">{{ eur(totals.vat) }}</span></div>
               <div class="grand"><span>Totaal incl. BTW</span><span class="num">{{ eur(totals.total) }}</span></div>
+              <template v-if="deductionsTotal > 0">
+                <div style="color:var(--warning);"><span>Al ontvangen / verrekend</span><span class="num">- {{ eur(deductionsTotal) }}</span></div>
+                <div class="grand" style="border-top-width:1px;"><span>Te betalen</span><span class="num">{{ eur(payable) }}</span></div>
+              </template>
+            </div>
+
+            <div class="pf-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <span>Verrekening · al ontvangen</span>
+              <button type="button" class="btn btn-secondary btn-sm" @click="addDeduction">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Verrekening toevoegen
+              </button>
+            </div>
+            <p class="pf-hint" style="margin-bottom:10px;">
+              Staat er op de factuur al een ontvangen of ingehouden bedrag (bijv. door een deurwaarder ontvangen gelden of een aanbetaling)?
+              Zet het hier — je kosten en voorbelasting blijven volledig staan, alleen "te betalen" gaat omlaag.
+            </p>
+            <div v-if="deductionError" class="field-error" style="margin-bottom:8px;">{{ deductionError }}</div>
+            <div v-for="(ded, idx) in form.deductions" :key="idx" class="pf-ded-row">
+              <input type="text" v-model="ded.description" placeholder="Bijv. Ontvangen door deurwaarder" maxlength="190">
+              <input type="date" v-model="ded.date">
+              <input type="number" v-model="ded.amount" step="0.01" min="0.01" placeholder="0,00">
+              <button type="button" class="icon-btn" title="Verwijderen" @click="removeDeduction(idx)">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div v-if="deductionsTotal > totals.total + 0.009" class="field-error" style="margin-top:4px;">
+              De verrekeningen (€ {{ deductionsTotal.toFixed(2) }}) zijn samen hoger dan het factuurtotaal.
             </div>
 
             <div class="pf-section-title">Betaling</div>
@@ -513,6 +573,16 @@ const fileError = computed(() => {
 .pf-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 130px 32px; gap: 8px; align-items: center; }
 .pf-row-head { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); font-weight: 600; margin-bottom: -2px; }
 .pf-row input, .pf-row select { min-width: 0; }
+
+.pf-ded-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px 130px 32px;
+  gap: 8px; align-items: center; margin-bottom: 8px;
+}
+.pf-ded-row input { min-width: 0; }
+@media (max-width: 560px) {
+  .pf-ded-row { grid-template-columns: minmax(0, 1fr) 32px; }
+}
 
 .pf-totals { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; max-width: 340px; margin-left: auto; }
 .pf-totals > div { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13.5px; color: var(--text-2); }

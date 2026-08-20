@@ -94,6 +94,16 @@ class PurchaseInboxController extends Controller
             return back()->with('flash', 'Dit voorstel bevat geen bedragen — boek het in via "Controleer eerst".');
         }
 
+        // Herkende verrekeningen (bijv. "reeds ontvangen"): verlagen het te
+        // betalen bedrag, niet de kosten of de voorbelasting.
+        $deductions = collect($scan['deductions'] ?? [])
+            ->filter(fn ($d) => (float) ($d['amount'] ?? 0) > 0)
+            ->map(fn ($d) => [
+                'description' => mb_substr(trim($d['description'] ?? 'Reeds ontvangen/verrekend'), 0, 190),
+                'date' => $scan['invoice_date'] ?? null,
+                'amount' => round((float) $d['amount'], 2),
+            ])->values()->all();
+
         $purchase = \App\Models\PurchaseInvoice::create([
             'supplier_name' => $scan['supplier_name'] ?: 'Onbekende leverancier',
             'supplier_reference' => $scan['supplier_reference'] ?? null,
@@ -105,6 +115,7 @@ class PurchaseInboxController extends Controller
             'vat_total' => round($vatTotal, 2),
             'total' => round($subtotal + $vatTotal, 2),
             'vat_lines' => $lines,
+            'deductions' => $deductions ?: null,
             'notes' => trim(($scan['notes'] ?? '') . "\nAutomatisch herkend uit e-mail (Postvak IN)."),
         ]);
 
