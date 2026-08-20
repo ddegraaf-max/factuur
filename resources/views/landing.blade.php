@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10/maand incl. btw')
-@section('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW-aangifte, inkoop, klantenportaal en incasso vanaf € 12,10 per maand (incl. 21% btw).')
+@section('title', 'EasyInvoice — Van offerte tot geld op je rekening, voor € 12,10/maand incl. btw')
+@section('description', 'EasyInvoice — facturatie voor Nederlandse ondernemers. Offertes digitaal laten ondertekenen, facturen met iDEAL en QR, meerdere handelsnamen, strippenkaarten, urenregistratie en BTW-overzicht — alles voor € 12,10 per maand (incl. 21% btw).')
 
 @section('content')
 
@@ -153,7 +153,7 @@
     <div class="eyebrow">Voor Nederlandse ondernemers</div>
     <h1>Facturatie <span class="accent">zonder gedoe.</span></h1>
     <p class="hero-sub">
-      Stuur facturen, beheer je klanten en houd je BTW automatisch bij. Speciaal voor ZZP'ers en MKB — voor <b style="color:var(--text);font-weight:600;">maar € 12,10 per maand (incl. 21% btw)</b>.
+      Van offerte tot geld op je rekening: je klant ondertekent digitaal, betaalt met iDEAL of QR-code, en je BTW wordt automatisch bijgehouden. Alles zit erin — voor <b style="color:var(--text);font-weight:600;">maar € 12,10 per maand (incl. 21% btw)</b>.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -454,6 +454,44 @@
   </div>
 </section>
 
+<!-- WAAROM EASYINVOICE: de drie troeven -->
+<section class="section" id="waarom">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow" style="margin-bottom:16px;">Waarom EasyInvoice</div>
+      <h2>Drie dingen die je bij anderen niet vindt.</h2>
+      <p>Facturen sturen kan overal. Dit is waar EasyInvoice écht het verschil maakt.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="info-card">
+        <div class="ic-emoji">🏷️</div>
+        <h3>Meerdere handelsnamen én administraties — één inlog, één prijs</h3>
+        <p>Bij andere pakketten betekent een tweede handelsnaam of een tweede bedrijf: een tweede abonnement.
+        Bij EasyInvoice beheer je meerdere administraties (elk met eigen KvK en nummering) onder één inlog,
+        en verstuur je binnen één administratie facturen en offertes onder verschillende handelsnamen —
+        elk met eigen logo, kleur en sjabloon. Zonder meerprijs.</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-emoji">🎟️</div>
+        <h3>Strippenkaarten: urenbundels die zichzelf aftellen</h3>
+        <p>Verkoop een bundel van bijvoorbeeld 10 uur, factureer 'm met één klik, en elke geschreven werksessie
+        telt automatisch af van het tegoed — jij en je klant zien altijd wat er nog openstaat.
+        Coaches, therapeuten en consultants houden dit nu bij in Excel náást hun factuurpakket;
+        hier zit het er gewoon in. Geen enkel ander Nederlands pakket doet dit.</p>
+      </div>
+      <div class="info-card">
+        <div class="ic-emoji">✍️</div>
+        <h3>Van ondertekende offerte tot geld op je rekening</h3>
+        <p>Je klant ondertekent de offerte digitaal in het portaal — rechtsgeldig, met bewijsdossier.
+        Daarna factureer je in één keer of in termijnen (30% vooraf, 70% bij oplevering), betaalt je klant
+        met de iDEAL-link of de QR-code op de factuur, en gaan herinneringen en zonodig incasso vanzelf.
+        Eén doorlopende keten, zonder losse tekentool of betaaldienst ertussen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FEATURES -->
 <section class="section section-alt" id="functies">
   <div class="container">
@@ -492,8 +530,8 @@
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         </div>
-        <div class="feature-title">Inkoop met een foto</div>
-        <div class="feature-desc">Boek inkoopfacturen in met een foto van de bon — de BTW telt automatisch mee als voorbelasting in je aangifte.</div>
+        <div class="feature-title">Inkoop die zichzelf inboekt</div>
+        <div class="feature-desc">Forward bonnen naar je eigen inboek-adres: de AI herkent leverancier, datum en bedragen en jij bevestigt met één klik. De BTW telt automatisch mee als voorbelasting.</div>
       </div>
 
       <div class="feature-card">
@@ -506,18 +544,18 @@
 
       <div class="feature-card">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
-        <div class="feature-title">Klantenbeheer</div>
-        <div class="feature-desc">Volledige klantadministratie inclusief KVK-, BTW- en IBAN-gegevens. Onderscheid tussen zakelijk en particulier.</div>
+        <div class="feature-title">Uren, strippenkaarten &amp; kilometers</div>
+        <div class="feature-desc">Schrijf uren met de timer, verkoop vooraf betaalde urenbundels die automatisch aftellen, en belast ritten door — alles met één klik op een factuur.</div>
       </div>
 
       <div class="feature-card">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
         </div>
-        <div class="feature-title">Creditnota's</div>
-        <div class="feature-desc">Volledig of gedeeltelijk crediteren met eigen nummerreeks — voldoet aan alle Nederlandse boekhoudregels.</div>
+        <div class="feature-title">Offertes: ondertekend &amp; in termijnen</div>
+        <div class="feature-desc">Je klant tekent digitaal in het portaal — rechtsgeldig, met bewijsdossier. Daarna factureer je in één keer of in termijnen, met iDEAL-link en QR op de factuur.</div>
       </div>
 
       <div class="feature-card">
@@ -551,11 +589,11 @@
     <div class="pricing-wrap">
       <div class="pricing-lead">
         <h2>Waarom zou je meer betalen?</h2>
-        <p>Andere boekhoudpakketten vragen €8 tot €25 per maand voor functies die jij waarschijnlijk niet gebruikt. EasyInvoice geeft je alleen wat je echt nodig hebt — voor een fractie van de prijs.</p>
+        <p>Bij andere pakketten zijn dit betaalde extra's of duurdere bundels: digitaal ondertekenen, een tweede handelsnaam, een tweede administratie, AI-bonherkenning, e-facturatie. Bij EasyInvoice zit álles in één vaste lage prijs — geen add-ons, geen verrassingen.</p>
         <ul class="pricing-lead-points">
-          <li>Onbeperkt facturen versturen</li>
-          <li>Onbeperkt klanten en producten</li>
-          <li>Alle functies vanaf dag één</li>
+          <li>Meerdere administraties én handelsnamen inbegrepen</li>
+          <li>Onbeperkt facturen, offertes, klanten en producten</li>
+          <li>Alle functies vanaf dag één — geen bundels</li>
           <li>Persoonlijke ondersteuning</li>
           <li>Maandelijks opzegbaar</li>
         </ul>
@@ -571,18 +609,18 @@
         </div>
         <div class="pricing-vat">Excl. 21% BTW · €12,10 incl. BTW</div>
         <ul class="pricing-features">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt facturen en creditnota's</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt klanten en producten</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Eigen huisstijl op factuur en PDF</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt facturen, offertes en creditnota's</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Meerdere administraties én handelsnamen</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Offertes digitaal laten ondertekenen + termijnfacturen</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Betaald worden met iDEAL-link en QR-code</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Urenregistratie, strippenkaarten en kilometers</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Klantenportaal met inzagelog</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-aangifte per kwartaal incl. voorbelasting</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Inkoopfacturen inboeken (ook met foto)</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gratis extra gebruikers met eigen rollen</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Automatische herinneringen en aanmaningen</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Incasso via Armaere Gerechtsdeurwaarders</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-assistent EASY</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Tweestapsverificatie en beveiliging</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Persoonlijke support per e-mail</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-overzicht, jaaroverzicht en cashflow-prognose</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Inkoop met AI-herkenning en eigen inboek-adres</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Automatische herinneringen, aanmaningen en incasso</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>E-facturatie: UBL en Peppol</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gratis extra gebruikers en je boekhouder</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-assistent EASY · 2FA · persoonlijke support</li>
         </ul>
         <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Start 14 dagen gratis</a>
         <div class="pricing-fineprint">Geen creditcard nodig · Opzeggen wanneer je wil</div>
@@ -627,7 +665,7 @@
 
       <div class="testimonial">
         <div class="testimonial-quote-mark">"</div>
-        <div class="testimonial-text">EASY weet altijd hoe het ervoor staat met mijn administratie. "Hoeveel staat er open?" — boem, antwoord. BTW-deadline? EASY waarschuwt. Bijna alsof ik een boekhouder heb.</div>
+        <div class="testimonial-text">Ik verkoop strippenkaarten van tien sessies. Vroeger: factuurtool plus een Excel om het tegoed bij te houden. Nu factureer ik de bundel met één klik en telt elke sessie vanzelf af — mijn klanten zien precies wat er nog openstaat.</div>
         <div class="testimonial-author">
           <div class="testimonial-avatar">TP</div>
           <div>
