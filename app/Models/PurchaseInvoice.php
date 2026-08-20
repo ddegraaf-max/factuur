@@ -52,6 +52,42 @@ class PurchaseInvoice extends Model
         return $query->where('status', 'open');
     }
 
+    /**
+     * Zoek een waarschijnlijk al ingeboekte dubbel: eerst op het factuurnummer
+     * van de leverancier (sterk signaal), anders op leverancier + totaalbedrag.
+     * Werkt binnen de company-scope van de ingelogde gebruiker.
+     */
+    public static function findLikelyDuplicate(?string $reference, ?string $supplier, ?float $totalIncl): ?self
+    {
+        if (filled($reference)) {
+            $match = static::whereRaw('LOWER(supplier_reference) = ?', [mb_strtolower(trim($reference))])
+                ->latest('id')->first();
+            if ($match) {
+                return $match;
+            }
+        }
+
+        if (filled($supplier) && $totalIncl > 0) {
+            return static::whereRaw('LOWER(supplier_name) = ?', [mb_strtolower(trim($supplier))])
+                ->where('total', round($totalIncl, 2))
+                ->latest('id')->first();
+        }
+
+        return null;
+    }
+
+    /** Waarschuwingstekst wanneer deze factuur als mogelijke dubbel is gevonden. */
+    public function duplicateWarningText(): string
+    {
+        return sprintf(
+            'Let op: deze factuur lijkt al ingeboekt — %s van %s (%s, € %s incl. btw).',
+            $this->supplier_reference ? "factuurnummer {$this->supplier_reference}" : 'een factuur',
+            $this->supplier_name,
+            $this->invoice_date->format('d-m-Y'),
+            number_format((float) $this->total, 2, ',', '.')
+        );
+    }
+
     /** Som van de verrekeningen (al ontvangen/ingehouden bedragen). */
     public function getDeductionsTotalAttribute(): float
     {

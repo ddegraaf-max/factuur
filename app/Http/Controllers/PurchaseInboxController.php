@@ -26,31 +26,50 @@ class PurchaseInboxController extends Controller
             ->paginate(25)
             ->withQueryString();
 
-        $items->getCollection()->transform(fn ($i) => [
-            'id' => $i->id,
-            'from_email' => $i->from_email,
-            'subject' => $i->subject,
-            'filename' => $i->filename,
-            'is_image' => $i->isImage(),
-            'size_label' => $i->size_bytes < 1048576
-                ? round($i->size_bytes / 1024) . ' KB'
-                : round($i->size_bytes / 1048576, 1) . ' MB',
-            'status' => $i->status,
-            'received_label' => $i->received_at->translatedFormat('j M Y, H:i'),
-            'purchase_invoice_id' => $i->purchase_invoice_id,
-            'purchase_supplier' => $i->purchaseInvoice?->supplier_name,
-            // Boekingsvoorstel uit de automatische herkenning (of de foutmelding).
-            'scanned' => $i->scanned_at !== null,
-            'scan_error' => $i->scan_error,
-            'proposal' => $i->scan ? [
-                'supplier_name' => $i->scan['supplier_name'] ?? null,
-                'invoice_date' => $i->scan['invoice_date'] ?? null,
-                'category' => $i->scan['category'] ?? null,
-                'total_incl' => round(collect($i->scan['vat_lines'] ?? [])
-                    ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2),
-                'warning' => $i->scan['warning'] ?? null,
-            ] : null,
-        ]);
+        $items->getCollection()->transform(function ($i) {
+            $proposal = null;
+            if ($i->scan) {
+                $totalIncl = round(collect($i->scan['vat_lines'] ?? [])
+                    ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2);
+
+                // Dubbelcontrole: lijkt dit voorstel op een al ingeboekte factuur?
+                $dupe = $i->status === 'pending'
+                    ? \App\Models\PurchaseInvoice::findLikelyDuplicate(
+                        $i->scan['supplier_reference'] ?? null,
+                        $i->scan['supplier_name'] ?? null,
+                        $totalIncl
+                    )
+                    : null;
+
+                $proposal = [
+                    'supplier_name' => $i->scan['supplier_name'] ?? null,
+                    'invoice_date' => $i->scan['invoice_date'] ?? null,
+                    'category' => $i->scan['category'] ?? null,
+                    'total_incl' => $totalIncl,
+                    'warning' => trim(($dupe ? $dupe->duplicateWarningText() . ' ' : '') . ($i->scan['warning'] ?? '')) ?: null,
+                    'duplicate' => (bool) $dupe,
+                ];
+            }
+
+            return [
+                'id' => $i->id,
+                'from_email' => $i->from_email,
+                'subject' => $i->subject,
+                'filename' => $i->filename,
+                'is_image' => $i->isImage(),
+                'size_label' => $i->size_bytes < 1048576
+                    ? round($i->size_bytes / 1024) . ' KB'
+                    : round($i->size_bytes / 1048576, 1) . ' MB',
+                'status' => $i->status,
+                'received_label' => $i->received_at->translatedFormat('j M Y, H:i'),
+                'purchase_invoice_id' => $i->purchase_invoice_id,
+                'purchase_supplier' => $i->purchaseInvoice?->supplier_name,
+                // Boekingsvoorstel uit de automatische herkenning (of de foutmelding).
+                'scanned' => $i->scanned_at !== null,
+                'scan_error' => $i->scan_error,
+                'proposal' => $proposal,
+            ];
+        });
 
         $company = $request->user()->company;
 
@@ -79,6 +98,20 @@ class PurchaseInboxController extends Controller
         abort_unless($item->status === 'pending' && is_array($item->scan), 404);
 
         $scan = $item->scan;
+
+        // Dubbelcontrole: met één klik een dubbele boeking maken is te riskant.
+        // Via "Controleer eerst" kan het alsnog, bewust.
+        $totalIncl = round(collect($scan['vat_lines'] ?? [])
+            ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2);
+        $dupe = \App\Models\PurchaseInvoice::findLikelyDuplicate(
+            $scan['supplier_reference'] ?? null,
+            $scan['supplier_name'] ?? null,
+            $totalIncl
+        );
+        if ($dupe) {
+            return back()->with('flash', 'Niet direct ingeboekt. ' . $dupe->duplicateWarningText()
+                . ' Wil je hem tóch inboeken, gebruik dan "Controleer eerst".');
+        }
 
         $lines = [];
         $subtotal = 0.0;

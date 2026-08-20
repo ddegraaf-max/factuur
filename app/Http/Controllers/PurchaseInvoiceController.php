@@ -128,6 +128,18 @@ class PurchaseInvoiceController extends Controller
         if ($request->filled('inbox')) {
             $item = \App\Models\PurchaseInboxItem::where('status', 'pending')->find($request->integer('inbox'));
             if ($item) {
+                // Dubbelcontrole op het herkende voorstel: staat deze factuur er al in?
+                $dupe = null;
+                if (is_array($item->scan)) {
+                    $totalIncl = round(collect($item->scan['vat_lines'] ?? [])
+                        ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2);
+                    $dupe = \App\Models\PurchaseInvoice::findLikelyDuplicate(
+                        $item->scan['supplier_reference'] ?? null,
+                        $item->scan['supplier_name'] ?? null,
+                        $totalIncl
+                    );
+                }
+
                 $inboxItem = [
                     'id' => $item->id,
                     'filename' => $item->filename,
@@ -137,6 +149,7 @@ class PurchaseInvoiceController extends Controller
                     'url' => route('purchases.inbox.file', $item),
                     // Al automatisch herkend? Dan vult het formulier zich voor.
                     'scan' => $item->scan,
+                    'duplicate_warning' => $dupe?->duplicateWarningText(),
                 ];
             }
         }
@@ -333,6 +346,19 @@ class PurchaseInvoiceController extends Controller
         }
 
         \App\Models\AiUsageEvent::record($request->user()->company_id, 'receipt_scan', 'form');
+
+        // Dubbelcontrole: staat deze factuur er al in? Dan waarschuwen we —
+        // inboeken blijft mogelijk (soms is een dubbel nummer legitiem).
+        $totalIncl = round(collect($result['vat_lines'] ?? [])
+            ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2);
+        $dupe = PurchaseInvoice::findLikelyDuplicate(
+            $result['supplier_reference'] ?? null,
+            $result['supplier_name'] ?? null,
+            $totalIncl
+        );
+        if ($dupe) {
+            $result['warning'] = trim($dupe->duplicateWarningText() . ' ' . ($result['warning'] ?? ''));
+        }
 
         return response()->json(['result' => $result]);
     }

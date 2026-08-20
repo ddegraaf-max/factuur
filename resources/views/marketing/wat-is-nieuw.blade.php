@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.30.0</div>
+        <h3>Dubbelcontrole op inkoopfacturen</h3>
+        <ul class="tl-list">
+          <li><b>Nooit meer per ongeluk dubbel boeken</b> — bij het scannen van een bon of factuur controleert EasyInvoice automatisch of hij al in je administratie staat (op factuurnummer, of op leverancier + bedrag). Je krijgt dan een duidelijke waarschuwing op het formulier én op het kaartje in het Postvak IN.</li>
+          <li><b>"Direct inboeken" beschermt je</b> — een vermoedelijke dubbel boek je niet met één klik in; via "Controleer eerst" kan het bewust alsnog.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.28.0</div>
         <h3>Bijlagen bij offertes — ook rechtstreeks vanuit Claude</h3>
         <ul class="tl-list">

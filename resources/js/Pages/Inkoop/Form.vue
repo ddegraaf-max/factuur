@@ -207,7 +207,10 @@ onMounted(() => {
   if (!isEdit.value && props.inbox_item?.scan?.vat_lines?.length) {
     applyScan(props.inbox_item.scan);
     scanNotice.value = 'Automatisch herkend uit je Postvak IN — controleer de gegevens even voor je opslaat.';
-    scanWarning.value = props.inbox_item.scan.warning || '';
+    scanWarning.value = [props.inbox_item.duplicate_warning, props.inbox_item.scan.warning]
+      .filter(Boolean).join(' ');
+  } else if (!isEdit.value && props.inbox_item?.duplicate_warning) {
+    scanWarning.value = props.inbox_item.duplicate_warning;
   }
 });
 

@@ -47,25 +47,33 @@ class QuoteTextScanService
 
         $client = new Client(apiKey: config('services.anthropic.key'));
 
-        try {
-            $message = $client->beta->messages->create(
-                model: config('services.anthropic.model'),
-                maxTokens: 16000,
-                outputConfig: [
-                    'format' => $this->outputFormat(),
-                    'effort' => 'medium',
+        $model = (string) config('services.anthropic.model');
+        $params = [
+            'model' => $model,
+            'maxTokens' => 16000,
+            'outputConfig' => [
+                'format' => $this->outputFormat(),
+                'effort' => 'medium',
+            ],
+            'messages' => [[
+                'role' => 'user',
+                'content' => [
+                    ['type' => 'text', 'text' => $this->prompt()],
+                    ['type' => 'text', 'text' => "=== OFFERTETEKST ===\n" . $text],
                 ],
-                fallbacks: 'default',
-                betas: ['server-side-fallback-2026-07-01'],
-                messages: [[
-                    'role' => 'user',
-                    'content' => [
-                        ['type' => 'text', 'text' => $this->prompt()],
-                        ['type' => 'text', 'text' => "=== OFFERTETEKST ===\n" . $text],
-                    ],
-                ]],
-                requestOptions: ['timeout' => 150],
-            );
+            ]],
+            'requestOptions' => ['timeout' => 150],
+        ];
+
+        // De fallbacks-parameter bestaat alleen op Opus 5/Fable — andere
+        // modellen (Sonnet, Haiku) geven er een 400 op.
+        if (str_contains($model, 'opus-5') || str_contains($model, 'fable') || str_contains($model, 'mythos')) {
+            $params['fallbacks'] = 'default';
+            $params['betas'] = ['server-side-fallback-2026-07-01'];
+        }
+
+        try {
+            $message = $client->beta->messages->create(...$params);
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error('Offerteherkenning: ongeldige Anthropic API-key', ['error' => $e->getMessage()]);
             throw new \DomainException('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).');
