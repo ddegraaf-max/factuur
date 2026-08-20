@@ -9,7 +9,8 @@ const props = defineProps({
   purchase: Object,     // null bij nieuw
   suppliers: Array,     // eerder gebruikte leveranciersnamen (autocomplete)
   categories: Array,
-  scan_enabled: Boolean, // bonnetjes scannen met AI (alleen met ANTHROPIC_API_KEY)
+  scan_enabled: Boolean, // bonnetjes scannen met AI (Slim-abonnement + API-key)
+  scan_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
   inbox_item: Object,   // aangeleverd bestand uit het Postvak IN (of null)
 });
 
@@ -492,6 +493,15 @@ const fileError = computed(() => {
                 </button>
                 <span class="pf-scan-hint">De gegevens en bedragen worden automatisch ingevuld — jij controleert ze.</span>
               </div>
+              <!-- Upgradehint: de scan zit in het Slim-abonnement -->
+              <div v-if="scan_locked" class="pf-scan">
+                <span class="pf-scan-hint">
+                  <b>Scan &amp; herken</b> leest je bon of factuur en vult dit formulier automatisch in —
+                  onderdeel van het <b>Slim</b>-abonnement.
+                  <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+                </span>
+              </div>
+
               <div v-if="scanNotice" class="pf-scan-msg pf-scan-ok">{{ scanNotice }}</div>
               <div v-if="scanWarning" class="pf-scan-msg pf-scan-warn">{{ scanWarning }}</div>
               <div v-if="scanError" class="field-error" style="margin-top:8px;">{{ scanError }}</div>

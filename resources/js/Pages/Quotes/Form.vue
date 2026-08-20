@@ -14,7 +14,8 @@ const props = defineProps({
   default_valid_days: { type: Number, default: 30 },
   preselect_customer_id: { type: [String, Number], default: null },
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
-  ai_enabled: Boolean, // "offerte uit tekst" (alleen met ANTHROPIC_API_KEY)
+  ai_enabled: Boolean, // "offerte uit tekst" (Slim-abonnement + API-key)
+  ai_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
 });
 
 const isEdit = computed(() => !!props.quote);
@@ -279,6 +280,15 @@ const submit = (action) => {
             <div v-if="aiNotice" class="ai-msg ai-ok">{{ aiNotice }}</div>
             <div v-if="aiWarning" class="ai-msg ai-warn">{{ aiWarning }}</div>
             <div v-if="aiError" class="field-error" style="margin-top:8px;">{{ aiError }}</div>
+          </div>
+        </div>
+
+        <!-- Upgradehint: offerte uit tekst zit in het Slim-abonnement -->
+        <div v-if="ai_locked" class="card" style="margin-bottom:16px;">
+          <div class="card-body" style="font-size:13px;color:var(--text-2);line-height:1.6;">
+            <b>Offerte uit tekst</b> — plak een offerte die je (bijv. met Claude) schreef en het formulier vult zich automatisch in.
+            Onderdeel van het <b>Slim</b>-abonnement.
+            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
           </div>
         </div>
 

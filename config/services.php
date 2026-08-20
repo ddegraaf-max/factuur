@@ -15,7 +15,11 @@ return [
     'stripe' => [
         'secret' => env('STRIPE_SECRET'),
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+        // Basis-abonnement (€10/maand excl. btw) — bestaande variabele.
         'price_id' => env('STRIPE_PRICE_ID'),
+        // Slim-abonnement (€17,50/maand excl. btw, met AI-functies). Zonder
+        // deze variabele is alleen Basis af te sluiten.
+        'price_id_slim' => env('STRIPE_PRICE_ID_SLIM'),
     ],
     'turnstile' => [
         'sitekey' => env('TURNSTILE_SITEKEY'),

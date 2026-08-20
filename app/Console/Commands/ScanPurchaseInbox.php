@@ -31,13 +31,17 @@ class ScanPurchaseInbox extends Command
         }
 
         // Demo-omgevingen slaan we over: die mogen geen AI-kosten maken.
+        // Alleen administraties met AI-toegang (Slim, proef of vrijgesteld)
+        // krijgen automatische boekingsvoorstellen.
         $items = PurchaseInboxItem::query()
+            ->with('company')
             ->where('status', 'pending')
             ->whereNull('scanned_at')
             ->whereHas('company', fn ($q) => $q->where('is_demo', false))
             ->orderBy('received_at')
             ->limit(max(1, (int) $this->option('limit')))
-            ->get();
+            ->get()
+            ->filter(fn ($item) => $item->company?->hasAiAccess());
 
         $done = 0;
         foreach ($items as $item) {

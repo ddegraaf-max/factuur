@@ -64,7 +64,7 @@ class PurchaseInboxController extends Controller
             // Zonder inboekdomein (env) toont de pagina de activatie-uitleg.
             'inbound_address' => $company->inboundAddress(),
             'configured' => filled(config('services.inbound.domain')) && filled(config('services.inbound.secret')),
-            'scan_enabled' => app(\App\Services\ReceiptScanService::class)->enabled(),
+            'scan_enabled' => app(\App\Services\ReceiptScanService::class)->availableFor($company),
         ]);
     }
 

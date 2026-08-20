@@ -141,11 +141,16 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
+        $scanner = app(ReceiptScanService::class);
+        $company = $request->user()->company;
+
         return Inertia::render('Inkoop/Form', [
             'purchase' => null,
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::CATEGORIES,
-            'scan_enabled' => app(ReceiptScanService::class)->enabled(),
+            'scan_enabled' => $scanner->availableFor($company),
+            // De functie bestaat wél, maar zit in het Slim-abonnement: toon een upgradehint.
+            'scan_locked' => $scanner->enabled() && ! $company->hasAiAccess(),
             'inbox_item' => $inboxItem,
         ]);
     }
@@ -210,9 +215,11 @@ class PurchaseInvoiceController extends Controller
         ]);
     }
 
-    public function edit(PurchaseInvoice $purchase): Response
+    public function edit(Request $request, PurchaseInvoice $purchase): Response
     {
         $purchase->load('attachments');
+        $scanner = app(ReceiptScanService::class);
+        $company = $request->user()->company;
 
         return Inertia::render('Inkoop/Form', [
             'purchase' => array_merge($purchase->toArray(), [
@@ -228,7 +235,8 @@ class PurchaseInvoiceController extends Controller
             ]),
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::CATEGORIES,
-            'scan_enabled' => app(ReceiptScanService::class)->enabled(),
+            'scan_enabled' => $scanner->availableFor($company),
+            'scan_locked' => $scanner->enabled() && ! $company->hasAiAccess(),
         ]);
     }
 
@@ -285,6 +293,12 @@ class PurchaseInvoiceController extends Controller
     public function scan(Request $request, ReceiptScanService $scanner): JsonResponse
     {
         abort_unless($scanner->enabled(), 404);
+
+        if (! $request->user()->company->hasAiAccess()) {
+            return response()->json([
+                'message' => 'Scan & herken zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.',
+            ], 403);
+        }
 
         $request->validate([
             'file' => ['required_without:inbox_id', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],

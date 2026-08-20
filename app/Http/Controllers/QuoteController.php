@@ -83,6 +83,12 @@ class QuoteController extends Controller
     {
         abort_unless($scanner->enabled(), 404);
 
+        if (! $request->user()->company->hasAiAccess()) {
+            return response()->json([
+                'message' => 'Offerte uit tekst zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.',
+            ], 403);
+        }
+
         $data = $request->validate([
             'text' => ['required', 'string', 'max:20000'],
         ], [
@@ -291,8 +297,9 @@ class QuoteController extends Controller
             'price_mode' => $company?->price_mode ?? 'excl',
             'default_valid_days' => $company?->quote_valid_days ?? 30,
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
-            // "Offerte uit tekst" (AI) — zelfde schakelaar als de bonherkenning.
-            'ai_enabled' => app(\App\Services\QuoteTextScanService::class)->enabled(),
+            // "Offerte uit tekst" (AI) — Slim-abonnement (of proef/demo/vrijgesteld).
+            'ai_enabled' => app(\App\Services\QuoteTextScanService::class)->availableFor($company),
+            'ai_locked' => app(\App\Services\QuoteTextScanService::class)->enabled() && $company !== null && ! $company->hasAiAccess(),
         ];
     }
 

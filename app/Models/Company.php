@@ -26,6 +26,7 @@ class Company extends Model
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
         'subscription_status', 'subscription_ends_at', 'subscription_cancel_emailed_at',
         'stripe_customer_id', 'stripe_subscription_id',
+        'plan', 'is_exempt',
     ];
 
     /**
@@ -41,6 +42,7 @@ class Company extends Model
     protected $casts = [
         'mollie_api_key' => 'encrypted',
         'is_demo' => 'boolean',
+        'is_exempt' => 'boolean',
         'demo_expires_at' => 'datetime',
         'default_payment_terms' => 'integer',
         'quote_valid_days' => 'integer',
@@ -183,10 +185,23 @@ class Company extends Model
             && $this->trial_ends_at->isFuture();
     }
 
-    /** Heeft toegang tot de app (proef of betaald). */
+    /** Heeft toegang tot de app (vrijgesteld, proef of betaald). */
     public function hasAccess(): bool
     {
-        return $this->onTrial() || $this->subscriptionActive();
+        return $this->is_exempt || $this->onTrial() || $this->subscriptionActive();
+    }
+
+    /**
+     * Toegang tot de AI-functies (bonherkenning, offerte uit tekst, Postvak
+     * IN-voorstellen). Zit in het Slim-abonnement; tijdens de proefperiode en
+     * in de demo mag alles, zodat mensen de functies kunnen ervaren.
+     */
+    public function hasAiAccess(): bool
+    {
+        return $this->is_exempt
+            || $this->is_demo
+            || $this->onTrial()
+            || ($this->subscriptionActive() && $this->plan === 'slim');
     }
 
     /** Tot wanneer loopt de toegang (proef of abonnement). */
@@ -213,9 +228,12 @@ class Company extends Model
         return (int) ceil(now()->floatDiffInDays($end));
     }
 
-    /** Status voor de UI: 'trialing' | 'active' | 'expired'. */
+    /** Status voor de UI: 'exempt' | 'trialing' | 'active' | 'expired'. */
     public function accessStatus(): string
     {
+        if ($this->is_exempt) {
+            return 'exempt';
+        }
         if ($this->subscriptionActive()) {
             return 'active';
         }
@@ -237,6 +255,9 @@ class Company extends Model
             'on_trial' => $this->onTrial(),
             'stripe_status' => $this->subscription_status,
             'has_subscription' => $this->subscription_ends_at !== null,
+            'plan' => $this->plan ?? 'basis',
+            'is_exempt' => (bool) $this->is_exempt,
+            'has_ai' => $this->hasAiAccess(),
         ];
     }
 }

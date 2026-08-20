@@ -22,11 +22,35 @@ class BillingController extends Controller
 
         return Inertia::render('Billing/Index', [
             'subscription' => $company->subscriptionSummary(),
-            'price' => [
-                'amount' => '10',
-                'currency' => '€',
-                'period' => 'maand',
-                'vat_note' => 'Excl. 21% btw · €12,10 incl. btw',
+            'plans' => [
+                [
+                    'key' => 'basis',
+                    'name' => 'Basis',
+                    'amount' => '10',
+                    'vat_note' => 'Excl. 21% btw · € 12,10 incl. btw',
+                    'tagline' => 'Alles om te factureren en je administratie bij te houden.',
+                    'features' => [
+                        'Onbeperkt facturen, offertes, klanten en producten',
+                        'BTW-overzicht, herinneringen, incasso en klantenportaal',
+                        'Inkoop, uren, ritten en jaaroverzicht',
+                        'Maandelijks opzegbaar',
+                    ],
+                    'available' => $this->stripe->configured(),
+                ],
+                [
+                    'key' => 'slim',
+                    'name' => 'Slim',
+                    'amount' => '17,50',
+                    'vat_note' => 'Excl. 21% btw · € 21,18 incl. btw',
+                    'tagline' => 'Alles uit Basis, plus de AI-assistent die werk uit handen neemt.',
+                    'features' => [
+                        'Alles uit Basis',
+                        'Scan & herken: bonnen en inkoopfacturen automatisch ingevuld',
+                        'Postvak IN met automatische boekingsvoorstellen',
+                        'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',
+                    ],
+                    'available' => $this->stripe->slimConfigured(),
+                ],
             ],
             'stripeReady' => $this->stripe->configured(),
         ]);
@@ -36,8 +60,14 @@ class BillingController extends Controller
     {
         $company = $request->user()->company;
 
-        if (! $this->stripe->configured()) {
+        $plan = $request->input('plan') === 'slim' ? 'slim' : 'basis';
+
+        if (! $this->stripe->configured() || ($plan === 'slim' && ! $this->stripe->slimConfigured())) {
             return back()->with('error', 'Betalen is nog niet beschikbaar. Probeer het later opnieuw.');
+        }
+
+        if ($company->is_exempt) {
+            return back()->with('flash', 'Dit account is vrijgesteld — je hoeft geen abonnement af te sluiten.');
         }
 
         // Wordt er tijdens de proefperiode afgesloten, laat Stripe dan pas
@@ -53,6 +83,7 @@ class BillingController extends Controller
                 route('billing.success').'?session_id={CHECKOUT_SESSION_ID}',
                 route('billing.show'),
                 $trialEnd,
+                $plan,
             );
         } catch (\Throwable $e) {
             Log::error('Stripe checkout aanmaken mislukt', ['error' => $e->getMessage(), 'company' => $company->id]);

@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
   subscription: Object,
-  price: Object,
+  plans: Array,
   stripeReady: Boolean,
 });
 
@@ -27,20 +27,29 @@ const endsAtLabel = computed(() => {
 });
 
 const statusMeta = computed(() => {
+  if (status.value === 'exempt') {
+    return { pill: 'Vrijgesteld', cls: 'ok', note: 'Dit account is vrijgesteld — je hebt altijd volledige toegang tot alles, inclusief de AI-functies.' };
+  }
   if (status.value === 'active') {
     return { pill: 'Actief abonnement', cls: 'ok', note: 'Je abonnement is actief.' };
   }
   if (status.value === 'trialing') {
-    return { pill: 'Proefperiode', cls: 'trial', note: 'Je zit in de gratis proefperiode.' };
+    return { pill: 'Proefperiode', cls: 'trial', note: 'Je zit in de gratis proefperiode — je probeert nu alles, inclusief de AI-functies uit Slim.' };
   }
   return { pill: 'Verlopen', cls: 'expired', note: 'Je toegang is verlopen. Sluit een abonnement af om verder te gaan.' };
 });
 
-const checkout = useForm({});
+const checkout = useForm({ plan: 'basis' });
 const portal = useForm({});
 
-const startCheckout = () => checkout.post(route('billing.checkout'));
+const startCheckout = (plan) => {
+  checkout.plan = plan;
+  checkout.post(route('billing.checkout'));
+};
 const openPortal = () => portal.post(route('billing.portal'));
+
+// Het plan waar dit bedrijf nu op zit (alleen relevant bij een actief abonnement).
+const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan || 'basis') : null));
 </script>
 
 <template>
@@ -70,17 +79,28 @@ const openPortal = () => portal.post(route('billing.portal'));
         <div class="card-body">
           <span class="status-pill" :class="statusMeta.cls">{{ statusMeta.pill }}</span>
 
-          <div class="days-wrap" v-if="status !== 'expired'">
-            <div class="days-num">{{ daysLeft }}</div>
-            <div class="days-label">{{ daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
-          </div>
-          <div class="days-wrap expired" v-else>
-            <div class="days-num">0</div>
-            <div class="days-label">dagen resterend</div>
-          </div>
+          <template v-if="status === 'exempt'">
+            <div class="days-wrap">
+              <div class="days-num">∞</div>
+              <div class="days-label">altijd toegang</div>
+            </div>
+          </template>
+          <template v-else>
+            <div class="days-wrap" v-if="status !== 'expired'">
+              <div class="days-num">{{ daysLeft }}</div>
+              <div class="days-label">{{ daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
+            </div>
+            <div class="days-wrap expired" v-else>
+              <div class="days-num">0</div>
+              <div class="days-label">dagen resterend</div>
+            </div>
+          </template>
 
           <p class="status-note">{{ statusMeta.note }}</p>
-          <p v-if="endsAtLabel" class="status-sub">
+          <p v-if="status === 'active'" class="status-sub">
+            Huidig abonnement: <strong>{{ currentPlan === 'slim' ? 'Slim' : 'Basis' }}</strong>
+          </p>
+          <p v-if="endsAtLabel && status !== 'exempt'" class="status-sub">
             <template v-if="status === 'active'">Volgende verlenging op <strong>{{ endsAtLabel }}</strong></template>
             <template v-else-if="status === 'trialing'">Proefperiode loopt tot <strong>{{ endsAtLabel }}</strong></template>
             <template v-else>Verlopen op <strong>{{ endsAtLabel }}</strong></template>
@@ -93,34 +113,45 @@ const openPortal = () => portal.post(route('billing.portal'));
         </div>
       </div>
 
-      <!-- PLAN CARD -->
-      <div class="card plan-card">
+      <!-- PLAN CARDS -->
+      <div v-for="plan in plans" :key="plan.key" class="card plan-card" :class="{ featured: plan.key === 'slim' }">
         <div class="card-body">
-          <div class="plan-name">EasyInvoice Compleet</div>
-          <div class="plan-price">
-            <span class="plan-amount">{{ price.currency }}{{ price.amount }}</span>
-            <span class="plan-period">/ {{ price.period }}</span>
+          <div class="plan-head">
+            <div class="plan-name">{{ plan.name }}</div>
+            <span v-if="currentPlan === plan.key" class="plan-current">Huidig</span>
+            <span v-else-if="plan.key === 'slim'" class="plan-ai-badge">Met AI</span>
           </div>
-          <div class="plan-vat">{{ price.vat_note }}</div>
+          <div class="plan-price">
+            <span class="plan-amount">€ {{ plan.amount }}</span>
+            <span class="plan-period">/ maand</span>
+          </div>
+          <div class="plan-vat">{{ plan.vat_note }}</div>
+          <p class="plan-tagline">{{ plan.tagline }}</p>
 
           <ul class="plan-feats">
-            <li>Onbeperkt facturen, klanten en producten</li>
-            <li>BTW automatisch · herinneringen · incasso</li>
-            <li>Maandelijks opzegbaar</li>
+            <li v-for="feat in plan.features" :key="feat">{{ feat }}</li>
           </ul>
 
-          <template v-if="status === 'active'">
-            <button class="btn btn-secondary btn-block" :disabled="portal.processing" @click="openPortal">
+          <template v-if="status === 'exempt'">
+            <p class="plan-hint">Vrijgesteld account — afsluiten is niet nodig.</p>
+          </template>
+          <template v-else-if="status === 'active'">
+            <button v-if="currentPlan === plan.key" class="btn btn-secondary btn-block" :disabled="portal.processing" @click="openPortal">
               {{ portal.processing ? 'Bezig…' : 'Abonnement beheren' }}
             </button>
-            <p class="plan-hint">Wijzig je betaalmethode of zeg op via het beveiligde Stripe-portaal.</p>
+            <p v-if="currentPlan === plan.key" class="plan-hint">Wijzig je betaalmethode of zeg op via het beveiligde Stripe-portaal.</p>
+            <p v-else class="plan-hint">Overstappen? Mail <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a> — wij regelen het zonder dubbele kosten.</p>
           </template>
           <template v-else>
-            <button class="btn btn-primary btn-block" :disabled="checkout.processing || !stripeReady" @click="startCheckout">
-              {{ checkout.processing ? 'Bezig…' : (status === 'expired' ? 'Abonnement afsluiten' : 'Nu abonnement afsluiten') }}
+            <button
+              :class="['btn', plan.key === 'slim' ? 'btn-primary' : 'btn-secondary', 'btn-block']"
+              :disabled="checkout.processing || !plan.available"
+              @click="startCheckout(plan.key)"
+            >
+              {{ checkout.processing && checkout.plan === plan.key ? 'Bezig…' : `Kies ${plan.name}` }}
             </button>
-            <p v-if="!stripeReady" class="plan-hint err-text">Betalen is momenteel niet beschikbaar. Probeer het later opnieuw.</p>
-            <p v-else class="plan-hint">Veilig betalen via Stripe. Je kunt elke maand opzeggen.</p>
+            <p v-if="!plan.available" class="plan-hint err-text">Dit abonnement is momenteel niet af te sluiten. Probeer het later opnieuw.</p>
+            <p v-else class="plan-hint">Veilig betalen via Stripe. Maandelijks opzegbaar.</p>
           </template>
         </div>
       </div>
@@ -133,8 +164,23 @@ const openPortal = () => portal.post(route('billing.portal'));
 </template>
 
 <style scoped>
-.bill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 880px; }
+.bill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1180px; align-items: start; }
+@media (max-width: 1080px) { .bill-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) { .bill-grid { grid-template-columns: 1fr; } }
+
+.plan-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.plan-current {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border);
+  border-radius: 100px; padding: 3px 10px;
+}
+.plan-ai-badge {
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--brand-darker); background: var(--brand-tint); border: 1px solid var(--brand-border);
+  border-radius: 100px; padding: 3px 10px;
+}
+.plan-card.featured { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+.plan-tagline { font-size: 13px; color: var(--text-3); margin-top: 10px; line-height: 1.5; }
 
 .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
 .status-pill::before { content: ''; width: 7px; height: 7px; border-radius: 100px; background: currentColor; }

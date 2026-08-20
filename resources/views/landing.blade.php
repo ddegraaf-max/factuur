@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'EasyInvoice — Van offerte tot geld op je rekening, voor € 12,10/maand incl. btw')
-@section('description', 'EasyInvoice — facturatie voor Nederlandse ondernemers. Offertes digitaal laten ondertekenen, facturen met iDEAL en QR, meerdere handelsnamen, strippenkaarten, urenregistratie en BTW-overzicht — alles voor € 12,10 per maand (incl. 21% btw).')
+@section('title', 'EasyInvoice — Van offerte tot geld op je rekening, vanaf € 12,10/maand incl. btw')
+@section('description', 'EasyInvoice — facturatie voor Nederlandse ondernemers. Offertes digitaal laten ondertekenen, facturen met iDEAL en QR, meerdere handelsnamen, strippenkaarten, urenregistratie en BTW-overzicht — vanaf € 12,10 per maand (incl. 21% btw).')
 
 @section('content')
 
@@ -153,7 +153,7 @@
     <div class="eyebrow">Voor Nederlandse ondernemers</div>
     <h1>Facturatie <span class="accent">zonder gedoe.</span></h1>
     <p class="hero-sub">
-      Van offerte tot geld op je rekening: je klant ondertekent digitaal, betaalt met iDEAL of QR-code, en je BTW wordt automatisch bijgehouden. Alles zit erin — voor <b style="color:var(--text);font-weight:600;">maar € 12,10 per maand (incl. 21% btw)</b>.
+      Van offerte tot geld op je rekening: je klant ondertekent digitaal, betaalt met iDEAL of QR-code, en je BTW wordt automatisch bijgehouden. Alles zit erin — vanaf <b style="color:var(--text);font-weight:600;">€ 12,10 per maand (incl. 21% btw)</b>.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -165,7 +165,7 @@
       </a>
     </div>
     <div class="hero-trust">
-      Geen creditcard nodig · 14 dagen gratis · Daarna <b>€ 12,10/maand incl. btw</b>
+      Geen creditcard nodig · 14 dagen gratis · Daarna vanaf <b>€ 12,10/maand incl. btw</b>
     </div>
 
     <!-- APP MOCKUP — geanimeerd, realistisch dashboard -->
@@ -574,41 +574,59 @@
     <div class="pricing-wrap">
       <div class="pricing-lead">
         <h2>Waarom zou je meer betalen?</h2>
-        <p>Bij andere pakketten zijn dit betaalde extra's of duurdere bundels: digitaal ondertekenen, een tweede handelsnaam, een tweede administratie, AI-bonherkenning, e-facturatie. Bij EasyInvoice zit álles in één vaste lage prijs — geen add-ons, geen verrassingen.</p>
+        <p>Bij andere pakketten zijn dit betaalde extra's of duurdere bundels: digitaal ondertekenen, een tweede handelsnaam, een tweede administratie, e-facturatie. Bij EasyInvoice zit dat állemaal in Basis. Wil je dat de AI ook je bonnen, inkoopfacturen en offertes invult? Dan kies je Slim.</p>
         <ul class="pricing-lead-points">
           <li>Meerdere administraties én handelsnamen inbegrepen</li>
           <li>Onbeperkt facturen, offertes, klanten en producten</li>
-          <li>Alle functies vanaf dag één — geen bundels</li>
-          <li>Persoonlijke ondersteuning</li>
-          <li>Maandelijks opzegbaar</li>
+          <li>Alle facturatiefuncties in élk abonnement</li>
+          <li>14 dagen gratis proberen — inclusief alle AI-functies</li>
+          <li>Persoonlijke ondersteuning · maandelijks opzegbaar</li>
         </ul>
       </div>
 
-      <div class="pricing-card">
-        <div class="pricing-badge">Meest gekozen</div>
-        <div class="pricing-title">EasyInvoice</div>
-        <div class="pricing-desc">Alles wat een Nederlandse ondernemer nodig heeft</div>
-        <div class="pricing-price-row">
-          <div class="pricing-price"><span class="euro">€</span>10</div>
-          <div class="pricing-period">/ maand</div>
+      <div class="pricing-cards">
+        <div class="pricing-card basic">
+          <div class="pricing-title">Basis</div>
+          <div class="pricing-desc">Alles om te factureren en je administratie bij te houden</div>
+          <div class="pricing-price-row">
+            <div class="pricing-price"><span class="euro">€</span>10</div>
+            <div class="pricing-period">/ maand</div>
+          </div>
+          <div class="pricing-vat">Excl. 21% BTW · € 12,10 incl. BTW</div>
+          <ul class="pricing-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt facturen, offertes en creditnota's</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Meerdere administraties én handelsnamen</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Digitaal ondertekenen + termijnfacturen</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>iDEAL-link en QR-code op je factuur</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Uren, strippenkaarten en kilometers</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-, jaar- en cashflow-overzicht</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Herinneringen, aanmaningen en incasso</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>E-facturatie: UBL en Peppol</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gratis extra gebruikers en je boekhouder</li>
+          </ul>
+          <a href="{{ route('register') }}" class="btn btn-secondary btn-lg" style="width:100%;justify-content:center;">Start 14 dagen gratis</a>
+          <div class="pricing-fineprint">Geen creditcard nodig · Opzeggen wanneer je wil</div>
         </div>
-        <div class="pricing-vat">Excl. 21% BTW · €12,10 incl. BTW</div>
-        <ul class="pricing-features">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Onbeperkt facturen, offertes en creditnota's</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Meerdere administraties én handelsnamen</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Offertes digitaal laten ondertekenen + termijnfacturen</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Betaald worden met iDEAL-link en QR-code</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Urenregistratie, strippenkaarten en kilometers</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Klantenportaal met inzagelog</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BTW-overzicht, jaaroverzicht en cashflow-prognose</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Inkoop met AI-herkenning en eigen inboek-adres</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Automatische herinneringen, aanmaningen en incasso</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>E-facturatie: UBL en Peppol</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Gratis extra gebruikers en je boekhouder</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI-assistent EASY · 2FA · persoonlijke support</li>
-        </ul>
-        <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Start 14 dagen gratis</a>
-        <div class="pricing-fineprint">Geen creditcard nodig · Opzeggen wanneer je wil</div>
+
+        <div class="pricing-card">
+          <div class="pricing-badge">Meest gekozen</div>
+          <div class="pricing-title">Slim</div>
+          <div class="pricing-desc">Alles uit Basis, plus de AI die je administratie invult</div>
+          <div class="pricing-price-row">
+            <div class="pricing-price"><span class="euro">€</span>17,50</div>
+            <div class="pricing-period">/ maand</div>
+          </div>
+          <div class="pricing-vat">Excl. 21% BTW · € 21,18 incl. BTW</div>
+          <ul class="pricing-features">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><b>Alles uit Basis</b></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Scan &amp; herken: bonnen en inkoopfacturen automatisch ingevuld</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Postvak IN met automatische boekingsvoorstellen</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Offerte uit tekst: plak je conceptofferte, het formulier vult zich in</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Eerst proberen? De proefperiode bevat alle AI-functies</li>
+          </ul>
+          <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Start 14 dagen gratis</a>
+          <div class="pricing-fineprint">Geen creditcard nodig · Opzeggen wanneer je wil</div>
+        </div>
       </div>
     </div>
   </div>
@@ -680,7 +698,7 @@
           <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
         </summary>
         <div class="faq-content">
-          Alles. Voor € 12,10 per maand (incl. 21% btw) krijg je het volledige product — onbeperkt facturen, klanten, producten, incasso, AI-assistent, alle functies. We geloven niet in betaalmuren voor basisfuncties.
+          Je kiest uit twee smaken: <b>Basis</b> (€ 12,10 per maand incl. btw) met het volledige facturatiepakket — onbeperkt facturen, offertes, klanten, incasso, e-facturatie — of <b>Slim</b> (€ 21,18 per maand incl. btw) met daarbovenop de AI-functies: bonnen en inkoopfacturen automatisch herkennen en offertes uit tekst. Tijdens de proefperiode probeer je alles.
         </div>
       </details>
     </div>
@@ -699,7 +717,7 @@
       Start 14 dagen gratis
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
     </a>
-    <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna € 12,10/maand incl. btw</div>
+    <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna vanaf € 12,10/maand incl. btw</div>
   </div>
 </section>
 

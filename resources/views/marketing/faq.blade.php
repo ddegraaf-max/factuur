@@ -33,7 +33,7 @@
       <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:32px 0 14px;">Prijs &amp; abonnement</h3>
       <details class="faq-item">
         <summary>Wat kost EasyInvoice? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">€ 12,10 per maand (incl. 21% BTW), met alle functies inbegrepen. Geen extra of verborgen kosten.</div>
+        <div class="faq-content">Er zijn twee abonnementen: <b>Basis</b> voor € 12,10 per maand (incl. 21% btw) met het volledige facturatiepakket, en <b>Slim</b> voor € 21,18 per maand (incl. btw) met daarbovenop de AI-functies — bonnen en inkoopfacturen automatisch herkennen, en offertes uit tekst. Geen verborgen kosten, maandelijks opzegbaar.</div>
       </details>
       <details class="faq-item">
         <summary>Kan ik op elk moment opzeggen? <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>

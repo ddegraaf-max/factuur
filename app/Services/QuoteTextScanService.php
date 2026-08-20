@@ -22,6 +22,15 @@ class QuoteTextScanService
     }
 
     /**
+     * Mag dit bedrijf de functie gebruiken? Vereist een geconfigureerde
+     * API-key én AI-toegang (Slim-abonnement, proefperiode, demo of vrijgesteld).
+     */
+    public function availableFor(?\App\Models\Company $company): bool
+    {
+        return $this->enabled() && $company !== null && $company->hasAiAccess();
+    }
+
+    /**
      * Zet een offertetekst om naar formuliervelden.
      *
      * @return array{customer_name: ?string, reference: ?string, intro: ?string, notes: ?string, valid_days: ?int, lines: list<array{description: string, details: ?string, quantity: float, unit: string, unit_price: float, vat_rate: float, discount_pct: float}>, warning: ?string}

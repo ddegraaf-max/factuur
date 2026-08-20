@@ -28,7 +28,7 @@ const submit = () => {
   <AuthLayout>
     <template #hero>
       <h2>Welkom terug</h2>
-      <p>Log in om verder te gaan met je administratie. Nederlandse facturatie zonder gedoe — voor maar € 12,10 per maand (incl. 21% btw).</p>
+      <p>Log in om verder te gaan met je administratie. Nederlandse facturatie zonder gedoe — vanaf € 12,10 per maand (incl. 21% btw).</p>
       <div class="login-features">
         <div class="login-feature"><span class="check">✓</span> BTW automatisch per regel (21/9/0%)</div>
         <div class="login-feature"><span class="check">✓</span> Eigen factuurnummerreeks per jaar</div>

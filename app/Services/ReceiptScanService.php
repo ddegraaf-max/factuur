@@ -24,6 +24,15 @@ class ReceiptScanService
     }
 
     /**
+     * Mag dit bedrijf de scan gebruiken? Vereist een geconfigureerde API-key
+     * én AI-toegang (Slim-abonnement, proefperiode, demo of vrijgesteld).
+     */
+    public function availableFor(?\App\Models\Company $company): bool
+    {
+        return $this->enabled() && $company !== null && $company->hasAiAccess();
+    }
+
+    /**
      * Herken een bon of factuur en geef de formuliervelden terug.
      *
      * @param  string  $bytes     ruwe bestandsinhoud

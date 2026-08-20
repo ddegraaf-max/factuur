@@ -20,6 +20,22 @@ class StripeService
             && ! empty(config('services.stripe.price_id'));
     }
 
+    /** Is het Slim-abonnement af te sluiten (aparte Stripe-price ingesteld)? */
+    public function slimConfigured(): bool
+    {
+        return $this->configured() && ! empty(config('services.stripe.price_id_slim'));
+    }
+
+    /** Vertaal een Stripe-price-id naar onze abonnementssmaak. */
+    public function planForPrice(?string $priceId): ?string
+    {
+        return match (true) {
+            $priceId !== null && $priceId === config('services.stripe.price_id_slim') => 'slim',
+            $priceId !== null && $priceId === config('services.stripe.price_id') => 'basis',
+            default => null,
+        };
+    }
+
     private function secret(): string
     {
         $secret = config('services.stripe.secret');
@@ -38,11 +54,18 @@ class StripeService
     /**
      * Maak een Checkout-sessie (abonnement) en geef de hosted checkout-URL terug.
      */
-    public function createCheckoutSession(Company $company, string $successUrl, string $cancelUrl, ?int $trialEnd = null): string
+    public function createCheckoutSession(Company $company, string $successUrl, string $cancelUrl, ?int $trialEnd = null, string $plan = 'basis'): string
     {
+        $priceId = $plan === 'slim'
+            ? config('services.stripe.price_id_slim')
+            : config('services.stripe.price_id');
+        if (empty($priceId)) {
+            throw new RuntimeException("Stripe-price voor abonnement '{$plan}' is niet geconfigureerd.");
+        }
+
         $payload = [
             'mode' => 'subscription',
-            'line_items[0][price]' => config('services.stripe.price_id'),
+            'line_items[0][price]' => $priceId,
             'line_items[0][quantity]' => 1,
             'success_url' => $successUrl,
             'cancel_url' => $cancelUrl,
@@ -161,6 +184,13 @@ class StripeService
         }
 
         $company->subscription_status = $subscription['status'] ?? $company->subscription_status;
+
+        // Smaak (basis/slim) afleiden uit de afgesloten Stripe-price. Zo klopt
+        // het plan ook na een overstap via het Stripe-klantportaal.
+        $plan = $this->planForPrice($subscription['items']['data'][0]['price']['id'] ?? null);
+        if ($plan !== null) {
+            $company->plan = $plan;
+        }
 
         // In nieuwere Stripe-API-versies staat current_period_end op de
         // subscription items i.p.v. op het hoofdobject. Val terug op trial_end.

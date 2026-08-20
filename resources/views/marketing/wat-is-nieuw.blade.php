@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.25.0</div>
+        <h3>Twee abonnementen: Basis en Slim</h3>
+        <ul class="tl-list">
+          <li><b>Basis (€ 10/maand excl. btw)</b> — het volledige facturatiepakket: onbeperkt facturen, offertes, klanten, inkoop, uren, BTW-overzicht, incasso, e-facturatie en het klantenportaal.</li>
+          <li><b>Slim (€ 17,50/maand excl. btw)</b> — alles uit Basis, plus de AI-assistent: Scan &amp; herken voor bonnen en inkoopfacturen, automatische boekingsvoorstellen in het Postvak IN en Offerte uit tekst.</li>
+          <li><b>Proefperiode = alles</b> — tijdens de 14 dagen gratis proberen zijn álle functies beschikbaar, inclusief AI. Bestaande abonnees behouden hun huidige prijs.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.24.0</div>
         <h3>Offerte uit tekst — plak je conceptofferte, het formulier vult zich in</h3>
         <ul class="tl-list">

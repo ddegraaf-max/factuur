@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw).')">
+<meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw), met AI vanaf € 21,18.')">
 <title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10/maand incl. btw')</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
@@ -225,8 +225,14 @@
   .feature-desc { color: var(--text-2); font-size: 14.5px; line-height: 1.6; }
 
   /* PRICING */
-  .pricing-wrap { display: grid; grid-template-columns: 1fr 1.4fr; gap: 30px; align-items: center; max-width: 1000px; margin: 0 auto; }
+  .pricing-wrap { display: grid; grid-template-columns: 1fr 1.9fr; gap: 30px; align-items: center; max-width: 1180px; margin: 0 auto; }
   @media (max-width: 880px) { .pricing-wrap { grid-template-columns: 1fr; } }
+
+  /* Twee abonnementen naast elkaar: Basis en Slim */
+  .pricing-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 640px) { .pricing-cards { grid-template-columns: 1fr; } }
+  .pricing-cards .pricing-card { padding: 30px 28px; }
+  .pricing-card.basic { border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
   .pricing-lead h2 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 16px; }
   .pricing-lead p { font-size: 17px; color: var(--text-2); line-height: 1.6; margin-bottom: 20px; }
   .pricing-lead-points { list-style: none; padding: 0; margin: 0; }
