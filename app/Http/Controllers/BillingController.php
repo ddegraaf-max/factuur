@@ -98,6 +98,7 @@ class BillingController extends Controller
                         'Scan & herken: bonnen en inkoopfacturen automatisch ingevuld',
                         'Postvak IN met automatische boekingsvoorstellen',
                         'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',
+                        'Claude-koppeling: maak offertes en facturen rechtstreeks vanuit je Claude-gesprek',
                         ((int) config('services.anthropic.monthly_limit', 250)) > 0
                             ? sprintf('Ruime fair-use: %d AI-acties per maand', (int) config('services.anthropic.monthly_limit', 250))
                             : null,

@@ -81,6 +81,33 @@ class Company extends Model
 
         return $domain ? 'bon-' . $this->ensureInboundToken() . '@' . $domain : null;
     }
+
+    /* ===================== CLAUDE-KOPPELING (MCP) ===================== */
+
+    /** (Her)activeer de Claude-koppeling met een nieuw geheim; het oude vervalt. */
+    public function rotateMcpToken(): string
+    {
+        do {
+            $token = bin2hex(random_bytes(24)); // 48 tekens
+        } while (static::where('mcp_token', $token)->exists());
+
+        $this->forceFill(['mcp_token' => $token])->saveQuietly();
+
+        return $token;
+    }
+
+    public function disableMcpToken(): void
+    {
+        $this->forceFill(['mcp_token' => null])->saveQuietly();
+    }
+
+    /** De geheime koppel-URL voor claude.ai (custom connector). */
+    public function mcpUrl(): ?string
+    {
+        return $this->mcp_token
+            ? rtrim(config('app.url'), '/') . '/mcp/' . $this->mcp_token
+            : null;
+    }
     /** Alle leden van deze administratie (lidmaatschappen, met rol per lid). */
     public function members(): \Illuminate\Database\Eloquent\Relations\BelongsToMany { return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps(); }
     public function customers(): HasMany { return $this->hasMany(Customer::class); }

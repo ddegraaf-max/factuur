@@ -1,0 +1,55 @@
+EASYINVOICE — CLAUDE-KOPPELING (MCP)
+====================================
+
+WAT IS HET
+----------
+Een ingebouwde MCP-server (Model Context Protocol) waarmee Claude — via
+een custom connector in claude.ai of de Claude-desktopapp — rechtstreeks
+in EasyInvoice kan werken. De gebruiker schrijft bijv. een offerte in een
+Claude-gesprek en zegt "zet deze offerte in EasyInvoice"; Claude maakt
+het concept direct aan in de administratie.
+
+Tools die Claude krijgt:
+- klanten_zoeken        klanten opzoeken op naam
+- offerte_aanmaken      CONCEPT-offerte (klant moet bestaan; eenduidige naammatch)
+- factuur_aanmaken      CONCEPT-factuur (nummer pas bij versturen)
+- openstaande_facturen  overzicht open/vervallen verkoopfacturen
+
+Alles is een concept: versturen gebeurt altijd door de gebruiker in de
+app. Prijzen worden exclusief btw aangeleverd; bij administraties met
+incl-invoer rekent de koppeling om zodat de totalen kloppen.
+
+ACTIVEREN (per administratie)
+-----------------------------
+Instellingen → Koppelingen → "Koppeling activeren". Dat genereert een
+geheime koppel-URL:  https://easyinvoice.nl/mcp/<48-tekens-token>
+Die URL voegt de gebruiker eenmalig toe in claude.ai:
+Settings → Connectors → Add custom connector (geen verdere auth).
+Ook bruikbaar in Claude Code:
+  claude mcp add easyinvoice --transport http <koppel-URL>
+
+BEVEILIGING
+-----------
+- Het token in de URL bepaalt de administratie (zelfde patroon als het
+  inboek-adres van het Postvak IN). Token = 48 hex-tekens, uniek.
+- "Nieuwe koppel-URL" trekt de oude direct in; "Uitschakelen" zet
+  mcp_token op null.
+- Claude kan alleen concepten aanmaken en lezen — nooit versturen,
+  betalen of verwijderen.
+- Vereist AI-toegang (Slim-abonnement, proef, demo of vrijgesteld);
+  anders krijgt Claude een nette upgrademelding terug.
+- Throttle 120 req/min; CSRF-uitzondering op mcp/*.
+
+TECHNIEK
+--------
+- McpController: minimale JSON-RPC 2.0-afhandeling van het MCP
+  Streamable-HTTP-transport (zonder SSE — elk antwoord is één JSON-
+  response, wat de spec toestaat). Ondersteunt initialize, ping,
+  tools/list, tools/call; notificaties krijgen 202, GET 405, DELETE 204.
+- Protocolversies: 2025-06-18 / 2025-03-26 / 2024-11-05 (echo van de
+  gevraagde versie als die bekend is).
+- Geen ingelogde gebruiker: de company-globalscopes zijn dan inactief,
+  dus elke query filtert expliciet op company_id (en de managers leiden
+  het bedrijf af uit de klant).
+- Migratie: companies.mcp_token (uniek, nullable).
+- Instellingenpagina: resources/js/Pages/Settings/Koppelingen.vue.

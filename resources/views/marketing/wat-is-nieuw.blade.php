@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.27.0</div>
+        <h3>Claude-koppeling — "zet deze offerte in EasyInvoice"</h3>
+        <ul class="tl-list">
+          <li><b>Werk rechtstreeks vanuit je Claude-gesprek</b> — koppel EasyInvoice eenmalig aan Claude (claude.ai of de desktopapp) en zeg voortaan gewoon: "zet deze offerte als concept in EasyInvoice". Claude zoekt de klant op en maakt de concept-offerte of -factuur direct in je administratie aan.</li>
+          <li><b>Jij houdt de controle</b> — alles wat Claude aanmaakt is een concept: versturen doe je altijd zelf in EasyInvoice. Claude kan ook je openstaande facturen opvragen ("wie moet mij nog betalen?").</li>
+          <li><b>Veilig gekoppeld</b> — via een geheime koppel-URL per administratie die je met één klik kunt vernieuwen of intrekken (Instellingen → Koppelingen). Onderdeel van het Slim-abonnement.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.26.0</div>
         <h3>Inzicht in je AI-gebruik</h3>
         <ul class="tl-list">

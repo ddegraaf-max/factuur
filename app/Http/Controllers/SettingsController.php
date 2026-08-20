@@ -8,6 +8,44 @@ use Inertia\Inertia;
 
 class SettingsController extends Controller
 {
+    // ----- KOPPELINGEN (Claude / MCP) -----
+    public function integrations()
+    {
+        $company = auth()->user()->company;
+
+        return Inertia::render('Settings/Koppelingen', [
+            'mcp' => [
+                'active' => $company->mcp_token !== null,
+                'url' => $company->mcpUrl(),
+            ],
+            'has_ai' => $company->hasAiAccess(),
+        ]);
+    }
+
+    /** (Her)activeer de Claude-koppeling — een oude koppel-URL vervalt meteen. */
+    public function rotateMcpToken()
+    {
+        $company = auth()->user()->company;
+
+        if (! $company->hasAiAccess()) {
+            return back()->with('error', 'De Claude-koppeling zit in het Slim-abonnement.');
+        }
+
+        $wasActive = $company->mcp_token !== null;
+        $company->rotateMcpToken();
+
+        return back()->with('flash', $wasActive
+            ? 'Nieuwe koppel-URL aangemaakt — de oude werkt niet meer. Werk de connector in Claude bij.'
+            : 'Claude-koppeling geactiveerd! Voeg de koppel-URL toe in Claude als custom connector.');
+    }
+
+    public function disableMcpToken()
+    {
+        auth()->user()->company->disableMcpToken();
+
+        return back()->with('flash', 'Claude-koppeling uitgeschakeld — de koppel-URL is ingetrokken.');
+    }
+
     // ----- COMPANY / BEDRIJFSGEGEVENS -----
     public function company()
     {

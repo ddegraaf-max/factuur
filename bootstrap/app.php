@@ -39,6 +39,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'stripe/webhook',
             'webhooks/mollie',
             'webhooks/inbound-mail/*',
+            'mcp/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -148,6 +148,10 @@ Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::
 Route::post('/webhooks/inbound-mail/{secret}', [\App\Http\Controllers\InboundMailController::class, 'handle'])
     ->middleware('throttle:60,1')->name('inbound.mail');
 
+// ---------- CLAUDE-KOPPELING (MCP, publiek, geen CSRF, geheim in de URL) ----------
+Route::match(['get', 'post', 'delete'], '/mcp/{token}', [\App\Http\Controllers\McpController::class, 'handle'])
+    ->middleware('throttle:120,1')->name('mcp');
+
 // ---------- GUEST AUTH ----------
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -369,6 +373,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
     // Settings (alleen de beheerder)
     Route::middleware('role:owner')->group(function () {
+        // Koppelingen: de Claude-koppeling (MCP) beheren
+        Route::get('settings/koppelingen', [SettingsController::class, 'integrations'])->name('settings.integrations');
+        Route::post('settings/koppelingen/claude', [SettingsController::class, 'rotateMcpToken'])
+            ->middleware('throttle:10,1')->name('settings.integrations.claude.rotate');
+        Route::delete('settings/koppelingen/claude', [SettingsController::class, 'disableMcpToken'])->name('settings.integrations.claude.disable');
+
         Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
         Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
 
