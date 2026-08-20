@@ -207,6 +207,11 @@ class Company extends Model
     /** Tot wanneer loopt de toegang (proef of abonnement). */
     public function accessEndsAt(): ?Carbon
     {
+        // Vrijgesteld = oneindig: er bestaat geen einddatum, ook niet als er
+        // (nog) een abonnement of oude proefperiode aan het account hangt.
+        if ($this->is_exempt) {
+            return null;
+        }
         if ($this->subscriptionActive()) {
             return $this->subscription_ends_at;
         }

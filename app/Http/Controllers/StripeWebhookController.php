@@ -102,6 +102,12 @@ class StripeWebhookController extends Controller
      */
     private function maybeSendCancellationEmail(Company $company, array $subscription): void
     {
+        // Vrijgestelde accounts (eigen beheer): geen win-back-mail als het
+        // eigen betaalde abonnement wordt opgezegd — de toegang blijft toch.
+        if ($company->is_exempt) {
+            return;
+        }
+
         $status = $subscription['status'] ?? null;
         $scheduledToCancel = ($subscription['cancel_at_period_end'] ?? false) === true;
         $ended = $status === 'canceled';
