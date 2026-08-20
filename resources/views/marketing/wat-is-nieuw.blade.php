@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.22.0</div>
+        <h3>Vijf nieuwe functies: van termijnfacturen tot een slimmer postvak</h3>
+        <ul class="tl-list">
+          <li><b>Postvak IN verwerkt zichzelf</b> — aangeleverde bonnen en facturen worden nu automatisch herkend. Op elk kaartje staat een kant-en-klaar boekingsvoorstel (leverancier, datum, bedrag, categorie): met <b>Direct inboeken</b> bevestig je met één klik, met <b>Controleer eerst</b> open je het vooringevulde formulier. Forward je bon en je bent klaar.</li>
+          <li><b>Termijnfacturen</b> — grote projecten in delen factureren: stel op een offerte een termijnplan op (bijv. 30% bij opdracht, 70% bij oplevering) en maak per termijn met één klik de factuur. De laatste termijn is automatisch het restant, zodat de som exact op de offertesom uitkomt.</li>
+          <li><b>Korting per factuurregel</b> — geef per regel een kortingspercentage, op facturen én offertes. De klant ziet de originele prijs en de korting netjes op de PDF; de BTW rekent automatisch mee over het verlaagde bedrag, ook op creditnota's en in de UBL-e-factuur.</li>
+          <li><b>Ouderdomsanalyse debiteuren</b> — nieuw rapport: wie staat er hoe lang open (1–30, 31–60, 61–90 en 90+ dagen), per klant en met de langst vervallen facturen bovenaan. Zo weet je precies waar je achteraan moet.</li>
+          <li><b>Winstgevendheid per klant</b> — het rapport Klantomzet toont nu ook de bestede uren en het <b>effectieve uurtarief</b> (omzet ÷ uren) per klant: zo zie je welke klant écht wat oplevert.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.21.0</div>
         <h3>QR-code betalen, cashflow-prognose &amp; eigen e-mailteksten</h3>
         <ul class="tl-list">

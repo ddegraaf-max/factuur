@@ -135,6 +135,8 @@ class PurchaseInvoiceController extends Controller
                     'is_image' => $item->isImage(),
                     'from_email' => $item->from_email,
                     'url' => route('purchases.inbox.file', $item),
+                    // Al automatisch herkend? Dan vult het formulier zich voor.
+                    'scan' => $item->scan,
                 ];
             }
         }

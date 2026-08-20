@@ -256,7 +256,8 @@ class InvoiceManager
             $qty = (float) ($line['quantity'] ?? 1);
             $price = (float) ($line['unit_price'] ?? 0);
             $rate = (float) ($line['vat_rate'] ?? 0);
-            $calc = $this->vat->calculateLine($qty, $price, $rate, $mode);
+            $discount = min(100, max(0, (float) ($line['discount_pct'] ?? 0)));
+            $calc = $this->vat->calculateLine($qty, $price, $rate, $mode, $discount);
 
             // In de database staat de stuksprijs altijd exclusief btw.
             $storedPrice = $mode === 'incl'
@@ -272,6 +273,7 @@ class InvoiceManager
                 'unit' => $line['unit'] ?? 'stuk',
                 'unit_price' => $storedPrice,
                 'vat_rate' => $rate,
+                'discount_pct' => $discount > 0 ? $discount : null,
                 'line_subtotal' => $calc['subtotal'],
                 'line_vat' => $calc['vat'],
                 'line_total' => $calc['total'],

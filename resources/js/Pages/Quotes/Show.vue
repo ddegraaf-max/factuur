@@ -60,6 +60,51 @@ const destroy = () => {
     router.delete(route('quotes.destroy', props.quote.id));
   }
 };
+
+/* ---------- Termijnfacturen ---------- */
+const installmentsError = computed(() => (page.props.errors || {}).installments ?? null);
+const showPlanner = ref(false);
+const planRows = ref([
+  { description: 'Termijn 1: bij opdracht', percentage: 30 },
+  { description: 'Termijn 2: bij oplevering', percentage: 70 },
+]);
+
+const applyPreset = (parts) => {
+  const labels = {
+    2: ['bij opdracht', 'bij oplevering'],
+    3: ['bij opdracht', 'tussentijds', 'bij oplevering'],
+  };
+  planRows.value = parts.map((pct, i) => ({
+    description: `Termijn ${i + 1}: ${(labels[parts.length] || [])[i] || ''}`.trim(),
+    percentage: pct,
+  }));
+};
+
+const addPlanRow = () => planRows.value.push({ description: `Termijn ${planRows.value.length + 1}`, percentage: 0 });
+const removePlanRow = (i) => { if (planRows.value.length > 2) planRows.value.splice(i, 1); };
+
+const planSum = computed(() => Math.round(planRows.value.reduce((s, r) => s + (Number(r.percentage) || 0), 0) * 100) / 100);
+
+const savePlan = () => {
+  router.post(route('quotes.installments.store', props.quote.id), { installments: planRows.value }, {
+    preserveScroll: true,
+    onSuccess: () => { showPlanner.value = false; },
+  });
+};
+
+const deletePlan = () => {
+  if (confirm('Termijnplan verwijderen? De offerte kan daarna weer in één keer worden gefactureerd.')) {
+    router.delete(route('quotes.installments.destroy', props.quote.id), { preserveScroll: true });
+  }
+};
+
+const invoiceInstallment = (inst) => {
+  if (confirm(`Conceptfactuur maken voor "${inst.description}" (${eur(inst.amount)})?`)) {
+    router.post(route('quotes.installments.invoice', [props.quote.id, inst.id]));
+  }
+};
+
+const invoicedCount = computed(() => (props.quote.installments || []).filter(i => i.invoice).length);
 </script>
 
 <template>
@@ -115,17 +160,19 @@ const destroy = () => {
         <span v-else-if="quote.days_left > 0">Nog {{ quote.days_left }} {{ quote.days_left === 1 ? 'dag' : 'dagen' }} geldig.</span>
       </div>
       <div class="decide-actions">
+        <button v-if="quote.can_installments && !(quote.installments || []).length" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">In termijnen</button>
         <button class="btn btn-secondary btn-sm" @click="reject">Afgewezen</button>
         <button class="btn btn-primary btn-sm" @click="accept">Geaccepteerd</button>
       </div>
     </div>
 
-    <div v-if="quote.status === 'accepted' && !quote.invoice" class="decide accepted">
+    <div v-if="quote.status === 'accepted' && !quote.invoice && !(quote.installments || []).length" class="decide accepted">
       <div class="decide-text">
         <strong>De klant is akkoord.</strong>
-        <span>Zet de offerte om in een factuur — de regels worden overgenomen als concept.</span>
+        <span>Zet de offerte om in een factuur — of factureer in termijnen (bijv. 30% vooraf).</span>
       </div>
       <div class="decide-actions">
+        <button v-if="quote.can_installments" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">In termijnen</button>
         <button class="btn btn-primary btn-sm" @click="convert">Omzetten naar factuur</button>
       </div>
     </div>
@@ -158,6 +205,68 @@ const destroy = () => {
       </div>
       <div class="decide-actions">
         <Link :href="route('invoices.show', quote.invoice.id)" class="btn btn-secondary btn-sm">Bekijk factuur</Link>
+      </div>
+    </div>
+
+    <div v-if="installmentsError" class="q-alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ installmentsError }}
+    </div>
+
+    <!-- Termijnplan: bestaat er al één, toon de voortgang -->
+    <div v-if="(quote.installments || []).length" class="card term-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Termijnfacturen</div>
+          <div class="card-subtitle">{{ invoicedCount }} van {{ quote.installments.length }} termijnen gefactureerd · samen {{ eur(quote.total) }}</div>
+        </div>
+        <button v-if="!quote.installments_locked" type="button" class="btn btn-secondary btn-sm" @click="deletePlan">Plan verwijderen</button>
+      </div>
+      <div class="card-body" style="padding-top:6px;">
+        <div v-for="(inst, i) in quote.installments" :key="inst.id" class="term-row">
+          <div class="term-num" :class="{ done: inst.invoice }">{{ i + 1 }}</div>
+          <div class="term-info">
+            <div class="term-desc">{{ inst.description }}</div>
+            <div class="term-sub">{{ Number(inst.percentage).toLocaleString('nl-NL') }}% · {{ eur(inst.amount) }} incl. btw</div>
+          </div>
+          <div class="term-action">
+            <Link v-if="inst.invoice" :href="route('invoices.show', inst.invoice.id)" class="pill pill-paid" style="text-decoration:none;">
+              {{ inst.invoice.number || 'Concept' }}
+            </Link>
+            <button v-else-if="inst.is_next" type="button" class="btn btn-primary btn-sm" @click="invoiceInstallment(inst)">Maak factuur</button>
+            <span v-else class="pill pill-draft">Wacht op eerdere termijn</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Termijnplan opstellen -->
+    <div v-else-if="showPlanner && quote.can_installments" class="card term-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">In termijnen factureren</div>
+          <div class="card-subtitle">Verdeel {{ eur(quote.total) }} over termijnen — de laatste termijn wordt automatisch het restant</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-secondary btn-sm" @click="applyPreset([30, 70])">30 / 70</button>
+          <button type="button" class="btn btn-secondary btn-sm" @click="applyPreset([50, 50])">50 / 50</button>
+          <button type="button" class="btn btn-secondary btn-sm" @click="applyPreset([33.33, 33.33, 33.34])">3 × ⅓</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div v-for="(row, i) in planRows" :key="i" class="term-edit-row">
+          <input type="text" v-model="row.description" maxlength="200" placeholder="Omschrijving (komt op de factuur)">
+          <input type="number" v-model.number="row.percentage" min="0.01" max="100" step="0.01" class="num right" style="width:90px;">
+          <span class="term-pct">%</span>
+          <button type="button" class="li-remove-sm" :disabled="planRows.length <= 2" @click="removePlanRow(i)" title="Termijn verwijderen">✕</button>
+        </div>
+        <div class="term-foot">
+          <button type="button" class="btn btn-ghost btn-sm" @click="addPlanRow">+ Termijn toevoegen</button>
+          <div :style="{ color: Math.abs(planSum - 100) > 0.01 ? 'var(--brand-dark)' : 'var(--success)', fontWeight: 600, fontSize: '13px' }">
+            Totaal: {{ planSum.toLocaleString('nl-NL') }}%
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" :disabled="Math.abs(planSum - 100) > 0.01" @click="savePlan">Plan opslaan</button>
+        </div>
       </div>
     </div>
 
@@ -229,7 +338,10 @@ const destroy = () => {
                 <div v-if="line.details" style="font-size:12px;color:var(--text-3);">{{ line.details }}</div>
               </td>
               <td class="mono" style="text-align:right" data-label="Aantal">{{ Number(line.quantity) }}</td>
-              <td class="mono" style="text-align:right" data-label="Prijs">{{ eur(line.unit_price) }}</td>
+              <td class="mono" style="text-align:right" data-label="Prijs">
+                {{ eur(line.unit_price) }}
+                <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% korting</span>
+              </td>
               <td style="text-align:center" data-label="BTW">{{ Number(line.vat_rate) }}%</td>
               <td class="mono" style="text-align:right" data-label="Totaal">{{ eur(line.line_subtotal) }}</td>
             </tr>
@@ -300,6 +412,29 @@ const destroy = () => {
   background: var(--surface); border: 1px dashed var(--border-strong, #D6D3D1); border-radius: 12px;
   padding: 12px 18px; margin-bottom: 16px; font-size: 13px; color: var(--text-2);
 }
+
+/* Termijnfacturen */
+.term-card { margin-bottom: 16px; }
+.term-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.term-row:last-child { border-bottom: none; }
+.term-num {
+  flex: none; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--surface-2); color: var(--text-3); font-weight: 700; font-size: 12.5px;
+}
+.term-num.done { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+.term-info { flex: 1; min-width: 0; }
+.term-desc { font-weight: 600; font-size: 13.5px; }
+.term-sub { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+.term-action { flex: none; }
+
+.term-edit-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.term-edit-row input[type="text"] { flex: 1; min-width: 0; height: 34px; padding: 0 10px; font-size: 13px; border: 1px solid var(--border); border-radius: 6px; }
+.term-edit-row input.num { height: 34px; padding: 0 8px; text-align: right; font-family: var(--font-mono); font-size: 13px; border: 1px solid var(--border); border-radius: 6px; }
+.term-pct { color: var(--text-3); font-size: 13px; }
+.li-remove-sm { width: 28px; height: 28px; border-radius: 6px; color: var(--text-4); }
+.li-remove-sm:hover:not(:disabled) { color: var(--brand); background: var(--brand-tint); }
+.li-remove-sm:disabled { opacity: 0.3; cursor: not-allowed; }
+.term-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
 
 @media (max-width: 760px) {
   .inv-detail-header, .inv-body { padding: 20px 16px; }

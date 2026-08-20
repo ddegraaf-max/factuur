@@ -33,6 +33,7 @@ return [
     'price' => 'Prijs',
     'vat' => 'BTW',
     'total' => 'Totaal',
+    'discount' => 'Korting',
     'subtotal' => 'Subtotaal',
     'total_incl_vat' => 'Totaal incl. btw',
     'already_settled' => 'Reeds doorgestort',

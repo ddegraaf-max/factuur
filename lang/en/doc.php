@@ -32,6 +32,7 @@ return [
     'price' => 'Price',
     'vat' => 'VAT',
     'total' => 'Total',
+    'discount' => 'Discount',
     'subtotal' => 'Subtotal',
     'total_incl_vat' => 'Total incl. VAT',
     'already_settled' => 'Already settled',

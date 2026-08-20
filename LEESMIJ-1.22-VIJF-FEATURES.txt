@@ -1,0 +1,62 @@
+EASYINVOICE 1.22.0 — VIJF FEATURES
+===================================
+Postvak-automatisering, termijnfacturen, regelkorting, ouderdomsanalyse
+debiteuren en winstgevendheid per klant. Geen nieuwe omgevingsvariabelen.
+
+1. POSTVAK IN VERWERKT ZICHZELF
+-------------------------------
+Nieuw commando `purchases:scan-inbox` draait elke 5 minuten (scheduler) en
+herkent nieuwe postvak-items met de bestaande AI-scan (alleen mét
+ANTHROPIC_API_KEY; demo-administraties overgeslagen; max 10 items per run;
+mislukte items worden afgestempeld zodat ze niet blijven herhalen).
+Het resultaat staat als boekingsvoorstel op het kaartje:
+- "Direct inboeken": maakt de inkoopfactuur + bijlage in één klik
+  (POST inkoop-postvak/{item}/inboeken).
+- "Controleer eerst": opent het inkoopformulier vooringevuld met het
+  herkende voorstel (geen tweede AI-call).
+Migratie: purchase_inbox_items + scan/scan_error/scanned_at.
+
+2. TERMIJNFACTUREN
+------------------
+Op een verstuurde/geaccepteerde offerte: knop "In termijnen" → plan met
+percentages (samen 100%, presets 30/70, 50/50, 3×⅓). Per termijn één klik
+→ gewone conceptfactuur, uitgesplitst per BTW-tarief, zelfde handelsnaam
+en taal. Regels:
+- Termijnen factureren op volgorde; de LAATSTE termijn = restant per
+  tarief, dus som van termijnen == offertesom tot op de cent.
+- Plan aanpassen/verwijderen kan tot de eerste termijn is gefactureerd.
+- Offerte met termijnplan kan niet meer in één keer worden omgezet
+  (guard in QuoteManager::convertToInvoice) en andersom.
+Migratie: quote_installments. Nieuw: QuoteInstallment(Controller).
+
+3. KORTING PER FACTUURREGEL
+---------------------------
+Kolom "Korting %" in factuur- en offerteformulier (invoice_lines +
+quote_lines: discount_pct). Korting gaat vóór de BTW (VatCalculator).
+Doorvertaald naar ALLE stromen:
+- PDF's (4 sjablonen): kolom Korting verschijnt alleen als ergens korting
+  is gegeven; originele prijs blijft zichtbaar.
+- Offerte → factuur (grossUnitPrice deelt de korting eruit — anders zou
+  hij dubbel worden toegepast), dupliceren, terugkerende facturen,
+  creditnota's (anders werd er te veel gecrediteerd!).
+- UBL: bij korting wordt de effectieve stuksprijs meegestuurd zodat
+  aantal × prijs = regelbedrag blijft kloppen voor validators.
+
+4. OUDERDOMSANALYSE DEBITEUREN (Rapporten → Debiteuren)
+-------------------------------------------------------
+Openstaand per klant in emmers: niet vervallen / 1-30 / 31-60 / 61-90 /
+90+ dagen. Rijen met 60+ lichten op; incasso-facturen gemarkeerd; top 10
+langst vervallen facturen met links. Nieuw: DebtorAgingController.
+
+5. WINSTGEVENDHEID PER KLANT (in Rapporten → Klantomzet)
+--------------------------------------------------------
+Klantomzet toont nu per klant ook: geschreven uren (+ km), en het
+effectieve uurtarief = omzet excl. btw ÷ uren. Klanten met uren maar
+zonder omzet staan er ook in (die kosten immers tijd). KPI met het
+gemiddelde effectieve tarief. En passant: de jaren-query van dit rapport
+gebruikte EXTRACT() (PostgreSQL-only) — nu portable.
+
+OVERIG
+------
+- Migraties: 2026_08_19_000016 t/m 000018.
+- Geen seederwijzigingen; de rooktest maakt eigen testdata.

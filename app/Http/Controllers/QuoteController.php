@@ -87,7 +87,10 @@ class QuoteController extends Controller
 
     public function show(Quote $quote): Response
     {
-        $quote->load('lines', 'customer', 'invoice');
+        $quote->load('lines', 'customer', 'invoice', 'installments.invoice');
+
+        // Termijnfacturen: eerstvolgende open termijn (factureren op volgorde).
+        $nextInstallmentId = $quote->installments->firstWhere('invoice_id', null)?->id;
 
         return Inertia::render('Quotes/Show', [
             'quote' => array_merge($quote->toArray(), [
@@ -106,6 +109,21 @@ class QuoteController extends Controller
                     'number' => $quote->invoice->number,
                     'status' => $quote->invoice->status,
                 ] : null,
+                'installments' => $quote->installments->map(fn ($i) => [
+                    'id' => $i->id,
+                    'description' => $i->description,
+                    'percentage' => (float) $i->percentage,
+                    'amount' => (float) $i->amount,
+                    'invoice' => $i->invoice ? [
+                        'id' => $i->invoice->id,
+                        'number' => $i->invoice->number,
+                        'status' => $i->invoice->status,
+                    ] : null,
+                    'is_next' => $i->id === $nextInstallmentId,
+                ])->values(),
+                'can_installments' => in_array($quote->status, ['sent', 'accepted'], true)
+                    && ! $quote->converted_invoice_id,
+                'installments_locked' => $quote->installments->whereNotNull('invoice_id')->isNotEmpty(),
             ]),
             // De offertevoorvertoning toont de huisstijl van de handelsnaam.
             'company' => $quote->brandedCompany(),
@@ -254,6 +272,7 @@ class QuoteController extends Controller
             'lines.*.unit' => ['nullable', 'string', 'max:30'],
             'lines.*.unit_price' => ['required', 'numeric', 'min:0'],
             'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
+            'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'action' => ['nullable', 'in:draft,send'],
         ]);
     }

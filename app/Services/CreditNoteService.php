@@ -48,6 +48,7 @@ class CreditNoteService
                     'unit' => $line->unit,
                     'unit_price' => $line->unit_price,
                     'vat_rate' => $line->vat_rate,
+                    'discount_pct' => $line->discount_pct,
                     'line_subtotal' => $line->line_subtotal,
                     'line_vat' => $line->line_vat,
                     'line_total' => $line->line_total,
@@ -55,11 +56,13 @@ class CreditNoteService
                 ]);
             }
 
-            // Recalculate totals
+            // Recalculate totals (inclusief regelkorting — anders zou er
+            // méér gecrediteerd worden dan er ooit is gefactureerd)
             $totals = $this->calc->calculateInvoice($credit->lines->map(fn ($l) => [
                 'quantity' => $l->quantity,
                 'unit_price' => $l->unit_price,
                 'vat_rate' => $l->vat_rate,
+                'discount_pct' => (float) ($l->discount_pct ?? 0),
             ])->toArray());
 
             $credit->update([

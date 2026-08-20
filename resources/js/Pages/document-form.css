@@ -17,7 +17,7 @@
 .lines-grid { width: 100%; }
 .lines-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 80px 110px 90px 110px 32px;
+  grid-template-columns: minmax(0, 1fr) 80px 110px 74px 90px 110px 32px;
   gap: 8px;
   font-size: 11px;
   font-weight: 600;
@@ -31,7 +31,7 @@
   display: grid;
   /* minmax(0, 1fr): zonder dat krijgt de omschrijvingskolom de min-content-breedte
      van de productselect + het invoerveld, en loopt de regel buiten de kaart. */
-  grid-template-columns: minmax(0, 1fr) 80px 110px 90px 110px 32px;
+  grid-template-columns: minmax(0, 1fr) 80px 110px 74px 90px 110px 32px;
   gap: 8px;
   align-items: start;
   padding: 12px 4px;

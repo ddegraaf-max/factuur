@@ -38,5 +38,11 @@ Schedule::command('summaries:send')
     ->dailyAt('08:30')
     ->timezone('Europe/Amsterdam');
 
+// Elke vijf minuten: herken nieuwe Postvak IN-items automatisch (scan & herken),
+// zodat er een kant-en-klaar boekingsvoorstel klaarligt.
+Schedule::command('purchases:scan-inbox')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();
+
 // Elk uur: ruim verlopen demo-omgevingen op.
 Schedule::command('demo:cleanup')->hourly();

@@ -251,6 +251,11 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');
     Route::post('offertes/{quote}/naar-factuur', [QuoteController::class, 'convert'])->name('quotes.convert');
 
+    // Termijnfacturen: een offerte in delen factureren (30% vooraf, 70% bij oplevering)
+    Route::post('offertes/{quote}/termijnen', [\App\Http\Controllers\QuoteInstallmentController::class, 'store'])->name('quotes.installments.store');
+    Route::delete('offertes/{quote}/termijnen', [\App\Http\Controllers\QuoteInstallmentController::class, 'destroy'])->name('quotes.installments.destroy');
+    Route::post('offertes/{quote}/termijnen/{installment}/factureren', [\App\Http\Controllers\QuoteInstallmentController::class, 'invoice'])->name('quotes.installments.invoice');
+
     // Urenregistratie: uren schrijven, timer en met één klik factureren
     Route::get('uren', [\App\Http\Controllers\TimeEntryController::class, 'index'])->name('hours.index');
     Route::post('uren', [\App\Http\Controllers\TimeEntryController::class, 'store'])->name('hours.store');
@@ -305,6 +310,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     // Postvak IN: per e-mail aangeleverde bonnen en facturen
     Route::get('inkoop-postvak', [\App\Http\Controllers\PurchaseInboxController::class, 'index'])->name('purchases.inbox.index');
     Route::get('inkoop-postvak/{item}/bestand', [\App\Http\Controllers\PurchaseInboxController::class, 'file'])->name('purchases.inbox.file');
+    Route::post('inkoop-postvak/{item}/inboeken', [\App\Http\Controllers\PurchaseInboxController::class, 'book'])->name('purchases.inbox.book');
     Route::post('inkoop-postvak/{item}/afwijzen', [\App\Http\Controllers\PurchaseInboxController::class, 'dismiss'])->name('purchases.inbox.dismiss');
     Route::delete('inkoop-postvak/{item}', [\App\Http\Controllers\PurchaseInboxController::class, 'destroy'])->name('purchases.inbox.destroy');
     Route::post('inkoop-postvak/adres', [\App\Http\Controllers\PurchaseInboxController::class, 'rotateAddress'])->name('purchases.inbox.rotate');
@@ -352,6 +358,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         // Cashflow-prognose: verwachte ontvangsten en uitgaven per maand
         Route::get('cashflow', [\App\Http\Controllers\CashflowController::class, 'index'])->name('cashflow.index');
+
+        // Ouderdomsanalyse debiteuren: wie staat er hoe lang open
+        Route::get('debiteuren', [\App\Http\Controllers\DebtorAgingController::class, 'index'])->name('aging.index');
     });
 
     // Settings (alleen de beheerder)

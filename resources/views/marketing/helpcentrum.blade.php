@@ -47,6 +47,8 @@
         <a class="help-link" href="{{ route('help.article', 'creditfactuur-maken') }}">Een creditfactuur maken →</a>
         <a class="help-link" href="{{ route('help.article', 'factuurnummering') }}">Factuurnummering aanpassen →</a>
         <a class="help-link" href="{{ route('help.article', 'facturen-in-het-engels') }}">Facturen in het Engels →</a>
+        <a class="help-link" href="{{ route('help.article', 'termijnfacturen') }}">Termijnfacturen (in delen factureren) →</a>
+        <a class="help-link" href="{{ route('help.article', 'korting-geven') }}">Korting geven op factuurregels →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">💸</div>
@@ -83,6 +85,7 @@
         <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je BTW-aangifte per kwartaal →</a>
         <a class="help-link" href="{{ route('help.article', 'jaaroverzicht') }}">Het jaaroverzicht (omzet, kosten, resultaat) →</a>
         <a class="help-link" href="{{ route('help.article', 'cashflow-prognose') }}">De cashflow-prognose →</a>
+        <a class="help-link" href="{{ route('help.article', 'ouderdomsanalyse-debiteuren') }}">Debiteuren: wie staat er hoe lang open? →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🤝</div>

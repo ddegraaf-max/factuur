@@ -17,18 +17,22 @@ class VatCalculator
      * Calculate a single line's totals.
      *
      * @param  float   $quantity
-     * @param  float   $unitPrice  Excluding VAT (mode 'excl') or including VAT (mode 'incl')
-     * @param  float   $vatRate    Percentage, e.g. 21.0
-     * @param  string  $mode       'excl' (default) or 'incl'
+     * @param  float   $unitPrice    Excluding VAT (mode 'excl') or including VAT (mode 'incl')
+     * @param  float   $vatRate      Percentage, e.g. 21.0
+     * @param  string  $mode         'excl' (default) or 'incl'
+     * @param  float   $discountPct  Regelkorting in procenten (0–100)
      * @return array{subtotal: float, vat: float, total: float}
      */
-    public function calculateLine(float $quantity, float $unitPrice, float $vatRate, string $mode = 'excl'): array
+    public function calculateLine(float $quantity, float $unitPrice, float $vatRate, string $mode = 'excl', float $discountPct = 0): array
     {
+        // Korting vóór BTW: de grondslag daalt, dus de BTW daalt automatisch mee.
+        $factor = 1 - min(100, max(0, $discountPct)) / 100;
+
         if ($mode === 'incl') {
             // De klant typt brutobedragen. Reken vanaf het regeltotaal terug,
             // niet vanaf de stuksprijs: anders loopt het bij meerdere stuks
             // centen uit de pas met wat de klant op de factuur ziet staan.
-            $total = $this->round($quantity * $unitPrice);
+            $total = $this->round($quantity * $unitPrice * $factor);
             $subtotal = $this->round($total / (1 + $vatRate / 100));
             $vat = $this->round($total - $subtotal);
 
@@ -39,7 +43,7 @@ class VatCalculator
             ];
         }
 
-        $subtotal = $this->round($quantity * $unitPrice);
+        $subtotal = $this->round($quantity * $unitPrice * $factor);
         $vat = $this->round($subtotal * ($vatRate / 100));
         $total = $this->round($subtotal + $vat);
 
@@ -79,8 +83,9 @@ class VatCalculator
             $qty = (float) ($line['quantity'] ?? 1);
             $price = (float) ($line['unit_price'] ?? 0);
             $rate = (float) ($line['vat_rate'] ?? 0);
+            $discount = (float) ($line['discount_pct'] ?? 0);
 
-            $lineCalc = $this->calculateLine($qty, $price, $rate, $mode);
+            $lineCalc = $this->calculateLine($qty, $price, $rate, $mode, $discount);
             $subtotal += $lineCalc['subtotal'];
             $vatTotal += $lineCalc['vat'];
 

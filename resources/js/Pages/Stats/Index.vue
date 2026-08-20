@@ -25,7 +25,7 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
     <div class="page-header">
       <div>
         <h1 class="page-title">Klantomzet</h1>
-        <p class="page-subtitle">Omzet per klant per jaar · inclusief en exclusief BTW</p>
+        <p class="page-subtitle">Omzet per klant per jaar · met bestede uren en het effectieve uurtarief</p>
       </div>
       <div class="year-tabs">
         <div v-for="y in allYears" :key="y" class="tab" :class="{ active: year === y }" @click="setYear(y)">{{ y }}</div>
@@ -43,6 +43,7 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
         <div class="kpi"><div class="lbl">Omzet excl. BTW</div><div class="val">{{ eur(totals.ex_vat) }}</div><div class="meta">Belastbaar bedrag</div></div>
         <div class="kpi"><div class="lbl">BTW totaal</div><div class="val">{{ eur(totals.vat) }}</div><div class="meta">Af te dragen</div></div>
         <div class="kpi tint"><div class="lbl">Omzet incl. BTW</div><div class="val brand">{{ eur(totals.inc_vat) }}</div><div class="meta">Totaal gefactureerd</div></div>
+        <div v-if="totals.hours > 0" class="kpi"><div class="lbl">Effectief uurtarief</div><div class="val">{{ eur(totals.effective_rate) }}</div><div class="meta">omzet excl. BTW ÷ {{ totals.hours.toLocaleString('nl-NL') }} geschreven uur</div></div>
       </div>
 
       <div v-if="list.length >= 2" class="card">
@@ -74,6 +75,8 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
               <th>#</th>
               <th>Klant</th>
               <th class="right">Facturen</th>
+              <th class="right">Uren</th>
+              <th class="right">Effectief/u</th>
               <th class="right">Excl. BTW</th>
               <th class="right">BTW</th>
               <th class="right">Incl. BTW</th>
@@ -84,6 +87,14 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
               <td class="num rank-cell">#{{ i + 1 }}</td>
               <td class="cell-primary">{{ c.customer_name }}<span v-if="c.customer_city" class="city"> · {{ c.customer_city }}</span></td>
               <td class="right num" data-label="Facturen">{{ c.invoice_count }}<span v-if="c.credit_count" class="muted-red">−{{ c.credit_count }}</span></td>
+              <td class="right num" data-label="Uren">
+                <template v-if="c.hours > 0">{{ c.hours.toLocaleString('nl-NL') }}<span v-if="c.km > 0" class="city"> · {{ c.km.toLocaleString('nl-NL') }} km</span></template>
+                <span v-else class="city">—</span>
+              </td>
+              <td class="right num" data-label="Effectief/u">
+                <template v-if="c.effective_rate !== null">{{ eur(c.effective_rate) }}</template>
+                <span v-else class="city">—</span>
+              </td>
               <td class="right num" data-label="Excl. BTW" :class="{ neg: c.ex_vat < 0 }">{{ c.ex_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.ex_vat)) }}</td>
               <td class="right num" data-label="BTW" :class="{ neg: c.vat < 0 }">{{ c.vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.vat)) }}</td>
               <td class="right num bold" data-label="Incl. BTW" :class="{ neg: c.inc_vat < 0 }">{{ c.inc_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.inc_vat)) }}</td>
@@ -92,6 +103,8 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
               <td class="rank-cell"></td>
               <td class="cell-primary">Totaal</td>
               <td class="right num" data-label="Facturen">{{ totals.invoice_count + totals.credit_count }}</td>
+              <td class="right num" data-label="Uren">{{ totals.hours > 0 ? totals.hours.toLocaleString('nl-NL') : '—' }}</td>
+              <td class="right num" data-label="Effectief/u">{{ totals.effective_rate !== null ? eur(totals.effective_rate) : '—' }}</td>
               <td class="right num" data-label="Excl. BTW">{{ eur(totals.ex_vat) }}</td>
               <td class="right num" data-label="BTW">{{ eur(totals.vat) }}</td>
               <td class="right num bold" data-label="Incl. BTW">{{ eur(totals.inc_vat) }}</td>
@@ -108,7 +121,7 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
 .tab { padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text-3); border-radius: 7px; cursor: pointer; }
 .tab:hover { color: var(--text); }
 .tab.active { background: var(--text); color: white; }
-.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; }
 .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
 .kpi.tint { background: var(--brand-tint); border-color: var(--brand-border); }
 .kpi .lbl { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }

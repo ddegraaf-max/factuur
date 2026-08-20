@@ -34,7 +34,7 @@
       <div>
         <div class="road-head road-idea"><span class="road-dot"></span> In onderzoek</div>
         <div class="road-card"><h4>BTW-aangifte direct indienen</h4><p>De kwartaalaangifte omzetbelasting rechtstreeks vanuit EasyInvoice indienen bij de Belastingdienst.</p></div>
-        <div class="road-card"><h4>Termijnfacturen</h4><p>Grote projecten in delen factureren (bijv. 30% vooraf, 70% bij oplevering) — met automatisch overzicht van wat er al gefactureerd is.</p></div>
+        <div class="road-card"><h4>Meerdere valuta</h4><p>Factureren in dollars, ponden of andere valuta — met de juiste BTW-behandeling en de wisselkoers vastgelegd op de factuur.</p></div>
       </div>
       <div>
         <div class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</div>
@@ -43,6 +43,11 @@
       </div>
       <div>
         <div class="road-head road-done"><span class="road-dot"></span> Onlangs geleverd</div>
+        <div class="road-card"><h4>Termijnfacturen</h4><p>Grote projecten in delen factureren (bijv. 30% vooraf, 70% bij oplevering) — de laatste termijn is automatisch het restant.</p></div>
+        <div class="road-card"><h4>Postvak IN verwerkt zichzelf</h4><p>Aangeleverde bonnen worden automatisch herkend: er ligt een kant-en-klaar boekingsvoorstel klaar dat je met één klik bevestigt.</p></div>
+        <div class="road-card"><h4>Korting per factuurregel</h4><p>Een kortingspercentage per regel op facturen en offertes — netjes zichtbaar op de PDF, de BTW rekent automatisch mee.</p></div>
+        <div class="road-card"><h4>Ouderdomsanalyse debiteuren</h4><p>Wie staat er hoe lang open (30/60/90+ dagen) — per klant, met de langst vervallen facturen bovenaan.</p></div>
+        <div class="road-card"><h4>Winstgevendheid per klant</h4><p>Omzet, bestede uren en het effectieve uurtarief per klant in het rapport Klantomzet.</p></div>
         <div class="road-card"><h4>QR-code betalen</h4><p>Een scan-en-betaal QR-code op de factuur-PDF: je klant scant met de telefoon en betaalt direct via iDEAL.</p></div>
         <div class="road-card"><h4>Cashflow-prognose</h4><p>Wat komt er de komende maanden binnen en wat gaat eruit — op basis van openstaande facturen, terugkerende facturen en vaste lasten.</p></div>
         <div class="road-card"><h4>Aanpasbare e-mailteksten</h4><p>Eigen onderwerp en tekst voor de factuur- en offertemail, met variabelen zoals {klant} en {factuurnummer}.</p></div>

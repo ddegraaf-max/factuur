@@ -26,11 +26,14 @@ const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
 /** Toon de prijs zoals de gebruiker hem invoert: bruto in incl-modus. */
 const displayPrice = (line) => {
   const qty = Number(line.quantity) || 0;
+  // Regeltotalen bevatten al de korting; die delen we eruit zodat je de
+  // originele prijs vóór korting terugziet (de korting staat in het %-veld).
+  const factor = 1 - (Number(line.discount_pct) || 0) / 100;
   if (props.price_mode === 'incl') {
     // Bestaande regel: leid de brutoprijs af uit het regeltotaal, dan zie je
     // exact terug wat er ooit is ingetypt (ook bij meerdere stuks).
-    if (line.line_total != null && qty > 0) {
-      return Math.round((Number(line.line_total) / qty) * 100) / 100;
+    if (line.line_total != null && qty > 0 && factor > 0) {
+      return Math.round((Number(line.line_total) / qty / factor) * 100) / 100;
     }
     return Math.round(Number(line.unit_price) * (1 + Number(line.vat_rate) / 100) * 100) / 100;
   }
@@ -56,6 +59,7 @@ const form = useForm({
         unit: l.unit,
         unit_price: displayPrice(l),
         vat_rate: Number(l.vat_rate),
+        discount_pct: Number(l.discount_pct) || 0,
       }))
     : [{
         product_id: null,
@@ -65,6 +69,7 @@ const form = useForm({
         unit: 'stuk',
         unit_price: 0,
         vat_rate: 21,
+        discount_pct: 0,
       }],
   action: 'draft',
   // Verrekeningen: al doorgestorte deelbetalingen die op de factuur in
@@ -82,14 +87,15 @@ const calcLine = (line) => {
   const qty = parseDutchNumber(line.quantity);
   const price = parseDutchNumber(line.unit_price);
   const rate = Number(line.vat_rate) || 0;
+  const factor = 1 - Math.min(100, Math.max(0, Number(line.discount_pct) || 0)) / 100;
 
   if (inclMode.value) {
-    const total = r2(qty * price);
+    const total = r2(qty * price * factor);
     const sub = r2(total / (1 + rate / 100));
     return { rate, subtotal: sub, vat: r2(total - sub), total };
   }
 
-  const sub = r2(qty * price);
+  const sub = r2(qty * price * factor);
   const vat = r2(sub * (rate / 100));
   return { rate, subtotal: sub, vat, total: r2(sub + vat) };
 };
@@ -134,6 +140,7 @@ const addLine = () => {
     unit: 'stuk',
     unit_price: 0,
     vat_rate: 21,
+    discount_pct: 0,
   });
 };
 
@@ -319,6 +326,7 @@ const submit = (action) => {
                 <div>Omschrijving</div>
                 <div style="text-align:right;">Aantal</div>
                 <div style="text-align:right;">{{ priceLabel }}</div>
+                <div style="text-align:right;">Korting</div>
                 <div>BTW</div>
                 <div style="text-align:right;">Totaal</div>
                 <div></div>
@@ -343,6 +351,9 @@ const submit = (action) => {
                 </div>
                 <div class="line-field" :data-label="priceLabel">
                   <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
+                </div>
+                <div class="line-field" data-label="Korting %">
+                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" title="Korting in procenten op deze regel">
                 </div>
                 <div class="line-field" data-label="BTW">
                   <select v-model.number="line.vat_rate">

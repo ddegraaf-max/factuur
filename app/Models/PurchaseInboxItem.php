@@ -18,11 +18,14 @@ class PurchaseInboxItem extends Model
         'company_id', 'purchase_invoice_id',
         'from_email', 'subject', 'filename', 'mime_type', 'size_bytes',
         'file_data', 'status', 'received_at',
+        'scan', 'scan_error', 'scanned_at',
     ];
 
     protected $casts = [
         'size_bytes' => 'integer',
         'received_at' => 'datetime',
+        'scan' => 'array',
+        'scanned_at' => 'datetime',
     ];
 
     // Het bestand zelf is te zwaar om standaard mee te sturen.

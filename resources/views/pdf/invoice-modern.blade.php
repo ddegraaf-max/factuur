@@ -126,14 +126,18 @@
   </tr>
 </table>
 
+@php
+  $hasDiscount = $invoice->lines->contains(fn ($l) => (float) ($l->discount_pct ?? 0) > 0);
+@endphp
 <table class="lines">
   <thead>
     <tr>
-      <th style="width:50%;">{{ __('doc.description') }}</th>
+      <th style="width:{{ $hasDiscount ? 44 : 50 }}%;">{{ __('doc.description') }}</th>
       <th class="right" style="width:10%;">{{ __('doc.quantity') }}</th>
       <th class="right" style="width:14%;">{{ __('doc.price') }}</th>
+      @if($hasDiscount)<th class="right" style="width:8%;">{{ __('doc.discount') }}</th>@endif
       <th class="center" style="width:8%;">{{ __('doc.vat') }}</th>
-      <th class="right" style="width:18%;">{{ __('doc.total') }}</th>
+      <th class="right" style="width:{{ $hasDiscount ? 16 : 18 }}%;">{{ __('doc.total') }}</th>
     </tr>
   </thead>
   <tbody>
@@ -145,6 +149,7 @@
         </td>
         <td class="right">{{ rtrim(rtrim(number_format($line->quantity, 3, ',', '.'), '0'), ',') }} {{ $line->unit }}</td>
         <td class="right">€ {{ number_format($line->unit_price, 2, ',', '.') }}</td>
+        @if($hasDiscount)<td class="right">{{ (float) ($line->discount_pct ?? 0) > 0 ? rtrim(rtrim(number_format($line->discount_pct, 2, ',', '.'), '0'), ',') . '%' : '—' }}</td>@endif
         <td class="center">{{ (int) $line->vat_rate }}%</td>
         <td class="right">€ {{ number_format($line->line_subtotal, 2, ',', '.') }}</td>
       </tr>

@@ -3,7 +3,7 @@ import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 import axios from 'axios';
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const props = defineProps({
   purchase: Object,     // null bij nieuw
@@ -172,6 +172,16 @@ const applyScan = (r) => {
   amountMode.value = 'excl';
   form.rows = r.vat_lines.map(l => ({ amount: Number(l.base), rate: Number(l.rate), vat: Number(l.vat) }));
 };
+
+// Postvak-item dat al automatisch is herkend: voorstel meteen invullen —
+// de gebruiker hoeft alleen nog te controleren en op te slaan.
+onMounted(() => {
+  if (!isEdit.value && props.inbox_item?.scan?.vat_lines?.length) {
+    applyScan(props.inbox_item.scan);
+    scanNotice.value = 'Automatisch herkend uit je Postvak IN — controleer de gegevens even voor je opslaat.';
+    scanWarning.value = props.inbox_item.scan.warning || '';
+  }
+});
 
 const scanReceipt = async () => {
   const entry = scannable.value;

@@ -88,6 +88,7 @@ class RecurringInvoiceController extends Controller
                 'unit' => $l->unit,
                 'unit_price' => (float) $l->unit_price,
                 'vat_rate' => (float) $l->vat_rate,
+                'discount_pct' => (float) ($l->discount_pct ?? 0),
             ])->values()->all(),
         ]);
 

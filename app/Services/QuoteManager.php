@@ -192,6 +192,9 @@ class QuoteManager
         if ($quote->status === 'rejected') {
             throw new \DomainException('Een afgewezen offerte kun je niet omzetten.');
         }
+        if ($quote->installments()->exists()) {
+            throw new \DomainException('Deze offerte wordt in termijnen gefactureerd — gebruik het termijnplan (of verwijder dat eerst).');
+        }
 
         $quote->loadMissing('lines');
         $mode = $this->priceMode($quote->company);
@@ -209,6 +212,9 @@ class QuoteManager
                     ? $this->grossUnitPrice($l)
                     : (float) $l->unit_price,
                 'vat_rate' => (float) $l->vat_rate,
+                // De korting verhuist mee; grossUnitPrice geeft de prijs
+                // vóór korting terug, dus er wordt niets dubbel gekort.
+                'discount_pct' => (float) ($l->discount_pct ?? 0),
             ])->values()->all();
 
             $invoice = $this->invoices->create([
@@ -323,13 +329,18 @@ class QuoteManager
         $mail->send(new QuoteMail($quote, $pdf));
     }
 
-    /** Brutostuksprijs afgeleid uit het regeltotaal — precies wat er is ingetypt. */
+    /**
+     * Brutostuksprijs afgeleid uit het regeltotaal — precies wat er is
+     * ingetypt. Het regeltotaal bevat al de regelkorting; die delen we er
+     * weer uit, anders zou de korting dubbel worden toegepast.
+     */
     protected function grossUnitPrice($line): float
     {
         $qty = (float) $line->quantity;
+        $factor = 1 - min(100, max(0, (float) ($line->discount_pct ?? 0))) / 100;
 
-        return $qty > 0
-            ? round((float) $line->line_total / $qty, 2)
+        return ($qty > 0 && $factor > 0)
+            ? round((float) $line->line_total / $qty / $factor, 2)
             : round((float) $line->unit_price * (1 + (float) $line->vat_rate / 100), 2);
     }
 
@@ -344,7 +355,8 @@ class QuoteManager
             $qty = (float) ($line['quantity'] ?? 1);
             $price = (float) ($line['unit_price'] ?? 0);
             $rate = (float) ($line['vat_rate'] ?? 0);
-            $calc = $this->vat->calculateLine($qty, $price, $rate, $mode);
+            $discount = min(100, max(0, (float) ($line['discount_pct'] ?? 0)));
+            $calc = $this->vat->calculateLine($qty, $price, $rate, $mode, $discount);
 
             $quote->lines()->create([
                 'product_id' => $line['product_id'] ?? null,
@@ -355,6 +367,7 @@ class QuoteManager
                 'unit' => $line['unit'] ?? 'stuk',
                 'unit_price' => $mode === 'incl' ? $this->vat->netUnitPrice($price, $rate) : $price,
                 'vat_rate' => $rate,
+                'discount_pct' => $discount > 0 ? $discount : null,
                 'line_subtotal' => $calc['subtotal'],
                 'line_vat' => $calc['vat'],
                 'line_total' => $calc['total'],

@@ -452,7 +452,10 @@ const deleteInvoice = () => {
                 <div v-if="line.details" style="font-size:12px;color:var(--text-3);">{{ line.details }}</div>
               </td>
               <td class="mono" style="text-align:right" data-label="Aantal">{{ Number(line.quantity) }}</td>
-              <td class="mono" style="text-align:right" data-label="Prijs">{{ eur(line.unit_price) }}</td>
+              <td class="mono" style="text-align:right" data-label="Prijs">
+                {{ eur(line.unit_price) }}
+                <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% korting</span>
+              </td>
               <td style="text-align:center" data-label="BTW">{{ Number(line.vat_rate) }}%</td>
               <td class="mono" style="text-align:right" data-label="Totaal">{{ eur(line.line_subtotal) }}</td>
             </tr>

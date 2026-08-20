@@ -21,12 +21,13 @@ const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
 
 const today = new Date().toISOString().slice(0, 10);
 
-/** Toon de prijs zoals hij is ingevoerd: bruto in incl-modus. */
+/** Toon de prijs zoals hij is ingevoerd: bruto in incl-modus, vóór korting. */
 const displayPrice = (line) => {
   const qty = Number(line.quantity) || 0;
+  const factor = 1 - (Number(line.discount_pct) || 0) / 100;
   if (props.price_mode === 'incl') {
-    if (line.line_total != null && qty > 0) {
-      return Math.round((Number(line.line_total) / qty) * 100) / 100;
+    if (line.line_total != null && qty > 0 && factor > 0) {
+      return Math.round((Number(line.line_total) / qty / factor) * 100) / 100;
     }
     return Math.round(Number(line.unit_price) * (1 + Number(line.vat_rate) / 100) * 100) / 100;
   }
@@ -57,8 +58,9 @@ const form = useForm({
         unit: l.unit,
         unit_price: displayPrice(l),
         vat_rate: Number(l.vat_rate),
+        discount_pct: Number(l.discount_pct) || 0,
       }))
-    : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21 }],
+    : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21, discount_pct: 0 }],
   action: 'draft',
 });
 
@@ -69,14 +71,15 @@ const calcLine = (line) => {
   const qty = parseDutchNumber(line.quantity);
   const price = parseDutchNumber(line.unit_price);
   const rate = Number(line.vat_rate) || 0;
+  const factor = 1 - Math.min(100, Math.max(0, Number(line.discount_pct) || 0)) / 100;
 
   if (inclMode.value) {
-    const total = r2(qty * price);
+    const total = r2(qty * price * factor);
     const sub = r2(total / (1 + rate / 100));
     return { rate, subtotal: sub, vat: r2(total - sub), total };
   }
 
-  const sub = r2(qty * price);
+  const sub = r2(qty * price * factor);
   const vat = r2(sub * (rate / 100));
   return { rate, subtotal: sub, vat, total: r2(sub + vat) };
 };
@@ -119,7 +122,7 @@ const validUntilLabel = computed(() => {
 });
 
 const addLine = () => {
-  form.lines.push({ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21 });
+  form.lines.push({ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21, discount_pct: 0 });
 };
 
 const removeLine = (i) => {
@@ -245,6 +248,7 @@ const submit = (action) => {
                 <div>Omschrijving</div>
                 <div style="text-align:right;">Aantal</div>
                 <div style="text-align:right;">{{ priceLabel }}</div>
+                <div style="text-align:right;">Korting</div>
                 <div>BTW</div>
                 <div style="text-align:right;">Totaal</div>
                 <div></div>
@@ -266,6 +270,9 @@ const submit = (action) => {
                 </div>
                 <div class="line-field" :data-label="priceLabel">
                   <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
+                </div>
+                <div class="line-field" data-label="Korting %">
+                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" title="Korting in procenten op deze regel">
                 </div>
                 <div class="line-field" data-label="BTW">
                   <select v-model.number="line.vat_rate">

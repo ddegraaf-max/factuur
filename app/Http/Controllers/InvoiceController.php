@@ -272,7 +272,7 @@ class InvoiceController extends Controller
         foreach ($invoice->lines as $line) {
             $copy->lines()->create($line->only([
                 'product_id', 'sort_order', 'description', 'details', 'quantity',
-                'unit', 'unit_price', 'vat_rate', 'line_subtotal', 'line_vat', 'line_total',
+                'unit', 'unit_price', 'vat_rate', 'discount_pct', 'line_subtotal', 'line_vat', 'line_total',
             ]));
         }
 
@@ -476,6 +476,7 @@ class InvoiceController extends Controller
             'lines.*.unit' => ['nullable', 'string', 'max:30'],
             'lines.*.unit_price' => ['required', 'numeric', 'min:0'],
             'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
+            'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'action' => ['nullable', 'in:draft,send'],
             'files' => ['nullable', 'array', 'max:10'],
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],

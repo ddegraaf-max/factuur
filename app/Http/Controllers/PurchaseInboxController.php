@@ -39,6 +39,17 @@ class PurchaseInboxController extends Controller
             'received_label' => $i->received_at->translatedFormat('j M Y, H:i'),
             'purchase_invoice_id' => $i->purchase_invoice_id,
             'purchase_supplier' => $i->purchaseInvoice?->supplier_name,
+            // Boekingsvoorstel uit de automatische herkenning (of de foutmelding).
+            'scanned' => $i->scanned_at !== null,
+            'scan_error' => $i->scan_error,
+            'proposal' => $i->scan ? [
+                'supplier_name' => $i->scan['supplier_name'] ?? null,
+                'invoice_date' => $i->scan['invoice_date'] ?? null,
+                'category' => $i->scan['category'] ?? null,
+                'total_incl' => round(collect($i->scan['vat_lines'] ?? [])
+                    ->sum(fn ($l) => (float) ($l['base'] ?? 0) + (float) ($l['vat'] ?? 0)), 2),
+                'warning' => $i->scan['warning'] ?? null,
+            ] : null,
         ]);
 
         $company = $request->user()->company;
@@ -53,7 +64,63 @@ class PurchaseInboxController extends Controller
             // Zonder inboekdomein (env) toont de pagina de activatie-uitleg.
             'inbound_address' => $company->inboundAddress(),
             'configured' => filled(config('services.inbound.domain')) && filled(config('services.inbound.secret')),
+            'scan_enabled' => app(\App\Services\ReceiptScanService::class)->enabled(),
         ]);
+    }
+
+    /**
+     * Direct inboeken: maak de inkoopfactuur aan uit het boekingsvoorstel
+     * (de automatische herkenning) — de gebruiker heeft het voorstel op het
+     * kaartje gezien en bevestigt met één klik. Aanpassen kan altijd nog
+     * via "Controleer eerst" of achteraf via bewerken.
+     */
+    public function book(PurchaseInboxItem $item): RedirectResponse
+    {
+        abort_unless($item->status === 'pending' && is_array($item->scan), 404);
+
+        $scan = $item->scan;
+
+        $lines = [];
+        $subtotal = 0.0;
+        $vatTotal = 0.0;
+        foreach ($scan['vat_lines'] ?? [] as $line) {
+            $base = round((float) ($line['base'] ?? 0), 2);
+            $vat = round((float) ($line['vat'] ?? 0), 2);
+            $lines[] = ['base' => $base, 'rate' => (float) ($line['rate'] ?? 0), 'vat' => $vat];
+            $subtotal += $base;
+            $vatTotal += $vat;
+        }
+        if ($lines === []) {
+            return back()->with('flash', 'Dit voorstel bevat geen bedragen — boek het in via "Controleer eerst".');
+        }
+
+        $purchase = \App\Models\PurchaseInvoice::create([
+            'supplier_name' => $scan['supplier_name'] ?: 'Onbekende leverancier',
+            'supplier_reference' => $scan['supplier_reference'] ?? null,
+            'category' => $scan['category'] ?? null,
+            'invoice_date' => $scan['invoice_date'] ?? $item->received_at->toDateString(),
+            'due_date' => $scan['due_date'] ?? null,
+            'status' => 'open',
+            'subtotal' => round($subtotal, 2),
+            'vat_total' => round($vatTotal, 2),
+            'total' => round($subtotal + $vatTotal, 2),
+            'vat_lines' => $lines,
+            'notes' => trim(($scan['notes'] ?? '') . "\nAutomatisch herkend uit e-mail (Postvak IN)."),
+        ]);
+
+        \App\Models\Attachment::create([
+            'attachable_type' => \App\Models\PurchaseInvoice::class,
+            'attachable_id' => $purchase->id,
+            'filename' => $item->filename,
+            'mime_type' => $item->mime_type,
+            'size_bytes' => $item->size_bytes,
+            'file_data' => $item->file_data,
+        ]);
+
+        $item->update(['status' => 'processed', 'purchase_invoice_id' => $purchase->id]);
+
+        return redirect()->route('purchases.show', $purchase)
+            ->with('flash', 'Inkoopfactuur ingeboekt vanuit het Postvak IN.');
     }
 
     /** Het bestand zelf (voor voorbeeld/thumbnail en het inkoopformulier). */

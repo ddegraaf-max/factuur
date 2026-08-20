@@ -147,7 +147,12 @@ class UblGenerator
             $xml[] = '        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>';
             $xml[] = '      </cac:ClassifiedTaxCategory>';
             $xml[] = '    </cac:Item>';
-            $xml[] = '    <cac:Price><cbc:PriceAmount currencyID="'.$this->e($currency).'">'.$this->amount($line->unit_price).'</cbc:PriceAmount></cac:Price>';
+            // Bij regelkorting sturen we de effectieve stuksprijs mee, zodat
+            // aantal × prijs = regelbedrag blijft kloppen voor validators.
+            $priceAmount = ((float) ($line->discount_pct ?? 0) > 0 && (float) $line->quantity > 0)
+                ? round((float) $line->line_subtotal / (float) $line->quantity, 2)
+                : (float) $line->unit_price;
+            $xml[] = '    <cac:Price><cbc:PriceAmount currencyID="'.$this->e($currency).'">'.$this->amount($priceAmount).'</cbc:PriceAmount></cac:Price>';
             $xml[] = '  </cac:InvoiceLine>';
         }
 

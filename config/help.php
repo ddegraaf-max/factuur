@@ -405,9 +405,63 @@ return [
                     'Ga naar Inkoop → Postvak IN: daar staat je persoonlijke inboek-adres (bijv. bon-a1b2c3d4e5f6@…). Stuur of forward e-mails met een PDF of foto als bijlage naar dat adres — van jezelf, of rechtstreeks van leveranciers. Alleen de bijlagen (PDF, PNG, JPG of WEBP, max 10 MB) worden bewaard; de mailtekst niet.',
                     'Raakt het adres bekend bij spammers? Met "Nieuw adres" genereer je direct een vers adres; het oude vervalt meteen.',
                 ]],
+                ['Automatisch herkend: het boekingsvoorstel', [
+                    'Nieuwe items worden binnen een paar minuten automatisch gelezen door de AI-herkenning. Op het kaartje verschijnt dan een boekingsvoorstel: leverancier, datum, bedrag en categorie. Klopt het? Met "Direct inboeken" staat de inkoopfactuur er met één klik in, inclusief het bestand als bijlage. Liever eerst kijken? "Controleer eerst" opent het inkoopformulier met alles vooringevuld en het bestand ernaast.',
+                    'Sloten de herkende bedragen niet helemaal op elkaar aan, dan staat er een waarschuwing bij het voorstel — controleer dan eerst. Lukt het herkennen niet (bijv. een onscherpe foto), dan boek je gewoon handmatig in zoals voorheen.',
+                ]],
                 ['Inboeken vanuit het postvak', [
                     'Elk aangeleverd bestand verschijnt als kaartje onder "Te verwerken", met een voorbeeld en de afzender. Klik op "Inboeken" en het inkoopformulier opent met het bestand er groot naast — inclusief de knop Scan & herken, die leverancier, datum en bedragen alvast invult. Bij het opslaan wordt het bestand automatisch als bijlage aan de inkoopfactuur gekoppeld en verhuist het item naar "Afgehandeld".',
                     'Niets mee doen? Wijs het item af (blijft zichtbaar onder Afgehandeld) of verwijder het definitief.',
+                ]],
+            ],
+        ],
+
+        'termijnfacturen' => [
+            'category' => 'Facturen',
+            'title' => 'Termijnfacturen: een offerte in delen factureren',
+            'intro' => 'Grote projecten factureer je in termijnen — bijvoorbeeld 30% bij opdracht en 70% bij oplevering.',
+            'sections' => [
+                ['Een termijnplan opstellen', [
+                    'Open een verstuurde of geaccepteerde offerte en klik op "In termijnen". Kies een voorinstelling (30/70, 50/50 of 3×⅓) of stel je eigen verdeling samen; de percentages moeten samen 100% zijn. Elke termijn krijgt een omschrijving die straks letterlijk op de factuur komt, zoals "Termijn 1: bij opdracht".',
+                ]],
+                ['Factureren per termijn', [
+                    'Op de offerte zie je het plan met de voortgang. Klik bij de eerstvolgende open termijn op "Maak factuur": er verschijnt een gewone conceptfactuur met het termijnbedrag, netjes uitgesplitst per BTW-tarief, onder dezelfde handelsnaam en in dezelfde taal als de offerte. Je controleert en verstuurt hem zoals altijd — herinneringen, iDEAL-betaallink en het klantenportaal werken gewoon.',
+                    'Termijnen factureer je op volgorde. De laatste termijn is automatisch het restant, zodat de som van alle termijnfacturen tot op de cent gelijk is aan de offertesom — ook als de percentages tot afrondingsverschillen zouden leiden.',
+                ]],
+                ['Goed om te weten', [
+                    'Zolang er nog geen termijn is gefactureerd kun je het plan aanpassen of verwijderen; daarna ligt het vast. Een offerte met termijnplan kan niet meer in één keer worden omgezet (en andersom). Op de offerte zie je per termijn de factuurstatus, dus ook of een termijn al betaald is.',
+                ]],
+            ],
+        ],
+
+        'korting-geven' => [
+            'category' => 'Facturen',
+            'title' => 'Korting geven op factuurregels',
+            'intro' => 'Geef per regel een kortingspercentage — de klant ziet de originele prijs én de korting op de factuur.',
+            'sections' => [
+                ['Zo werkt het', [
+                    'In het factuur- en offerteformulier staat naast de prijs een kolom "Korting". Vul daar een percentage in (bijv. 10) en het regeltotaal rekent direct mee. De BTW wordt automatisch berekend over het verlaagde bedrag — korting gaat immers vóór de BTW.',
+                ]],
+                ['Wat de klant ziet', [
+                    'Op de PDF verschijnt (alleen als er ergens korting is gegeven) een kolom Korting: de originele stuksprijs blijft staan, de korting staat ernaast en het regeltotaal is het verlaagde bedrag. Zo ziet je klant precies wat hij bespaart. De korting verhuist automatisch mee bij offerte → factuur, terugkerende facturen, dupliceren en creditnota\'s, en de UBL-e-factuur blijft kloppend.',
+                ]],
+                ['Vast kortingsbedrag of totaalkorting', [
+                    'Wil je een vast bedrag korting geven in plaats van een percentage, voeg dan een aparte regel toe met een negatief bedrag (bijv. "Actiekorting − € 50"). Voor korting op het hele document zet je hetzelfde percentage op alle regels.',
+                ]],
+            ],
+        ],
+
+        'ouderdomsanalyse-debiteuren' => [
+            'category' => 'Rapporten',
+            'title' => 'Debiteuren: wie staat er hoe lang open?',
+            'intro' => 'De ouderdomsanalyse laat per klant zien hoe lang facturen al openstaan — zodat je weet waar je achteraan moet.',
+            'sections' => [
+                ['De emmers', [
+                    'Ga naar Rapporten → Debiteuren. Openstaande facturen staan per klant verdeeld over "nog niet vervallen", 1–30, 31–60, 61–90 en 90+ dagen over de vervaldatum. Hoe verder naar rechts, hoe groter het risico dat er nooit betaald wordt — rijen met posten ouder dan 60 dagen lichten op. Onderaan staan de langst vervallen facturen, met directe links.',
+                ]],
+                ['Wat je ermee doet', [
+                    'De automatische herinneringen en aanmaningen (Instellingen → Herinneringen) vangen het gros af; dit rapport is voor het overzicht en de hardnekkige gevallen. Voor facturen die maar blijven staan is er het incassotraject — facturen die daar al in zitten zijn in het rapport gemarkeerd.',
+                    'Tip: het rapport Klantomzet toont sinds deze update ook de bestede uren en het effectieve uurtarief per klant — samen met de ouderdomsanalyse zie je zo welke klanten waardevol zijn én netjes betalen.',
                 ]],
             ],
         ],

@@ -9,7 +9,20 @@ const props = defineProps({
   counts: Object,          // { pending, done }
   inbound_address: String, // bon-xxxx@inboekdomein (of null)
   configured: Boolean,     // is het inbound-maildomein ingericht?
+  scan_enabled: Boolean,   // automatische herkenning actief (ANTHROPIC_API_KEY)
 });
+
+const eurFmt = (n) => '€ ' + Number(n || 0).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/* ---------- Direct inboeken vanuit het voorstel ---------- */
+const booking = ref(null);
+const book = (item) => {
+  booking.value = item.id;
+  router.post(route('purchases.inbox.book', item.id), {}, {
+    preserveScroll: true,
+    onFinish: () => { booking.value = null; },
+  });
+};
 
 const setStatus = (status) => router.get(route('purchases.inbox.index'), { status }, { preserveState: true });
 
@@ -110,9 +123,38 @@ const remove = (item) => {
             <template v-if="item.from_email"><br>van {{ item.from_email }}</template>
             <template v-if="item.subject"><br>„{{ item.subject }}"</template>
           </div>
+
+          <!-- Boekingsvoorstel uit de automatische herkenning -->
+          <div v-if="item.status === 'pending' && item.proposal" class="pv-proposal">
+            <div class="pv-proposal-title">Boekingsvoorstel</div>
+            <div class="pv-proposal-line">
+              <strong>{{ item.proposal.supplier_name || 'Leverancier onbekend' }}</strong>
+              · {{ eurFmt(item.proposal.total_incl) }} incl. btw
+            </div>
+            <div class="pv-proposal-sub">
+              <template v-if="item.proposal.invoice_date">{{ item.proposal.invoice_date }}</template>
+              <template v-if="item.proposal.category"> · {{ item.proposal.category }}</template>
+            </div>
+            <div v-if="item.proposal.warning" class="pv-proposal-warn">⚠ {{ item.proposal.warning }}</div>
+          </div>
+          <div v-else-if="item.status === 'pending' && item.scan_error" class="pv-proposal pv-proposal-err">
+            Niet automatisch herkend: {{ item.scan_error }}
+          </div>
+          <div v-else-if="item.status === 'pending' && scan_enabled && !item.scanned" class="pv-proposal pv-proposal-wait">
+            Wordt automatisch herkend — het voorstel staat hier binnen een paar minuten.
+          </div>
+
           <div class="pv-actions">
             <template v-if="item.status === 'pending'">
-              <Link :href="route('purchases.create', { inbox: item.id })" class="btn btn-primary btn-sm">Inboeken</Link>
+              <template v-if="item.proposal">
+                <button type="button" class="btn btn-primary btn-sm" :disabled="booking === item.id"
+                        :title="item.proposal.warning ? 'Let op: de bedragen sloten niet helemaal — controleer eerst' : ''"
+                        @click="book(item)">
+                  {{ booking === item.id ? 'Bezig…' : 'Direct inboeken' }}
+                </button>
+                <Link :href="route('purchases.create', { inbox: item.id })" class="btn btn-secondary btn-sm">Controleer eerst</Link>
+              </template>
+              <Link v-else :href="route('purchases.create', { inbox: item.id })" class="btn btn-primary btn-sm">Inboeken</Link>
               <button type="button" class="btn btn-secondary btn-sm" @click="dismiss(item)">Afwijzen</button>
             </template>
             <template v-else>
@@ -171,6 +213,17 @@ const remove = (item) => {
 .pv-name { font-weight: 600; font-size: 13.5px; word-break: break-word; }
 .pv-meta { font-size: 11.5px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
 .pv-actions { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.pv-proposal {
+  margin-top: 10px; padding: 8px 10px; border-radius: 8px; font-size: 12px; line-height: 1.55;
+  background: var(--success-bg, #F0FDF4); border: 1px solid var(--success-border, #BBF7D0);
+}
+.pv-proposal-title { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; color: var(--success, #16A34A); margin-bottom: 2px; }
+.pv-proposal-line { font-size: 12.5px; }
+.pv-proposal-sub { color: var(--text-3); margin-top: 1px; }
+.pv-proposal-warn { color: #92400E; margin-top: 4px; }
+.pv-proposal-err { background: var(--surface-2); border-color: var(--border); color: var(--text-3); }
+.pv-proposal-wait { background: var(--surface-2); border-color: var(--border); color: var(--text-3); font-style: italic; }
 
 .pill-muted { background: var(--surface-2); color: var(--text-3); }
 .icon-btn { width: 28px; height: 28px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); }
