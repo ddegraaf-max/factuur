@@ -85,7 +85,9 @@ class McpController extends Controller
             'instructions' => 'EasyInvoice is de facturatie-administratie van de gebruiker. '
                 . 'Gebruik klanten_zoeken om de juiste klant te vinden voordat je een offerte of factuur aanmaakt. '
                 . 'Alles wat je aanmaakt is een concept: de gebruiker controleert en verstuurt het zelf in EasyInvoice. '
-                . 'Prijzen geef je altijd exclusief btw op, met het btw-tarief (21, 9 of 0) per regel.',
+                . 'Prijzen geef je altijd exclusief btw op, met het btw-tarief (21, 9 of 0) per regel. '
+                . 'Heb je een uitgebreid offertedocument of plan van aanpak geschreven? Stuur het mee als bijlage '
+                . '(veld "bijlage" met "tekst" in markdown) — EasyInvoice maakt er een nette PDF van die met de mail naar de klant meegaat.',
         ]);
     }
 
@@ -130,6 +132,7 @@ class McpController extends Controller
                         'intro' => ['type' => 'string', 'description' => 'Inleidende tekst boven de offerte (optioneel).'],
                         'opmerkingen' => ['type' => 'string', 'description' => 'Voorwaarden, planning of aannames onder de offerte (optioneel).'],
                         'geldig_dagen' => ['type' => 'integer', 'description' => 'Geldigheid in dagen (optioneel; standaard van de administratie).'],
+                        'bijlage' => $this->attachmentSchema('offerte'),
                     ],
                     'required' => ['klant', 'regels'],
                     'additionalProperties' => false,
@@ -146,6 +149,7 @@ class McpController extends Controller
                         'referentie' => ['type' => 'string', 'description' => 'Referentie (optioneel).'],
                         'opmerkingen' => ['type' => 'string', 'description' => 'Opmerking voor de klant onderaan de factuur (optioneel).'],
                         'betalingstermijn_dagen' => ['type' => 'integer', 'description' => 'Betalingstermijn in dagen (optioneel; standaard van de klant of administratie).'],
+                        'bijlage' => $this->attachmentSchema('factuur'),
                     ],
                     'required' => ['klant', 'regels'],
                     'additionalProperties' => false,
@@ -157,6 +161,79 @@ class McpController extends Controller
                 'inputSchema' => ['type' => 'object', 'properties' => new \stdClass(), 'additionalProperties' => false],
             ],
         ]]);
+    }
+
+    /** Schema voor de optionele bijlage bij offerte_aanmaken / factuur_aanmaken. */
+    protected function attachmentSchema(string $doc): array
+    {
+        return [
+            'type' => 'object',
+            'description' => "Optioneel: een bijlage die met de {$doc} wordt meegestuurd naar de klant. Geef ÓF \"tekst\" (bijv. het volledige offertedocument of een plan van aanpak in markdown — EasyInvoice maakt er een nette PDF van) ÓF \"base64\" met \"bestandsnaam\" voor een echt bestand (PDF/PNG/JPG/WEBP, max 10 MB).",
+            'properties' => [
+                'titel' => ['type' => 'string', 'description' => 'Titel van het document (wordt ook de bestandsnaam), bijv. "Plan van aanpak".'],
+                'tekst' => ['type' => 'string', 'description' => 'De documenttekst in markdown of platte tekst — EasyInvoice zet dit om naar een verzorgde PDF.'],
+                'bestandsnaam' => ['type' => 'string', 'description' => 'Bestandsnaam inclusief extensie (alleen samen met base64).'],
+                'base64' => ['type' => 'string', 'description' => 'De base64-inhoud van het bestand (alleen voor echte bestanden; gebruik anders "tekst").'],
+            ],
+            'additionalProperties' => false,
+        ];
+    }
+
+    /**
+     * Maak van de meegegeven bijlage een Attachment bij het document.
+     * Retourneert de bestandsnaam, of null als er geen bijlage was.
+     */
+    protected function attachDocument(object $model, Company $company, array $args, string $documentLabel): ?string
+    {
+        $bijlage = $args['bijlage'] ?? null;
+        if (! is_array($bijlage)) {
+            return null;
+        }
+
+        if (filled($bijlage['tekst'] ?? null)) {
+            $title = mb_substr(trim((string) ($bijlage['titel'] ?? '')), 0, 120) ?: 'Bijlage';
+            $html = \Illuminate\Support\Str::markdown((string) $bijlage['tekst'], [
+                'html_input' => 'strip',
+                'allow_unsafe_links' => false,
+            ]);
+            $binary = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.bijlage-tekst', [
+                'title' => $title,
+                'html' => $html,
+                'company' => $company,
+                'documentLabel' => $documentLabel,
+            ])->setPaper('a4')->output();
+            $filename = (\Illuminate\Support\Str::slug($title) ?: 'bijlage') . '.pdf';
+            $mime = 'application/pdf';
+        } elseif (filled($bijlage['base64'] ?? null)) {
+            $binary = base64_decode(preg_replace('/\s+/', '', (string) $bijlage['base64']), true);
+            if ($binary === false || strlen($binary) === 0) {
+                throw new \DomainException('De bijlage kon niet worden gelezen (ongeldige base64). Gebruik anders "tekst" — dan maakt EasyInvoice er zelf een PDF van.');
+            }
+            if (strlen($binary) > 10 * 1024 * 1024) {
+                throw new \DomainException('De bijlage is groter dan 10 MB.');
+            }
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'application/octet-stream';
+            if (! in_array($mime, ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'], true)) {
+                throw new \DomainException('Alleen PDF-, PNG-, JPG- of WEBP-bijlagen zijn toegestaan. Gebruik anders "tekst" — dan maakt EasyInvoice er zelf een PDF van.');
+            }
+            $filename = mb_substr(trim((string) ($bijlage['bestandsnaam'] ?? 'bijlage.pdf')), 0, 255) ?: 'bijlage.pdf';
+        } else {
+            return null;
+        }
+
+        \App\Models\Attachment::create([
+            // Expliciet: zonder ingelogde gebruiker vult het model dit niet zelf in.
+            'company_id' => $company->id,
+            'attachable_type' => get_class($model),
+            'attachable_id' => $model->id,
+            'filename' => $filename,
+            'mime_type' => $mime,
+            'size_bytes' => strlen($binary),
+            'file_data' => base64_encode($binary),
+            'for_customer' => true,
+        ]);
+
+        return $filename;
     }
 
     protected function toolsCall(mixed $id, array $params, Company $company): Response
@@ -299,11 +376,14 @@ class McpController extends Controller
             'lines' => $lines,
         ]);
 
+        $attached = $this->attachDocument($quote, $company, $args, 'offerte ' . ($quote->number ?: '(concept)'));
+
         $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
 
         return "Concept-offerte aangemaakt voor {$customer->name}.\n"
             . 'Subtotaal ' . $eur($quote->subtotal) . ' · BTW ' . $eur($quote->vat_total) . ' · Totaal ' . $eur($quote->total) . "\n"
             . 'Geldig tot ' . $quote->valid_until->translatedFormat('j F Y') . ".\n"
+            . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de offertemail naar de klant.\n" : '')
             . 'Controleren en versturen: ' . route('quotes.show', $quote);
     }
 
@@ -324,11 +404,14 @@ class McpController extends Controller
 
         $invoice = $this->invoices->create($data);
 
+        $attached = $this->attachDocument($invoice, $company, $args, 'factuur (concept)');
+
         $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
 
         return "Concept-factuur aangemaakt voor {$customer->name}.\n"
             . 'Subtotaal ' . $eur($invoice->subtotal) . ' · BTW ' . $eur($invoice->vat_total) . ' · Totaal ' . $eur($invoice->total) . "\n"
             . "Het factuurnummer wordt toegekend bij het versturen.\n"
+            . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de factuurmail naar de klant.\n" : '')
             . 'Controleren en versturen: ' . route('invoices.show', $invoice);
     }
 

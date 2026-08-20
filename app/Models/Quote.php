@@ -66,6 +66,7 @@ class Quote extends Model
     public function lines(): HasMany { return $this->hasMany(QuoteLine::class)->orderBy('sort_order'); }
     public function invoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'converted_invoice_id')->withoutGlobalScope('company'); }
     public function installments(): HasMany { return $this->hasMany(QuoteInstallment::class)->orderBy('sort_order'); }
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\MorphMany { return $this->morphMany(Attachment::class, 'attachable'); }
 
     /** Geheime link voor het klantenportaal (bekijken en ondertekenen). */
     public function ensurePortalToken(): string

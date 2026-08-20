@@ -16,6 +16,17 @@ class AttachmentController extends Controller
 
     public function store(Request $request, Invoice $invoice)
     {
+        return $this->storeFor($request, Invoice::class, $invoice->id);
+    }
+
+    public function storeForQuote(Request $request, \App\Models\Quote $quote)
+    {
+        // Offertebijlagen gaan standaard mee met de offertemail.
+        return $this->storeFor($request, \App\Models\Quote::class, $quote->id, defaultForCustomer: true);
+    }
+
+    protected function storeFor(Request $request, string $attachableType, int $attachableId, bool $defaultForCustomer = false)
+    {
         $request->validate([
             'files' => 'required|array|max:10',
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
@@ -30,13 +41,13 @@ class AttachmentController extends Controller
             // In de database opslaan (base64), niet op schijf: het bestandssysteem
             // van Railway wordt bij elke deploy leeggegooid.
             Attachment::create([
-                'attachable_type' => Invoice::class,
-                'attachable_id' => $invoice->id,
+                'attachable_type' => $attachableType,
+                'attachable_id' => $attachableId,
                 'filename' => $file->getClientOriginalName(),
                 'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
                 'size_bytes' => $file->getSize(),
                 'file_data' => base64_encode(file_get_contents($file->getRealPath())),
-                'for_customer' => $request->boolean('for_customer'),
+                'for_customer' => $request->has('for_customer') ? $request->boolean('for_customer') : $defaultForCustomer,
             ]);
             $added++;
         }

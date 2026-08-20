@@ -61,6 +61,34 @@ const destroy = () => {
   }
 };
 
+/* ---------- Bijlagen ---------- */
+const attFileInput = ref(null);
+const attUploading = ref(false);
+
+const uploadAttachments = (event) => {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  attUploading.value = true;
+  router.post(route('quotes.attachments.store', props.quote.id), { files }, {
+    forceFormData: true,
+    preserveScroll: true,
+    onFinish: () => {
+      attUploading.value = false;
+      if (attFileInput.value) attFileInput.value.value = '';
+    },
+  });
+};
+
+const removeAttachment = (att) => {
+  if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
+    router.delete(route('attachments.destroy', att.id), { preserveScroll: true });
+  }
+};
+
+const toggleAttachmentVisibility = (att) => {
+  router.patch(route('attachments.update', att.id), { for_customer: !att.for_customer }, { preserveScroll: true });
+};
+
 /* ---------- Termijnfacturen ---------- */
 const installmentsError = computed(() => (page.props.errors || {}).installments ?? null);
 const showPlanner = ref(false);
@@ -369,10 +397,61 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         </div>
       </div>
     </div>
+
+    <!-- Bijlagen: gaan mee met de offertemail (voor de klant) of blijven intern -->
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Bijlagen</div>
+          <div class="card-subtitle">Bijv. een specificatie of plan van aanpak — gaat mee met de offertemail naar de klant</div>
+        </div>
+        <div>
+          <input ref="attFileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadAttachments">
+          <button class="btn btn-secondary btn-sm" :disabled="attUploading" @click="attFileInput?.click()">
+            {{ attUploading ? 'Uploaden…' : 'Bijlage toevoegen' }}
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div v-if="!quote.attachments || quote.attachments.length === 0" class="qa-empty">
+          Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand.
+        </div>
+        <div v-else>
+          <div v-for="att in quote.attachments" :key="att.id" class="qa-row">
+            <span class="qa-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </span>
+            <div class="qa-info">
+              <a :href="route('attachments.show', att.id)" target="_blank" class="qa-name">{{ att.filename }}</a>
+              <div class="qa-meta">{{ att.size_formatted }} · {{ att.uploaded_at_label }}</div>
+            </div>
+            <button
+              class="btn btn-ghost btn-sm"
+              :title="att.for_customer ? 'Gaat mee met de offertemail — klik om alleen intern te maken' : 'Alleen intern — klik om mee te sturen naar de klant'"
+              @click="toggleAttachmentVisibility(att)"
+            >
+              {{ att.for_customer ? 'Voor de klant ✓' : 'Alleen intern' }}
+            </button>
+            <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">Download</a>
+            <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">Verwijder</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
 <style scoped>
+/* Bijlagen */
+.qa-empty { color: var(--text-3); font-size: 12.5px; background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 9px; padding: 13px 15px; }
+.qa-row { display: flex; align-items: center; gap: 11px; border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; flex-wrap: wrap; }
+.qa-icon { width: 32px; height: 32px; border-radius: 7px; background: var(--surface-2); color: var(--text-3); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.qa-icon svg { width: 16px; height: 16px; }
+.qa-info { flex: 1; min-width: 160px; }
+.qa-name { font-weight: 600; font-size: 13px; color: var(--text); word-break: break-word; }
+.qa-name:hover { color: var(--brand); }
+.qa-meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+
 /* Documentweergave — zelfde vormgeving als de factuurpagina. Lokaal
    gedefinieerd zodat de offerte er ook goed uitziet wanneer je er direct
    op binnenkomt zonder eerst een factuur te openen. */

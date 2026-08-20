@@ -15,6 +15,13 @@ Tools die Claude krijgt:
 - factuur_aanmaken      CONCEPT-factuur (nummer pas bij versturen)
 - openstaande_facturen  overzicht open/vervallen verkoopfacturen
 
+Bijlage meesturen: offerte_aanmaken en factuur_aanmaken accepteren een
+optioneel "bijlage"-veld — met "tekst" (markdown; EasyInvoice rendert er
+via pdf/bijlage-tekst.blade.php een nette PDF van) of met "base64" +
+"bestandsnaam" (echt bestand, PDF/PNG/JPG/WEBP, max 10 MB, mime-check
+via finfo). De bijlage komt als for_customer op het document en gaat mee
+met de offerte-/factuurmail.
+
 Alles is een concept: versturen gebeurt altijd door de gebruiker in de
 app. Prijzen worden exclusief btw aangeleverd; bij administraties met
 incl-invoer rekent de koppeling om zodat de totalen kloppen.

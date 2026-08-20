@@ -142,7 +142,7 @@ class QuoteController extends Controller
 
     public function show(Quote $quote): Response
     {
-        $quote->load('lines', 'customer', 'invoice', 'installments.invoice');
+        $quote->load('lines', 'customer', 'invoice', 'installments.invoice', 'attachments');
 
         // Termijnfacturen: eerstvolgende open termijn (factureren op volgorde).
         $nextInstallmentId = $quote->installments->firstWhere('invoice_id', null)?->id;
@@ -164,6 +164,14 @@ class QuoteController extends Controller
                     'number' => $quote->invoice->number,
                     'status' => $quote->invoice->status,
                 ] : null,
+                'attachments' => $quote->attachments->map(fn ($a) => [
+                    'id' => $a->id,
+                    'filename' => $a->filename,
+                    'kind' => $a->kind,
+                    'size_formatted' => $a->size_formatted,
+                    'for_customer' => (bool) $a->for_customer,
+                    'uploaded_at_label' => $a->created_at?->translatedFormat('j M Y'),
+                ]),
                 'installments' => $quote->installments->map(fn ($i) => [
                     'id' => $i->id,
                     'description' => $i->description,

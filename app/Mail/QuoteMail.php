@@ -65,8 +65,28 @@ class QuoteMail extends Mailable
     {
         $name = ($this->quote->number ?: 'offerte-'.$this->quote->id).'.pdf';
 
-        return [
+        $attachments = [
             Attachment::fromData(fn () => $this->pdf, $name)->withMime('application/pdf'),
         ];
+
+        // Bijlagen die voor de klant zijn bedoeld (bijv. een specificatie of
+        // plan van aanpak). Met een totaalbudget zodat de mail bezorgbaar blijft.
+        $budget = 15 * 1024 * 1024;
+        $customerFiles = $this->quote->attachments()
+            ->withoutGlobalScope('company')
+            ->where('for_customer', true)
+            ->orderBy('id')
+            ->get();
+        foreach ($customerFiles as $file) {
+            $contents = $file->contents();
+            if ($contents === null || strlen($contents) > $budget) {
+                continue;
+            }
+            $budget -= strlen($contents);
+            $attachments[] = Attachment::fromData(fn () => $contents, $file->filename)
+                ->withMime($file->mime_type ?: 'application/octet-stream');
+        }
+
+        return $attachments;
     }
 }

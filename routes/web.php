@@ -254,6 +254,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         ->parameters(['offertes' => 'quote'])
         ->names('quotes');
     Route::post('offertes/{quote}/versturen', [QuoteController::class, 'send'])->name('quotes.send');
+    Route::post('offertes/{quote}/bijlagen', [\App\Http\Controllers\AttachmentController::class, 'storeForQuote'])->name('quotes.attachments.store');
     Route::get('offertes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
     Route::post('offertes/{quote}/accepteren', [QuoteController::class, 'accept'])->name('quotes.accept');
     Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');

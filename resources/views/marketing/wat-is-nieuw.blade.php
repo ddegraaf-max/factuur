@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.28.0</div>
+        <h3>Bijlagen bij offertes — ook rechtstreeks vanuit Claude</h3>
+        <ul class="tl-list">
+          <li><b>Bijlagen bij je offerte</b> — voeg een specificatie, plan van aanpak of tekening toe aan een offerte. Bijlagen voor de klant gaan automatisch mee met de offertemail; interne bijlagen blijven privé.</li>
+          <li><b>Claude stuurt het document mee</b> — schreef je met Claude een uitgebreid offertedocument? Claude stuurt de tekst mee bij het aanmaken en EasyInvoice maakt er een verzorgde PDF-bijlage van, in jouw administratie, klaar om mee te sturen. Een echt bestand (PDF of afbeelding) meegeven kan ook.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.27.0</div>
         <h3>Claude-koppeling — "zet deze offerte in EasyInvoice"</h3>
         <ul class="tl-list">
