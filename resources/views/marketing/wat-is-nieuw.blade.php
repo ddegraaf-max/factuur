@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.24.0</div>
+        <h3>Offerte uit tekst — plak je conceptofferte, het formulier vult zich in</h3>
+        <ul class="tl-list">
+          <li><b>Schrijf je je offertes met Claude of ChatGPT?</b> Plak de tekst bovenaan het offerteformulier en klik op "Formulier invullen": de AI zet klant, offerteregels (met aantal, eenheid, prijs en btw), inleiding en voorwaarden op de juiste plek. Jij controleert en verstuurt.</li>
+          <li><b>Slim meegedacht</b> — een herkende klantnaam wordt automatisch gekoppeld aan je bestaande klant, prijzen inclusief btw worden teruggerekend naar exclusief, en als de regels niet optellen tot het totaal in je tekst krijg je een waarschuwing.</li>
+          <li><b>Niets gaat vanzelf de deur uit</b> — de AI vult alleen het formulier in; er wordt pas iets opgeslagen als jij op "Opslaan als concept" of "Versturen" klikt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.23.0</div>
         <h3>Verrekening op inkoopfacturen — "te betalen" klopt nu altijd</h3>
         <ul class="tl-list">

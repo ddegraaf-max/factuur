@@ -242,6 +242,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::delete('invoices/{invoice}/inplannen', [InvoiceController::class, 'unschedule'])->name('invoices.unschedule');
 
     // Offertes
+    // "Offerte uit tekst" (AI) — vóór de resource, zodat 'herken' niet als
+    // {quote}-parameter wordt gelezen.
+    Route::post('offertes/herken', [QuoteController::class, 'parseText'])
+        ->middleware('throttle:15,1')->name('quotes.parse');
     Route::resource('offertes', QuoteController::class)
         ->parameters(['offertes' => 'quote'])
         ->names('quotes');

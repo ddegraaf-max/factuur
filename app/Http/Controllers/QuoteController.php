@@ -73,6 +73,47 @@ class QuoteController extends Controller
         ]));
     }
 
+    /**
+     * Offerte uit tekst: een geplakte offertetekst (bijv. geschreven met
+     * Claude) wordt door de AI omgezet naar formuliervelden. Er wordt hier
+     * niets opgeslagen — de gebruiker controleert het resultaat in het
+     * formulier.
+     */
+    public function parseText(Request $request, \App\Services\QuoteTextScanService $scanner): \Illuminate\Http\JsonResponse
+    {
+        abort_unless($scanner->enabled(), 404);
+
+        $data = $request->validate([
+            'text' => ['required', 'string', 'max:20000'],
+        ], [
+            'text.required' => 'Plak eerst de offertetekst.',
+            'text.max' => 'De tekst is te lang (maximaal 20.000 tekens).',
+        ]);
+
+        try {
+            $result = $scanner->scan($data['text']);
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        // Herkende klantnaam koppelen aan een bestaande klant (alleen bij een
+        // eenduidige match — anders kiest de gebruiker zelf).
+        $result['customer_id'] = null;
+        if ($result['customer_name']) {
+            $needle = mb_strtolower(trim($result['customer_name']));
+            $matches = Customer::get(['id', 'name'])->filter(function ($c) use ($needle) {
+                $name = mb_strtolower($c->name);
+
+                return str_contains($name, $needle) || str_contains($needle, $name);
+            });
+            if ($matches->count() === 1) {
+                $result['customer_id'] = $matches->first()->id;
+            }
+        }
+
+        return response()->json(['result' => $result]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
@@ -250,6 +291,8 @@ class QuoteController extends Controller
             'price_mode' => $company?->price_mode ?? 'excl',
             'default_valid_days' => $company?->quote_valid_days ?? 30,
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
+            // "Offerte uit tekst" (AI) — zelfde schakelaar als de bonherkenning.
+            'ai_enabled' => app(\App\Services\QuoteTextScanService::class)->enabled(),
         ];
     }
 

@@ -2,7 +2,8 @@
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur, parseDutchNumber } from '@/format.js';
-import { computed } from 'vue';
+import axios from 'axios';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   quote: Object,
@@ -13,6 +14,7 @@ const props = defineProps({
   default_valid_days: { type: Number, default: 30 },
   preselect_customer_id: { type: [String, Number], default: null },
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
+  ai_enabled: Boolean, // "offerte uit tekst" (alleen met ANTHROPIC_API_KEY)
 });
 
 const isEdit = computed(() => !!props.quote);
@@ -143,6 +145,58 @@ const applyProduct = (line, productId) => {
   }
 };
 
+/* ---------- Offerte uit tekst (AI) ---------- */
+const aiText = ref('');
+const aiBusy = ref(false);
+const aiError = ref('');
+const aiNotice = ref('');
+const aiWarning = ref('');
+
+const applyParsed = (r) => {
+  if (r.customer_id && props.customers.some(c => c.id === r.customer_id)) form.customer_id = r.customer_id;
+  if (r.reference) form.reference = r.reference;
+  if (r.intro) form.intro = r.intro;
+  if (r.notes) form.notes = r.notes;
+  if (r.valid_days) form.valid_days = r.valid_days;
+  if (r.lines?.length) {
+    form.lines = r.lines.map(l => ({
+      product_id: null,
+      description: l.description,
+      details: l.details || '',
+      quantity: Number(l.quantity) || 1,
+      unit: l.unit || 'stuk',
+      // De AI levert prijzen exclusief btw; in incl-modus toont het formulier bruto.
+      unit_price: inclMode.value
+        ? r2(Number(l.unit_price) * (1 + Number(l.vat_rate) / 100))
+        : Number(l.unit_price),
+      vat_rate: Number(l.vat_rate),
+      discount_pct: Number(l.discount_pct) || 0,
+    }));
+  }
+
+  const bits = [`${r.lines.length} regel${r.lines.length === 1 ? '' : 's'} ingevuld`];
+  if (r.customer_id) bits.push('klant herkend');
+  else if (r.customer_name) bits.push(`klant "${r.customer_name}" staat nog niet in je klantenlijst — kies er zelf een`);
+  aiNotice.value = `Offerte overgenomen (${bits.join(', ')}) — controleer alles even voor je opslaat.`;
+  aiWarning.value = r.warning || '';
+};
+
+const parseWithAi = async () => {
+  if (!aiText.value.trim() || aiBusy.value) return;
+  aiBusy.value = true;
+  aiError.value = ''; aiNotice.value = ''; aiWarning.value = '';
+  try {
+    const { data } = await axios.post(route('quotes.parse'), { text: aiText.value });
+    applyParsed(data.result);
+  } catch (e) {
+    aiError.value = e.response?.data?.message
+      || e.response?.data?.errors?.text?.[0]
+      || 'Herkennen is niet gelukt. Probeer het opnieuw of vul het formulier handmatig in.';
+  } finally {
+    aiBusy.value = false;
+  }
+};
+
 /* ---------- Zichtbare foutmeldingen bij het opslaan ---------- */
 const hasErrors = computed(() => Object.keys(form.errors).length > 0);
 
@@ -204,6 +258,30 @@ const submit = (action) => {
 
     <div class="form-layout">
       <div class="form-main">
+        <!-- Offerte uit tekst: plak wat je (bijv. met Claude) schreef, de AI vult het formulier in -->
+        <div v-if="ai_enabled" class="card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Offerte uit tekst</div>
+              <div class="card-subtitle">Schrijf je je offertes met Claude of ChatGPT? Plak de tekst hieronder — klant, regels en teksten worden ingevuld en jij controleert ze.</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <textarea v-model="aiText" rows="5" placeholder="Plak hier de volledige offertetekst — inclusief de prijzen…"></textarea>
+            <div class="ai-actions">
+              <button type="button" class="btn btn-primary btn-sm" :disabled="aiBusy || !aiText.trim()" @click="parseWithAi">
+                <svg v-if="!aiBusy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
+                <svg v-else class="ai-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>
+                {{ aiBusy ? 'Tekst wordt gelezen…' : 'Formulier invullen' }}
+              </button>
+              <span class="ai-hint">Er wordt niets opgeslagen totdat jij op "Opslaan als concept" of "Versturen" klikt.</span>
+            </div>
+            <div v-if="aiNotice" class="ai-msg ai-ok">{{ aiNotice }}</div>
+            <div v-if="aiWarning" class="ai-msg ai-warn">{{ aiWarning }}</div>
+            <div v-if="aiError" class="field-error" style="margin-top:8px;">{{ aiError }}</div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="card-title">Klant &amp; geldigheid</div></div>
           <div class="card-body">
@@ -352,3 +430,13 @@ const submit = (action) => {
 </template>
 
 <style src="../document-form.css"></style>
+
+<style scoped>
+.ai-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.ai-hint { font-size: 11.5px; color: var(--text-3); line-height: 1.5; flex: 1; min-width: 160px; }
+.ai-msg { margin-top: 10px; font-size: 12.5px; border-radius: 8px; padding: 8px 10px; line-height: 1.5; }
+.ai-ok { background: var(--success-bg); color: var(--success); }
+.ai-warn { background: rgba(217, 119, 6, 0.1); color: #b45309; }
+.ai-spin { animation: ai-rotate 0.9s linear infinite; }
+@keyframes ai-rotate { to { transform: rotate(360deg); } }
+</style>
