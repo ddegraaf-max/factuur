@@ -195,12 +195,12 @@
               Facturen
             </div>
             <div class="d-navitem">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
-              Klanten
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+              Offertes
             </div>
             <div class="d-navitem">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              Producten
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Uren
             </div>
             <div class="d-navitem">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="11" rx="2"/></svg>
@@ -213,8 +213,8 @@
             </div>
             <div class="d-navlabel">Instellingen</div>
             <div class="d-navitem">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              Bedrijf
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+              Handelsnamen
             </div>
           </aside>
 
@@ -254,9 +254,9 @@
                 <div class="d-kpi-meta"><span class="up" data-count="18" data-prefix="↑ " data-suffix="%">↑ 18%</span> vs vorige maand</div>
               </div>
               <div class="d-kpi d-anim" style="--d:.33s">
-                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>BTW Q2</div>
+                <div class="d-kpi-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>BTW Q3</div>
                 <div class="d-kpi-value" data-count="892" data-prefix="€ ">€ 892</div>
-                <div class="d-kpi-meta">Deadline 31-07</div>
+                <div class="d-kpi-meta">Deadline 31-10</div>
               </div>
             </div>
 
@@ -326,43 +326,55 @@
               </div>
             </section>
 
-            <!-- SCHERM: Klanten -->
-            <section class="d-screen" data-screen="klanten">
+            <!-- SCHERM: Offertes -->
+            <section class="d-screen" data-screen="offertes">
               <div class="d-shead d-anim" style="--d:.04s">
-                <div><div class="d-h1">Klanten</div><div class="d-sub">58 klanten · € 7.842 openstaand</div></div>
-                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Klant toevoegen</div>
+                <div><div class="d-h1">Offertes</div><div class="d-sub">18 offertes · € 24.150 uitstaand</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nieuwe offerte</div>
               </div>
-              <div class="d-card d-anim" style="--d:.12s">
+              <div class="d-card d-anim" style="--d:.10s;border-color:var(--success-border);background:var(--success-bg);">
+                <div class="d-card-sub" style="margin:0;">✍️ <b>Van Dijk Techniek</b> ondertekende offerte OFF-2026-0018 zojuist digitaal in het portaal — rechtsgeldig, met bewijsdossier. Termijn 1 van 2 (30%) staat klaar als conceptfactuur.</div>
+              </div>
+              <div class="d-card d-anim" style="--d:.16s">
                 <table class="d-table">
-                  <thead><tr><th>Klant</th><th class="d-hide">Plaats</th><th class="right">Openstaand</th><th class="right d-hide">Facturen</th></tr></thead>
+                  <thead><tr><th>Nummer</th><th>Klant</th><th class="d-hide">Geldig tot</th><th>Status</th><th class="right">Bedrag</th></tr></thead>
                   <tbody>
-                    <tr class="d-fade" style="--d:.18s"><td><div class="d-cust"><span class="d-avatar">BK</span>Bakkerij de Korenbloem</div></td><td class="d-hide">Hilversum</td><td class="mono right">€ 1.210</td><td class="mono right d-hide">18</td></tr>
-                    <tr class="d-fade" style="--d:.24s"><td><div class="d-cust"><span class="d-avatar">GA</span>Groenveld Advies</div></td><td class="d-hide">Utrecht</td><td class="mono right">€ 845</td><td class="mono right d-hide">9</td></tr>
-                    <tr class="d-fade" style="--d:.30s"><td><div class="d-cust"><span class="d-avatar">SL</span>Studio Lumen</div></td><td class="d-hide">Rotterdam</td><td class="mono right">€ 1.573</td><td class="mono right d-hide">12</td></tr>
-                    <tr class="d-fade" style="--d:.36s"><td><div class="d-cust"><span class="d-avatar">VD</span>Van Dijk Techniek</div></td><td class="d-hide">Eindhoven</td><td class="mono right">€ 0</td><td class="mono right d-hide">24</td></tr>
-                    <tr class="d-fade" style="--d:.42s"><td><div class="d-cust"><span class="d-avatar">DG</span>De Groot Interim</div></td><td class="d-hide">Den Haag</td><td class="mono right">€ 690</td><td class="mono right d-hide">7</td></tr>
-                    <tr class="d-fade" style="--d:.48s"><td><div class="d-cust"><span class="d-avatar">HM</span>Horizon Media</div></td><td class="d-hide">Groningen</td><td class="mono right">€ 540</td><td class="mono right d-hide">5</td></tr>
+                    <tr class="d-fade" style="--d:.20s"><td class="mono">OFF-0018</td><td>Van Dijk Techniek</td><td class="d-hide">14-09</td><td><span class="d-pill green">Ondertekend</span></td><td class="mono right">€ 8.470</td></tr>
+                    <tr class="d-fade" style="--d:.26s"><td class="mono">OFF-0017</td><td>Bakkerij de Korenbloem</td><td class="d-hide">—</td><td><span class="d-pill amber">Termijn 1/2</span></td><td class="mono right">€ 6.050</td></tr>
+                    <tr class="d-fade" style="--d:.32s"><td class="mono">OFF-0016</td><td>Studio Lumen</td><td class="d-hide">02-09</td><td><span class="d-pill blue">Verstuurd</span></td><td class="mono right">€ 3.920</td></tr>
+                    <tr class="d-fade" style="--d:.38s"><td class="mono">OFF-0015</td><td>Groenveld Advies</td><td class="d-hide">28-08</td><td><span class="d-pill blue">Verstuurd</span></td><td class="mono right">€ 2.140</td></tr>
+                    <tr class="d-fade" style="--d:.44s"><td class="mono">OFF-0014</td><td>Horizon Media</td><td class="d-hide">—</td><td><span class="d-pill gray">Concept</span></td><td class="mono right">€ 1.780</td></tr>
                   </tbody>
                 </table>
               </div>
             </section>
 
-            <!-- SCHERM: Producten -->
-            <section class="d-screen" data-screen="producten">
+            <!-- SCHERM: Uren & strippenkaarten -->
+            <section class="d-screen" data-screen="uren">
               <div class="d-shead d-anim" style="--d:.04s">
-                <div><div class="d-h1">Producten</div><div class="d-sub">24 producten &amp; diensten</div></div>
-                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Product toevoegen</div>
+                <div><div class="d-h1">Uren</div><div class="d-sub">Deze week 14:30 geschreven · timer, strippenkaarten en kilometers</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>Start timer</div>
               </div>
-              <div class="d-card d-anim" style="--d:.12s">
+              <div class="d-card d-anim" style="--d:.10s">
+                <div class="d-card-head">
+                  <div>
+                    <div class="d-card-title">Strippenkaart — Bakkerij de Korenbloem</div>
+                    <div class="d-card-sub">Bundel van 10 uur · vooraf betaald · uren tellen automatisch af</div>
+                  </div>
+                  <span class="d-pill green">Nog 3:30 over</span>
+                </div>
+                <div class="d-htrack"><div class="d-hfill" style="--w:65%;--d:.20s"></div></div>
+              </div>
+              <div class="d-card d-anim" style="--d:.16s">
+                <div class="d-card-head">
+                  <div class="d-card-title">Klaar om te factureren</div>
+                  <span class="d-card-link">Maak factuur →</span>
+                </div>
                 <table class="d-table">
-                  <thead><tr><th>Code</th><th>Naam</th><th class="right">Prijs</th><th class="right d-hide">BTW</th></tr></thead>
                   <tbody>
-                    <tr class="d-fade" style="--d:.18s"><td class="mono">P001</td><td>Consultancy (uur)</td><td class="mono right">€ 95,00</td><td class="right d-hide">21%</td></tr>
-                    <tr class="d-fade" style="--d:.24s"><td class="mono">P002</td><td>Webdesign pakket</td><td class="mono right">€ 1.250,00</td><td class="right d-hide">21%</td></tr>
-                    <tr class="d-fade" style="--d:.30s"><td class="mono">P003</td><td>Onderhoud maandelijks</td><td class="mono right">€ 45,00</td><td class="right d-hide">21%</td></tr>
-                    <tr class="d-fade" style="--d:.36s"><td class="mono">P004</td><td>Hosting (managed)</td><td class="mono right">€ 12,50</td><td class="right d-hide">21%</td></tr>
-                    <tr class="d-fade" style="--d:.42s"><td class="mono">P005</td><td>Fotografie dagdeel</td><td class="mono right">€ 350,00</td><td class="right d-hide">21%</td></tr>
-                    <tr class="d-fade" style="--d:.48s"><td class="mono">P006</td><td>Advies internationaal</td><td class="mono right">€ 80,00</td><td class="right d-hide">0%</td></tr>
+                    <tr class="d-fade" style="--d:.22s"><td>Van Dijk Techniek</td><td class="d-hide">6 urenregels</td><td class="mono right">6:15 uur</td><td class="mono right">€ 593,75</td></tr>
+                    <tr class="d-fade" style="--d:.28s"><td>Studio Lumen</td><td class="d-hide">4 urenregels</td><td class="mono right">4:30 uur</td><td class="mono right">€ 427,50</td></tr>
+                    <tr class="d-fade" style="--d:.34s"><td>Groenveld Advies</td><td class="d-hide">3 urenregels + 2 ritten</td><td class="mono right">3:45 uur</td><td class="mono right">€ 389,05</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -388,7 +400,7 @@
             <!-- SCHERM: Klantomzet -->
             <section class="d-screen" data-screen="klantomzet">
               <div class="d-shead d-anim" style="--d:.04s">
-                <div><div class="d-h1">Klantomzet</div><div class="d-sub">Top klanten in 2026 · € 48.320 totaal</div></div>
+                <div><div class="d-h1">Klantomzet</div><div class="d-sub">Top klanten in 2026 · € 48.320 totaal · effectief uurtarief € 92/u</div></div>
               </div>
               <div class="d-card d-anim" style="--d:.12s">
                 <div class="d-hbars">
@@ -402,27 +414,22 @@
               </div>
             </section>
 
-            <!-- SCHERM: Bedrijf -->
-            <section class="d-screen" data-screen="bedrijf">
+            <!-- SCHERM: Handelsnamen -->
+            <section class="d-screen" data-screen="handelsnamen">
               <div class="d-shead d-anim" style="--d:.04s">
-                <div><div class="d-h1">Bedrijfsgegevens</div><div class="d-sub">Deze gegevens verschijnen op je facturen</div></div>
-                <div class="d-newbtn ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Opslaan</div>
+                <div><div class="d-h1">Handelsnamen</div><div class="d-sub">Twee huisstijlen · één administratie, één abonnement</div></div>
+                <div class="d-newbtn ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Handelsnaam toevoegen</div>
               </div>
               <div class="d-logo-tile d-anim" style="--d:.10s">
-                <img src="/images/easyinvoice-favicon-180.png" alt="Logo">
-                <div><div class="t">Bedrijfslogo</div><div class="s">Verschijnt rechtsboven op elke factuur</div></div>
+                <div style="width:40px;height:40px;border-radius:9px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:15px;">JC</div>
+                <div><div class="t">Jansen Consultancy</div><div class="s">Standaard huisstijl · sjabloon Modern · rood</div></div>
               </div>
-              <div class="d-card d-anim" style="--d:.16s">
-                <div class="d-form">
-                  <div class="d-field d-fade" style="--d:.22s"><label>Bedrijfsnaam</label><div class="val">Jansen Consultancy B.V.</div></div>
-                  <div class="d-field d-fade" style="--d:.26s"><label>KvK-nummer</label><div class="val">59683198</div></div>
-                  <div class="d-field d-fade" style="--d:.30s"><label>BTW-nummer</label><div class="val">NL853603108B01</div></div>
-                  <div class="d-field d-fade" style="--d:.34s"><label>IBAN</label><div class="val">NL91 ABNA 0417 1643 00</div></div>
-                  <div class="d-field d-fade" style="--d:.38s"><label>Adres</label><div class="val">Torenlaan 5B</div></div>
-                  <div class="d-field d-fade" style="--d:.42s"><label>Postcode &amp; plaats</label><div class="val">1402 AT Bussum</div></div>
-                  <div class="d-field d-fade" style="--d:.46s"><label>E-mail</label><div class="val">hallo@jansenconsultancy.nl</div></div>
-                  <div class="d-field d-fade" style="--d:.50s"><label>Telefoon</label><div class="val">035 - 123 45 67</div></div>
-                </div>
+              <div class="d-logo-tile d-anim" style="--d:.16s">
+                <div style="width:40px;height:40px;border-radius:9px;background:#1D4ED8;color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:15px;">JF</div>
+                <div><div class="t">Jansen Fotografie</div><div class="s">Eigen logo &amp; kleur · sjabloon Minimal · blauw</div></div>
+              </div>
+              <div class="d-card d-anim" style="--d:.22s">
+                <div class="d-card-sub" style="margin:0;">Kies bij elke factuur of offerte onder welke handelsnaam hij de deur uitgaat — je klant ziet dát logo, díe kleur en díe afzendernaam. Juridisch verandert er niets: zelfde KvK, zelfde BTW-aangifte. En een écht tweede bedrijf? Dat voeg je toe als extra administratie onder dezelfde inlog — zonder tweede abonnement.</div>
               </div>
             </section>
           </div>
@@ -710,7 +717,7 @@
   if (!screens.length) return;
 
   // URL-slug per scherm (zelfde volgorde als de schermen en de menu-items).
-  var slugs = ['dashboard', 'facturen', 'klanten', 'producten', 'incasso', 'klantomzet', 'instellingen/bedrijf'];
+  var slugs = ['dashboard', 'facturen', 'offertes', 'uren', 'incasso', 'klantomzet', 'instellingen/handelsnamen'];
 
   function fmt(n, d) { return n.toLocaleString('nl-NL', { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function setNum(el, val) {
