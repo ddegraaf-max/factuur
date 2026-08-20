@@ -101,7 +101,17 @@ const showTrialBanner = computed(() => !isDemo.value && subscription.value.statu
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
 const isActive = (routeName) => {
-  return route().current(routeName) || route().current(routeName.replace('.index', '.*'));
+  if (route().current(routeName)) return true;
+  if (!route().current(routeName.replace('.index', '.*'))) return false;
+  // Wildcard-match ('purchases.*' dekt ook 'purchases.inbox.*'): alleen actief
+  // als er geen specifieker menu-item is dat óók matcht — anders lichten
+  // Inkoopfacturen en Postvak IN allebei op.
+  const prefix = routeName.replace(/\.index$/, '.');
+  return !rawNav.some(section => section.items.some(item =>
+    item.route !== routeName
+    && item.route.startsWith(prefix)
+    && (route().current(item.route) || route().current(item.route.replace('.index', '.*')))
+  ));
 };
 
 const flash = computed(() => page.props.flash || {});
