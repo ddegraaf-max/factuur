@@ -132,6 +132,7 @@ class McpController extends Controller
                         'intro' => ['type' => 'string', 'description' => 'Inleidende tekst boven de offerte (optioneel).'],
                         'opmerkingen' => ['type' => 'string', 'description' => 'Voorwaarden, planning of aannames onder de offerte (optioneel).'],
                         'geldig_dagen' => ['type' => 'integer', 'description' => 'Geldigheid in dagen (optioneel; standaard van de administratie).'],
+                        'handelsnaam' => ['type' => 'string', 'description' => 'Optioneel: de handelsnaam (huisstijl) waaronder de offerte wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.'],
                         'bijlage' => $this->attachmentSchema('offerte'),
                     ],
                     'required' => ['klant', 'regels'],
@@ -149,6 +150,7 @@ class McpController extends Controller
                         'referentie' => ['type' => 'string', 'description' => 'Referentie (optioneel).'],
                         'opmerkingen' => ['type' => 'string', 'description' => 'Opmerking voor de klant onderaan de factuur (optioneel).'],
                         'betalingstermijn_dagen' => ['type' => 'integer', 'description' => 'Betalingstermijn in dagen (optioneel; standaard van de klant of administratie).'],
+                        'handelsnaam' => ['type' => 'string', 'description' => 'Optioneel: de handelsnaam (huisstijl) waaronder de factuur wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.'],
                         'bijlage' => $this->attachmentSchema('factuur'),
                     ],
                     'required' => ['klant', 'regels'],
@@ -196,10 +198,15 @@ class McpController extends Controller
                 'html_input' => 'strip',
                 'allow_unsafe_links' => false,
             ]);
+            // Huisstijl van de gekozen handelsnaam (of gewoon het bedrijf):
+            // logo, merkkleur en lettertype — zelfde look als de offerte zelf.
+            $branded = method_exists($model, 'brandedCompany')
+                ? ($model->brandedCompany() ?? $company)
+                : $company;
             $binary = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.bijlage-tekst', [
                 'title' => $title,
                 'html' => $html,
-                'company' => $company,
+                'company' => $branded,
                 'documentLabel' => $documentLabel,
             ])->setPaper('a4')->output();
             $filename = (\Illuminate\Support\Str::slug($title) ?: 'bijlage') . '.pdf';
@@ -291,6 +298,35 @@ class McpController extends Controller
         return "Gevonden klanten:\n" . $lines->implode("\n");
     }
 
+    /** Eenduidige handelsnaam-match binnen de eigen administratie (of null). */
+    protected function resolveBrandProfile(Company $company, array $args): ?int
+    {
+        $name = trim((string) ($args['handelsnaam'] ?? ''));
+        if ($name === '') {
+            return null;
+        }
+
+        $profiles = \App\Models\BrandProfile::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->get(['id', 'name']);
+
+        if ($profiles->isEmpty()) {
+            throw new \DomainException('Deze administratie heeft geen handelsnamen ingericht — laat "handelsnaam" weg voor de standaard huisstijl.');
+        }
+
+        $needle = mb_strtolower($name);
+        $matches = $profiles->filter(fn ($p) => str_contains(mb_strtolower($p->name), $needle));
+        if ($matches->count() === 1) {
+            return $matches->first()->id;
+        }
+
+        throw new \DomainException(($matches->isEmpty()
+            ? "Handelsnaam \"{$name}\" bestaat niet."
+            : "Meerdere handelsnamen matchen op \"{$name}\".")
+            . ' Beschikbaar: ' . $profiles->pluck('name')->implode(', ')
+            . '. Of laat "handelsnaam" weg voor de standaard huisstijl.');
+    }
+
     /** Eenduidige klantmatch binnen de eigen administratie — anders een nette fout. */
     protected function resolveCustomer(Company $company, string $name): Customer
     {
@@ -369,6 +405,7 @@ class McpController extends Controller
 
         $quote = $this->quotes->create([
             'customer_id' => $customer->id,
+            'brand_profile_id' => $this->resolveBrandProfile($company, $args),
             'valid_days' => isset($args['geldig_dagen']) ? max(1, min(365, (int) $args['geldig_dagen'])) : null,
             'reference' => filled($args['referentie'] ?? null) ? mb_substr(trim($args['referentie']), 0, 255) : null,
             'intro' => filled($args['intro'] ?? null) ? mb_substr(trim($args['intro']), 0, 2000) : null,
@@ -379,8 +416,9 @@ class McpController extends Controller
         $attached = $this->attachDocument($quote, $company, $args, 'offerte ' . ($quote->number ?: '(concept)'));
 
         $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $brand = $quote->brandProfile?->name;
 
-        return "Concept-offerte aangemaakt voor {$customer->name}.\n"
+        return "Concept-offerte aangemaakt voor {$customer->name}" . ($brand ? " onder handelsnaam {$brand}" : '') . ".\n"
             . 'Subtotaal ' . $eur($quote->subtotal) . ' · BTW ' . $eur($quote->vat_total) . ' · Totaal ' . $eur($quote->total) . "\n"
             . 'Geldig tot ' . $quote->valid_until->translatedFormat('j F Y') . ".\n"
             . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de offertemail naar de klant.\n" : '')
@@ -394,6 +432,7 @@ class McpController extends Controller
 
         $data = [
             'customer_id' => $customer->id,
+            'brand_profile_id' => $this->resolveBrandProfile($company, $args),
             'reference' => filled($args['referentie'] ?? null) ? mb_substr(trim($args['referentie']), 0, 255) : null,
             'notes' => filled($args['opmerkingen'] ?? null) ? trim($args['opmerkingen']) : null,
             'lines' => $lines,
@@ -407,8 +446,9 @@ class McpController extends Controller
         $attached = $this->attachDocument($invoice, $company, $args, 'factuur (concept)');
 
         $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $brand = $invoice->brandProfile?->name;
 
-        return "Concept-factuur aangemaakt voor {$customer->name}.\n"
+        return "Concept-factuur aangemaakt voor {$customer->name}" . ($brand ? " onder handelsnaam {$brand}" : '') . ".\n"
             . 'Subtotaal ' . $eur($invoice->subtotal) . ' · BTW ' . $eur($invoice->vat_total) . ' · Totaal ' . $eur($invoice->total) . "\n"
             . "Het factuurnummer wordt toegekend bij het versturen.\n"
             . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de factuurmail naar de klant.\n" : '')

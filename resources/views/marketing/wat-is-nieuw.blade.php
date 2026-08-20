@@ -36,6 +36,7 @@
         <ul class="tl-list">
           <li><b>Bijlagen bij je offerte</b> — voeg een specificatie, plan van aanpak of tekening toe aan een offerte. Bijlagen voor de klant gaan automatisch mee met de offertemail; interne bijlagen blijven privé.</li>
           <li><b>Claude stuurt het document mee</b> — schreef je met Claude een uitgebreid offertedocument? Claude stuurt de tekst mee bij het aanmaken en EasyInvoice maakt er een verzorgde PDF-bijlage van, in jouw administratie, klaar om mee te sturen. Een echt bestand (PDF of afbeelding) meegeven kan ook.</li>
+          <li><b>In je eigen huisstijl</b> — de PDF die EasyInvoice van een Claude-document maakt, draagt automatisch je logo, merkkleur en lettertype. En Claude kan een <b>handelsnaam</b> kiezen: "maak deze offerte onder handelsnaam X".</li>
         </ul>
       </article>
 
