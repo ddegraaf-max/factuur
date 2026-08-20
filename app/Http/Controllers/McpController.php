@@ -122,7 +122,7 @@ class McpController extends Controller
             ],
             [
                 'name' => 'offerte_aanmaken',
-                'description' => 'Maak een CONCEPT-offerte aan voor een bestaande klant. De gebruiker controleert en verstuurt de offerte zelf in EasyInvoice. Prijzen exclusief btw.',
+                'description' => 'Maak een CONCEPT-offerte aan voor een bestaande klant. Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. het volledige offertedocument of plan van aanpak): EasyInvoice maakt er een PDF in de eigen huisstijl van die met de offertemail meegaat. Ook een handelsnaam kiezen kan. De gebruiker controleert en verstuurt alles zelf in EasyInvoice.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
@@ -141,7 +141,7 @@ class McpController extends Controller
             ],
             [
                 'name' => 'factuur_aanmaken',
-                'description' => 'Maak een CONCEPT-factuur aan voor een bestaande klant. De gebruiker controleert en verstuurt de factuur zelf in EasyInvoice (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw.',
+                'description' => 'Maak een CONCEPT-factuur aan voor een bestaande klant (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. een urenspecificatie): EasyInvoice maakt er een PDF in de eigen huisstijl van die met de factuurmail meegaat. De gebruiker controleert en verstuurt alles zelf in EasyInvoice.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
