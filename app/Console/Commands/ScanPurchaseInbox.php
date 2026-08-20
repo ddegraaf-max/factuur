@@ -41,7 +41,7 @@ class ScanPurchaseInbox extends Command
             ->orderBy('received_at')
             ->limit(max(1, (int) $this->option('limit')))
             ->get()
-            ->filter(fn ($item) => $item->company?->hasAiAccess());
+            ->filter(fn ($item) => $item->company?->hasAiAccess() && ! $item->company->aiLimitReached());
 
         $done = 0;
         foreach ($items as $item) {
@@ -55,6 +55,7 @@ class ScanPurchaseInbox extends Command
                     throw new \DomainException('Het bestand kon niet worden gelezen.');
                 }
                 $update['scan'] = $scanner->scan($contents, $item->mime_type);
+                \App\Models\AiUsageEvent::record($item->company_id, 'receipt_scan', 'inbox_auto');
                 $done++;
             } catch (\DomainException $e) {
                 $update['scan_error'] = mb_substr($e->getMessage(), 0, 300);

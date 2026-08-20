@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.26.0</div>
+        <h3>Inzicht in je AI-gebruik</h3>
+        <ul class="tl-list">
+          <li><b>Verbruiksteller</b> — op de abonnementspagina zie je precies hoeveel AI-acties (bonscans en offerteherkenningen) je deze maand hebt gebruikt. De teller staat elke maand weer op nul.</li>
+          <li><b>Ruime fair-use</b> — het Slim-abonnement bevat 250 AI-acties per maand: meer dan genoeg voor dagelijks gebruik, en een vangnet tegen uitschieters. Handmatig inboeken blijft altijd onbeperkt.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.25.0</div>
         <h3>Twee abonnementen: Basis en Slim</h3>
         <ul class="tl-list">

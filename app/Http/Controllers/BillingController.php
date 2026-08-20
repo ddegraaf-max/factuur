@@ -20,8 +20,58 @@ class BillingController extends Controller
     {
         $company = $request->user()->company;
 
+        // AI-verbruik van deze administratie (voor de teller op de pagina).
+        $usage = $company->aiUsageThisMonth();
+        $aiUsage = [
+            'month_label' => now()->translatedFormat('F Y'),
+            'receipt_scans' => $usage['receipt_scans'],
+            'quote_parses' => $usage['quote_parses'],
+            'total' => $usage['total'],
+            'limit' => $company->aiMonthlyLimit(),
+            'has_ai' => $company->hasAiAccess(),
+        ];
+
+        // Platformoverzicht (alleen voor het vrijgestelde beheerdersaccount):
+        // totaal AI-gebruik en de administraties die het meest scannen — de
+        // cijfers om een fair-use-grens en de marge op Slim te bewaken.
+        $platformAi = null;
+        if ($company->is_exempt) {
+            $months = collect(range(0, 2))->map(function ($i) {
+                $start = now()->subMonthsNoOverflow($i)->startOfMonth();
+                $rows = \App\Models\AiUsageEvent::whereBetween('created_at', [$start, (clone $start)->endOfMonth()])
+                    ->selectRaw('kind, COUNT(*) AS c')
+                    ->groupBy('kind')
+                    ->pluck('c', 'kind');
+
+                return [
+                    'label' => $start->translatedFormat('F Y'),
+                    'receipt_scans' => (int) ($rows['receipt_scan'] ?? 0),
+                    'quote_parses' => (int) ($rows['quote_parse'] ?? 0),
+                    'total' => (int) $rows->sum(),
+                ];
+            })->values();
+
+            $top = \App\Models\AiUsageEvent::where('created_at', '>=', now()->startOfMonth())
+                ->selectRaw('company_id, COUNT(*) AS c')
+                ->groupBy('company_id')
+                ->orderByDesc('c')
+                ->limit(10)
+                ->get();
+            $names = \App\Models\Company::whereIn('id', $top->pluck('company_id'))->pluck('name', 'id');
+
+            $platformAi = [
+                'months' => $months,
+                'top' => $top->map(fn ($r) => [
+                    'name' => $names[$r->company_id] ?? ('Administratie #' . $r->company_id),
+                    'total' => (int) $r->c,
+                ])->values(),
+            ];
+        }
+
         return Inertia::render('Billing/Index', [
             'subscription' => $company->subscriptionSummary(),
+            'ai_usage' => $aiUsage,
+            'platform_ai' => $platformAi,
             'plans' => [
                 [
                     'key' => 'basis',
@@ -43,12 +93,15 @@ class BillingController extends Controller
                     'amount' => '17,50',
                     'vat_note' => 'Excl. 21% btw · € 21,18 incl. btw',
                     'tagline' => 'Alles uit Basis, plus de AI-assistent die werk uit handen neemt.',
-                    'features' => [
+                    'features' => array_values(array_filter([
                         'Alles uit Basis',
                         'Scan & herken: bonnen en inkoopfacturen automatisch ingevuld',
                         'Postvak IN met automatische boekingsvoorstellen',
                         'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',
-                    ],
+                        ((int) config('services.anthropic.monthly_limit', 250)) > 0
+                            ? sprintf('Ruime fair-use: %d AI-acties per maand', (int) config('services.anthropic.monthly_limit', 250))
+                            : null,
+                    ])),
                     'available' => $this->stripe->slimConfigured(),
                 ],
             ],

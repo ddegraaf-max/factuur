@@ -89,6 +89,12 @@ class QuoteController extends Controller
             ], 403);
         }
 
+        if ($request->user()->company->aiLimitReached()) {
+            return response()->json([
+                'message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.',
+            ], 429);
+        }
+
         $data = $request->validate([
             'text' => ['required', 'string', 'max:20000'],
         ], [
@@ -101,6 +107,8 @@ class QuoteController extends Controller
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+
+        \App\Models\AiUsageEvent::record($request->user()->company_id, 'quote_parse', 'form');
 
         // Herkende klantnaam koppelen aan een bestaande klant (alleen bij een
         // eenduidige match — anders kiest de gebruiker zelf).

@@ -7,6 +7,13 @@ const props = defineProps({
   subscription: Object,
   plans: Array,
   stripeReady: Boolean,
+  ai_usage: { type: Object, default: null },   // verbruik van deze administratie
+  platform_ai: { type: Object, default: null }, // alleen voor het vrijgestelde beheerdersaccount
+});
+
+const usagePct = computed(() => {
+  if (!props.ai_usage?.limit) return 0;
+  return Math.min(100, Math.round((props.ai_usage.total / props.ai_usage.limit) * 100));
 });
 
 const page = usePage();
@@ -157,6 +164,60 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
       </div>
     </div>
 
+    <!-- AI-gebruik deze maand -->
+    <div v-if="ai_usage && (ai_usage.has_ai || ai_usage.total > 0)" class="card au-card">
+      <div class="card-body">
+        <div class="au-head">
+          <div>
+            <div class="au-title">AI-gebruik · {{ ai_usage.month_label }}</div>
+            <div class="au-sub">Scan &amp; herken en Offerte uit tekst — de teller staat elke maand weer op nul.</div>
+          </div>
+          <div class="au-total">
+            <b>{{ ai_usage.total }}</b>
+            <span v-if="ai_usage.limit"> van {{ ai_usage.limit }}</span>
+            <span v-else> · onbeperkt</span>
+          </div>
+        </div>
+        <div v-if="ai_usage.limit" class="au-bar">
+          <div class="au-bar-fill" :class="{ warn: usagePct >= 80 }" :style="{ width: Math.max(2, usagePct) + '%' }"></div>
+        </div>
+        <div class="au-split">
+          {{ ai_usage.receipt_scans }} {{ ai_usage.receipt_scans === 1 ? 'bon of factuur gescand' : 'bonnen en facturen gescand' }}
+          · {{ ai_usage.quote_parses }} {{ ai_usage.quote_parses === 1 ? 'offerte uit tekst' : 'offertes uit tekst' }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Platformoverzicht: alleen zichtbaar voor het vrijgestelde beheerdersaccount -->
+    <div v-if="platform_ai" class="card au-card">
+      <div class="card-body">
+        <div class="au-title">AI-gebruik hele platform <span class="au-admin-badge">beheer</span></div>
+        <div class="au-sub" style="margin-bottom:12px;">Alle administraties samen — om de AI-kosten en de fair-use-grens te bewaken.</div>
+
+        <table class="au-table">
+          <thead>
+            <tr><th>Maand</th><th class="right">Bonscans</th><th class="right">Offertes</th><th class="right">Totaal</th></tr>
+          </thead>
+          <tbody>
+            <tr v-for="m in platform_ai.months" :key="m.label">
+              <td>{{ m.label }}</td>
+              <td class="right num">{{ m.receipt_scans }}</td>
+              <td class="right num">{{ m.quote_parses }}</td>
+              <td class="right num"><b>{{ m.total }}</b></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <template v-if="platform_ai.top.length">
+          <div class="au-sub" style="margin:14px 0 6px;">Meeste AI-acties deze maand</div>
+          <div v-for="t in platform_ai.top" :key="t.name" class="au-top-row">
+            <span>{{ t.name }}</span><span class="num">{{ t.total }}</span>
+          </div>
+        </template>
+        <div v-else class="au-sub" style="margin-top:10px;">Nog geen AI-gebruik deze maand.</div>
+      </div>
+    </div>
+
     <p class="bill-foot">
       Vragen over je abonnement? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.
     </p>
@@ -210,6 +271,30 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
 .btn-block { width: 100%; }
 .plan-hint { font-size: 12px; color: var(--text-3); margin-top: 10px; text-align: center; }
 .plan-hint.err-text { color: var(--brand); }
+
+/* AI-gebruik */
+.au-card { max-width: 1180px; margin-top: 20px; }
+.au-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.au-title { font-family: var(--font-display); font-weight: 700; font-size: 16px; }
+.au-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
+.au-total { font-size: 15px; color: var(--text-2); white-space: nowrap; }
+.au-total b { font-family: var(--font-display); font-size: 22px; color: var(--text); }
+.au-bar { margin-top: 12px; height: 8px; background: var(--surface-3); border-radius: 100px; overflow: hidden; }
+.au-bar-fill { height: 100%; background: var(--success); border-radius: 100px; transition: width .3s; }
+.au-bar-fill.warn { background: var(--warning); }
+.au-split { font-size: 13px; color: var(--text-2); margin-top: 10px; }
+.au-admin-badge {
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--info); background: var(--info-bg); border: 1px solid var(--info-border);
+  border-radius: 100px; padding: 2px 9px; vertical-align: middle; margin-left: 8px;
+}
+.au-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin-top: 6px; }
+.au-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); padding: 6px 8px; border-bottom: 1px solid var(--border); }
+.au-table td { padding: 8px; border-bottom: 1px solid var(--border); }
+.au-table .right { text-align: right; }
+.num { font-family: var(--font-mono); }
+.au-top-row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 8px; font-size: 13.5px; color: var(--text-2); border-bottom: 1px solid var(--border); }
+.au-top-row:last-child { border-bottom: none; }
 
 .bill-alert { padding: 12px 16px; border-radius: var(--r); margin-bottom: 18px; font-size: 14px; font-weight: 500; max-width: 880px; }
 .bill-alert.ok { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }

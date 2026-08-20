@@ -300,6 +300,12 @@ class PurchaseInvoiceController extends Controller
             ], 403);
         }
 
+        if ($request->user()->company->aiLimitReached()) {
+            return response()->json([
+                'message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul — tot die tijd kun je gewoon handmatig inboeken.',
+            ], 429);
+        }
+
         $request->validate([
             'file' => ['required_without:inbox_id', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
             'inbox_id' => ['nullable', 'integer'],
@@ -325,6 +331,8 @@ class PurchaseInvoiceController extends Controller
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+
+        \App\Models\AiUsageEvent::record($request->user()->company_id, 'receipt_scan', 'form');
 
         return response()->json(['result' => $result]);
     }

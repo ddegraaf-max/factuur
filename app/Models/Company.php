@@ -249,6 +249,42 @@ class Company extends Model
         return 'expired';
     }
 
+    /* ===================== AI-GEBRUIK (fair use) ===================== */
+
+    /** AI-acties van deze maand, uitgesplitst per soort. */
+    public function aiUsageThisMonth(): array
+    {
+        $rows = AiUsageEvent::where('company_id', $this->id)
+            ->where('created_at', '>=', now()->startOfMonth())
+            ->selectRaw('kind, COUNT(*) AS c')
+            ->groupBy('kind')
+            ->pluck('c', 'kind');
+
+        return [
+            'receipt_scans' => (int) ($rows['receipt_scan'] ?? 0),
+            'quote_parses' => (int) ($rows['quote_parse'] ?? 0),
+            'total' => (int) $rows->sum(),
+        ];
+    }
+
+    /** Maandlimiet voor AI-acties; null = onbeperkt (vrijgesteld of limiet uit). */
+    public function aiMonthlyLimit(): ?int
+    {
+        if ($this->is_exempt) {
+            return null;
+        }
+        $limit = (int) config('services.anthropic.monthly_limit', 250);
+
+        return $limit > 0 ? $limit : null;
+    }
+
+    public function aiLimitReached(): bool
+    {
+        $limit = $this->aiMonthlyLimit();
+
+        return $limit !== null && $this->aiUsageThisMonth()['total'] >= $limit;
+    }
+
     /** Compacte samenvatting voor het frontend. */
     public function subscriptionSummary(): array
     {

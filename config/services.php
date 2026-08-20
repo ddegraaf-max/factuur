@@ -50,6 +50,10 @@ return [
     'anthropic' => [
         'key' => env('ANTHROPIC_API_KEY'),
         'model' => env('ANTHROPIC_MODEL', 'claude-opus-5'),
+        // Fair use: maximaal aantal AI-acties (scans + offerteherkenningen)
+        // per administratie per maand. 0 = geen limiet. Vrijgestelde accounts
+        // hebben nooit een limiet.
+        'monthly_limit' => (int) env('AI_MONTHLY_LIMIT', 250),
     ],
     'slack' => [
         'notifications' => [
