@@ -173,7 +173,7 @@
   @if($pdfAdvances->isNotEmpty())
     <tr><td class="label">{{ __('doc.total_incl_vat') }}</td><td class="value">€ {{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
     @foreach($pdfAdvances as $adv)
-      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">− € {{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">- € {{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
     @endforeach
     <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value brand">€ {{ number_format($pdfPayable, 2, ',', '.') }}</td></tr>
   @else

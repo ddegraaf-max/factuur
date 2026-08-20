@@ -1,5 +1,5 @@
 @php
-    $money = fn ($v) => ($v < 0 ? '− ' : '') . '€ ' . number_format(abs((float) $v), 2, ',', '.');
+    $money = fn ($v) => ($v < 0 ? '- ' : '') . '€ ' . number_format(abs((float) $v), 2, ',', '.');
     $brand = $company->brand_color ?: '#E8231F';
     $statusLabels = ['closed' => 'Afgerond', 'current' => 'Loopt nu', 'future' => 'Nog niet begonnen'];
     $rateRows = [
@@ -112,7 +112,7 @@
           <tr>
             <td><span class="rubriek">5b</span> Voorbelasting (inkoop)</td>
             <td class="right" style="color:#78716C;">{{ $q['purchase_count'] }} {{ $q['purchase_count'] === 1 ? 'factuur' : 'facturen' }}</td>
-            <td class="right">− {{ $money($q['input_vat']) }}</td>
+            <td class="right">- {{ $money($q['input_vat']) }}</td>
           </tr>
           <tr class="total">
             <td>{{ $q['balance'] < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }}</td>
