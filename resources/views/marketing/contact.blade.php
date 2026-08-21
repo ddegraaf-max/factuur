@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Contact — EasyInvoice')
-@section('description', 'Neem contact op met EasyInvoice. We reageren binnen één werkdag.')
+@section('title', 'Contact met EasyInvoice — we reageren binnen één werkdag')
+@section('description', 'Vragen over facturen, je abonnement of een functie? Mail het EasyInvoice-team via hallo@easyinvoice.nl — we reageren binnen één werkdag, ook tijdens je proefperiode.')
 
 @push('styles')
 <style>

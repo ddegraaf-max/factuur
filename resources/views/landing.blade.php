@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'EasyInvoice — Van offerte tot geld op je rekening, vanaf € 12,10/maand incl. btw')
-@section('description', 'EasyInvoice — facturatie voor Nederlandse ondernemers. Offertes digitaal laten ondertekenen, facturen met iDEAL en QR, meerdere handelsnamen, strippenkaarten, urenregistratie en BTW-overzicht — vanaf € 12,10 per maand (incl. 21% btw).')
+@section('title', 'Factuurprogramma voor Nederlandse ondernemers — EasyInvoice')
+@section('description', 'Facturen, offertes met digitale ondertekening, BTW-overzicht, incasso en AI die je administratie invult. Vanaf € 12,10 per maand. Probeer 14 dagen gratis.')
 
 @section('content')
 

@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Status — EasyInvoice')
-@section('description', 'Actuele, live status van de EasyInvoice-systemen.')
+@section('title', 'Status van de EasyInvoice-systemen — live en actueel')
+@section('description', 'Live status van de EasyInvoice-systemen: app, e-mailbezorging en betalingen. Bij een storing lees je hier direct wat er speelt en waar we aan werken.')
 
 @push('styles')
 <style>

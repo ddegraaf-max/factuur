@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Wat is nieuw — EasyInvoice')
-@section('description', 'De laatste updates en verbeteringen van EasyInvoice.')
+@section('title', 'Wat is nieuw in EasyInvoice — updates en verbeteringen')
+@section('description', 'Elke maand nieuwe functies in EasyInvoice: van AI-bonherkenning en de Claude-koppeling tot termijnfacturen en eigen briefpapier. Bekijk alle updates op een rij.')
 
 @push('styles')
 <style>

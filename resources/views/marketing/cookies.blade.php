@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Cookiebeleid — EasyInvoice')
-@section('description', 'Welke cookies EasyInvoice gebruikt en waarom.')
+@section('title', 'Cookiebeleid van EasyInvoice — welke cookies en waarom')
+@section('description', 'EasyInvoice gebruikt alleen functionele cookies — geen tracking en geen advertenties. Lees welke cookies we plaatsen, waarvoor en hoelang ze bewaard blijven.')
 
 @section('content')
 <style>

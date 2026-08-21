@@ -4,7 +4,66 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw), met AI vanaf € 21,18.')">
-<title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10/maand incl. btw')</title>
+<title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')</title>
+
+{{-- SEO: canonical + social preview + structured data --}}
+<link rel="canonical" href="{{ url()->current() }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EasyInvoice">
+<meta property="og:locale" content="nl_NL">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:title" content="@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')">
+<meta property="og:description" content="@yield('description', 'Eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW en incasso — met AI die je administratie invult.')">
+<meta property="og:image" content="{{ url('/images/og-easyinvoice.png') }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')">
+<meta name="twitter:description" content="@yield('description', 'Eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW en incasso — met AI die je administratie invult.')">
+<meta name="twitter:image" content="{{ url('/images/og-easyinvoice.png') }}">
+<script type="application/ld+json">
+{
+  "@@context": "https://schema.org",
+  "@@graph": [
+    {
+      "@@type": "SoftwareApplication",
+      "name": "EasyInvoice",
+      "url": "{{ url('/') }}",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "nl",
+      "description": "Online facturatieprogramma voor Nederlandse ondernemers: facturen, offertes met digitale ondertekening, BTW-overzicht, incasso, urenregistratie en AI die de administratie invult.",
+      "image": "{{ url('/images/og-easyinvoice.png') }}",
+      "offers": [
+        {
+          "@@type": "Offer",
+          "name": "Basis",
+          "price": "12.10",
+          "priceCurrency": "EUR",
+          "description": "Het volledige facturatiepakket voor € 12,10 per maand (incl. 21% btw), maandelijks opzegbaar."
+        },
+        {
+          "@@type": "Offer",
+          "name": "Slim",
+          "price": "21.18",
+          "priceCurrency": "EUR",
+          "description": "Alles uit Basis plus de AI-functies voor € 21,18 per maand (incl. 21% btw), maandelijks opzegbaar."
+        }
+      ],
+      "publisher": { "@@type": "Organization", "name": "Creditline B.V." }
+    },
+    {
+      "@@type": "Organization",
+      "name": "EasyInvoice",
+      "url": "{{ url('/') }}",
+      "logo": "{{ url('/images/easyinvoice-favicon-512.png') }}",
+      "email": "hallo@easyinvoice.nl",
+      "address": { "@@type": "PostalAddress", "addressLocality": "Bussum", "addressCountry": "NL" }
+    }
+  ]
+}
+</script>
+
 <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
 <link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">

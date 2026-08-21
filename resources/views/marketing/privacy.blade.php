@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Privacybeleid — EasyInvoice')
-@section('description', 'Hoe EasyInvoice omgaat met je persoonsgegevens. AVG-compliant.')
+@section('title', 'Privacybeleid EasyInvoice — zo gaan we met je gegevens om')
+@section('description', 'Hoe EasyInvoice omgaat met je persoonsgegevens: wat we opslaan, waarom, hoelang en met welke verwerkers. AVG-compliant en zonder verkoop van data.')
 
 @section('content')
 <style>

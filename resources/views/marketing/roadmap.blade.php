@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Roadmap — EasyInvoice')
+@section('title', 'Roadmap van EasyInvoice — waar we nu aan werken')
 @section('description', 'Waar we aan werken. Bekijk wat er op de planning staat voor EasyInvoice.')
 
 @push('styles')

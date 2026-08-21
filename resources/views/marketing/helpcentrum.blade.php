@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Helpcentrum — EasyInvoice')
-@section('description', 'Vind snel antwoord op je vraag in het EasyInvoice helpcentrum.')
+@section('title', 'Helpcentrum EasyInvoice — antwoorden en handleidingen')
+@section('description', 'Vind snel antwoord op je vraag: facturen maken, BTW, herinneringen, incasso, koppelingen en meer. Kom je er niet uit? We helpen je persoonlijk verder.')
 
 @push('styles')
 <style>

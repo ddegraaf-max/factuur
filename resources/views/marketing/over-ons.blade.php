@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Over ons — EasyInvoice')
+@section('title', 'Over EasyInvoice — facturatie zonder gedoe, uit Bussum')
 @section('description', 'Het verhaal achter EasyInvoice: facturatie terug naar de basis, voor elke Nederlandse ondernemer.')
 
 @section('content')
