@@ -17,6 +17,7 @@ class Company extends Model
         'email', 'phone', 'website',
         'address_line', 'postal_code', 'city', 'country', 'currency',
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
+        'stationery_data', 'stationery_margin_top', 'stationery_margin_bottom',
         'numbering_settings', 'price_mode', 'fiscal_year_start',
         'default_send_method', 'results_per_page',
         'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
@@ -35,9 +36,9 @@ class Company extends Model
      * logo echt nodig is (Huisstijl-pagina, portaal, e-mails) wordt het
      * expliciet opgevraagd via makeVisible() of directe attribuut-toegang.
      */
-    // logo_data is te zwaar voor elke response; de Mollie-key is geheim en
-    // mag nooit naar de browser (auth.company wordt op élke pagina gedeeld).
-    protected $hidden = ['logo_data', 'mollie_api_key'];
+    // logo_data/stationery_data zijn te zwaar voor elke response; de Mollie-key
+    // is geheim en mag nooit naar de browser (auth.company wordt op élke pagina gedeeld).
+    protected $hidden = ['logo_data', 'stationery_data', 'mollie_api_key'];
 
     protected $casts = [
         'mollie_api_key' => 'encrypted',
@@ -46,6 +47,8 @@ class Company extends Model
         'demo_expires_at' => 'datetime',
         'default_payment_terms' => 'integer',
         'quote_valid_days' => 'integer',
+        'stationery_margin_top' => 'integer',
+        'stationery_margin_bottom' => 'integer',
         'fiscal_year_start' => 'integer',
         'results_per_page' => 'integer',
         'logo_scale' => 'integer',
@@ -80,6 +83,21 @@ class Company extends Model
         $domain = config('services.inbound.domain');
 
         return $domain ? 'bon-' . $this->ensureInboundToken() . '@' . $domain : null;
+    }
+
+    /**
+     * Het factuurtemplate dat daadwerkelijk gerenderd wordt. "stationery"
+     * (eigen briefpapier) telt alleen als er ook echt briefpapier is
+     * geüpload; anders vallen we terug op "modern".
+     */
+    public function resolvedInvoiceTemplate(): string
+    {
+        $template = $this->invoice_template;
+        if ($template === 'stationery') {
+            return $this->stationery_data ? 'stationery' : 'modern';
+        }
+
+        return in_array($template, ['modern', 'classic', 'minimal'], true) ? $template : 'modern';
     }
 
     /* ===================== CLAUDE-KOPPELING (MCP) ===================== */

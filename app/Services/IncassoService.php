@@ -61,9 +61,7 @@ class IncassoService
             $company = $invoice->brandedCompany();
             $invoice->load(['lines', 'payments', 'reminderLogs', 'attachments']);
 
-            $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
-                ? $company->invoice_template
-                : 'modern';
+            $template = $company->resolvedInvoiceTemplate();
 
             $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
                 'invoice' => $invoice,

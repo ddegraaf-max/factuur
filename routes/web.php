@@ -386,6 +386,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::get('settings/brand', [SettingsController::class, 'brand'])->name('settings.brand');
         Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');
         Route::delete('settings/brand/logo', [SettingsController::class, 'removeLogo'])->name('settings.brand.logo.remove');
+        Route::delete('settings/brand/briefpapier', [SettingsController::class, 'removeStationery'])->name('settings.brand.stationery.remove');
+        Route::post('settings/brand/herkennen', [SettingsController::class, 'scanBrand'])
+            ->middleware('throttle:10,1')->name('settings.brand.scan');
 
         // Handelsnamen: meerdere huisstijlen onder één administratie
         Route::get('settings/handelsnamen', [\App\Http\Controllers\BrandProfileController::class, 'index'])->name('settings.brands');

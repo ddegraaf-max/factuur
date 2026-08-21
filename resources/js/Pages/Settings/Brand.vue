@@ -1,10 +1,13 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { router, useForm, Head } from '@inertiajs/vue3';
+import { router, useForm, Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import axios from 'axios';
 
 const props = defineProps({
   company: Object,
+  ai_enabled: Boolean, // huisstijl herkennen met AI (Slim + API-key)
+  ai_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
 });
 
 const defaultFooter = 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.';
@@ -17,6 +20,9 @@ const form = useForm({
   invoice_footer: props.company.invoice_footer || defaultFooter,
   logo_scale: props.company.logo_scale || 100,
   logo: null,
+  stationery: null,
+  stationery_margin_top: props.company.stationery_margin_top || 45,
+  stationery_margin_bottom: props.company.stationery_margin_bottom || 25,
 });
 
 const logoUploading = ref(false);
@@ -36,7 +42,67 @@ const templates = [
   { value: 'modern', name: 'Modern', desc: 'Kleurband, sterk' },
   { value: 'classic', name: 'Klassiek', desc: 'Formeel, gelijnd' },
   { value: 'minimal', name: 'Minimaal', desc: 'Veel ruimte, rustig' },
+  { value: 'stationery', name: 'Briefpapier', desc: 'Je eigen ontwerp' },
 ];
+
+const previewStationery = computed(() => props.company.stationery_data || null);
+const stationeryHint = ref(false);
+const selectTemplate = (value) => {
+  if (value === 'stationery' && !previewStationery.value) {
+    stationeryHint.value = true;
+    return;
+  }
+  stationeryHint.value = false;
+  form.invoice_template = value;
+};
+
+/* ---------- Briefpapier uploaden ---------- */
+const stationeryUploading = ref(false);
+const onStationeryChange = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  form.stationery = file;
+  stationeryUploading.value = true;
+  form.post(route('settings.brand.update'), {
+    forceFormData: true,
+    preserveScroll: true,
+    onFinish: () => { stationeryUploading.value = false; form.stationery = null; },
+  });
+};
+const removeStationery = () => {
+  if (!confirm('Briefpapier verwijderen? Het sjabloon valt dan terug op Modern.')) return;
+  router.delete(route('settings.brand.stationery.remove'), { preserveScroll: true });
+};
+
+/* ---------- Huisstijl herkennen met AI ---------- */
+const aiBusy = ref(false);
+const aiError = ref('');
+const aiNotice = ref('');
+const onAiFile = async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file || aiBusy.value) return;
+  aiBusy.value = true;
+  aiError.value = ''; aiNotice.value = '';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const { data } = await axios.post(route('settings.brand.scan'), fd);
+    const r = data.result;
+    form.brand_color = r.brand_color;
+    if (r.accent_color) form.accent_color = r.accent_color;
+    form.invoice_font = r.font;
+    if (form.invoice_template !== 'stationery') form.invoice_template = r.template;
+    aiNotice.value = (r.motivation ? r.motivation + ' — ' : '')
+      + 'Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.';
+  } catch (err) {
+    aiError.value = err.response?.data?.message
+      || err.response?.data?.errors?.file?.[0]
+      || 'Herkennen is niet gelukt. Probeer het opnieuw of stel de kleuren handmatig in.';
+  } finally {
+    aiBusy.value = false;
+  }
+};
 
 const nf = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const companyAddr = computed(() => [props.company.postal_code, props.company.city].filter(Boolean).join(' '));
@@ -96,6 +162,30 @@ const removeLogo = () => {
 
     <div class="huisstijl-layout">
       <div class="huisstijl-settings">
+        <!-- Huisstijl herkennen met AI -->
+        <div v-if="ai_enabled" class="card" style="border-color:var(--brand-border);">
+          <div class="card-header">
+            <div>
+              <div class="card-title">✨ Huisstijl herkennen met AI</div>
+              <div class="card-subtitle">Upload je huisstijlgids, briefpapier of een oude factuur — de kleuren, het lettertype en het best passende sjabloon worden voor je ingevuld</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <label class="btn btn-primary btn-sm" style="cursor:pointer;">
+              {{ aiBusy ? 'Document wordt gelezen…' : 'Kies een bestand (PDF of afbeelding)' }}
+              <input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none;" :disabled="aiBusy" @change="onAiFile" />
+            </label>
+            <div v-if="aiNotice" class="ai-msg ai-ok">{{ aiNotice }}</div>
+            <div v-if="aiError" class="field-error" style="margin-top:8px;">{{ aiError }}</div>
+          </div>
+        </div>
+        <div v-else-if="ai_locked" class="card">
+          <div class="card-body" style="font-size:13px;color:var(--text-2);line-height:1.6;">
+            ✨ <b>Huisstijl herkennen met AI</b> — upload je huisstijlgids of briefpapier en de kleuren en stijl worden automatisch ingesteld. Onderdeel van het <b>Slim</b>-abonnement.
+            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header"><div class="card-title">Logo</div></div>
           <div class="card-body">
@@ -169,8 +259,8 @@ const removeLogo = () => {
             <div class="template-cards">
               <div v-for="t in templates" :key="t.value"
                 class="template-card"
-                :class="{ active: form.invoice_template === t.value }"
-                @click="form.invoice_template = t.value">
+                :class="{ active: form.invoice_template === t.value, disabled: t.value === 'stationery' && !previewStationery }"
+                @click="selectTemplate(t.value)">
                 <div class="template-thumb" :class="`thumb-${t.value}`" :style="{ '--brand': form.brand_color }">
                   <!-- Modern -->
                   <template v-if="t.value === 'modern'">
@@ -191,17 +281,62 @@ const removeLogo = () => {
                     <div class="tt-total-c"></div>
                   </template>
                   <!-- Minimal -->
-                  <template v-else>
+                  <template v-else-if="t.value === 'minimal'">
                     <div class="tt-title-m"></div>
                     <div class="tt-line tt-line-1"></div>
                     <div class="tt-line tt-line-2"></div>
                     <div class="tt-total-m"></div>
+                  </template>
+                  <!-- Briefpapier -->
+                  <template v-else>
+                    <img v-if="previewStationery" :src="previewStationery" class="tt-stationery-img" alt="" />
+                    <div v-else class="tt-stationery-empty">Upload<br>hieronder</div>
                   </template>
                 </div>
                 <div class="template-name">{{ t.name }}</div>
                 <div class="template-desc">{{ t.desc }}</div>
               </div>
             </div>
+            <div v-if="stationeryHint" class="field-error" style="margin-top:8px;">Upload eerst je briefpapier (hieronder) om dit sjabloon te kunnen kiezen.</div>
+          </div>
+        </div>
+
+        <!-- Eigen briefpapier -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Eigen briefpapier</div>
+              <div class="card-subtitle">Je volledige eigen ontwerp (bijv. door AI gemaakt) als ondergrond — EasyInvoice zet er alleen de factuurinhoud op</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div v-if="previewStationery">
+              <img :src="previewStationery" class="stationery-preview" alt="Briefpapier" />
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <label class="btn btn-ghost btn-sm">
+                  {{ stationeryUploading ? 'Bezig…' : 'Vervangen' }}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" @change="onStationeryChange" :disabled="stationeryUploading" style="display:none;" />
+                </label>
+                <button class="btn btn-danger btn-sm" @click="removeStationery" :disabled="stationeryUploading">Verwijderen</button>
+              </div>
+              <div class="form-row" style="margin-top:14px;">
+                <div class="form-group">
+                  <label>Bovenmarge (mm)<span class="label-hint">waar de inhoud begint</span></label>
+                  <input type="number" v-model.number="form.stationery_margin_top" min="10" max="150" />
+                </div>
+                <div class="form-group">
+                  <label>Ondermarge (mm)</label>
+                  <input type="number" v-model.number="form.stationery_margin_bottom" min="5" max="100" />
+                </div>
+              </div>
+              <p class="stationery-hint">Tip: staat je adres of logo bovenaan het papier? Zet de bovenmarge dan zo dat de factuurinhoud eronder begint. Het voorbeeld rechts beweegt live mee.</p>
+            </div>
+            <label v-else class="logo-upload-zone">
+              <input type="file" accept="image/png,image/jpeg,image/webp" @change="onStationeryChange" :disabled="stationeryUploading" style="display:none;" />
+              <div class="upload-hint">PNG of JPG op A4-verhouding — max 4 MB. Heb je een PDF? Exporteer die eerst als afbeelding.</div>
+              <div class="upload-cta"><b>{{ stationeryUploading ? 'Uploaden…' : 'Klik om je briefpapier te uploaden' }}</b></div>
+            </label>
+            <div v-if="form.errors.stationery" class="field-error" style="margin-top:8px;">{{ form.errors.stationery }}</div>
           </div>
         </div>
 
@@ -341,6 +476,46 @@ const removeLogo = () => {
                 Gelieve het bedrag binnen {{ pv.terms }} dagen te voldoen op {{ company.iban }} o.v.v. factuurnummer {{ pv.number }}.
               </div>
               <div class="pv-footer pv-footer-classic">{{ footerText }}</div>
+            </div>
+          </template>
+
+          <!-- ============ BRIEFPAPIER ============ -->
+          <template v-else-if="form.invoice_template === 'stationery'">
+            <div class="pv-stationery">
+              <img v-if="previewStationery" :src="previewStationery" class="pv-stationery-bg" alt="" />
+              <div
+                class="pv-stationery-content"
+                :style="{ top: (form.stationery_margin_top / 297 * 100) + '%', bottom: (form.stationery_margin_bottom / 297 * 100) + '%' }"
+              >
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <div>
+                    <div style="font-weight:700;font-size:13px;">FACTUUR</div>
+                    <div style="font-size:9px;color:#78716c;">{{ pv.number }}</div>
+                  </div>
+                  <div style="text-align:right;font-size:9px;color:#44403c;">
+                    <div>Factuurdatum: <b>{{ pv.date }}</b></div>
+                    <div>Vervaldatum: <b>{{ pv.due }}</b></div>
+                  </div>
+                </div>
+                <div style="margin-top:10px;font-size:9px;">
+                  <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.07em;color:#78716c;">Aan</div>
+                  <div style="font-weight:700;font-size:10px;">{{ pv.customer.name }}</div>
+                  <div>{{ pv.customer.addr }} · {{ pv.customer.city }}</div>
+                </div>
+                <table class="pv-lines" style="margin-top:10px;">
+                  <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs</th><th class="r">Bedrag</th></tr></thead>
+                  <tbody>
+                    <tr v-for="(l, i) in pv.lines" :key="i">
+                      <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="r">{{ nf(l.qty * l.price) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="pv-totals">
+                  <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
+                  <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
+                  <div class="pv-grand" style="border-top:2px solid #1c1917;"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
+                </div>
+              </div>
             </div>
           </template>
 
@@ -507,6 +682,19 @@ const removeLogo = () => {
 .thumb-minimal { padding-top: 14px; }
 .thumb-minimal .tt-title-m { width: 40%; height: 4px; background: var(--text); margin-bottom: 14px; }
 .thumb-minimal .tt-total-m { margin-top: 14px; height: 4px; background: var(--text); width: 30%; margin-left: auto; }
+
+/* Briefpapier */
+.template-card.disabled { opacity: 0.55; }
+.tt-stationery-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tt-stationery-empty { display: flex; align-items: center; justify-content: center; height: 100%; font-size: 9px; color: var(--text-3); text-align: center; line-height: 1.4; }
+.stationery-preview { max-width: 100%; max-height: 220px; display: block; border: 1px solid var(--border); border-radius: 8px; }
+.stationery-hint { font-size: 12px; color: var(--text-3); margin-top: 10px; line-height: 1.6; }
+.ai-msg { margin-top: 10px; font-size: 12.5px; border-radius: 8px; padding: 8px 10px; line-height: 1.5; }
+.ai-ok { background: var(--success-bg); color: var(--success); }
+
+.pv-stationery { position: relative; width: 100%; height: 100%; }
+.pv-stationery-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pv-stationery-content { position: absolute; left: 8.6%; right: 8.6%; overflow: hidden; font-size: 10px; }
 
 /* Fonts */
 .font-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }

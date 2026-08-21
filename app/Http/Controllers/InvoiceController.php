@@ -331,9 +331,7 @@ class InvoiceController extends Controller
         $invoice->load('lines');
         $company = $invoice->brandedCompany();
 
-        $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
-            ? $company->invoice_template
-            : 'modern';
+        $template = $company->resolvedInvoiceTemplate();
 
         $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,

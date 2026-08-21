@@ -210,9 +210,7 @@ class InvoiceManager
         $company = $invoice->brandedCompany();
         $invoice->load('lines');
 
-        $template = in_array($company->invoice_template, ['modern', 'classic', 'minimal'], true)
-            ? $company->invoice_template
-            : 'modern';
+        $template = $company->resolvedInvoiceTemplate();
 
         $pdf = Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,

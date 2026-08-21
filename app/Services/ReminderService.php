@@ -188,9 +188,7 @@ class ReminderService
         $subject = strtr($subjectTpl, $vars);
         $body = strtr($bodyTpl, $vars);
 
-        $template = in_array($branded->invoice_template, ['modern', 'classic', 'minimal'], true)
-            ? $branded->invoice_template
-            : 'modern';
+        $template = $branded->resolvedInvoiceTemplate();
 
         // De PDF-bijlage in de taal van de factuur; de herinneringstekst zelf
         // komt uit de eigen sjablonen van de ondernemer (Instellingen).

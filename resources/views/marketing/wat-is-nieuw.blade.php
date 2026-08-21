@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.31.0</div>
+        <h3>Jouw huisstijl, jouw briefpapier</h3>
+        <ul class="tl-list">
+          <li><b>Huisstijl herkennen met AI</b> — upload je huisstijlgids, briefpapier of een oude factuur en de merkkleur, accentkleur, het lettertype en het best passende sjabloon worden automatisch voor je ingesteld. Jij bekijkt het live voorbeeld en bevestigt.</li>
+          <li><b>Eigen briefpapier</b> — heb je een volledig ontworpen huisstijl (bijv. door AI gemaakt)? Upload hem als vierde sjabloon "Briefpapier": jouw ontwerp is de ondergrond en EasyInvoice zet er alleen de factuurinhoud op, met instelbare marges. Werkt overal — factuurmail, herinneringen, portaal en incasso.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.30.0</div>
         <h3>Dubbelcontrole op inkoopfacturen</h3>
         <ul class="tl-list">

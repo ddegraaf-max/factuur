@@ -146,22 +146,31 @@ class SettingsController extends Controller
     // ----- BRAND / HUISSTIJL -----
     public function brand()
     {
+        $company = auth()->user()->company;
+        $scanner = app(\App\Services\BrandScanService::class);
+
         return Inertia::render('Settings/Brand', [
-            // logo_data staat standaard op hidden (te zwaar voor elke response);
-            // hier is het juist nodig voor de voorvertoning.
-            'company' => auth()->user()->company->makeVisible('logo_data'),
+            // logo_data/stationery_data staan standaard op hidden (te zwaar voor
+            // elke response); hier zijn ze juist nodig voor de voorvertoning.
+            'company' => $company->makeVisible(['logo_data', 'stationery_data']),
+            'ai_enabled' => $scanner->availableFor($company),
+            'ai_locked' => $scanner->enabled() && ! $company->hasAiAccess(),
         ]);
     }
 
     public function updateBrand(Request $request)
     {
+        $company = auth()->user()->company;
+
         $data = $request->validate([
             'brand_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'accent_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
-            'invoice_template' => ['required', 'in:modern,classic,minimal'],
+            'invoice_template' => ['required', 'in:modern,classic,minimal,stationery'],
             'invoice_font' => ['required', 'in:sans,serif'],
             'invoice_footer' => ['nullable', 'string', 'max:1000'],
             'logo_scale' => ['nullable', 'integer', 'min:50', 'max:200'],
+            'stationery_margin_top' => ['nullable', 'integer', 'min:10', 'max:150'],
+            'stationery_margin_bottom' => ['nullable', 'integer', 'min:5', 'max:100'],
         ]);
 
         // Optional logo upload — store as base64 data URL in DB (survives Railway redeploys)
@@ -174,8 +183,84 @@ class SettingsController extends Controller
             $data['logo_path'] = null; // clear old path-based logo
         }
 
-        auth()->user()->company->update($data);
+        // Eigen briefpapier (A4-afbeelding als ondergrond voor het
+        // "stationery"-template). PNG/JPG — een PDF-briefpapier moet eerst
+        // als afbeelding worden geëxporteerd (ontwerp-tools kunnen dat altijd).
+        if ($request->hasFile('stationery')) {
+            $request->validate([
+                'stationery' => 'image|mimes:png,jpg,jpeg,webp|max:4096',
+            ], [
+                'stationery.mimes' => 'Upload het briefpapier als PNG of JPG (exporteer een PDF eerst als afbeelding).',
+                'stationery.max' => 'Het briefpapier mag maximaal 4 MB groot zijn — het gaat met elke factuur-PDF mee.',
+            ]);
+            $file = $request->file('stationery');
+            $data['stationery_data'] = 'data:' . $file->getMimeType() . ';base64,'
+                . base64_encode(file_get_contents($file->getRealPath()));
+        }
+
+        // Briefpapier-template zonder briefpapier heeft geen zin.
+        if (($data['invoice_template'] ?? null) === 'stationery'
+            && empty($data['stationery_data'])
+            && ! $company->stationery_data) {
+            return back()->withErrors(['stationery' => 'Upload eerst je briefpapier voordat je dit sjabloon kiest.']);
+        }
+
+        $company->update($data);
         return back()->with('flash', 'Huisstijl opgeslagen.');
+    }
+
+    /** Briefpapier verwijderen; het template valt automatisch terug op "modern". */
+    public function removeStationery()
+    {
+        $company = auth()->user()->company;
+        $changes = ['stationery_data' => null];
+        if ($company->invoice_template === 'stationery') {
+            $changes['invoice_template'] = 'modern';
+        }
+        $company->update($changes);
+
+        return back()->with('flash', 'Briefpapier verwijderd.');
+    }
+
+    /**
+     * Huisstijl herkennen met AI: upload een huisstijlgids, briefpapier of
+     * oude factuur en krijg kleuren, lettertype en template als voorstel
+     * terug. Er wordt hier niets opgeslagen — de gebruiker bevestigt zelf.
+     */
+    public function scanBrand(Request $request, \App\Services\BrandScanService $scanner)
+    {
+        abort_unless($scanner->enabled(), 404);
+
+        $company = auth()->user()->company;
+        if (! $company->hasAiAccess()) {
+            return response()->json(['message' => 'Huisstijl herkennen zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.'], 403);
+        }
+        if ($company->aiLimitReached()) {
+            return response()->json(['message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.'], 429);
+        }
+
+        $request->validate([
+            'file' => ['required', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+        ], [
+            'file.required' => 'Kies eerst een bestand (PDF of afbeelding).',
+            'file.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden kunnen worden gelezen.',
+            'file.max' => 'Het bestand mag maximaal 10 MB groot zijn.',
+        ]);
+
+        $file = $request->file('file');
+
+        try {
+            $result = $scanner->scan(
+                file_get_contents($file->getRealPath()),
+                $file->getMimeType() ?? 'application/octet-stream'
+            );
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        \App\Models\AiUsageEvent::record($company->id, 'brand_scan', 'form');
+
+        return response()->json(['result' => $result]);
     }
 
     public function removeLogo()
