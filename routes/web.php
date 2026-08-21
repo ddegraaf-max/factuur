@@ -57,6 +57,28 @@ Route::get('/helpcentrum/{slug}', function (string $slug) {
     ]);
 })->name('help.article');
 Route::get('/status', [StatusController::class, 'index'])->name('status');
+
+// ---------- SITEMAP (voor zoekmachines) ----------
+// Dynamisch: nieuwe helpartikelen in config/help.php lopen automatisch mee.
+Route::get('/sitemap.xml', function () {
+    $paths = [
+        '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum',
+        '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
+        '/login', '/register',
+    ];
+    foreach (array_keys(config('help.articles', [])) as $slug) {
+        $paths[] = '/helpcentrum/' . $slug;
+    }
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+    foreach ($paths as $path) {
+        $xml .= '  <url><loc>' . e(url($path)) . '</loc></url>' . "\n";
+    }
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+})->name('sitemap');
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
 Route::view('/privacy', 'marketing.privacy')->name('privacy');
 Route::view('/cookies', 'marketing.cookies')->name('cookies');
