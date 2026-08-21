@@ -18,6 +18,10 @@
       <h2>Onze missie</h2>
       <p>We willen dat elke Nederlandse ondernemer met een gerust hart kan factureren en sneller betaald krijgt — zonder een boekhouddiploma of een duur abonnement.</p>
       <p>Daarom bouwen we de eenvoudigste facturatietool van Nederland. Eén heldere prijs, alle functies die je écht nodig hebt, en ondersteuning van echte mensen in Bussum.</p>
+
+      <h2>Een dienst van Creditline B.V.</h2>
+      <p>EasyInvoice is een dienst van Creditline B.V. uit Bussum, met ruim 25 jaar ervaring in kredietbeheer en incasso. Uit die praktijk kennen we het grootste probleem van ondernemers niet van horen zeggen, maar van dichtbij: facturen die te laat of helemaal niet betaald worden.</p>
+      <p>Die ervaring zit overal in het product verwerkt — van automatische <a href="{{ route('helpcentrum') }}">herinneringen en aanmaningen</a> tot het klantenportaal met inzagelog en de directe lijn naar incasso. Niet als losse extra's, maar als vast onderdeel van elk abonnement. Bekijk onze <a href="{{ route('faq') }}">veelgestelde vragen</a> of <a href="{{ route('roadmap') }}">roadmap</a> om te zien waar we naartoe werken.</p>
     </div>
   </div>
 </section>

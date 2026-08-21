@@ -55,6 +55,27 @@
       er wordt niets vooraf ingevuld. Ervaar je toch een probleem dat hier niet wordt getoond?
       Mail ons op <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a>.
     </p>
+
+    <div class="status-note" style="margin-top:28px;">
+      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">Wat controleren we hier?</h2>
+      <p style="margin:0 0 14px;">
+        We meten de onderdelen waar je administratie van afhankelijk is: de applicatie zelf, de database
+        waarin je facturen en klanten staan, de e-mailbezorging (factuur- en offertemails, herinneringen)
+        en de betaalkoppelingen. Elke controle gebeurt op het moment dat jij deze pagina opent, dus wat je
+        hier ziet is de werkelijke situatie van nu — geen cache en geen handmatig bijgewerkte melding.
+      </p>
+      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">Wat als er een storing is?</h2>
+      <p style="margin:0;">
+        Je gegevens zijn ook tijdens een storing veilig: alles staat versleuteld op servers binnen de EU en
+        wordt dagelijks geback-upt. Geplande factuurverzendingen en herinneringen worden na herstel
+        automatisch alsnog verwerkt — je hoeft zelf niets opnieuw te doen. Duurt een storing langer of heb
+        je er direct last van, mail dan gerust naar
+        <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a> —
+        ook tijdens een storing lezen we mee. Zie ook het
+        <a href="{{ route('helpcentrum') }}" style="color:var(--brand);font-weight:500;">helpcentrum</a> voor
+        antwoorden op veelvoorkomende vragen.
+      </p>
+    </div>
   </div>
 </section>
 @endsection

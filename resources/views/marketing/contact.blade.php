@@ -89,5 +89,29 @@
       </div>
     </aside>
   </div>
+
+  <div class="container" style="max-width:1000px;margin-top:36px;">
+    <div class="contact-card">
+      <h2 style="font-size:19px;margin-bottom:10px;">Waarmee kunnen we je helpen?</h2>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0 0 10px;">
+        <strong>Vragen over het gebruik</strong> — een factuur maken, de BTW-aangifte, herinneringen instellen of
+        een koppeling activeren: de meeste antwoorden staan al in het
+        <a href="{{ route('helpcentrum') }}" style="color:var(--brand);font-weight:500;">helpcentrum</a> en bij de
+        <a href="{{ route('faq') }}" style="color:var(--brand);font-weight:500;">veelgestelde vragen</a>.
+        Kom je er niet uit, dan kijken we persoonlijk met je mee — ook tijdens je gratis proefperiode.
+      </p>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0 0 10px;">
+        <strong>Abonnement of factuur van ons</strong> — vragen over Basis of Slim, overstappen of opzeggen
+        beantwoorden we binnen één werkdag. Overstappen van andere software? We helpen je gratis op weg met
+        het overzetten van je klanten en producten.
+      </p>
+      <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0;">
+        <strong>Een idee of verzoek</strong> — veel functies op onze
+        <a href="{{ route('roadmap') }}" style="color:var(--brand);font-weight:500;">roadmap</a> komen rechtstreeks
+        van gebruikers. Mis je iets? Stuur het in via het formulier; we lezen álles en je hoort altijd wat we ermee doen.
+        Storing of iets kapot? Check eerst de <a href="{{ route('status') }}" style="color:var(--brand);font-weight:500;">actuele status</a> van onze systemen.
+      </p>
+    </div>
+  </div>
 </section>
 @endsection

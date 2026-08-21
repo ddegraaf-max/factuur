@@ -24,6 +24,28 @@
     @if($seo)
         <meta name="description" content="{{ $seo['description'] }}">
         <link rel="canonical" href="{{ url()->current() }}">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="EasyInvoice">
+        <meta property="og:locale" content="nl_NL">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="{{ $seo['title'] }}">
+        <meta property="og:description" content="{{ $seo['description'] }}">
+        <meta property="og:image" content="{{ url('/images/og-easyinvoice.png') }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $seo['title'] }}">
+        <meta name="twitter:description" content="{{ $seo['description'] }}">
+        <meta name="twitter:image" content="{{ url('/images/og-easyinvoice.png') }}">
+        <script type="application/ld+json">{!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+            'name' => $seo['title'],
+            'description' => $seo['description'],
+            'url' => url()->current(),
+            'inLanguage' => 'nl',
+            'isPartOf' => ['@type' => 'WebSite', 'name' => 'EasyInvoice', 'url' => url('/')],
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
     @endif
 
     <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
