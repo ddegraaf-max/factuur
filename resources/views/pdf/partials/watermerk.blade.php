@@ -47,25 +47,25 @@
 
 @if ($wmAan)
     <style>
+        /* Rechtsonder op elke pagina, als een echt gezet stempel. */
         .wm-vel {
             position: fixed;
-            top: 118mm;
-            left: 0;
-            width: 210mm;
-            text-align: center;
+            bottom: 10mm;
+            right: 4mm;
+            text-align: right;
             z-index: 900;
         }
         .wm-stempel {
             display: inline-block;
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 30pt;
+            font-size: 22pt;
             font-weight: bold;
-            letter-spacing: 3pt;
-            padding: 5mm 9mm;
+            letter-spacing: 2.5pt;
+            padding: 4mm 7mm;
             border: 3px solid {{ $wmKleur }};
             border-radius: 5px;
             color: {{ $wmKleur }};
-            transform: rotate(-19deg);
+            transform: rotate(-12deg);
         }
     </style>
 
