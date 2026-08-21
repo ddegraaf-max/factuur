@@ -69,6 +69,7 @@
 </style>
 </head>
 <body>
+@include('pdf.partials.watermerk')
 
 <table class="header">
   <tr>

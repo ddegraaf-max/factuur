@@ -66,6 +66,7 @@
 </style>
 </head>
 <body>
+@include('pdf.partials.watermerk')
 
 <div class="stationery-bg"><img src="{{ $company->stationery_data }}" alt=""></div>
 

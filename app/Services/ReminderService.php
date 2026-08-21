@@ -195,6 +195,8 @@ class ReminderService
         $pdf = \App\Support\DocumentLocale::using($invoice->language, fn () => Pdf::loadView("pdf.invoice-{$template}", [
             'invoice' => $invoice,
             'company' => $branded,
+            // Stempel op de PDF-bijlage: HERINNERING of AANMANING.
+            'watermarkStatus' => $kind === 'warning' ? 'dunning' : 'reminder',
         ])->setPaper('a4')->output());
 
         // Ook vanuit een herinnering moet de klant naar het portaal kunnen.

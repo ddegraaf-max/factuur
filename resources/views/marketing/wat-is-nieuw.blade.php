@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.32.0</div>
+        <h3>Statusstempels op je factuur-PDF</h3>
+        <ul class="tl-list">
+          <li><b>In één oogopslag duidelijk</b> — factuur-PDF's dragen nu een subtiel schuin stempel bij hun status: CONCEPT, BETAALD, VERVALLEN of GECREDITEERD. Een gewone openstaande factuur blijft schoon.</li>
+          <li><b>Herinneringen en aanmaningen</b> — de PDF-bijlage bij een betalingsherinnering of aanmaning draagt automatisch het stempel HERINNERING of AANMANING, zodat de ontvanger direct de urgentie ziet.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.31.0</div>
         <h3>Jouw huisstijl, jouw briefpapier</h3>
         <ul class="tl-list">

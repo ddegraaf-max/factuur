@@ -89,6 +89,7 @@
 </style>
 </head>
 <body>
+@include('pdf.partials.watermerk')
 
 <div class="doc-header">
   @php
