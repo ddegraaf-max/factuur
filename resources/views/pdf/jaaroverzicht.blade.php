@@ -33,18 +33,18 @@
     @foreach($quarters as $q)
       <tr>
         <td>{{ $q['label'] }} {{ $year }}</td>
-        <td class="num right">€ {{ number_format($q['revenue'], 2, ',', '.') }}</td>
-        <td class="num right">@if($q['costs'])- € {{ number_format($q['costs'], 2, ',', '.') }}@else—@endif</td>
-        <td class="num right">@if($q['km_amount'])- € {{ number_format($q['km_amount'], 2, ',', '.') }}@else—@endif</td>
-        <td class="num right">€ {{ number_format($q['result'], 2, ',', '.') }}</td>
+        <td class="num right">€&nbsp;{{ number_format($q['revenue'], 2, ',', '.') }}</td>
+        <td class="num right">@if($q['costs'])-&nbsp;€&nbsp;{{ number_format($q['costs'], 2, ',', '.') }}@else—@endif</td>
+        <td class="num right">@if($q['km_amount'])-&nbsp;€&nbsp;{{ number_format($q['km_amount'], 2, ',', '.') }}@else—@endif</td>
+        <td class="num right">€&nbsp;{{ number_format($q['result'], 2, ',', '.') }}</td>
       </tr>
     @endforeach
     <tr class="total">
       <td>Totaal {{ $year }}</td>
-      <td class="num right">€ {{ number_format($totals['revenue'], 2, ',', '.') }}</td>
-      <td class="num right">- € {{ number_format($totals['costs'], 2, ',', '.') }}</td>
-      <td class="num right">- € {{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
-      <td class="num right">€ {{ number_format($totals['result'], 2, ',', '.') }}</td>
+      <td class="num right">€&nbsp;{{ number_format($totals['revenue'], 2, ',', '.') }}</td>
+      <td class="num right">-&nbsp;€&nbsp;{{ number_format($totals['costs'], 2, ',', '.') }}</td>
+      <td class="num right">-&nbsp;€&nbsp;{{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
+      <td class="num right">€&nbsp;{{ number_format($totals['result'], 2, ',', '.') }}</td>
     </tr>
   </tbody>
 </table>
@@ -59,7 +59,7 @@
       <tr>
         <td>{{ $c['name'] }}</td>
         <td class="num right">{{ $c['count'] }}</td>
-        <td class="num right">€ {{ number_format($c['amount'], 2, ',', '.') }}</td>
+        <td class="num right">€&nbsp;{{ number_format($c['amount'], 2, ',', '.') }}</td>
       </tr>
     @empty
       <tr><td colspan="3">Geen inkoopfacturen in {{ $year }}.</td></tr>
@@ -73,7 +73,7 @@
     <tr>
       <td>Zakelijke kilometers ({{ $totals['trip_count'] }} ritten)</td>
       <td class="num right">{{ number_format($totals['km'], 1, ',', '.') }} km</td>
-      <td class="num right">€ {{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
+      <td class="num right">€&nbsp;{{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
     </tr>
   </tbody>
 </table>
@@ -83,10 +83,10 @@
 <table>
   <tbody>
     <tr>
-      <td>Omzet € {{ number_format($previous['revenue'], 2, ',', '.') }}</td>
-      <td>Kosten € {{ number_format($previous['costs'], 2, ',', '.') }}</td>
-      <td>Kilometeraftrek € {{ number_format($previous['km_amount'], 2, ',', '.') }}</td>
-      <td class="right"><strong>Resultaat € {{ number_format($previous['result'], 2, ',', '.') }}</strong></td>
+      <td>Omzet €&nbsp;{{ number_format($previous['revenue'], 2, ',', '.') }}</td>
+      <td>Kosten €&nbsp;{{ number_format($previous['costs'], 2, ',', '.') }}</td>
+      <td>Kilometeraftrek €&nbsp;{{ number_format($previous['km_amount'], 2, ',', '.') }}</td>
+      <td class="right"><strong>Resultaat €&nbsp;{{ number_format($previous['result'], 2, ',', '.') }}</strong></td>
     </tr>
   </tbody>
 </table>
