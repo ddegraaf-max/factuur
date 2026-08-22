@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 22 augustus 2026 · Easy 1.33.0</div>
+        <h3>Gratis tools en een kennisbank — ook zonder account</h3>
+        <ul class="tl-list">
+          <li><b>Gratis factuur maken</b> — op <a href="{{ route('gratis-factuur') }}">easyinvoice.nl/gratis-factuur-maken</a> maakt iedereen zonder account een professionele factuur-PDF, met correcte btw, btw verlegd of KOR-vrijstelling. Zonder watermerk, en er wordt niets opgeslagen.</li>
+          <li><b>Btw- en uurtarief-calculator</b> — reken snel btw om (incl. ↔ excl.) of bepaal welk uurtarief je als zzp'er moet vragen.</li>
+          <li><b>Kennisbank</b> — praktische artikelen over factuureisen, factuurnummers, btw-tarieven, de KOR en aanmanen. Gratis te lezen voor iedereen.</li>
+          <li><b>Nieuwe pagina's</b> — een eigen pagina over <a href="{{ route('ai') }}">factureren met AI</a> en een pagina voor <a href="{{ route('boekhouders') }}">boekhouders en accountants</a> die gratis met hun klanten meekijken.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.32.0</div>
         <h3>Statusstempels op je factuur-PDF</h3>
         <ul class="tl-list">

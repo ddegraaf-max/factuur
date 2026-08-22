@@ -55,6 +55,12 @@ return [
         // hebben nooit een limiet.
         'monthly_limit' => (int) env('AI_MONTHLY_LIMIT', 250),
     ],
+    // Wie mag het interne marketingdashboard (/marketing-inzichten) zien?
+    // Komma-gescheiden e-mailadressen; leeg = alleen gebruiker met id 1
+    // (de eerste registratie, oftewel de eigenaar).
+    'marketing_stats' => [
+        'emails' => env('MARKETING_STATS_EMAILS', ''),
+    ],
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

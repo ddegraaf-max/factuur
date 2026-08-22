@@ -5,6 +5,7 @@ use App\Http\Middleware\DemoMode;
 use App\Http\Middleware\EnsurePortalVerified;
 use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\EnsureSubscriptionActive;
+use App\Http\Middleware\TrackPageView;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
             DemoMode::class,
             HandleInertiaRequests::class,
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
+            // Bezoekersstatistieken voor de marketingpagina's (schrijft pas
+            // ná de response; zie de middleware zelf voor de allowlist).
+            TrackPageView::class,
         ]);
 
         $middleware->alias([

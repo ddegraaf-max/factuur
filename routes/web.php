@@ -58,6 +58,39 @@ Route::get('/helpcentrum/{slug}', function (string $slug) {
 })->name('help.article');
 Route::get('/status', [StatusController::class, 'index'])->name('status');
 
+// ---------- GRATIS TOOLS ----------
+// Instapkanaal voor nieuwe klanten: zonder account een factuur maken of iets
+// uitrekenen, met onderaan een uitnodiging om EasyInvoice te proberen.
+Route::get('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'show'])->name('gratis-factuur');
+Route::post('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'download'])
+    ->middleware(['throttle:15,1', 'turnstile'])->name('gratis-factuur.download');
+Route::view('/btw-calculator', 'marketing.btw-calculator')->name('btw-calculator');
+Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uurtarief-calculator');
+
+// ---------- EXTRA MARKETINGPAGINA'S ----------
+Route::view('/facturatie-met-ai', 'marketing.facturatie-met-ai')->name('ai');
+Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders');
+
+// ---------- KENNISBANK ----------
+// SEO-artikelen over factureren, btw en betaald krijgen (config/kennisbank.php).
+Route::view('/kennisbank', 'marketing.kennisbank')->name('kennisbank');
+Route::get('/kennisbank/{slug}', function (string $slug) {
+    $articles = config('kennisbank.articles');
+    abort_unless(isset($articles[$slug]), 404);
+
+    return view('marketing.kennisbank-artikel', [
+        'slug' => $slug,
+        'article' => $articles[$slug],
+        'articles' => $articles,
+    ]);
+})->name('kennisbank.artikel');
+
+// ---------- MARKETING-INZICHTEN (intern) ----------
+// Bezoekersstatistieken van de publieke pagina's; alleen voor de eigenaar
+// (zie MarketingStatsController voor de toegangscheck).
+Route::get('/marketing-inzichten', [\App\Http\Controllers\MarketingStatsController::class, 'index'])
+    ->middleware('auth')->name('marketing.inzichten');
+
 // ---------- SITEMAP (voor zoekmachines) ----------
 // Dynamisch: nieuwe helpartikelen in config/help.php lopen automatisch mee.
 Route::get('/sitemap.xml', function () {
@@ -65,9 +98,14 @@ Route::get('/sitemap.xml', function () {
         '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum',
         '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
         '/login', '/register',
+        '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
+        '/facturatie-met-ai', '/boekhouders', '/kennisbank',
     ];
     foreach (array_keys(config('help.articles', [])) as $slug) {
         $paths[] = '/helpcentrum/' . $slug;
+    }
+    foreach (array_keys(config('kennisbank.articles', [])) as $slug) {
+        $paths[] = '/kennisbank/' . $slug;
     }
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"

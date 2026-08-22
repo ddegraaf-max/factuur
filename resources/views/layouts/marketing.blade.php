@@ -445,7 +445,7 @@
 
   /* FOOTER */
   footer { background: #0F0E0D; color: rgba(255,255,255,0.7); padding: 60px 0 30px; margin-top: 0; }
-  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 40px; }
   @media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
   .footer-brand-block { max-width: 320px; }
@@ -481,7 +481,9 @@
     <nav class="nav-links">
       <a href="/#waarom" class="nav-link">Waarom EasyInvoice</a>
       <a href="/#functies" class="nav-link">Functies</a>
+      <a href="{{ route('ai') }}" class="nav-link">Factureren met AI</a>
       <a href="/#prijzen" class="nav-link">Prijzen</a>
+      <a href="{{ route('gratis-factuur') }}" class="nav-link">Gratis factuur</a>
       <a href="{{ route('faq') }}" class="nav-link">Veelgestelde vragen</a>
     </nav>
     <div class="nav-actions">
@@ -493,7 +495,9 @@
   <div class="nav-mobile">
     <a href="/#waarom" class="nav-mobile-link">Waarom EasyInvoice</a>
     <a href="/#functies" class="nav-mobile-link">Functies</a>
+    <a href="{{ route('ai') }}" class="nav-mobile-link">Factureren met AI</a>
     <a href="/#prijzen" class="nav-mobile-link">Prijzen</a>
+    <a href="{{ route('gratis-factuur') }}" class="nav-mobile-link">Gratis factuur maken</a>
     <a href="{{ route('faq') }}" class="nav-mobile-link">Veelgestelde vragen</a>
     <div class="nav-mobile-actions">
       <a href="{{ route('login') }}" class="btn btn-secondary btn-block">Inloggen</a>
@@ -526,6 +530,7 @@
         <ul class="footer-links">
           <li><a href="/#waarom">Waarom EasyInvoice</a></li>
           <li><a href="/#functies">Functies</a></li>
+          <li><a href="{{ route('ai') }}">Factureren met AI</a></li>
           <li><a href="/#prijzen">Prijzen</a></li>
           <li><a href="{{ route('changelog') }}">Wat is nieuw</a></li>
           <li><a href="{{ route('roadmap') }}">Roadmap</a></li>
@@ -533,9 +538,20 @@
       </div>
 
       <div>
+        <div class="footer-col-title">Gratis tools</div>
+        <ul class="footer-links">
+          <li><a href="{{ route('gratis-factuur') }}">Gratis factuur maken</a></li>
+          <li><a href="{{ route('btw-calculator') }}">Btw-calculator</a></li>
+          <li><a href="{{ route('uurtarief-calculator') }}">Uurtarief-calculator</a></li>
+          <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
+        </ul>
+      </div>
+
+      <div>
         <div class="footer-col-title">Bedrijf</div>
         <ul class="footer-links">
           <li><a href="{{ route('over') }}">Over ons</a></li>
+          <li><a href="{{ route('boekhouders') }}">Voor boekhouders</a></li>
           <li><a href="{{ route('contact') }}">Contact</a></li>
         </ul>
       </div>
@@ -544,6 +560,7 @@
         <div class="footer-col-title">Hulp</div>
         <ul class="footer-links">
           <li><a href="{{ route('helpcentrum') }}">Helpcentrum</a></li>
+          <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
           <li><a href="{{ route('faq') }}">Veelgestelde vragen</a></li>
           <li><a href="mailto:hallo@easyinvoice.nl">E-mail support</a></li>
           <li><a href="{{ route('status') }}">Status</a></li>
