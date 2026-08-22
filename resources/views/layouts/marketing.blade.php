@@ -152,7 +152,9 @@
   .nav-mobile-link:hover { color: var(--text); }
   .nav-mobile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
   .btn-block { width: 100%; justify-content: center; }
-  @media (max-width: 880px) {
+  /* Met zes menu-items past de balk pas ruim boven de 1000px; daaronder
+     nemen we het hamburgermenu. */
+  @media (max-width: 1080px) {
     .nav-links { display: none; }
     .nav-actions { display: none; }
     .nav-toggle { display: flex; }
@@ -446,6 +448,10 @@
   /* FOOTER */
   footer { background: #0F0E0D; color: rgba(255,255,255,0.7); padding: 60px 0 30px; margin-top: 0; }
   .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr; gap: 36px; margin-bottom: 40px; }
+  @media (max-width: 1000px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .footer-brand-block { grid-column: 1 / -1; max-width: none; }
+  }
   @media (max-width: 800px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
   .footer-brand-block { max-width: 320px; }

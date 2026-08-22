@@ -28,7 +28,20 @@
   }
   @media (max-width: 700px) {
     .gen-card { padding: 22px 18px; }
-    .lines-table .col-qty, .lines-table .col-vat { width: 64px; }
+    /* Op een telefoon is de tabel te krap: elke factuurregel wordt een
+       blokje — omschrijving over de volle breedte, daaronder aantal,
+       prijs en btw naast elkaar, met mini-labels erboven. */
+    .lines-table, .lines-table tbody { display: block; }
+    .lines-table thead { display: none; }
+    .lines-table tr.line-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .lines-table tr.line-row:first-child { padding-top: 0; }
+    .lines-table td { display: block; padding: 0; }
+    .lines-table td.td-desc { grid-column: 1 / -1; }
+    .lines-table td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); margin-bottom: 4px; }
+    .lines-table td.line-total { grid-column: 1 / 3; text-align: left; padding-top: 0; font-weight: 600; color: var(--text); }
+    .lines-table td.td-del { text-align: right; }
+    /* 16px voorkomt dat iOS inzoomt zodra een veld focus krijgt. */
+    .lines-table input, .lines-table select, .m-field input, .m-field textarea, .m-field select { font-size: 16px; }
   }
 </style>
 @endpush
@@ -132,18 +145,18 @@
         <tbody id="linesBody">
           @foreach (old('regels', [['omschrijving' => '', 'aantal' => '1', 'prijs' => '', 'btw' => '21']]) as $i => $line)
             <tr class="line-row">
-              <td><input type="text" name="regels[{{ $i }}][omschrijving]" maxlength="200" required value="{{ $line['omschrijving'] ?? '' }}" placeholder="Bijv. Website ontwerp"></td>
-              <td><input type="text" name="regels[{{ $i }}][aantal]" required inputmode="decimal" value="{{ $line['aantal'] ?? '1' }}" class="js-qty"></td>
-              <td><input type="text" name="regels[{{ $i }}][prijs]" required inputmode="decimal" value="{{ $line['prijs'] ?? '' }}" placeholder="0,00" class="js-price"></td>
-              <td>
+              <td class="td-desc" data-label="Omschrijving"><input type="text" name="regels[{{ $i }}][omschrijving]" maxlength="200" required value="{{ $line['omschrijving'] ?? '' }}" placeholder="Bijv. Website ontwerp"></td>
+              <td data-label="Aantal"><input type="text" name="regels[{{ $i }}][aantal]" required inputmode="decimal" value="{{ $line['aantal'] ?? '1' }}" class="js-qty"></td>
+              <td data-label="Prijs (excl.)"><input type="text" name="regels[{{ $i }}][prijs]" required inputmode="decimal" value="{{ $line['prijs'] ?? '' }}" placeholder="0,00" class="js-price"></td>
+              <td data-label="Btw">
                 <select name="regels[{{ $i }}][btw]" class="js-vat">
                   <option value="21" @selected(($line['btw'] ?? '21') == '21')>21%</option>
                   <option value="9" @selected(($line['btw'] ?? '') == '9')>9%</option>
                   <option value="0" @selected(($line['btw'] ?? '') == '0')>0%</option>
                 </select>
               </td>
-              <td class="line-total js-line-total">€ 0,00</td>
-              <td><button type="button" class="line-del js-del" title="Regel verwijderen">×</button></td>
+              <td class="line-total js-line-total" data-label="Bedrag">€ 0,00</td>
+              <td class="td-del"><button type="button" class="line-del js-del" title="Regel verwijderen">×</button></td>
             </tr>
           @endforeach
         </tbody>
