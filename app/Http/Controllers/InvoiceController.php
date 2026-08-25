@@ -458,8 +458,11 @@ class InvoiceController extends Controller
 
     protected function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
+            // Hoe de prijzen in dít formulier zijn ingetypt (schakelaar op het
+            // formulier); zonder waarde geldt de bedrijfsinstelling.
+            'price_mode' => ['nullable', 'in:excl,incl'],
             // De manager controleert dat het profiel van het eigen bedrijf is.
             'brand_profile_id' => ['nullable', 'integer', 'exists:brand_profiles,id'],
             'invoice_date' => ['required', 'date'],
@@ -472,7 +475,9 @@ class InvoiceController extends Controller
             'lines.*.details' => ['nullable', 'string'],
             'lines.*.quantity' => ['required', 'numeric', 'min:0'],
             'lines.*.unit' => ['nullable', 'string', 'max:30'],
-            'lines.*.unit_price' => ['required', 'numeric', 'min:0'],
+            // Negatief mag: een korting of verrekening als losse regel is
+            // gangbaar. Alleen het factuurtotaal mag niet onder nul (zie onder).
+            'lines.*.unit_price' => ['required', 'numeric', 'min:-1000000', 'max:1000000'],
             'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
             'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'action' => ['nullable', 'in:draft,send'],
@@ -504,7 +509,8 @@ class InvoiceController extends Controller
             'lines.*.quantity.min' => 'Het aantal kan niet negatief zijn.',
             'lines.*.unit_price.required' => 'Vul een prijs in.',
             'lines.*.unit_price.numeric' => 'De prijs moet een getal zijn (gebruik een punt als decimaalteken).',
-            'lines.*.unit_price.min' => 'De prijs kan niet negatief zijn.',
+            'lines.*.unit_price.min' => 'De prijs valt buiten het toegestane bereik.',
+            'lines.*.unit_price.max' => 'De prijs valt buiten het toegestane bereik.',
             'lines.*.vat_rate.required' => 'Kies een btw-tarief.',
             'lines.*.vat_rate.in' => 'Kies een geldig btw-tarief (0, 9 of 21%).',
             'lines.*.discount_pct.numeric' => 'De korting moet een getal zijn.',
@@ -515,6 +521,23 @@ class InvoiceController extends Controller
             'advances.*.description' => 'Geef elke verrekening een omschrijving (bijv. "Reeds doorgestort").',
             'advances.*.amount' => 'Vul bij elke verrekening een bedrag in.',
         ]);
+
+        // Losse regels mogen negatief zijn, maar de optelsom niet: voor een
+        // negatieve factuur bestaat de creditnota. Het teken van de som is in
+        // beide prijsmodi (incl./excl.) gelijk, dus deze check volstaat.
+        $sum = collect($data['lines'])->sum(function ($line) {
+            $factor = 1 - min(100, max(0, (float) ($line['discount_pct'] ?? 0))) / 100;
+
+            return (float) ($line['quantity'] ?? 0) * (float) ($line['unit_price'] ?? 0) * $factor;
+        });
+
+        if ($sum < -0.005) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'lines' => 'Het factuurtotaal kan niet negatief zijn. Wil je geld terugbetalen of iets crediteren? Maak dan een creditnota bij de oorspronkelijke factuur.',
+            ]);
+        }
+
+        return $data;
     }
 
     /**

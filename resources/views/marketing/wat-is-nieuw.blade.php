@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.34.0</div>
+        <h3>Prijzen incl. of excl. btw intypen — en negatieve regels</h3>
+        <ul class="tl-list">
+          <li><b>Schakelaar op het formulier</b> — kies bij het maken van een factuur of offerte direct of je prijzen inclusief of exclusief btw intypt. Al ingevulde regels rekenen automatisch mee om; de btw wordt voor je teruggerekend. De standaard stel je nog steeds in bij Instellingen → Bedrijfsgegevens.</li>
+          <li><b>Negatieve regels</b> — een korting of verrekende aanbetaling als losse regel met een negatief bedrag kan nu gewoon, op facturen én offertes. Alleen het totaal mag niet onder nul: daarvoor is er de creditnota.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 22 augustus 2026 · Easy 1.33.0</div>
         <h3>Gratis tools en een kennisbank — ook zonder account</h3>
         <ul class="tl-list">

@@ -41,7 +41,7 @@ class InvoiceManager
                 : null;
 
             $lines = $data['lines'] ?? [];
-            $mode = $this->priceMode($customer->company);
+            $mode = $this->resolveMode($data, $customer->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             // Documenttaal: momentopname van de klantinstelling (of expliciet
@@ -98,7 +98,7 @@ class InvoiceManager
 
         return DB::transaction(function () use ($invoice, $data) {
             $lines = $data['lines'] ?? [];
-            $mode = $this->priceMode($invoice->company);
+            $mode = $this->resolveMode($data, $invoice->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $invoiceDate = isset($data['invoice_date'])
@@ -246,6 +246,17 @@ class InvoiceManager
     protected function priceMode(?\App\Models\Company $company): string
     {
         return ($company?->price_mode === 'incl') ? 'incl' : 'excl';
+    }
+
+    /**
+     * De schakelaar op het formulier wint van de bedrijfsinstelling — zo kun
+     * je per factuur kiezen hoe je de prijzen intypt.
+     */
+    protected function resolveMode(array $data, ?\App\Models\Company $company): string
+    {
+        return in_array($data['price_mode'] ?? null, ['excl', 'incl'], true)
+            ? $data['price_mode']
+            : $this->priceMode($company);
     }
 
     protected function syncLines(Invoice $invoice, array $lines, string $mode = 'excl'): void

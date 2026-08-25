@@ -19,8 +19,9 @@ const props = defineProps({
 const isEdit = computed(() => !!props.invoice);
 
 // 'incl' = de ondernemer typt de prijs die de klant betaalt (bruto).
-// De opslag blijft altijd netto; de server rekent dat terug.
-const inclMode = computed(() => props.price_mode === 'incl');
+// De opslag blijft altijd netto; de server rekent dat terug. De schakelaar op
+// het formulier (form.price_mode) wint van de bedrijfsinstelling.
+const inclMode = computed(() => form.price_mode === 'incl');
 const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
 
 /** Toon de prijs zoals de gebruiker hem invoert: bruto in incl-modus. */
@@ -44,6 +45,9 @@ const today = new Date().toISOString().slice(0, 10);
 
 const form = useForm({
   customer_id: props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  // Start in de bedrijfsinstelling; met de schakelaar op het formulier kies
+  // je per factuur hoe je prijzen intypt (de server slaat altijd netto op).
+  price_mode: props.price_mode === 'incl' ? 'incl' : 'excl',
   brand_profile_id: props.invoice?.brand_profile_id ?? null,
   invoice_date: props.invoice?.invoice_date ?? today,
   // Standaardtermijn uit Instellingen → Bedrijfsgegevens (klant kan afwijken).
@@ -78,6 +82,22 @@ const form = useForm({
 });
 
 const r2 = (n) => Math.round(n * 100) / 100;
+
+/**
+ * Wissel tussen prijzen incl. en excl. btw. De al ingetypte prijzen worden
+ * omgerekend, zodat de regeltotalen (op centafronding na) gelijk blijven.
+ */
+const setPriceMode = (mode) => {
+  if (mode === form.price_mode) return;
+  for (const line of form.lines) {
+    const price = parseDutchNumber(line.unit_price) || 0;
+    const rate = Number(line.vat_rate) || 0;
+    line.unit_price = mode === 'incl'
+      ? r2(price * (1 + rate / 100))
+      : r2(price / (1 + rate / 100));
+  }
+  form.price_mode = mode;
+};
 
 /**
  * Rekent één regel door — dezelfde volgorde als VatCalculator op de server,
@@ -336,9 +356,13 @@ const submit = (action) => {
             <div>
               <div class="card-title">Factuurregels</div>
               <div class="card-subtitle">
-                {{ inclMode ? 'Je typt prijzen inclusief btw' : 'Je typt prijzen exclusief btw' }}
-                · aan te passen bij Instellingen → Bedrijfsgegevens
+                {{ inclMode ? 'Je typt de prijs die de klant betaalt — de btw wordt automatisch teruggerekend' : 'Je typt prijzen exclusief btw' }}
+                · standaard in te stellen bij Instellingen → Bedrijfsgegevens
               </div>
+            </div>
+            <div class="price-mode-toggle" role="group" aria-label="Prijzen invoeren exclusief of inclusief btw">
+              <button type="button" :class="{ active: !inclMode }" @click="setPriceMode('excl')">excl. btw</button>
+              <button type="button" :class="{ active: inclMode }" @click="setPriceMode('incl')">incl. btw</button>
             </div>
           </div>
           <div class="card-body">
@@ -371,7 +395,7 @@ const submit = (action) => {
                   <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
                 </div>
                 <div class="line-field" :data-label="priceLabel">
-                  <input type="number" v-model.number="line.unit_price" min="0" step="0.01" class="num right">
+                  <input type="number" v-model.number="line.unit_price" step="0.01" class="num right" title="Negatief mag ook — bijv. voor een korting of verrekende aanbetaling">
                 </div>
                 <div class="line-field" data-label="Korting %">
                   <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" title="Korting in procenten op deze regel">
@@ -393,6 +417,9 @@ const submit = (action) => {
             <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
             <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
               Regel {{ e.line }}: {{ e.msgs.join(' ') }}
+            </div>
+            <div v-if="totals.total < -0.004" class="field-error" style="margin-top:10px;">
+              Het factuurtotaal is negatief — daarvoor maak je een creditnota. Een negatieve regel (korting of verrekende aanbetaling) mag wél, zolang het totaal op nul of hoger uitkomt.
             </div>
 
             <button class="add-line-btn" @click="addLine" type="button">

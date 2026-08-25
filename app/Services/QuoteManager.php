@@ -25,7 +25,7 @@ class QuoteManager
         return DB::transaction(function () use ($data) {
             $customer = Customer::findOrFail($data['customer_id']);
             $company = $customer->company;
-            $mode = $this->priceMode($company);
+            $mode = $this->resolveMode($data, $company);
 
             $quoteDate = isset($data['quote_date']) ? Carbon::parse($data['quote_date']) : now();
             $validDays = (int) ($data['valid_days'] ?? $company->quote_valid_days ?? 30);
@@ -88,7 +88,7 @@ class QuoteManager
         }
 
         return DB::transaction(function () use ($quote, $data) {
-            $mode = $this->priceMode($quote->company);
+            $mode = $this->resolveMode($data, $quote->company);
             $lines = $data['lines'] ?? [];
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
@@ -347,6 +347,17 @@ class QuoteManager
     protected function priceMode(?Company $company): string
     {
         return ($company?->price_mode === 'incl') ? 'incl' : 'excl';
+    }
+
+    /**
+     * De schakelaar op het formulier wint van de bedrijfsinstelling — zo kun
+     * je per offerte kiezen hoe je de prijzen intypt.
+     */
+    protected function resolveMode(array $data, ?Company $company): string
+    {
+        return in_array($data['price_mode'] ?? null, ['excl', 'incl'], true)
+            ? $data['price_mode']
+            : $this->priceMode($company);
     }
 
     protected function syncLines(Quote $quote, array $lines, string $mode = 'excl'): void
