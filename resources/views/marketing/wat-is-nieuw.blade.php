@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.35.0</div>
+        <h3>Bedankmail na betaling — met reviewlink</h3>
+        <ul class="tl-list">
+          <li><b>Automatisch bedanken</b> — zodra een factuur volledig is betaald, krijgt je klant een vriendelijke bedankmail in jouw huisstijl: een overzicht van de betaling, een knop naar het klantenportaal en de factuur met het stempel BETAALD als PDF (een betaalbewijs voor zijn administratie). Werkt bij de bankkoppeling en bij iDEAL-betalingen; boek je een betaling handmatig, dan kies je het per betaling met één vinkje.</li>
+          <li><b>Vraag om een review</b> — vul je Google- of Trustpilot-link in bij Instellingen → E-mailteksten en de bedankmail krijgt een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen.</li>
+          <li><b>Eigen tekst, voorbeeld en historie</b> — onderwerp en tekst pas je aan met variabelen zoals {klant}, {bedrag} en {betaaldatum}; met "Bekijk voorbeeld" zie je de mail vooraf. In de factuurhistorie zie je precies wanneer de bedankmail is verstuurd. Voor bestaande administraties staat de functie uit tot je 'm aanzet.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.34.0</div>
         <h3>Prijzen incl. of excl. btw intypen — en negatieve regels</h3>
         <ul class="tl-list">

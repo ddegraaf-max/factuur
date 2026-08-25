@@ -56,6 +56,7 @@
         <p style="margin-bottom:12px;">Herinneringen en het incassotraject.</p>
         <a class="help-link" href="{{ route('help.article', 'betaallink-ideal') }}">Betaald worden met iDEAL →</a>
         <a class="help-link" href="{{ route('help.article', 'betaling-registreren') }}">Een betaling registreren →</a>
+        <a class="help-link" href="{{ route('help.article', 'bedankmail-na-betaling') }}">Bedankmail na betaling (met reviewlink) →</a>
         <a class="help-link" href="{{ route('help.article', 'automatische-herinneringen') }}">Automatische herinneringen →</a>
         <a class="help-link" href="{{ route('help.article', 'incassotraject') }}">Het incassotraject →</a>
       </div>

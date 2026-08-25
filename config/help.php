@@ -396,6 +396,28 @@ return [
             ],
         ],
 
+        'bedankmail-na-betaling' => [
+            'category' => 'Betalingen & incasso',
+            'title' => 'Bedankmail na betaling',
+            'intro' => 'Zodra een factuur volledig is betaald, kan EasyInvoice je klant automatisch een vriendelijk bedankje sturen — in jouw huisstijl, met de factuur als betaalbewijs.',
+            'sections' => [
+                ['Wat je klant ontvangt', [
+                    'Een korte, vriendelijke e-mail met een overzicht van de betaling (factuurnummer, bedrag, ontvangstdatum en betaalwijze), een knop naar het klantenportaal en de factuur als PDF met het stempel BETAALD — handig als betaalbewijs voor zijn administratie. Afzendernaam, logo en kleur volgen je huisstijl of handelsnaam; de standaardtekst volgt automatisch de taal van de klant (Nederlands of Engels).',
+                ]],
+                ['Aanzetten en aanpassen', [
+                    'Ga naar Instellingen → E-mailteksten en zet "Bedankmail na betaling" aan. Wil je een eigen onderwerp of tekst? Gebruik variabelen zoals {klant}, {factuurnummer}, {bedrag}, {betaaldatum} en {betaalwijze}. Met "Bekijk voorbeeld" zie je de mail vooraf, precies zoals je klant hem krijgt.',
+                    'Nieuwe administraties hebben de bedankmail standaard aan; bestaande administraties zetten hem zelf aan, zodat er niets ongevraagd verandert.',
+                ]],
+                ['Wanneer hij wordt verstuurd', [
+                    'Bij een betaling via de bankkoppeling of via iDEAL (Mollie) gaat de bedankmail automatisch, direct nadat de factuur volledig is voldaan. Boek je een betaling handmatig, dan staat in het formulier een vinkje "Klant bedanken per e-mail" — voorgevinkt als de instelling aanstaat, en per betaling uit te zetten.',
+                    'Er wordt nooit bedankt bij een deelbetaling, een afboeking, een verrekening of een creditnota, en nooit als de klant geen e-mailadres heeft. Per factuur gaat er maximaal één bedankmail automatisch uit; via de knop "Bedankmail sturen" op de factuurpagina kun je hem altijd handmatig (opnieuw) versturen. In de factuurhistorie zie je wanneer hij is verstuurd.',
+                ]],
+                ['Vraag om een review', [
+                    'Vul bij de instelling een reviewlink in (bijvoorbeeld je Google-, Trustpilot- of Klantenvertellen-pagina) en de bedankmail krijgt een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen: de klus is af en de klant is tevreden.',
+                ]],
+            ],
+        ],
+
         'postvak-in' => [
             'category' => 'Inkoop',
             'title' => 'Inkoopfacturen per e-mail aanleveren (Postvak IN)',

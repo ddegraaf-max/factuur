@@ -5,11 +5,13 @@ namespace App\Console\Commands;
 use App\Mail\DailySummaryMail;
 use App\Mail\InvoiceMail;
 use App\Mail\PaymentReminderMail;
+use App\Mail\PaymentThanksMail;
 use App\Mail\QuoteMail;
 use App\Mail\VerificationCodeMail;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
+use App\Models\Payment;
 use App\Models\Quote;
 use App\Models\QuoteLine;
 use App\Models\User;
@@ -32,7 +34,7 @@ use Illuminate\Support\Facades\Mail;
 class SendTestMails extends Command
 {
     protected $signature = 'mail:test {email : Ontvanger van de proefmails}
-                                      {--only= : Alleen dit type (factuur|herinnering|offerte|dagoverzicht|verificatie)}';
+                                      {--only= : Alleen dit type (factuur|herinnering|bedankt|offerte|dagoverzicht|verificatie)}';
 
     protected $description = 'Verstuur van elk berichttype een proefmail met verzonnen gegevens.';
 
@@ -60,6 +62,7 @@ class SendTestMails extends Command
         $jobs = [
             'factuur' => fn () => $this->sendInvoice($to, $company, $vat, $ubl),
             'herinnering' => fn () => $this->sendReminder($to, $company, $vat),
+            'bedankt' => fn () => $this->sendThanks($to, $company, $vat),
             'offerte' => fn () => $this->sendQuote($to, $company, $vat),
             'dagoverzicht' => fn () => $this->sendSummary($to, $company),
             'verificatie' => fn () => $this->sendVerification($to, $company),
@@ -154,6 +157,31 @@ class SendTestMails extends Command
             $invoice,
             $pdf,
         ));
+    }
+
+    private function sendThanks(string $to, Company $company, VatCalculator $vat): void
+    {
+        $invoice = $this->fakeInvoice($company, $vat);
+        $invoice->status = 'paid';
+        $invoice->paid_total = $invoice->total;
+        $invoice->paid_at = now();
+
+        $payment = new Payment([
+            'kind' => 'payment',
+            'amount' => $invoice->total,
+            'paid_on' => now()->toDateString(),
+            'method' => 'ideal',
+        ]);
+        $payment->exists = false;
+
+        // De bijlage zoals de klant 'm krijgt: de factuur met stempel BETAALD.
+        $pdf = Pdf::loadView('pdf.invoice-modern', [
+            'invoice' => $invoice,
+            'company' => $company,
+            'watermarkStatus' => 'paid',
+        ])->setPaper('a4')->output();
+
+        Mail::to($to)->send(new PaymentThanksMail($invoice, $payment, $pdf));
     }
 
     private function sendQuote(string $to, Company $company, VatCalculator $vat): void

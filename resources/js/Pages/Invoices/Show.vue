@@ -26,7 +26,7 @@ const showCreditModal = ref(false);
 const page = usePage();
 const pageError = computed(() => {
   const e = page.props.errors || {};
-  return e.incasso || e.credit || e.reminder || e.ubl || e.status || e.delete || e.peppol || null;
+  return e.incasso || e.credit || e.reminder || e.thanks || e.ubl || e.status || e.delete || e.peppol || null;
 });
 
 /* ---------- Creditnota ---------- */
@@ -69,6 +69,22 @@ const canRemind = computed(() =>
 const sendReminder = () => {
   if (confirm(`Herinnering sturen naar ${props.invoice.customer_email}?`)) {
     router.post(route('invoices.remind', props.invoice.id), {}, { preserveScroll: true });
+  }
+};
+
+/* ---------- Bedankmail na betaling ---------- */
+const canThank = computed(() =>
+  !props.invoice.is_credit
+  && props.invoice.status === 'paid'
+  && !!props.invoice.customer_email
+);
+
+const sendThanks = () => {
+  const again = props.invoice.thanks_sent_at_label
+    ? `Er is al een bedankmail verstuurd op ${props.invoice.thanks_sent_at_label}.\n\n`
+    : '';
+  if (confirm(`${again}Bedankmail sturen naar ${props.invoice.customer_email}? De factuur gaat mee als PDF met het stempel BETAALD.`)) {
+    router.post(route('invoices.thank', props.invoice.id), {}, { preserveScroll: true });
   }
 };
 
@@ -148,12 +164,19 @@ const paymentForm = useForm({
   method: 'bank_transfer',
   reference: '',
   notes: '',
+  // Bedankmail: voorgevinkt als de instelling aanstaat (Instellingen → E-mailteksten).
+  send_thanks: !!props.company?.thanks_mail_enabled && !!props.invoice.customer_email,
 });
 
 // Bij afboeken is het restbedrag vrijwel altijd wat je wilt wegboeken.
 watch(() => paymentForm.kind, (kind) => {
   if (kind === 'write_off') paymentForm.amount = props.invoice.remaining;
 });
+
+// Een bedankje hoort pas bij een volledige betaling — niet bij een deelbetaling.
+const isFullPayment = computed(() =>
+  paymentForm.kind === 'payment' && Number(paymentForm.amount) >= Number(props.invoice.remaining) - 0.005
+);
 
 const recordPayment = () => {
   paymentForm.post(route('invoices.payments.store', props.invoice.id), {
@@ -311,6 +334,15 @@ const deleteInvoice = () => {
         <button v-if="canRemind" class="btn btn-secondary btn-sm" title="Stuur nu een herinnering naar de klant" @click="sendReminder">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           Herinnering sturen
+        </button>
+        <button
+          v-if="canThank"
+          class="btn btn-secondary btn-sm"
+          :title="invoice.thanks_sent_at_label ? `Bedankmail verstuurd op ${invoice.thanks_sent_at_label} — nogmaals sturen` : 'Stuur de klant een bedankje voor de betaling, met de factuur (stempel BETAALD) als PDF'"
+          @click="sendThanks"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          {{ invoice.thanks_sent_at_label ? 'Bedankmail opnieuw sturen' : 'Bedankmail sturen' }}
         </button>
         <button v-if="canCredit" class="btn btn-secondary btn-sm" title="Maak een creditnota op deze factuur" @click="showCreditModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
@@ -602,6 +634,7 @@ const deleteInvoice = () => {
               <span class="hist-chip" :class="{ on: !!invoice.sent_at_label }">{{ invoice.sent_at_label ? '1× verstuurd' : 'Nog niet verstuurd' }}</span>
               <span v-if="reminderCounts.reminders" class="hist-chip on">{{ reminderCounts.reminders }}× herinnering</span>
               <span v-if="reminderCounts.warnings" class="hist-chip warn">{{ reminderCounts.warnings }}× aanmaning</span>
+              <span v-if="invoice.thanks_sent_at_label" class="hist-chip thanks" :title="`Verstuurd op ${invoice.thanks_sent_at_label}`">♥ Bedankmail verstuurd</span>
             </div>
           </div>
           <div class="hist-trail">
@@ -615,6 +648,7 @@ const deleteInvoice = () => {
                 <svg v-else-if="e.icon === 'euro'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/></svg>
                 <svg v-else-if="e.icon === 'check'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 <svg v-else-if="e.icon === 'gavel'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
+                <svg v-else-if="e.icon === 'heart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
               </span>
               <div class="hist-label">{{ e.label }}</div>
@@ -787,6 +821,19 @@ const deleteInvoice = () => {
             </label>
             <input type="text" v-model="paymentForm.reference" maxlength="255">
           </div>
+
+          <!-- Bedankmail: alleen bij een echte, volledige betaling -->
+          <label v-if="paymentForm.kind === 'payment'" class="credit-opt thanks-opt" :class="{ on: paymentForm.send_thanks && isFullPayment && invoice.customer_email, off: !isFullPayment || !invoice.customer_email }">
+            <input type="checkbox" v-model="paymentForm.send_thanks" :disabled="!isFullPayment || !invoice.customer_email">
+            <div>
+              <div class="credit-opt-title">Klant bedanken per e-mail</div>
+              <div class="credit-opt-sub">
+                <template v-if="!invoice.customer_email">Deze klant heeft geen e-mailadres — vul het aan bij de klantgegevens.</template>
+                <template v-else-if="!isFullPayment">Volgt pas bij volledige betaling; dit is een deelbetaling.</template>
+                <template v-else>Stuurt direct een bedankmail naar {{ invoice.customer_email }}, met de factuur (stempel BETAALD) als PDF.</template>
+              </div>
+            </div>
+          </label>
         </div>
         <div class="modal-footer">
           <div></div>
@@ -992,6 +1039,10 @@ const deleteInvoice = () => {
 .credit-opt input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--brand); flex: none; }
 .credit-opt-title { font-weight: 600; font-size: 14px; }
 .credit-opt-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; line-height: 1.5; }
+.thanks-opt { margin-top: 4px; }
+.thanks-opt.on { border-color: var(--success); background: var(--success-bg); }
+.thanks-opt.off { cursor: default; opacity: .7; }
+.thanks-opt.off:hover { background: transparent; }
 
 /* Sectiekoppen binnen de factuur */
 .sect-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin-bottom: 12px; }
@@ -1053,6 +1104,7 @@ const deleteInvoice = () => {
 }
 .hist-chip.on { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
 .hist-chip.warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning-border); }
+.hist-chip.thanks { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
 .hist-trail { display: flex; flex-direction: column; }
 .hist-row {
   display: flex; align-items: center; gap: 12px;

@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
 use App\Services\InvoiceManager;
+use App\Services\PaymentThanksService;
 use App\Services\UblGenerator;
 use App\Services\VatCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -154,6 +155,7 @@ class InvoiceController extends Controller
                 'scheduled_send_on' => $invoice->scheduled_send_on?->format('Y-m-d'),
                 'scheduled_send_on_label' => $invoice->scheduled_send_on?->translatedFormat('j F Y'),
                 'first_viewed_at_label' => $invoice->first_viewed_at?->translatedFormat('j M Y, H:i'),
+                'thanks_sent_at_label' => $invoice->thanks_sent_at?->translatedFormat('j M Y, H:i'),
                 'history' => $this->history($invoice),
                 'portal_url' => $invoice->portalUrl(),
                 'views' => $invoice->views->map(fn ($v) => [
@@ -375,7 +377,29 @@ class InvoiceController extends Controller
         return back()->with('flash', "{$label} verstuurd naar {$invoice->customer_email}.");
     }
 
-    public function recordPayment(Request $request, Invoice $invoice): RedirectResponse
+    /**
+     * Bedankmail (opnieuw) sturen voor een betaalde factuur — een bewuste
+     * keuze van de ondernemer, dus ook als er al eerder een is verstuurd.
+     */
+    public function thank(Invoice $invoice, PaymentThanksService $thanks): RedirectResponse
+    {
+        try {
+            $thanks->send($invoice, force: true);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['thanks' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Bedankmail (handmatig) mislukt', [
+                'invoice' => $invoice->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withErrors(['thanks' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+        }
+
+        return back()->with('flash', "Bedankmail verstuurd naar {$invoice->customer_email}.");
+    }
+
+    public function recordPayment(Request $request, Invoice $invoice, PaymentThanksService $thanks): RedirectResponse
     {
         $data = $request->validate([
             'kind' => ['nullable', 'in:payment,write_off,advance'],
@@ -384,6 +408,9 @@ class InvoiceController extends Controller
             'method' => ['nullable', 'required_if:kind,payment', 'in:bank_transfer,ideal,cash,card,other'],
             'reference' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string'],
+            // Vinkje "Klant bedanken per e-mail" — alleen zinvol bij een echte,
+            // volledige betaling; de service bewaakt de rest.
+            'send_thanks' => ['nullable', 'boolean'],
         ]);
 
         // Afboeking: wikkelt (een deel van) de factuur af zonder echt geld —
@@ -400,11 +427,32 @@ class InvoiceController extends Controller
             'notes' => $data['notes'] ?? null,
         ]);
 
-        return back()->with('flash', match ($kind) {
+        $flash = match ($kind) {
             'write_off' => 'Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.',
             'advance' => 'Verrekening geregistreerd — de PDF toont het bedrag als "reeds doorgestort"; omzet en BTW blijven ongewijzigd.',
             default => 'Betaling geregistreerd.',
-        });
+        };
+
+        // Volledig voldaan én de ondernemer wil bedanken? Dan direct de bedankmail.
+        if ($kind === 'payment' && $request->boolean('send_thanks')) {
+            $invoice->refresh();
+            if ($invoice->status === 'paid') {
+                try {
+                    $thanks->send($invoice);
+                    $flash .= " Bedankmail verstuurd naar {$invoice->customer_email}.";
+                } catch (\DomainException $e) {
+                    $flash .= ' Geen bedankmail: ' . $e->getMessage();
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error('Bedankmail na betaling mislukt', [
+                        'invoice' => $invoice->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $flash .= ' De bedankmail kon niet worden verstuurd — probeer het straks via "Bedankmail sturen".';
+                }
+            }
+        }
+
+        return back()->with('flash', $flash);
     }
 
     /**
@@ -442,6 +490,8 @@ class InvoiceController extends Controller
         if ($invoice->status === 'paid') {
             $push($invoice->paid_at, 'check', 'Volledig betaald');
         }
+
+        $push($invoice->thanks_sent_at, 'heart', 'Bedankmail verstuurd' . ($invoice->thanks_sent_to ? " naar {$invoice->thanks_sent_to}" : ''));
 
         $push($invoice->incasso_sent_at, 'gavel', 'Overgedragen aan incasso' . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));
 

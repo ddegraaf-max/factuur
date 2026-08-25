@@ -70,6 +70,26 @@ return [
     'mail_regards' => 'Kind regards,',
     'mail_sent_via' => 'Sent via EasyInvoice on behalf of :name.',
 
+    // Bedankmail na betaling
+    'mail_thanks_subject' => 'Thank you for your payment — invoice :number',
+    'mail_thanks_title' => 'Thank you for your payment!',
+    'mail_thanks_intro' => 'We have received your payment for invoice <strong>:number</strong>. Thank you — it has been a pleasure working with you.',
+    'mail_thanks_invoice' => 'Invoice',
+    'mail_thanks_amount' => 'Amount',
+    'mail_thanks_settled' => 'PAID',
+    'mail_thanks_received_on' => 'Received on',
+    'mail_thanks_method' => 'Payment method',
+    'mail_thanks_attachment' => 'The invoice, marked as paid, is attached as a PDF for your records.',
+    'mail_thanks_review_title' => 'Happy with our work?',
+    'mail_thanks_review_text' => 'A short review helps us a great deal — and only takes a minute.',
+    'mail_thanks_review_cta' => 'Leave a review',
+    'pay_method_bank_transfer' => 'Bank transfer',
+    'pay_method_ideal' => 'iDEAL',
+    'pay_method_cash' => 'Cash',
+    'pay_method_card' => 'Debit / credit card',
+    'pay_method_direct_debit' => 'Direct debit',
+    'pay_method_other' => 'Other',
+
     // Offertemail
     'mail_quote_subject' => 'Quotation :number — :company',
     'mail_quote_intro_default' => 'Please find our quotation attached as a PDF.',

@@ -171,6 +171,11 @@ class MolliePaymentService
         ]);
 
         $onlinePayment->update(['payment_id' => $payment->id]);
+
+        // Volledig voldaan? Dan — als de ondernemer dat aan heeft staan — direct
+        // een bedankje naar de klant: de betaalbevestiging die hij toch al
+        // verwacht na een iDEAL-betaling. Nooit blokkerend voor de webhook.
+        app(PaymentThanksService::class)->sendIfEnabled($invoice->fresh());
     }
 
     protected function mapMethod(?string $mollieMethod): string

@@ -208,7 +208,14 @@ class DemoDataBuilder
             // De betaling heeft de factuur zelf al bijgewerkt (status 'paid');
             // eerst opnieuw inlezen, anders overschrijven we dat met oude waarden.
             $invoice->refresh();
-            $invoice->forceFill(['paid_at' => now()->subDays($daysAgo - 9)])->save();
+            $paidAt = now()->subDays($daysAgo - 9);
+            $invoice->forceFill([
+                'paid_at' => $paidAt,
+                // In de demo is de bedankmail al "verstuurd", zodat de
+                // factuurhistorie laat zien hoe dat eruitziet.
+                'thanks_sent_at' => $invoice->customer_email ? $paidAt->copy()->addMinutes(2) : null,
+                'thanks_sent_to' => $invoice->customer_email,
+            ])->save();
             $made['paid'.$i] = $invoice;
         }
 

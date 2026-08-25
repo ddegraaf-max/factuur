@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PurchaseInvoice;
 use App\Services\BankStatementParser;
+use App\Services\PaymentThanksService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -130,7 +131,7 @@ class BankController extends Controller
     }
 
     /** Koppel een ontvangst aan een factuur en boek de betaling. */
-    public function matchInvoice(Request $request, BankTransaction $transaction): RedirectResponse
+    public function matchInvoice(Request $request, BankTransaction $transaction, PaymentThanksService $thanks): RedirectResponse
     {
         $data = $request->validate(['invoice_id' => ['required', 'integer']]);
 
@@ -162,6 +163,12 @@ class BankController extends Controller
         $note = abs((float) $transaction->amount) - $amount > 0.009
             ? ' Let op: de transactie was hoger dan het openstaande bedrag; er is ' . '€ ' . number_format($amount, 2, ',', '.') . ' geboekt.'
             : '';
+
+        // Volledig voldaan? Dan (als dat aanstaat) meteen een bedankje naar de klant.
+        $invoice->refresh();
+        if ($invoice->status === 'paid' && $thanks->sendIfEnabled($invoice)) {
+            $note .= " Bedankmail verstuurd naar {$invoice->customer_email}.";
+        }
 
         return back()->with('flash', "Gekoppeld aan factuur {$invoice->number} — betaling geboekt.{$note}");
     }

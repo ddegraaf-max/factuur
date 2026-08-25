@@ -299,6 +299,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
     Route::post('invoices/{invoice}/herinnering', [InvoiceController::class, 'remind'])->name('invoices.remind');
+    Route::post('invoices/{invoice}/bedankmail', [InvoiceController::class, 'thank'])->name('invoices.thank');
     Route::post('invoices/{invoice}/payments', [InvoiceController::class, 'recordPayment'])->name('invoices.payments.store');
     Route::post('invoices/{invoice}/dupliceren', [InvoiceController::class, 'duplicate'])->name('invoices.duplicate');
     Route::patch('invoices/{invoice}/notitie', [InvoiceController::class, 'updateInternalNotes'])->name('invoices.notes.update');
@@ -465,6 +466,8 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // E-mailteksten: eigen onderwerp en tekst voor factuur- en offertemail
         Route::get('settings/emailteksten', [SettingsController::class, 'emails'])->name('settings.emails');
         Route::patch('settings/emailteksten', [SettingsController::class, 'updateEmails'])->name('settings.emails.update');
+        // Voorbeeld van de bedankmail in de browser (tekst uit het formulier; niets wordt opgeslagen)
+        Route::get('settings/emailteksten/voorbeeld-bedankmail', [SettingsController::class, 'previewThanks'])->name('settings.emails.preview.thanks');
 
         // Team: collega's en boekhouder uitnodigen, rollen beheren
         Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team');

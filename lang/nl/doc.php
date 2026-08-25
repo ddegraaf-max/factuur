@@ -71,6 +71,26 @@ return [
     'mail_regards' => 'Met vriendelijke groet,',
     'mail_sent_via' => 'Verzonden via EasyInvoice namens :name.',
 
+    // Bedankmail na betaling
+    'mail_thanks_subject' => 'Bedankt voor uw betaling — factuur :number',
+    'mail_thanks_title' => 'Bedankt voor uw betaling!',
+    'mail_thanks_intro' => 'Wij hebben uw betaling voor factuur <strong>:number</strong> in goede orde ontvangen. Hartelijk dank voor de prettige samenwerking.',
+    'mail_thanks_invoice' => 'Factuur',
+    'mail_thanks_amount' => 'Bedrag',
+    'mail_thanks_settled' => 'VOLDAAN',
+    'mail_thanks_received_on' => 'Ontvangen op',
+    'mail_thanks_method' => 'Betaalwijze',
+    'mail_thanks_attachment' => 'De factuur is, voorzien van het stempel BETAALD, als PDF bijgevoegd — handig voor uw administratie.',
+    'mail_thanks_review_title' => 'Blij met de samenwerking?',
+    'mail_thanks_review_text' => 'Een korte review helpt ons enorm — en kost u maar een minuut.',
+    'mail_thanks_review_cta' => 'Laat een review achter',
+    'pay_method_bank_transfer' => 'Bankoverschrijving',
+    'pay_method_ideal' => 'iDEAL',
+    'pay_method_cash' => 'Contant',
+    'pay_method_card' => 'Pinpas / creditcard',
+    'pay_method_direct_debit' => 'Automatische incasso',
+    'pay_method_other' => 'Anders',
+
     // Offertemail
     'mail_quote_subject' => 'Offerte :number — :company',
     'mail_quote_intro_default' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',

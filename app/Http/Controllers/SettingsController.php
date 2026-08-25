@@ -285,13 +285,19 @@ class SettingsController extends Controller
                 'invoice_body' => $texts['invoice_body'] ?? '',
                 'quote_subject' => $texts['quote_subject'] ?? '',
                 'quote_body' => $texts['quote_body'] ?? '',
+                'thanks_subject' => $texts['thanks_subject'] ?? '',
+                'thanks_body' => $texts['thanks_body'] ?? '',
             ],
+            'thanks_enabled' => (bool) $company->thanks_mail_enabled,
+            'review_url' => $company->review_url ?? '',
             // De standaardteksten (NL) als voorbeeld/placeholder in het formulier.
             'defaults' => [
                 'invoice_subject' => 'Factuur {factuurnummer} — {bedrijf}',
                 'invoice_body' => "Beste {klant},\n\nHierbij ontvangt u factuur {factuurnummer} van {factuurdatum} voor een bedrag van {bedrag}. De factuur vindt u als PDF in de bijlage.\n\nWij verzoeken u het bedrag uiterlijk {vervaldatum} te voldoen op {iban} onder vermelding van factuurnummer {factuurnummer}.",
                 'quote_subject' => 'Offerte {offertenummer} — {bedrijf}',
                 'quote_body' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
+                'thanks_subject' => 'Bedankt voor uw betaling — factuur {factuurnummer}',
+                'thanks_body' => "Beste {klant},\n\nWij hebben uw betaling voor factuur {factuurnummer} in goede orde ontvangen. Hartelijk dank voor de prettige samenwerking.",
             ],
         ]);
     }
@@ -303,14 +309,94 @@ class SettingsController extends Controller
             'invoice_body' => 'nullable|string|max:4000',
             'quote_subject' => 'nullable|string|max:200',
             'quote_body' => 'nullable|string|max:4000',
+            'thanks_subject' => 'nullable|string|max:200',
+            'thanks_body' => 'nullable|string|max:4000',
+            'thanks_enabled' => 'nullable|boolean',
+            'review_url' => 'nullable|string|max:500',
         ]);
 
-        // Alleen ingevulde teksten bewaren; leeg = terug naar de standaard.
-        $texts = array_filter(array_map(fn ($v) => trim((string) $v), $data), fn ($v) => $v !== '');
+        // Reviewlink: "g.page/r/…" zonder schema is ook goed — wij zetten https:// ervoor.
+        $reviewUrl = self::normalizeUrl($data['review_url'] ?? null);
+        if ($reviewUrl !== null && ! filter_var($reviewUrl, FILTER_VALIDATE_URL)) {
+            return back()->withErrors(['review_url' => 'Vul een geldige link in, bijvoorbeeld https://g.page/r/… of je Trustpilot-pagina.']);
+        }
 
-        auth()->user()->company->update(['email_texts' => $texts ?: null]);
+        // Alleen ingevulde teksten bewaren; leeg = terug naar de standaard.
+        $textKeys = ['invoice_subject', 'invoice_body', 'quote_subject', 'quote_body', 'thanks_subject', 'thanks_body'];
+        $texts = array_filter(
+            array_map(fn ($v) => trim((string) $v), array_intersect_key($data, array_flip($textKeys))),
+            fn ($v) => $v !== ''
+        );
+
+        auth()->user()->company->update([
+            'email_texts' => $texts ?: null,
+            'thanks_mail_enabled' => $request->boolean('thanks_enabled'),
+            'review_url' => $reviewUrl,
+        ]);
 
         return back()->with('flash', 'E-mailteksten opgeslagen.');
+    }
+
+    /**
+     * Voorbeeld van de bedankmail in de browser — met de (nog niet opgeslagen)
+     * tekst uit het formulier en verzonnen factuurgegevens. Er wordt niets
+     * opgeslagen of verstuurd.
+     */
+    public function previewThanks(Request $request)
+    {
+        // Kopie in het geheugen: de formulierwaarden eroverheen, zonder op te slaan.
+        $company = auth()->user()->company->replicate();
+        $texts = $company->email_texts ?? [];
+        $texts['thanks_subject'] = trim((string) $request->input('thanks_subject', ''));
+        $texts['thanks_body'] = trim((string) $request->input('thanks_body', ''));
+        $company->email_texts = $texts;
+        if ($request->has('review_url')) {
+            $company->review_url = self::normalizeUrl($request->input('review_url'));
+        }
+
+        $invoice = new \App\Models\Invoice([
+            'number' => date('Y') . '-0042',
+            'status' => 'paid',
+            'language' => 'nl',
+            'invoice_date' => now()->subDays(12),
+            'due_date' => now()->addDays(2),
+            'paid_at' => now(),
+            'customer_name' => 'De Vries Bouw B.V.',
+            'customer_email' => 'administratie@devriesbouw.nl',
+            'subtotal' => 1000,
+            'vat_total' => 210,
+            'total' => 1210,
+            'paid_total' => 1210,
+        ]);
+        $invoice->id = 0;
+        $invoice->exists = false;
+        $invoice->setRelation('company', $company);
+
+        $payment = new \App\Models\Payment([
+            'kind' => 'payment',
+            'amount' => 1210,
+            'paid_on' => now()->toDateString(),
+            'method' => 'ideal',
+        ]);
+        $payment->exists = false;
+
+        $html = \App\Support\DocumentLocale::using('nl', fn () => (new \App\Mail\PaymentThanksMail($invoice, $payment, '', preview: true))->render());
+
+        return response($html)->header('X-Robots-Tag', 'noindex');
+    }
+
+    /** Reviewlink netjes maken: spaties weg, zonder schema → https://. Leeg = null. */
+    protected static function normalizeUrl(?string $url): ?string
+    {
+        $url = trim((string) $url);
+        if ($url === '') {
+            return null;
+        }
+        if (! preg_match('~^https?://~i', $url)) {
+            $url = 'https://' . $url;
+        }
+
+        return $url;
     }
 
     // ----- REMINDERS -----

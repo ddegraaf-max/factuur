@@ -1,17 +1,32 @@
 <script setup>
+import { computed } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
-  texts: Object,    // { invoice_subject, invoice_body, quote_subject, quote_body } — '' = standaard
+  texts: Object,    // { invoice_*, quote_*, thanks_* } — '' = standaard
   defaults: Object, // standaardteksten (NL), als placeholder/voorbeeld
+  thanks_enabled: Boolean,
+  review_url: { type: String, default: '' },
 });
 
-const form = useForm({ ...props.texts });
+const form = useForm({
+  ...props.texts,
+  thanks_enabled: !!props.thanks_enabled,
+  review_url: props.review_url || '',
+});
 
 const submit = () => form.patch(route('settings.emails.update'), { preserveScroll: true });
 
 const reset = (fields) => fields.forEach((f) => { form[f] = ''; });
+
+// Voorbeeld van de bedankmail met de tekst zoals die nú in het formulier staat
+// (nog niet opgeslagen) — opent in een nieuw tabblad.
+const previewUrl = computed(() => route('settings.emails.preview.thanks', {
+  thanks_subject: form.thanks_subject || '',
+  thanks_body: form.thanks_body || '',
+  review_url: form.review_url || '',
+}));
 </script>
 
 <template>
@@ -25,7 +40,7 @@ const reset = (fields) => fields.forEach((f) => { form[f] = ''; });
     <div class="page-header">
       <div>
         <h1 class="page-title">E-mailteksten</h1>
-        <p class="page-subtitle">Bepaal zelf het onderwerp en de tekst van je factuur- en offertemail. Leeg laten = de standaardtekst.</p>
+        <p class="page-subtitle">Bepaal zelf het onderwerp en de tekst van je factuur-, bedank- en offertemail. Leeg laten = de standaardtekst.</p>
       </div>
     </div>
 
@@ -51,6 +66,63 @@ const reset = (fields) => fields.forEach((f) => { form[f] = ''; });
             De knop naar het klantenportaal, verrekeningsmeldingen ("reeds doorgestort") en de PDF-bijlage
             blijven automatisch onder je tekst staan.
             <button v-if="form.invoice_subject || form.invoice_body" type="button" class="txt-reset" @click="reset(['invoice_subject', 'invoice_body'])">Terug naar standaard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bedankmail na betaling -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-header thanks-head">
+          <div>
+            <div class="card-title">Bedankmail na betaling</div>
+            <div class="thanks-sub">Een vriendelijk bedankje zodra een factuur volledig is betaald — in jouw huisstijl.</div>
+          </div>
+          <label class="switch" :class="{ on: form.thanks_enabled }">
+            <input type="checkbox" v-model="form.thanks_enabled" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ form.thanks_enabled ? 'Aan' : 'Uit' }}</span>
+          </label>
+        </div>
+        <div class="card-body" style="padding:18px 20px;">
+          <div class="thanks-flow" :class="{ muted: !form.thanks_enabled }">
+            <div class="flow-step">
+              <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></span>
+              <div><b>Bankkoppeling</b><span>Automatisch zodra je een ontvangst koppelt.</span></div>
+            </div>
+            <div class="flow-step">
+              <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+              <div><b>iDEAL via Mollie</b><span>Direct na de online betaling.</span></div>
+            </div>
+            <div class="flow-step">
+              <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+              <div><b>Handmatig geboekt</b><span>Jij kiest het per betaling met een vinkje.</span></div>
+            </div>
+          </div>
+          <p class="txt-help">
+            De mail bevat automatisch een overzicht van de betaling (factuur, bedrag, datum, betaalwijze), een knop naar het
+            klantenportaal en de factuur met het stempel <b>BETAALD</b> als PDF — een betaalbewijs voor de administratie van je klant.
+            Variabelen: <code>{klant}</code> <code>{bedrijf}</code> <code>{factuurnummer}</code> <code>{factuurdatum}</code>
+            <code>{bedrag}</code> <code>{betaaldatum}</code> <code>{betaalwijze}</code>.
+            Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.
+          </p>
+          <div class="txt-block">
+            <div class="txt-label">Onderwerp</div>
+            <input type="text" v-model="form.thanks_subject" maxlength="200" :placeholder="defaults.thanks_subject" />
+            <div class="txt-label">Bericht</div>
+            <textarea v-model="form.thanks_body" rows="5" maxlength="4000" :placeholder="defaults.thanks_body"></textarea>
+            <div class="txt-label">Reviewlink <span class="txt-opt">optioneel</span></div>
+            <input type="text" v-model="form.review_url" maxlength="500" placeholder="https://g.page/r/... of je Trustpilot-, Klantenvertellen- of Google-pagina" />
+            <div v-if="form.errors.review_url" class="field-error">{{ form.errors.review_url }}</div>
+            <div class="txt-hint">Met een link krijgt de bedankmail een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen.</div>
+          </div>
+          <div class="txt-note">
+            <a :href="previewUrl" target="_blank" rel="noopener" class="txt-preview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Bekijk voorbeeld
+            </a>
+            <span class="txt-sep">·</span>
+            <span>Overzicht, portaalknop en PDF-bijlage blijven automatisch staan.</span>
+            <button v-if="form.thanks_subject || form.thanks_body" type="button" class="txt-reset" @click="reset(['thanks_subject', 'thanks_body'])">Terug naar standaard</button>
           </div>
         </div>
       </div>
@@ -81,7 +153,7 @@ const reset = (fields) => fields.forEach((f) => { form[f] = ''; });
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>
           <strong>Let op bij Engelstalige klanten:</strong> een eigen tekst wordt letterlijk gebruikt voor álle klanten,
-          ook klanten met taalinstelling Engels. De standaardteksten volgen wél automatisch de taal van de klant.
+          ook klanten met taalinstelling Engels. De standaardteksten (ook die van de bedankmail) volgen wél automatisch de taal van de klant.
           Herinneringen en aanmaningen hebben hun eigen teksten onder Instellingen → Herinneringen.
         </div>
       </div>
@@ -94,9 +166,38 @@ const reset = (fields) => fields.forEach((f) => { form[f] = ''; });
 .txt-help code { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 11.5px; color: var(--text-2); }
 .txt-block { margin-bottom: 14px; }
 .txt-label { font-size: 12.5px; font-weight: 600; color: var(--text-2); margin: 12px 0 6px; }
+.txt-opt { font-weight: 400; color: var(--text-4); margin-left: 4px; }
 .txt-block input, .txt-block textarea { width: 100%; }
-.txt-note { font-size: 12.5px; color: var(--text-3); line-height: 1.7; }
+.txt-hint { font-size: 12px; color: var(--text-3); line-height: 1.6; margin-top: 6px; }
+.txt-note { font-size: 12.5px; color: var(--text-3); line-height: 1.7; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.txt-sep { color: var(--text-4); }
 .txt-reset { background: none; border: none; padding: 0; margin-left: 6px; font-size: 12.5px; color: var(--brand); cursor: pointer; text-decoration: underline; }
+.txt-preview { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--brand); text-decoration: none; }
+.txt-preview:hover { text-decoration: underline; }
+.txt-preview svg { width: 15px; height: 15px; }
+
+/* Kop met aan/uit-schakelaar */
+.thanks-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.thanks-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
+.switch { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; flex: none; }
+.switch input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.switch-track { position: relative; width: 40px; height: 22px; border-radius: 999px; background: var(--border); transition: background .15s; flex: none; }
+.switch-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+.switch.on .switch-track { background: var(--success); }
+.switch.on .switch-thumb { transform: translateX(18px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--brand); outline-offset: 2px; }
+.switch-text { font-size: 13px; font-weight: 600; color: var(--text-2); min-width: 26px; }
+
+/* De drie routes waarlangs een betaling binnenkomt */
+.thanks-flow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 16px; transition: opacity .15s; }
+.thanks-flow.muted { opacity: .55; }
+.flow-step { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; background: var(--surface-2); }
+.flow-step b { display: block; font-size: 12.5px; color: var(--text-1); }
+.flow-step span:not(.flow-ico) { display: block; font-size: 12px; color: var(--text-3); line-height: 1.5; margin-top: 2px; }
+.flow-ico { width: 30px; height: 30px; border-radius: 8px; background: #fff; border: 1px solid var(--border); color: var(--brand); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.flow-ico svg { width: 15px; height: 15px; }
+@media (max-width: 720px) { .thanks-flow { grid-template-columns: 1fr; } }
+
 .txt-lang-note {
   display: flex; gap: 12px; align-items: flex-start;
   background: #FEF9EC; border: 1px solid #FDE68A; border-radius: 12px;

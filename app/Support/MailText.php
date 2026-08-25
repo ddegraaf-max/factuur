@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Invoice;
+use App\Models\Payment;
 use App\Models\Quote;
 
 /**
@@ -31,6 +32,36 @@ class MailText
             '{openstaand}' => '€ ' . number_format(max((float) $invoice->total - (float) $invoice->paid_total, 0), 2, ',', '.'),
             '{iban}' => (string) ($company->iban ?? ''),
         ];
+    }
+
+    /**
+     * Variabelen voor de bedankmail na betaling. {betaaldatum} en {betaalwijze}
+     * komen van de laatste échte betaling; ontbreekt die, dan van de factuur.
+     *
+     * @return array<string, string>
+     */
+    public static function thanksVars(Invoice $invoice, $company, ?Payment $payment = null): array
+    {
+        $paidOn = $payment?->paid_on ?? $invoice->paid_at;
+
+        return [
+            '{klant}' => (string) ($invoice->customer_name ?? ''),
+            '{bedrijf}' => (string) ($company->name ?? ''),
+            '{factuurnummer}' => (string) ($invoice->number ?? ''),
+            '{factuurdatum}' => optional($invoice->invoice_date)->translatedFormat('j F Y') ?? '',
+            '{bedrag}' => '€ ' . number_format((float) $invoice->total, 2, ',', '.'),
+            '{betaaldatum}' => $paidOn ? $paidOn->translatedFormat('j F Y') : '',
+            '{betaalwijze}' => $payment?->method ? self::paymentMethodLabel($payment->method) : '',
+        ];
+    }
+
+    /** Leesbare betaalwijze in de taal van het document. */
+    public static function paymentMethodLabel(?string $method): string
+    {
+        $known = ['bank_transfer', 'ideal', 'cash', 'card', 'direct_debit', 'other'];
+        $key = in_array($method, $known, true) ? $method : 'other';
+
+        return __('doc.pay_method_' . $key);
     }
 
     /** @return array<string, string> */

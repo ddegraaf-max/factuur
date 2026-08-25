@@ -24,6 +24,7 @@ class Invoice extends Model
         'subtotal', 'vat_total', 'total', 'paid_total', 'vat_breakdown',
         'notes', 'footer', 'internal_notes',
         'sent_at', 'scheduled_send_on', 'first_viewed_at', 'paid_at',
+        'thanks_sent_at', 'thanks_sent_to',
         'incasso_sent_at', 'incasso_reference', 'incasso_handler', 'incasso_phase',
     ];
 
@@ -35,6 +36,7 @@ class Invoice extends Model
         'scheduled_send_on' => 'date',
         'first_viewed_at' => 'datetime',
         'paid_at' => 'datetime',
+        'thanks_sent_at' => 'datetime',
         'incasso_sent_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'vat_total' => 'decimal:2',
