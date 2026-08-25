@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.36.0</div>
+        <h3>Btw-aangifte: aangifte-klaar, met betalingskenmerk</h3>
+        <ul class="tl-list">
+          <li><b>Alle rubrieken klaar</b> — per tijdvak (kwartaal, maand of jaar) staan 1a t/m 5c precies in de indeling van Mijn Belastingdienst Zakelijk, in hele euro's en afgerond in je voordeel. Klik op een bedrag om het te kopiëren; onder "Onderbouwing" zie je welke facturen in welke rubriek zitten. Export en EU-leveringen (3a/3b) worden op klantland herkend.</li>
+          <li><b>Vul aan wat Easy niet weet</b> — verlegde btw, inkoop uit het buitenland, privégebruik en niet-ingeboekte voorbelasting vul je per tijdvak zelf in; het wordt bewaard en meegeteld.</li>
+          <li><b>Zo overgemaakt</b> — bedrag, het (nieuwe) rekeningnummer van de Belastingdienst en het betalingskenmerk staan klaar. Het kenmerk berekent Easy uit je omzetbelastingnummer volgens de officiële specificatie van de Belastingdienst — of je plakt het kenmerk uit je ingestuurde aangifte.</li>
+          <li><b>Niets meer vergeten</b> — vink "aangegeven" en "betaald" af, krijg twee weken en drie dagen vóór de deadline een herinnering met de cijfers erbij, en zie op het dashboard direct of er een aangifte openstaat. Het btw-kpi op het dashboard toont nu het saldo ná voorbelasting.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.35.0</div>
         <h3>Bedankmail na betaling — met reviewlink</h3>
         <ul class="tl-list">

@@ -253,16 +253,23 @@ return [
         // ---------- BTW & RAPPORTEN ----------
         'btw-aangifte-per-kwartaal' => [
             'category' => 'BTW & rapporten',
-            'title' => 'Je BTW-aangifte per kwartaal',
-            'intro' => 'Onder Rapporten → BTW-aangifte staat per kwartaal precies wat je invult bij de Belastingdienst.',
+            'title' => 'Je btw-aangifte: aangifte-klaar',
+            'intro' => 'Onder Rapporten → Btw-aangifte staan per tijdvak álle rubrieken van het aangifteformulier klaar — in de indeling van Mijn Belastingdienst Zakelijk, met betaalgegevens en betalingskenmerk erbij.',
             'sections' => [
                 ['Wat je ziet', [
-                    'Per kwartaal: de grondslag en BTW per tarief (rubriek 1a en 1b), het nultarief (1e), de voorbelasting uit je ingeboekte inkoopfacturen (5b) en het saldo dat je per kwartaal betaalt of terugkrijgt.',
-                    'Is een kwartaal voorbij maar de aangiftetermijn nog niet? Dan kleurt de kaart en zie je bovenaan een waarschuwing met het bedrag en de uiterste datum.',
+                    'Per tijdvak (kwartaal, maand of jaar — zoals de Belastingdienst het aan je heeft toegewezen) de grondslag en btw per rubriek: 1a en 1b (21% en 9%), 1e (0% binnenland), 3a en 3b (uitvoer en EU, op basis van het land van de klant), de voorbelasting uit je ingeboekte inkoopfacturen (5b) en het saldo 5c dat je betaalt of terugkrijgt.',
+                    'Klik op "Aangifte-klaar" bij een tijdvak: je ziet de rubrieken in hele euro\'s, afgerond in je voordeel zoals de Belastingdienst toestaat. Klik op een bedrag om het te kopiëren en plak het in Mijn Belastingdienst Zakelijk. Onder "Onderbouwing" zie je welke facturen in welke rubriek zitten.',
                 ]],
-                ['Goed om te weten', [
-                    'De cijfers worden berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota\'s. De voorbelasting is zo volledig als je inkoopadministratie — boek dus al je inkoop in.',
-                    'Met "Download PDF" bewaar je het overzicht voor je administratie of stuur je het naar je boekhouder.',
+                ['Wat je zelf aanvult', [
+                    'Wat EasyInvoice niet kan weten, vul je per tijdvak zelf in: verlegde btw (2a), inkoop uit het buitenland (4a/4b), privégebruik (1d), overige tarieven (1c) en voorbelasting die je niet hebt ingeboekt. Easy bewaart het per tijdvak en telt het op in 5a en 5b.',
+                ]],
+                ['Betalen en afvinken', [
+                    'Bij een te betalen saldo staan het bedrag, het rekeningnummer van de Belastingdienst (sinds 1 mei 2026: NL04 RABO 0200 1122 44) en het betalingskenmerk klaar om te kopiëren. Zet het kenmerk in het veld "Betalingskenmerk" van je overschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.',
+                    'Het betalingskenmerk berekent Easy uit je omzetbelastingnummer (Instellingen op de btw-pagina). Let op: bij een eenmanszaak is dat een ander nummer dan het btw-id op je facturen. Geen nummer ingesteld? Plak dan het kenmerk dat je na het insturen ziet in Mijn Belastingdienst Zakelijk. Vink daarna "Aangifte ingediend" en "Betaald" af; de historie staat op de kaart.',
+                ]],
+                ['Herinnering en dashboard', [
+                    'Twee weken en drie dagen vóór de deadline (een maand na afloop van het tijdvak; bij jaaraangifte 31 maart) krijg je een e-mail met de cijfers en de betaalgegevens — zolang je het tijdvak niet als aangegeven hebt gemarkeerd. Op het dashboard zie je een balk zodra een aangifte openstaat.',
+                    'De cijfers worden berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota\'s. De voorbelasting is zo volledig als je inkoopadministratie — boek dus al je inkoop in. Controleer de aangifte altijd met je boekhouder; EasyInvoice stuurt (nog) niets naar de Belastingdienst.',
                 ]],
             ],
         ],

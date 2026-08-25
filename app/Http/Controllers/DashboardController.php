@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\PurchaseInvoice;
+use App\Services\VatService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -11,7 +12,7 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(): Response
+    public function index(VatService $vat): Response
     {
         // First, mark overdue
         Invoice::where('status', 'sent')
@@ -43,15 +44,15 @@ class DashboardController extends Controller
             ? round((($monthRevenue - $lastMonthRevenue) / $lastMonthRevenue) * 100, 1)
             : 0;
 
-        // VAT to pay this quarter
-        $quarterStart = now()->firstOfQuarter();
-        $quarterEnd = now()->lastOfQuarter();
-        $vatToPay = Invoice::whereIn('status', ['sent', 'partial', 'paid', 'overdue'])
-            ->whereBetween('invoice_date', [$quarterStart, $quarterEnd])
-            ->sum('vat_total');
-
+        // Btw: het lopende tijdvak per saldo (btw over omzet min voorbelasting)
+        // en het afgesloten tijdvak dat nu aangifte vraagt.
+        $vatAttention = $vat->attention(auth()->user()->company);
+        $vatCurrent = $vatAttention['current'];
+        $vatDue = $vatAttention['due'];
+        $vatToPay = $vatCurrent['balance'] ?? 0.0;
+        $vatPeriodLabel = $vatCurrent['label'] ?? '';
         $quarterNumber = ceil(now()->month / 3);
-        $quarterDeadline = $quarterEnd->copy()->addMonth()->endOfMonth();
+        $quarterDeadline = $vatCurrent ? Carbon::parse($vatCurrent['deadline']) : now()->lastOfQuarter()->addMonth()->endOfMonth();
 
         // Recent invoices
         $recentInvoices = Invoice::with('customer')
@@ -111,9 +112,18 @@ class DashboardController extends Controller
                 'month_revenue' => (float) $monthRevenue,
                 'month_change' => $monthChange,
                 'vat_to_pay' => (float) $vatToPay,
+                'vat_period_label' => $vatPeriodLabel,
                 'quarter_number' => $quarterNumber,
                 'quarter_deadline' => $quarterDeadline->translatedFormat('j M Y'),
             ],
+            // Aangifte die nu open staat (afgesloten tijdvak, deadline nog niet voorbij).
+            'vat_due' => $vatDue ? [
+                'label' => $vatDue['label'],
+                'year' => $vatDue['year'],
+                'deadline_label' => $vatDue['deadline_label'],
+                'days_left' => $vatDue['days_left'],
+                'balance_rounded' => $vatDue['balance_rounded'],
+            ] : null,
             'recent_invoices' => $recentInvoices,
             'result_chart' => [
                 'year' => $year,

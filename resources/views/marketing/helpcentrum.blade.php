@@ -83,7 +83,7 @@
         <a class="help-link" href="{{ route('help.article', 'inkoopfacturen-inboeken') }}">Inkoopfacturen inboeken (ook met foto) →</a>
         <a class="help-link" href="{{ route('help.article', 'postvak-in') }}">Inkoopfacturen per e-mail aanleveren →</a>
         <a class="help-link" href="{{ route('help.article', 'vaste-lasten') }}">Vaste lasten automatisch inboeken →</a>
-        <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je BTW-aangifte per kwartaal →</a>
+        <a class="help-link" href="{{ route('help.article', 'btw-aangifte-per-kwartaal') }}">Je btw-aangifte: aangifte-klaar (rubrieken, betalingskenmerk) →</a>
         <a class="help-link" href="{{ route('help.article', 'jaaroverzicht') }}">Het jaaroverzicht (omzet, kosten, resultaat) →</a>
         <a class="help-link" href="{{ route('help.article', 'cashflow-prognose') }}">De cashflow-prognose →</a>
         <a class="help-link" href="{{ route('help.article', 'ouderdomsanalyse-debiteuren') }}">Debiteuren: wie staat er hoe lang open? →</a>

@@ -3,31 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
-use App\Models\PurchaseInvoice;
+use App\Models\VatFiling;
+use App\Services\VatService;
+use App\Support\VatPaymentReference;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
- * BTW-overzicht per kwartaal — precies de cijfers die de ondernemer nodig
- * heeft voor de kwartaalaangifte omzetbelasting:
- *
- *   rubriek 1a — leveringen/diensten belast met hoog tarief (21%)
- *   rubriek 1b — leveringen/diensten belast met laag tarief (9%)
- *   rubriek 1e — leveringen/diensten belast met 0%
- *   rubriek 5b — voorbelasting (BTW op ingeboekte inkoopfacturen)
- *
- * Grondslag en BTW komen uit de factuurregels (factuurstelsel: geteld in het
- * kwartaal van de factuurdatum). Creditnota's tellen negatief mee. Het saldo
- * (af te dragen minus voorbelasting) is wat er per kwartaal betaald wordt.
+ * Btw-aangifte "aangifte-klaar": alle rubrieken per tijdvak in de indeling
+ * van Mijn Belastingdienst Zakelijk, betaalgegevens met betalingskenmerk en
+ * de status (aangegeven/betaald) per tijdvak. De berekening zit in VatService.
  */
 class VatController extends Controller
 {
+    public function __construct(protected VatService $vat) {}
+
     public function index(Request $request): Response
     {
+        $company = auth()->user()->company;
         $year = (int) $request->input('year', now()->year);
 
         $allYears = Invoice::regular()
@@ -35,157 +32,162 @@ class VatController extends Controller
             ->selectRaw('DISTINCT EXTRACT(YEAR FROM invoice_date) AS yr')
             ->pluck('yr')
             ->map(fn ($y) => (int) $y)
+            ->push(now()->year)
+            ->unique()
             ->sortDesc()
             ->values()
             ->all();
 
-        if (empty($allYears)) $allYears = [now()->year];
-
-        return Inertia::render('Btw/Index', array_merge($this->overview($year), [
+        return Inertia::render('Btw/Index', array_merge($this->vat->overview($company, $year), [
             'year' => $year,
             'allYears' => $allYears,
+            'settings' => [
+                'vat_period' => VatService::periodType($company),
+                'has_ob_number' => filled($company->ob_number),
+                'ob_number_hint' => $this->maskObNumber($company->ob_number),
+                'vat_reminder_enabled' => (bool) $company->vat_reminder_enabled,
+                'reminder_email' => $company->daily_notification_email ?: $company->email ?: auth()->user()->email,
+            ],
+            'mbz_url' => 'https://mijnzakelijk.belastingdienst.nl',
         ]));
     }
 
-    /** Hetzelfde overzicht, maar als PDF voor de eigen administratie/boekhouder. */
+    /** Hetzelfde overzicht als PDF voor de eigen administratie of de boekhouder. */
     public function pdf(Request $request): HttpResponse
     {
-        $year = (int) $request->input('year', now()->year);
         $company = auth()->user()->company;
+        $year = (int) $request->input('year', now()->year);
 
-        $pdf = Pdf::loadView('pdf.btw-overzicht', array_merge($this->overview($year), [
+        $pdf = Pdf::loadView('pdf.btw-overzicht', array_merge($this->vat->overview($company, $year, false), [
             'year' => $year,
             'company' => $company,
             'generated_at' => now()->translatedFormat('j F Y, H:i'),
         ]))->setPaper('a4');
 
-        return $pdf->download("btw-overzicht-{$year}.pdf");
+        return $pdf->download("btw-aangifte-{$year}.pdf");
     }
 
-    /* ===================== Berekening ===================== */
-
-    protected function overview(int $year): array
+    /** Status en aanvullingen van één tijdvak bijwerken. */
+    public function updateFiling(Request $request, int $year, string $type, int $period): RedirectResponse
     {
-        $invoices = Invoice::with('lines')
-            ->whereNotIn('status', ['draft', 'cancelled'])
-            ->whereYear('invoice_date', $year)
-            ->get();
+        $company = auth()->user()->company;
+        abort_unless(in_array($type, VatService::PERIOD_TYPES, true), 404);
+        $max = match ($type) { 'month' => 12, 'year' => 1, default => 4 };
+        abort_unless($period >= 1 && $period <= $max && $year >= 2000 && $year <= 2100, 404);
 
-        $emptyRates = fn () => [
-            '21' => ['base' => 0.0, 'vat' => 0.0],
-            '9' => ['base' => 0.0, 'vat' => 0.0],
-            '0' => ['base' => 0.0, 'vat' => 0.0],
-        ];
+        $data = $request->validate([
+            'filed' => ['nullable', 'boolean'],
+            'paid' => ['nullable', 'boolean'],
+            'payment_reference' => ['nullable', 'string', 'max:30'],
+            'manual' => ['nullable', 'array'],
+            'manual.*.base' => ['nullable', 'numeric', 'between:-99999999,99999999'],
+            'manual.*.vat' => ['nullable', 'numeric', 'between:-99999999,99999999'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ]);
 
-        $quarters = [];
-        for ($q = 1; $q <= 4; $q++) {
-            $quarters[$q] = [
-                'rates' => $emptyRates(),
-                'invoice_count' => 0,
-                'credit_count' => 0,
-            ];
+        $filing = VatFiling::firstOrNew([
+            'company_id' => $company->id,
+            'year' => $year,
+            'period_type' => $type,
+            'period' => $period,
+        ]);
+
+        if ($request->has('filed')) {
+            $filing->filed_at = $request->boolean('filed') ? ($filing->filed_at ?? now()) : null;
+        }
+        if ($request->has('paid')) {
+            $filing->paid_at = $request->boolean('paid') ? ($filing->paid_at ?? now()) : null;
         }
 
-        foreach ($invoices as $invoice) {
-            $q = (int) ceil($invoice->invoice_date->month / 3);
-            $sign = $invoice->is_credit ? -1 : 1;
-
-            if ($invoice->is_credit) $quarters[$q]['credit_count']++;
-            else $quarters[$q]['invoice_count']++;
-
-            foreach ($invoice->lines as $line) {
-                $key = (string) (int) (float) $line->vat_rate;
-                if (! isset($quarters[$q]['rates'][$key])) $key = '0';
-                $quarters[$q]['rates'][$key]['base'] += $sign * (float) $line->line_subtotal;
-                $quarters[$q]['rates'][$key]['vat'] += $sign * (float) $line->line_vat;
+        if ($request->has('payment_reference')) {
+            $raw = trim((string) ($data['payment_reference'] ?? ''));
+            if ($raw === '') {
+                $filing->payment_reference = null;
+            } else {
+                $normalized = VatPaymentReference::normalize($raw);
+                if (! $normalized || ! VatPaymentReference::isValid($normalized)) {
+                    return back()->withErrors([
+                        'payment_reference' => 'Dit is geen geldig betalingskenmerk: het bestaat uit 16 cijfers, waarvan het eerste een controlecijfer is. Neem het letterlijk over uit Mijn Belastingdienst Zakelijk.',
+                    ]);
+                }
+                $filing->payment_reference = $normalized;
             }
         }
 
-        // Voorbelasting (rubriek 5b): BTW op ingeboekte inkoopfacturen,
-        // eveneens geteld in het kwartaal van de factuurdatum.
-        $inputVat = [1 => 0.0, 2 => 0.0, 3 => 0.0, 4 => 0.0];
-        $purchaseCounts = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
-        PurchaseInvoice::whereYear('invoice_date', $year)
-            ->get(['invoice_date', 'vat_total'])
-            ->each(function ($p) use (&$inputVat, &$purchaseCounts) {
-                $q = (int) ceil($p->invoice_date->month / 3);
-                $inputVat[$q] += (float) $p->vat_total;
-                $purchaseCounts[$q]++;
-            });
-
-        $now = now();
-        $monthsLabels = [1 => 'jan – mrt', 2 => 'apr – jun', 3 => 'jul – sep', 4 => 'okt – dec'];
-
-        $result = [];
-        $yearTotals = [
-            'rates' => $emptyRates(), 'base' => 0.0, 'vat' => 0.0,
-            'input_vat' => 0.0, 'balance' => 0.0,
-            'invoice_count' => 0, 'credit_count' => 0, 'purchase_count' => 0,
-        ];
-
-        foreach ($quarters as $q => $data) {
-            $start = Carbon::create($year, ($q - 1) * 3 + 1, 1)->startOfDay();
-            $end = $start->copy()->addMonths(3)->subDay()->endOfDay();
-            // Aangifte + betaling moeten binnen zijn vóór het einde van de
-            // maand ná het kwartaal (Q1 → 30 april, Q4 → 31 januari).
-            $deadline = $end->copy()->addDay()->endOfMonth();
-
-            $status = $now->lt($start) ? 'future' : ($now->lte($end) ? 'current' : 'closed');
-
-            $base = 0.0;
-            $vat = 0.0;
-            $rates = [];
-            foreach ($data['rates'] as $rate => $amounts) {
-                $rates[$rate] = [
-                    'base' => round($amounts['base'], 2),
-                    'vat' => round($amounts['vat'], 2),
-                ];
-                $base += $amounts['base'];
-                $vat += $amounts['vat'];
-
-                $yearTotals['rates'][$rate]['base'] += $amounts['base'];
-                $yearTotals['rates'][$rate]['vat'] += $amounts['vat'];
+        if ($request->has('manual')) {
+            // Alleen de rubrieken die Easy niet zelf kent; nullen niet bewaren.
+            $clean = [];
+            foreach (VatService::MANUAL as $key) {
+                $base = round((float) ($data['manual'][$key]['base'] ?? 0), 2);
+                $vat = round((float) ($data['manual'][$key]['vat'] ?? 0), 2);
+                if ($base != 0.0 || $vat != 0.0) {
+                    $clean[$key] = ['base' => $base, 'vat' => $vat];
+                }
             }
-            $yearTotals['base'] += $base;
-            $yearTotals['vat'] += $vat;
-            $yearTotals['input_vat'] += $inputVat[$q];
-            $yearTotals['invoice_count'] += $data['invoice_count'];
-            $yearTotals['credit_count'] += $data['credit_count'];
-            $yearTotals['purchase_count'] += $purchaseCounts[$q];
-
-            $result[] = [
-                'quarter' => $q,
-                'label' => "{$q}e kwartaal",
-                'months' => $monthsLabels[$q],
-                'status' => $status,
-                // Kwartaal voorbij maar de aangiftetermijn loopt nog → actie nodig.
-                'declaration_due' => $status === 'closed' && $now->lte($deadline),
-                'deadline_label' => $deadline->translatedFormat('j F Y'),
-                'rates' => $rates,
-                'base' => round($base, 2),
-                'vat' => round($vat, 2),
-                'input_vat' => round($inputVat[$q], 2),
-                'balance' => round($vat - $inputVat[$q], 2),
-                'invoice_count' => $data['invoice_count'],
-                'credit_count' => $data['credit_count'],
-                'purchase_count' => $purchaseCounts[$q],
-            ];
+            $filing->manual = $clean ?: null;
         }
 
-        foreach ($yearTotals['rates'] as $rate => $amounts) {
-            $yearTotals['rates'][$rate] = [
-                'base' => round($amounts['base'], 2),
-                'vat' => round($amounts['vat'], 2),
-            ];
+        if ($request->has('notes')) {
+            $filing->notes = trim((string) ($data['notes'] ?? '')) ?: null;
         }
-        $yearTotals['base'] = round($yearTotals['base'], 2);
-        $yearTotals['vat'] = round($yearTotals['vat'], 2);
-        $yearTotals['input_vat'] = round($yearTotals['input_vat'], 2);
-        $yearTotals['balance'] = round($yearTotals['vat'] - $yearTotals['input_vat'], 2);
 
-        return [
-            'quarters' => $result,
-            'totals' => $yearTotals,
+        $filing->save();
+
+        $flash = match (true) {
+            $request->has('filed') && $request->boolean('filed') => 'Gemarkeerd als aangegeven.',
+            $request->has('filed') => 'Markering "aangegeven" verwijderd.',
+            $request->has('paid') && $request->boolean('paid') => 'Gemarkeerd als betaald.',
+            $request->has('paid') => 'Markering "betaald" verwijderd.',
+            $request->has('payment_reference') => 'Betalingskenmerk opgeslagen.',
+            default => 'Aangifte bijgewerkt.',
+        };
+
+        return back()->with('flash', $flash);
+    }
+
+    /** Tijdvak, omzetbelastingnummer en herinnering. */
+    public function updateSettings(Request $request): RedirectResponse
+    {
+        $company = auth()->user()->company;
+
+        $data = $request->validate([
+            'vat_period' => ['required', 'in:quarter,month,year'],
+            'ob_number' => ['nullable', 'string', 'max:30'],
+            'ob_number_clear' => ['nullable', 'boolean'],
+            'vat_reminder_enabled' => ['nullable', 'boolean'],
+        ]);
+
+        $update = [
+            'vat_period' => $data['vat_period'],
+            'vat_reminder_enabled' => $request->boolean('vat_reminder_enabled'),
         ];
+
+        if ($request->boolean('ob_number_clear')) {
+            $update['ob_number'] = null;
+        } elseif (filled($data['ob_number'] ?? null)) {
+            $parsed = VatPaymentReference::parseObNumber($data['ob_number']);
+            if (! $parsed) {
+                return back()->withErrors([
+                    'ob_number' => 'Vul je omzetbelastingnummer in zoals de Belastingdienst het schrijft, bijvoorbeeld 123456789B01. Let op: bij een eenmanszaak is dat níet het btw-id dat op je facturen staat.',
+                ]);
+            }
+            $update['ob_number'] = $parsed['fiscal'] . 'B' . $parsed['sub'];
+        }
+        // Leeg veld zonder "wissen" = ongewijzigd laten.
+
+        $company->update($update);
+
+        return back()->with('flash', 'Btw-instellingen opgeslagen.');
+    }
+
+    /** Alleen de laatste cijfers tonen: het nummer is BSN-gebaseerd. */
+    private function maskObNumber(?string $ob): ?string
+    {
+        if (! $ob) {
+            return null;
+        }
+        $parsed = VatPaymentReference::parseObNumber($ob);
+
+        return $parsed ? '•••••' . substr($parsed['fiscal'], 5) . 'B' . $parsed['sub'] : '••••••••';
     }
 }

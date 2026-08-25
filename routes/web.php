@@ -418,9 +418,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::middleware('role:owner,accountant')->group(function () {
         Route::get('stats', [StatsController::class, 'index'])->name('stats.index');
 
-        // BTW-overzicht per kwartaal (voor de aangifte omzetbelasting)
+        // Btw-aangifte "aangifte-klaar": rubrieken per tijdvak, betaalgegevens, status
         Route::get('btw', [\App\Http\Controllers\VatController::class, 'index'])->name('vat.index');
         Route::get('btw/pdf', [\App\Http\Controllers\VatController::class, 'pdf'])->name('vat.pdf');
+        Route::patch('btw/instellingen', [\App\Http\Controllers\VatController::class, 'updateSettings'])->name('vat.settings');
+        Route::patch('btw/{year}/{type}/{period}', [\App\Http\Controllers\VatController::class, 'updateFiling'])
+            ->where(['year' => '[0-9]{4}', 'type' => 'quarter|month|year', 'period' => '[0-9]{1,2}'])
+            ->name('vat.filing.update');
 
         // Jaaroverzicht: omzet, kosten en resultaat uit de facturatie
         Route::get('jaaroverzicht', [\App\Http\Controllers\YearReportController::class, 'index'])->name('yearreport.index');

@@ -33,6 +33,11 @@ Schedule::command('invoices:send-scheduled')
     ->dailyAt('07:30')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: herinnering aan de btw-aangifte (14 en 3 dagen voor de deadline).
+Schedule::command('vat:remind')
+    ->dailyAt('08:15')
+    ->timezone('Europe/Amsterdam');
+
 // Elke ochtend: het dagoverzicht voor bedrijven die dat aan hebben staan.
 Schedule::command('summaries:send')
     ->dailyAt('08:30')

@@ -49,6 +49,7 @@ class DemoDataBuilder
             $invoices = $this->createInvoices($company, $customers);
             $this->createRecurring($company, $customers, $invoices);
             $this->createQuotes($company, $customers);
+            $this->createVatFiling($company);
 
             return $user;
         });
@@ -410,6 +411,32 @@ class DemoDataBuilder
      *
      * @param  array<int, array{0:string,1:float,2:float}>  $lines  [omschrijving, aantal, stuksprijs]
      */
+    /**
+     * Btw-aangifte in de demo: een (fictief) omzetbelastingnummer zodat het
+     * betalingskenmerk verschijnt, en het vorige kwartaal al aangegeven en
+     * betaald — zo zie je hoe de historie eruitziet.
+     */
+    protected function createVatFiling(Company $company): void
+    {
+        // 123456782 is het bekende test-BSN (voldoet aan de elfproef); niet van iemand.
+        $company->forceFill(['ob_number' => '123456782B01'])->save();
+
+        $previous = now()->subQuarter();
+        $filedAt = now()->firstOfQuarter()->addDays(11)->setTime(10, 15);
+        if ($filedAt->isFuture()) {
+            $filedAt = now()->subDay();
+        }
+
+        \App\Models\VatFiling::create([
+            'company_id' => $company->id,
+            'year' => $previous->year,
+            'period_type' => 'quarter',
+            'period' => (int) ceil($previous->month / 3),
+            'filed_at' => $filedAt,
+            'paid_at' => $filedAt->copy()->addMinutes(20),
+        ]);
+    }
+
     protected function makeInvoice(Company $company, Customer $customer, array $lines, array $attributes): Invoice
     {
         $normalized = array_map(fn ($l) => [

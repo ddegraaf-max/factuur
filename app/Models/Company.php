@@ -19,6 +19,7 @@ class Company extends Model
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
         'stationery_data', 'stationery_margin_top', 'stationery_margin_bottom',
         'numbering_settings', 'price_mode', 'fiscal_year_start',
+        'vat_period', 'ob_number', 'vat_reminder_enabled',
         'default_send_method', 'results_per_page',
         'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings', 'email_texts', 'thanks_mail_enabled', 'review_url',
@@ -38,10 +39,14 @@ class Company extends Model
      */
     // logo_data/stationery_data zijn te zwaar voor elke response; de Mollie-key
     // is geheim en mag nooit naar de browser (auth.company wordt op élke pagina gedeeld).
-    protected $hidden = ['logo_data', 'stationery_data', 'mollie_api_key'];
+    // ob_number (omzetbelastingnummer) is bij eenmanszaken BSN-gebaseerd:
+    // versleuteld opgeslagen en nooit naar de browser.
+    protected $hidden = ['logo_data', 'stationery_data', 'mollie_api_key', 'ob_number'];
 
     protected $casts = [
         'mollie_api_key' => 'encrypted',
+        'ob_number' => 'encrypted',
+        'vat_reminder_enabled' => 'boolean',
         'is_demo' => 'boolean',
         'is_exempt' => 'boolean',
         'demo_expires_at' => 'datetime',

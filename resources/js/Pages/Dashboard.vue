@@ -9,6 +9,7 @@ const props = defineProps({
   kpis: Object,
   recent_invoices: Array,
   result_chart: Object,
+  vat_due: { type: Object, default: null },
 });
 
 const greeting = () => {
@@ -42,6 +43,21 @@ const greeting = () => {
         <p class="page-subtitle" v-else>Alles is up-to-date.</p>
       </div>
     </div>
+
+    <!-- Btw-aangifte die open staat -->
+    <Link v-if="vat_due" :href="route('vat.index', { year: vat_due.year })" class="vat-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="vat-banner-text">
+        <strong>Btw-aangifte {{ vat_due.label }} {{ vat_due.year }} staat open</strong>
+        <span>
+          <template v-if="vat_due.balance_rounded > 0">Per saldo {{ eur(vat_due.balance_rounded) }} te betalen</template>
+          <template v-else-if="vat_due.balance_rounded < 0">Je krijgt {{ eur(-vat_due.balance_rounded) }} terug</template>
+          <template v-else>Nihilaangifte</template>
+          · vóór {{ vat_due.deadline_label }}{{ vat_due.days_left !== null ? ` (nog ${vat_due.days_left} ${vat_due.days_left === 1 ? 'dag' : 'dagen'})` : '' }}
+        </span>
+      </div>
+      <span class="vat-banner-cta">Aangifte voorbereiden →</span>
+    </Link>
 
     <!-- KPI CARDS -->
     <div class="kpi-grid">
@@ -86,10 +102,10 @@ const greeting = () => {
       <div class="kpi-card">
         <div class="kpi-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          BTW Q{{ kpis.quarter_number }}
+          Btw {{ kpis.vat_period_label || ('Q' + kpis.quarter_number) }}
         </div>
         <div class="kpi-value">{{ eur(kpis.vat_to_pay) }}</div>
-        <div class="kpi-meta">Deadline {{ kpis.quarter_deadline }}</div>
+        <div class="kpi-meta">{{ kpis.vat_to_pay < 0 ? 'Terug te ontvangen' : 'Per saldo' }} · aangifte vóór {{ kpis.quarter_deadline }}</div>
       </div>
     </div>
 
@@ -187,6 +203,18 @@ const greeting = () => {
   transition: all 0.2s;
 }
 .kpi-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+.vat-banner {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning);
+  border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; text-decoration: none;
+  transition: box-shadow .15s;
+}
+.vat-banner:hover { box-shadow: 0 0 0 3px var(--warning-bg); }
+.vat-banner > svg { width: 22px; height: 22px; flex: none; }
+.vat-banner-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; font-size: 13.5px; line-height: 1.5; }
+.vat-banner-text strong { font-weight: 700; }
+.vat-banner-cta { font-size: 13px; font-weight: 600; white-space: nowrap; }
+@media (max-width: 640px) { .vat-banner { flex-wrap: wrap; } .vat-banner-cta { width: 100%; padding-left: 36px; } }
 .kpi-card.alert {
   border-color: var(--brand-border);
   background: linear-gradient(180deg, var(--brand-tint) 0%, var(--surface) 60%);
