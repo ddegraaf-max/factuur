@@ -158,6 +158,7 @@ class QuoteController extends Controller
                 'days_left' => $quote->days_left,
                 'brand_profile_name' => $quote->brandProfile?->name,
                 'signed_at_label' => $quote->signed_at?->translatedFormat('j F Y, H:i'),
+                'accept_mail_sent_at_label' => $quote->accept_mail_sent_at?->translatedFormat('j M Y, H:i'),
                 'portal_url' => $quote->portalUrl(),
                 'invoice' => $quote->invoice ? [
                     'id' => $quote->invoice->id,
@@ -240,7 +241,7 @@ class QuoteController extends Controller
         return $this->dispatchSend($quote);
     }
 
-    public function accept(Quote $quote): RedirectResponse
+    public function accept(Request $request, Quote $quote): RedirectResponse
     {
         try {
             $this->manager->accept($quote);
@@ -248,7 +249,38 @@ class QuoteController extends Controller
             return back()->withErrors(['quote' => $e->getMessage()]);
         }
 
-        return back()->with('flash', 'Offerte gemarkeerd als geaccepteerd.');
+        $flash = 'Offerte gemarkeerd als geaccepteerd.';
+
+        // Vinkje "Bevestiging mailen naar de klant" (bijv. akkoord per telefoon).
+        if ($request->boolean('send_confirmation')) {
+            try {
+                $this->manager->sendAcceptConfirmation($quote->fresh());
+                $flash .= " Bevestiging gemaild naar {$quote->customer_email}.";
+            } catch (\DomainException $e) {
+                $flash .= ' Geen bevestiging: '.$e->getMessage();
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Bevestiging akkoord mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+                $flash .= ' De bevestiging kon niet worden gemaild — probeer het straks via "Bevestiging mailen".';
+            }
+        }
+
+        return back()->with('flash', $flash);
+    }
+
+    /** Bevestiging van het akkoord (opnieuw) naar de klant mailen. */
+    public function confirm(Quote $quote): RedirectResponse
+    {
+        try {
+            $this->manager->sendAcceptConfirmation($quote, force: true);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Bevestiging akkoord (handmatig) mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+
+            return back()->withErrors(['quote' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+        }
+
+        return back()->with('flash', "Bevestiging gemaild naar {$quote->customer_email}.");
     }
 
     public function reject(Quote $quote): RedirectResponse

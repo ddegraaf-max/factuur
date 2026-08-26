@@ -196,6 +196,60 @@ class QuoteManager
         return $quote->fresh();
     }
 
+    /** Waarom er (nu) geen bevestiging kan — of null als het kan. */
+    public function acceptConfirmationBlocker(Quote $quote, bool $force = false): ?string
+    {
+        if ($quote->status !== 'accepted') {
+            return 'De offerte is (nog) niet geaccepteerd.';
+        }
+        if (! $quote->customer_email) {
+            return 'Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.';
+        }
+        if ($quote->accept_mail_sent_at && ! $force) {
+            return 'Er is al een bevestiging verstuurd op '.$quote->accept_mail_sent_at->translatedFormat('j F Y').'.';
+        }
+
+        return null;
+    }
+
+    /**
+     * Bevestiging van het akkoord naar de klant, met de (ondertekende)
+     * offerte als PDF. Met $force ook als er al eerder een is verstuurd.
+     *
+     * @throws \DomainException  met een uitlegbare reden wanneer het niet kan
+     */
+    public function sendAcceptConfirmation(Quote $quote, bool $force = false): bool
+    {
+        if ($reason = $this->acceptConfirmationBlocker($quote, $force)) {
+            throw new \DomainException($reason);
+        }
+
+        $company = $quote->company;
+        $branded = $quote->brandedCompany();
+        $quote->load('lines', 'installments');
+        $quote->ensurePortalToken();
+
+        \App\Support\DocumentLocale::using($quote->language, function () use ($quote, $company, $branded) {
+            // Dezelfde PDF als in het portaal — mét handtekeningblok als er is getekend.
+            $pdf = Pdf::loadView('pdf.quote', [
+                'quote' => $quote,
+                'company' => $branded,
+            ])->setPaper('a4')->output();
+
+            // Uit een demo vertrekt nooit echte post (ook niet via het portaal).
+            Mail::mailer($company->is_demo ? 'log' : null)
+                ->to($quote->customer_email)
+                ->send(new \App\Mail\QuoteAcceptedMail($quote, $pdf));
+        });
+
+        $quote->forceFill([
+            'accept_mail_sent_at' => now(),
+            'accept_mail_sent_to' => $quote->customer_email,
+        ])->saveQuietly();
+
+        return true;
+    }
+
     public function reject(Quote $quote): Quote
     {
         if (! in_array($quote->status, ['sent', 'expired'], true)) {

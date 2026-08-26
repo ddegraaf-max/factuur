@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.37.0</div>
+        <h3>Bevestiging naar de klant na akkoord op een offerte</h3>
+        <ul class="tl-list">
+          <li><b>"Bedankt voor uw akkoord"</b> — ondertekent je klant een offerte in het portaal, dan krijgt hij direct een bevestiging in jouw huisstijl: datum en naam van de ondertekenaar, het totaal, het termijnplan als dat er is, een "hoe nu verder"-tekst en de ondertekende offerte als PDF. Zo hebben jullie allebei hetzelfde document.</li>
+          <li><b>Ook bij een akkoord per telefoon</b> — markeer je een offerte zelf als geaccepteerd, dan kies je met één vinkje of de bevestiging meegaat. Op de offertepagina zie je wanneer die is gemaild en kun je hem opnieuw sturen.</li>
+          <li><b>Eigen tekst en voorbeeld</b> — bij Instellingen → E-mailteksten pas je onderwerp en "hoe nu verder"-tekst aan (met variabelen als {ondertekenaar} en {akkoorddatum}) en bekijk je de mail vooraf. Tweetalig: klanten met taal Engels krijgen de Engelse standaardtekst.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.36.0</div>
         <h3>Btw-aangifte: aangifte-klaar, met betalingskenmerk</h3>
         <ul class="tl-list">

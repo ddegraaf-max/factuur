@@ -100,4 +100,19 @@ return [
     'mail_quote_agree' => '<strong>Akkoord?</strong> Beantwoord deze e-mail — dan zetten we de offerte om in een opdracht. Vragen of iets aanpassen kan natuurlijk ook.',
     'mail_view_quote' => 'Bekijk en onderteken online',
     'signed_by' => 'Digitaal ondertekend door <strong>:name</strong> op :date.',
+
+    // Bevestiging na akkoord op een offerte
+    'mail_accept_subject' => 'Bevestiging van uw akkoord — offerte :number',
+    'mail_accept_title' => 'Bedankt voor uw akkoord!',
+    'mail_accept_intro' => 'U heeft offerte <strong>:number</strong> van :company op :date geaccepteerd:signed. Hierbij onze bevestiging.',
+    'mail_accept_signed_suffix' => ' en digitaal ondertekend',
+    'mail_accept_next' => 'Wij nemen binnenkort contact met u op over de planning en de verdere afspraken. Heeft u in de tussentijd vragen? Beantwoord dan gewoon deze e-mail.',
+    'mail_accept_quote' => 'Offerte',
+    'mail_accept_date' => 'Akkoord op',
+    'mail_accept_signed_by' => 'Ondertekend door',
+    'mail_accept_total' => 'Totaal incl. btw',
+    'mail_accept_installments' => 'Facturatie in termijnen',
+    'mail_accept_attachment' => 'De offerte is als PDF bijgevoegd — bewaar deze voor uw administratie.',
+    'mail_accept_attachment_signed' => 'De offerte, inclusief uw digitale handtekening, is als PDF bijgevoegd — bewaar deze voor uw administratie.',
+    'mail_view_quote_online' => 'Bekijk de offerte online',
 ];

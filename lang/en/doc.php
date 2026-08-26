@@ -99,4 +99,19 @@ return [
     'mail_quote_agree' => '<strong>Ready to go ahead?</strong> Simply reply to this e-mail and we will turn the quotation into an assignment. Questions or changes? Just let us know.',
     'mail_view_quote' => 'View and sign online',
     'signed_by' => 'Digitally signed by <strong>:name</strong> on :date.',
+
+    // Bevestiging na akkoord op een offerte
+    'mail_accept_subject' => 'Confirmation of your approval — quotation :number',
+    'mail_accept_title' => 'Thank you for your approval!',
+    'mail_accept_intro' => 'You accepted quotation <strong>:number</strong> from :company on :date:signed. This e-mail confirms your approval.',
+    'mail_accept_signed_suffix' => ' and signed it digitally',
+    'mail_accept_next' => 'We will contact you shortly about the planning and next steps. Any questions in the meantime? Simply reply to this e-mail.',
+    'mail_accept_quote' => 'Quotation',
+    'mail_accept_date' => 'Approved on',
+    'mail_accept_signed_by' => 'Signed by',
+    'mail_accept_total' => 'Total incl. VAT',
+    'mail_accept_installments' => 'Invoicing in instalments',
+    'mail_accept_attachment' => 'The quotation is attached as a PDF — please keep it for your records.',
+    'mail_accept_attachment_signed' => 'The quotation, including your digital signature, is attached as a PDF — please keep it for your records.',
+    'mail_view_quote_online' => 'View the quotation online',
 ];

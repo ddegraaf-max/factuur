@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 import { computed, ref } from 'vue';
@@ -30,7 +30,24 @@ const send = () => {
   }
 };
 
-const accept = () => router.post(route('quotes.accept', props.quote.id), {}, { preserveScroll: true });
+/* ---------- Geaccepteerd markeren (+ bevestiging naar de klant) ---------- */
+const showAcceptModal = ref(false);
+const acceptForm = useForm({
+  // Voorgevinkt als de bevestigingsmail aanstaat (Instellingen → E-mailteksten).
+  send_confirmation: !!props.company?.quote_accept_mail_enabled && !!props.quote.customer_email,
+});
+const accept = () => {
+  acceptForm.post(route('quotes.accept', props.quote.id), {
+    preserveScroll: true,
+    onSuccess: () => { showAcceptModal.value = false; },
+  });
+};
+const sendConfirmation = () => {
+  const again = props.quote.accept_mail_sent_at_label ? `Er is al een bevestiging gemaild op ${props.quote.accept_mail_sent_at_label}.\n\n` : '';
+  if (confirm(`${again}Bevestiging van het akkoord mailen naar ${props.quote.customer_email}? De offerte gaat mee als PDF.`)) {
+    router.post(route('quotes.confirm', props.quote.id), {}, { preserveScroll: true });
+  }
+};
 const reject = () => {
   if (confirm('Offerte markeren als afgewezen?')) {
     router.post(route('quotes.reject', props.quote.id), {}, { preserveScroll: true });
@@ -154,7 +171,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <h1 class="page-title">Offerte {{ quote.number || '— concept —' }}</h1>
         <p class="page-subtitle">
           <template v-if="quote.status === 'draft'">Concept · nog niet verstuurd</template>
-          <template v-else-if="quote.status === 'accepted'">Geaccepteerd op {{ quote.accepted_at_label }}</template>
+          <template v-else-if="quote.status === 'accepted'">Geaccepteerd op {{ quote.accepted_at_label }}<template v-if="quote.accept_mail_sent_at_label"> · bevestiging gemaild {{ quote.accept_mail_sent_at_label }}</template></template>
           <template v-else-if="quote.status === 'rejected'">Afgewezen op {{ quote.rejected_at_label }}</template>
           <template v-else-if="quote.sent_at_label">Verstuurd op {{ quote.sent_at_label }}</template>
           <template v-if="quote.brand_profile_name"> · als <b>{{ quote.brand_profile_name }}</b></template>
@@ -166,6 +183,14 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           PDF
         </a>
+        <button
+          v-if="quote.status === 'accepted' && quote.customer_email"
+          class="btn btn-secondary btn-sm"
+          :title="quote.accept_mail_sent_at_label ? `Bevestiging gemaild op ${quote.accept_mail_sent_at_label} — nogmaals sturen` : 'Stuur de klant een bevestiging van het akkoord, met de offerte als PDF'"
+          @click="sendConfirmation"
+        >
+          {{ quote.accept_mail_sent_at_label ? 'Bevestiging opnieuw mailen' : 'Bevestiging mailen' }}
+        </button>
         <Link v-if="canEdit" :href="route('quotes.edit', quote.id)" class="btn btn-secondary btn-sm">Bewerken</Link>
         <button v-if="quote.status === 'draft'" class="btn btn-danger btn-sm" @click="destroy">Verwijder</button>
         <button v-if="canEdit" class="btn btn-primary btn-sm" @click="send">
@@ -190,7 +215,39 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       <div class="decide-actions">
         <button v-if="quote.can_installments && !(quote.installments || []).length" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">In termijnen</button>
         <button class="btn btn-secondary btn-sm" @click="reject">Afgewezen</button>
-        <button class="btn btn-primary btn-sm" @click="accept">Geaccepteerd</button>
+        <button class="btn btn-primary btn-sm" @click="showAcceptModal = true">Geaccepteerd</button>
+      </div>
+    </div>
+
+    <!-- Geaccepteerd markeren -->
+    <div v-if="showAcceptModal" class="modal-overlay" @click.self="showAcceptModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">Offerte markeren als geaccepteerd</div>
+          <button class="icon-btn" @click="showAcceptModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-text">De klant is akkoord (bijv. per telefoon of e-mail). De offerte krijgt de status <b>Geaccepteerd</b>; daarna kun je hem omzetten naar een factuur.</p>
+          <label class="opt" :class="{ on: acceptForm.send_confirmation && quote.customer_email, off: !quote.customer_email }">
+            <input type="checkbox" v-model="acceptForm.send_confirmation" :disabled="!quote.customer_email">
+            <div>
+              <div class="opt-title">Bevestiging mailen naar de klant</div>
+              <div class="opt-sub">
+                <template v-if="!quote.customer_email">Deze klant heeft geen e-mailadres.</template>
+                <template v-else>Stuurt direct een bevestiging van het akkoord naar {{ quote.customer_email }}, met de offerte als PDF.</template>
+              </div>
+            </div>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showAcceptModal = false">Annuleren</button>
+            <button class="btn btn-primary btn-sm" @click="accept" :disabled="acceptForm.processing">Markeren als geaccepteerd</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -214,6 +271,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         </div>
         <div class="sig-line">Door <strong>{{ quote.signed_name }}</strong> op {{ quote.signed_at_label }}</div>
         <div class="sig-meta">Geverifieerd e-mailadres: {{ quote.signed_email }} · IP: {{ quote.signed_ip }}</div>
+        <div class="sig-meta" v-if="quote.accept_mail_sent_at_label">✓ Bevestiging gemaild naar {{ quote.accept_mail_sent_to }} op {{ quote.accept_mail_sent_at_label }}</div>
       </div>
       <img v-if="quote.signature_data" :src="quote.signature_data" alt="Handtekening" class="sig-img">
     </div>
@@ -442,6 +500,24 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 </template>
 
 <style scoped>
+/* Modal "markeren als geaccepteerd" */
+.modal-overlay { position: fixed; inset: 0; background: rgba(28, 25, 23, 0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+.modal { background: var(--surface); border-radius: var(--r-lg); width: 100%; max-width: 520px; max-height: calc(100vh - 40px); overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: var(--font-display); font-weight: 600; font-size: 18px; }
+.modal-body { padding: 22px 24px; }
+.modal-text { margin: 0 0 14px; font-size: 13.5px; line-height: 1.6; color: var(--text-2); }
+.modal-footer { padding: 14px 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--surface-2); border-radius: 0 0 var(--r-lg) var(--r-lg); }
+.icon-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; color: var(--text-3); background: none; border: none; cursor: pointer; }
+.icon-btn:hover { background: var(--surface-2); }
+.opt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s; }
+.opt:hover { background: var(--surface-2); }
+.opt.on { border-color: var(--success); background: var(--success-bg); }
+.opt.off { cursor: default; opacity: .7; }
+.opt input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--success); flex: none; }
+.opt-title { font-weight: 600; font-size: 13.5px; }
+.opt-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; line-height: 1.5; }
+
 /* Bijlagen */
 .qa-empty { color: var(--text-3); font-size: 12.5px; background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 9px; padding: 13px 15px; }
 .qa-row { display: flex; align-items: center; gap: 11px; border: 1px solid var(--border); border-radius: 9px; padding: 9px 12px; margin-bottom: 8px; flex-wrap: wrap; }

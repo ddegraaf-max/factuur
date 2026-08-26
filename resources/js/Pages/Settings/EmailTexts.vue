@@ -8,13 +8,20 @@ const props = defineProps({
   defaults: Object, // standaardteksten (NL), als placeholder/voorbeeld
   thanks_enabled: Boolean,
   review_url: { type: String, default: '' },
+  accept_enabled: Boolean,
 });
 
 const form = useForm({
   ...props.texts,
   thanks_enabled: !!props.thanks_enabled,
   review_url: props.review_url || '',
+  accept_enabled: !!props.accept_enabled,
 });
+
+const previewAcceptUrl = computed(() => route('settings.emails.preview.accept', {
+  accept_subject: form.accept_subject || '',
+  accept_body: form.accept_body || '',
+}));
 
 const submit = () => form.patch(route('settings.emails.update'), { preserveScroll: true });
 
@@ -123,6 +130,46 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
             <span class="txt-sep">·</span>
             <span>Overzicht, portaalknop en PDF-bijlage blijven automatisch staan.</span>
             <button v-if="form.thanks_subject || form.thanks_body" type="button" class="txt-reset" @click="reset(['thanks_subject', 'thanks_body'])">Terug naar standaard</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bevestiging na akkoord op een offerte -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-header thanks-head">
+          <div>
+            <div class="card-title">Bevestiging na akkoord op offerte</div>
+            <div class="thanks-sub">Naar de klant zodra hij de offerte in het portaal ondertekent — met de ondertekende offerte als PDF.</div>
+          </div>
+          <label class="switch" :class="{ on: form.accept_enabled }">
+            <input type="checkbox" v-model="form.accept_enabled" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ form.accept_enabled ? 'Aan' : 'Uit' }}</span>
+          </label>
+        </div>
+        <div class="card-body" style="padding:18px 20px;">
+          <p class="txt-help">
+            De mail bevat automatisch het overzicht (offertenummer, datum akkoord, ondertekenaar, totaal), het termijnplan als dat er is,
+            een knop naar het portaal en de offerte als PDF. Markeer je een offerte zelf als geaccepteerd (bijv. akkoord per telefoon),
+            dan kies je per offerte of de bevestiging meegaat. Hier stel je de "hoe nu verder"-tekst in.
+            Variabelen: <code>{klant}</code> <code>{ondertekenaar}</code> <code>{bedrijf}</code> <code>{offertenummer}</code>
+            <code>{offertedatum}</code> <code>{akkoorddatum}</code> <code>{bedrag}</code>.
+            Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.
+          </p>
+          <div class="txt-block">
+            <div class="txt-label">Onderwerp</div>
+            <input type="text" v-model="form.accept_subject" maxlength="200" :placeholder="defaults.accept_subject" />
+            <div class="txt-label">Bericht</div>
+            <textarea v-model="form.accept_body" rows="6" maxlength="4000" :placeholder="defaults.accept_body"></textarea>
+          </div>
+          <div class="txt-note">
+            <a :href="previewAcceptUrl" target="_blank" rel="noopener" class="txt-preview">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Bekijk voorbeeld
+            </a>
+            <span class="txt-sep">·</span>
+            <span>Overzicht, termijnplan, portaalknop en PDF-bijlage blijven automatisch staan.</span>
+            <button v-if="form.accept_subject || form.accept_body" type="button" class="txt-reset" @click="reset(['accept_subject', 'accept_body'])">Terug naar standaard</button>
           </div>
         </div>
       </div>

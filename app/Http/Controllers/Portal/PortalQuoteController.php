@@ -125,6 +125,17 @@ class PortalQuoteController extends Controller
 
         $this->notifyCompany($quote->fresh(), accepted: true);
 
+        // Bevestiging (met de ondertekende PDF) naar de klant zelf — als de
+        // ondernemer dat aan heeft staan. Nooit blokkerend voor het portaal.
+        $fresh = $quote->fresh();
+        if ($fresh->company?->quote_accept_mail_enabled) {
+            try {
+                $manager->sendAcceptConfirmation($fresh);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Bevestiging akkoord naar klant mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         return back()->with('flash', 'Bedankt! De offerte is ondertekend — je ontvangt vanzelf bericht.');
     }
 

@@ -31,6 +31,7 @@ class Quote extends Model
         'intro', 'notes', 'footer',
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
         'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
+        'accept_mail_sent_at', 'accept_mail_sent_to',
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class Quote extends Model
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
         'signed_at' => 'datetime',
+        'accept_mail_sent_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',

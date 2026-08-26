@@ -64,6 +64,21 @@ class MailText
         return __('doc.pay_method_' . $key);
     }
 
+    /**
+     * Variabelen voor de bevestiging na akkoord op een offerte.
+     *
+     * @return array<string, string>
+     */
+    public static function acceptVars(Quote $quote, $company): array
+    {
+        $acceptedAt = $quote->signed_at ?? $quote->accepted_at;
+
+        return self::quoteVars($quote, $company) + [
+            '{akkoorddatum}' => $acceptedAt ? $acceptedAt->translatedFormat('j F Y') : '',
+            '{ondertekenaar}' => (string) ($quote->signed_name ?: $quote->customer_name ?: ''),
+        ];
+    }
+
     /** @return array<string, string> */
     public static function quoteVars(Quote $quote, $company): array
     {

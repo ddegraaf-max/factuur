@@ -6,6 +6,7 @@ use App\Mail\DailySummaryMail;
 use App\Mail\InvoiceMail;
 use App\Mail\PaymentReminderMail;
 use App\Mail\PaymentThanksMail;
+use App\Mail\QuoteAcceptedMail;
 use App\Mail\QuoteMail;
 use App\Mail\VerificationCodeMail;
 use App\Models\Company;
@@ -34,7 +35,7 @@ use Illuminate\Support\Facades\Mail;
 class SendTestMails extends Command
 {
     protected $signature = 'mail:test {email : Ontvanger van de proefmails}
-                                      {--only= : Alleen dit type (factuur|herinnering|bedankt|offerte|dagoverzicht|verificatie)}';
+                                      {--only= : Alleen dit type (factuur|herinnering|bedankt|offerte|akkoord|dagoverzicht|verificatie)}';
 
     protected $description = 'Verstuur van elk berichttype een proefmail met verzonnen gegevens.';
 
@@ -64,6 +65,7 @@ class SendTestMails extends Command
             'herinnering' => fn () => $this->sendReminder($to, $company, $vat),
             'bedankt' => fn () => $this->sendThanks($to, $company, $vat),
             'offerte' => fn () => $this->sendQuote($to, $company, $vat),
+            'akkoord' => fn () => $this->sendQuoteAccepted($to, $company, $vat),
             'dagoverzicht' => fn () => $this->sendSummary($to, $company),
             'verificatie' => fn () => $this->sendVerification($to, $company),
         ];
@@ -194,6 +196,23 @@ class SendTestMails extends Command
         ])->setPaper('a4')->output();
 
         Mail::to($to)->send(new QuoteMail($quote, $pdf));
+    }
+
+    private function sendQuoteAccepted(string $to, Company $company, VatCalculator $vat): void
+    {
+        $quote = $this->fakeQuote($company, $vat);
+        $quote->status = 'accepted';
+        $quote->accepted_at = now();
+        $quote->signed_at = now();
+        $quote->signed_name = 'Sanne de Vries';
+        $quote->setRelation('installments', new Collection());
+
+        $pdf = Pdf::loadView('pdf.quote', [
+            'quote' => $quote,
+            'company' => $company,
+        ])->setPaper('a4')->output();
+
+        Mail::to($to)->send(new QuoteAcceptedMail($quote, $pdf));
     }
 
     private function sendSummary(string $to, Company $company): void

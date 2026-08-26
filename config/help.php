@@ -579,6 +579,10 @@ return [
                 ['Rechtsgeldig bewijsdossier', [
                     'Bij de handtekening legt EasyInvoice vast: het geverifieerde e-mailadres, de ingevulde naam, de handtekening zelf, het tijdstip en het IP-adres. Dat dossier zie je op de offertepagina, en de handtekening komt ook op de offerte-PDF te staan — die kan je klant direct downloaden voor zijn eigen administratie.',
                 ]],
+                ['Bevestiging voor je klant', [
+                    'Zodra je klant tekent, krijgt hij automatisch een bevestiging in jouw huisstijl: datum en naam van de ondertekenaar, het totaal, het termijnplan als dat er is, een "hoe nu verder"-tekst en de ondertekende offerte als PDF — zo hebben jullie allebei hetzelfde document. Markeer je een offerte zelf als geaccepteerd (bijv. akkoord per telefoon), dan kies je per offerte of de bevestiging meegaat; opnieuw sturen kan altijd vanaf de offertepagina.',
+                    'Onderwerp en tekst pas je aan bij Instellingen → E-mailteksten (met "Bekijk voorbeeld"); daar zet je de automatische bevestiging ook uit als je hem niet wilt.',
+                ]],
                 ['En daarna', [
                     'Jij krijgt direct een e-mail zodra er is ondertekend (of afgewezen). De offerte springt op geaccepteerd en je zet hem met één klik om naar een conceptfactuur. Handig: op de offertepagina kun je de ondertekenlink ook kopiëren om hem bijvoorbeeld via WhatsApp te sturen.',
                 ]],

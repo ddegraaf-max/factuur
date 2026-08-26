@@ -287,9 +287,12 @@ class SettingsController extends Controller
                 'quote_body' => $texts['quote_body'] ?? '',
                 'thanks_subject' => $texts['thanks_subject'] ?? '',
                 'thanks_body' => $texts['thanks_body'] ?? '',
+                'accept_subject' => $texts['accept_subject'] ?? '',
+                'accept_body' => $texts['accept_body'] ?? '',
             ],
             'thanks_enabled' => (bool) $company->thanks_mail_enabled,
             'review_url' => $company->review_url ?? '',
+            'accept_enabled' => (bool) $company->quote_accept_mail_enabled,
             // De standaardteksten (NL) als voorbeeld/placeholder in het formulier.
             'defaults' => [
                 'invoice_subject' => 'Factuur {factuurnummer} — {bedrijf}',
@@ -298,6 +301,8 @@ class SettingsController extends Controller
                 'quote_body' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
                 'thanks_subject' => 'Bedankt voor uw betaling — factuur {factuurnummer}',
                 'thanks_body' => "Beste {klant},\n\nWij hebben uw betaling voor factuur {factuurnummer} in goede orde ontvangen. Hartelijk dank voor de prettige samenwerking.",
+                'accept_subject' => 'Bevestiging van uw akkoord — offerte {offertenummer}',
+                'accept_body' => "Beste {ondertekenaar},\n\nU heeft offerte {offertenummer} van {bedrijf} op {akkoorddatum} geaccepteerd. Hierbij onze bevestiging.\n\nWij nemen binnenkort contact met u op over de planning en de verdere afspraken. Heeft u in de tussentijd vragen? Beantwoord dan gewoon deze e-mail.",
             ],
         ]);
     }
@@ -313,6 +318,9 @@ class SettingsController extends Controller
             'thanks_body' => 'nullable|string|max:4000',
             'thanks_enabled' => 'nullable|boolean',
             'review_url' => 'nullable|string|max:500',
+            'accept_subject' => 'nullable|string|max:200',
+            'accept_body' => 'nullable|string|max:4000',
+            'accept_enabled' => 'nullable|boolean',
         ]);
 
         // Reviewlink: "g.page/r/…" zonder schema is ook goed — wij zetten https:// ervoor.
@@ -322,7 +330,7 @@ class SettingsController extends Controller
         }
 
         // Alleen ingevulde teksten bewaren; leeg = terug naar de standaard.
-        $textKeys = ['invoice_subject', 'invoice_body', 'quote_subject', 'quote_body', 'thanks_subject', 'thanks_body'];
+        $textKeys = ['invoice_subject', 'invoice_body', 'quote_subject', 'quote_body', 'thanks_subject', 'thanks_body', 'accept_subject', 'accept_body'];
         $texts = array_filter(
             array_map(fn ($v) => trim((string) $v), array_intersect_key($data, array_flip($textKeys))),
             fn ($v) => $v !== ''
@@ -332,6 +340,7 @@ class SettingsController extends Controller
             'email_texts' => $texts ?: null,
             'thanks_mail_enabled' => $request->boolean('thanks_enabled'),
             'review_url' => $reviewUrl,
+            'quote_accept_mail_enabled' => $request->boolean('accept_enabled'),
         ]);
 
         return back()->with('flash', 'E-mailteksten opgeslagen.');
@@ -381,6 +390,43 @@ class SettingsController extends Controller
         $payment->exists = false;
 
         $html = \App\Support\DocumentLocale::using('nl', fn () => (new \App\Mail\PaymentThanksMail($invoice, $payment, '', preview: true))->render());
+
+        return response($html)->header('X-Robots-Tag', 'noindex');
+    }
+
+    /** Voorbeeld van de bevestiging na akkoord — verzonnen offerte, niets wordt opgeslagen. */
+    public function previewAccept(Request $request)
+    {
+        $company = auth()->user()->company->replicate();
+        $texts = $company->email_texts ?? [];
+        $texts['accept_subject'] = trim((string) $request->input('accept_subject', ''));
+        $texts['accept_body'] = trim((string) $request->input('accept_body', ''));
+        $company->email_texts = $texts;
+
+        $quote = new \App\Models\Quote([
+            'number' => 'OFF-' . date('Y') . '-0007',
+            'status' => 'accepted',
+            'language' => 'nl',
+            'quote_date' => now()->subDays(6),
+            'valid_until' => now()->addDays(24),
+            'accepted_at' => now(),
+            'signed_at' => now(),
+            'signed_name' => 'Sanne de Vries',
+            'customer_name' => 'De Vries Bouw B.V.',
+            'customer_email' => 'administratie@devriesbouw.nl',
+            'subtotal' => 4250,
+            'vat_total' => 892.5,
+            'total' => 5142.5,
+        ]);
+        $quote->id = 0;
+        $quote->exists = false;
+        $quote->setRelation('company', $company);
+        $quote->setRelation('installments', collect([
+            new \App\Models\QuoteInstallment(['description' => 'Aanbetaling bij opdracht', 'percentage' => 30, 'amount' => 1542.75]),
+            new \App\Models\QuoteInstallment(['description' => 'Bij oplevering', 'percentage' => 70, 'amount' => 3599.75]),
+        ]));
+
+        $html = \App\Support\DocumentLocale::using('nl', fn () => (new \App\Mail\QuoteAcceptedMail($quote, '', preview: true))->render());
 
         return response($html)->header('X-Robots-Tag', 'noindex');
     }

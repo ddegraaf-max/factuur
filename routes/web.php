@@ -318,6 +318,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('offertes/{quote}/bijlagen', [\App\Http\Controllers\AttachmentController::class, 'storeForQuote'])->name('quotes.attachments.store');
     Route::get('offertes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
     Route::post('offertes/{quote}/accepteren', [QuoteController::class, 'accept'])->name('quotes.accept');
+    Route::post('offertes/{quote}/bevestiging', [QuoteController::class, 'confirm'])->name('quotes.confirm');
     Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');
     Route::post('offertes/{quote}/naar-factuur', [QuoteController::class, 'convert'])->name('quotes.convert');
 
@@ -472,6 +473,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::patch('settings/emailteksten', [SettingsController::class, 'updateEmails'])->name('settings.emails.update');
         // Voorbeeld van de bedankmail in de browser (tekst uit het formulier; niets wordt opgeslagen)
         Route::get('settings/emailteksten/voorbeeld-bedankmail', [SettingsController::class, 'previewThanks'])->name('settings.emails.preview.thanks');
+        Route::get('settings/emailteksten/voorbeeld-akkoord', [SettingsController::class, 'previewAccept'])->name('settings.emails.preview.accept');
 
         // Team: collega's en boekhouder uitnodigen, rollen beheren
         Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team');
