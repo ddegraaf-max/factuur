@@ -38,6 +38,7 @@
           <li><b>Vul aan wat Easy niet weet</b> — verlegde btw, inkoop uit het buitenland, privégebruik en niet-ingeboekte voorbelasting vul je per tijdvak zelf in; het wordt bewaard en meegeteld.</li>
           <li><b>Zo overgemaakt</b> — bedrag, het (nieuwe) rekeningnummer van de Belastingdienst en het betalingskenmerk staan klaar. Het kenmerk berekent Easy uit je omzetbelastingnummer volgens de officiële specificatie van de Belastingdienst — of je plakt het kenmerk uit je ingestuurde aangifte.</li>
           <li><b>Niets meer vergeten</b> — vink "aangegeven" en "betaald" af, krijg twee weken en drie dagen vóór de deadline een herinnering met de cijfers erbij, en zie op het dashboard direct of er een aangifte openstaat. Het btw-kpi op het dashboard toont nu het saldo ná voorbelasting.</li>
+          <li><b>Offertes op het dashboard</b> — je laatste offertes met status, wat er openstaat bij klanten (en wat bijna verloopt), wat geaccepteerd is maar nog gefactureerd moet worden, en je acceptatiegraad van dit jaar. Plus "Nieuwe offerte" bij de snelle acties.</li>
         </ul>
       </article>
 

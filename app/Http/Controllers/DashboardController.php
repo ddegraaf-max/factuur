@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\PurchaseInvoice;
+use App\Models\Quote;
 use App\Services\VatService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -68,6 +69,43 @@ class DashboardController extends Controller
                 'total' => (float) $i->total,
             ]);
 
+        // Offertes: wat wacht op een reactie, wat is geaccepteerd maar nog
+        // niet gefactureerd, en hoe vaak zegt een klant ja.
+        $openQuotes = Quote::where('status', 'sent')->get(['id', 'status', 'total', 'valid_until']);
+        $toInvoice = Quote::where('status', 'accepted')->whereNull('converted_invoice_id')->get(['id', 'total']);
+        $decidedThisYear = Quote::whereIn('status', ['accepted', 'rejected', 'expired'])
+            ->whereYear('quote_date', now()->year)
+            ->get(['id', 'status', 'total']);
+        $acceptedThisYear = $decidedThisYear->where('status', 'accepted');
+
+        $quotes = [
+            'open_count' => $openQuotes->count(),
+            'open_total' => round((float) $openQuotes->sum('total'), 2),
+            'expiring_count' => $openQuotes->filter(fn ($q) => ! $q->is_expired && $q->days_left <= 7)->count(),
+            'expired_count' => $openQuotes->filter(fn ($q) => $q->is_expired)->count(),
+            'draft_count' => Quote::where('status', 'draft')->count(),
+            'to_invoice_count' => $toInvoice->count(),
+            'to_invoice_total' => round((float) $toInvoice->sum('total'), 2),
+            'accepted_year_count' => $acceptedThisYear->count(),
+            'accepted_year_total' => round((float) $acceptedThisYear->sum('total'), 2),
+            'decided_year_count' => $decidedThisYear->count(),
+            'acceptance_rate' => $decidedThisYear->count() > 0
+                ? (int) round($acceptedThisYear->count() / $decidedThisYear->count() * 100)
+                : null,
+            'recent' => Quote::latest('quote_date')->latest('id')->limit(6)->get()->map(fn ($q) => [
+                'id' => $q->id,
+                'number' => $q->number ?? '— concept —',
+                'customer_name' => $q->customer_name,
+                'quote_date' => $q->quote_date->format('d M Y'),
+                'status' => $q->status,
+                'status_label' => $q->status_label,
+                'is_expired' => $q->is_expired,
+                'days_left' => $q->status === 'sent' ? $q->days_left : null,
+                'to_invoice' => $q->status === 'accepted' && ! $q->converted_invoice_id,
+                'total' => (float) $q->total,
+            ]),
+        ];
+
         // Resultaat per maand: omzet, inkoop en winst voor dit én vorig jaar,
         // zodat de grafiek winst/verlies en de groei ten opzichte van vorig
         // jaar kan laten zien.
@@ -125,6 +163,7 @@ class DashboardController extends Controller
                 'balance_rounded' => $vatDue['balance_rounded'],
             ] : null,
             'recent_invoices' => $recentInvoices,
+            'quotes' => $quotes,
             'result_chart' => [
                 'year' => $year,
                 'prev_year' => $year - 1,

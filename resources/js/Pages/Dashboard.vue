@@ -10,7 +10,20 @@ const props = defineProps({
   recent_invoices: Array,
   result_chart: Object,
   vat_due: { type: Object, default: null },
+  quotes: { type: Object, default: null },
 });
+
+// Offertestatus in dezelfde pil-kleuren als op de offertepagina.
+const quotePill = (q) => {
+  if (q.status === 'sent' && q.is_expired) return 'pill-partial';
+  return { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', rejected: 'pill-overdue', expired: 'pill-partial' }[q.status] ?? 'pill-draft';
+};
+const quoteLabel = (q) => {
+  if (q.status === 'sent' && q.is_expired) return 'Verlopen';
+  if (q.status === 'sent' && q.days_left !== null && q.days_left <= 7) return `Nog ${q.days_left} ${q.days_left === 1 ? 'dag' : 'dagen'}`;
+  if (q.to_invoice) return 'Te factureren';
+  return q.status_label;
+};
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -161,6 +174,15 @@ const greeting = () => {
               <div class="qa-sub">Stuur direct of bewaar als concept</div>
             </div>
           </Link>
+          <Link :href="route('quotes.create')" class="quick-action">
+            <div class="qa-icon" style="background:var(--warning-bg);color:var(--warning);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
+            </div>
+            <div>
+              <div class="qa-title">Nieuwe offerte</div>
+              <div class="qa-sub">Laat online ondertekenen, zet om naar factuur</div>
+            </div>
+          </Link>
           <Link :href="route('customers.create')" class="quick-action">
             <div class="qa-icon" style="background:var(--info-bg);color:var(--info);">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
@@ -179,6 +201,67 @@ const greeting = () => {
               <div class="qa-sub">Sjabloon voor factuurregels</div>
             </div>
           </Link>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offertes: recente offertes + wat er open staat, te factureren is en hoe vaak klanten ja zeggen -->
+    <div v-if="quotes" class="row-2" style="margin-top:20px;">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Offertes</div>
+            <div class="card-subtitle">Laatste 6 offertes</div>
+          </div>
+          <Link :href="route('quotes.index')" class="card-link">Alle →</Link>
+        </div>
+        <div class="card-body-flush" v-if="quotes.recent.length > 0">
+          <table class="data-table">
+            <thead>
+              <tr><th>Nummer</th><th>Klant</th><th>Datum</th><th>Status</th><th class="right">Bedrag</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="q in quotes.recent" :key="q.id" @click="router.visit(route('quotes.show', q.id))">
+                <td class="num cell-primary">{{ q.number }}</td>
+                <td data-label="Klant">{{ q.customer_name }}</td>
+                <td data-label="Datum">{{ q.quote_date }}</td>
+                <td data-label="Status"><span class="pill" :class="quotePill(q)">{{ quoteLabel(q) }}</span></td>
+                <td class="num right" data-label="Bedrag">{{ eur(q.total) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-empty" v-else>
+          Nog geen offertes. <Link :href="route('quotes.create')" style="color:var(--brand);font-weight:500;">Maak je eerste offerte →</Link>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">Offertes in cijfers</div></div>
+        <div class="card-body q-stats">
+          <Link :href="route('quotes.index', { status: 'sent' })" class="q-stat">
+            <div class="q-stat-val">{{ eur(quotes.open_total) }}</div>
+            <div class="q-stat-lbl">{{ quotes.open_count }} open · wacht op reactie van de klant</div>
+            <div v-if="quotes.expired_count || quotes.expiring_count" class="q-stat-meta warn">
+              <template v-if="quotes.expired_count">{{ quotes.expired_count }} verlopen</template>
+              <template v-if="quotes.expired_count && quotes.expiring_count"> · </template>
+              <template v-if="quotes.expiring_count">{{ quotes.expiring_count }} {{ quotes.expiring_count === 1 ? 'verloopt' : 'verlopen' }} binnen 7 dagen</template>
+            </div>
+          </Link>
+          <Link :href="route('quotes.index', { status: 'accepted' })" class="q-stat" :class="{ hot: quotes.to_invoice_count > 0 }">
+            <div class="q-stat-val">{{ eur(quotes.to_invoice_total) }}</div>
+            <div class="q-stat-lbl">{{ quotes.to_invoice_count }} geaccepteerd · nog te factureren</div>
+            <div v-if="quotes.to_invoice_count > 0" class="q-stat-meta">Zet om naar een factuur via de offertepagina</div>
+          </Link>
+          <div class="q-stat">
+            <div class="q-stat-val">{{ quotes.acceptance_rate === null ? '—' : quotes.acceptance_rate + '%' }}</div>
+            <div class="q-stat-lbl">acceptatiegraad {{ new Date().getFullYear() }}</div>
+            <div class="q-stat-meta">
+              <template v-if="quotes.decided_year_count">{{ quotes.accepted_year_count }} van {{ quotes.decided_year_count }} beslist · {{ eur(quotes.accepted_year_total) }} gewonnen</template>
+              <template v-else>Nog geen offerte geaccepteerd of afgewezen dit jaar</template>
+              <template v-if="quotes.draft_count"> · {{ quotes.draft_count }} concept</template>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -247,6 +330,15 @@ const greeting = () => {
   .kpi-label { font-size: 12px; margin-bottom: 6px; }
   .kpi-value { font-size: 22px; }
 }
+
+.q-stats { display: flex; flex-direction: column; gap: 8px; }
+.q-stat { display: block; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--r-sm); text-decoration: none; color: inherit; transition: background .15s, border-color .15s; }
+a.q-stat:hover { background: var(--surface-2); border-color: var(--border-strong); }
+.q-stat.hot { border-color: var(--success-border); background: var(--success-bg); }
+.q-stat-val { font-family: var(--font-display); font-weight: 600; font-size: 20px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.q-stat-lbl { font-size: 12.5px; color: var(--text-2); margin-top: 2px; }
+.q-stat-meta { font-size: 11.5px; color: var(--text-4); margin-top: 3px; line-height: 1.5; }
+.q-stat-meta.warn { color: var(--warning); font-weight: 600; }
 
 .quick-action {
   display: flex;
