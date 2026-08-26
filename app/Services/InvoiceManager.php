@@ -123,11 +123,40 @@ class InvoiceManager
                 ];
             }
 
+            // Klant: een concept volgt de actuele klantgegevens tot het wordt
+            // verstuurd — pas dan is de momentopname definitief. Zo werkt ook
+            // een andere klant kiezen (bijv. na dupliceren) gewoon. Alleen een
+            // klant van hetzelfde bedrijf telt.
+            $customerChanges = [];
+            if (! empty($data['customer_id'])) {
+                $customer = Customer::withoutGlobalScope('company')
+                    ->where('company_id', $invoice->company_id)
+                    ->find($data['customer_id']);
+                if ($customer) {
+                    $customerChanges = [
+                        'customer_id' => $customer->id,
+                        'customer_name' => $customer->name,
+                        'customer_address_line' => $customer->address_line,
+                        'customer_postal_code' => $customer->postal_code,
+                        'customer_city' => $customer->city,
+                        'customer_country' => $customer->country,
+                        'customer_vat_number' => $customer->vat_number,
+                        'customer_kvk_number' => $customer->kvk_number,
+                        'customer_email' => $customer->email,
+                    ];
+                    // Andere klant? Dan ook de documenttaal van die klant.
+                    if ((int) $customer->id !== (int) $invoice->customer_id) {
+                        $language = $customer->language ?? 'nl';
+                        $customerChanges['language'] = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
+                    }
+                }
+            }
+
             // Leeggemaakte velden komen als null binnen (lege strings worden
             // door Laravel naar null omgezet). "Sleutel aanwezig" is dus het
             // criterium om te wijzigen — niet "waarde niet null", anders is
             // een opmerking of referentie nooit meer leeg te maken.
-            $invoice->update($brandChanges + [
+            $invoice->update($brandChanges + $customerChanges + [
                 'reference' => array_key_exists('reference', $data) ? $data['reference'] : $invoice->reference,
                 'invoice_date' => $invoiceDate,
                 'due_date' => $invoiceDate->copy()->addDays($paymentTerms),

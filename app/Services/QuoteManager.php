@@ -112,7 +112,33 @@ class QuoteManager
                 ];
             }
 
-            $quote->update($brandChanges + [
+            // Klant: de offerte volgt de actuele klantgegevens zolang hij nog
+            // gewijzigd mag worden; een andere klant kiezen werkt zo ook.
+            $customerChanges = [];
+            if (! empty($data['customer_id'])) {
+                $customer = Customer::withoutGlobalScope('company')
+                    ->where('company_id', $quote->company_id)
+                    ->find($data['customer_id']);
+                if ($customer) {
+                    $customerChanges = [
+                        'customer_id' => $customer->id,
+                        'customer_name' => $customer->name,
+                        'customer_address_line' => $customer->address_line,
+                        'customer_postal_code' => $customer->postal_code,
+                        'customer_city' => $customer->city,
+                        'customer_country' => $customer->country,
+                        'customer_vat_number' => $customer->vat_number,
+                        'customer_kvk_number' => $customer->kvk_number,
+                        'customer_email' => $customer->email,
+                    ];
+                    if ((int) $customer->id !== (int) $quote->customer_id) {
+                        $language = $customer->language ?? 'nl';
+                        $customerChanges['language'] = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
+                    }
+                }
+            }
+
+            $quote->update($brandChanges + $customerChanges + [
                 // Leeggemaakt veld = null; sleutel aanwezig is het criterium (zie InvoiceManager).
                 'reference' => array_key_exists('reference', $data) ? $data['reference'] : $quote->reference,
                 'quote_date' => $quoteDate,
