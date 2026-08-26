@@ -57,7 +57,7 @@ const setType = (v) => {
     </div>
 
     <div v-if="customers.data.length > 0" class="customer-grid">
-      <Link v-for="c in customers.data" :key="c.id" :href="route('customers.edit', c.id)" class="customer-card">
+      <Link v-for="c in customers.data" :key="c.id" :href="route('customers.show', c.id)" class="customer-card">
         <div class="customer-avatar">{{ c.initials }}</div>
         <div class="customer-info">
           <div class="customer-name">{{ c.name }}</div>

@@ -79,10 +79,97 @@ class CustomerController extends Controller
         ]);
     }
 
+    /**
+     * Klantpagina: gegevens, kerncijfers (openstaand, omzet, betaalgedrag),
+     * facturen, offertes en nog te factureren uren — alles per klant bij elkaar.
+     */
+    public function show(Customer $customer): Response
+    {
+        $year = now()->year;
+
+        $invoices = $customer->invoices()->orderByDesc('invoice_date')->orderByDesc('id')->get();
+        $quotes = $customer->quotes()->orderByDesc('quote_date')->orderByDesc('id')->get();
+
+        $real = $invoices->whereNotIn('status', ['draft', 'cancelled']);
+        $open = $real->filter(fn ($i) => ! $i->is_credit && in_array($i->status, ['sent', 'partial', 'overdue', 'incasso'], true));
+        $signed = fn ($i) => ($i->is_credit ? -1 : 1) * (float) $i->subtotal;
+
+        // Betaalgedrag: hoeveel dagen na de factuurdatum wordt er gemiddeld betaald,
+        // en hoe vaak binnen de termijn?
+        $paid = $real->filter(fn ($i) => ! $i->is_credit && $i->status === 'paid' && $i->paid_at);
+        $avgDays = $paid->isNotEmpty()
+            ? (int) round($paid->avg(fn ($i) => max(0, $i->invoice_date->diffInDays($i->paid_at, false))))
+            : null;
+        $onTime = $paid->filter(fn ($i) => ! $i->due_date || $i->paid_at->lte($i->due_date->copy()->endOfDay()))->count();
+
+        $openQuotes = $quotes->where('status', 'sent');
+        $decided = $quotes->whereIn('status', ['accepted', 'rejected', 'expired']);
+
+        // Uren die nog op een factuur moeten.
+        $unbilled = \App\Models\TimeEntry::where('customer_id', $customer->id)
+            ->whereNull('invoice_id')
+            ->where('billable', true)
+            ->get(['minutes', 'hourly_rate']);
+
+        return Inertia::render('Customers/Show', [
+            'customer' => array_merge($customer->toArray(), [
+                'initials' => $customer->initials,
+                'address' => collect([$customer->address_line, trim(($customer->postal_code ?? '') . ' ' . ($customer->city ?? ''))])->filter()->implode(', '),
+                'created_at_label' => $customer->created_at?->translatedFormat('j F Y'),
+            ]),
+            'year' => $year,
+            'stats' => [
+                'open_total' => round($open->sum(fn ($i) => (float) $i->total - (float) $i->paid_total), 2),
+                'open_count' => $open->count(),
+                'overdue_count' => $open->filter(fn ($i) => $i->status === 'overdue' || $i->is_overdue)->count(),
+                'revenue_year' => round($real->filter(fn ($i) => $i->invoice_date->year === $year)->sum($signed), 2),
+                'revenue_total' => round($real->sum($signed), 2),
+                'invoice_count' => $real->where('is_credit', false)->count(),
+                'credit_count' => $real->where('is_credit', true)->count(),
+                'first_invoice_label' => $real->last()?->invoice_date?->translatedFormat('M Y'),
+                'avg_days_to_pay' => $avgDays,
+                'paid_count' => $paid->count(),
+                'on_time_count' => $onTime,
+                'quotes_open_count' => $openQuotes->count(),
+                'quotes_open_total' => round((float) $openQuotes->sum('total'), 2),
+                'quotes_accepted_count' => $decided->where('status', 'accepted')->count(),
+                'quotes_decided_count' => $decided->count(),
+                'unbilled_minutes' => (int) $unbilled->sum('minutes'),
+                'unbilled_value' => round($unbilled->sum(fn ($e) => $e->minutes / 60 * (float) ($e->hourly_rate ?? $customer->hourly_rate ?? 0)), 2),
+            ],
+            'invoices' => $invoices->take(50)->values()->map(fn ($i) => [
+                'id' => $i->id,
+                'number' => $i->number ?: '— concept —',
+                'is_credit' => (bool) $i->is_credit,
+                'invoice_date_label' => $i->invoice_date->translatedFormat('j M Y'),
+                'due_date_label' => $i->due_date?->translatedFormat('j M Y'),
+                'status' => $i->status,
+                'days_overdue' => $i->days_overdue,
+                'total' => (float) $i->total,
+                'remaining' => round((float) $i->total - (float) $i->paid_total, 2),
+            ]),
+            'invoices_total' => $invoices->count(),
+            'quotes' => $quotes->take(50)->values()->map(fn ($q) => [
+                'id' => $q->id,
+                'number' => $q->number ?: '— concept —',
+                'quote_date_label' => $q->quote_date->translatedFormat('j M Y'),
+                'valid_until_label' => $q->valid_until?->translatedFormat('j M Y'),
+                'status' => $q->status,
+                'status_label' => $q->status_label,
+                'is_expired' => $q->is_expired,
+                'days_left' => $q->status === 'sent' ? $q->days_left : null,
+                'converted' => (bool) $q->converted_invoice_id,
+                'total' => (float) $q->total,
+            ]),
+            'quotes_total' => $quotes->count(),
+            'hours_url' => \Illuminate\Support\Facades\Route::has('hours.index') ? route('hours.index') : null,
+        ]);
+    }
+
     public function update(Request $request, Customer $customer): RedirectResponse
     {
         $customer->update($this->validated($request));
-        return redirect()->route('customers.index')->with('flash', 'Klant bijgewerkt.');
+        return redirect()->route('customers.show', $customer)->with('flash', 'Klant bijgewerkt.');
     }
 
     public function destroy(Customer $customer): RedirectResponse
