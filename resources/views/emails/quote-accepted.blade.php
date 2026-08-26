@@ -20,10 +20,12 @@
   <div style="max-width:600px;margin:0 auto;padding:24px;">
     <div style="background:#fff;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
       <div style="padding:20px 24px;border-bottom:1px solid #e7e5e4;">
-        @if($logo && isset($message))
-          <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}" alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
-        @elseif($logo && ! empty($preview))
+        {{-- Voorbeeld in de browser: eerst op preview testen — render() zet ook een
+             $message klaar, en een cid:-bijlage kan een browser niet tonen. --}}
+        @if($logo && ! empty($preview))
           <img src="{{ $company->logo_data }}" alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
+        @elseif($logo && isset($message))
+          <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}" alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
         @else
           <div style="font-weight:700;font-size:18px;color:{{ $brand }};">{{ $company->name }}</div>
         @endif
