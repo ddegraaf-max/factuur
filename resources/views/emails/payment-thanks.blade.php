@@ -58,6 +58,11 @@
         @endif
 
         {{-- Betaaloverzicht --}}
+        @if(! empty($preview))
+          <p style="margin:0 0 6px;font-size:11.5px;color:#a8a29e;line-height:1.5;">
+            Voorbeeldgegevens — in de echte mail staan het nummer, het bedrag, de betaaldatum en de betaalwijze van de factuur zelf.
+          </p>
+        @endif
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 22px;border:1px solid #e7e5e4;border-radius:10px;background:#fafaf9;">
           <tr>
             <td style="padding:14px 18px;">

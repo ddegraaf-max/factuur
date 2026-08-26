@@ -52,6 +52,11 @@
           <p style="margin:0 0 14px;">{{ __('doc.mail_accept_next') }}</p>
         @endif
 
+        @if(! empty($preview))
+          <p style="margin:0 0 6px;font-size:11.5px;color:#a8a29e;line-height:1.5;">
+            Voorbeeldgegevens — in de echte mail staan het nummer, het bedrag, de ondertekenaar en het termijnplan van de offerte zelf (of geen termijnen als die er niet zijn).
+          </p>
+        @endif
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0 22px;border:1px solid #e7e5e4;border-radius:10px;background:#fafaf9;">
           <tr><td style="padding:14px 18px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13.5px;line-height:1.5;">
