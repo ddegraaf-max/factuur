@@ -71,6 +71,12 @@ const setType = (v) => {
               <div class="cs-label">Facturen</div>
               <div class="cs-value mono">{{ c.invoices_count }}</div>
             </div>
+            <div class="cs-item">
+              <div class="cs-label">Offertes</div>
+              <div class="cs-value mono">
+                {{ c.quotes_count }}<span v-if="c.open_quotes_count > 0" class="cs-open" :title="`${c.open_quotes_count} offerte(s) wachten op reactie`">· {{ c.open_quotes_count }} open</span>
+              </div>
+            </div>
             <div class="cs-item" v-if="c.outstanding > 0">
               <div class="cs-label">Openstaand</div>
               <div class="cs-value mono" style="color:var(--brand)">{{ eur(c.outstanding) }}</div>
@@ -148,7 +154,8 @@ const setType = (v) => {
   margin-bottom: 12px;
 }
 .customer-meta span { white-space: nowrap; }
-.customer-stats { display: flex; gap: 16px; padding-top: 10px; border-top: 1px solid var(--border); }
+.customer-stats { display: flex; gap: 16px; padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.cs-open { font-family: var(--font-body); font-size: 11.5px; font-weight: 600; color: var(--warning); margin-left: 5px; }
 .cs-item { font-size: 11px; }
 .cs-label { color: var(--text-4); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 2px; }
 .cs-value { font-size: 13px; font-weight: 600; }

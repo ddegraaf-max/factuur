@@ -52,6 +52,11 @@ class Customer extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
+    }
+
     public function getInitialsAttribute(): string
     {
         $parts = preg_split('/\s+/', trim($this->name));

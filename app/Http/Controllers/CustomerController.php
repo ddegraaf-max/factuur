@@ -16,7 +16,12 @@ class CustomerController extends Controller
         $type = $request->input('type');
 
         $customers = Customer::query()
-            ->withCount('invoices')
+            ->withCount([
+                'invoices',
+                'quotes',
+                // Offertes die nog bij de klant liggen (verstuurd, geen reactie).
+                'quotes as open_quotes_count' => fn ($qb) => $qb->where('status', 'sent'),
+            ])
             ->when($q, fn ($qb) => $qb->where(function ($w) use ($q) {
                 $w->where('name', 'like', "%{$q}%")
                   ->orWhere('email', 'like', "%{$q}%")
@@ -39,6 +44,8 @@ class CustomerController extends Controller
                 'city' => $c->city,
                 'email' => $c->email,
                 'invoices_count' => $c->invoices_count,
+                'quotes_count' => $c->quotes_count,
+                'open_quotes_count' => $c->open_quotes_count,
                 'outstanding' => (float) $c->outstanding_total,
             ];
         });
