@@ -123,8 +123,12 @@ class InvoiceManager
                 ];
             }
 
+            // Leeggemaakte velden komen als null binnen (lege strings worden
+            // door Laravel naar null omgezet). "Sleutel aanwezig" is dus het
+            // criterium om te wijzigen — niet "waarde niet null", anders is
+            // een opmerking of referentie nooit meer leeg te maken.
             $invoice->update($brandChanges + [
-                'reference' => $data['reference'] ?? $invoice->reference,
+                'reference' => array_key_exists('reference', $data) ? $data['reference'] : $invoice->reference,
                 'invoice_date' => $invoiceDate,
                 'due_date' => $invoiceDate->copy()->addDays($paymentTerms),
                 'payment_terms' => $paymentTerms,
@@ -132,7 +136,7 @@ class InvoiceManager
                 'vat_total' => $totals['vat_total'],
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
-                'notes' => $data['notes'] ?? $invoice->notes,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $invoice->notes,
             ]);
 
             $invoice->lines()->delete();

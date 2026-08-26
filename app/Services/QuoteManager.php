@@ -113,15 +113,16 @@ class QuoteManager
             }
 
             $quote->update($brandChanges + [
-                'reference' => $data['reference'] ?? $quote->reference,
+                // Leeggemaakt veld = null; sleutel aanwezig is het criterium (zie InvoiceManager).
+                'reference' => array_key_exists('reference', $data) ? $data['reference'] : $quote->reference,
                 'quote_date' => $quoteDate,
                 'valid_until' => $quoteDate->copy()->addDays($validDays),
                 'subtotal' => $totals['subtotal'],
                 'vat_total' => $totals['vat_total'],
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
-                'intro' => $data['intro'] ?? $quote->intro,
-                'notes' => $data['notes'] ?? $quote->notes,
+                'intro' => array_key_exists('intro', $data) ? $data['intro'] : $quote->intro,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $quote->notes,
             ]);
 
             $quote->lines()->delete();
