@@ -64,7 +64,7 @@ class PortalAuthController extends Controller
         $request->session()->put('portal_pending_email', $email);
         $request->session()->forget(['portal_intended', 'portal_gate']);
 
-        $this->sendCodeIfInvoicesExist($request, $email);
+        $this->sendCodeIfDocumentsExist($request, $email);
 
         // Altijd hetzelfde antwoord — zo valt niet te achterhalen welke
         // e-mailadressen facturen hebben (geen accountsprobing).
@@ -103,7 +103,7 @@ class PortalAuthController extends Controller
         }
 
         $this->guardSendRate($request, $email);
-        $this->sendCodeIfInvoicesExist($request, $email);
+        $this->sendCodeIfDocumentsExist($request, $email);
 
         return back()->with('flash', 'Code verstuurd. Kijk ook even in je spam-map.');
     }
@@ -229,10 +229,11 @@ class PortalAuthController extends Controller
 
     /**
      * Genereer en mail een code — maar alleen als er daadwerkelijk verstuurde
-     * facturen voor dit adres bestaan. De sessie wordt in beide gevallen
+     * facturen óf offertes voor dit adres bestaan (een klant krijgt vaak eerst
+     * een offerte en pas later een factuur). De sessie wordt in beide gevallen
      * identiek gevuld, zodat het gedrag van buitenaf niet te onderscheiden is.
      */
-    protected function sendCodeIfInvoicesExist(Request $request, string $email): void
+    protected function sendCodeIfDocumentsExist(Request $request, string $email): void
     {
         $code = (string) random_int(100000, 999999);
 
@@ -243,13 +244,23 @@ class PortalAuthController extends Controller
             'portal_code_sent_at' => now()->timestamp,
         ]);
 
-        $hasInvoices = Invoice::withoutGlobalScope('company')
-            ->whereRaw('LOWER(customer_email) = ?', [$email])
-            ->where('status', '!=', 'draft')
-            ->exists();
+        $hasDocuments = Invoice::withoutGlobalScope('company')
+                ->whereRaw('LOWER(customer_email) = ?', [$email])
+                ->where('status', '!=', 'draft')
+                ->exists()
+            || \App\Models\Quote::withoutGlobalScope('company')
+                ->whereRaw('LOWER(customer_email) = ?', [$email])
+                ->where('status', '!=', 'draft')
+                ->exists();
 
-        if ($hasInvoices) {
+        if ($hasDocuments) {
             Mail::to($email)->send(new PortalCodeMail($code));
+        } else {
+            // Bewust geen melding naar de bezoeker (geen adres-probing), wel
+            // een spoor voor support: "ik krijg geen code" is anders onvindbaar.
+            \Illuminate\Support\Facades\Log::info('Portaalcode niet verstuurd: geen verstuurde facturen of offertes voor dit adres', [
+                'email' => self::maskEmail($email),
+            ]);
         }
     }
 
