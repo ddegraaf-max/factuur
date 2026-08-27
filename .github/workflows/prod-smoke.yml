@@ -1,0 +1,57 @@
+# Bugscan laag 2: de LIVE site controleren — dagelijks, na elke deploy en op verzoek.
+# Bij falen wordt automatisch een GitHub-issue geopend (GitHub mailt de eigenaar).
+name: Live rookproef
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '15 5 * * *'   # dagelijks 07:15 Amsterdam
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Verwachte versie (uit config/app.php)
+        id: version
+        run: echo "version=$(grep -oP "version' => 'Easy \K[0-9.]+" config/app.php)" >> "$GITHUB_OUTPUT"
+
+      - name: Rookproef live site
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            node scripts/smoke.mjs --wait-for-version "${{ steps.version.outputs.version }}"
+          else
+            node scripts/smoke.mjs
+          fi
+
+      - name: Issue openen bij falen
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `Live rookproef mislukt (${new Date().toISOString().slice(0, 10)})`;
+            const body = [
+              'De automatische rookproef van easyinvoice.nl is mislukt.',
+              '',
+              `Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              `Aanleiding: ${context.eventName} (${context.sha.slice(0, 7)})`,
+              '',
+              'Bekijk de stap "Rookproef live site" voor de pagina\'s die faalden.',
+            ].join('\n');
+            const open = await github.rest.issues.listForRepo({ owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'bugscan' });
+            if (open.data.length) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: open.data[0].number, body });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body, labels: ['bugscan'] });
+            }

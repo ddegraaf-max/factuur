@@ -1,0 +1,123 @@
+# Bugscan laag 1: bij elke push/PR én elke nacht.
+#  - lint: elk PHP-bestand door php -l (fatale syntaxfouten)
+#  - tests: rookproef van alle pagina's + kernflows op een echte Postgres
+#  - frontend: Vite-build (Vue-compilefouten)
+#  - static: Larastan (ontbrekende imports, onbekende methodes) — informatief
+name: CI bugscan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '30 4 * * *'   # dagelijks 06:30 Amsterdam
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Rookproef & flows (PHP + Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: easyinvoice_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'true'
+      APP_URL: http://localhost
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: '5432'
+      DB_DATABASE: easyinvoice_test
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      MAIL_MAILER: array
+      SESSION_DRIVER: array
+      CACHE_STORE: array
+      QUEUE_CONNECTION: sync
+      FILESYSTEM_DISK: local
+      BCRYPT_ROUNDS: '4'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, gd, zip, bcmath, pdo_pgsql, pgsql, dom, curl
+          coverage: none
+
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: PHP syntax-lint (alle bestanden)
+        run: |
+          set -e
+          find app bootstrap config database routes lang tests -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /tmp/lint.log 2>&1 || { grep -v 'No syntax errors' /tmp/lint.log; exit 1; }
+          echo "Alle PHP-bestanden syntactisch in orde."
+
+      - name: App-key en mappen
+        run: |
+          echo "APP_KEY=$(php artisan key:generate --show)" >> "$GITHUB_ENV"
+          mkdir -p storage/framework/{cache,sessions,views,testing} storage/logs bootstrap/cache
+
+      - name: Tests
+        run: php artisan test --without-tty --colors=never
+
+      - name: Laravel-log bij falen
+        if: failure()
+        run: tail -n 200 storage/logs/laravel.log 2>/dev/null || true
+
+  frontend:
+    name: Vite-build (Vue)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  static:
+    name: Larastan (informatief)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    continue-on-error: true   # eerst de bestaande stand zien; daarna aanscherpen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, intl, gd, zip, bcmath, pdo_pgsql, dom, curl
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Larastan installeren (alleen in CI)
+        run: composer require --dev "larastan/larastan:^3.0" --no-interaction --no-progress -W
+      - name: Analyse (niveau 2 — fatals, onbekende methodes/props)
+        run: |
+          cat > phpstan.ci.neon <<'NEON'
+          includes:
+            - vendor/larastan/larastan/extension.neon
+          parameters:
+            level: 2
+            paths:
+              - app
+              - routes
+            reportUnmatchedIgnoredErrors: false
+          NEON
+          vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit=1G --no-progress --error-format=table
