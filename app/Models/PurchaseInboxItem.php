@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PurchaseInboxItem extends Model
 {
     protected $fillable = [
-        'company_id', 'purchase_invoice_id',
+        'company_id', 'purchase_invoice_id', 'peppol_document_id',
         'from_email', 'subject', 'filename', 'mime_type', 'size_bytes',
         'file_data', 'status', 'received_at',
         'scan', 'scan_error', 'scanned_at',

@@ -6,7 +6,23 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 const props = defineProps({
   mcp: Object,     // { active, url }
   has_ai: Boolean, // AI-toegang (Slim, proef of vrijgesteld)
+  peppol: Object,  // { configured, status, verification_url, participant_id, registered_at_label, verified_at_label, blockers }
 });
+
+/* ---------- Peppol (Recommand) ---------- */
+const peppolActivate = useForm({});
+const peppolRefresh = useForm({});
+const peppolDisable = useForm({});
+const activatePeppol = () => peppolActivate.post(route('settings.integrations.peppol.activate'), { preserveScroll: true });
+const refreshPeppol = () => peppolRefresh.post(route('settings.integrations.peppol.refresh'), { preserveScroll: true });
+const disablePeppol = () => {
+  if (confirm('Peppol uitschakelen? Je administratie wordt afgemeld op het netwerk; klanten kunnen je dan geen e-facturen meer sturen en jij kunt niet meer via Peppol afleveren.')) {
+    peppolDisable.delete(route('settings.integrations.peppol.disable'), { preserveScroll: true });
+  }
+};
+const peppolStatusLabel = computed(() => ({
+  none: 'Uit', pending: 'Identiteitscontrole', verified: 'Actief', rejected: 'Afgewezen', error: 'Fout',
+}[props.peppol?.status] || 'Uit'));
 
 const page = usePage();
 const flash = computed(() => page.props.flash || {});
@@ -57,6 +73,75 @@ const copyUrl = async () => {
 
     <div v-if="flash.flash" class="kop-alert ok">{{ flash.flash }}</div>
     <div v-if="flash.error" class="kop-alert err">{{ flash.error }}</div>
+
+    <!-- Peppol: e-facturen verzenden en ontvangen -->
+    <div v-if="peppol" class="card kop-card">
+      <div class="card-body">
+        <div class="kop-head">
+          <div>
+            <div class="kop-title">
+              Peppol e-facturatie
+              <span class="kop-pill" :class="peppol.status === 'verified' ? 'on' : (peppol.status === 'pending' ? 'wait' : 'off')">{{ peppolStatusLabel }}</span>
+            </div>
+            <p class="kop-desc">
+              Lever facturen rechtstreeks af in het boekhoudpakket van je klant en ontvang inkoopfacturen van leveranciers
+              automatisch in je Postvak IN — via het Peppol-netwerk, zonder mailbox ertussen. Je administratie wordt een eigen
+              Peppol-deelnemer<template v-if="peppol.participant_id"> (<code style="font-size:12px;">{{ peppol.participant_id }}</code>)</template>.
+            </p>
+          </div>
+        </div>
+
+        <div v-if="!peppol.configured" class="kop-locked">
+          Peppol wordt binnenkort geactiveerd. Zodra de koppeling met het netwerk klaar is, kun je hier je administratie aanmelden.
+        </div>
+
+        <template v-else-if="peppol.status === 'none'">
+          <div v-if="peppol.blockers.length" class="kop-locked">
+            Vul eerst {{ peppol.blockers.join(', ') }} in bij
+            <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">Bedrijfsgegevens</Link>.
+          </div>
+          <template v-else>
+            <button class="btn btn-primary" :disabled="peppolActivate.processing" @click="activatePeppol">
+              {{ peppolActivate.processing ? 'Bezig…' : 'Peppol activeren' }}
+            </button>
+            <p class="kop-hint">
+              Je administratie wordt geregistreerd op het netwerk. Daarna rondt een tekenbevoegd persoon eenmalig een
+              online identiteitscontrole af (een paar minuten) — verplicht voor iedereen op Peppol.
+            </p>
+          </template>
+        </template>
+
+        <template v-else>
+          <div v-if="peppol.status === 'pending'" class="kop-steps">
+            <div class="kop-steps-title">Nog één stap: de identiteitscontrole</div>
+            <p class="kop-hint" style="margin:0 0 10px;">
+              Geregistreerd op {{ peppol.registered_at_label }}. Verzenden en ontvangen kan zodra een tekenbevoegd persoon de
+              identiteitscontrole heeft afgerond. Niet zelf tekenbevoegd? Stuur de link door.
+            </p>
+            <div class="kop-actions" style="margin-top:0;">
+              <a v-if="peppol.verification_url" :href="peppol.verification_url" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Identiteitscontrole afronden ↗</a>
+              <button class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">Status vernieuwen</button>
+            </div>
+          </div>
+          <div v-else-if="peppol.status === 'verified'" class="kop-steps">
+            <div class="kop-steps-title">Actief sinds {{ peppol.verified_at_label }}</div>
+            <ol>
+              <li>Op verstuurde facturen van klanten die op Peppol zitten staat de knop <b>"⚡ Via Peppol afleveren"</b>.</li>
+              <li>E-facturen van leveranciers komen automatisch binnen in <Link :href="route('purchases.inbox.index')" style="color:var(--brand);font-weight:600;">Postvak IN</Link>, met de gegevens al ingevuld.</li>
+              <li>Geef leveranciers je Peppol-ID door: <code style="font-size:12px;">{{ peppol.participant_id }}</code>.</li>
+            </ol>
+          </div>
+          <div v-else class="kop-locked">
+            De identiteitscontrole is {{ peppol.status === 'rejected' ? 'afgewezen' : 'niet gelukt' }}. Neem contact met ons op via
+            <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:600;">hallo@easyinvoice.nl</a>.
+          </div>
+          <div class="kop-actions">
+            <button v-if="peppol.status !== 'pending'" class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">Status vernieuwen</button>
+            <button class="btn btn-danger btn-sm" :disabled="peppolDisable.processing" @click="disablePeppol">Peppol uitschakelen</button>
+          </div>
+        </template>
+      </div>
+    </div>
 
     <div class="card kop-card">
       <div class="card-body">
@@ -135,6 +220,7 @@ const copyUrl = async () => {
 .kop-pill { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 100px; padding: 3px 10px; border: 1px solid transparent; }
 .kop-pill.on { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
 .kop-pill.off { color: var(--text-3); background: var(--surface-2); border-color: var(--border); }
+.kop-pill.wait { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
 .kop-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.65; margin-top: 8px; max-width: 640px; }
 
 .kop-locked {

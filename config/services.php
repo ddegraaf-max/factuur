@@ -34,9 +34,14 @@ return [
     // Peppol-verzending via Storecove (storecove.com). De bereikbaarheids-
     // check via de openbare Peppol Directory werkt altijd; daadwerkelijk
     // afleveren kan pas met een token + legal entity id.
+    // Peppol via Recommand (recommand.eu): één teamkey voor EasyInvoice; elke
+    // administratie wordt daaronder als eigen deelnemer geregistreerd.
     'peppol' => [
-        'storecove_token' => env('STORECOVE_API_TOKEN'),
-        'legal_entity_id' => env('STORECOVE_LEGAL_ENTITY_ID'),
+        'recommand_base' => env('RECOMMAND_API_BASE', 'https://app.recommand.eu/api/v1'),
+        'recommand_key' => env('RECOMMAND_API_KEY'),
+        'recommand_secret' => env('RECOMMAND_API_SECRET'),
+        // Geheim waarmee Recommand webhooks ondertekent (X-Signature).
+        'recommand_webhook_secret' => env('RECOMMAND_WEBHOOK_SECRET'),
     ],
     // Inkoopfacturen per e-mail aanleveren: een inbound-maildomein (bijv.
     // Postmark inbound) POST binnenkomende mail naar onze webhook. Zonder

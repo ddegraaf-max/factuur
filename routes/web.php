@@ -203,6 +203,9 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 // ---------- MOLLIE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
     ->middleware('throttle:120,1')->name('mollie.webhook');
+// Peppol (Recommand): ontvangen e-facturen en verificatiestatus, ondertekend met X-Signature.
+Route::post('/webhooks/recommand', [\App\Http\Controllers\RecommandWebhookController::class, 'handle'])
+    ->middleware('throttle:240,1')->name('recommand.webhook');
 
 // ---------- INBOUND MAIL WEBHOOK (publiek, geen CSRF, geheim in de URL) ----------
 Route::post('/webhooks/inbound-mail/{secret}', [\App\Http\Controllers\InboundMailController::class, 'handle'])
@@ -279,6 +282,11 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::resource('customers', CustomerController::class);
 
         // Peppol: bereikbaarheid checken + facturen afleveren
+        // Peppol-koppeling van de administratie (Instellingen → Koppelingen).
+        Route::post('settings/peppol/activeren', [\App\Http\Controllers\PeppolController::class, 'activate'])->name('settings.integrations.peppol.activate');
+        Route::post('settings/peppol/status', [\App\Http\Controllers\PeppolController::class, 'refresh'])->name('settings.integrations.peppol.refresh');
+        Route::delete('settings/peppol', [\App\Http\Controllers\PeppolController::class, 'disable'])->name('settings.integrations.peppol.disable');
+
         Route::post('customers/{customer}/peppol-check', [\App\Http\Controllers\PeppolController::class, 'check'])
             ->middleware('throttle:20,1')->name('customers.peppol.check');
         Route::post('invoices/{invoice}/peppol', [\App\Http\Controllers\PeppolController::class, 'send'])

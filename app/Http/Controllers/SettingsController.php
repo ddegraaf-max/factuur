@@ -13,12 +13,25 @@ class SettingsController extends Controller
     {
         $company = auth()->user()->company;
 
+        $peppol = app(\App\Services\PeppolService::class);
+
         return Inertia::render('Settings/Koppelingen', [
             'mcp' => [
                 'active' => $company->mcp_token !== null,
                 'url' => $company->mcpUrl(),
             ],
             'has_ai' => $company->hasAiAccess(),
+            // Peppol (Recommand): configured = beheerder heeft de teamkey gezet;
+            // status = none | pending | verified | rejected | error.
+            'peppol' => [
+                'configured' => $peppol->configured(),
+                'status' => $company->peppol_company_id ? ($company->peppol_verification_status ?: 'pending') : 'none',
+                'verification_url' => $company->peppol_verification_url,
+                'participant_id' => strlen(preg_replace('/\D/', '', (string) $company->kvk_number)) === 8 ? '0106:' . preg_replace('/\D/', '', $company->kvk_number) : null,
+                'registered_at_label' => $company->peppol_registered_at?->translatedFormat('j M Y'),
+                'verified_at_label' => $company->peppol_verified_at?->translatedFormat('j M Y'),
+                'blockers' => $peppol->registrationBlockers($company),
+            ],
         ]);
     }
 

@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 27 augustus 2026 · Easy 1.38.0</div>
+        <h2>Peppol: e-facturen verzenden én ontvangen</h2>
+        <ul class="tl-list">
+          <li><b>Je eigen Peppol-deelnemer</b> — activeer Peppol bij Instellingen → Koppelingen: je administratie wordt geregistreerd op het netwerk (op je KvK-nummer) en na een eenmalige online identiteitscontrole kun je verzenden en ontvangen. Geen aparte abonnementen of certificaten.</li>
+          <li><b>Afleveren in het boekhoudpakket van je klant</b> — op facturen van klanten die op Peppol zitten staat "Via Peppol afleveren"; de e-factuur (NLCIUS of Peppol BIS 3, afgestemd op wat de ontvanger accepteert) komt rechtstreeks in hun administratie.</li>
+          <li><b>Inkoopfacturen automatisch in je Postvak IN</b> — e-facturen van leveranciers verschijnen met alle gegevens ingevuld (leverancier, nummer, datums, btw per tarief) en een PDF-weergave; één klik en hij is ingeboekt.</li>
+          <li>Ook nieuw: de bevestiging van een offerte-akkoord aan jou in de EasyInvoice-huisstijl, en het klantenportaal stuurt nu ook een toegangscode aan klanten die alleen een offerte hebben.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.37.0</div>
         <h2>Bevestiging naar de klant na akkoord op een offerte</h2>
         <ul class="tl-list">

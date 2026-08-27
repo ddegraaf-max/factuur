@@ -48,6 +48,7 @@
         <a class="help-link" href="{{ route('help.article', 'creditfactuur-maken') }}">Een creditfactuur maken →</a>
         <a class="help-link" href="{{ route('help.article', 'factuurnummering') }}">Factuurnummering aanpassen →</a>
         <a class="help-link" href="{{ route('help.article', 'facturen-in-het-engels') }}">Facturen in het Engels →</a>
+        <a class="help-link" href="{{ route('help.article', 'peppol-e-facturen') }}">E-facturen via Peppol →</a>
         <a class="help-link" href="{{ route('help.article', 'termijnfacturen') }}">Termijnfacturen (in delen factureren) →</a>
         <a class="help-link" href="{{ route('help.article', 'korting-geven') }}">Korting geven op factuurregels →</a>
       </div>

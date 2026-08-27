@@ -139,7 +139,7 @@ class InvoiceController extends Controller
             $peppol = [
                 'participant_id' => $peppolService->participantId($invoice->customer),
                 'available' => $available,
-                'sending_enabled' => $peppolService->sendingEnabled(),
+                'sending_enabled' => $peppolService->sendingEnabled($company),
                 'sent_at_label' => $invoice->peppol_sent_at?->translatedFormat('j M Y, H:i'),
                 'reference' => $invoice->peppol_reference,
             ];

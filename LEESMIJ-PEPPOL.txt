@@ -1,6 +1,19 @@
 EASYINVOICE — VERZENDING VIA PEPPOL
 ===================================
 
+UPDATE 27-08-2026 (Easy 1.38.0): provider is nu RECOMMAND (recommand.eu),
+niet meer Storecove. Eén teamkey voor EasyInvoice (RECOMMAND_API_KEY /
+RECOMMAND_API_SECRET / RECOMMAND_WEBHOOK_SECRET op Railway); elke
+administratie registreert zichzelf via Instellingen → Koppelingen als eigen
+deelnemer (POST /companies, KvK 0106) en doorloopt een identiteitscontrole.
+Verzenden: POST /{companyId}/send met documentType "xml" (NLCIUS, of BIS 3
+als de ontvanger dat vereist). Ontvangen: webhook POST /webhooks/recommand
+(document.received → Postvak IN met ingevulde gegevens + PDF-render).
+Webhook in het Recommand-dashboard aanmaken: URL https://easyinvoice.nl/webhooks/recommand,
+secret = RECOMMAND_WEBHOOK_SECRET, companyId leeg (alle bedrijven).
+Zie app/Services/Peppol/RecommandClient.php en app/Services/PeppolService.php.
+De Storecove-uitleg hieronder is historisch.
+
 WAT IS HET
 ----------
 E-facturen (UBL/NLCIUS) rechtstreeks afleveren in het boekhoudpakket van

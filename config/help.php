@@ -425,6 +425,24 @@ return [
             ],
         ],
 
+        'peppol-e-facturen' => [
+            'category' => 'Facturen',
+            'title' => 'E-facturen via Peppol verzenden en ontvangen',
+            'intro' => 'Met Peppol lever je facturen rechtstreeks af in het boekhoudpakket van je klant en ontvang je inkoopfacturen automatisch in je Postvak IN — zonder e-mail ertussen.',
+            'sections' => [
+                ['Activeren', [
+                    'Ga naar Instellingen → Koppelingen en klik op "Peppol activeren". Je administratie wordt op je KvK-nummer geregistreerd als Peppol-deelnemer (ID 0106:kvknummer). Daarna rondt een tekenbevoegd persoon eenmalig een online identiteitscontrole af — dat is verplicht voor iedereen op het netwerk en duurt een paar minuten. Niet zelf tekenbevoegd? Stuur de link door. Zodra de status op "Actief" staat, kun je verzenden en ontvangen.',
+                    'Zorg dat KvK-nummer, adres en e-mailadres bij Bedrijfsgegevens zijn ingevuld; die gegevens gaan mee in de registratie.',
+                ]],
+                ['Verzenden', [
+                    'EasyInvoice controleert per klant (op KvK-nummer of een eigen Peppol-ID op de klantkaart) of die op Peppol bereikbaar is; je ziet dan een ⚡-badge op de factuur. Na het versturen verschijnt de knop "Via Peppol afleveren". De e-factuur gaat als NLCIUS — of als Peppol BIS 3 wanneer de ontvanger alleen dat accepteert — en de referentie komt in de factuurhistorie.',
+                ]],
+                ['Ontvangen', [
+                    'Geef je leveranciers je Peppol-ID door (staat bij Koppelingen). Hun e-facturen verschijnen automatisch in Postvak IN, met leverancier, factuurnummer, datums en btw per tarief al ingevuld en een PDF-weergave. Controleren, categorie kiezen, inboeken — klaar. Creditnota\'s komen met negatieve bedragen binnen.',
+                ]],
+            ],
+        ],
+
         'postvak-in' => [
             'category' => 'Inkoop',
             'title' => 'Inkoopfacturen per e-mail aanleveren (Postvak IN)',
