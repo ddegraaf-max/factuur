@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Portal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\Quote;
 use App\Models\InvoiceView;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -35,15 +36,53 @@ class PortalController extends Controller
 
         $open = $invoices->filter(fn ($i) => ! $i->is_credit && in_array($i->status, ['sent', 'partial', 'overdue', 'incasso']));
 
+        // Offertes voor dit adres: alleen verstuurde (met portaallink), zodat
+        // de klant ze hier kan bekijken en ondertekenen.
+        $quotes = Quote::withoutGlobalScope('company')
+            ->with('company:id,name,brand_color')
+            ->whereRaw('LOWER(customer_email) = ?', [$email])
+            ->where('status', '!=', 'draft')
+            ->whereNotNull('portal_token')
+            ->orderByDesc('quote_date')
+            ->orderByDesc('id')
+            ->get();
+
         return Inertia::render('Portal/Index', [
             'email' => $email,
             'invoices' => $invoices->map(fn ($i) => $this->invoiceSummary($i))->values(),
+            'quotes' => $quotes->map(fn ($q) => $this->quoteSummary($q))->values(),
             'stats' => [
                 'open_count' => $open->count(),
                 'open_amount' => round($open->sum(fn ($i) => (float) $i->total - (float) $i->paid_total), 2),
                 'overdue_count' => $open->filter(fn ($i) => $i->is_overdue || $i->status === 'overdue')->count(),
+                'quotes_open_count' => $quotes->filter(fn ($q) => $q->status === 'sent' && ! $q->is_expired)->count(),
             ],
         ]);
+    }
+
+    /** Offerte zoals de klant hem in het overzicht ziet. */
+    protected function quoteSummary(Quote $quote): array
+    {
+        $expired = $quote->status === 'expired' || $quote->is_expired;
+
+        return [
+            'token' => $quote->portal_token,
+            'number' => $quote->number,
+            'status' => $expired ? 'expired' : $quote->status,
+            'status_label' => match (true) {
+                $expired => 'Verlopen',
+                $quote->status === 'accepted' => 'Geaccepteerd',
+                $quote->status === 'rejected' => 'Afgewezen',
+                default => 'Wacht op uw reactie',
+            },
+            'awaiting' => ! $expired && $quote->status === 'sent',
+            'company_name' => $quote->company?->name,
+            'quote_date_label' => $quote->quote_date?->translatedFormat('j M Y'),
+            'valid_until_label' => $quote->valid_until?->translatedFormat('j F Y'),
+            'days_left' => $quote->status === 'sent' ? $quote->days_left : null,
+            'accepted_at_label' => ($quote->signed_at ?? $quote->accepted_at)?->translatedFormat('j M Y'),
+            'total' => (float) $quote->total,
+        ];
     }
 
     /** Factuurdetail via de beveiligde link. Niet geverifieerd? Eerst de codestap. */

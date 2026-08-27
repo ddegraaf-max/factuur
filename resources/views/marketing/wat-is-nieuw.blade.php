@@ -37,6 +37,7 @@
           <li><b>"Bedankt voor uw akkoord"</b> — ondertekent je klant een offerte in het portaal, dan krijgt hij direct een bevestiging in jouw huisstijl: datum en naam van de ondertekenaar, het totaal, het termijnplan als dat er is, een "hoe nu verder"-tekst en de ondertekende offerte als PDF. Zo hebben jullie allebei hetzelfde document.</li>
           <li><b>Ook bij een akkoord per telefoon</b> — markeer je een offerte zelf als geaccepteerd, dan kies je met één vinkje of de bevestiging meegaat. Op de offertepagina zie je wanneer die is gemaild en kun je hem opnieuw sturen.</li>
           <li><b>Eigen tekst en voorbeeld</b> — bij Instellingen → E-mailteksten pas je onderwerp en "hoe nu verder"-tekst aan (met variabelen als {ondertekenaar} en {akkoorddatum}) en bekijk je de mail vooraf. Tweetalig: klanten met taal Engels krijgen de Engelse standaardtekst.</li>
+          <li><b>Klantenportaal: offertes erbij</b> — je klant ziet in het portaal nu ook zijn offertes naast zijn facturen, met status, geldigheid en een directe "bekijk en onderteken"-link; een offerte die op reactie wacht staat bovenaan. Ook opgelost: klanten die alleen nog een offerte hadden (nog geen factuur) kregen geen toegangscode.</li>
         </ul>
       </article>
 
