@@ -58,13 +58,32 @@ const submit = () => form.post(route('register'));
   <Head title="Registreren" />
   <AuthLayout>
     <template #hero>
-      <h2>Begin met je administratie</h2>
-      <p>Maak een gratis EasyInvoice-account aan en stuur binnen vijf minuten je eerste factuur.</p>
-      <ul class="hero-bullets">
-        <li>Onbeperkt facturen versturen</li>
-        <li>Automatische BTW per regel</li>
-        <li>14 dagen gratis — geen creditcard</li>
-      </ul>
+      <div class="auth-copy">
+        <h1 class="auth-h1">Maak gratis een EasyInvoice-account aan</h1>
+        <p>Begin vandaag met je administratie: je maakt in één minuut een account aan en verstuurt binnen vijf minuten je eerste professionele factuur. De eerste 14 dagen zijn gratis, zonder creditcard en zonder verplichtingen — daarna vanaf € 12,10 per maand (incl. 21% btw), maandelijks opzegbaar.</p>
+        <ul class="hero-bullets">
+          <li>Onbeperkt facturen en offertes, in je eigen huisstijl</li>
+          <li>Btw automatisch per regel (21/9/0%) en de aangifte per kwartaal klaar</li>
+          <li>Herinneringen, aanmaningen en incasso zonder omkijken</li>
+          <li>iDEAL-betaallink en klantenportaal met digitaal ondertekenen</li>
+          <li>Urenregistratie, inkoopfacturen en een live resultaatoverzicht</li>
+          <li>Boekhouder gratis mee laten kijken</li>
+        </ul>
+        <h2>Hoe werkt het?</h2>
+        <p>Vul hiernaast je naam, e-mailadres en een wachtwoord in en bevestig je e-mailadres met de code die je ontvangt. Daarna vul je je bedrijfsgegevens in — met je KvK-nummer halen we die grotendeels automatisch op — en kun je meteen een klant toevoegen en factureren. Alles wat je in de proefperiode aanmaakt, blijft gewoon staan als je doorgaat.</p>
+        <h2>Wat kost het?</h2>
+        <p>Het volledige facturatiepakket kost € 12,10 per maand (incl. 21% btw). Wil je ook de AI-functies, zoals bonnetjes scannen en een offerte maken uit een paar zinnen tekst? Dan kies je Slim voor € 21,18 per maand. Geen instapkosten, geen jaarcontract: je zegt op wanneer je wilt.</p>
+        <h2>Liever eerst kijken?</h2>
+        <p>Bekijk de demo met voorbeeldgegevens, maak zonder account een gratis factuur, of lees in het helpcentrum hoe alles werkt.</p>
+        <ul class="auth-links">
+          <li><a :href="route('demo')">Demo bekijken</a></li>
+          <li><a :href="route('gratis-factuur')">Gratis factuur maken</a></li>
+          <li><a :href="route('helpcentrum')">Helpcentrum</a></li>
+          <li><a :href="route('faq')">Veelgestelde vragen</a></li>
+          <li><a :href="route('over')">Over EasyInvoice</a></li>
+          <li><a :href="route('login')">Al een account? Inloggen</a></li>
+        </ul>
+      </div>
     </template>
 
     <div class="register-card">

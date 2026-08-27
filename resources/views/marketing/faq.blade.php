@@ -60,7 +60,7 @@
   <div class="container">
     <div class="faq-list">
       @foreach($faqGroups as $groupTitle => $items)
-        <h3 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:{{ $loop->first ? '8px' : '32px' }} 0 14px;">{{ $groupTitle }}</h3>
+        <h2 style="font-size:14px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-4);margin:{{ $loop->first ? '8px' : '32px' }} 0 14px;">{{ $groupTitle }}</h2>
         @foreach($items as [$question, $answer])
           <details class="faq-item">
             <summary>{{ $question }} <svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>

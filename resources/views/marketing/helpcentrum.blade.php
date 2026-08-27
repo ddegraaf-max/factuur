@@ -7,6 +7,7 @@
 <style>
   .help-search { display: flex; align-items: center; gap: 10px; max-width: 520px; margin: 24px auto 0; background: var(--surface); border: 1px solid var(--border-strong); border-radius: 12px; padding: 0 16px; box-shadow: var(--shadow-sm); }
   .help-search input { flex: 1; border: none; outline: none; background: none; padding: 14px 0; font-size: 15px; font-family: inherit; color: var(--text); }
+  .help-cat-title { font-size: 18px; margin-bottom: 6px; }
   .help-link { display: block; font-size: 14px; color: var(--text-2); padding: 4px 0; }
   .help-link:hover { color: var(--brand); }
 </style>
@@ -30,7 +31,7 @@
     <div class="card-grid">
       <div class="info-card">
         <div class="ic-emoji">🚀</div>
-        <h3>Aan de slag</h3>
+        <h2 class="help-cat-title">Aan de slag</h2>
         <p style="margin-bottom:12px;">Account aanmaken en je eerste factuur versturen.</p>
         <a class="help-link" href="{{ route('help.article', 'een-account-aanmaken') }}">Een account aanmaken →</a>
         <a class="help-link" href="{{ route('help.article', 'bedrijfsgegevens-instellen') }}">Je bedrijfsgegevens instellen →</a>
@@ -38,7 +39,7 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">🧾</div>
-        <h3>Facturen</h3>
+        <h2 class="help-cat-title">Facturen</h2>
         <p style="margin-bottom:12px;">BTW, creditnota's en nummering.</p>
         <a class="help-link" href="{{ route('help.article', 'urenregistratie') }}">Uren schrijven en factureren →</a>
         <a class="help-link" href="{{ route('help.article', 'strippenkaarten') }}">Strippenkaarten (vooraf betaalde uren) →</a>
@@ -52,7 +53,7 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">💸</div>
-        <h3>Betalingen &amp; incasso</h3>
+        <h2 class="help-cat-title">Betalingen &amp; incasso</h2>
         <p style="margin-bottom:12px;">Herinneringen en het incassotraject.</p>
         <a class="help-link" href="{{ route('help.article', 'betaallink-ideal') }}">Betaald worden met iDEAL →</a>
         <a class="help-link" href="{{ route('help.article', 'betaling-registreren') }}">Een betaling registreren →</a>
@@ -62,14 +63,14 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">👥</div>
-        <h3>Klanten &amp; producten</h3>
+        <h2 class="help-cat-title">Klanten &amp; producten</h2>
         <p style="margin-bottom:12px;">Klantgegevens en je catalogus.</p>
         <a class="help-link" href="{{ route('help.article', 'klant-toevoegen') }}">Een klant toevoegen →</a>
         <a class="help-link" href="{{ route('help.article', 'producten-beheren') }}">Producten beheren →</a>
       </div>
       <div class="info-card">
         <div class="ic-emoji">🎨</div>
-        <h3>Huisstijl</h3>
+        <h2 class="help-cat-title">Huisstijl</h2>
         <p style="margin-bottom:12px;">Logo, kleuren en sjablonen.</p>
         <a class="help-link" href="{{ route('help.article', 'logo-uploaden') }}">Je logo uploaden →</a>
         <a class="help-link" href="{{ route('help.article', 'sjabloon-kiezen') }}">Een sjabloon kiezen →</a>
@@ -78,7 +79,7 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">📊</div>
-        <h3>Inkoop &amp; BTW</h3>
+        <h2 class="help-cat-title">Inkoop &amp; BTW</h2>
         <p style="margin-bottom:12px;">Inkoop inboeken en je BTW-aangifte per kwartaal.</p>
         <a class="help-link" href="{{ route('help.article', 'inkoopfacturen-inboeken') }}">Inkoopfacturen inboeken (ook met foto) →</a>
         <a class="help-link" href="{{ route('help.article', 'postvak-in') }}">Inkoopfacturen per e-mail aanleveren →</a>
@@ -90,7 +91,7 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">🤝</div>
-        <h3>Samenwerken &amp; klantenportaal</h3>
+        <h2 class="help-cat-title">Samenwerken &amp; klantenportaal</h2>
         <p style="margin-bottom:12px;">Teamrollen en facturen online laten inzien.</p>
         <a class="help-link" href="{{ route('help.article', 'offertes-digitaal-ondertekenen') }}">Offertes digitaal laten ondertekenen →</a>
         <a class="help-link" href="{{ route('help.article', 'team-en-rollen') }}">Collega's en boekhouder uitnodigen →</a>
@@ -98,7 +99,7 @@
       </div>
       <div class="info-card">
         <div class="ic-emoji">🔒</div>
-        <h3>Account &amp; beveiliging</h3>
+        <h2 class="help-cat-title">Account &amp; beveiliging</h2>
         <p style="margin-bottom:12px;">Wachtwoord en tweestapsverificatie.</p>
         <a class="help-link" href="{{ route('help.article', 'meerdere-administraties') }}">Meerdere administraties →</a>
         <a class="help-link" href="{{ route('help.article', '2fa-instellen') }}">2FA instellen →</a>
@@ -107,7 +108,7 @@
     </div>
 
     <div class="info-card" style="text-align:center;margin-top:32px;padding:36px;">
-      <h3 style="font-size:22px;margin-bottom:8px;">Niet gevonden wat je zocht?</h3>
+      <h2 style="font-size:22px;margin-bottom:8px;">Niet gevonden wat je zocht?</h2>
       <p style="margin-bottom:20px;">Ons team helpt je graag persoonlijk verder.</p>
       <a href="{{ route('contact') }}" class="btn btn-primary" style="margin-right:8px;">Neem contact op</a>
       <a href="mailto:hallo@easyinvoice.nl" class="btn btn-secondary">E-mailondersteuning</a>

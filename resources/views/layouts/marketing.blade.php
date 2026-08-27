@@ -7,11 +7,11 @@
 <title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')</title>
 
 {{-- SEO: canonical + social preview + structured data --}}
-<link rel="canonical" href="{{ url()->current() }}">
+<link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="EasyInvoice">
 <meta property="og:locale" content="nl_NL">
-<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:url" content="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:title" content="@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')">
 <meta property="og:description" content="@yield('description', 'Eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW en incasso — met AI die je administratie invult.')">
 <meta property="og:image" content="{{ url('/images/og-easyinvoice.png') }}">
@@ -69,7 +69,11 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+{{-- Lettertypen laden zonder de eerste render te blokkeren (LCP): met display=swap
+     staat de tekst er direct in de fallback en wisselt hij zodra het font binnen is. --}}
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 <style>
   :root {
     --brand: #E8231F;

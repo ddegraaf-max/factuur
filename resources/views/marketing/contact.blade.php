@@ -67,7 +67,7 @@
 
     <aside>
       <div class="contact-card">
-        <h3 style="font-size:18px;margin-bottom:14px;">Direct contact</h3>
+        <h2 style="font-size:18px;margin-bottom:14px;">Direct contact</h2>
         <div class="contact-line">
           <span class="contact-ic">✉</span>
           <div><div style="font-size:13px;color:var(--text-3);">E-mail</div><a href="mailto:hallo@easyinvoice.nl" style="font-weight:600;color:var(--brand);">hallo@easyinvoice.nl</a></div>
@@ -82,7 +82,7 @@
         </div>
       </div>
       <div class="contact-card" style="margin-top:16px;">
-        <h3 style="font-size:17px;margin-bottom:8px;">Liever zelf zoeken?</h3>
+        <h2 style="font-size:17px;margin-bottom:8px;">Liever zelf zoeken?</h2>
         <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;">Veel antwoorden vind je direct in ons helpcentrum of de veelgestelde vragen.</p>
         <a href="{{ route('helpcentrum') }}" class="btn btn-secondary" style="margin-right:8px;">Helpcentrum</a>
         <a href="{{ route('faq') }}" class="btn btn-ghost">FAQ</a>

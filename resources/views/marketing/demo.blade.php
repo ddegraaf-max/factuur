@@ -12,7 +12,7 @@
   .demo-feats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
   @media (max-width: 860px) { .demo-feats { grid-template-columns: 1fr; } }
   .demo-feat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-  .demo-feat h4 { font-size: 15px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .demo-feat h2 { font-size: 15px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
   .demo-feat p { color: var(--text-2); font-size: 13.5px; margin: 0; line-height: 1.6; }
   .demo-feat svg { width: 18px; height: 18px; color: var(--brand); flex: none; }
   .demo-tag { display: inline-block; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #fff; background: var(--brand); border-radius: 100px; padding: 2px 7px; margin-left: 6px; vertical-align: 1px; }
@@ -54,45 +54,45 @@
 
     <div class="demo-feats">
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/></svg>
           Facturen
-        </h4>
+        </h2>
         <p>Twaalf facturen in alle statussen: concept, openstaand, deels betaald, vervallen, betaald — plus een creditnota. Maak er zelf een bij en bekijk de PDF.</p>
       </div>
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           Terugkerend<span class="demo-tag">Nieuw</span>
-        </h4>
+        </h2>
         <p>Twee lopende abonnementsprofielen die automatisch factureren. Zie precies wanneer de volgende factuur eruit gaat.</p>
       </div>
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export &amp; UBL<span class="demo-tag">Nieuw</span>
-        </h4>
+        </h2>
         <p>Download de boekhoudexport met BTW per tarief, of haal een factuur op als UBL 2.1 e-factuur (NLCIUS).</p>
       </div>
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
           Incasso
-        </h4>
+        </h2>
         <p>Een lopend incassodossier met het volledige verloop: herinnering, aanmaning en overdracht aan de deurwaarder.</p>
       </div>
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="3" y1="20" x2="21" y2="20"/></svg>
           Dashboard &amp; rapporten
-        </h4>
+        </h2>
         <p>Openstaand bedrag, omzet per maand en je beste klanten — gevuld met een half jaar aan voorbeeldhistorie.</p>
       </div>
       <div class="demo-feat">
-        <h4>
+        <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
           Huisstijl &amp; instellingen
-        </h4>
+        </h2>
         <p>Verander de accentkleur of het factuursjabloon en zie het meteen terug in de PDF. Alles mag — het is jouw sandbox.</p>
       </div>
     </div>

@@ -11,7 +11,7 @@
   .tl-item:last-child { padding-bottom: 0; }
   .tl-dot { position: absolute; left: -28px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--brand); border: 3px solid var(--bg); }
   .tl-meta { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--text-3); flex-wrap: wrap; }
-  .tl-item h3 { font-size: 20px; margin: 8px 0 10px; }
+  .tl-item h2 { font-size: 20px; margin: 8px 0 10px; }
   .tl-list { margin: 0; padding-left: 18px; color: var(--text-2); line-height: 1.7; }
   .tl-list li { margin-bottom: 6px; }
 </style>
@@ -32,7 +32,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.37.0</div>
-        <h3>Bevestiging naar de klant na akkoord op een offerte</h3>
+        <h2>Bevestiging naar de klant na akkoord op een offerte</h2>
         <ul class="tl-list">
           <li><b>"Bedankt voor uw akkoord"</b> — ondertekent je klant een offerte in het portaal, dan krijgt hij direct een bevestiging in jouw huisstijl: datum en naam van de ondertekenaar, het totaal, het termijnplan als dat er is, een "hoe nu verder"-tekst en de ondertekende offerte als PDF. Zo hebben jullie allebei hetzelfde document.</li>
           <li><b>Ook bij een akkoord per telefoon</b> — markeer je een offerte zelf als geaccepteerd, dan kies je met één vinkje of de bevestiging meegaat. Op de offertepagina zie je wanneer die is gemaild en kun je hem opnieuw sturen.</li>
@@ -44,7 +44,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 26 augustus 2026 · Easy 1.36.0</div>
-        <h3>Btw-aangifte: aangifte-klaar, met betalingskenmerk</h3>
+        <h2>Btw-aangifte: aangifte-klaar, met betalingskenmerk</h2>
         <ul class="tl-list">
           <li><b>Alle rubrieken klaar</b> — per tijdvak (kwartaal, maand of jaar) staan 1a t/m 5c precies in de indeling van Mijn Belastingdienst Zakelijk, in hele euro's en afgerond in je voordeel. Klik op een bedrag om het te kopiëren; onder "Onderbouwing" zie je welke facturen in welke rubriek zitten. Export en EU-leveringen (3a/3b) worden op klantland herkend.</li>
           <li><b>Vul aan wat Easy niet weet</b> — verlegde btw, inkoop uit het buitenland, privégebruik en niet-ingeboekte voorbelasting vul je per tijdvak zelf in; het wordt bewaard en meegeteld.</li>
@@ -58,7 +58,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.35.0</div>
-        <h3>Bedankmail na betaling — met reviewlink</h3>
+        <h2>Bedankmail na betaling — met reviewlink</h2>
         <ul class="tl-list">
           <li><b>Automatisch bedanken</b> — zodra een factuur volledig is betaald, krijgt je klant een vriendelijke bedankmail in jouw huisstijl: een overzicht van de betaling, een knop naar het klantenportaal en de factuur met het stempel BETAALD als PDF (een betaalbewijs voor zijn administratie). Werkt bij de bankkoppeling en bij iDEAL-betalingen; boek je een betaling handmatig, dan kies je het per betaling met één vinkje.</li>
           <li><b>Vraag om een review</b> — vul je Google- of Trustpilot-link in bij Instellingen → E-mailteksten en de bedankmail krijgt een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen.</li>
@@ -69,7 +69,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 25 augustus 2026 · Easy 1.34.0</div>
-        <h3>Prijzen incl. of excl. btw intypen — en negatieve regels</h3>
+        <h2>Prijzen incl. of excl. btw intypen — en negatieve regels</h2>
         <ul class="tl-list">
           <li><b>Schakelaar op het formulier</b> — kies bij het maken van een factuur of offerte direct of je prijzen inclusief of exclusief btw intypt. Al ingevulde regels rekenen automatisch mee om; de btw wordt voor je teruggerekend. De standaard stel je nog steeds in bij Instellingen → Bedrijfsgegevens.</li>
           <li><b>Negatieve regels</b> — een korting of verrekende aanbetaling als losse regel met een negatief bedrag kan nu gewoon, op facturen én offertes. Alleen het totaal mag niet onder nul: daarvoor is er de creditnota.</li>
@@ -79,7 +79,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 22 augustus 2026 · Easy 1.33.0</div>
-        <h3>Gratis tools en een kennisbank — ook zonder account</h3>
+        <h2>Gratis tools en een kennisbank — ook zonder account</h2>
         <ul class="tl-list">
           <li><b>Gratis factuur maken</b> — op <a href="{{ route('gratis-factuur') }}">easyinvoice.nl/gratis-factuur-maken</a> maakt iedereen zonder account een professionele factuur-PDF, met correcte btw, btw verlegd of KOR-vrijstelling. Zonder watermerk, en er wordt niets opgeslagen.</li>
           <li><b>Btw- en uurtarief-calculator</b> — reken snel btw om (incl. ↔ excl.) of bepaal welk uurtarief je als zzp'er moet vragen.</li>
@@ -91,7 +91,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.32.0</div>
-        <h3>Statusstempels op je factuur-PDF</h3>
+        <h2>Statusstempels op je factuur-PDF</h2>
         <ul class="tl-list">
           <li><b>In één oogopslag duidelijk</b> — factuur-PDF's dragen nu een subtiel schuin stempel bij hun status: CONCEPT, BETAALD, VERVALLEN of GECREDITEERD. Een gewone openstaande factuur blijft schoon.</li>
           <li><b>Herinneringen en aanmaningen</b> — de PDF-bijlage bij een betalingsherinnering of aanmaning draagt automatisch het stempel HERINNERING of AANMANING, zodat de ontvanger direct de urgentie ziet.</li>
@@ -101,7 +101,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.31.0</div>
-        <h3>Jouw huisstijl, jouw briefpapier</h3>
+        <h2>Jouw huisstijl, jouw briefpapier</h2>
         <ul class="tl-list">
           <li><b>Huisstijl herkennen met AI</b> — upload je huisstijlgids, briefpapier of een oude factuur en de merkkleur, accentkleur, het lettertype en het best passende sjabloon worden automatisch voor je ingesteld. Jij bekijkt het live voorbeeld en bevestigt.</li>
           <li><b>Eigen briefpapier</b> — heb je een volledig ontworpen huisstijl (bijv. door AI gemaakt)? Upload hem als vierde sjabloon "Briefpapier": jouw ontwerp is de ondergrond en EasyInvoice zet er alleen de factuurinhoud op, met instelbare marges. Werkt overal — factuurmail, herinneringen, portaal en incasso.</li>
@@ -111,7 +111,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 21 augustus 2026 · Easy 1.30.0</div>
-        <h3>Dubbelcontrole op inkoopfacturen</h3>
+        <h2>Dubbelcontrole op inkoopfacturen</h2>
         <ul class="tl-list">
           <li><b>Nooit meer per ongeluk dubbel boeken</b> — bij het scannen van een bon of factuur controleert EasyInvoice automatisch of hij al in je administratie staat (op factuurnummer, of op leverancier + bedrag). Je krijgt dan een duidelijke waarschuwing op het formulier én op het kaartje in het Postvak IN.</li>
           <li><b>"Direct inboeken" beschermt je</b> — een vermoedelijke dubbel boek je niet met één klik in; via "Controleer eerst" kan het bewust alsnog.</li>
@@ -121,7 +121,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.28.0</div>
-        <h3>Bijlagen bij offertes — ook rechtstreeks vanuit Claude</h3>
+        <h2>Bijlagen bij offertes — ook rechtstreeks vanuit Claude</h2>
         <ul class="tl-list">
           <li><b>Bijlagen bij je offerte</b> — voeg een specificatie, plan van aanpak of tekening toe aan een offerte. Bijlagen voor de klant gaan automatisch mee met de offertemail; interne bijlagen blijven privé.</li>
           <li><b>Claude stuurt het document mee</b> — schreef je met Claude een uitgebreid offertedocument? Claude stuurt de tekst mee bij het aanmaken en EasyInvoice maakt er een verzorgde PDF-bijlage van, in jouw administratie, klaar om mee te sturen. Een echt bestand (PDF of afbeelding) meegeven kan ook.</li>
@@ -132,7 +132,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.27.0</div>
-        <h3>Claude-koppeling — "zet deze offerte in EasyInvoice"</h3>
+        <h2>Claude-koppeling — "zet deze offerte in EasyInvoice"</h2>
         <ul class="tl-list">
           <li><b>Werk rechtstreeks vanuit je Claude-gesprek</b> — koppel EasyInvoice eenmalig aan Claude (claude.ai of de desktopapp) en zeg voortaan gewoon: "zet deze offerte als concept in EasyInvoice". Claude zoekt de klant op en maakt de concept-offerte of -factuur direct in je administratie aan.</li>
           <li><b>Jij houdt de controle</b> — alles wat Claude aanmaakt is een concept: versturen doe je altijd zelf in EasyInvoice. Claude kan ook je openstaande facturen opvragen ("wie moet mij nog betalen?").</li>
@@ -143,7 +143,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.26.0</div>
-        <h3>Inzicht in je AI-gebruik</h3>
+        <h2>Inzicht in je AI-gebruik</h2>
         <ul class="tl-list">
           <li><b>Verbruiksteller</b> — op de abonnementspagina zie je precies hoeveel AI-acties (bonscans en offerteherkenningen) je deze maand hebt gebruikt. De teller staat elke maand weer op nul.</li>
           <li><b>Ruime fair-use</b> — het Slim-abonnement bevat 250 AI-acties per maand: meer dan genoeg voor dagelijks gebruik, en een vangnet tegen uitschieters. Handmatig inboeken blijft altijd onbeperkt.</li>
@@ -153,7 +153,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.25.0</div>
-        <h3>Twee abonnementen: Basis en Slim</h3>
+        <h2>Twee abonnementen: Basis en Slim</h2>
         <ul class="tl-list">
           <li><b>Basis (€ 10/maand excl. btw)</b> — het volledige facturatiepakket: onbeperkt facturen, offertes, klanten, inkoop, uren, BTW-overzicht, incasso, e-facturatie en het klantenportaal.</li>
           <li><b>Slim (€ 17,50/maand excl. btw)</b> — alles uit Basis, plus de AI-assistent: Scan &amp; herken voor bonnen en inkoopfacturen, automatische boekingsvoorstellen in het Postvak IN en Offerte uit tekst.</li>
@@ -164,7 +164,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.24.0</div>
-        <h3>Offerte uit tekst — plak je conceptofferte, het formulier vult zich in</h3>
+        <h2>Offerte uit tekst — plak je conceptofferte, het formulier vult zich in</h2>
         <ul class="tl-list">
           <li><b>Schrijf je je offertes met Claude of ChatGPT?</b> Plak de tekst bovenaan het offerteformulier en klik op "Formulier invullen": de AI zet klant, offerteregels (met aantal, eenheid, prijs en btw), inleiding en voorwaarden op de juiste plek. Jij controleert en verstuurt.</li>
           <li><b>Slim meegedacht</b> — een herkende klantnaam wordt automatisch gekoppeld aan je bestaande klant, prijzen inclusief btw worden teruggerekend naar exclusief, en als de regels niet optellen tot het totaal in je tekst krijg je een waarschuwing.</li>
@@ -175,7 +175,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 20 augustus 2026 · Easy 1.23.0</div>
-        <h3>Verrekening op inkoopfacturen — "te betalen" klopt nu altijd</h3>
+        <h2>Verrekening op inkoopfacturen — "te betalen" klopt nu altijd</h2>
         <ul class="tl-list">
           <li><b>Al ontvangen bedragen verrekenen</b> — staat er op een inkoopfactuur een al ontvangen of ingehouden bedrag (bijv. door een deurwaarder ontvangen gelden, of een aanbetaling)? Zet het als verrekening op de factuur: je kosten en voorbelasting blijven volledig staan voor de BTW-aangifte, alleen het te betalen bedrag gaat omlaag.</li>
           <li><b>Scan &amp; herken leest verrekeningen mee</b> — vermeldt het document "reeds ontvangen" of "door u te voldoen", dan vult de AI-herkenning de verrekening automatisch in en controleert of het te betalen bedrag klopt met het document.</li>
@@ -186,7 +186,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.22.0</div>
-        <h3>Vijf nieuwe functies: van termijnfacturen tot een slimmer postvak</h3>
+        <h2>Vijf nieuwe functies: van termijnfacturen tot een slimmer postvak</h2>
         <ul class="tl-list">
           <li><b>Postvak IN verwerkt zichzelf</b> — aangeleverde bonnen en facturen worden nu automatisch herkend. Op elk kaartje staat een kant-en-klaar boekingsvoorstel (leverancier, datum, bedrag, categorie): met <b>Direct inboeken</b> bevestig je met één klik, met <b>Controleer eerst</b> open je het vooringevulde formulier. Forward je bon en je bent klaar.</li>
           <li><b>Termijnfacturen</b> — grote projecten in delen factureren: stel op een offerte een termijnplan op (bijv. 30% bij opdracht, 70% bij oplevering) en maak per termijn met één klik de factuur. De laatste termijn is automatisch het restant, zodat de som exact op de offertesom uitkomt.</li>
@@ -199,7 +199,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.21.0</div>
-        <h3>QR-code betalen, cashflow-prognose &amp; eigen e-mailteksten</h3>
+        <h2>QR-code betalen, cashflow-prognose &amp; eigen e-mailteksten</h2>
         <ul class="tl-list">
           <li><b>Scan &amp; betaal op de factuur-PDF</b> — heb je Mollie gekoppeld, dan staat er voortaan automatisch een QR-code naast de betaalinstructie op de factuur. Je klant scant met de telefoon en betaalt direct via iDEAL — ook als de factuur geprint op de deurmat ligt.</li>
           <li><b>Cashflow-prognose</b> — nieuw rapport dat laat zien wat er de komende maanden naar verwachting binnenkomt en uitgaat: openstaande facturen op vervaldatum, terugkerende facturen, openstaande inkoop en je vaste lasten. Inclusief wat er nú al vervallen (opeisbaar) is.</li>
@@ -210,7 +210,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.20.0</div>
-        <h3>Inkoopfacturen per e-mail aanleveren (Postvak IN)</h3>
+        <h2>Inkoopfacturen per e-mail aanleveren (Postvak IN)</h2>
         <ul class="tl-list">
           <li><b>Je eigen inboek-adres</b> — elke administratie krijgt een uniek e-mailadres. Stuur (of forward) bonnen en facturen met een PDF of foto als bijlage en ze verschijnen automatisch in het nieuwe Postvak IN onder Inkoop. Je kunt het adres ook direct aan leveranciers geven.</li>
           <li><b>Inboeken in twee klikken</b> — vanuit het postvak open je het inkoopformulier met het bestand er groot naast, inclusief <b>Scan &amp; herken</b>: de AI vult leverancier, datum en bedragen alvast in. Bij het opslaan wordt het bestand automatisch als bijlage gekoppeld.</li>
@@ -221,7 +221,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.19.0</div>
-        <h3>Vaste lasten — terugkerende inkoop automatisch inboeken</h3>
+        <h2>Vaste lasten — terugkerende inkoop automatisch inboeken</h2>
         <ul class="tl-list">
           <li><b>Eén keer instellen, nooit meer vergeten</b> — huur, software-abonnementen, verzekeringen: zet ze klaar als vaste last (wekelijks t/m jaarlijks) en Easy boekt ze voortaan automatisch in als inkoopfactuur. De BTW telt vanzelf mee als voorbelasting in je aangifte.</li>
           <li><b>Incasso? Direct op betaald</b> — vaste lasten via automatische incasso worden meteen als betaald ingeboekt, met de juiste betaalwijze. Pauzeren, een einddatum of aanpassen kan altijd.</li>
@@ -232,7 +232,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.18.0</div>
-        <h3>Jaaroverzicht — omzet, kosten en resultaat in één rapport</h3>
+        <h2>Jaaroverzicht — omzet, kosten en resultaat in één rapport</h2>
         <ul class="tl-list">
           <li><b>Je hele jaar in één oogopslag</b> — omzet (excl. btw, creditnota's verrekend), kosten per categorie, de kilometeraftrek (€ 0,23/km) en het resultaat, per kwartaal én vergeleken met vorig jaar.</li>
           <li><b>PDF voor je boekhouder</b> — download het complete overzicht en stuur het mee: alles uit je facturatie in één document, inclusief kilometeradministratie.</li>
@@ -243,7 +243,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.17.0</div>
-        <h3>Strippenkaarten &amp; tegoeden</h3>
+        <h2>Strippenkaarten &amp; tegoeden</h2>
         <ul class="tl-list">
           <li><b>Urenbundels vooraf verkopen</b> — maak op de urenpagina een strippenkaart aan (bijv. 10 uur voor € 850), factureer 'm met één klik, en het tegoed staat klaar.</li>
           <li><b>Automatisch aftellen</b> — geschreven uren (ook timeruren) worden automatisch van het tegoed afgeschreven. Je ziet per kaart een balkje met wat er is gebruikt en wat er nog over is, en gedekte uren komen nooit dubbel op een factuur.</li>
@@ -254,7 +254,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.16.0</div>
-        <h3>Offertes digitaal ondertekenen</h3>
+        <h2>Offertes digitaal ondertekenen</h2>
         <ul class="tl-list">
           <li><b>Akkoord in twee minuten</b> — in de offertemail staat "Bekijk en onderteken online". Je klant opent de offerte in het beveiligde portaal, zet zijn handtekening in het tekenveld (met muis of vinger) en klaar — geen geprint papier, geen scanner.</li>
           <li><b>Rechtsgeldig bewijsdossier</b> — bij de handtekening worden het geverifieerde e-mailadres, de naam, het tijdstip en het IP-adres vastgelegd. De handtekening komt óók op de offerte-PDF te staan.</li>
@@ -265,7 +265,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.15.0</div>
-        <h3>Betaallink op de factuur — betaald worden met iDEAL</h3>
+        <h2>Betaallink op de factuur — betaald worden met iDEAL</h2>
         <ul class="tl-list">
           <li><b>Klanten betalen in twee klikken</b> — in de factuurmail staat "Bekijk en betaal online", en in het klantenportaal betaalt je klant het openstaande bedrag direct met iDEAL. De betaling wordt automatisch op de factuur geboekt en de status springt op betaald.</li>
           <li><b>Jouw eigen Mollie-account</b> — koppel je Mollie API-key bij Instellingen → Bedrijfsgegevens. Het geld gaat rechtstreeks naar jouw rekening; EasyInvoice zit er niet tussen en rekent er niets voor.</li>
@@ -276,7 +276,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.14.0</div>
-        <h3>Meerdere administraties onder één inlog</h3>
+        <h2>Meerdere administraties onder één inlog</h2>
         <ul class="tl-list">
           <li><b>Meerdere bedrijven, één account</b> — start extra administraties (elk met eigen KvK, klanten, facturen, huisstijl én eigen nummering) en wissel moeiteloos via het menu linksonder. Elke administratie heeft een eigen abonnement en start met een eigen gratis proefperiode.</li>
           <li><b>Strikt gescheiden</b> — administraties zien elkaars gegevens nooit; je rol kan per administratie verschillen (beheerder in de één, boekhouder in de ander).</li>
@@ -287,7 +287,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.13.0</div>
-        <h3>Facturen en offertes in het Engels</h3>
+        <h2>Facturen en offertes in het Engels</h2>
         <ul class="tl-list">
           <li><b>Taal per klant</b> — zet op de klantkaart de taal op Engels en alles wat die klant ontvangt is Engelstalig: de factuur- en offerte-PDF (alle sjablonen), de begeleidende e-mails én de datums ("19 August 2026").</li>
           <li><b>Slim vastgelegd</b> — de taal wordt per document vastgelegd bij het aanmaken. Verander je de klantinstelling later, dan blijven eerder verstuurde facturen exact zoals de klant ze kreeg. Ook creditnota's, herinnering-bijlagen en het incassodossier volgen de documenttaal.</li>
@@ -298,7 +298,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.12.0</div>
-        <h3>Handelsnamen nu ook op offertes</h3>
+        <h2>Handelsnamen nu ook op offertes</h2>
         <ul class="tl-list">
           <li><b>Offerte als …</b> — kies bij het maken van een offerte onder welke handelsnaam die de deur uitgaat. De offerte-PDF, de voorvertoning en de offertemail (inclusief afzendernaam) volgen automatisch die huisstijl.</li>
           <li><b>Van offerte tot factuur in dezelfde huisstijl</b> — zet je een geaccepteerde offerte om naar een factuur, dan erft die automatisch de handelsnaam. Je klant ziet van offerte tot betaling één consistent merk.</li>
@@ -308,7 +308,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.11.0</div>
-        <h3>Kilometerregistratie — ritten bijhouden en doorbelasten</h3>
+        <h2>Kilometerregistratie — ritten bijhouden en doorbelasten</h2>
         <ul class="tl-list">
           <li><b>Ritten registreren</b> — datum, van–naar, afstand en het doel van de rit. Vink "retour" aan en de terugreis telt automatisch mee. Het nieuwe menu-item Ritten staat naast Uren.</li>
           <li><b>Doorbelasten met één klik</b> — alle openstaande ritten van een klant worden gebundeld op één conceptfactuur, als nette reiskostenregels met datum en afstand ("Reiskosten: Bussum – Amsterdam (retour), 62 km").</li>
@@ -320,7 +320,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.10.0</div>
-        <h3>Meerdere handelsnamen — factureer onder verschillende merken</h3>
+        <h2>Meerdere handelsnamen — factureer onder verschillende merken</h2>
         <ul class="tl-list">
           <li><b>Eigen huisstijl per handelsnaam</b> — voeg bij Instellingen → Handelsnamen je handelsnamen toe, elk met een eigen logo, factuurkleur, sjabloon en voetnoot. Bij het maken van een factuur kies je simpelweg "Factureren als …".</li>
           <li><b>Overal consequent</b> — de PDF, de factuurmail (inclusief afzendernaam), de betalingsherinneringen en het klantenportaal volgen automatisch de huisstijl van de gekozen handelsnaam. Ook terugkerende facturen onthouden 'm.</li>
@@ -331,7 +331,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.9.0</div>
-        <h3>Urenregistratie — uren schrijven en met één klik factureren</h3>
+        <h2>Urenregistratie — uren schrijven en met één klik factureren</h2>
         <ul class="tl-list">
           <li><b>Uren schrijven per klant of project</b> — snel invoeren met datum, omschrijving en duur (typ "1:30" of "1,5"), of start de ingebouwde <b>timer</b> en ga aan het werk.</li>
           <li><b>Met één klik factureren</b> — alle openstaande uren van een klant worden gebundeld op één conceptfactuur, met per regel de omschrijving, datum en het aantal uur. Controleren, versturen, klaar.</li>
@@ -343,7 +343,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.8.0</div>
-        <h3>Bonnetjes automatisch herkennen (scan &amp; herken)</h3>
+        <h2>Bonnetjes automatisch herkennen (scan &amp; herken)</h2>
         <ul class="tl-list">
           <li><b>Foto maken, klaar</b> — maak bij het inboeken van een inkoopfactuur een foto van de bon (of upload een PDF) en klik op <b>Scan &amp; herken</b>. De AI leest leverancier, factuurnummer, datum en de bedragen per BTW-tarief en vult het formulier voor je in.</li>
           <li><b>Jij houdt de controle</b> — de bon staat groot naast het formulier, zodat je de ingevulde waarden in één oogopslag controleert. Klopt het totaal niet met de bon, dan krijg je automatisch een waarschuwing.</li>
@@ -354,7 +354,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.7.0</div>
-        <h3>Verzending via Peppol</h3>
+        <h2>Verzending via Peppol</h2>
         <ul class="tl-list">
           <li><b>Peppol-bereikbaarheid</b> — Easy controleert automatisch (via de officiële Peppol Directory) of je klant is aangesloten op het Peppol-netwerk. Is dat zo, dan zie je een ⚡-badge op de factuur.</li>
           <li><b>E-factuur rechtstreeks afleveren</b> — met één klik lever je de UBL-factuur (NLCIUS) af in het boekhoudpakket van je klant, via een gecertificeerd Peppol Access Point. Geen mailbox ertussen, geen overtypen bij de ontvanger.</li>
@@ -365,7 +365,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 19 augustus 2026 · Easy 1.6.1</div>
-        <h3>Sneller laden</h3>
+        <h2>Sneller laden</h2>
         <ul class="tl-list">
           <li>Serveroptimalisaties (PHP-opcache en voorgecachte configuratie/templates) en een fors kleinere paginapayload — het bedrijfslogo wordt niet langer bij elke pagina meegestuurd.</li>
         </ul>
@@ -374,7 +374,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.6.0</div>
-        <h3>Klanten toevoegen via het KvK-register</h3>
+        <h2>Klanten toevoegen via het KvK-register</h2>
         <ul class="tl-list">
           <li><b>Zoek in het Handelsregister</b> — typ bij een nieuwe klant een bedrijfsnaam of KvK-nummer en kies het juiste bedrijf uit de lijst.</li>
           <li><b>Automatisch ingevuld</b> — bedrijfsnaam, KvK-nummer, adres, postcode en plaats staan direct goed, rechtstreeks uit de officiële KvK API. Geen typfouten meer in je klantgegevens.</li>
@@ -385,7 +385,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.5.0</div>
-        <h3>Bank &amp; transacties — afschriften importeren en koppelen</h3>
+        <h2>Bank &amp; transacties — afschriften importeren en koppelen</h2>
         <ul class="tl-list">
           <li><b>Bankafschriften importeren</b> — sleep je CAMT.053- of MT940-bestand (te downloaden bij elke Nederlandse bank) in het nieuwe Bank-menu. Dubbele transacties worden automatisch overgeslagen.</li>
           <li><b>Slimme koppel-suggesties</b> — Easy herkent factuurnummer, bedrag en klantnaam in de omschrijving en stelt de juiste factuur voor. Eén klik en de betaling is geboekt.</li>
@@ -398,7 +398,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · Easy 1.4.0</div>
-        <h3>Slimmere factuurpagina, verrekeningen &amp; bijlagen voor de klant</h3>
+        <h2>Slimmere factuurpagina, verrekeningen &amp; bijlagen voor de klant</h2>
         <ul class="tl-list">
           <li><b>Verrekening "reeds doorgestort"</b> — al doorgestorte deelbetalingen komen op de factuur-PDF in mindering op het te betalen bedrag, mét vermelding — zonder effect op je totaal, omzet of BTW. Ook achteraf toe te voegen.</li>
           <li><b>Afboeken zonder BTW-effect</b> — wikkel een factuur af bij een betalingsverschil of kwijtschelding, zonder creditnota en zonder dat je aangifte verandert.</li>
@@ -411,7 +411,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 augustus 2026 · Easy 1.3.0</div>
-        <h3>Klantenportaal, complete BTW-aangifte, inkoopfacturen &amp; teamrollen</h3>
+        <h2>Klantenportaal, complete BTW-aangifte, inkoopfacturen &amp; teamrollen</h2>
         <ul class="tl-list">
           <li><b>Klantenportaal</b> — je klant bekijkt zijn facturen voortaan ook online, via een beveiligde link in de factuurmail (met eenmalige toegangscode per e-mail). Jij ziet in een inzagelog precies óf en wanneer je factuur is bekeken — inclusief een groen oogje in je facturenlijst.</li>
           <li><b>BTW-aangifte per kwartaal</b> — per kwartaal precies wat je invult bij de Belastingdienst: rubriek 1a, 1b en 1e, mét voorbelasting (5b) en het saldo dat je per kwartaal betaalt. Inclusief deadline-waarschuwing en PDF-download voor je administratie.</li>
@@ -424,7 +424,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.2.0</div>
-        <h3>Offertes — van voorstel naar factuur in één klik</h3>
+        <h2>Offertes — van voorstel naar factuur in één klik</h2>
         <ul class="tl-list">
           <li>Maak een offerte met dezelfde regels, producten en btw-berekening als een factuur.</li>
           <li>Versturen gaat per e-mail met een eigen offerte-PDF in je huisstijl, inclusief geldigheidsdatum.</li>
@@ -437,7 +437,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 augustus 2026 · Easy 1.1.0</div>
-        <h3>Terugkerende facturen, e-facturatie (UBL) &amp; export voor je boekhouder</h3>
+        <h2>Terugkerende facturen, e-facturatie (UBL) &amp; export voor je boekhouder</h2>
         <ul class="tl-list">
           <li><b>Terugkerende facturen</b> — zet elke factuur met één klik om in een terugkerend profiel. EasyInvoice factureert daarna automatisch per week, maand, kwartaal, half jaar of jaar: als concept om zelf te controleren, of direct verstuurd.</li>
           <li><b>UBL / e-facturatie</b> — elke verstuurde factuur bevat nu automatisch een UBL 2.1-bijlage (NLCIUS), die boekhoudpakketten direct kunnen inlezen. Ook los te downloaden op de factuurpagina.</li>
@@ -448,7 +448,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 mei 2026 · Easy 1.0.0</div>
-        <h3>EASY-assistent: je slimme hulp</h3>
+        <h2>EASY-assistent: je slimme hulp</h2>
         <ul class="tl-list">
           <li>Stel vragen over je administratie en krijg direct antwoord.</li>
           <li>Suggesties terwijl je een factuur opstelt.</li>
@@ -459,7 +459,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 2 april 2026 · Easy 0.9</div>
-        <h3>Incassotraject in fases</h3>
+        <h2>Incassotraject in fases</h2>
         <ul class="tl-list">
           <li>Gefaseerd traject: herinnering → aanmaning → incasso.</li>
           <li>Per fase de status en datum bijhouden.</li>
@@ -470,7 +470,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 maart 2026 · Easy 0.8</div>
-        <h3>Creditfacturen &amp; deelbetalingen</h3>
+        <h2>Creditfacturen &amp; deelbetalingen</h2>
         <ul class="tl-list">
           <li>Maak in één klik een creditnota op een bestaande factuur.</li>
           <li>Registreer deelbetalingen met automatische statusupdate.</li>
@@ -480,7 +480,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 5 februari 2026 · Easy 0.7</div>
-        <h3>Nieuwe factuursjablonen</h3>
+        <h2>Nieuwe factuursjablonen</h2>
         <ul class="tl-list">
           <li>Modern sjabloon met meer ruimte voor je huisstijl.</li>
           <li>Eigen accentkleur instelbaar.</li>

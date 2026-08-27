@@ -23,7 +23,7 @@
     <title inertia>{{ $seo['title'] ?? config('app.name', 'EasyInvoice') }}</title>
     @if($seo)
         <meta name="description" content="{{ $seo['description'] }}">
-        <link rel="canonical" href="{{ url()->current() }}">
+        <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="EasyInvoice">
         <meta property="og:locale" content="nl_NL">

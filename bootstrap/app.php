@@ -8,6 +8,7 @@ use App\Http\Middleware\EnsureSubscriptionActive;
 use App\Http\Middleware\TrackPageView;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RedirectToCanonicalHost;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // www ↔ zonder-www: één canonieke host (SEO), vóór alle andere middleware.
+        $middleware->web(prepend: [RedirectToCanonicalHost::class]);
+
         $middleware->web(append: [
             // Vóór Inertia: zet de demo-omgeving in veilige modus (geen echte
             // e-mail, geen betaalroutes) voordat er iets wordt afgehandeld.
