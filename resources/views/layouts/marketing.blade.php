@@ -555,6 +555,9 @@
           <li><a href="{{ route('btw-calculator') }}">Btw-calculator</a></li>
           <li><a href="{{ route('uurtarief-calculator') }}">Uurtarief-calculator</a></li>
           <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
+          <li><a href="{{ route('overstappen.van', 'wefact') }}">Overstappen van WeFact</a></li>
+          <li><a href="{{ route('overstappen.van', 'moneybird') }}">Overstappen van Moneybird</a></li>
+          <li><a href="{{ route('overstappen.van', 'e-boekhouden') }}">Overstappen van e-Boekhouden</a></li>
         </ul>
       </div>
 
