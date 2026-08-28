@@ -35,6 +35,18 @@ class HealthController extends Controller
             'age_minutes' => $age,
         ];
 
+        // Back-up: alleen beoordelen als hij is ingericht; dan mag de laatste
+        // geslaagde run niet ouder zijn dan 36 uur (dagelijks om 03:30).
+        if (app(\App\Services\BackupService::class)->configured()) {
+            $last = (int) Cache::get(\App\Services\BackupService::LAST_OK_KEY, 0);
+            $hours = $last ? round((now()->timestamp - $last) / 3600, 1) : null;
+            $checks['backup'] = [
+                'ok' => $last > 0 && $hours <= 36,
+                'last_ok' => $last ? date('c', $last) : null,
+                'age_hours' => $hours,
+            ];
+        }
+
         $ok = collect($checks)->every(fn ($c) => $c['ok']);
 
         return response()->json([

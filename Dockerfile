@@ -36,8 +36,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     git \
     unzip \
+    gnupg \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
+    # pg_dump voor de dagelijkse back-up (backup:run). PGDG-versie 17 dumpt
+    # elke oudere Postgres-server; de Debian-eigen client 15 zou weigeren
+    # bij een nieuwere server ("server version mismatch").
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/pgdg.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update && apt-get install -y --no-install-recommends postgresql-client-17 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ----- Composer -----

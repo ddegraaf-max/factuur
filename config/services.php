@@ -43,6 +43,19 @@ return [
         // Geheim waarmee Recommand webhooks ondertekent (X-Signature).
         'recommand_webhook_secret' => env('RECOMMAND_WEBHOOK_SECRET'),
     ],
+    // Dagelijkse database-back-up (backup:run) naar S3-compatibele opslag
+    // (Cloudflare R2, Backblaze B2, Hetzner, Scaleway …). Zonder bucket blijft
+    // de taak uit en meldt /health geen back-upstatus.
+    'backup' => [
+        'endpoint' => env('BACKUP_S3_ENDPOINT'),          // bijv. https://<account>.r2.cloudflarestorage.com
+        'region' => env('BACKUP_S3_REGION', 'auto'),
+        'bucket' => env('BACKUP_S3_BUCKET'),
+        'key' => env('BACKUP_S3_KEY'),
+        'secret' => env('BACKUP_S3_SECRET'),
+        'prefix' => env('BACKUP_S3_PREFIX', 'easyinvoice'),
+        'keep_days' => (int) env('BACKUP_KEEP_DAYS', 30),
+        'dump_command' => env('BACKUP_DUMP_COMMAND'),     // alleen voor tests/afwijkende omgevingen
+    ],
     // Inkoopfacturen per e-mail aanleveren: een inbound-maildomein (bijv.
     // Postmark inbound) POST binnenkomende mail naar onze webhook. Zonder
     // beide variabelen blijft het Postvak IN in de "nog activeren"-stand.

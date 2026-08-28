@@ -584,6 +584,7 @@
       <div class="footer-bottom-links">
         <a href="{{ route('voorwaarden') }}">Algemene voorwaarden</a>
         <a href="{{ route('privacy') }}">Privacybeleid</a>
+        <a href="{{ route('verwerkersovereenkomst') }}">Verwerkersovereenkomst</a>
         <a href="{{ route('cookies') }}">Cookies</a>
       </div>
     </div>

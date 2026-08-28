@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.40.0</div>
+        <h2>Logboek, jouw gegevens en bewaking</h2>
+        <ul class="tl-list">
+          <li><b>Logboek</b> — bij Instellingen → Logboek zie je voortaan wie wat deed en wanneer: elke wijziging aan facturen, offertes, klanten, producten, betalingen en instellingen, elke verzending en herinnering, en elke aanmelding. Met filters en CSV-export voor je accountant of bij een geschil.</li>
+          <li><b>Jouw gegevens, jouw keuze (AVG)</b> — bij Instellingen → Bedrijfsgegevens exporteer je met één klik je complete administratie als ZIP (CSV + JSON), en kun je als eigenaar de administratie definitief verwijderen. De nieuwe <a href="{{ route('verwerkersovereenkomst') }}">verwerkersovereenkomst</a> legt vast wat wij met de gegevens van jouw klanten mogen doen — en wat niet.</li>
+          <li><b>Achter de schermen</b> — dagelijkse back-ups naar een aparte locatie, automatische foutmeldingen naar ons team en een doorlopende gezondheidscheck van het platform. Je merkt er niets van, en dat is precies de bedoeling.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 28 augustus 2026 · Easy 1.39.1</div>
         <h2>Geplande taken en klantenportaal</h2>
         <ul class="tl-list">

@@ -139,6 +139,7 @@ Route::get('/sitemap.xml', function () {
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
 Route::view('/privacy', 'marketing.privacy')->name('privacy');
 Route::view('/cookies', 'marketing.cookies')->name('cookies');
+Route::view('/verwerkersovereenkomst', 'marketing.verwerkersovereenkomst')->name('verwerkersovereenkomst');
 
 // Merkbewaking: "Zocht u een ander EasyInvoice?" — spontaan bewijs van verwarring, door derden zelf vastgelegd.
 Route::get('/zocht-u-een-ander-easyinvoice', fn () => view('marketing.verwarring'))->name('confusion');
@@ -514,6 +515,11 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
         Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+        // AVG-zelfbediening: volledige export (ZIP) en definitief verwijderen van de eigen administratie.
+        Route::get('settings/gegevens/export', [\App\Http\Controllers\AccountDataController::class, 'export'])
+            ->middleware('throttle:5,10')->name('settings.data.export');
+        Route::delete('settings/administratie', [\App\Http\Controllers\AccountDataController::class, 'destroy'])
+            ->middleware('role:owner')->name('settings.company.destroy');
 
         Route::get('settings/brand', [SettingsController::class, 'brand'])->name('settings.brand');
         Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');

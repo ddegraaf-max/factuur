@@ -62,3 +62,9 @@ Schedule::command('demo:cleanup')->hourly();
 Schedule::call(fn () => \Illuminate\Support\Facades\Cache::forever(\App\Http\Controllers\HealthController::HEARTBEAT_KEY, now()->timestamp))
     ->everyFiveMinutes()
     ->name('scheduler-heartbeat');
+
+// Elke nacht 03:30: database-back-up naar de externe opslag (zie config services.backup).
+Schedule::command('backup:run')
+    ->dailyAt('03:30')
+    ->timezone('Europe/Amsterdam')
+    ->withoutOverlapping();

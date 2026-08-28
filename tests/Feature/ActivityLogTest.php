@@ -23,7 +23,7 @@ class ActivityLogTest extends TestCase
         $companyId = $user->company_id;
 
         $customer = Customer::orderBy('id')->firstOrFail();
-        $this->patch(route('customers.update', $customer), array_merge($customer->only(['name', 'email', 'address_line', 'postal_code', 'city', 'country']), ['name' => 'Nieuwe Naam BV']))->assertRedirect();
+        $this->patch(route('customers.update', $customer), array_merge($customer->only(['name', 'type', 'email', 'address_line', 'postal_code', 'city', 'country', 'payment_terms', 'language']), ['name' => 'Nieuwe Naam BV']))->assertRedirect();
 
         $log = ActivityLog::withoutGlobalScope('company')->where('company_id', $companyId)->where('action', 'updated')->where('subject_type', 'klant')->latest('id')->first();
         $this->assertNotNull($log, 'klantwijziging niet gelogd');

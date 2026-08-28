@@ -53,7 +53,7 @@
     </ul>
 
     <h2>Delen met derden</h2>
-    <p>We verkopen je gegevens nooit. We delen ze alleen met verwerkers die nodig zijn om de dienst te leveren — zoals onze betaalprovider (Stripe) en onze hostingpartij binnen de Europese Unie. Met deze partijen zijn verwerkersovereenkomsten gesloten.</p>
+    <p>We verkopen je gegevens nooit. We delen ze alleen met verwerkers die nodig zijn om de dienst te leveren — zoals onze betaalprovider (Stripe) en onze hostingpartij binnen de Europese Unie. Met deze partijen zijn verwerkersovereenkomsten gesloten. Voor de gegevens van jóuw klanten en medewerkers zijn wij verwerker en jij verantwoordelijke; daarvoor geldt onze <a href="{{ route('verwerkersovereenkomst') }}">verwerkersovereenkomst</a>, inclusief de volledige lijst van subverwerkers.</p>
 
     <h2>Opslag en beveiliging</h2>
     <p>Je gegevens worden versleuteld opgeslagen op servers binnen de Europese Unie. We maken dagelijks back-ups, gebruiken TLS-versleuteling en bieden tweestapsverificatie (2FA) aan.</p>

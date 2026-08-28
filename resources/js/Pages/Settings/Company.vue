@@ -1,6 +1,15 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+// AVG: administratie definitief verwijderen — wachtwoord + bedrijfsnaam als dubbele bevestiging.
+const destroyCompany = () => {
+  const confirm = prompt(`Dit verwijdert de administratie "${props.company.name}" met alle facturen, offertes, klanten en gebruikers — definitief.\n\nTyp ter bevestiging de bedrijfsnaam:`);
+  if (confirm === null) return;
+  const password = prompt('Bevestig met je wachtwoord:');
+  if (password === null) return;
+  router.delete(route('settings.company.destroy'), { data: { confirm, password } });
+};
 
 const props = defineProps({
   company: Object,
@@ -264,11 +273,41 @@ const submit = () => form.patch(route('settings.company.update'));
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Jouw gegevens</div>
+            <div class="card-subtitle">Alles wat in deze administratie staat is van jou — exporteer het wanneer je wilt, of verwijder de administratie definitief (AVG)</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="data-row">
+            <div>
+              <div class="toggle-title">Volledige export</div>
+              <div class="toggle-sub">ZIP met klanten, producten, facturen (incl. regels en betalingen), offertes, inkoopfacturen, uren en ritten als CSV én JSON. Handig voor je eigen archief of een overstap.</div>
+            </div>
+            <a :href="route('settings.data.export')" class="btn btn-secondary btn-sm">Exporteer ZIP</a>
+          </div>
+          <div class="data-row" v-if="$page.props.auth.can?.settings">
+            <div>
+              <div class="toggle-title">Administratie verwijderen</div>
+              <div class="toggle-sub">Wist alle gegevens van deze administratie direct en definitief, inclusief de gebruikersaccounts van je team. Denk aan de fiscale bewaarplicht van 7 jaar: exporteer eerst.</div>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm btn-danger-ghost" @click="destroyCompany">Definitief verwijderen</button>
+          </div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
 
 <style scoped>
+.data-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); }
+.data-row:first-child { border-top: none; padding-top: 0; }
+.data-row .toggle-sub { max-width: 620px; }
+.btn-danger-ghost { color: #B91C1C; border-color: #FECACA; flex: none; }
+.btn-danger-ghost:hover { background: #FEF2F2; }
 .mollie-status {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   padding: 10px 14px; border: 1px solid var(--success-border); border-radius: var(--r-sm); background: var(--success-bg);
