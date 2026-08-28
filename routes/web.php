@@ -471,6 +471,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::middleware('role:owner,accountant')->group(function () {
         Route::get('export', [ExportController::class, 'index'])->name('export.index');
         Route::get('export/download', [ExportController::class, 'download'])->name('export.download');
+        Route::get('export/auditfile', [ExportController::class, 'xaf'])->middleware('throttle:10,1')->name('export.xaf');
     });
 
     // Credit notes

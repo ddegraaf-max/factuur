@@ -28,6 +28,23 @@ class ExportController extends Controller
         ]);
     }
 
+    /** Auditfile Financieel (XAF 3.2) van één boekjaar — voor accountant en Belastingdienst. */
+    public function xaf(Request $request, \App\Services\XafExporter $exporter)
+    {
+        $data = $request->validate(['year' => ['required', 'integer', 'between:2000,2100']]);
+        $company = auth()->user()->company;
+        $xml = $exporter->generate($company, (int) $data['year']);
+
+        \App\Support\Audit::log('exported', null, "Auditfile XAF {$data['year']} gedownload");
+
+        $slug = preg_replace('/[^A-Za-z0-9]+/', '-', trim($company->name)) ?: 'administratie';
+
+        return response($xml, 200, [
+            'Content-Type' => 'application/xml; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"auditfile-{$slug}-{$data['year']}.xaf\"",
+        ]);
+    }
+
     public function download(Request $request): StreamedResponse
     {
         $data = $request->validate([

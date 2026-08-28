@@ -56,6 +56,11 @@ const downloadUrl = computed(() => route('export.download', {
 }));
 
 const canDownload = computed(() => from.value && to.value && from.value <= to.value);
+
+const thisYear = new Date().getFullYear();
+const xafYear = ref(thisYear);
+const xafYears = [thisYear, thisYear - 1, thisYear - 2, thisYear - 3];
+const xafUrl = computed(() => route('export.xaf', { year: xafYear.value }));
 </script>
 
 <template>
@@ -123,6 +128,17 @@ const canDownload = computed(() => from.value && to.value && from.value <= to.va
       </div>
 
       <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><div class="card-title">Auditfile (XAF 3.2) <span class="pill pill-sent" style="margin-left:6px;">Nieuw</span></div></div>
+          <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--text-2);">
+            <p style="margin:0 0 12px;">Het standaardbestand dat elke Nederlandse accountant en de Belastingdienst direct kunnen inlezen (Twinfield, Exact, e-Boekhouden, AFAS, Snelstart …). Bevat per boekjaar het verkoopboek, inkoopboek en bankboek met btw per tarief, klanten en leveranciers — sluitend in debet en credit.</p>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+              <select v-model="xafYear" style="max-width:140px;"><option v-for="y in xafYears" :key="y" :value="y">Boekjaar {{ y }}</option></select>
+              <a :href="xafUrl" class="btn btn-primary btn-sm">Download auditfile</a>
+            </div>
+          </div>
+        </div>
+
         <div class="card" style="margin-bottom:16px;">
           <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--text-2);">
             <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;">Wat zit er in de export?</div>
