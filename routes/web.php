@@ -57,6 +57,8 @@ Route::get('/helpcentrum/{slug}', function (string $slug) {
     ]);
 })->name('help.article');
 Route::get('/status', [StatusController::class, 'index'])->name('status');
+// Machineleesbare gezondheidscheck (database + planner-hartslag) voor externe bewaking.
+Route::get('/health', \App\Http\Controllers\HealthController::class)->middleware('throttle:60,1')->name('health');
 
 // ---------- GRATIS TOOLS ----------
 // Instapkanaal voor nieuwe klanten: zonder account een factuur maken of iets

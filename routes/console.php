@@ -56,3 +56,9 @@ Schedule::command('brand:evidence')
 
 // Elk uur: ruim verlopen demo-omgevingen op.
 Schedule::command('demo:cleanup')->hourly();
+
+// Hartslag van de planner: /health meldt 'degraded' zodra dit stempel ouder is
+// dan een kwartier — zo valt een stilgevallen schedule:work direct op.
+Schedule::call(fn () => \Illuminate\Support\Facades\Cache::forever(\App\Http\Controllers\HealthController::HEARTBEAT_KEY, now()->timestamp))
+    ->everyFiveMinutes()
+    ->name('scheduler-heartbeat');

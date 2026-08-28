@@ -70,6 +70,16 @@ async function waitForVersion(version) {
     await expectPage(p);
   }
 
+  console.log('Gezondheid');
+  try {
+    const res = await fetch(BASE + '/health');
+    const health = await res.json();
+    if (res.status === 200 && health.status === 'ok') ok(`/health (planner ${health.checks?.scheduler?.age_minutes ?? '?'} min geleden, ${health.version})`);
+    else fail('/health', `status ${res.status}: ${JSON.stringify(health.checks)}`);
+  } catch (e) {
+    fail('/health', e.message);
+  }
+
   console.log('Demo-sandbox');
   const demoHtml = await expectPage('/demo', 'GET /demo');
   const token = demoHtml ? demoHtml.match(/name="_token"\s+value="([^"]+)"/)?.[1] : null;

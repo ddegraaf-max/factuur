@@ -53,5 +53,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Foutbewaking: onverwachte fouten per mail naar de eigenaar (gedoseerd).
+        $exceptions->report(fn (\Throwable $e) => \App\Support\ErrorAlert::report($e));
     })->create();
