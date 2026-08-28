@@ -36,6 +36,18 @@ class SmokePagesTest extends TestCase
         }
     }
 
+    /** Elke URL uit de sitemap moet renderen — vangt verkeerde routenamen in marketingpagina's. */
+    public function test_every_sitemap_page_renders(): void
+    {
+        $xml = (string) $this->get('/sitemap.xml')->assertOk()->getContent();
+        preg_match_all('#<loc>([^<]+)</loc>#', $xml, $m);
+        $this->assertNotEmpty($m[1], 'Sitemap zonder URLs');
+
+        foreach ($m[1] as $url) {
+            $this->assertRenders((string) (parse_url($url, PHP_URL_PATH) ?: '/'), $url);
+        }
+    }
+
     public function test_all_app_pages_render_for_an_owner(): void
     {
         $user = $this->demoUser();

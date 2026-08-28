@@ -86,8 +86,7 @@ return [
         ],
     ],
     // Bankkoppeling via Ponto Connect (Ibanity). Certificaat en sleutels als PEM
-    // (letterlijk, met 
-, of base64). Zonder client-id/certificaat blijft de
+    // (letterlijk, met regelovergangen, of base64). Zonder client-id/certificaat blijft de
     // koppeling onzichtbaar. PONTO_SANDBOX=true gebruikt de Ponto-testomgeving.
     'ponto' => [
         'client_id' => env('PONTO_CLIENT_ID'),

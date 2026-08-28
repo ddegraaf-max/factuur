@@ -146,26 +146,11 @@ class BankStatementParser
         $current = null;
         $inDescription = false;
 
-        // Rondt de lopende transactie af en geeft hem terug (null als er geen is).
-        $flush = function () use (&$current): ?array {
-            if ($current === null) {
-                return null;
-            }
-            // Eerst tegenpartij uit de RUWE tekst halen (daar staan de
-            // /NAME/- en /IBAN/-markeringen nog in), daarna opschonen.
-            [$current['counterparty_name'], $current['counterparty_iban']] =
-                $this->extractCounterparty($current['description']);
-            $current['description'] = mb_substr($this->cleanMt940Description($current['description']), 0, 1000) ?: null;
-            $row = $current;
-            $current = null;
-
-            return $row;
-        };
-
         foreach ($lines as $line) {
             if (str_starts_with($line, ':61:')) {
-                if ($row = $flush()) {
-                    $rows[] = $row;
+                if ($current !== null) {
+                    $rows[] = $this->finishMt940Row($current);
+                    $current = null;
                 }
                 $inDescription = false;
 
@@ -200,15 +185,30 @@ class BankStatementParser
                 $current['description'] .= $line . ' ';
             }
         }
-        if ($row = $flush()) {
-            $rows[] = $row;
+        if ($current !== null) {
+            $rows[] = $this->finishMt940Row($current);
         }
 
-        if (empty($rows)) {
+        if ($rows === []) {
             throw new \DomainException('Geen transacties gevonden in dit MT940-bestand.');
         }
 
         return $rows;
+    }
+
+    /**
+     * Rondt een MT940-transactie af: eerst de tegenpartij uit de RUWE tekst halen
+     * (daar staan de /NAME/- en /IBAN/-markeringen nog in), daarna opschonen.
+     *
+     * @param  array<string, mixed>  $row
+     * @return array<string, mixed>
+     */
+    private function finishMt940Row(array $row): array
+    {
+        [$row['counterparty_name'], $row['counterparty_iban']] = $this->extractCounterparty($row['description']);
+        $row['description'] = mb_substr($this->cleanMt940Description($row['description']), 0, 1000) ?: null;
+
+        return $row;
     }
 
     /** Structured MT940-velden (/NAME/, /REMI/ enz.) omzetten naar leesbare tekst. */

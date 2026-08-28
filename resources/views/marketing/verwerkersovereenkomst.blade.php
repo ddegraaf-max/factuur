@@ -65,7 +65,7 @@
       <tr><td>Anthropic PBC</td><td>AI-functies: herkennen van bonnen en inkoopfacturen, offerte uit tekst — alleen als je die functies gebruikt; geen training op jouw gegevens</td><td>VS · EU-modelcontracten</td></tr>
       <tr><td>Cloudflare, Inc.</td><td>bescherming van formulieren tegen misbruik (Turnstile)</td><td>EU/VS</td></tr>
     </table>
-    <p>Wijzigen wij een subverwerker, dan kondigen wij dat minimaal 30 dagen vooraf aan op de pagina <a href="{{ route('wat-is-nieuw') }}">Wat is nieuw</a> en per e-mail aan de eigenaar van de administratie. Bezwaar? Dan kun je de overeenkomst kosteloos beëindigen en je gegevens exporteren.</p>
+    <p>Wijzigen wij een subverwerker, dan kondigen wij dat minimaal 30 dagen vooraf aan op de pagina <a href="{{ route('changelog') }}">Wat is nieuw</a> en per e-mail aan de eigenaar van de administratie. Bezwaar? Dan kun je de overeenkomst kosteloos beëindigen en je gegevens exporteren.</p>
 
     <h2>5. Beveiliging</h2>
     <ul>
