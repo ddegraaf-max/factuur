@@ -124,8 +124,8 @@ jobs:
             # Model ziet (bijv. ->get()->map(fn ($c) => $c->name)). Echte fouten op
             # getypeerde klassen (App\Models\…) blijven gewoon zichtbaar.
             ignoreErrors:
-              - '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\\:\\:\\$[A-Za-z0-9_]+\\.$#'
-              - '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\\:\\:[A-Za-z0-9_]+\\(\\)\\.$#'
+              - '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$[A-Za-z0-9_]+\.$#'
+              - '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:[A-Za-z0-9_]+\(\)\.$#'
               - '#^Access to an undefined property App\\Models\\AiUsageEvent\:\:\$c\.$#'   # COUNT(*) AS c uit selectRaw
           NEON
           vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit=1G --no-progress --error-format=table
