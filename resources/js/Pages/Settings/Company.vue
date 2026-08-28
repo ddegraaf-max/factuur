@@ -22,6 +22,7 @@ const form = useForm({
   kvk_number: props.company.kvk_number ?? '',
   vat_number: props.company.vat_number ?? '',
   iban: props.company.iban ?? '',
+  sepa_creditor_id: props.company.sepa_creditor_id ?? '',
   email: props.company.email ?? '',
   copy_email: props.company.copy_email ?? '',
   accountant_email: props.company.accountant_email ?? '',
@@ -89,9 +90,16 @@ const submit = () => form.patch(route('settings.company.update'));
               <input type="text" v-model="form.vat_number" maxlength="20">
             </div>
           </div>
-          <div class="form-group">
-            <label>IBAN<span class="label-hint">(verschijnt op facturen)</span></label>
-            <input type="text" v-model="form.iban" maxlength="34" class="mono">
+          <div class="form-row">
+            <div class="form-group">
+              <label>IBAN<span class="label-hint">(verschijnt op facturen)</span></label>
+              <input type="text" v-model="form.iban" maxlength="34" class="mono">
+            </div>
+            <div class="form-group">
+              <label>Incassant-ID<span class="label-hint">(voor automatische incasso, bijv. NL12ZZZ123456780000)</span></label>
+              <input type="text" v-model="form.sepa_creditor_id" maxlength="35" class="mono" placeholder="Vraag aan bij je bank">
+              <div v-if="form.errors.sepa_creditor_id" class="field-error">{{ form.errors.sepa_creditor_id }}</div>
+            </div>
           </div>
         </div>
       </div>

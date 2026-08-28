@@ -17,10 +17,13 @@ class Customer extends Model
         'kvk_number', 'vat_number', 'peppol_id',
         'address_line', 'postal_code', 'city', 'country', 'language',
         'payment_terms', 'hourly_rate', 'notes',
+        'mandate_reference', 'mandate_iban', 'mandate_holder', 'mandate_signed_on', 'mandate_type', 'mandate_status',
     ];
 
     protected $casts = [
         'payment_terms' => 'integer',
+        'mandate_signed_on' => 'date',
+        'mandate_first_collected_at' => 'datetime',
         'peppol_available' => 'boolean',
         'peppol_checked_at' => 'datetime',
     ];

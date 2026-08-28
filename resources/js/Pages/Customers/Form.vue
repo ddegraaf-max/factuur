@@ -81,6 +81,12 @@ const form = useForm({
   payment_terms: props.customer?.payment_terms ?? null,
   hourly_rate: props.customer?.hourly_rate ?? null,
   notes: props.customer?.notes ?? '',
+  mandate_iban: props.customer?.mandate_iban ?? '',
+  mandate_holder: props.customer?.mandate_holder ?? '',
+  mandate_signed_on: props.customer?.mandate_signed_on ?? '',
+  mandate_type: props.customer?.mandate_type ?? 'CORE',
+  mandate_status: props.customer?.mandate_status ?? 'active',
+  mandate_reference: props.customer?.mandate_reference ?? '',
 });
 
 const submit = () => {
@@ -295,12 +301,63 @@ const remove = () => {
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Automatische incasso (SEPA)</div>
+            <div class="card-subtitle">Heeft deze klant je een machtiging gegeven? Vul het IBAN in; open facturen kun je dan in één batch bij je bank indienen.</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>IBAN van de klant</label>
+              <input type="text" v-model="form.mandate_iban" maxlength="40" class="mono" placeholder="NL00 BANK 0123 4567 89">
+              <div v-if="form.errors.mandate_iban" class="field-error">{{ form.errors.mandate_iban }}</div>
+            </div>
+            <div class="form-group">
+              <label>Naam rekeninghouder<span class="label-hint">(leeg = klantnaam)</span></label>
+              <input type="text" v-model="form.mandate_holder" maxlength="70">
+            </div>
+          </div>
+          <div class="form-row" v-if="form.mandate_iban">
+            <div class="form-group">
+              <label>Datum ondertekening machtiging</label>
+              <input type="date" v-model="form.mandate_signed_on">
+            </div>
+            <div class="form-group">
+              <label>Soort machtiging</label>
+              <select v-model="form.mandate_type">
+                <option value="CORE">Standaard (CORE) — particulier én zakelijk, 8 weken storneerbaar</option>
+                <option value="B2B">Zakelijk (B2B) — niet storneerbaar, klant registreert bij eigen bank</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" v-if="form.mandate_iban">
+            <div class="form-group">
+              <label>Machtigingskenmerk<span class="label-hint">(leeg = automatisch)</span></label>
+              <input type="text" v-model="form.mandate_reference" maxlength="35" class="mono" placeholder="wordt automatisch aangemaakt">
+              <div v-if="form.errors.mandate_reference" class="field-error">{{ form.errors.mandate_reference }}</div>
+            </div>
+            <div class="form-group">
+              <label>Status</label>
+              <select v-model="form.mandate_status">
+                <option value="active">Actief</option>
+                <option value="revoked">Ingetrokken</option>
+              </select>
+            </div>
+          </div>
+          <div class="muted-hint">Bewaar de ondertekende machtiging zelf (papier of PDF); de bank kan daar bij een storno naar vragen.</div>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
 
 <style>
 .single-col { max-width: 760px; }
+.muted-hint { font-size: 12px; color: var(--text-4); line-height: 1.6; margin-top: 4px; }
 .type-toggle {
   display: inline-flex;
   background: var(--surface-2);

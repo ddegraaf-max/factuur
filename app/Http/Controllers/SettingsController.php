@@ -97,6 +97,7 @@ class SettingsController extends Controller
             'kvk_number' => ['nullable', 'string', 'max:20', 'unique:companies,kvk_number,' . $company->id],
             'vat_number' => ['nullable', 'string', 'max:20', 'unique:companies,vat_number,' . $company->id],
             'iban' => ['nullable', 'string', 'max:34'],
+            'sepa_creditor_id' => ['nullable', 'string', 'max:35', 'regex:/^[A-Za-z]{2}\d{2}[A-Za-z0-9]{3}\d{6,}$/'],
             'email' => ['nullable', 'email', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
             'website' => ['nullable', 'string', 'max:255'],

@@ -183,7 +183,32 @@ class CustomerController extends Controller
 
     protected function validated(Request $request): array
     {
+        $data = $this->validatedRules($request);
+
+        // Automatische incasso: een machtiging krijgt automatisch een kenmerk en staat aan zodra er een IBAN is.
+        if (filled($data['mandate_iban'] ?? null)) {
+            $data['mandate_iban'] = \App\Support\Iban::normalize($data['mandate_iban']);
+            $data['mandate_reference'] = filled($data['mandate_reference'] ?? null) ? strtoupper(trim($data['mandate_reference'])) : 'EI' . auth()->user()->company_id . '-' . strtoupper(\Illuminate\Support\Str::random(8));
+            $data['mandate_type'] = $data['mandate_type'] ?? 'CORE';
+            $data['mandate_status'] = $data['mandate_status'] ?? 'active';
+        } elseif (array_key_exists('mandate_iban', $data)) {
+            $data['mandate_status'] = null;
+        }
+
+        return $data;
+    }
+
+    protected function validatedRules(Request $request): array
+    {
         return $request->validate([
+            'mandate_reference' => ['nullable', 'string', 'max:35', 'regex:/^[A-Za-z0-9+?\/\-:().,\' ]+$/'],
+            'mandate_iban' => ['nullable', 'string', 'max:40', function ($attr, $value, $fail) {
+                if (filled($value) && ! \App\Support\Iban::valid($value)) $fail('Dit is geen geldig IBAN.');
+            }],
+            'mandate_holder' => ['nullable', 'string', 'max:70'],
+            'mandate_signed_on' => ['nullable', 'date'],
+            'mandate_type' => ['nullable', 'in:CORE,B2B'],
+            'mandate_status' => ['nullable', 'in:active,revoked'],
             'name' => ['required', 'string', 'max:255'],
             'type' => ['required', 'in:business,consumer'],
             'contact_name' => ['nullable', 'string', 'max:255'],

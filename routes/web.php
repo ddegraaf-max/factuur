@@ -479,6 +479,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('invoices/{invoice}/credit/finalize', [CreditNoteController::class, 'finalize'])->name('invoices.credit.finalize');
 
     // Incasso
+    // Automatische incasso (SEPA Direct Debit): batches + pain.008-bestanden
+    Route::get('automatische-incasso', [\App\Http\Controllers\DirectDebitController::class, 'index'])->name('direct-debit.index');
+    Route::post('automatische-incasso', [\App\Http\Controllers\DirectDebitController::class, 'store'])->name('direct-debit.store');
+    Route::get('automatische-incasso/{batch}/download', [\App\Http\Controllers\DirectDebitController::class, 'download'])->name('direct-debit.download');
+    Route::delete('automatische-incasso/{batch}', [\App\Http\Controllers\DirectDebitController::class, 'destroy'])->name('direct-debit.destroy');
+
     Route::get('incasso', [IncassoController::class, 'index'])->name('incasso.index');
     Route::post('invoices/{invoice}/incasso', [IncassoController::class, 'send'])->name('incasso.send');
     Route::patch('invoices/{invoice}/incasso/phase', [IncassoController::class, 'updatePhase'])->name('incasso.phase');

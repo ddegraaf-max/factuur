@@ -13,7 +13,7 @@ class Company extends Model
 
     protected $fillable = [
         'name', 'is_demo', 'demo_expires_at',
-        'trading_name', 'kvk_number', 'vat_number', 'iban', 'mollie_api_key',
+        'trading_name', 'kvk_number', 'vat_number', 'iban', 'sepa_creditor_id', 'mollie_api_key',
         'email', 'phone', 'website',
         'address_line', 'postal_code', 'city', 'country', 'currency',
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',

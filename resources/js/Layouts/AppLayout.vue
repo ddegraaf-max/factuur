@@ -36,6 +36,7 @@ const rawNav = [
       { name: 'Terugkerend', route: 'recurring.index', icon: 'repeat' },
       { name: 'Klanten', route: 'customers.index', icon: 'users' },
       { name: 'Producten', route: 'products.index', icon: 'box' },
+      { name: 'Automatische incasso', route: 'direct-debit.index', icon: 'bank', badge: 'Nieuw' },
       { name: 'Incasso', route: 'incasso.index', icon: 'gavel' },
     ],
   },
