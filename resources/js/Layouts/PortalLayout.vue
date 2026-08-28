@@ -9,6 +9,7 @@ const props = defineProps({
 
 const page = usePage();
 const flash = computed(() => page.props.flash?.flash || null);
+const flashError = computed(() => page.props.flash?.error || null);
 
 const logout = () => {
   router.post(route('portal.logout'));
@@ -39,6 +40,7 @@ const logout = () => {
 
     <main class="portal-main">
       <div v-if="flash" class="portal-flash">{{ flash }}</div>
+      <div v-if="flashError" class="portal-flash portal-flash-error">{{ flashError }}</div>
       <slot />
     </main>
 
@@ -99,6 +101,11 @@ const logout = () => {
   max-width: 920px;
   margin: 0 auto;
   padding: 28px 20px 48px;
+}
+.portal-flash-error {
+  background: var(--danger-bg, #FEF2F2) !important;
+  color: var(--danger, #B91C1C) !important;
+  border-color: var(--danger-border, #FECACA) !important;
 }
 .portal-flash {
   background: var(--success-bg);

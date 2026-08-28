@@ -34,6 +34,7 @@ class PortalQuoteController extends Controller
             $request->session()->put('portal_pending_email', mb_strtolower($quote->customer_email));
             $request->session()->put('portal_intended', route('portal.quote', $token));
             $request->session()->put('portal_gate', [
+                'type' => 'offerte',
                 'company' => $quote->company?->name,
                 'number' => $quote->number,
             ]);

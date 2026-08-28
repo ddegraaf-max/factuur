@@ -97,6 +97,7 @@ class PortalController extends Controller
             $request->session()->put('portal_pending_email', mb_strtolower($invoice->customer_email));
             $request->session()->put('portal_intended', route('portal.invoice', $token));
             $request->session()->put('portal_gate', [
+                'type' => 'factuur',
                 'company' => $invoice->company?->name,
                 'number' => $invoice->number,
             ]);
