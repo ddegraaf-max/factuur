@@ -50,7 +50,7 @@ jobs:
       FILESYSTEM_DISK: local
       BCRYPT_ROUNDS: '4'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -86,8 +86,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: npm
@@ -100,7 +100,7 @@ jobs:
     timeout-minutes: 15
     continue-on-error: true   # eerst de bestaande stand zien; daarna aanscherpen
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
@@ -120,5 +120,11 @@ jobs:
               - app
               - routes
             reportUnmatchedIgnoredErrors: false
+            # Bekende valse meldingen: een relatie-resultaat dat Larastan als kaal
+            # Model ziet (bijv. ->get()->map(fn ($c) => $c->name)). Echte fouten op
+            # getypeerde klassen (App\Models\…) blijven gewoon zichtbaar.
+            ignoreErrors:
+              - '#^Access to an undefined property Illuminate\Database\Eloquent\Model\:\:\$[A-Za-z0-9_]+\.$#'
+              - '#^Call to an undefined method Illuminate\Database\Eloquent\Model\:\:[A-Za-z0-9_]+\(\)\.$#'
           NEON
           vendor/bin/phpstan analyse -c phpstan.ci.neon --memory-limit=1G --no-progress --error-format=table
