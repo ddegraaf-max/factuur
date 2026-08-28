@@ -206,20 +206,26 @@ const submit = () => form.patch(route('settings.company.update'));
           </div>
           <div class="form-group">
             <label>Online betalingen — iDEAL via Mollie<span class="label-hint">(betaallink in de factuurmail en het klantenportaal)</span></label>
-            <div v-if="mollie_connected" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-              <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--success);font-weight:600;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                Mollie gekoppeld — klanten kunnen online betalen
-              </span>
-              <label class="checkbox-row" style="margin:0;">
-                <input type="checkbox" v-model="form.mollie_disconnect">
-                <span>Koppeling verwijderen</span>
-              </label>
+            <div v-if="mollie_connected" class="mollie-status" :class="{ 'is-removing': form.mollie_disconnect }">
+              <template v-if="!form.mollie_disconnect">
+                <span class="mollie-status-text">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Mollie gekoppeld — klanten kunnen online betalen
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" @click="form.mollie_disconnect = true">Koppeling verwijderen</button>
+              </template>
+              <template v-else>
+                <span class="mollie-status-text">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                  De koppeling wordt verwijderd zodra je opslaat — klanten kunnen dan niet meer online betalen.
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" @click="form.mollie_disconnect = false">Toch behouden</button>
+              </template>
             </div>
             <template v-else>
               <input type="password" v-model="form.mollie_api_key" placeholder="live_... of test_..." autocomplete="off" style="max-width:340px;">
               <div style="font-size:11px;color:var(--text-4);margin-top:4px;line-height:1.6;">
-                Plak hier de API-key van je eigen <b>Mollie</b>-account (mollie.com → Developers → API-keys).
+                Plak hier de <b>Live API-sleutel</b> van je eigen Mollie-account (mollie.com → Developers → API-toegangstokens).
                 Betalingen gaan rechtstreeks naar jouw rekening; wij zitten er niet tussen.
               </div>
             </template>
@@ -263,6 +269,13 @@ const submit = () => form.patch(route('settings.company.update'));
 </template>
 
 <style scoped>
+.mollie-status {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 10px 14px; border: 1px solid var(--success-border); border-radius: var(--r-sm); background: var(--success-bg);
+}
+.mollie-status-text { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--success); line-height: 1.4; }
+.mollie-status.is-removing { border-color: var(--danger-border, #FECACA); background: var(--danger-bg, #FEF2F2); }
+.mollie-status.is-removing .mollie-status-text { color: var(--danger, #B91C1C); font-weight: 500; }
 .toggle-row { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
 .toggle-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--brand); flex: none; }
 .toggle-title { font-weight: 600; font-size: 14px; }
