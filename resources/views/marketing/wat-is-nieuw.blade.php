@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.42.0</div>
+        <h2>Automatische bankkoppeling</h2>
+        <ul class="tl-list">
+          <li><b>Bank koppelen via Ponto</b> — bij Bank &amp; transacties koppel je met een paar klikken je zakelijke rekening (alle Nederlandse en Belgische banken). Nieuwe transacties komen daarna drie keer per dag vanzelf binnen, met dezelfde slimme koppelsuggesties als bij een geïmporteerd afschrift. Afschriften uploaden blijft gewoon werken.</li>
+          <li><b>Saldo en toestemming in beeld</b> — per rekening zie je het actuele saldo, wanneer er voor het laatst is bijgewerkt en wanneer je bank om een nieuwe toestemming vraagt. Rekeningen die je niet wilt volgen zet je met één vinkje uit.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.41.0</div>
         <h2>Groot onderhoud: incasso, auditfile, eigen domein, overstappen en zoeken</h2>
         <ul class="tl-list">

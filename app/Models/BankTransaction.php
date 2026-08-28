@@ -12,7 +12,7 @@ class BankTransaction extends Model
         'company_id', 'booking_date', 'amount', 'currency',
         'counterparty_name', 'counterparty_iban', 'description',
         'status', 'matched_invoice_id', 'matched_purchase_id', 'payment_id',
-        'source', 'import_hash',
+        'source', 'import_hash', 'ponto_account_id',
     ];
 
     protected $casts = [
@@ -39,4 +39,5 @@ class BankTransaction extends Model
     public function matchedInvoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'matched_invoice_id')->withoutGlobalScope('company'); }
     public function matchedPurchase(): BelongsTo { return $this->belongsTo(PurchaseInvoice::class, 'matched_purchase_id')->withoutGlobalScope('company'); }
     public function payment(): BelongsTo { return $this->belongsTo(Payment::class)->withoutGlobalScope('company'); }
+    public function pontoAccount(): BelongsTo { return $this->belongsTo(PontoAccount::class); }
 }

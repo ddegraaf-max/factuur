@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PurchaseInvoice;
 use App\Services\BankStatementParser;
+use App\Services\Ponto\PontoSyncer;
 use App\Services\PaymentThanksService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -68,6 +69,7 @@ class BankController extends Controller
             'transactions' => $transactions,
             'tab' => $tab,
             'counts' => $counts,
+            'ponto' => app(PontoSyncer::class)->summary(auth()->user()->company, auth()->user()->isOwner()),
             'open_invoices' => $openInvoices->map(fn ($i) => [
                 'id' => $i->id,
                 'label' => trim("{$i->number} · {$i->customer_name} · € " . number_format($i->total - $i->paid_total, 2, ',', '.')),

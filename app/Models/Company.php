@@ -143,6 +143,7 @@ class Company extends Model
     public function customers(): HasMany { return $this->hasMany(Customer::class); }
     public function products(): HasMany { return $this->hasMany(Product::class); }
     public function invoices(): HasMany { return $this->hasMany(Invoice::class); }
+    public function pontoConnection(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(PontoConnection::class); }
     public function payments(): HasMany { return $this->hasMany(Payment::class); }
 
     public function getResolvedNumberingAttribute(): array

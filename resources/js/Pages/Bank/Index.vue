@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import PontoCard from '@/Components/PontoCard.vue';
 import { eur } from '@/format.js';
 import { reactive, ref } from 'vue';
 
@@ -10,6 +11,7 @@ const props = defineProps({
   counts: Object,
   open_invoices: Array,
   open_purchases: Array,
+  ponto: Object,
 });
 
 /* ---------- Upload (klik of slepen) ---------- */
@@ -79,6 +81,8 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
       </div>
     </div>
 
+    <PontoCard :ponto="ponto" />
+
     <!-- Import + automatische koppeling -->
     <div class="bank-top">
       <div
@@ -92,7 +96,7 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
         <input ref="fileInput" type="file" accept=".xml,.sta,.940,.mt940,.txt,.dat" style="display:none" @change="e => uploadFile(e.target.files?.[0])">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <div class="bank-drop-title">{{ uploadForm.processing ? 'Bezig met importeren…' : 'Sleep je bankafschrift hierheen of klik om te kiezen' }}</div>
-        <div class="bank-drop-sub">Ondersteund: CAMT.053 (XML) of MT940 — te downloaden bij alle Nederlandse banken. Dubbele transacties worden automatisch overgeslagen.</div>
+        <div class="bank-drop-sub">Ondersteund: CAMT.053 (XML) of MT940 — te downloaden bij alle Nederlandse banken. Dubbele transacties worden automatisch overgeslagen, ook naast de bankkoppeling.</div>
         <div v-if="uploadForm.errors.file" class="field-error" style="margin-top:8px;">{{ uploadForm.errors.file }}</div>
       </div>
 
@@ -179,7 +183,7 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
         {{ tab === 'open' ? 'Geen open transacties' : tab === 'matched' ? 'Nog niets verwerkt' : 'Niets genegeerd' }}
       </div>
       <div v-if="tab === 'open'">
-        Importeer een bankafschrift hierboven — daarna koppel je hier elke transactie met één klik aan de juiste factuur.
+        Koppel je bank of importeer een bankafschrift hierboven — daarna koppel je hier elke transactie met één klik aan de juiste factuur.
       </div>
       <div v-else>Verwerkte en genegeerde transacties verschijnen hier.</div>
     </div>

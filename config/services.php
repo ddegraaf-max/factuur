@@ -85,4 +85,20 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    // Bankkoppeling via Ponto Connect (Ibanity). Certificaat en sleutels als PEM
+    // (letterlijk, met 
+, of base64). Zonder client-id/certificaat blijft de
+    // koppeling onzichtbaar. PONTO_SANDBOX=true gebruikt de Ponto-testomgeving.
+    'ponto' => [
+        'client_id' => env('PONTO_CLIENT_ID'),
+        'client_secret' => env('PONTO_CLIENT_SECRET'),
+        'certificate' => env('PONTO_CERTIFICATE'),
+        'private_key' => env('PONTO_PRIVATE_KEY'),
+        'key_passphrase' => env('PONTO_KEY_PASSPHRASE'),
+        'signature_certificate_id' => env('PONTO_SIGNATURE_CERTIFICATE_ID'),
+        'signature_private_key' => env('PONTO_SIGNATURE_PRIVATE_KEY'),
+        'signature_key_passphrase' => env('PONTO_SIGNATURE_KEY_PASSPHRASE'),
+        'sandbox' => (bool) env('PONTO_SANDBOX', false),
+        'api_base' => env('PONTO_API_BASE', 'https://api.ibanity.com/ponto-connect'),
+    ],
 ];

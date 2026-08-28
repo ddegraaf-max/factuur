@@ -68,3 +68,10 @@ Schedule::command('backup:run')
     ->dailyAt('03:30')
     ->timezone('Europe/Amsterdam')
     ->withoutOverlapping();
+
+// Drie keer per dag (PSD2 staat vier onbeheerde synchronisaties per dag toe):
+// nieuwe banktransacties ophalen voor administraties met een Ponto-koppeling.
+Schedule::command('ponto:sync')
+    ->cron('40 6,12,18 * * *')
+    ->timezone('Europe/Amsterdam')
+    ->withoutOverlapping();

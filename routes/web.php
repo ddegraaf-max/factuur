@@ -83,7 +83,7 @@ Route::get('/overstappen-van/{pakket}', function (string $pakket) {
             'compare_intro' => 'De belangrijkste verschillen op een rij — op basis van de instellingen en tarieven zoals WeFact die in augustus 2026 in de eigen omgeving toont.',
             'rows' => [
                 ['Facturen, offertes en inkoopfacturen', 'Verbruikslimiet per maand (bijv. 100 facturen, 100 offertes, 50 inkoopfacturen), overschot beperkt mee te nemen', 'Onbeperkt'],
-                ['Bankkoppeling', 'Directe koppeling: € 5,- excl. btw per maand per IBAN', 'Gratis import van CAMT.053/MT940-afschriften met automatische matching; directe koppeling in voorbereiding'],
+                ['Bankkoppeling', 'Directe koppeling: € 5,- excl. btw per maand per IBAN', 'Directe bankkoppeling via Ponto én gratis import van CAMT.053/MT940-afschriften, met automatische matching'],
                 ['Opslagruimte voor bijlagen', '1 GB, uit te breiden voor € 2,50 per GB per maand', '2 GB inbegrepen (Slim: 10 GB)'],
                 ['Digitaal ondertekenen van offertes', 'Ondersteund', 'Inbegrepen, met bewijsdossier (naam, IP, tijdstip, handtekening)'],
                 ['Mail vanaf eigen domein', 'Ondersteund (DNS instellen)', 'Inbegrepen (DNS instellen)'],
@@ -499,6 +499,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('bank/{transaction}/inkoop', [\App\Http\Controllers\BankController::class, 'matchPurchase'])->name('bank.match.purchase');
     Route::post('bank/{transaction}/negeren', [\App\Http\Controllers\BankController::class, 'ignore'])->name('bank.ignore');
     Route::post('bank/{transaction}/herstel', [\App\Http\Controllers\BankController::class, 'restore'])->name('bank.restore');
+
+    // Bankkoppeling via Ponto (OAuth2): de eigenaar koppelt, daarna synchroniseren we automatisch.
+    Route::get('bank/ponto/verbinden', [\App\Http\Controllers\PontoController::class, 'connect'])->middleware('role:owner')->name('bank.ponto.connect');
+    Route::get('bank/ponto/callback', [\App\Http\Controllers\PontoController::class, 'callback'])->name('bank.ponto.callback');
+    Route::post('bank/ponto/bijwerken', [\App\Http\Controllers\PontoController::class, 'sync'])->middleware('throttle:6,1')->name('bank.ponto.sync');
+    Route::post('bank/ponto/rekening/{account}', [\App\Http\Controllers\PontoController::class, 'toggleAccount'])->name('bank.ponto.account');
+    Route::post('bank/ponto/ontkoppelen', [\App\Http\Controllers\PontoController::class, 'disconnect'])->middleware('role:owner')->name('bank.ponto.disconnect');
 
     // Inkoopfacturen / crediteuren
     Route::get('inkoop', [PurchaseInvoiceController::class, 'index'])->name('purchases.index');

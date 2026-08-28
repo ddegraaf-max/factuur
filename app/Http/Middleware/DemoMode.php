@@ -23,6 +23,7 @@ class DemoMode
     protected array $blocked = [
         'billing.checkout' => 'Afrekenen kan niet in de demo. Maak een gratis proefaccount aan om een abonnement af te sluiten.',
         'billing.portal' => 'Het betaalportaal is niet beschikbaar in de demo.',
+        'bank.ponto.connect' => 'In de demo kun je geen echte bank koppelen. Maak een gratis proefaccount aan om dit te proberen.',
         'settings.security.setup' => 'Tweestapsverificatie instellen kan in je eigen omgeving.',
         'settings.security.verify' => 'Tweestapsverificatie instellen kan in je eigen omgeving.',
         'settings.security.disable' => 'Tweestapsverificatie instellen kan in je eigen omgeving.',
