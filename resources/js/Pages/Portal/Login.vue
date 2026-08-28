@@ -16,16 +16,16 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Facturenportaal" />
+  <Head title="Klantenportaal" />
   <PortalLayout>
     <div class="portal-center">
       <div class="portal-card portal-login-card">
         <div class="portal-lock-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <h1 class="portal-card-title">Bekijk je facturen</h1>
+        <h1 class="portal-card-title">Bekijk je facturen en offertes</h1>
         <p class="portal-card-sub">
-          Vul het e-mailadres in waarop je facturen ontvangt.
+          Vul het e-mailadres in waarop je de factuur of offerte hebt ontvangen.
           We sturen je een eenmalige toegangscode — een wachtwoord is niet nodig.
         </p>
 

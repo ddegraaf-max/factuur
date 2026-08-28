@@ -20,7 +20,7 @@ class PortalCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Je toegangscode voor het facturenportaal: ' . $this->code,
+            subject: 'Je toegangscode voor het klantenportaal: ' . $this->code,
         );
     }
 

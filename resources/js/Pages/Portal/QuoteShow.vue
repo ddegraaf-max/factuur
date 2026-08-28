@@ -93,7 +93,7 @@ const decline = () => {
 </script>
 
 <template>
-  <Head :title="`Offerte ${quote.number} · Portaal`" />
+  <Head :title="`Offerte ${quote.number} · Klantenportaal`" />
   <PortalLayout :email="email">
     <div class="portal-card portal-invoice">
       <!-- Kop met huisstijl van de afzender -->

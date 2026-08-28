@@ -103,12 +103,15 @@ const sendCode = () => {
 </script>
 
 <template>
-  <Head title="Verificatie · Facturenportaal" />
+  <Head title="Verificatie · Klantenportaal" />
   <PortalLayout>
     <div class="portal-center">
       <div class="portal-card portal-verify-card">
-        <div v-if="gate" class="portal-gate-context">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div v-if="gate" class="portal-gate-context" :class="{ 'is-quote': gate.type === 'offerte' }">
+          <span class="portal-gate-icon">
+            <svg v-if="gate.type === 'offerte'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </span>
           <div>
             <div class="portal-gate-number">{{ gate.type === 'offerte' ? 'Offerte' : 'Factuur' }} {{ gate.number }}</div>
             <div v-if="gate.company" class="portal-gate-company">van {{ gate.company }}</div>
@@ -195,7 +198,13 @@ const sendCode = () => {
   padding: 12px 16px;
   margin-bottom: 22px;
 }
-.portal-gate-context svg { width: 22px; height: 22px; color: var(--text-3); flex: none; }
+.portal-gate-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-3);
+}
+.portal-gate-icon svg { width: 19px; height: 19px; }
+.portal-gate-context.is-quote .portal-gate-icon { background: var(--brand-tint); border-color: var(--brand-border); color: var(--brand); }
 .portal-gate-number { font-weight: 600; font-size: 14px; }
 .portal-gate-company { font-size: 12.5px; color: var(--text-3); }
 .portal-verify-note {

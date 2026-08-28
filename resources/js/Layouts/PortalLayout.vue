@@ -20,17 +20,13 @@ const logout = () => {
   <div class="portal-shell">
     <header class="portal-topbar">
       <div class="portal-topbar-inner">
-        <div class="portal-brand">
-          <span class="portal-shield">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </span>
+        <a href="https://easyinvoice.nl" target="_blank" rel="noopener" class="portal-brand" title="EasyInvoice">
+          <img src="/images/easyinvoice-favicon-180.png" class="portal-logo" alt="EasyInvoice">
           <div>
-            <div class="portal-brand-name">Facturenportaal</div>
-            <div class="portal-brand-sub">Beveiligde omgeving</div>
+            <div class="portal-brand-name">Easy<span>Invoice</span></div>
+            <div class="portal-brand-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Klantenportaal · beveiligde omgeving</div>
           </div>
-        </div>
+        </a>
         <div v-if="email" class="portal-user">
           <span class="portal-user-email">{{ email }}</span>
           <button type="button" class="portal-logout" @click="logout">Uitloggen</button>
@@ -74,18 +70,15 @@ const logout = () => {
   justify-content: space-between;
   gap: 16px;
 }
-.portal-brand { display: flex; align-items: center; gap: 12px; }
-.portal-shield {
-  width: 38px; height: 38px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-  color: #fff;
-  display: inline-flex; align-items: center; justify-content: center;
-  flex: none;
+.portal-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+.portal-logo {
+  width: 40px; height: 40px; border-radius: 11px; display: block; flex: none;
+  box-shadow: 0 1px 2px rgba(28,25,23,0.18);
 }
-.portal-shield svg { width: 19px; height: 19px; }
-.portal-brand-name { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
-.portal-brand-sub { font-size: 11.5px; color: var(--text-3); }
+.portal-brand-name { font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: -0.02em; line-height: 1.15; color: var(--text); }
+.portal-brand-name span { color: var(--brand); }
+.portal-brand-sub { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.portal-brand-sub svg { width: 12px; height: 12px; color: var(--success); }
 .portal-user { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .portal-user-email { font-size: 13px; color: var(--text-2); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .portal-logout {

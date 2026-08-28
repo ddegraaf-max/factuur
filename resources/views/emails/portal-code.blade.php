@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toegangscode facturenportaal</title>
+    <title>Toegangscode klantenportaal</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
         .container { max-width: 520px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
         .header { background: #1C1917; padding: 26px 36px; color: white; }
         .logo { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+        .logo table { border-collapse: collapse; }
+        .logo img { width: 34px; height: 34px; border: 0; border-radius: 9px; display: block; }
+        .logo .name { font-size: 18px; font-weight: 700; color: #FFFFFF; padding-left: 10px; line-height: 1.2; }
+        .logo .name span { color: #F87171; }
+        .logo .tag { font-size: 12px; font-weight: 500; color: #A8A29E; padding-left: 10px; }
         .logo .accent { color: #FCA5A5; }
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
@@ -25,11 +30,16 @@
     <div class="wrapper">
         <div class="container">
             <div class="header">
-                <div class="logo">🔒 Beveiligd facturenportaal</div>
+                <div class="logo">
+                    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                        <td><img src="{{ rtrim(config('app.url'), '/') }}/images/easyinvoice-icon-512.png" alt="EasyInvoice"></td>
+                        <td><div class="name">Easy<span>Invoice</span></div><div class="tag">🔒 Klantenportaal · beveiligde omgeving</div></td>
+                    </tr></table>
+                </div>
             </div>
             <div class="body">
                 <h1>Je toegangscode</h1>
-                <p>Met onderstaande code krijg je veilig toegang tot je facturen in het online portaal.</p>
+                <p>Met onderstaande code krijg je veilig toegang tot je facturen en offertes in het online klantenportaal.</p>
 
                 <div class="code-box">
                     <div class="code-label">Toegangscode</div>
@@ -40,11 +50,11 @@
 
                 <div class="meta">
                     Heb jij dit niet aangevraagd? Dan kun je deze e-mail veilig negeren —
-                    zonder deze code krijgt niemand toegang tot je facturen.
+                    zonder deze code krijgt niemand toegang tot je documenten.
                 </div>
             </div>
             <div class="footer">
-                © {{ date('Y') }} EasyInvoice · Beveiligde facturenomgeving
+                © {{ date('Y') }} EasyInvoice · Beveiligd klantenportaal voor facturen en offertes
             </div>
         </div>
     </div>
