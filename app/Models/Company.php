@@ -14,7 +14,7 @@ class Company extends Model
     protected $fillable = [
         'name', 'is_demo', 'demo_expires_at',
         'trading_name', 'kvk_number', 'vat_number', 'iban', 'sepa_creditor_id', 'mollie_api_key',
-        'email', 'phone', 'website',
+        'email', 'phone', 'website', 'public_slug',
         'address_line', 'postal_code', 'city', 'country', 'currency',
         'logo_path', 'logo_data', 'logo_scale', 'brand_color', 'accent_color', 'invoice_template', 'invoice_font',
         'stationery_data', 'stationery_margin_top', 'stationery_margin_bottom',
@@ -144,6 +144,8 @@ class Company extends Model
     public function products(): HasMany { return $this->hasMany(Product::class); }
     public function invoices(): HasMany { return $this->hasMany(Invoice::class); }
     public function pontoConnection(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(PontoConnection::class); }
+    public function businessCard(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(BusinessCard::class); }
+    public function site(): \Illuminate\Database\Eloquent\Relations\HasOne { return $this->hasOne(CompanySite::class); }
     public function payments(): HasMany { return $this->hasMany(Payment::class); }
 
     public function getResolvedNumberingAttribute(): array
@@ -224,6 +226,36 @@ class Company extends Model
             $this->address_line,
             trim(($this->postal_code ?? '') . ' ' . ($this->city ?? '')),
         ])->filter()->implode(', ');
+    }
+
+    /* ===================== PUBLIEKE PAGINA'S ===================== */
+
+    /** Publieke naam: handelsnaam als die er is, anders de bedrijfsnaam. */
+    public function publicName(): string
+    {
+        return trim((string) ($this->trading_name ?: $this->name)) ?: 'Mijn bedrijf';
+    }
+
+    /** Zorg voor een unieke, leesbare slug voor visitekaartje en website. */
+    public function ensurePublicSlug(): string
+    {
+        if ($this->public_slug) {
+            return $this->public_slug;
+        }
+        $base = mb_substr(\Illuminate\Support\Str::slug($this->publicName()), 0, 50) ?: 'bedrijf-' . $this->id;
+        $slug = $base;
+        for ($i = 2; static::where('public_slug', $slug)->where('id', '!=', $this->id)->exists(); $i++) {
+            $slug = $base . '-' . $i;
+        }
+        $this->forceFill(['public_slug' => $slug])->save();
+
+        return $slug;
+    }
+
+    /** Mogen de publieke pagina's (visitekaartje, website) worden getoond? */
+    public function publicPagesAllowed(): bool
+    {
+        return ! $this->is_demo && $this->hasAccess();
     }
 
     /* ===================== ABONNEMENT / PROEFPERIODE ===================== */

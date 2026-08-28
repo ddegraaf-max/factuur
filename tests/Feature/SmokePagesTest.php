@@ -59,7 +59,7 @@ class SmokePagesTest extends TestCase
             'purchases.index', 'purchases.create', 'purchases.inbox.index', 'purchases.recurring.index',
             'recurring.index', 'hours.index', 'trips.index', 'bank.index', 'incasso.index', 'aging.index',
             'stats.index', 'vat.index', 'yearreport.index', 'cashflow.index', 'export.index',
-            'settings.company', 'settings.brand', 'settings.brands', 'settings.numbering', 'settings.reminders',
+            'settings.company', 'settings.brand', 'settings.brands', 'settings.card', 'settings.site', 'settings.numbering', 'settings.reminders',
             'settings.emails', 'settings.emails.preview.thanks', 'settings.emails.preview.accept',
             'settings.security', 'settings.team', 'settings.integrations', 'administrations.index', 'billing.show',
         ];

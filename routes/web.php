@@ -273,6 +273,13 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
 })->middleware(['throttle:5,1', 'turnstile'])->name('contact.send');
 
+// ---------- PUBLIEKE PAGINA'S VAN ADMINISTRATIES ----------
+// Digitaal visitekaartje en website in de huisstijl van de ondernemer.
+Route::get('/k/{slug}', [\App\Http\Controllers\BusinessCardController::class, 'show'])->middleware('throttle:120,1')->name('card.show');
+Route::get('/k/{slug}/vcard', [\App\Http\Controllers\BusinessCardController::class, 'vcard'])->middleware('throttle:60,1')->name('card.vcard');
+Route::get('/s/{slug}', [\App\Http\Controllers\SiteController::class, 'show'])->middleware('throttle:120,1')->name('site.show');
+Route::post('/s/{slug}/contact', [\App\Http\Controllers\SiteController::class, 'lead'])->middleware('throttle:5,1')->name('site.lead');
+
 // ---------- KLANTENPORTAAL ----------
 // Voor de klánten van onze gebruikers: facturen online inzien en downloaden.
 // Inloggen zonder wachtwoord, maar met twee stappen (e-mail + 6-cijferige
@@ -611,6 +618,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::delete('settings/administratie', [\App\Http\Controllers\AccountDataController::class, 'destroy'])
             ->middleware('role:owner')->name('settings.company.destroy');
 
+        // Digitaal visitekaartje en website (publiek onder /k/{slug} en /s/{slug})
+        Route::get('settings/visitekaartje', [\App\Http\Controllers\BusinessCardController::class, 'edit'])->name('settings.card');
+        Route::patch('settings/visitekaartje', [\App\Http\Controllers\BusinessCardController::class, 'update'])->name('settings.card.update');
+        Route::get('settings/website', [\App\Http\Controllers\SiteController::class, 'edit'])->name('settings.site');
+        Route::post('settings/website/genereren', [\App\Http\Controllers\SiteController::class, 'generate'])->middleware('throttle:6,1')->name('settings.site.generate');
+        Route::patch('settings/website', [\App\Http\Controllers\SiteController::class, 'update'])->name('settings.site.update');
         Route::get('settings/brand', [SettingsController::class, 'brand'])->name('settings.brand');
         Route::post('settings/brand', [SettingsController::class, 'updateBrand'])->name('settings.brand.update');
         Route::delete('settings/brand/logo', [SettingsController::class, 'removeLogo'])->name('settings.brand.logo.remove');

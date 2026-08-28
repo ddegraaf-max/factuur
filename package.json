@@ -15,6 +15,7 @@
         "vue": "^3.4.0"
     },
     "dependencies": {
+        "qrcode": "^1.5.4",
         "ziggy-js": "^2.0.0"
     }
 }
