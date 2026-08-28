@@ -14,7 +14,13 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', env('LOG_STACK', 'single')),
+            // In productie (Railway) altijd óók naar stderr: het bestand
+            // storage/logs/laravel.log verdwijnt bij elke deploy en is in het
+            // Railway-dashboard onzichtbaar — stderr wél.
+            'channels' => array_values(array_unique(array_merge(
+                explode(',', env('LOG_STACK', 'single')),
+                env('APP_ENV') === 'production' ? ['stderr'] : []
+            ))),
             'ignore_exceptions' => false,
         ],
         'single' => [

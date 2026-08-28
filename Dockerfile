@@ -96,4 +96,8 @@ EXPOSE 8080
 # Bij het opstarten eerst de Laravel-caches opbouwen (config + views), zodat
 # niet elke request het hele framework opnieuw hoeft te configureren. Faalt
 # een cache-stap, dan start de server gewoon zonder (|| true).
-CMD ["sh", "-c", "php artisan config:cache || true; php artisan view:cache || true; frankenphp php-server --listen :${PORT:-8080} --root /app/public"]
+# De Laravel-scheduler (herinneringen, terugkerende facturen, dagoverzicht,
+# btw-herinnering, demo-opschoning, merkdossier …) draait als achtergrond-
+# proces náást de webserver. Railway heeft één container; zonder dit proces
+# draait er géén enkele geplande taak. Uitvoer gaat naar dezelfde stdout.
+CMD ["sh", "-c", "php artisan config:cache || true; php artisan view:cache || true; (php artisan schedule:work --no-ansi 2>&1 | sed -u 's/^/[scheduler] /' &); exec frankenphp php-server --listen :${PORT:-8080} --root /app/public"]

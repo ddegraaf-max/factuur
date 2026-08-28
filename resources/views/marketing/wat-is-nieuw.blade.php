@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 28 augustus 2026 · Easy 1.39.1</div>
+        <h2>Geplande taken en klantenportaal</h2>
+        <ul class="tl-list">
+          <li><b>Dagelijkse taken draaien weer betrouwbaar</b> — het dagelijks overzicht, automatische herinneringen en aanmaningen, terugkerende en ingeplande facturen, de btw-herinnering en het scannen van het Postvak IN worden nu gegarandeerd elke dag uitgevoerd. Stond een taak stil, dan pakt EasyInvoice hem vanaf vandaag weer op.</li>
+          <li><b>Klantenportaal</b> — EasyInvoice-logo in de kop, "Offerte" in plaats van "Factuur" bij het bevestigen van een offerte, en foutmeldingen worden nu getoond in plaats van stilzwijgend genegeerd.</li>
+          <li><b>Mollie</b> — nettere knop om de koppeling te verwijderen; de uitleg verwijst naar de nieuwe menunaam bij Mollie.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 augustus 2026 · Easy 1.39.0</div>
         <h2>Zocht u een ander EasyInvoice?</h2>
         <ul class="tl-list">
