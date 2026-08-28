@@ -544,6 +544,7 @@
           <li><a href="/#prijzen">Prijzen</a></li>
           <li><a href="{{ route('changelog') }}">Wat is nieuw</a></li>
           <li><a href="{{ route('roadmap') }}">Roadmap</a></li>
+          <li><a href="{{ route('confusion') }}">Zocht u een ander EasyInvoice?</a></li>
         </ul>
       </div>
 

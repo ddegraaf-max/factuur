@@ -35,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'owner' => \App\Http\Middleware\EnsureOwner::class,
             'subscribed' => EnsureSubscriptionActive::class,
             'turnstile' => VerifyTurnstile::class,
             'portal.verified' => EnsurePortalVerified::class,

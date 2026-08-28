@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 augustus 2026 · Easy 1.39.0</div>
+        <h2>Zocht u een ander EasyInvoice?</h2>
+        <ul class="tl-list">
+          <li><b>Verkeerde deur?</b> — er bestaan meer bedrijven met een naam die op de onze lijkt. Kwam u hier terecht terwijl u een ander bedrijf zocht, laat het ons dan weten via het nieuwe vinkje op het contactformulier of via de pagina <a href="{{ route('confusion') }}">Zocht u een ander EasyInvoice?</a> in de voettekst. Zo kunnen we u snel de goede kant op wijzen.</li>
+          <li>Onder de motorkap: de maandelijkse rapportage over het gebruik van het platform is geautomatiseerd.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 27 augustus 2026 · Easy 1.38.0</div>
         <h2>Peppol: e-facturen verzenden én ontvangen</h2>
         <ul class="tl-list">

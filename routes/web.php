@@ -91,6 +91,17 @@ Route::get('/kennisbank/{slug}', function (string $slug) {
 Route::get('/marketing-inzichten', [\App\Http\Controllers\MarketingStatsController::class, 'index'])
     ->middleware('auth')->name('marketing.inzichten');
 
+// Merkbewaking (alleen eigenaar; check in de controller): verwarringslog + merkgebruik-dossiers.
+Route::middleware(['auth', 'owner'])->prefix('merkbewaking')->name('brand.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\BrandEvidenceController::class, 'index'])->name('index');
+    Route::post('/incidenten', [\App\Http\Controllers\BrandEvidenceController::class, 'storeIncident'])->name('incidents.store');
+    Route::delete('/incidenten/{incident}', [\App\Http\Controllers\BrandEvidenceController::class, 'destroyIncident'])->name('incidents.destroy');
+    Route::get('/incidenten/{incident}/bijlage', [\App\Http\Controllers\BrandEvidenceController::class, 'attachment'])->name('incidents.attachment');
+    Route::get('/export', [\App\Http\Controllers\BrandEvidenceController::class, 'exportCsv'])->name('export');
+    Route::post('/dossier', [\App\Http\Controllers\BrandEvidenceController::class, 'generate'])->name('dossier.generate');
+    Route::get('/dossier/{month}/{file}', [\App\Http\Controllers\BrandEvidenceController::class, 'file'])->name('dossier.file');
+});
+
 // ---------- SITEMAP (voor zoekmachines) ----------
 // Dynamisch: nieuwe helpartikelen in config/help.php lopen automatisch mee.
 Route::get('/sitemap.xml', function () {
@@ -121,6 +132,26 @@ Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
 Route::view('/privacy', 'marketing.privacy')->name('privacy');
 Route::view('/cookies', 'marketing.cookies')->name('cookies');
 
+// Merkbewaking: "Zocht u een ander EasyInvoice?" — spontaan bewijs van verwarring, door derden zelf vastgelegd.
+Route::get('/zocht-u-een-ander-easyinvoice', fn () => view('marketing.verwarring'))->name('confusion');
+Route::post('/zocht-u-een-ander-easyinvoice', function (\Illuminate\Http\Request $request) {
+    $data = $request->validate([
+        'looking_for' => ['required', 'string', 'max:2000'],
+        'how' => ['nullable', 'string', 'max:300'],
+        'email' => ['nullable', 'email', 'max:180'],
+    ]);
+    \App\Models\BrandIncident::create([
+        'occurred_on' => now()->toDateString(),
+        'source' => 'verwarringspagina',
+        'name' => null,
+        'email' => $data['email'] ?? null,
+        'summary' => $data['looking_for'],
+        'evidence' => 'Bezoeker vulde de pagina "Zocht u een ander EasyInvoice?" in.' . (! empty($data['how']) ? ' Binnengekomen via: ' . $data['how'] : '') . ' IP: ' . $request->ip(),
+    ]);
+
+    return redirect()->route('confusion')->with('confusion_sent', true);
+})->middleware(['throttle:10,1', 'turnstile'])->name('confusion.send');
+
 Route::get('/contact', fn () => view('marketing.contact'))->name('contact');
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
     $data = $request->validate([
@@ -128,10 +159,29 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
         'email' => ['required', 'email', 'max:180'],
         'subject' => ['nullable', 'string', 'max:160'],
         'message' => ['required', 'string', 'max:4000'],
+        'confusion' => ['nullable', 'boolean'],
     ]);
 
     $subject = $data['subject'] ?: 'Nieuw contactbericht via website';
     $body = "Naam: {$data['name']}\nE-mail: {$data['email']}\nOnderwerp: {$subject}\n\n{$data['message']}";
+
+    // Merkbewaking: de bezoeker geeft zelf aan een ánder EasyInvoice te zoeken —
+    // precies het spontane bewijs van verwarring dat we willen vastleggen.
+    if ($request->boolean('confusion')) {
+        $subject = '[Verwarring] ' . $subject;
+        try {
+            \App\Models\BrandIncident::create([
+                'occurred_on' => now()->toDateString(),
+                'source' => 'contactformulier',
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'summary' => $data['message'],
+                'evidence' => 'Bezoeker vinkte in het contactformulier aan: "Ik zocht eigenlijk een ander EasyInvoice."',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Verwarringsincident vastleggen mislukt', ['error' => $e->getMessage()]);
+        }
+    }
 
     try {
         \Illuminate\Support\Facades\Mail::raw($body, function ($mail) use ($data, $subject) {

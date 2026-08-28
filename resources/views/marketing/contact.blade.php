@@ -56,6 +56,12 @@
           <textarea id="message" name="message" rows="6" required>{{ old('message') }}</textarea>
           @error('message')<div class="m-err">{{ $message }}</div>@enderror
         </div>
+        <div class="m-field" style="margin-top:-4px;">
+          <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;font-size:13.5px;color:var(--text-2);cursor:pointer;">
+            <input type="checkbox" name="confusion" value="1" style="margin-top:3px;" {{ old('confusion') ? 'checked' : '' }}>
+            <span>Ik zocht eigenlijk een <b>ander</b> bedrijf met de naam EasyInvoice (bijv. over een uitbetaling of een account dat ik niet bij easyinvoice.nl heb).</span>
+          </label>
+        </div>
         @if(config('services.turnstile.sitekey'))
           <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.sitekey') }}" style="margin-bottom:14px;"></div>
           @error('cf-turnstile-response')<div class="m-err">{{ $message }}</div>@enderror

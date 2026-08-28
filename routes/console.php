@@ -49,5 +49,10 @@ Schedule::command('purchases:scan-inbox')
     ->everyFiveMinutes()
     ->withoutOverlapping();
 
+// Maandelijks (de 1e, 07:30): merkgebruik-dossier van de vorige maand naar de eigenaar.
+Schedule::command('brand:evidence')
+    ->monthlyOn(1, '07:30')
+    ->timezone('Europe/Amsterdam');
+
 // Elk uur: ruim verlopen demo-omgevingen op.
 Schedule::command('demo:cleanup')->hourly();
