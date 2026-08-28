@@ -32,6 +32,11 @@ class ReminderService
             ->get();
 
         foreach ($invoices as $invoice) {
+            // Verlopen proefperiode of gestopt abonnement? Dan gaat er geen
+            // automatische post meer uit naam van die administratie.
+            if (! $invoice->company?->hasAccess()) {
+                continue;
+            }
             try {
                 if ($this->processInvoice($invoice)) {
                     $sent++;

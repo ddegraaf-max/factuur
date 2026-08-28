@@ -29,6 +29,10 @@ class SendScheduledInvoices extends Command
 
         $sent = 0;
         foreach ($due as $invoice) {
+            // Geen toegang meer (proef verlopen, niet betaald)? Dan blijft het concept staan.
+            if (! $invoice->company?->hasAccess()) {
+                continue;
+            }
             try {
                 $invoice->scheduled_send_on = null;
                 $manager->send($invoice);

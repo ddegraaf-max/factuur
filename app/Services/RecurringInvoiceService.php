@@ -31,11 +31,15 @@ class RecurringInvoiceService
             ->where('active', true)
             ->whereDate('next_run_on', '<=', today())
             ->whereHas('company', fn ($q) => $q->where('is_demo', false))
-            ->with('customer')
+            ->with(['customer', 'company'])
             ->get();
 
         $count = 0;
         foreach ($due as $profile) {
+            // Geen toegang meer (proef verlopen, niet betaald)? Dan geen facturen.
+            if (! $profile->company?->hasAccess()) {
+                continue;
+            }
             try {
                 if ($this->generate($profile)) {
                     $count++;
