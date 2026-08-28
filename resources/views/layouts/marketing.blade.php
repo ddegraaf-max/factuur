@@ -139,13 +139,13 @@
 
   /* NAV */
   .nav { position: sticky; top: 0; z-index: 50; background: rgba(250, 250, 249, 0.85); backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px); border-bottom: 1px solid var(--border); }
-  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 68px; }
-  .nav-brand { display: flex; align-items: center; gap: 10px; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--text); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 68px; }
+  .nav-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; white-space: nowrap; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.02em; color: var(--text); }
   .nav-brand img { width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; }
   .nav-links { display: flex; align-items: center; gap: 6px; }
-  .nav-link { padding: 8px 14px; font-size: 14px; font-weight: 500; color: var(--text-2); border-radius: 8px; transition: all 0.15s; }
+  .nav-link { white-space: nowrap; padding: 8px 12px; font-size: 14px; font-weight: 500; color: var(--text-2); border-radius: 8px; transition: all 0.15s; }
   .nav-link:hover { color: var(--text); background: var(--surface-2); }
-  .nav-actions { display: flex; align-items: center; gap: 8px; }
+  .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; white-space: nowrap; }
   .nav-toggle-cb { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
   .nav-toggle { display: none; width: 44px; height: 44px; border-radius: 10px; cursor: pointer; align-items: center; justify-content: center; flex-direction: column; gap: 5px; margin-right: -8px; flex-shrink: 0; }
   .nav-toggle:hover { background: var(--surface-2); }
@@ -156,9 +156,10 @@
   .nav-mobile-link:hover { color: var(--text); }
   .nav-mobile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
   .btn-block { width: 100%; justify-content: center; }
-  /* Met zes menu-items past de balk pas ruim boven de 1000px; daaronder
-     nemen we het hamburgermenu. */
-  @media (max-width: 1080px) {
+  /* Met zes menu-items, merknaam en twee knoppen past de balk pas vanaf
+     ±1250px; daaronder nemen we het hamburgermenu, zodat niets over de
+     merknaam heen schuift. */
+  @media (max-width: 1280px) {
     .nav-links { display: none; }
     .nav-actions { display: none; }
     .nav-toggle { display: flex; }
