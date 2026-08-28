@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\InvoiceMail;
 use App\Mail\PaymentThanksMail;
 use App\Models\Customer;
 use App\Models\Invoice;
