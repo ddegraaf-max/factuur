@@ -61,6 +61,29 @@ class InvoiceFlowTest extends TestCase
         $this->assertSame(30, (int) $invoice->payment_terms);
     }
 
+    /** Instellingen → E-mails: kopie naar jezelf (CC) en boekhoudkantoor (BCC) gaan mee met elke factuurmail. */
+    public function test_sending_an_invoice_copies_owner_and_accountant(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        $user->company->forceFill(['copy_email' => 'kopie@example.com', 'accountant_email' => 'boekhouder@example.com'])->save();
+
+        $customer = Customer::whereNotNull('email')->orderBy('id')->firstOrFail();
+        $this->post(route('invoices.store'), [
+            'customer_id' => $customer->id, 'invoice_date' => now()->toDateString(), 'payment_terms' => 14,
+            'lines' => $this->lines(), 'action' => 'draft',
+        ])->assertRedirect();
+        $invoice = Invoice::where('status', 'draft')->latest('id')->firstOrFail();
+
+        $this->post(route('invoices.send', $invoice))->assertRedirect();
+        $this->assertSame('sent', $invoice->fresh()->status);
+
+        Mail::assertSent(InvoiceMail::class, fn ($mail) => $mail->hasTo($customer->email)
+            && $mail->hasCc('kopie@example.com')
+            && $mail->hasBcc('boekhouder@example.com'));
+    }
+
     public function test_duplicate_creates_a_fresh_draft_with_the_same_lines(): void
     {
         $this->actingAs($this->demoUser());
