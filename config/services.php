@@ -20,6 +20,8 @@ return [
         // Slim-abonnement (€17,50/maand excl. btw, met AI-functies). Zonder
         // deze variabele is alleen Basis af te sluiten.
         'price_id_slim' => env('STRIPE_PRICE_ID_SLIM'),
+        // Toeslag bankkoppeling: price per gekoppelde rekening per maand (hoeveelheid = aantal rekeningen).
+        'price_id_bank' => env('STRIPE_PRICE_ID_BANK'),
     ],
     'turnstile' => [
         'sitekey' => env('TURNSTILE_SITEKEY'),
@@ -99,5 +101,7 @@ return [
         'signature_key_passphrase' => env('PONTO_SIGNATURE_KEY_PASSPHRASE'),
         'sandbox' => (bool) env('PONTO_SANDBOX', false),
         'api_base' => env('PONTO_API_BASE', 'https://api.ibanity.com/ponto-connect'),
+        // Weergaveprijs per rekening per maand (excl. btw); het echte bedrag zit in de Stripe-price.
+        'account_price' => (float) env('PONTO_ACCOUNT_PRICE', 5),
     ],
 ];

@@ -31,13 +31,18 @@ const toggleAccount = (account) => router.post(route('bank.ponto.account', accou
         <div v-if="!ponto.connected" class="ponto-sub">
           Koppel je zakelijke rekening via Ponto: nieuwe transacties komen dan drie keer per dag vanzelf binnen — geen afschriften meer uploaden. Werkt met alle Nederlandse en Belgische banken.
         </div>
+        <div v-if="!ponto.connected && ponto.price_label" class="ponto-price">{{ ponto.price_label }} — alleen voor rekeningen die je laat synchroniseren, bovenop je abonnement.</div>
         <div v-else class="ponto-sub">
-          {{ ponto.last_synced_label ? `Laatst bijgewerkt ${ponto.last_synced_label}` : 'Nog niet bijgewerkt' }} · automatisch drie keer per dag.
+          {{ ponto.last_synced_label ? `Laatst bijgewerkt ${ponto.last_synced_label}` : 'Nog niet bijgewerkt' }} · automatisch drie keer per dag.<span v-if="ponto.monthly_cost_label"> · {{ ponto.monthly_cost_label }}</span>
         </div>
       </div>
       <div class="ponto-actions">
         <template v-if="!ponto.connected">
-          <a v-if="ponto.can_manage" class="btn btn-primary" :href="route('bank.ponto.connect')">Bank koppelen</a>
+          <a v-if="ponto.can_manage && ponto.can_connect" class="btn btn-primary" :href="route('bank.ponto.connect')">Bank koppelen</a>
+          <template v-else-if="ponto.can_manage">
+            <span class="ponto-muted">{{ ponto.connect_hint }}</span>
+            <a class="btn btn-secondary btn-sm" :href="ponto.billing_url">Naar abonnement</a>
+          </template>
           <span v-else class="ponto-muted">Alleen de eigenaar kan een bank koppelen.</span>
         </template>
         <template v-else>
@@ -83,6 +88,7 @@ const toggleAccount = (account) => router.post(route('bank.ponto.account', accou
 .ponto-pill { font-size: 11px; font-weight: 600; line-height: 1; text-transform: uppercase; letter-spacing: .04em; padding: 4px 8px; border-radius: 999px; background: #fff4e5; color: #9a5b00; }
 .ponto-pill.ok { background: #e8f7ee; color: #157347; }
 .ponto-sub, .ponto-meta, .ponto-muted { font-size: 13px; color: var(--text-2); margin-top: 4px; line-height: 1.5; }
+.ponto-price { font-size: 13px; color: var(--text); margin-top: 6px; font-weight: 500; }
 .ponto-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .ponto-alert { margin-top: 12px; padding: 10px 12px; border-radius: 8px; background: #fff4e5; color: #9a5b00; font-size: 13px; }
 .ponto-accounts { margin-top: 14px; border-top: 1px solid var(--border); }

@@ -78,12 +78,12 @@ Route::get('/overstappen-van/{pakket}', function (string $pakket) {
     $ov = [
         'wefact' => [
             'name' => 'WeFact',
-            'intro' => 'WeFact is een degelijk pakket, maar rekent voor veel extra\'s apart: een verbruikslimiet per maand, € 5 per IBAN voor de bankkoppeling en betaalde extra opslag.',
+            'intro' => 'WeFact is een degelijk pakket, maar rekent voor veel extra\'s apart: een verbruikslimiet per maand en betaalde extra opslag.',
             'export' => 'Ga in WeFact naar Debiteuren → Exporteren en kies CSV; doe hetzelfde bij Producten. Voor openstaande facturen: Facturen → filter op "Openstaand" → Exporteren (CSV).',
             'compare_intro' => 'De belangrijkste verschillen op een rij — op basis van de instellingen en tarieven zoals WeFact die in augustus 2026 in de eigen omgeving toont.',
             'rows' => [
                 ['Facturen, offertes en inkoopfacturen', 'Verbruikslimiet per maand (bijv. 100 facturen, 100 offertes, 50 inkoopfacturen), overschot beperkt mee te nemen', 'Onbeperkt'],
-                ['Bankkoppeling', 'Directe koppeling: € 5,- excl. btw per maand per IBAN', 'Directe bankkoppeling via Ponto én gratis import van CAMT.053/MT940-afschriften, met automatische matching'],
+                ['Bankkoppeling', 'Directe koppeling: € 5,- excl. btw per maand per IBAN', 'Directe bankkoppeling via Ponto: € 5 excl. btw per rekening per maand, alleen voor rekeningen die je koppelt — plus gratis import van CAMT.053/MT940-afschriften met automatische matching'],
                 ['Opslagruimte voor bijlagen', '1 GB, uit te breiden voor € 2,50 per GB per maand', '2 GB inbegrepen (Slim: 10 GB)'],
                 ['Digitaal ondertekenen van offertes', 'Ondersteund', 'Inbegrepen, met bewijsdossier (naam, IP, tijdstip, handtekening)'],
                 ['Mail vanaf eigen domein', 'Ondersteund (DNS instellen)', 'Inbegrepen (DNS instellen)'],

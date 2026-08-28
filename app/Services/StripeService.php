@@ -26,6 +26,49 @@ class StripeService
         return $this->configured() && ! empty(config('services.stripe.price_id_slim'));
     }
 
+    /** Is de toeslag voor de bankkoppeling af te rekenen (aparte Stripe-price per rekening)? */
+    public function bankConfigured(): bool
+    {
+        return $this->configured() && ! empty(config('services.stripe.price_id_bank'));
+    }
+
+    /**
+     * Zet de hoeveelheid van een toeslag-price op een lopend abonnement: item
+     * aanmaken, bijwerken of (bij 0) verwijderen, met verrekening naar rato.
+     * Geeft het item-id terug, of null als het item is verwijderd.
+     */
+    public function setSubscriptionItemQuantity(string $subscriptionId, string $priceId, int $quantity, ?string $itemId = null): ?string
+    {
+        if ($itemId === null) {
+            foreach ($this->retrieveSubscription($subscriptionId)['items']['data'] ?? [] as $item) {
+                if (($item['price']['id'] ?? null) === $priceId) {
+                    $itemId = $item['id'];
+                    break;
+                }
+            }
+        }
+
+        if ($quantity <= 0) {
+            if ($itemId) {
+                $response = $this->request()->delete(self::BASE.'/subscription_items/'.$itemId, ['proration_behavior' => 'create_prorations']);
+                if ($response->failed() && $response->status() !== 404) {
+                    throw new RuntimeException('Stripe: toeslag verwijderen mislukt: '.$response->body());
+                }
+            }
+
+            return null;
+        }
+
+        $response = $itemId
+            ? $this->request()->post(self::BASE.'/subscription_items/'.$itemId, ['quantity' => $quantity, 'proration_behavior' => 'create_prorations'])
+            : $this->request()->post(self::BASE.'/subscription_items', ['subscription' => $subscriptionId, 'price' => $priceId, 'quantity' => $quantity, 'proration_behavior' => 'create_prorations']);
+        if ($response->failed()) {
+            throw new RuntimeException('Stripe: toeslag bijwerken mislukt: '.$response->body());
+        }
+
+        return (string) $response->json('id');
+    }
+
     /** Vertaal een Stripe-price-id naar onze abonnementssmaak. */
     public function planForPrice(?string $priceId): ?string
     {
@@ -187,9 +230,13 @@ class StripeService
 
         // Smaak (basis/slim) afleiden uit de afgesloten Stripe-price. Zo klopt
         // het plan ook na een overstap via het Stripe-klantportaal.
-        $plan = $this->planForPrice($subscription['items']['data'][0]['price']['id'] ?? null);
-        if ($plan !== null) {
-            $company->plan = $plan;
+        // De bankkoppeling-toeslag is een extra item; zoek het item met een abonnementsprice.
+        foreach ($subscription['items']['data'] ?? [] as $item) {
+            $plan = $this->planForPrice($item['price']['id'] ?? null);
+            if ($plan !== null) {
+                $company->plan = $plan;
+                break;
+            }
         }
 
         // In nieuwere Stripe-API-versies staat current_period_end op de

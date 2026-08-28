@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\SubscriptionCanceledMail;
 use App\Models\Company;
+use App\Services\Ponto\PontoService;
 use App\Services\ResendScheduler;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
@@ -92,6 +93,24 @@ class StripeWebhookController extends Controller
 
         $this->stripe->applySubscriptionToCompany($company, $subscription);
         $this->maybeSendCancellationEmail($company->fresh(), $subscription);
+
+        if (in_array($subscription['status'] ?? null, ['canceled', 'unpaid', 'incomplete_expired'], true)) {
+            $this->disconnectPonto($company->fresh());
+        }
+    }
+
+    /** Abonnement gestopt: bankkoppeling verbreken, zodat er geen rekeningkosten bij Ponto doorlopen. */
+    private function disconnectPonto(Company $company): void
+    {
+        $connection = $company->is_exempt ? null : $company->pontoConnection;
+        if (! $connection) {
+            return;
+        }
+        try {
+            app(PontoService::class)->disconnect($connection);
+        } catch (\Throwable $e) {
+            Log::warning('Ponto: ontkoppelen na opzegging mislukt', ['company' => $company->id, 'error' => $e->getMessage()]);
+        }
     }
 
     /**

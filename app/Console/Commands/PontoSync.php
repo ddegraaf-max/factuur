@@ -24,6 +24,11 @@ class PontoSync extends Command
 
         $connections = PontoConnection::where('status', PontoConnection::STATUS_ACTIVE)->get();
         foreach ($connections as $connection) {
+            // Proef/abonnement verlopen: niet synchroniseren (kost alleen maar Ponto-tegoed).
+            if (! $connection->company?->hasAccess()) {
+                $this->line("Administratie {$connection->company_id}: overgeslagen (geen actieve toegang).");
+                continue;
+            }
             try {
                 $imported = $syncer->sync($connection);
                 $this->info("Administratie {$connection->company_id}: {$imported} nieuwe transactie(s).");

@@ -36,6 +36,7 @@
         <ul class="tl-list">
           <li><b>Bank koppelen via Ponto</b> — bij Bank &amp; transacties koppel je met een paar klikken je zakelijke rekening (alle Nederlandse en Belgische banken). Nieuwe transacties komen daarna drie keer per dag vanzelf binnen, met dezelfde slimme koppelsuggesties als bij een geïmporteerd afschrift. Afschriften uploaden blijft gewoon werken.</li>
           <li><b>Saldo en toestemming in beeld</b> — per rekening zie je het actuele saldo, wanneer er voor het laatst is bijgewerkt en wanneer je bank om een nieuwe toestemming vraagt. Rekeningen die je niet wilt volgen zet je met één vinkje uit.</li>
+          <li><b>Kosten</b> — € 5 per gekoppelde rekening per maand (excl. btw), bovenop je abonnement en alleen voor rekeningen die je laat synchroniseren; het bedrag beweegt automatisch mee. Afschriften importeren blijft gratis.</li>
         </ul>
       </article>
 

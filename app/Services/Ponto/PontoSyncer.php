@@ -24,7 +24,7 @@ class PontoSyncer
     private const MAX_PAGES = 20;
     private const POLL_ATTEMPTS = 10;
 
-    public function __construct(private PontoService $ponto)
+    public function __construct(private PontoService $ponto, private PontoBilling $billing)
     {
     }
 
@@ -36,6 +36,7 @@ class PontoSyncer
             $token = $this->ponto->accessToken($connection);
             if ($refreshAccounts) {
                 $this->ponto->refreshAccounts($connection);
+                $this->billing->syncQuantity($connection);
             }
             foreach ($connection->accounts()->where('sync_enabled', true)->get() as $account) {
                 try {
@@ -170,6 +171,12 @@ class PontoSyncer
             'status' => $connection?->status,
             'last_synced_label' => $connection?->last_synced_at?->translatedFormat('j M Y, H:i'),
             'last_error' => $connection?->last_error,
+            'can_connect' => $this->billing->canConnect($company),
+            'connect_hint' => $this->billing->connectBlocker($company),
+            'price_label' => $company->is_exempt ? null : $this->billing->priceLabel(),
+            'billed_quantity' => (int) ($connection?->billed_quantity ?? 0),
+            'monthly_cost_label' => $connection && ! $company->is_exempt ? $this->billing->monthlyCostLabel($this->billing->billableQuantity($connection)) : null,
+            'billing_url' => route('billing.show'),
             'accounts' => $connection ? $connection->accounts()->orderBy('iban')->get()->map(fn (PontoAccount $a) => [
                 'id' => $a->id,
                 'label' => $a->label(),

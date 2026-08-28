@@ -84,6 +84,7 @@ class BillingController extends Controller
                         'BTW-overzicht, herinneringen, incasso en klantenportaal',
                         'Inkoop, uren, ritten en jaaroverzicht',
                         'Maandelijks opzegbaar',
+                        'Optioneel: automatische bankkoppeling voor € ' . number_format((float) config('services.ponto.account_price', 5), 2, ',', '.') . ' per rekening per maand',
                     ],
                     'available' => $this->stripe->configured(),
                 ],
@@ -94,7 +95,7 @@ class BillingController extends Controller
                     'vat_note' => 'Excl. 21% btw · € 21,18 incl. btw',
                     'tagline' => 'Alles uit Basis, plus de AI-assistent die werk uit handen neemt.',
                     'features' => array_values(array_filter([
-                        'Alles uit Basis',
+                        'Alles uit Basis (bankkoppeling optioneel, per rekening)',
                         'Scan & herken: bonnen en inkoopfacturen automatisch ingevuld',
                         'Postvak IN met automatische boekingsvoorstellen',
                         'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',

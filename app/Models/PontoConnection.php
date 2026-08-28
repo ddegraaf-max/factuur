@@ -14,7 +14,7 @@ class PontoConnection extends Model
 
     protected $fillable = [
         'company_id', 'access_token', 'refresh_token', 'token_expires_at', 'status', 'scope',
-        'sandbox', 'connected_at', 'last_synced_at', 'last_error',
+        'sandbox', 'connected_at', 'last_synced_at', 'last_error', 'stripe_item_id', 'billed_quantity',
     ];
 
     protected $casts = [
