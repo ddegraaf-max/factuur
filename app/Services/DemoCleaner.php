@@ -19,6 +19,16 @@ class DemoCleaner
             throw new \DomainException('Alleen demo-omgevingen kunnen zo worden verwijderd.');
         }
 
+        // Sinds 1.39.1 doet CompanyPurger het generieke opruimwerk (ook voor
+        // echte administraties via de eigenaarpagina); de oude, handmatige
+        // volgorde hieronder blijft als referentie staan maar wordt niet meer
+        // aangeroepen.
+        app(CompanyPurger::class)->purge($company);
+    }
+
+    /** @deprecated Zie CompanyPurger. */
+    protected function legacyDelete(Company $company): void
+    {
         DB::transaction(function () use ($company) {
             $invoiceIds = DB::table('invoices')->where('company_id', $company->id)->pluck('id');
 

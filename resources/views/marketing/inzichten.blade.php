@@ -48,7 +48,7 @@
   <a class="back" href="{{ route('dashboard') }}">← Terug naar EasyInvoice</a>
   <h1 style="margin-top:14px;">Marketing-inzichten</h1>
   <div class="sub">Publieke pagina's, afgelopen {{ $days }} dagen. First-party gemeten, zonder cookies — bots en ingelogde gebruikers tellen niet mee.</div>
-  <div class="sub" style="margin-top:6px;"><a href="{{ route('brand.index') }}">Merkbewaking →</a> verwarringslog en maandelijkse merkgebruik-dossiers.</div>
+  <div class="sub" style="margin-top:6px;"><a href="{{ route('brand.index') }}">Merkbewaking →</a> verwarringslog en maandelijkse merkgebruik-dossiers. &nbsp;·&nbsp; <a href="{{ route('owner.companies.index') }}">Administraties →</a> alle accounts, testaccounts opruimen.</div>
 
   <div class="kpis">
     <div class="kpi"><div class="label">Unieke bezoekers</div><div class="value">{{ number_format($totals['visitors'], 0, ',', '.') }}</div></div>

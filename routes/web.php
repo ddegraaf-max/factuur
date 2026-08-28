@@ -91,6 +91,12 @@ Route::get('/kennisbank/{slug}', function (string $slug) {
 Route::get('/marketing-inzichten', [\App\Http\Controllers\MarketingStatsController::class, 'index'])
     ->middleware('auth')->name('marketing.inzichten');
 
+// Eigenaar: alle administraties bekijken en (test)accounts definitief opruimen.
+Route::middleware(['auth', 'owner'])->prefix('eigenaar')->name('owner.')->group(function () {
+    Route::get('administraties', [\App\Http\Controllers\OwnerAdministrationsController::class, 'index'])->name('companies.index');
+    Route::delete('administraties/{company}', [\App\Http\Controllers\OwnerAdministrationsController::class, 'destroy'])->name('companies.destroy');
+});
+
 // Merkbewaking (alleen eigenaar; check in de controller): verwarringslog + merkgebruik-dossiers.
 Route::middleware(['auth', 'owner'])->prefix('merkbewaking')->name('brand.')->group(function () {
     Route::get('/', [\App\Http\Controllers\BrandEvidenceController::class, 'index'])->name('index');
