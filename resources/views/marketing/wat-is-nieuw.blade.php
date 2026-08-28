@@ -31,6 +31,20 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.41.0</div>
+        <h2>Groot onderhoud: incasso, auditfile, eigen domein, overstappen en zoeken</h2>
+        <ul class="tl-list">
+          <li><b>Automatische incasso (SEPA)</b> — leg per klant een machtiging vast en bundel open facturen in één incassobestand voor je bank (Verkoop → Automatische incasso). CORE en B2B, eerste en vervolgincasso's, alles volgens de bankstandaard pain.008.</li>
+          <li><b>Auditfile voor je accountant (XAF 3.2)</b> — bij Export boekhouder download je per boekjaar het standaardbestand dat Twinfield, Exact, e-Boekhouden en de Belastingdienst direct inlezen: verkoop-, inkoop- en bankboek met btw per tarief.</li>
+          <li><b>Mail vanaf je eigen domein</b> — koppel je domein bij Instellingen → Koppelingen (twee DNS-records) en je facturen, offertes en herinneringen gaan uit als bijvoorbeeld facturen@jouwbedrijf.nl.</li>
+          <li><b>Overstapwizard</b> — klanten, producten en openstaande facturen uit WeFact, Moneybird, e-Boekhouden of Excel importeren met automatische kolomherkenning (Instellingen → Overstappen).</li>
+          <li><b>Zoeken met Ctrl-K</b> — vind elke factuur, offerte, klant of product vanaf elke pagina, en spring met een paar letters naar acties als "nieuwe offerte".</li>
+          <li><b>Installeerbaar als app</b> op telefoon en desktop, en een opslagmeter bij Bedrijfsgegevens.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.40.0</div>
         <h2>Logboek, jouw gegevens en bewaking</h2>
         <ul class="tl-list">

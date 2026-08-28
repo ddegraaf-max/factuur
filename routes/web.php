@@ -73,6 +73,66 @@ Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uu
 Route::view('/facturatie-met-ai', 'marketing.facturatie-met-ai')->name('ai');
 Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders');
 
+// Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
+Route::get('/overstappen-van/{pakket}', function (string $pakket) {
+    $ov = [
+        'wefact' => [
+            'name' => 'WeFact',
+            'intro' => 'WeFact is een degelijk pakket, maar rekent voor veel extra\'s apart: een verbruikslimiet per maand, € 5 per IBAN voor de bankkoppeling en betaalde extra opslag.',
+            'export' => 'Ga in WeFact naar Debiteuren → Exporteren en kies CSV; doe hetzelfde bij Producten. Voor openstaande facturen: Facturen → filter op "Openstaand" → Exporteren (CSV).',
+            'compare_intro' => 'De belangrijkste verschillen op een rij — op basis van de instellingen en tarieven zoals WeFact die in augustus 2026 in de eigen omgeving toont.',
+            'rows' => [
+                ['Facturen, offertes en inkoopfacturen', 'Verbruikslimiet per maand (bijv. 100 facturen, 100 offertes, 50 inkoopfacturen), overschot beperkt mee te nemen', 'Onbeperkt'],
+                ['Bankkoppeling', 'Directe koppeling: € 5,- excl. btw per maand per IBAN', 'Gratis import van CAMT.053/MT940-afschriften met automatische matching; directe koppeling in voorbereiding'],
+                ['Opslagruimte voor bijlagen', '1 GB, uit te breiden voor € 2,50 per GB per maand', '2 GB inbegrepen (Slim: 10 GB)'],
+                ['Digitaal ondertekenen van offertes', 'Ondersteund', 'Inbegrepen, met bewijsdossier (naam, IP, tijdstip, handtekening)'],
+                ['Mail vanaf eigen domein', 'Ondersteund (DNS instellen)', 'Inbegrepen (DNS instellen)'],
+                ['Automatische incasso (SEPA)', 'Ondersteund', 'Inbegrepen: machtigingen per klant en pain.008-bestanden voor je bank'],
+                ['Peppol e-facturatie', 'Ondersteund', 'Inbegrepen: verzenden én ontvangen, registratie in één klik'],
+                ['AI: bonnen en inkoopfacturen automatisch inlezen', 'Niet standaard', 'In Slim: bonherkenning, Postvak IN en offerte uit tekst'],
+                ['Auditfile (XAF 3.2) voor de accountant', 'Ondersteund', 'Inbegrepen, per boekjaar'],
+            ],
+            'compare_note' => 'Vergelijking op hoofdlijnen; controleer de actuele voorwaarden van WeFact op hun eigen website. EasyInvoice Basis: € 10 per maand excl. btw (€ 12,10 incl.), maandelijks opzegbaar.',
+        ],
+        'moneybird' => [
+            'name' => 'Moneybird',
+            'intro' => 'Moneybird is een volledig boekhoudpakket. Wil je vooral snel en netjes factureren, offertes laten ondertekenen en je btw op orde hebben — zonder de complexiteit van een grootboek — dan is EasyInvoice lichter, sneller en goedkoper.',
+            'export' => 'Ga in Moneybird naar Contacten → Exporteren (CSV) en naar Producten → Exporteren. Openstaande facturen: Verkoopfacturen → filter "Openstaand" → Exporteren als CSV.',
+            'compare_intro' => 'Waar EasyInvoice bewust anders is dan een boekhoudpakket.',
+            'rows' => [
+                ['Opzet', 'Volledige boekhouding met grootboek en journaalposten', 'Facturatie-eerst: factureren, innen, btw — de boekhouder krijgt een XAF-auditfile'],
+                ['Facturen en offertes', 'Ondersteund', 'Onbeperkt, met digitale ondertekening en klantenportaal'],
+                ['iDEAL-betalingen', 'Via betaalprovider', 'Via je eigen Mollie-account — betalingen direct op jouw rekening'],
+                ['Peppol e-facturatie', 'Ondersteund', 'Inbegrepen: verzenden én ontvangen'],
+                ['Automatische incasso (SEPA)', 'Ondersteund', 'Inbegrepen'],
+                ['AI voor bonnen en inkoopfacturen', 'Ondersteund', 'In Slim, inclusief Postvak IN per e-mail en offerte uit tekst'],
+                ['Boekhouder meekijken', 'Ondersteund', 'Gratis, alleen-lezen, plus automatische kopie van elke factuur'],
+                ['Prijs', 'Zie de website van Moneybird', 'Basis € 10 / Slim € 17,50 per maand excl. btw, maandelijks opzegbaar'],
+            ],
+            'compare_note' => 'Vergelijking op hoofdlijnen; raadpleeg voor actuele functies en tarieven de website van Moneybird.',
+        ],
+        'e-boekhouden' => [
+            'name' => 'e-Boekhouden.nl',
+            'intro' => 'e-Boekhouden.nl is sterk in boekhouden, maar factureren en offertes voelen er vaak als bijzaak. EasyInvoice draait dat om: alles wat met verkopen, innen en klantcontact te maken heeft staat centraal — en je boekhouder krijgt precies wat hij nodig heeft.',
+            'export' => 'Ga in e-Boekhouden.nl naar Relaties → Exporteren (CSV) en naar Producten/Artikelen → Exporteren. Openstaande facturen: Facturen → Openstaande posten → Exporteren.',
+            'compare_intro' => 'Waar EasyInvoice bewust anders is dan een boekhoudpakket.',
+            'rows' => [
+                ['Opzet', 'Boekhouding met grootboek', 'Facturatie-eerst; auditfile (XAF) en exports voor de boekhouding'],
+                ['Offertes met digitale handtekening', 'Beperkt', 'Inbegrepen, met bewijsdossier en automatische bevestiging'],
+                ['Klantenportaal (inzien, downloaden, betalen)', 'Beperkt', 'Inbegrepen, met iDEAL via je eigen Mollie-account'],
+                ['Betalingsherinneringen en aanmaningen', 'Ondersteund', 'Automatisch, in jouw teksten, met incassodossier als sluitstuk'],
+                ['Peppol e-facturatie', 'Ondersteund', 'Inbegrepen: verzenden én ontvangen'],
+                ['AI voor bonnen en inkoopfacturen', 'Ondersteund', 'In Slim, inclusief Postvak IN per e-mail'],
+                ['Prijs', 'Zie de website van e-Boekhouden.nl', 'Basis € 10 / Slim € 17,50 per maand excl. btw, maandelijks opzegbaar'],
+            ],
+            'compare_note' => 'Vergelijking op hoofdlijnen; raadpleeg voor actuele functies en tarieven de website van e-Boekhouden.nl.',
+        ],
+    ];
+    abort_unless(isset($ov[$pakket]), 404);
+
+    return view('marketing.overstappen', ['from' => $ov[$pakket]]);
+})->where('pakket', '[a-z-]+')->name('overstappen.van');
+
 // ---------- KENNISBANK ----------
 // SEO-artikelen over factureren, btw en betaald krijgen (config/kennisbank.php).
 Route::view('/kennisbank', 'marketing.kennisbank')->name('kennisbank');
@@ -118,7 +178,8 @@ Route::get('/sitemap.xml', function () {
         '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
         '/login', '/register',
         '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
-        '/facturatie-met-ai', '/boekhouders', '/kennisbank',
+        '/facturatie-met-ai', '/boekhouders', '/kennisbank', '/verwerkersovereenkomst',
+        '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
     ];
     foreach (array_keys(config('help.articles', [])) as $slug) {
         $paths[] = '/helpcentrum/' . $slug;
