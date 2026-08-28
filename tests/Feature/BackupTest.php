@@ -41,10 +41,10 @@ class BackupTest extends TestCase
         $this->configure();
         Cache::forget(BackupService::LAST_OK_KEY);
         $old = now('UTC')->subDays(45)->format('Y-m-d');
-        Http::fake([
-            'example.r2.cloudflarestorage.com/easyinvoice-backups?*' => Http::response('<?xml version="1.0"?><ListBucketResult><Contents><Key>prod/easyinvoice-' . $old . '-0330.dump</Key><Size>10</Size></Contents><Contents><Key>prod/easyinvoice-' . now('UTC')->format('Y-m-d') . '-0100.dump</Key><Size>10</Size></Contents></ListBucketResult>'),
-            'example.r2.cloudflarestorage.com/*' => Http::response('', 200),
-        ]);
+        $listing = '<?xml version="1.0" encoding="UTF-8"?><ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>easyinvoice-backups</Name><Contents><Key>prod/easyinvoice-' . $old . '-0330.dump</Key><Size>10</Size></Contents><Contents><Key>prod/easyinvoice-' . now('UTC')->format('Y-m-d') . '-0100.dump</Key><Size>10</Size></Contents></ListBucketResult>';
+        Http::fake(fn ($request) => $request->method() === 'GET' && str_contains($request->url(), 'list-type=2')
+            ? Http::response($listing, 200, ['Content-Type' => 'application/xml'])
+            : Http::response('', 200));
 
         $this->artisan('backup:run')->assertExitCode(0);
 

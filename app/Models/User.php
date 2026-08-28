@@ -102,7 +102,7 @@ class User extends Authenticatable
 
     public function roleLabel(): string
     {
-        return self::ROLE_LABELS[$this->role] ?? $this->role;
+        return self::ROLE_LABELS[$this->role] ?? ucfirst((string) ($this->role ?: 'eigenaar'));
     }
 
     /** Stuur de wachtwoord-reset e-mail in het Nederlands. */

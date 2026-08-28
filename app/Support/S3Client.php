@@ -115,8 +115,11 @@ class S3Client
     private function request(string $method, string $objectKey, array $query = [], string $body = '', array $extraHeaders = []): Response
     {
         $headers = $this->signedHeaders($method, $objectKey, $query, $body, $extraHeaders);
+        $pending = Http::withHeaders($headers)->timeout(120);
+        if ($body !== '') {
+            $pending = $pending->withBody($body, $extraHeaders['content-type'] ?? 'application/octet-stream');
+        }
 
-        return Http::withHeaders($headers)->timeout(120)->withBody($body, $extraHeaders['content-type'] ?? 'application/octet-stream')
-            ->send($method, $this->url($objectKey, $query));
+        return $pending->send($method, $this->url($objectKey, $query));
     }
 }

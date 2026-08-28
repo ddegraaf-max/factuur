@@ -287,7 +287,7 @@ class Company extends Model
             return 0;
         }
 
-        return (int) ceil(now()->floatDiffInDays($end));
+        return (int) ceil((float) now()->diffInDays($end, true));
     }
 
     /** Status voor de UI: 'exempt' | 'trialing' | 'active' | 'expired'. */

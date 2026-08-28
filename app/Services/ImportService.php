@@ -253,7 +253,7 @@ class ImportService
         ]);
 
         if ($paid > 0) {
-            Payment::create(['company_id' => $company->id, 'invoice_id' => $invoice->id, 'kind' => 'payment', 'amount' => min($paid, $total), 'paid_on' => $date->toDateString(), 'method' => 'bank', 'notes' => 'Overgenomen bij import']);
+            Payment::create(['company_id' => $company->id, 'invoice_id' => $invoice->id, 'kind' => 'payment', 'amount' => min($paid, $total), 'paid_on' => $date->toDateString(), 'method' => 'bank_transfer', 'notes' => 'Overgenomen bij import']);
         }
 
         return true;

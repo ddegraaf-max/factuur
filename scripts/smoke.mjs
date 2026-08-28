@@ -71,13 +71,23 @@ async function waitForVersion(version) {
   }
 
   console.log('Gezondheid');
-  try {
-    const res = await fetch(BASE + '/health');
-    const health = await res.json();
-    if (res.status === 200 && health.status === 'ok') ok(`/health (planner ${health.checks?.scheduler?.age_minutes ?? '?'} min geleden, ${health.version})`);
-    else fail('/health', `status ${res.status}: ${JSON.stringify(health.checks)}`);
-  } catch (e) {
-    fail('/health', e.message);
+  // Direct na een deploy heeft de planner zijn eerste hartslag (elke 5 min) nog
+  // niet gegeven; daarom maximaal ~7 minuten geduld voordat we dit een fout noemen.
+  const healthDeadline = Date.now() + 7 * 60 * 1000;
+  for (;;) {
+    let health = null, status = 0;
+    try {
+      const res = await fetch(BASE + '/health');
+      status = res.status;
+      health = await res.json();
+    } catch (e) {
+      health = { checks: { error: e.message } };
+    }
+    if (status === 200 && health.status === 'ok') { ok(`/health (planner ${health.checks?.scheduler?.age_minutes ?? '?'} min geleden, ${health.version})`); break; }
+    const onlyScheduler = health.checks?.database?.ok && health.checks?.scheduler && !health.checks.scheduler.ok && (health.checks.backup?.ok ?? true);
+    if (onlyScheduler && Date.now() < healthDeadline) { process.stdout.write('  … planner-hartslag nog niet gezien, even wachten\n'); await new Promise(r => setTimeout(r, 30000)); continue; }
+    fail('/health', `status ${status}: ${JSON.stringify(health.checks)}`);
+    break;
   }
 
   console.log('Demo-sandbox');

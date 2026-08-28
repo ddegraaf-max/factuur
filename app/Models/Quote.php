@@ -107,7 +107,7 @@ class Quote extends Model
             return 0;
         }
 
-        return (int) ceil(now()->floatDiffInDays($this->valid_until));
+        return (int) ceil((float) now()->diffInDays($this->valid_until, true));
     }
 
     public function scopeForStatus(Builder $query, ?string $status): Builder

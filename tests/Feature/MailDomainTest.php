@@ -25,7 +25,9 @@ class MailDomainTest extends TestCase
         $state = ['status' => 'pending'];
         Http::fake([
             'api.resend.com/domains/dom_1/verify' => Http::response(['object' => 'domain', 'id' => 'dom_1']),
-            'api.resend.com/domains/dom_1' => fn () => Http::response(['id' => 'dom_1', 'name' => 'vriesdesign.nl', 'status' => $state['status'], 'records' => array_map(fn ($r) => $r + ['status' => $state['status'] === 'verified' ? 'verified' : 'pending'], $records)]),
+            'api.resend.com/domains/dom_1' => function () use (&$state, $records) {
+                return Http::response(['id' => 'dom_1', 'name' => 'vriesdesign.nl', 'status' => $state['status'], 'records' => array_map(fn ($r) => $r + ['status' => $state['status'] === 'verified' ? 'verified' : 'pending'], $records)]);
+            },
             'api.resend.com/domains' => Http::response(['id' => 'dom_1', 'name' => 'vriesdesign.nl', 'status' => 'not_started', 'records' => $records]),
         ]);
 
