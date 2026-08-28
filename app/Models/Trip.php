@@ -61,7 +61,7 @@ class Trip extends Model
     /** Factureerbaar: open, aan een klant gekoppeld en op factureerbaar gezet. */
     public function scopeBillable(Builder $query): Builder
     {
-        return $query->open()->where('billable', true)->whereNotNull('customer_id')->where('kilometers', '>', 0);
+        return $this->scopeOpen($query)->where('billable', true)->whereNotNull('customer_id')->where('kilometers', '>', 0);
     }
 
     /** Het geldende tarief: eigen tarief van de rit, anders het bedrijfstarief. */

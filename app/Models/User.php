@@ -67,7 +67,7 @@ class User extends Authenticatable
 
         $this->forceFill([
             'company_id' => $company->id,
-            'role' => $membership->pivot->role ?: 'staff',
+            'role' => $membership->pivot->getAttribute('role') ?: 'staff',
         ])->save();
 
         return true;

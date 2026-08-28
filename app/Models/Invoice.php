@@ -38,6 +38,7 @@ class Invoice extends Model
         'paid_at' => 'datetime',
         'thanks_sent_at' => 'datetime',
         'incasso_sent_at' => 'datetime',
+        'peppol_sent_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',

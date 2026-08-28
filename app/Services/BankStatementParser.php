@@ -146,21 +146,27 @@ class BankStatementParser
         $current = null;
         $inDescription = false;
 
-        $flush = function () use (&$current, &$rows) {
-            if ($current !== null) {
-                // Eerst tegenpartij uit de RUWE tekst halen (daar staan de
-                // /NAME/- en /IBAN/-markeringen nog in), daarna opschonen.
-                [$current['counterparty_name'], $current['counterparty_iban']] =
-                    $this->extractCounterparty($current['description']);
-                $current['description'] = mb_substr($this->cleanMt940Description($current['description']), 0, 1000) ?: null;
-                $rows[] = $current;
-                $current = null;
+        // Rondt de lopende transactie af en geeft hem terug (null als er geen is).
+        $flush = function () use (&$current): ?array {
+            if ($current === null) {
+                return null;
             }
+            // Eerst tegenpartij uit de RUWE tekst halen (daar staan de
+            // /NAME/- en /IBAN/-markeringen nog in), daarna opschonen.
+            [$current['counterparty_name'], $current['counterparty_iban']] =
+                $this->extractCounterparty($current['description']);
+            $current['description'] = mb_substr($this->cleanMt940Description($current['description']), 0, 1000) ?: null;
+            $row = $current;
+            $current = null;
+
+            return $row;
         };
 
         foreach ($lines as $line) {
             if (str_starts_with($line, ':61:')) {
-                $flush();
+                if ($row = $flush()) {
+                    $rows[] = $row;
+                }
                 $inDescription = false;
 
                 // :61:JJMMDD[MMDD]D/C[funds]bedrag,decNTYPE...
@@ -194,7 +200,9 @@ class BankStatementParser
                 $current['description'] .= $line . ' ';
             }
         }
-        $flush();
+        if ($row = $flush()) {
+            $rows[] = $row;
+        }
 
         if (empty($rows)) {
             throw new \DomainException('Geen transacties gevonden in dit MT940-bestand.');

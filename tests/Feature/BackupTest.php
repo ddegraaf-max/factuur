@@ -31,8 +31,8 @@ class BackupTest extends TestCase
 
         $this->assertSame('20260829T033000Z', $headers['x-amz-date']);
         $this->assertSame(hash('sha256', 'inhoud'), $headers['x-amz-content-sha256']);
-        $this->assertStringStartsWith('AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE/20260829/auto/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=', $headers['authorization']);
-        $this->assertMatchesRegularExpression('/Signature=[0-9a-f]{64}$/', $headers['authorization']);
+        $this->assertStringStartsWith('AWS4-HMAC-SHA256 Credential=AKIAEXAMPLE/20260829/auto/s3/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date, Signature=', $headers['Authorization']);
+        $this->assertMatchesRegularExpression('/Signature=[0-9a-f]{64}$/', $headers['Authorization']);
         $this->assertSame('https://example.r2.cloudflarestorage.com/easyinvoice-backups/prod/easyinvoice-2026-08-29-0330.dump', $client->url('prod/easyinvoice-2026-08-29-0330.dump'));
     }
 

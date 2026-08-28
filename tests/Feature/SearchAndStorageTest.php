@@ -38,7 +38,8 @@ class SearchAndStorageTest extends TestCase
     {
         $this->demoUser();
         $other = new \App\Models\Company();
-        $other->forceFill(['name' => 'Andere BV'])->save();
+        // Met proefperiode, anders stuurt 'subscribed' door naar de abonnementspagina.
+        $other->forceFill(['name' => 'Andere BV', 'trial_ends_at' => now()->addDays(14)])->save();
         $stranger = new \App\Models\User();
         $stranger->forceFill(['name' => 'Vreemde', 'email' => 'vreemde@example.com', 'password' => bcrypt('x-y-z-1234'), 'company_id' => $other->id])->save();
 

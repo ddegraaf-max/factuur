@@ -2,7 +2,7 @@
 #  - lint: elk PHP-bestand door php -l (fatale syntaxfouten)
 #  - tests: rookproef van alle pagina's + kernflows op een echte Postgres
 #  - frontend: Vite-build (Vue-compilefouten)
-#  - static: Larastan (ontbrekende imports, onbekende methodes) — informatief
+#  - static: Larastan niveau 2 (ontbrekende imports, onbekende methodes/props)
 name: CI bugscan
 
 on:
@@ -95,10 +95,9 @@ jobs:
       - run: npm run build
 
   static:
-    name: Larastan (informatief)
+    name: Larastan (statische analyse)
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    continue-on-error: true   # eerst de bestaande stand zien; daarna aanscherpen
     steps:
       - uses: actions/checkout@v5
       - uses: shivammathur/setup-php@v2

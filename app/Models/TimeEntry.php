@@ -64,7 +64,7 @@ class TimeEntry extends Model
      */
     public function scopeBillable(Builder $query): Builder
     {
-        return $query->open()->where('billable', true)->whereNotNull('customer_id')
+        return $this->scopeOpen($query)->where('billable', true)->whereNotNull('customer_id')
             ->whereNull('time_card_id')->where('minutes', '>', 0);
     }
 

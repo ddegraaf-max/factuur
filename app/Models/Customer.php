@@ -8,6 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Telkolommen uit withCount() in CustomerController::index.
+ *
+ * @property-read int $invoices_count
+ * @property-read int $quotes_count
+ * @property-read int $open_quotes_count
+ */
 class Customer extends Model
 {
     use HasFactory;
