@@ -36,6 +36,14 @@ class AttachmentController extends Controller
             'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
         ]);
 
+        // Opslagmeter: boven de limiet geen nieuwe bijlagen (zie App\Support\StorageUsage).
+        $incoming = array_sum(array_map(fn ($f) => (int) $f->getSize(), $request->file('files', [])));
+        if (! \App\Support\StorageUsage::hasRoomFor($request->user()->company, $incoming)) {
+            $usage = \App\Support\StorageUsage::for($request->user()->company);
+
+            return back()->withErrors(['files' => "De opslag van je administratie is vol ({$usage['used_label']} van {$usage['limit_label']}). Verwijder oude bijlagen of stap over op Slim (10 GB)."]);
+        }
+
         $added = 0;
         foreach ($request->file('files', []) as $file) {
             // In de database opslaan (base64), niet op schijf: het bestandssysteem

@@ -51,6 +51,10 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#E8231F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="EasyInvoice">
 
     @routes
     @vite(['resources/js/app.js'])

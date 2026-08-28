@@ -79,6 +79,7 @@ class SettingsController extends Controller
             // De key zelf blijft geheim (hidden); de interface hoeft alleen te
             // weten óf er een Mollie-koppeling is.
             'mollie_connected' => filled(auth()->user()->company->mollie_api_key),
+            'storage' => \App\Support\StorageUsage::for(auth()->user()->company),
         ]);
     }
 

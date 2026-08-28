@@ -14,6 +14,7 @@ const destroyCompany = () => {
 const props = defineProps({
   company: Object,
   mollie_connected: Boolean, // is er een Mollie-koppeling? (de key zelf blijft geheim)
+  storage: Object,           // { used_bytes, limit_bytes, percent, used_label, limit_label, full }
 });
 
 const form = useForm({
@@ -290,6 +291,13 @@ const submit = () => form.patch(route('settings.company.update'));
           </div>
         </div>
         <div class="card-body">
+          <div class="data-row" v-if="storage">
+            <div style="flex:1;">
+              <div class="toggle-title">Opslag: {{ storage.used_label }} van {{ storage.limit_label }}</div>
+              <div class="storage-bar"><div class="storage-fill" :class="{ warn: storage.percent > 80, full: storage.full }" :style="{ width: Math.max(1, storage.percent) + '%' }"></div></div>
+              <div class="toggle-sub">Bijlagen bij facturen, offertes en inkoop, plus bonnetjes in het Postvak IN en je logo. {{ storage.full ? 'De opslag is vol — verwijder oude bijlagen of stap over op Slim (10 GB).' : 'Ruim voldoende voor jaren aan PDF\'s en bonnen; Slim heeft 10 GB.' }}</div>
+            </div>
+          </div>
           <div class="data-row">
             <div>
               <div class="toggle-title">Volledige export</div>
@@ -314,6 +322,10 @@ const submit = () => form.patch(route('settings.company.update'));
 .data-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border); }
 .data-row:first-child { border-top: none; padding-top: 0; }
 .data-row .toggle-sub { max-width: 620px; }
+.storage-bar { height: 8px; border-radius: 100px; background: var(--surface-3); overflow: hidden; margin: 8px 0 6px; max-width: 420px; }
+.storage-fill { height: 100%; background: var(--success); border-radius: 100px; transition: width .3s; }
+.storage-fill.warn { background: var(--warning); }
+.storage-fill.full { background: var(--brand); }
 .btn-danger-ghost { color: #B91C1C; border-color: #FECACA; flex: none; }
 .btn-danger-ghost:hover { background: #FEF2F2; }
 .mollie-status {

@@ -8,6 +8,12 @@ import { ZiggyVue } from 'ziggy-js';
 
 const appName = import.meta.env.VITE_APP_NAME || 'EasyInvoice';
 
+// PWA: installeerbaar op telefoon/desktop; de service worker cachet alleen
+// statische bestanden. Niet in development (zou Vite's hot reload storen).
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
 // Vangnet: als een Inertia-bezoek een gewone HTML-pagina terugkrijgt (bijv. een
 // Blade-route zoals de homepage, of een sessie die verlopen is), toont Inertia
 // standaard een debug-modal met de pagina in een iframe. Dat willen we niet in

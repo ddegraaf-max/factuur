@@ -368,6 +368,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::resource('products', ProductController::class);
 
     // Invoices
+    // Globaal zoeken (Ctrl/⌘-K in de bovenbalk)
+    Route::get('zoeken', \App\Http\Controllers\SearchController::class)->middleware('throttle:120,1')->name('search');
+
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');

@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import Toast from '@/Components/Toast.vue';
 import EasyAgent from '@/Components/EasyAgent.vue';
+import GlobalSearch from '@/Components/GlobalSearch.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -236,6 +237,7 @@ const logout = () => {
           <slot name="breadcrumb"></slot>
         </div>
         <div class="topbar-right">
+          <GlobalSearch />
           <!-- Boekhouder-rol is alleen-lezen: geen aanmaak-/opslaknoppen tonen. -->
           <span v-if="can.write === false" class="readonly-badge" title="Je kunt alles inzien en exporteren, maar niets wijzigen.">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>

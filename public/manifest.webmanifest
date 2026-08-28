@@ -1,0 +1,21 @@
+{
+  "name": "EasyInvoice",
+  "short_name": "EasyInvoice",
+  "description": "Facturen, offertes en inkoop — snel en zonder gedoe.",
+  "lang": "nl",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#E8231F",
+  "icons": [
+    { "src": "/images/easyinvoice-favicon-180.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/images/easyinvoice-favicon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/images/easyinvoice-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nieuwe factuur", "url": "/invoices/create", "icons": [{ "src": "/images/easyinvoice-favicon-180.png", "sizes": "180x180" }] },
+    { "name": "Nieuwe offerte", "url": "/offertes/create" },
+    { "name": "Postvak IN (bonnetje scannen)", "url": "/inkoop/postvak" }
+  ]
+}
