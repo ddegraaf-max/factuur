@@ -17,8 +17,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Nooit in productie: de voorbeeldadministratie is alleen voor lokaal
+        // ontwikkelen. De publieke demo gebruikt DemoDataBuilder (sandboxes met
+        // is_demo, zonder echte e-mail). Op 28-08-2026 zette deze seeder na een
+        // deploy "Vries Design B.V." terug en mailde daarbij een incassodossier
+        // naar de incassopartner — vandaar deze grendel én geen --seed meer in railway.json.
+        if (app()->environment('production')) {
+            $this->command?->warn('Seeder overgeslagen: draait niet in productie.');
+
+            return;
+        }
+
         // Idempotent guard: if demo data already exists, skip seeding entirely.
-        // This makes it safe to run `migrate --force --seed` on every deploy.
         if (User::where('email', 'demo@easyinvoice.test')->exists()) {
             $this->command->info('Demo data already present — skipping seeder.');
             return;

@@ -80,7 +80,8 @@ class IncassoService
                 }
             }
 
-            Mail::to(config('incasso.claims_email'))
+            // Demo-/voorbeeldadministraties mailen de incassopartner nooit echt.
+            Mail::mailer($invoice->company?->is_demo ? 'log' : null)->to(config('incasso.claims_email'))
                 ->cc(config('incasso.cc'))
                 ->send(new IncassoDossierMail($invoice, $pdf, $files));
         } catch (\Throwable $e) {
