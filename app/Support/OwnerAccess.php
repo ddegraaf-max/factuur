@@ -20,7 +20,19 @@ class OwnerAccess
             ->map(fn ($email) => mb_strtolower(trim($email)))
             ->filter();
 
-        return $allowed->isNotEmpty() ? $allowed->contains(mb_strtolower($user->email)) : $user->id === 1;
+        return $allowed->isNotEmpty()
+            ? $allowed->contains(mb_strtolower($user->email))
+            : $user->id === static::owner()?->id;
+    }
+
+    /**
+     * De eigenaar: de allereerste gebruiker. Bewust "laagste id" en niet
+     * letterlijk 1 — in tests (Postgres-sequences lopen door na een rollback)
+     * is de eerste gebruiker niet altijd id 1.
+     */
+    public static function owner(): ?User
+    {
+        return User::query()->orderBy('id')->first();
     }
 
     /** Adressen waar eigenaarsmail (dossiers) naartoe gaat. */
@@ -36,7 +48,7 @@ class OwnerAccess
             return $configured;
         }
 
-        $owner = User::find(1);
+        $owner = static::owner();
 
         return $owner ? [$owner->email] : [];
     }

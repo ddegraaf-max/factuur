@@ -74,7 +74,8 @@ jobs:
           mkdir -p storage/framework/{cache,sessions,views,testing} storage/logs bootstrap/cache
 
       - name: Tests
-        run: php artisan test --without-tty --colors=never
+        # Kale PHPUnit-uitvoer: volledige meldingen (artisan test kapt lange regels af).
+        run: vendor/bin/phpunit --colors=never --display-warnings --display-notices
 
       - name: Laravel-log bij falen
         if: failure()

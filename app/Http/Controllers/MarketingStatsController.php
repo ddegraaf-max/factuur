@@ -101,6 +101,6 @@ class MarketingStatsController extends Controller
             return $allowed->contains(mb_strtolower($user->email));
         }
 
-        return $user->id === 1;
+        return $user->id === \App\Support\OwnerAccess::owner()?->id;
     }
 }

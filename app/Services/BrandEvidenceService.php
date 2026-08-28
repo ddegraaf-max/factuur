@@ -187,8 +187,7 @@ class BrandEvidenceService
     /** Een verstuurde factuur van de eigenaarsadministratie (liefst uit deze maand, anders de laatste). */
     protected function ownerInvoice(Carbon $start, Carbon $end): ?Invoice
     {
-        $owner = \App\Models\User::find(1);
-        $companyId = $owner?->company_id;
+        $companyId = OwnerAccess::owner()?->company_id;
         if (! $companyId) {
             return null;
         }
