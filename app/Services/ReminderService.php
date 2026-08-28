@@ -221,6 +221,8 @@ class ReminderService
             'sent_at' => now(),
         ]);
 
+        \App\Support\Audit::log('reminded', $invoice, ucfirst($label) . ' voor ' . \App\Support\Audit::label($invoice) . ' verstuurd naar ' . $invoice->customer_email, [], $company->id);
+
         return true;
     }
 

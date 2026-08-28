@@ -207,6 +207,8 @@ class InvoiceManager
 
         $this->emailInvoice($invoice);
 
+        \App\Support\Audit::log('sent', $invoice, \App\Support\Audit::label($invoice) . ' verstuurd' . ($invoice->customer_email ? ' naar ' . $invoice->customer_email : ' (zonder e-mail)'));
+
         return $invoice;
     }
 

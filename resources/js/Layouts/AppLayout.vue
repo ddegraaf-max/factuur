@@ -75,6 +75,7 @@ const rawNav = [
       { name: 'E-mailteksten', route: 'settings.emails', icon: 'mail', can: 'settings' },
       { name: 'Koppelingen', route: 'settings.integrations', icon: 'plug', can: 'settings', badge: 'Nieuw' },
       { name: 'Team', route: 'settings.team', icon: 'users', can: 'team' },
+      { name: 'Logboek', route: 'settings.activity', icon: 'clock', can: 'settings', badge: 'Nieuw' },
       { name: 'Beveiliging', route: 'settings.security', icon: 'shield' },
       { name: 'Abonnement', route: 'billing.show', icon: 'card', can: 'billing' },
     ],

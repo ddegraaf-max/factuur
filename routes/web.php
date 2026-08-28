@@ -541,6 +541,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::get('settings/emailteksten/voorbeeld-bedankmail', [SettingsController::class, 'previewThanks'])->name('settings.emails.preview.thanks');
         Route::get('settings/emailteksten/voorbeeld-akkoord', [SettingsController::class, 'previewAccept'])->name('settings.emails.preview.accept');
 
+        // Logboek: wie deed wat, wanneer (met CSV-export voor de accountant)
+        Route::get('settings/logboek', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('settings.activity');
+        Route::get('settings/logboek/export', [\App\Http\Controllers\ActivityLogController::class, 'export'])->name('settings.activity.export');
+
         // Team: collega's en boekhouder uitnodigen, rollen beheren
         Route::get('settings/team', [TeamController::class, 'index'])->name('settings.team');
         Route::post('settings/team/uitnodigen', [TeamController::class, 'invite'])

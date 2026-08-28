@@ -21,5 +21,22 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Vite::prefetch(concurrency: 3);
+
+        // Logboek: aanmaken/wijzigen/verwijderen van de kernmodellen, plus in- en uitloggen.
+        foreach ([
+            \App\Models\Invoice::class, \App\Models\Quote::class, \App\Models\Customer::class, \App\Models\Product::class,
+            \App\Models\Payment::class, \App\Models\PurchaseInvoice::class, \App\Models\Company::class,
+            \App\Models\RecurringInvoice::class, \App\Models\BrandProfile::class,
+        ] as $model) {
+            $model::observe(\App\Observers\ActivityObserver::class);
+        }
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
+            \App\Support\Audit::log('login', null, ($event->user->name ?? 'Gebruiker') . ' ingelogd', [], $event->user->company_id ?? null);
+        });
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Logout::class, function ($event) {
+            if ($event->user) {
+                \App\Support\Audit::log('logout', null, ($event->user->name ?? 'Gebruiker') . ' uitgelogd', [], $event->user->company_id ?? null);
+            }
+        });
     }
 }

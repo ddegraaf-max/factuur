@@ -192,6 +192,7 @@ class QuoteManager
         }
 
         $quote->update(['status' => 'accepted', 'accepted_at' => now(), 'rejected_at' => null]);
+        \App\Support\Audit::log('accepted', $quote, \App\Support\Audit::label($quote) . ' geaccepteerd' . (auth()->check() ? '' : ' door de klant via het portaal'), [], $quote->company_id);
 
         return $quote->fresh();
     }
@@ -257,6 +258,7 @@ class QuoteManager
         }
 
         $quote->update(['status' => 'rejected', 'rejected_at' => now(), 'accepted_at' => null]);
+        \App\Support\Audit::log('rejected', $quote, \App\Support\Audit::label($quote) . ' afgewezen' . (auth()->check() ? '' : ' door de klant via het portaal'), [], $quote->company_id);
 
         return $quote->fresh();
     }

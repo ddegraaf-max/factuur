@@ -54,6 +54,8 @@ class OwnerAdministrationsController extends Controller
 
         \Illuminate\Support\Facades\Log::warning('Administratie verwijderd door eigenaar', ['company' => $company, 'name' => $name, 'by' => $request->user()->id]);
 
+        \App\Support\Audit::log('purged', null, "Administratie \"{$name}\" (#{$company}) volledig verwijderd door de eigenaar", [], $request->user()->company_id);
+
         return back()->with('flash', "Administratie \"{$name}\" is volledig verwijderd.");
     }
 }
