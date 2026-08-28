@@ -424,7 +424,6 @@
           <li><b>Slimme koppel-suggesties</b> — Easy herkent factuurnummer, bedrag en klantnaam in de omschrijving en stelt de juiste factuur voor. Eén klik en de betaling is geboekt.</li>
           <li><b>Ook voor inkoop</b> — afschrijvingen koppel je aan inkoopfacturen, die daarmee direct op betaald staan.</li>
           <li><b>Alles terug te draaien</b> — verwerkte transacties kun je ontkoppelen (de betaling wordt teruggedraaid) en genegeerde weer herstellen.</li>
-          <li>De <b>automatische bankkoppeling</b> (PSD2, dagelijkse import) is in voorbereiding — zonder maandkosten per rekening.</li>
         </ul>
       </article>
 

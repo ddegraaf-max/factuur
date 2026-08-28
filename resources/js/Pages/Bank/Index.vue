@@ -96,22 +96,6 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
         <div v-if="uploadForm.errors.file" class="field-error" style="margin-top:8px;">{{ uploadForm.errors.file }}</div>
       </div>
 
-      <div class="bank-auto">
-        <div class="bank-auto-head">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-          <div>
-            <div class="bank-auto-title">Automatische bankkoppeling</div>
-            <span class="bank-auto-badge">In voorbereiding</span>
-          </div>
-        </div>
-        <p>
-          Binnenkort koppel je je bankrekening rechtstreeks, zodat transacties er elke dag
-          vanzelf in staan. We bereiden dit voor via <b>GoCardless Bank Account Data</b> —
-          hetzelfde soort beveiligde PSD2-koppeling als Ponto, maar zonder maandkosten per
-          rekening, met ondersteuning voor alle grote Nederlandse banken.
-        </p>
-        <p style="margin-top:8px;">Tot die tijd werkt de import hiernaast al volledig — één afschrift per week bijhouden is genoeg.</p>
-      </div>
     </div>
 
     <!-- Tabs -->
@@ -205,7 +189,7 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
 <style scoped>
 .bank-top {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -222,23 +206,6 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
 .bank-drop svg { width: 30px; height: 30px; color: var(--text-3); margin-bottom: 10px; }
 .bank-drop-title { font-family: var(--font-display); font-weight: 600; font-size: 15px; margin-bottom: 6px; }
 .bank-drop-sub { font-size: 12.5px; color: var(--text-3); line-height: 1.6; max-width: 460px; margin: 0 auto; }
-
-.bank-auto {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  padding: 20px 22px;
-  font-size: 12.5px; color: var(--text-3); line-height: 1.6;
-}
-.bank-auto-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.bank-auto-head svg { width: 20px; height: 20px; color: var(--brand); flex: none; }
-.bank-auto-title { font-family: var(--font-display); font-weight: 600; font-size: 14.5px; color: var(--text); }
-.bank-auto-badge {
-  display: inline-block; margin-top: 2px;
-  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-  background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border);
-  border-radius: 100px; padding: 1px 8px;
-}
 
 .bank-list { display: flex; flex-direction: column; gap: 10px; }
 .bank-row {

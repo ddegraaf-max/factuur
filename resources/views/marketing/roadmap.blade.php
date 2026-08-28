@@ -38,7 +38,6 @@
       </div>
       <div>
         <h2 class="road-head road-doing"><span class="road-dot"></span> In ontwikkeling</h2>
-        <div class="road-card"><h3>Automatische bankkoppeling</h3><p>Transacties dagelijks automatisch binnenhalen via een beveiligde PSD2-koppeling — zonder maandkosten per rekening.</p></div>
         <div class="road-card"><h3>Boekhoudkoppelingen</h3><p>Directe koppeling met pakketten als Twinfield, e-Boekhouden en Exact.</p></div>
       </div>
       <div>
