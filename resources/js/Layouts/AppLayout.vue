@@ -79,6 +79,15 @@ const rawNav = [
       { name: 'Abonnement', route: 'billing.show', icon: 'card', can: 'billing' },
     ],
   },
+  {
+    // Alleen zichtbaar voor de eigenaar van EasyInvoice zelf (auth.can.platform).
+    title: 'Eigenaar',
+    items: [
+      { name: 'Marketing-inzichten', route: 'marketing.inzichten', icon: 'chart', can: 'platform', external: true },
+      { name: 'Merkbewaking', route: 'brand.index', icon: 'shield', can: 'platform' },
+      { name: 'Administraties', route: 'owner.companies.index', icon: 'users', can: 'platform' },
+    ],
+  },
 ];
 
 const can = computed(() => page.props.auth.can || {});
@@ -144,7 +153,8 @@ const logout = () => {
       <nav class="sidebar-nav">
         <div v-for="section in nav" :key="section.title" class="nav-section">
           <div class="nav-section-title">{{ section.title }}</div>
-          <Link
+          <component
+            :is="item.external ? 'a' : Link"
             v-for="item in section.items"
             :key="item.route"
             :href="route(item.route)"
@@ -178,7 +188,7 @@ const logout = () => {
             <svg v-else-if="item.icon === 'download'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             {{ item.name }}
             <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
-          </Link>
+          </component>
         </div>
       </nav>
 

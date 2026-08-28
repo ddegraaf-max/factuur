@@ -31,6 +31,9 @@ class HandleInertiaRequests extends Middleware
                     'settings' => $request->user()->isOwner(),
                     'team' => $request->user()->isOwner(),
                     'billing' => $request->user()->isOwner(),
+                    // Platform-eigenaar (EasyInvoice zelf): marketing-inzichten,
+                    // merkbewaking, administraties — zie App\Support\OwnerAccess.
+                    'platform' => \App\Support\OwnerAccess::allows($request->user()),
                 ] : null,
                 'role_label' => $request->user()?->roleLabel(),
                 // Alle administraties van deze gebruiker, voor de wisselaar
