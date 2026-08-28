@@ -79,7 +79,7 @@ class PontoBilling
         try {
             $itemId = $this->stripe->setSubscriptionItemQuantity(
                 (string) $company->stripe_subscription_id,
-                (string) config('services.stripe.price_id_bank'),
+                (string) $this->stripe->bankPriceId(),
                 $quantity,
                 $connection->stripe_item_id,
             );

@@ -6,6 +6,7 @@ use App\Models\BankTransaction;
 use App\Models\PontoAccount;
 use App\Models\PontoConnection;
 use App\Models\User;
+use App\Services\Ponto\PontoBilling;
 use App\Services\Ponto\PontoException;
 use App\Services\Ponto\PontoService;
 use App\Services\Ponto\PontoSyncer;
@@ -272,6 +273,24 @@ class PontoTest extends TestCase
         $this->get(route('bank.index'))->assertOk()->assertInertia(fn ($page) => $page
             ->where('ponto.can_connect', true)
             ->where('ponto.price_label', null));
+    }
+
+    public function test_bank_price_may_be_configured_as_a_stripe_product(): void
+    {
+        $this->configure();
+        config(['services.stripe.price_id_bank' => 'prod_bank']);
+        $user = $this->paid($this->demoUser());
+        $this->actingAs($user);
+        $connection = $this->connection($user);
+        PontoAccount::create(['company_id' => $user->company_id, 'ponto_connection_id' => $connection->id, 'ponto_id' => self::ACCOUNT_ID, 'iban' => 'NL91ABNA0417164300', 'sync_enabled' => true]);
+        Http::fake(fn ($request) => str_contains($request->url(), '/v1/products/prod_bank')
+            ? Http::response(['id' => 'prod_bank', 'default_price' => 'price_from_product'])
+            : Http::response(['id' => 'si_bank_9', 'quantity' => 1]));
+
+        app(PontoBilling::class)->syncQuantity($connection);
+
+        Http::assertSent(fn ($r) => str_ends_with($r->url(), '/v1/subscription_items') && $r['price'] === 'price_from_product' && (int) $r['quantity'] === 1);
+        $this->assertSame('si_bank_9', $connection->fresh()->stripe_item_id);
     }
 
     public function test_bank_page_hides_the_ponto_block_when_not_configured(): void

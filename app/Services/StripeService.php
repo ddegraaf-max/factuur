@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Company;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -67,6 +68,35 @@ class StripeService
         }
 
         return (string) $response->json('id');
+    }
+
+    /**
+     * Price-id van de bankkoppeling-toeslag. Mag ook als product-id (prod_…)
+     * zijn ingesteld: dan gebruiken we de standaardprice van dat product.
+     */
+    public function bankPriceId(): ?string
+    {
+        $configured = (string) config('services.stripe.price_id_bank');
+        if ($configured === '') {
+            return null;
+        }
+        if (! str_starts_with($configured, 'prod_')) {
+            return $configured;
+        }
+
+        return Cache::remember('stripe.bank_price.'.$configured, now()->addDay(), function () use ($configured) {
+            $product = $this->request()->get(self::BASE.'/products/'.$configured);
+            if ($product->failed()) {
+                throw new RuntimeException('Stripe: product voor de bankkoppeling niet gevonden: '.$product->body());
+            }
+            $price = $product->json('default_price');
+            $priceId = is_array($price) ? ($price['id'] ?? null) : $price;
+            if (! $priceId) {
+                throw new RuntimeException("Stripe: product {$configured} heeft geen standaardprice; stel er een in of gebruik de price-id.");
+            }
+
+            return (string) $priceId;
+        });
     }
 
     /** Vertaal een Stripe-price-id naar onze abonnementssmaak. */
