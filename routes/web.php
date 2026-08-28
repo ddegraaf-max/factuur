@@ -529,6 +529,11 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         Route::get('settings/company', [SettingsController::class, 'company'])->name('settings.company');
         Route::patch('settings/company', [SettingsController::class, 'updateCompany'])->name('settings.company.update');
+        // Overstappen: CSV-exports van andere pakketten importeren (klanten, producten, open facturen).
+        Route::get('settings/overstappen', [\App\Http\Controllers\ImportController::class, 'index'])->name('import.index');
+        Route::post('settings/overstappen/voorbeeld', [\App\Http\Controllers\ImportController::class, 'preview'])->middleware('throttle:20,1')->name('import.preview');
+        Route::post('settings/overstappen/importeren', [\App\Http\Controllers\ImportController::class, 'commit'])->middleware('throttle:20,1')->name('import.commit');
+
         // AVG-zelfbediening: volledige export (ZIP) en definitief verwijderen van de eigen administratie.
         Route::get('settings/gegevens/export', [\App\Http\Controllers\AccountDataController::class, 'export'])
             ->middleware('throttle:5,10')->name('settings.data.export');
