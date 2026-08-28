@@ -20,7 +20,7 @@ const logout = () => {
   <div class="portal-shell">
     <header class="portal-topbar">
       <div class="portal-topbar-inner">
-        <a href="https://easyinvoice.nl" target="_blank" rel="noopener" class="portal-brand" title="EasyInvoice">
+        <a href="https://easyinvoice.nl" target="_blank" rel="noopener" class="portal-brand">
           <img src="/images/easyinvoice-favicon-180.png" class="portal-logo" alt="EasyInvoice">
           <div>
             <div class="portal-brand-name">Easy<span>Invoice</span></div>
