@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.43.0</div>
+        <h2>Voor starters: huisstijl, visitekaartje en website</h2>
+        <ul class="tl-list">
+          <li><b>Digitaal visitekaartje</b> — één link (en QR-code) met al je contactgegevens in je eigen huisstijl: bellen, mailen, WhatsApp, opslaan in contacten. In te richten onder Instellingen → Visitekaartje, met je eigen adres zoals easyinvoice.nl/k/jouw-bedrijf.</li>
+          <li><b>Huisstijl ontwerpen met AI</b> — nog geen huisstijl? Vertel wat je doet en voor wie, en kies uit drie voorstellen met kleuren, lettertype, factuursjabloon, slogan en een logo. Eén klik en alles staat op je facturen, offertes en mails (Slim).</li>
+          <li><b>Je eigen website</b> — een complete one-pager in je huisstijl met diensten, over ons, waarom jij en een contactformulier; de tekst laat je schrijven door AI uit vier vragen (Slim) of schrijf je zelf. Berichten komen als leads binnen in EasyInvoice én in je mail.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 augustus 2026 · Easy 1.42.0</div>
         <h2>Automatische bankkoppeling</h2>
         <ul class="tl-list">

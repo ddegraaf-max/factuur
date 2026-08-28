@@ -83,6 +83,7 @@ class BillingController extends Controller
                         'Onbeperkt facturen, offertes, klanten en producten',
                         'BTW-overzicht, herinneringen, incasso en klantenportaal',
                         'Inkoop, uren, ritten en jaaroverzicht',
+                        'Digitaal visitekaartje en eigen website in je huisstijl',
                         'Maandelijks opzegbaar',
                         'Optioneel: automatische bankkoppeling voor € ' . number_format((float) config('services.ponto.account_price', 5), 2, ',', '.') . ' per rekening per maand',
                     ],
@@ -101,6 +102,7 @@ class BillingController extends Controller
                         'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',
                         'Claude-koppeling: maak offertes en facturen rechtstreeks vanuit je Claude-gesprek',
                         'Huisstijl herkennen met AI: upload je huisstijlgids en alles staat goed',
+                        'Huisstijl en websitetekst laten ontwerpen door AI — ideaal als starter',
                         ((int) config('services.anthropic.monthly_limit', 250)) > 0
                             ? sprintf('Ruime fair-use: %d AI-acties per maand', (int) config('services.anthropic.monthly_limit', 250))
                             : null,
