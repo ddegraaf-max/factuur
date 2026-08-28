@@ -24,8 +24,13 @@ class PeppolRecommandTest extends TestCase
     public function test_company_registers_and_sends_an_invoice(): void
     {
         Http::fake([
-            'app.recommand.eu/api/v1/companies' => Http::response(['success' => true, 'company' => ['id' => 'c_1', 'isVerified' => false], 'verificationUrl' => 'https://app.recommand.eu/verify/abc']),
+            'app.recommand.eu/api/v1/companies/c_1/identifiers' => Http::response(['success' => true, 'identifiers' => [['scheme' => '0106', 'identifier' => '12345678']]]),
             'app.recommand.eu/api/v1/companies/c_1' => Http::response(['success' => true, 'company' => ['id' => 'c_1', 'isVerified' => true]]),
+            // GET = zoeken naar een bestaande registratie (niets gevonden), POST = aanmaken.
+            'app.recommand.eu/api/v1/companies*' => fn ($request) => $request->method() === 'GET'
+                ? Http::response(['success' => true, 'companies' => []])
+                : Http::response(['success' => true, 'company' => ['id' => 'c_1', 'isVerified' => false], 'verificationUrl' => 'https://app.recommand.eu/verify/abc']),
+            'app.recommand.eu/api/v1/webhooks' => Http::response(['success' => true, 'webhooks' => []]),
             'app.recommand.eu/api/v1/verify' => Http::response(['success' => true, 'isValid' => true, 'supportedDocuments' => [['docTypeId' => PeppolService::DOCTYPE_BIS3]]]),
             'app.recommand.eu/api/v1/c_1/send' => Http::response(['success' => true, 'id' => 'doc_out', 'sentOverPeppol' => true]),
         ]);
@@ -56,6 +61,37 @@ class PeppolRecommandTest extends TestCase
             && $request['documentType'] === 'xml'
             && str_contains($request['document'], 'urn:fdc:peppol.eu:2017:poacc:billing:3.0')
             && str_starts_with($request['recipient'], '0106:'));
+    }
+
+    /** Bedrijf al handmatig in het Recommand-dashboard aangemaakt → koppelen, niet dubbel registreren. */
+    public function test_activation_adopts_an_existing_recommand_company(): void
+    {
+        Http::fake([
+            'app.recommand.eu/api/v1/companies/c_9/identifiers' => fn ($request) => $request->method() === 'GET'
+                ? Http::response(['success' => true, 'identifiers' => [['scheme' => '9944', 'identifier' => 'NL001234567B01']]])
+                : Http::response(['success' => true, 'identifier' => ['id' => 'i_1']]),
+            'app.recommand.eu/api/v1/companies*' => fn ($request) => $request->method() === 'GET'
+                ? Http::response(['success' => true, 'companies' => [['id' => 'c_9', 'name' => 'Bestaand BV', 'enterpriseNumber' => '', 'vatNumber' => 'NL001234567B01', 'isVerified' => true]]])
+                : Http::response(['success' => false, 'error' => 'mag niet aangeroepen worden'], 500),
+            'app.recommand.eu/api/v1/webhooks' => Http::response(['success' => true, 'webhooks' => []]),
+        ]);
+
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        $company = $user->company;
+        $company->forceFill(['kvk_number' => '87654321', 'vat_number' => 'NL001234567B01'])->save();
+
+        $this->post(route('settings.integrations.peppol.activate'))->assertRedirect()->assertSessionMissing('error');
+
+        $company->refresh();
+        $this->assertSame('c_9', $company->peppol_company_id);
+        $this->assertSame('verified', $company->peppol_verification_status);
+        $this->assertNotNull($company->peppol_verified_at);
+
+        // Geen POST /companies (geen dubbele registratie); wél de KvK als 0106-identifier toegevoegd.
+        Http::assertNotSent(fn ($request) => $request->method() === 'POST' && str_ends_with($request->url(), '/api/v1/companies'));
+        Http::assertSent(fn ($request) => $request->method() === 'POST' && str_ends_with($request->url(), '/companies/c_9/identifiers')
+            && $request['scheme'] === '0106' && $request['identifier'] === '87654321');
     }
 
     public function test_webhook_imports_received_invoice_into_inbox(): void

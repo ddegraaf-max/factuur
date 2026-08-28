@@ -9,8 +9,12 @@ deelnemer (POST /companies, KvK 0106) en doorloopt een identiteitscontrole.
 Verzenden: POST /{companyId}/send met documentType "xml" (NLCIUS, of BIS 3
 als de ontvanger dat vereist). Ontvangen: webhook POST /webhooks/recommand
 (document.received → Postvak IN met ingevulde gegevens + PDF-render).
-Webhook in het Recommand-dashboard aanmaken: URL https://easyinvoice.nl/webhooks/recommand,
-secret = RECOMMAND_WEBHOOK_SECRET, companyId leeg (alle bedrijven).
+Webhook: wordt bij de eerste activering automatisch (teambreed, idempotent)
+geregistreerd op https://easyinvoice.nl/webhooks/recommand met secret
+RECOMMAND_WEBHOOK_SECRET. Handmatig kan ook in het dashboard (companyId leeg).
+Activeren koppelt een bedrijf dat al in het Recommand-team staat (gezocht op
+KvK, btw-nummer of naam) in plaats van dubbel te registreren, en vult de
+Peppol-identifiers 0106:KvK en 9944:btw aan als die ontbreken.
 Zie app/Services/Peppol/RecommandClient.php en app/Services/PeppolService.php.
 De Storecove-uitleg hieronder is historisch.
 

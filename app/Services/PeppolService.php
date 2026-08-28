@@ -153,19 +153,29 @@ class PeppolService
             return (string) $company->peppol_verification_url;
         }
 
-        $data = $this->client->createCompany([
-            'name' => $company->name,
-            'address' => $company->address_line,
-            'postalCode' => $company->postal_code,
-            'city' => $company->city,
-            'country' => strtoupper($company->country ?: 'NL'),
-            'enterpriseNumber' => preg_replace('/\D/', '', (string) $company->kvk_number),
-            'vatNumber' => filled($company->vat_number) ? strtoupper(preg_replace('/[\s.]/', '', $company->vat_number)) : null,
-            'email' => $company->email,
-            'isSmpRecipient' => true,
-        ]);
+        $kvk = preg_replace('/\D/', '', (string) $company->kvk_number);
+        $vat = filled($company->vat_number) ? strtoupper(preg_replace('/[\s.-]/', '', $company->vat_number)) : null;
 
-        $remote = $data['company'] ?? [];
+        // Staat het bedrijf al in het Recommand-team (bijv. handmatig in het
+        // dashboard aangemaakt)? Dan koppelen we dát, geen dubbele registratie.
+        $remote = $this->findExisting($company, $kvk, $vat);
+        $data = [];
+        if (! $remote) {
+            $data = $this->client->createCompany([
+                'name' => $company->name,
+                'address' => $company->address_line,
+                'postalCode' => $company->postal_code,
+                'city' => $company->city,
+                'country' => strtoupper($company->country ?: 'NL'),
+                'enterpriseNumberScheme' => strtoupper($company->country ?: 'NL') === 'NL' ? '0106' : null,
+                'enterpriseNumber' => $kvk,
+                'vatNumber' => $vat,
+                'email' => $company->email,
+                'isSmpRecipient' => true,
+            ]);
+            $remote = $data['company'] ?? [];
+        }
+
         $verified = ! empty($remote['isVerified']);
         $company->forceFill([
             'peppol_company_id' => $remote['id'] ?? null,
@@ -175,7 +185,75 @@ class PeppolService
             'peppol_verified_at' => $verified ? now() : null,
         ])->save();
 
-        return (string) ($data['verificationUrl'] ?? '');
+        if (! empty($remote['id'])) {
+            $this->ensureIdentifiers($remote['id'], $kvk, $vat);
+        }
+        $this->ensureWebhook();
+
+        return $verified ? '' : (string) ($data['verificationUrl'] ?? '');
+    }
+
+    /** Bestaand Recommand-bedrijf zoeken op KvK, btw-nummer of (genormaliseerde) naam. */
+    protected function findExisting(Company $company, string $kvk, ?string $vat): ?array
+    {
+        $norm = fn ($s) => preg_replace('/[^a-z0-9]/', '', mb_strtolower((string) $s));
+        $candidates = [];
+        try {
+            if ($kvk !== '') {
+                $candidates = $this->client->listCompanies(['enterpriseNumber' => $kvk]);
+            }
+            if (! $candidates && $vat) {
+                $candidates = $this->client->listCompanies(['vatNumber' => $vat]);
+            }
+            if (! $candidates) {
+                $candidates = array_values(array_filter(
+                    $this->client->listCompanies(),
+                    fn ($c) => $norm($c['name'] ?? '') !== '' && $norm($c['name'] ?? '') === $norm($company->name)
+                ));
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Recommand: bestaande registratie zoeken mislukt', ['company' => $company->id, 'error' => $e->getMessage()]);
+
+            return null;
+        }
+
+        return $candidates[0] ?? null;
+    }
+
+    /** Zorg dat KvK (0106) en btw-nummer (9944) als Peppol-identifier op het bedrijf staan. */
+    protected function ensureIdentifiers(string $remoteId, string $kvk, ?string $vat): void
+    {
+        try {
+            $have = array_map(fn ($i) => strtolower(($i['scheme'] ?? '') . ':' . ($i['identifier'] ?? '')), $this->client->getIdentifiers($remoteId));
+            $wanted = array_filter(['0106' => $kvk !== '' ? $kvk : null, '9944' => $vat]);
+            foreach ($wanted as $scheme => $identifier) {
+                if (! in_array(strtolower("{$scheme}:{$identifier}"), $have, true)) {
+                    $this->client->createIdentifier($remoteId, (string) $scheme, $identifier);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Recommand: Peppol-identifiers aanvullen mislukt', ['remote' => $remoteId, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /** Eenmalig (teambreed) de webhook naar EasyInvoice registreren — idempotent. */
+    protected function ensureWebhook(): void
+    {
+        $url = route('recommand.webhook');
+        if (! str_starts_with($url, 'https://')) {
+            return; // lokaal/test: geen webhook naar een niet-publiek adres
+        }
+        try {
+            foreach ($this->client->listWebhooks() as $hook) {
+                if (rtrim((string) ($hook['url'] ?? ''), '/') === rtrim($url, '/')) {
+                    return;
+                }
+            }
+            $this->client->createWebhook($url, config('services.peppol.recommand_webhook_secret') ?: null);
+            Log::info('Recommand: webhook geregistreerd', ['url' => $url]);
+        } catch (\Throwable $e) {
+            Log::warning('Recommand: webhook registreren mislukt', ['error' => $e->getMessage()]);
+        }
     }
 
     /** Verificatiestatus ophalen bij Recommand en op de administratie zetten. */

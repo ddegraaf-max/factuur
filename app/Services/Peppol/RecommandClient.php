@@ -26,6 +26,37 @@ class RecommandClient
         return $this->json($this->http()->post('/companies', $payload), 'Registreren bij het Peppol-netwerk is niet gelukt.');
     }
 
+    /** Alle bedrijven van het team, optioneel gefilterd op KvK (enterpriseNumber) of btw-nummer. */
+    public function listCompanies(array $filters = []): array
+    {
+        $data = $this->json($this->http()->get('/companies', array_filter($filters)), 'De Peppol-registraties konden niet worden opgehaald.');
+
+        return $data['companies'] ?? [];
+    }
+
+    /** Peppol-identifiers (scheme + nummer) van een geregistreerd bedrijf. */
+    public function getIdentifiers(string $companyId): array
+    {
+        $data = $this->json($this->http()->get("/companies/{$companyId}/identifiers"), 'De Peppol-identifiers konden niet worden opgehaald.');
+
+        return $data['identifiers'] ?? [];
+    }
+
+    public function createIdentifier(string $companyId, string $scheme, string $identifier): array
+    {
+        return $this->json($this->http()->post("/companies/{$companyId}/identifiers", [
+            'scheme' => $scheme,
+            'identifier' => $identifier,
+        ]), 'De Peppol-identifier kon niet worden toegevoegd.');
+    }
+
+    public function listWebhooks(): array
+    {
+        $data = $this->json($this->http()->get('/webhooks'), 'De webhooks konden niet worden opgehaald.');
+
+        return $data['webhooks'] ?? [];
+    }
+
     public function getCompany(string $companyId): array
     {
         return $this->json($this->http()->get("/companies/{$companyId}"), 'De Peppol-status kon niet worden opgehaald.');
