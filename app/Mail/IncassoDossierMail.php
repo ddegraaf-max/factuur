@@ -32,7 +32,7 @@ class IncassoDossierMail extends Mailable
 
         // De deurwaarder moet de schuldeiser direct kunnen bereiken.
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: 'Nieuwe incasso-opdracht ' . $ref . ' — ' . $this->invoice->customer_name,
         );

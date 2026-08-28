@@ -32,6 +32,18 @@ class SettingsController extends Controller
                 'verified_at_label' => $company->peppol_verified_at?->translatedFormat('j M Y'),
                 'blockers' => $peppol->registrationBlockers($company),
             ],
+            // Mail vanaf eigen domein (Resend Domains): status none | pending | verified | failed.
+            'mail_domain' => [
+                'configured' => app(\App\Services\MailDomainService::class)->configured(),
+                'status' => $company->mail_domain_id ? ($company->mail_domain_status ?: 'pending') : 'none',
+                'domain' => $company->mail_domain,
+                'from_address' => $company->mail_from_address,
+                'records' => $company->mail_domain_records ?: [],
+                'checked_at_label' => $company->mail_domain_checked_at?->translatedFormat('j M Y, H:i'),
+                'default_from' => config('mail.from.address'),
+                'suggested_domain' => filled($company->email) && ! preg_match('/@(gmail|hotmail|outlook|live|icloud|yahoo|ziggo|kpnmail)\./i', $company->email) ? substr(strrchr($company->email, '@'), 1) : '',
+                'suggested_local_part' => filled($company->email) ? strstr($company->email, '@', true) : 'facturen',
+            ],
         ]);
     }
 

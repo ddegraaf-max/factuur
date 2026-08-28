@@ -31,7 +31,7 @@ class QuoteMail extends Mailable
 
         // Afzendernaam = de ondernemer, antwoorden gaan rechtstreeks naar hem.
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: $customSubject
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::quoteVars($this->quote, $company))

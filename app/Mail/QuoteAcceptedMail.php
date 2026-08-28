@@ -36,7 +36,7 @@ class QuoteAcceptedMail extends Mailable
         $customSubject = $company->emailText('accept_subject');
 
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: $customSubject
                 ? MailText::apply($customSubject, MailText::acceptVars($this->quote, $company))

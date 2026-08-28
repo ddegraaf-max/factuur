@@ -40,7 +40,7 @@ class PaymentThanksMail extends Mailable
         $customSubject = $company->emailText('thanks_subject');
 
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: $customSubject
                 ? MailText::apply($customSubject, MailText::thanksVars($this->invoice, $company, $this->payment))

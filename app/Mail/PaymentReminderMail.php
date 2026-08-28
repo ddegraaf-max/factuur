@@ -31,7 +31,7 @@ class PaymentReminderMail extends Mailable
         // Afzendernaam = de ondernemer; een herinnering van een onbekende
         // afzender wordt niet betaald. Antwoorden komen bij hem terecht.
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company?->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: $this->subjectLine,
         );

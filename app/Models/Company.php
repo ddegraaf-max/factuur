@@ -47,6 +47,8 @@ class Company extends Model
     protected $casts = [
         'mollie_api_key' => 'encrypted',
         'ob_number' => 'encrypted',
+        'mail_domain_records' => 'array',
+        'mail_domain_checked_at' => 'datetime',
         'vat_reminder_enabled' => 'boolean',
         'is_demo' => 'boolean',
         'is_exempt' => 'boolean',

@@ -35,7 +35,7 @@ class InvoiceMail extends Mailable
         $customSubject = $company->emailText('invoice_subject');
 
         return new Envelope(
-            from: new Address(config('mail.from.address'), $company->name ?: config('mail.from.name')),
+            from: \App\Support\Sender::address($company, $company->name ?: config('mail.from.name')),
             replyTo: array_filter([$this->companyReplyTo($company)]),
             subject: $customSubject
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::invoiceVars($this->invoice, $company))

@@ -346,6 +346,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::post('settings/peppol/status', [\App\Http\Controllers\PeppolController::class, 'refresh'])->name('settings.integrations.peppol.refresh');
         Route::delete('settings/peppol', [\App\Http\Controllers\PeppolController::class, 'disable'])->name('settings.integrations.peppol.disable');
 
+        // Mail vanaf eigen domein (Instellingen → Koppelingen → Eigen afzenderadres).
+        Route::post('settings/maildomein', [\App\Http\Controllers\MailDomainController::class, 'connect'])
+            ->middleware('throttle:10,1')->name('settings.integrations.maildomain.connect');
+        Route::post('settings/maildomein/controleer', [\App\Http\Controllers\MailDomainController::class, 'refresh'])
+            ->middleware('throttle:20,1')->name('settings.integrations.maildomain.refresh');
+        Route::delete('settings/maildomein', [\App\Http\Controllers\MailDomainController::class, 'disconnect'])->name('settings.integrations.maildomain.disconnect');
+
         Route::post('customers/{customer}/peppol-check', [\App\Http\Controllers\PeppolController::class, 'check'])
             ->middleware('throttle:20,1')->name('customers.peppol.check');
         Route::post('invoices/{invoice}/peppol', [\App\Http\Controllers\PeppolController::class, 'send'])

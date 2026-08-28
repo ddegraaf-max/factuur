@@ -7,7 +7,20 @@ const props = defineProps({
   mcp: Object,     // { active, url }
   has_ai: Boolean, // AI-toegang (Slim, proef of vrijgesteld)
   peppol: Object,  // { configured, status, verification_url, participant_id, registered_at_label, verified_at_label, blockers }
+  mail_domain: Object, // { configured, status, domain, from_address, records, checked_at_label, default_from, suggested_domain, suggested_local_part }
 });
+
+/* ---------- Eigen afzenderadres (Resend Domains) ---------- */
+const domainForm = useForm({ domain: props.mail_domain?.suggested_domain || '', local_part: props.mail_domain?.suggested_local_part || 'facturen' });
+const domainRefresh = useForm({});
+const domainDisconnect = useForm({});
+const connectDomain = () => domainForm.post(route('settings.integrations.maildomain.connect'), { preserveScroll: true });
+const refreshDomain = () => domainRefresh.post(route('settings.integrations.maildomain.refresh'), { preserveScroll: true });
+const disconnectDomain = () => {
+  if (confirm('Eigen afzenderadres loskoppelen? Mail gaat dan weer uit via easyinvoice.nl.')) domainDisconnect.delete(route('settings.integrations.maildomain.disconnect'), { preserveScroll: true });
+};
+const domainStatusLabel = computed(() => ({ none: 'Uit', pending: 'DNS instellen', verified: 'Actief', failed: 'DNS niet gevonden' }[props.mail_domain?.status] || 'Uit'));
+const copyValue = (v) => navigator.clipboard?.writeText(v);
 
 /* ---------- Peppol (Recommand) ---------- */
 const peppolActivate = useForm({});
@@ -143,6 +156,67 @@ const copyUrl = async () => {
       </div>
     </div>
 
+    <!-- Eigen afzenderadres: mail vanaf het eigen domein -->
+    <div v-if="mail_domain" class="card kop-card">
+      <div class="card-body">
+        <div class="kop-head">
+          <div>
+            <div class="kop-title">
+              Eigen afzenderadres
+              <span class="kop-pill" :class="mail_domain.status === 'verified' ? 'on' : (mail_domain.status === 'pending' ? 'wait' : 'off')">{{ domainStatusLabel }}</span>
+            </div>
+            <p class="kop-desc">
+              Facturen, offertes en herinneringen gaan nu uit naam van <b>{{ mail_domain.default_from }}</b> met jouw bedrijfsnaam als afzender
+              (antwoorden komen al bij jou aan). Wil je dat ze echt vanaf <b>jouw</b> domein komen — bijvoorbeeld
+              <code style="font-size:12px;">facturen@{{ mail_domain.suggested_domain || 'jouwbedrijf.nl' }}</code> — koppel dan je domein. Je zet daarvoor
+              eenmalig een paar DNS-records bij je domeinbeheerder (TransIP, Vimexx, Cloudflare, Hostnet …).
+            </p>
+          </div>
+        </div>
+
+        <div v-if="!mail_domain.configured" class="kop-locked">Deze koppeling is nog niet beschikbaar op dit platform.</div>
+
+        <template v-else-if="mail_domain.status === 'none'">
+          <div class="dom-form">
+            <div class="form-group"><label>Afzender</label>
+              <div class="dom-from"><input type="text" v-model="domainForm.local_part" placeholder="facturen" style="max-width:160px;"><span>@</span><input type="text" v-model="domainForm.domain" placeholder="jouwbedrijf.nl" style="max-width:260px;"></div>
+              <div v-if="domainForm.errors.domain || domainForm.errors.local_part" class="field-error">{{ domainForm.errors.domain || domainForm.errors.local_part }}</div>
+            </div>
+            <button class="btn btn-primary" :disabled="domainForm.processing || !domainForm.domain" @click="connectDomain">{{ domainForm.processing ? 'Bezig…' : 'Domein koppelen' }}</button>
+          </div>
+          <p class="kop-hint">Werkt alleen met een eigen domeinnaam (geen Gmail/Outlook). Na het koppelen zie je hier precies welke DNS-records je moet toevoegen.</p>
+        </template>
+
+        <template v-else>
+          <div class="kop-steps">
+            <div class="kop-steps-title">
+              <template v-if="mail_domain.status === 'verified'">Actief — mail gaat uit als {{ mail_domain.from_address }}</template>
+              <template v-else>Zet deze DNS-records bij de beheerder van {{ mail_domain.domain }}</template>
+            </div>
+            <table class="dom-records">
+              <thead><tr><th>Type</th><th>Naam (host)</th><th>Waarde</th><th></th></tr></thead>
+              <tbody>
+                <tr v-for="r in mail_domain.records" :key="r.name + r.type">
+                  <td><b>{{ r.type }}</b><div class="dom-rec-kind">{{ r.record }}</div></td>
+                  <td><code>{{ r.name }}</code></td>
+                  <td><code class="dom-value">{{ r.value }}</code><div v-if="r.priority" class="dom-rec-kind">prioriteit {{ r.priority }}</div></td>
+                  <td class="right"><span class="kop-pill" :class="r.status === 'verified' ? 'on' : 'wait'" style="margin-left:0;">{{ r.status === 'verified' ? 'ok' : 'wacht' }}</span> <button type="button" class="dom-copy" @click="copyValue(r.value)" title="Kopieer waarde">kopieer</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="kop-hint" style="margin-top:10px;">
+              <template v-if="mail_domain.status === 'verified'">Geverifieerd; laatst gecontroleerd {{ mail_domain.checked_at_label }}. Tip: voeg ook een DMARC-record toe (<code>_dmarc</code> TXT <code>v=DMARC1; p=none;</code>) voor de beste aflevering.</template>
+              <template v-else>DNS-wijzigingen zijn meestal binnen een kwartier zichtbaar, soms pas na een uur. Klik daarna op "Controleer DNS". Tot die tijd gaat je mail gewoon via {{ mail_domain.default_from }}.</template>
+            </p>
+          </div>
+          <div class="kop-actions">
+            <button class="btn btn-secondary btn-sm" :disabled="domainRefresh.processing" @click="refreshDomain">{{ domainRefresh.processing ? 'Bezig…' : 'Controleer DNS' }}</button>
+            <button class="btn btn-danger btn-sm" :disabled="domainDisconnect.processing" @click="disconnectDomain">Loskoppelen</button>
+          </div>
+        </template>
+      </div>
+    </div>
+
     <div class="card kop-card">
       <div class="card-body">
         <div class="kop-head">
@@ -215,6 +289,17 @@ const copyUrl = async () => {
 
 <style scoped>
 .kop-card { max-width: 860px; }
+.dom-form { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-top: 6px; }
+.dom-form .form-group { margin: 0; }
+.dom-from { display: flex; align-items: center; gap: 6px; }
+.dom-from span { color: var(--text-3); font-weight: 600; }
+.dom-records { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+.dom-records th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-3); padding: 4px 8px 6px 0; border-bottom: 1px solid var(--border); }
+.dom-records td { padding: 8px 8px 8px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+.dom-records code { font-size: 11.5px; word-break: break-all; }
+.dom-value { display: inline-block; max-width: 360px; }
+.dom-rec-kind { font-size: 11px; color: var(--text-4); }
+.dom-copy { background: none; border: none; font-size: 11.5px; color: var(--brand); text-decoration: underline; cursor: pointer; padding: 0; }
 .kop-head { display: flex; justify-content: space-between; gap: 16px; }
 .kop-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
 .kop-pill { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 100px; padding: 3px 10px; border: 1px solid transparent; }
