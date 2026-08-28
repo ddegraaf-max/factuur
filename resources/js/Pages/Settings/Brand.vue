@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import { router, useForm, Head, Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
@@ -20,6 +20,7 @@ const form = useForm({
   invoice_footer: props.company.invoice_footer || defaultFooter,
   logo_scale: props.company.logo_scale || 100,
   logo: null,
+  logo_data_url: null,
   stationery: null,
   stationery_margin_top: props.company.stationery_margin_top || 45,
   stationery_margin_bottom: props.company.stationery_margin_bottom || 25,
@@ -104,6 +105,57 @@ const onAiFile = async (e) => {
   }
 };
 
+/* ---------- Huisstijl ontwerpen met AI ---------- */
+const design = reactive({ sector: '', audience: '', tone: 'fris en modern', colors: '' });
+const designBusy = ref(false);
+const designError = ref('');
+const directions = ref([]);
+const chosen = ref(null);
+const useLogo = ref(true);
+
+const proposeDesign = async () => {
+  if (designBusy.value) return;
+  designBusy.value = true;
+  designError.value = '';
+  chosen.value = null;
+  try {
+    const { data } = await axios.post(route('settings.brand.design'), design);
+    directions.value = data.directions || [];
+  } catch (err) {
+    designError.value = err.response?.data?.message
+      || err.response?.data?.errors?.sector?.[0]
+      || 'Ontwerpen is niet gelukt. Probeer het opnieuw.';
+  } finally {
+    designBusy.value = false;
+  }
+};
+
+const escXml = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+// Logo-voorstel als SVG: monogram (letters in een gekleurd vlak) of woordmerk (naam in accentkleur met kleurstreep).
+const svgFor = (d) => {
+  const font = d.font === 'serif' ? "Georgia, 'Times New Roman', serif" : 'Inter, Arial, Helvetica, sans-serif';
+  if (d.logo_style === 'monogram') {
+    const t = escXml(d.logo_text.slice(0, 3).toUpperCase());
+    const size = t.length > 2 ? 84 : (t.length === 2 ? 104 : 124);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240"><rect width="240" height="240" rx="48" fill="${d.brand_color}"/><text x="120" y="126" text-anchor="middle" dominant-baseline="middle" font-family="${font}" font-weight="800" font-size="${size}" fill="#ffffff">${t}</text></svg>`;
+  }
+  const t = escXml(d.logo_text);
+  const w = Math.max(320, Math.round(d.logo_text.length * 27) + 70);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="96" viewBox="0 0 ${w} 96"><rect x="0" y="22" width="12" height="52" rx="4" fill="${d.brand_color}"/><text x="30" y="52" dominant-baseline="middle" font-family="${font}" font-weight="800" font-size="44" letter-spacing="-1" fill="${d.accent_color}">${t}</text></svg>`;
+};
+const logoUrl = (d) => 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgFor(d))));
+
+const applyDirection = (d) => {
+  form.brand_color = d.brand_color;
+  form.accent_color = d.accent_color;
+  form.invoice_font = d.font;
+  if (form.invoice_template !== 'stationery') form.invoice_template = d.template;
+  form.logo_data_url = useLogo.value ? logoUrl(d) : null;
+  chosen.value = d.name;
+  aiError.value = '';
+  aiNotice.value = `${d.name} gekozen — ${d.motivation} Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.`;
+};
+
 const nf = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const companyAddr = computed(() => [props.company.postal_code, props.company.city].filter(Boolean).join(' '));
 const footerText = computed(() => form.invoice_footer || defaultFooter);
@@ -183,6 +235,45 @@ const removeLogo = () => {
           <div class="card-body" style="font-size:13px;color:var(--text-2);line-height:1.6;">
             ✨ <b>Huisstijl herkennen met AI</b> — upload je huisstijlgids of briefpapier en de kleuren en stijl worden automatisch ingesteld. Onderdeel van het <b>Slim</b>-abonnement.
             <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+          </div>
+        </div>
+
+        <!-- Huisstijl ontwerpen met AI -->
+        <div v-if="ai_enabled" class="card" style="border-color:var(--brand-border);">
+          <div class="card-header">
+            <div>
+              <div class="card-title">✨ Huisstijl ontwerpen met AI</div>
+              <div class="card-subtitle">Nog geen huisstijl? Vertel in een paar woorden wat je doet en kies uit drie voorstellen: kleuren, lettertype, sjabloon, slogan en een logo.</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-group"><label>Wat doet je bedrijf?</label><input v-model="design.sector" placeholder="Bijv. loodgieter voor particulieren in Utrecht" /></div>
+            <div class="form-row">
+              <div class="form-group"><label>Voor wie?</label><input v-model="design.audience" placeholder="Bijv. huiseigenaren en VvE's" /></div>
+              <div class="form-group"><label>Uitstraling</label>
+                <select v-model="design.tone"><option>fris en modern</option><option>warm en ambachtelijk</option><option>strak en zakelijk</option><option>speels en creatief</option><option>luxe en rustig</option></select>
+              </div>
+            </div>
+            <div class="form-group"><label>Kleurwens (optioneel)</label><input v-model="design.colors" placeholder="Bijv. graag blauw, geen rood" /></div>
+            <button class="btn btn-primary btn-sm" :disabled="designBusy || design.sector.trim().length < 3" @click="proposeDesign">
+              {{ designBusy ? 'Ontwerpen… (± 20 seconden)' : (directions.length ? 'Nieuwe voorstellen' : 'Ontwerp mijn huisstijl') }}
+            </button>
+            <div v-if="designError" class="field-error" style="margin-top:8px;">{{ designError }}</div>
+            <div v-if="directions.length" class="dir-grid">
+              <div v-for="d in directions" :key="d.name" class="dir" :class="{ chosen: chosen === d.name }">
+                <div class="dir-swatches"><span :style="{ background: d.brand_color }"></span><span :style="{ background: d.accent_color }"></span></div>
+                <img :src="logoUrl(d)" class="dir-logo" alt="" />
+                <div class="dir-name">{{ d.name }}</div>
+                <div class="dir-meta">{{ d.font === 'serif' ? 'Schreefletter' : 'Schreefloos' }} · sjabloon {{ d.template }}</div>
+                <div class="dir-tag">"{{ d.tagline }}"</div>
+                <div class="dir-why">{{ d.motivation }}</div>
+                <button class="btn btn-secondary btn-sm" @click="applyDirection(d)">{{ chosen === d.name ? 'Gekozen ✓' : 'Gebruik deze' }}</button>
+              </div>
+            </div>
+            <label v-if="directions.length" class="toggle-row" style="margin-top:12px;">
+              <input type="checkbox" v-model="useLogo">
+              <div><div class="toggle-title">Ook het logo-voorstel gebruiken</div><div class="toggle-sub">Vervangt je huidige logo zodra je op Opslaan klikt. Later altijd te wijzigen.</div></div>
+            </label>
           </div>
         </div>
 
@@ -845,4 +936,13 @@ const removeLogo = () => {
 .pv-minimal .pv-parties { gap: 28px; margin-bottom: 16px; }
 .pv-minimal .pv-pay-note { background: transparent; border-left: none; padding: 10px 0 0; color: var(--text-3); }
 .pv-minimal .pv-meta { margin-top: 2px; }
+.dir-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 14px; }
+.dir { border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; background: var(--surface); }
+.dir.chosen { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+.dir-swatches { display: flex; gap: 6px; }
+.dir-swatches span { width: 28px; height: 28px; border-radius: 8px; display: block; border: 1px solid rgba(0,0,0,.06); }
+.dir-logo { height: 40px; width: 100%; object-fit: contain; object-position: left; }
+.dir-name { font-weight: 700; }
+.dir-meta, .dir-why { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+.dir-tag { font-size: 13px; font-style: italic; }
 </style>

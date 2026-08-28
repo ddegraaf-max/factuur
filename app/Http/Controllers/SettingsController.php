@@ -210,6 +210,13 @@ class SettingsController extends Controller
             $data['logo_path'] = null; // clear old path-based logo
         }
 
+        // Logo uit de huisstijl-wizard: SVG-woordmerk/monogram (of PNG) als data-URL.
+        if ($request->filled('logo_data_url')) {
+            $request->validate(['logo_data_url' => ['string', 'max:200000', 'regex:#^data:image/(svg\+xml|png);base64,[A-Za-z0-9+/=]+$#']]);
+            $data['logo_data'] = $request->input('logo_data_url');
+            $data['logo_path'] = null;
+        }
+
         // Eigen briefpapier (A4-afbeelding als ondergrond voor het
         // "stationery"-template). PNG/JPG — een PDF-briefpapier moet eerst
         // als afbeelding worden geëxporteerd (ontwerp-tools kunnen dat altijd).
