@@ -7,30 +7,250 @@
 
 @push('styles')
 <style>
-  /* Startersreis onder de hero: vier stappen die in elkaar overlopen. */
-  .lp-flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 1040px; margin: 56px auto 0; text-align: left; }
-  .lp-step { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 22px 20px; box-shadow: var(--shadow-sm); }
-  .lp-step::after { content: ''; position: absolute; right: -9px; top: 50%; width: 14px; height: 14px; border-top: 2px solid var(--border-strong); border-right: 2px solid var(--border-strong); transform: translateY(-50%) rotate(45deg); background: var(--bg); }
-  .lp-step:last-child::after { display: none; }
-  .lp-step-nr { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 14px; margin-bottom: 14px; }
-  .lp-step:last-child .lp-step-nr { background: var(--accent); }
-  .lp-step h3 { font-size: 16px; margin-bottom: 6px; }
-  .lp-step p { font-size: 13.5px; color: var(--text-3); line-height: 1.55; margin: 0; }
-  .lp-step-time { display: inline-block; margin-top: 12px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--brand); background: var(--brand-tint); border: 1px solid var(--brand-border); border-radius: 100px; padding: 3px 10px; }
-  @media (max-width: 980px) { .lp-flow { grid-template-columns: 1fr 1fr; } .lp-step:nth-child(2)::after { display: none; } }
-  @media (max-width: 560px) { .lp-flow { grid-template-columns: 1fr; } .lp-step::after { display: none; } }
+  /* ===== Hero ===== */
+  .hero h1 .accent { white-space: nowrap; }
 
-  /* Drie troeven */
-  .lp-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .lp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 30px 28px; }
-  .lp-card-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--brand-tint); color: var(--brand); display: flex; align-items: center; justify-content: center; margin-bottom: 18px; }
-  .lp-card-icon svg { width: 22px; height: 22px; }
-  .lp-card h3 { font-size: 19px; margin-bottom: 10px; }
-  .lp-card p { color: var(--text-2); line-height: 1.6; margin: 0; font-size: 15px; }
-  .lp-card p + p { margin-top: 10px; }
-  @media (max-width: 900px) { .lp-cards { grid-template-columns: 1fr; } }
+  /* Zwevende meldingen naast de mockup */
+  .lp-float { position: absolute; z-index: 3; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px 12px 12px; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 11px; text-align: left; animation: lpFloat 6s ease-in-out infinite; }
+  .lp-float .ic { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+  .lp-float b { display: block; font-size: 13px; color: var(--text); }
+  .lp-float span { display: block; font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+  .lp-float.one { top: -30px; right: -36px; }
+  .lp-float.two { bottom: 44px; left: -40px; animation-delay: -3s; }
+  /* Extra's onder de schermen: tegels en previews in de gekozen huisstijl */
+  #lpDash .d-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-top: 12px; }
+  #lpDash .d-tile { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 11px 13px; }
+  #lpDash .d-tile .ic { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-tint); color: var(--brand); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #lpDash .d-tile .ic svg { width: 16px; height: 16px; }
+  #lpDash .d-tile .ic.copper { background: var(--accent-tint); color: var(--accent-dark); }
+  #lpDash .d-tile .ic.green { background: var(--success-bg); color: #047857; }
+  #lpDash .d-tile b { display: block; font-size: 12px; color: var(--text); }
+  #lpDash .d-tile span { display: block; font-size: 10.5px; color: var(--text-3); margin-top: 1px; }
+  #lpDash .d-tile .big { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--brand-darker); display: block; line-height: 1.1; }
+  #lpDash .d-styled { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; margin-top: 12px; }
+  #lpDash .d-styled .lbl { font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-4); font-weight: 700; margin-bottom: 7px; }
+  #lpDash .d-inv { background: #fff; border: 1px solid var(--border); border-radius: 9px; padding: 11px 12px; font-size: 9.5px; color: var(--text-3); }
+  #lpDash .d-inv .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+  #lpDash .d-inv .lg { width: 20px; height: 20px; border-radius: 5px; background: #2E4A3F; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 8.5px; display: flex; align-items: center; justify-content: center; }
+  #lpDash .d-inv .t { font-family: var(--font-display); font-weight: 600; color: #2E4A3F; font-size: 11px; }
+  #lpDash .d-inv .row { display: flex; justify-content: space-between; padding: 4px 0; border-top: 1px solid var(--border); }
+  #lpDash .d-inv .row.tot { font-weight: 700; color: var(--text); }
+  #lpDash .d-vcard.mini { padding: 11px; border-radius: 10px; }
+  #lpDash .d-vcard.mini .av { width: 26px; height: 26px; font-size: 12px; border-radius: 7px; }
+  #lpDash .d-vcard.mini .nm { font-size: 12px; }
+  #lpDash .d-vcard.mini .rl { font-size: 9px; }
+  #lpDash .d-vcard.mini .ln { font-size: 9.5px; padding: 5px 8px; margin-top: 5px; }
+  #lpDash .d-vcard.mini .qr { display: none; }
+  #lpDash .d-site.mini .hero { padding: 10px 10px 9px; }
+  #lpDash .d-site.mini .hero .h { font-size: 11px; }
+  #lpDash .d-site.mini .hero .p { font-size: 7.5px; margin: 3px 0 6px; }
+  #lpDash .d-site.mini .blocks { padding: 7px 10px 9px; }
+  #lpDash .d-site.mini .blocks div { height: 18px; }
+  @media (max-width: 760px) { #lpDash .d-tiles, #lpDash .d-styled { grid-template-columns: 1fr; } }
+  @keyframes lpFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  @media (max-width: 1180px) { .lp-float { display: none; } }
 
-  /* "Los kopen" vergelijking */
+  /* ===== Productmockup: Lopra-schermen (#lpDash) ===== */
+  #lpDash .d-body { display: grid; grid-template-columns: 204px 1fr; height: 572px; background: var(--bg); text-align: left; }
+  #lpDash .d-side { background: linear-gradient(180deg, #163E62 0%, #132F49 100%); padding: 14px 12px; display: flex; flex-direction: column; gap: 1px; }
+  #lpDash .d-brand { display: flex; align-items: center; gap: 9px; padding: 4px 8px 14px; color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 16px; letter-spacing: 0.01em; }
+  #lpDash .d-brand img { width: 30px; height: 22px; display: block; }
+  #lpDash .d-navlabel { font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.4); font-weight: 700; padding: 12px 10px 5px; }
+  #lpDash .d-navitem { position: relative; display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; font-size: 12.5px; color: rgba(255,255,255,0.78); font-weight: 500; }
+  #lpDash .d-navitem svg { width: 15px; height: 15px; opacity: 0.75; }
+  #lpDash .d-navitem.active { background: rgba(255,255,255,0.12); color: #fff; font-weight: 600; }
+  #lpDash .d-navitem.active::before { content: ''; position: absolute; left: 0; top: 7px; bottom: 7px; width: 3px; border-radius: 3px; background: var(--accent-light); }
+  #lpDash .d-navitem.active svg { opacity: 1; }
+  #lpDash.js-ready .d-navitem { cursor: pointer; transition: background 0.15s, color 0.15s; }
+  #lpDash.js-ready .d-navitem:not(.active):hover { background: rgba(255,255,255,0.07); color: #fff; }
+  #lpDash .d-main { padding: 16px 20px; overflow: hidden; }
+  #lpDash .d-progress { height: 3px; background: var(--surface-3); border-radius: 3px; margin: 0 0 14px; overflow: hidden; }
+  #lpDash .d-progress i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 3px; }
+  #lpDash .d-topbar, #lpDash .d-shead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  #lpDash .d-greet, #lpDash .d-h1 { font-family: var(--font-display); font-weight: 600; font-size: 19px; color: var(--brand-darker); }
+  #lpDash .d-sub { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+  #lpDash .d-newbtn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent); color: #fff; font-size: 12px; font-weight: 600; padding: 8px 13px; border-radius: 8px; box-shadow: 0 4px 12px rgba(200,117,42,0.28); white-space: nowrap; }
+  #lpDash .d-newbtn svg { width: 13px; height: 13px; }
+  #lpDash .d-toggle { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; color: var(--success); white-space: nowrap; }
+  #lpDash .d-toggle i { width: 30px; height: 17px; border-radius: 10px; background: var(--success); position: relative; display: inline-block; }
+  #lpDash .d-toggle i::after { content: ''; position: absolute; right: 2px; top: 2px; width: 13px; height: 13px; border-radius: 50%; background: #fff; }
+
+  #lpDash .d-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 12px; }
+  #lpDash .d-kpi { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; }
+  #lpDash .d-kpi.hi { border-color: #EBCBA8; background: linear-gradient(180deg, var(--accent-tint) 0%, var(--surface) 70%); }
+  #lpDash .d-kpi-label { font-size: 10.5px; color: var(--text-3); font-weight: 500; margin-bottom: 7px; }
+  #lpDash .d-kpi-value { font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--brand-darker); font-variant-numeric: tabular-nums; line-height: 1; }
+  #lpDash .d-kpi-value.copper { color: var(--accent-dark); }
+  #lpDash .d-kpi-meta { font-size: 10.5px; color: var(--text-3); margin-top: 6px; }
+  #lpDash .d-kpi-meta .up { color: var(--success); font-weight: 700; }
+  #lpDash .d-dot { position: absolute; top: 11px; right: 11px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  #lpDash .d-screen.active .d-dot { animation: lpPulse 2s ease-in-out infinite; }
+  @keyframes lpPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(200,117,42,0.5); } 50% { box-shadow: 0 0 0 6px rgba(200,117,42,0); } }
+
+  #lpDash .d-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; margin-bottom: 12px; }
+  #lpDash .d-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  #lpDash .d-card-title { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: var(--text); }
+  #lpDash .d-card-sub { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+  #lpDash .d-card-link { font-size: 11px; color: var(--brand); font-weight: 600; }
+  #lpDash .d-two { display: grid; grid-template-columns: 1.25fr 1fr; gap: 12px; }
+  #lpDash .d-two.even { grid-template-columns: 1fr 1fr; }
+
+  #lpDash .d-bars { display: flex; align-items: flex-end; gap: 7px; height: 92px; }
+  #lpDash .d-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  #lpDash .d-bar-col span { font-size: 9px; color: var(--text-4); font-weight: 500; }
+  #lpDash .d-bar { width: 100%; max-width: 26px; border-radius: 4px 4px 0 0; background: var(--brand-tint-2); height: var(--h); transition: height 0.9s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #lpDash .d-bar.tall { background: var(--brand); }
+  #lpDash.js-ready .d-screen .d-bar { height: 0; }
+  #lpDash.js-ready .d-screen.active .d-bar { height: var(--h); }
+
+  #lpDash .d-table { width: 100%; border-collapse: collapse; }
+  #lpDash .d-table td { padding: 7px 6px; font-size: 11.5px; color: var(--text-2); border-top: 1px solid var(--border); }
+  #lpDash .d-table tr:first-child td { border-top: none; }
+  #lpDash .d-table thead th { text-align: left; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-4); font-weight: 700; padding: 0 6px 8px; border-bottom: 1px solid var(--border); }
+  #lpDash .d-table thead th.right { text-align: right; }
+  #lpDash .d-table .mono { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+  #lpDash .d-table .right { text-align: right; color: var(--text); font-weight: 600; }
+  #lpDash .d-pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 100px; white-space: nowrap; }
+  #lpDash .d-pill.green { background: var(--success-bg); color: #047857; }
+  #lpDash .d-pill.blue { background: var(--brand-tint-2); color: var(--brand); }
+  #lpDash .d-pill.amber { background: #FEF3C7; color: #B45309; }
+  #lpDash .d-pill.gray { background: var(--surface-3); color: var(--text-3); }
+  #lpDash .d-pill.copper { background: var(--accent-tint); color: var(--accent-dark); }
+
+  #lpDash .d-lead { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--border); font-size: 11.5px; min-width: 0; }
+  #lpDash .d-lead:first-child { border-top: none; padding-top: 2px; }
+  #lpDash .d-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--brand-tint-2); color: var(--brand); font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #lpDash .d-lead .who { min-width: 0; }
+  #lpDash .d-lead .t { font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #lpDash .d-lead .s { color: var(--text-3); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #lpDash .d-lead .when { margin-left: auto; font-size: 10px; color: var(--text-4); white-space: nowrap; }
+
+  #lpDash .d-tabs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+  #lpDash .d-tab { font-size: 11px; font-weight: 600; color: var(--text-3); padding: 5px 11px; border-radius: 100px; background: var(--surface); border: 1px solid var(--border); }
+  #lpDash .d-tab.active { background: var(--brand-darker); color: #fff; border-color: var(--brand-darker); }
+
+  /* Huisstijl-voorstellen */
+  #lpDash .d-props { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+  #lpDash .d-prop { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  #lpDash .d-prop.chosen { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  #lpDash .d-prop .badge { position: absolute; top: 10px; right: 10px; font-size: 9.5px; font-weight: 700; color: var(--accent-dark); background: var(--accent-tint); border-radius: 100px; padding: 3px 8px; }
+  #lpDash .d-logo { width: 46px; height: 46px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: #fff; margin-bottom: 10px; }
+  #lpDash .d-prop .n { font-size: 12.5px; font-weight: 700; color: var(--text); }
+  #lpDash .d-prop .f { font-size: 10.5px; color: var(--text-3); margin: 2px 0 8px; }
+  #lpDash .d-swatches { display: flex; gap: 5px; margin-bottom: 8px; }
+  #lpDash .d-swatches i { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border); }
+  #lpDash .d-prop .slogan { font-size: 11.5px; font-style: italic; color: var(--text-2); font-family: var(--font-display); }
+  #lpDash .d-prop .btn-mini { margin-top: 10px; display: inline-block; font-size: 10.5px; font-weight: 600; padding: 6px 10px; border-radius: 7px; background: var(--surface-2); color: var(--text-2); }
+  #lpDash .d-prop.chosen .btn-mini { background: var(--accent); color: #fff; }
+  #lpDash .d-note { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-3); margin-top: 12px; }
+  #lpDash .d-note b { color: var(--accent-dark); }
+
+  /* Formulier + preview (visitekaartje / website) */
+  #lpDash .d-form { display: grid; gap: 9px; align-content: start; }
+  #lpDash .d-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-4); font-weight: 700; margin-bottom: 4px; }
+  #lpDash .d-field .val { font-size: 11.5px; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 7px 10px; }
+  #lpDash .d-field .val.multi { color: var(--text-2); line-height: 1.4; }
+  #lpDash .d-preview { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+  #lpDash .d-preview .cap { display: flex; justify-content: space-between; font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-4); font-weight: 700; margin-bottom: 9px; }
+  #lpDash .d-ai { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #fff; background: var(--brand); border-radius: 8px; padding: 7px 11px; }
+
+  /* Visitekaartje in de huisstijl van de starter (groen + terracotta) */
+  #lpDash .d-vcard { position: relative; background: #2E4A3F; border-radius: 14px; padding: 14px; color: #fff; overflow: hidden; }
+  #lpDash .d-vcard::before { content: ''; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -70px; top: -90px; background: radial-gradient(circle, rgba(217,160,102,0.35) 0%, rgba(217,160,102,0) 65%); }
+  #lpDash .d-vcard .who { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; position: relative; }
+  #lpDash .d-vcard .av { width: 34px; height: 34px; border-radius: 9px; background: #D9A066; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  #lpDash .d-vcard .nm { font-family: var(--font-display); font-weight: 600; font-size: 14px; }
+  #lpDash .d-vcard .rl { font-size: 10px; opacity: 0.7; }
+  #lpDash .d-vcard .ln { display: flex; align-items: center; gap: 8px; font-size: 10.5px; padding: 7px 10px; border-radius: 8px; background: rgba(255,255,255,0.1); margin-top: 6px; position: relative; }
+  #lpDash .d-vcard .ln.site { background: #D9A066; font-weight: 600; }
+  #lpDash .d-vcard .qr { position: absolute; right: 12px; top: 12px; width: 38px; height: 38px; background: #fff; border-radius: 6px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 5px; }
+  #lpDash .d-vcard .qr i { background: #2E4A3F; border-radius: 1px; }
+  #lpDash .d-vcard .qr i.o { background: transparent; }
+
+  /* Website-preview */
+  #lpDash .d-site { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: #fff; }
+  #lpDash .d-site .bar { display: flex; gap: 4px; padding: 6px 8px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  #lpDash .d-site .bar i { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); }
+  #lpDash .d-site .nav { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; font-size: 9.5px; font-weight: 700; color: #2E4A3F; }
+  #lpDash .d-site .nav div { display: flex; gap: 6px; }
+  #lpDash .d-site .nav span { width: 22px; height: 3px; background: var(--border); border-radius: 2px; }
+  #lpDash .d-site .hero { padding: 14px 12px 12px; background: #F3EFE8; }
+  #lpDash .d-site .hero .h { font-family: var(--font-display); font-weight: 600; font-size: 13.5px; color: #2E4A3F; line-height: 1.2; }
+  #lpDash .d-site .hero .p { font-size: 8.5px; color: #6B675F; margin: 5px 0 8px; line-height: 1.4; }
+  #lpDash .d-site .hero .b { display: inline-block; font-size: 8.5px; font-weight: 700; color: #fff; background: #D9A066; border-radius: 5px; padding: 4px 8px; }
+  #lpDash .d-site .blocks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 10px 12px 12px; }
+  #lpDash .d-site .blocks div { height: 30px; border-radius: 6px; background: #F3EFE8; border: 1px solid #E6E1D8; }
+
+  /* Tour: schermen + animaties */
+  #lpDash .d-screen { display: none; }
+  #lpDash .d-screen:first-of-type { display: block; }
+  #lpDash.js-ready .d-screen { display: none; }
+  #lpDash.js-ready .d-screen.active { display: block; animation: lpIn 0.45s ease both; }
+  @keyframes lpIn { from { opacity: 0.3; } to { opacity: 1; } }
+  #lpDash .d-anim, #lpDash .d-fade { transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--d, 0s); }
+  #lpDash.js-ready .d-screen .d-anim { opacity: 0; transform: translateY(12px); }
+  #lpDash.js-ready .d-screen .d-fade { opacity: 0; }
+  #lpDash.js-ready .d-screen.active .d-anim,
+  #lpDash.js-ready .d-screen.active .d-fade { opacity: 1; transform: none; }
+
+  @media (max-width: 760px) {
+    #lpDash .d-body { grid-template-columns: 1fr; height: auto; }
+    #lpDash .d-side { display: none; }
+    #lpDash .d-kpis { grid-template-columns: repeat(2, 1fr); }
+    #lpDash .d-two, #lpDash .d-two.even { grid-template-columns: 1fr; }
+    #lpDash .d-props { grid-template-columns: 1fr; }
+    #lpDash .d-hide { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #lpDash .d-anim, #lpDash .d-fade, #lpDash .d-bar { transition: none !important; }
+    #lpDash .d-screen.active .d-dot { animation: none !important; }
+    #lpDash.js-ready .d-screen.active { animation: none !important; }
+    .lp-float { animation: none !important; }
+  }
+
+  /* ===== Waarom Lopra: drie visuele kaarten ===== */
+  .lp-vcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .lp-vcard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+  .lp-vcard-visual { position: relative; height: 216px; padding: 22px; overflow: hidden; background: linear-gradient(180deg, var(--brand-tint) 0%, #F7F5F1 100%); border-bottom: 1px solid var(--border); }
+  .lp-vcard-body { padding: 22px 26px 28px; }
+  .lp-vcard-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-dark); margin-bottom: 8px; }
+  .lp-vcard h3 { font-size: 19px; margin-bottom: 8px; color: var(--brand-darker); }
+  .lp-vcard p { color: var(--text-2); font-size: 14.5px; line-height: 1.6; margin: 0; }
+  @media (max-width: 900px) { .lp-vcards { grid-template-columns: 1fr; } }
+
+  .lp-mini-props { display: grid; gap: 8px; }
+  .lp-mini-prop { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--border); border-radius: 11px; padding: 9px 11px; font-size: 11.5px; color: var(--text); font-weight: 600; box-shadow: var(--shadow-sm); }
+  .lp-mini-prop .lg { width: 30px; height: 30px; border-radius: 8px; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .lp-mini-prop small { display: block; font-weight: 400; color: var(--text-3); font-size: 10.5px; }
+  .lp-mini-prop .sw { display: flex; gap: 4px; margin-left: auto; }
+  .lp-mini-prop .sw i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border); }
+  .lp-mini-prop.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+  .lp-mini-prop .ok { font-size: 9.5px; font-weight: 700; color: var(--accent-dark); background: var(--accent-tint); border-radius: 100px; padding: 2px 7px; margin-left: 6px; }
+
+  .lp-mini-site { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-md); transform: rotate(-1.5deg); margin: 2px 8px 0; }
+  .lp-mini-site .bar { display: flex; gap: 4px; padding: 7px 9px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .lp-mini-site .bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong); }
+  .lp-mini-site .nav { display: flex; justify-content: space-between; align-items: center; padding: 9px 12px; font-size: 10px; font-weight: 700; color: #2E4A3F; }
+  .lp-mini-site .nav div { display: flex; gap: 6px; }
+  .lp-mini-site .nav span { width: 24px; height: 3px; background: var(--border); border-radius: 2px; }
+  .lp-mini-site .hero { padding: 14px 12px 12px; background: #F3EFE8; }
+  .lp-mini-site .hero .h { font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #2E4A3F; line-height: 1.2; }
+  .lp-mini-site .hero .p { font-size: 9px; color: #6B675F; margin: 5px 0 8px; }
+  .lp-mini-site .hero .b { display: inline-block; font-size: 9px; font-weight: 700; color: #fff; background: #D9A066; border-radius: 5px; padding: 4px 9px; }
+  .lp-mini-site .blocks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 10px 12px 12px; }
+  .lp-mini-site .blocks div { height: 26px; border-radius: 6px; background: #F3EFE8; border: 1px solid #E6E1D8; }
+  .lp-online { position: absolute; left: 22px; bottom: 16px; display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border); border-radius: 100px; padding: 5px 11px; font-size: 11px; font-weight: 700; color: var(--success); box-shadow: var(--shadow-md); }
+  .lp-online i { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+
+  .lp-mini-inv { background: #fff; border-radius: 8px; box-shadow: var(--shadow-md); padding: 16px 18px; width: 84%; margin: 0 auto; transform: rotate(1.5deg); font-size: 10.5px; color: var(--text-3); }
+  .lp-mini-inv .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .lp-mini-inv .lg { width: 28px; height: 28px; border-radius: 7px; background: #2E4A3F; display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 11px; }
+  .lp-mini-inv .t { font-family: var(--font-display); font-weight: 600; color: var(--text); font-size: 12.5px; }
+  .lp-mini-inv .row { display: flex; justify-content: space-between; padding: 5px 0; border-top: 1px solid var(--border); }
+  .lp-mini-inv .row.tot { font-weight: 700; color: var(--text); border-top-width: 2px; }
+  .lp-mini-badge { position: absolute; right: 18px; bottom: 18px; background: #fff; border: 1px solid #A7E3C0; color: #047857; font-weight: 700; font-size: 11.5px; border-radius: 100px; padding: 7px 12px; box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 6px; }
+
+  /* ===== "Los kopen" vergelijking ===== */
   .lp-compare { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; }
   .lp-compare-list { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 10px; }
   .lp-compare-list li { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; font-size: 14.5px; color: var(--text-2); }
@@ -39,23 +259,24 @@
   .lp-compare-sum { margin-top: 18px; padding: 18px 20px; border-radius: 14px; background: var(--brand-darker); color: #fff; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
   .lp-compare-sum .amount { font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -0.01em; }
   .lp-compare-sum .amount small { font-family: var(--font-body); font-size: 13px; font-weight: 500; opacity: 0.75; margin-left: 4px; }
-  .lp-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-tint, #FBF1E7); border-radius: 100px; padding: 5px 12px; }
+  .lp-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent-light); background: rgba(255,255,255,0.1); border-radius: 100px; padding: 5px 12px; }
   @media (max-width: 900px) { .lp-compare { grid-template-columns: 1fr; } }
 
-  /* Voorbeeld-visitekaartje in de huisstijl */
-  .lp-card-demo { background: var(--brand-darker); border-radius: 22px; padding: 32px; color: #fff; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
-  .lp-card-demo::before { content: ''; position: absolute; width: 320px; height: 320px; border-radius: 50%; right: -120px; top: -140px; background: radial-gradient(circle, rgba(224,165,92,0.28) 0%, rgba(224,165,92,0) 65%); }
+  /* Voorbeeld-visitekaartje in de huisstijl van de starter */
+  .lp-card-demo { position: relative; background: #2E4A3F; border-radius: 22px; padding: 32px; color: #fff; box-shadow: var(--shadow-lg); overflow: hidden; }
+  .lp-card-demo::before { content: ''; position: absolute; width: 320px; height: 320px; border-radius: 50%; right: -120px; top: -140px; background: radial-gradient(circle, rgba(217,160,102,0.32) 0%, rgba(217,160,102,0) 65%); }
   .lp-card-demo .who { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; position: relative; }
-  .lp-card-demo .avatar { width: 52px; height: 52px; border-radius: 14px; background: var(--accent); color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 22px; display: flex; align-items: center; justify-content: center; }
+  .lp-card-demo .avatar { width: 52px; height: 52px; border-radius: 14px; background: #D9A066; color: #fff; font-family: var(--font-display); font-weight: 600; font-size: 22px; display: flex; align-items: center; justify-content: center; }
   .lp-card-demo .name { font-family: var(--font-display); font-size: 20px; font-weight: 600; }
   .lp-card-demo .role { font-size: 13px; opacity: 0.7; }
   .lp-card-demo .lines { display: grid; gap: 8px; position: relative; }
   .lp-card-demo .line { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; background: rgba(255,255,255,0.08); font-size: 13.5px; }
   .lp-card-demo .line svg { width: 16px; height: 16px; opacity: 0.85; flex-shrink: 0; }
-  .lp-card-demo .line.site { background: var(--accent); color: #fff; font-weight: 600; }
+  .lp-card-demo .line.site { background: #D9A066; color: #fff; font-weight: 600; }
   .lp-card-demo .qr { position: absolute; right: 28px; bottom: 28px; width: 66px; height: 66px; border-radius: 10px; background: #fff; display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; padding: 8px; }
-  .lp-card-demo .qr i { background: var(--brand-darker); border-radius: 2px; }
+  .lp-card-demo .qr i { background: #2E4A3F; border-radius: 2px; }
   .lp-card-demo .qr i.o { background: transparent; }
+  .lp-card-cap { margin-top: 12px; font-size: 12px; color: var(--text-3); text-align: center; }
 </style>
 @endpush
 
@@ -80,30 +301,244 @@
       Geen creditcard nodig · 14 dagen gratis · Daarna vanaf <b>€ 12,10/maand incl. btw</b>
     </div>
 
-    <div class="lp-flow" aria-label="Zo begin je met Lopra">
-      <div class="lp-step">
-        <div class="lp-step-nr">1</div>
-        <h3>Account aanmaken</h3>
-        <p>Naam, e-mail, KvK-nummer. Meer heb je niet nodig om te beginnen.</p>
-        <span class="lp-step-time">1 minuut</span>
+    <!-- PRODUCTMOCKUP — klikbaar menu, wisselt automatisch van scherm -->
+    <div class="app-mockup-wrap">
+      <div class="lp-float one" aria-hidden="true">
+        <div class="ic" style="background:var(--accent-tint);color:var(--accent-dark);">✦</div>
+        <div><b>Huisstijl klaar</b><span>3 voorstellen · 1 gekozen · logo als SVG</span></div>
       </div>
-      <div class="lp-step">
-        <div class="lp-step-nr">2</div>
-        <h3>Huisstijl kiezen</h3>
-        <p>Vertel wat je doet en voor wie. Je krijgt drie voorstellen met kleuren, lettertype, slogan en logo.</p>
-        <span class="lp-step-time">5 minuten</span>
+      <div class="lp-float two" aria-hidden="true">
+        <div class="ic" style="background:var(--success-bg);color:#047857;">✓</div>
+        <div><b>€ 1.210,00 betaald via iDEAL</b><span>Factuur 2026-0007 · zojuist</span></div>
       </div>
-      <div class="lp-step">
-        <div class="lp-step-nr">3</div>
-        <h3>Visitekaartje &amp; website online</h3>
-        <p>Vier vragen beantwoorden, tekst laten schrijven, publiceren. Met contactformulier en QR-code.</p>
-        <span class="lp-step-time">10 minuten</span>
-      </div>
-      <div class="lp-step">
-        <div class="lp-step-nr">4</div>
-        <h3>Eerste factuur versturen</h3>
-        <p>In je eigen huisstijl, met iDEAL-link. De btw houdt Lopra vanaf nu voor je bij.</p>
-        <span class="lp-step-time">Vandaag nog</span>
+
+      <div class="app-mockup" id="lpDash">
+        <div class="mock-chrome">
+          <div class="mock-dot red"></div>
+          <div class="mock-dot yellow"></div>
+          <div class="mock-dot green"></div>
+          <div class="mock-url" id="lpUrl">{{ brand('domain') }}/dashboard</div>
+        </div>
+        <div class="d-body">
+          <aside class="d-side">
+            <div class="d-brand"><img src="/brand/lopra/lopra-mark-white.svg" alt=""><span>Lopra</span></div>
+            <div class="d-navlabel">Overzicht</div>
+            <div class="d-navitem active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>Dashboard</div>
+            <div class="d-navlabel">Verkoop</div>
+            <div class="d-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Facturen</div>
+            <div class="d-navlabel">Jouw merk</div>
+            <div class="d-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>Huisstijl</div>
+            <div class="d-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Visitekaartje</div>
+            <div class="d-navitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Website</div>
+          </aside>
+
+          <div class="d-main">
+            <div class="d-progress"><i id="lpProgress"></i></div>
+
+            <!-- SCHERM 1: Dashboard -->
+            <section class="d-screen active" data-screen="dashboard">
+              <div class="d-topbar d-anim" style="--d:.05s">
+                <div>
+                  <div class="d-greet">Goedemorgen, Sanne</div>
+                  <div class="d-sub">Je website leverde deze week 3 aanvragen op — en 2 facturen zijn betaald.</div>
+                </div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nieuwe factuur</div>
+              </div>
+              <div class="d-kpis">
+                <div class="d-kpi d-anim" style="--d:.12s"><div class="d-kpi-label">Openstaand</div><div class="d-kpi-value" data-count="1240" data-prefix="€ ">€ 1.240</div><div class="d-kpi-meta">2 facturen</div></div>
+                <div class="d-kpi d-anim" style="--d:.19s"><div class="d-kpi-label">Betaald deze maand</div><div class="d-kpi-value" data-count="3180" data-prefix="€ ">€ 3.180</div><div class="d-kpi-meta"><span class="up">↑ 24%</span> vs vorige maand</div></div>
+                <div class="d-kpi hi d-anim" style="--d:.26s"><span class="d-dot"></span><div class="d-kpi-label">Aanvragen via je website</div><div class="d-kpi-value copper" data-count="3">3</div><div class="d-kpi-meta">deze week · 1 al offerte</div></div>
+                <div class="d-kpi d-anim" style="--d:.33s"><div class="d-kpi-label">Btw 3e kwartaal</div><div class="d-kpi-value" data-count="668" data-prefix="€ ">€ 668</div><div class="d-kpi-meta">aangifte vóór 31 okt.</div></div>
+              </div>
+              <div class="d-two">
+                <div class="d-card d-anim" style="--d:.4s">
+                  <div class="d-card-head"><div><div class="d-card-title">Omzet per maand</div><div class="d-card-sub">Excl. btw · sinds je start in februari</div></div><span class="d-card-link">Rapport →</span></div>
+                  <div class="d-bars">
+                    <div class="d-bar-col"><div class="d-bar" style="--h:22%;--d:.45s"></div><span>feb</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:38%;--d:.50s"></div><span>mrt</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:47%;--d:.55s"></div><span>apr</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:44%;--d:.60s"></div><span>mei</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:63%;--d:.65s"></div><span>jun</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:71%;--d:.70s"></div><span>jul</span></div>
+                    <div class="d-bar-col"><div class="d-bar" style="--h:66%;--d:.75s"></div><span>aug</span></div>
+                    <div class="d-bar-col"><div class="d-bar tall" style="--h:92%;--d:.80s"></div><span>sep</span></div>
+                  </div>
+                </div>
+                <div class="d-card d-anim" style="--d:.48s">
+                  <div class="d-card-head"><div><div class="d-card-title">Aanvragen via je website</div><div class="d-card-sub">Contactformulier → lead → offerte</div></div></div>
+                  <div class="d-lead"><span class="d-avatar">FB</span><div class="who"><div class="t">Familie Bakker</div><div class="s">Advies woonkamer en keuken</div></div><span class="when">2 u</span></div>
+                  <div class="d-lead"><span class="d-avatar">GL</span><div class="who"><div class="t">Café De Gouden Leeuw</div><div class="s">Inrichting nieuw terras</div></div><span class="when">gisteren</span></div>
+                  <div class="d-lead"><span class="d-avatar">PZ</span><div class="who"><div class="t">Praktijk Zonnehoek</div><div class="s">Wachtruimte opnieuw inrichten</div></div><span class="when">3 d</span></div>
+                </div>
+              </div>
+              <div class="d-card d-anim" style="--d:.56s">
+                <div class="d-card-head"><div class="d-card-title">Recente facturen</div><span class="d-card-link">Alle →</span></div>
+                <table class="d-table">
+                  <tbody>
+                    <tr><td class="mono">2026-0007</td><td>Studio Noord</td><td class="d-hide">12 sep</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 1.210,00</td></tr>
+                    <tr><td class="mono">2026-0006</td><td>Familie Jansen</td><td class="d-hide">9 sep</td><td><span class="d-pill blue">Verzonden</span></td><td class="mono right">€ 640,00</td></tr>
+                    <tr><td class="mono">2026-0005</td><td>Café De Gouden Leeuw</td><td class="d-hide">2 sep</td><td><span class="d-pill amber">Deels betaald</span></td><td class="mono right">€ 2.420,00</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- SCHERM 2: Facturen -->
+            <section class="d-screen" data-screen="facturen">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Facturen</div><div class="d-sub">7 facturen · € 1.240 openstaand · alles in je eigen huisstijl</div></div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nieuwe factuur</div>
+              </div>
+              <div class="d-tabs d-anim" style="--d:.09s"><span class="d-tab active">Alle</span><span class="d-tab">Concept</span><span class="d-tab">Verzonden</span><span class="d-tab">Betaald</span><span class="d-tab">Achterstallig</span></div>
+              <div class="d-card d-anim" style="--d:.14s">
+                <table class="d-table">
+                  <thead><tr><th>Nummer</th><th>Klant</th><th class="d-hide">Datum</th><th class="d-hide">Vervalt</th><th>Status</th><th class="right">Bedrag</th></tr></thead>
+                  <tbody>
+                    <tr class="d-fade" style="--d:.18s"><td class="mono">2026-0007</td><td>Studio Noord</td><td class="d-hide">12-09</td><td class="d-hide">26-09</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 1.210,00</td></tr>
+                    <tr class="d-fade" style="--d:.24s"><td class="mono">2026-0006</td><td>Familie Jansen</td><td class="d-hide">09-09</td><td class="d-hide">23-09</td><td><span class="d-pill blue">Verzonden</span></td><td class="mono right">€ 640,00</td></tr>
+                    <tr class="d-fade" style="--d:.30s"><td class="mono">2026-0005</td><td>Café De Gouden Leeuw</td><td class="d-hide">02-09</td><td class="d-hide">16-09</td><td><span class="d-pill amber">Deels betaald</span></td><td class="mono right">€ 2.420,00</td></tr>
+                    <tr class="d-fade" style="--d:.36s"><td class="mono">2026-0004</td><td>Praktijk Zonnehoek</td><td class="d-hide">21-08</td><td class="d-hide">04-09</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 895,00</td></tr>
+                    <tr class="d-fade" style="--d:.42s"><td class="mono">2026-0003</td><td>Familie Bakker</td><td class="d-hide">14-08</td><td class="d-hide">28-08</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 1.575,00</td></tr>
+                    <tr class="d-fade" style="--d:.48s"><td class="mono">2026-0002</td><td>Studio Noord</td><td class="d-hide">03-08</td><td class="d-hide">17-08</td><td><span class="d-pill green">Betaald</span></td><td class="mono right">€ 480,00</td></tr>
+                    <tr class="d-fade" style="--d:.54s"><td class="mono">— concept —</td><td>Familie Bakker</td><td class="d-hide">—</td><td class="d-hide">—</td><td><span class="d-pill gray">Concept</span></td><td class="mono right">€ 2.150,00</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="d-note d-fade" style="--d:.6s">✓ <b>iDEAL-link en QR-code</b> staan automatisch op elke factuur; herinneringen gaan vanzelf.</div>
+              <div class="d-tiles">
+                <div class="d-tile d-anim" style="--d:.64s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div><div><span class="big">€ 3.180</span><span>betaald deze maand</span></div></div>
+                <div class="d-tile d-anim" style="--d:.7s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div><span class="big">9 dagen</span><span>gemiddelde betaaltermijn</span></div></div>
+                <div class="d-tile d-anim" style="--d:.76s"><div class="ic copper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><span class="big">1</span><span>herinnering, automatisch verstuurd</span></div></div>
+              </div>
+            </section>
+
+            <!-- SCHERM 3: Huisstijl -->
+            <section class="d-screen" data-screen="huisstijl">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Huisstijl</div><div class="d-sub">Drie voorstellen op basis van: interieurstylist · particulieren &amp; horeca · warm en persoonlijk</div></div>
+                <div class="d-ai">✦ Opnieuw voorstellen</div>
+              </div>
+              <div class="d-props">
+                <div class="d-prop chosen d-anim" style="--d:.12s">
+                  <span class="badge">Gekozen</span>
+                  <div class="d-logo" style="background:#2E4A3F;">dW</div>
+                  <div class="n">Warm &amp; ambachtelijk</div>
+                  <div class="f">Fraunces + Instrument Sans</div>
+                  <div class="d-swatches"><i style="background:#2E4A3F"></i><i style="background:#D9A066"></i><i style="background:#F3EFE8"></i><i style="background:#1F1D1A"></i></div>
+                  <div class="slogan">"Ruimtes die bij je passen."</div>
+                  <span class="btn-mini">✓ Deze huisstijl gebruiken</span>
+                </div>
+                <div class="d-prop d-anim" style="--d:.2s">
+                  <div class="d-logo" style="background:#1F3A5F;">DW</div>
+                  <div class="n">Strak &amp; modern</div>
+                  <div class="f">Manrope</div>
+                  <div class="d-swatches"><i style="background:#1F3A5F"></i><i style="background:#C9A227"></i><i style="background:#E8E4DD"></i><i style="background:#101418"></i></div>
+                  <div class="slogan">"Interieur met karakter."</div>
+                  <span class="btn-mini">Kies</span>
+                </div>
+                <div class="d-prop d-anim" style="--d:.28s">
+                  <div class="d-logo" style="background:#7A4B2B;">dw.</div>
+                  <div class="n">Natuurlijk &amp; rustig</div>
+                  <div class="f">Lora + Karla</div>
+                  <div class="d-swatches"><i style="background:#7A4B2B"></i><i style="background:#B8A48A"></i><i style="background:#F6F1EA"></i><i style="background:#2B2723"></i></div>
+                  <div class="slogan">"Thuis, opnieuw ontdekt."</div>
+                  <span class="btn-mini">Kies</span>
+                </div>
+              </div>
+              <div class="d-note d-fade" style="--d:.4s">✦ <b>Door AI gemaakt uit vier vragen.</b> Eén klik zet kleuren, lettertype, sjabloon en logo op je facturen, je visitekaartje en je website. Alles blijft aanpasbaar.</div>
+              <div class="d-styled">
+                <div class="d-anim" style="--d:.46s">
+                  <div class="lbl">Je factuur</div>
+                  <div class="d-inv">
+                    <div class="top"><span class="t">Factuur 2026-0007</span><span class="lg">dW</span></div>
+                    <div class="row"><span>Interieuradvies woonkamer</span><span>€ 750,00</span></div>
+                    <div class="row"><span>Stylingdag incl. materialen</span><span>€ 250,00</span></div>
+                    <div class="row tot"><span>Totaal incl. btw</span><span>€ 1.210,00</span></div>
+                  </div>
+                </div>
+                <div class="d-anim" style="--d:.52s">
+                  <div class="lbl">Je visitekaartje</div>
+                  <div class="d-vcard mini">
+                    <div class="who"><div class="av">S</div><div><div class="nm">Sanne de Wit</div><div class="rl">Interieurstylist</div></div></div>
+                    <div class="ln">06 - 12 34 56 78</div>
+                    <div class="ln site">Bekijk mijn website →</div>
+                  </div>
+                </div>
+                <div class="d-anim" style="--d:.58s">
+                  <div class="lbl">Je website</div>
+                  <div class="d-site mini">
+                    <div class="bar"><i></i><i></i><i></i></div>
+                    <div class="hero"><div class="h">Ruimtes die bij je passen.</div><div class="p">Interieuradvies voor wie thuis wil komen.</div><span class="b">Plan een kennismaking</span></div>
+                    <div class="blocks"><div></div><div></div><div></div></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- SCHERM 4: Visitekaartje -->
+            <section class="d-screen" data-screen="visitekaartje">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Visitekaartje</div><div class="d-sub">{{ brand('domain') }}/k/dewit-interieur · deel de link of laat de QR-code scannen</div></div>
+                <div class="d-toggle"><i></i>Online</div>
+              </div>
+              <div class="d-two even">
+                <div class="d-form d-anim" style="--d:.1s">
+                  <div class="d-field"><label>Naam</label><div class="val">Sanne de Wit</div></div>
+                  <div class="d-field"><label>Functie</label><div class="val">Interieurstylist</div></div>
+                  <div class="d-field"><label>Slogan</label><div class="val">Ruimtes die bij je passen.</div></div>
+                  <div class="d-field"><label>WhatsApp</label><div class="val">06 - 12 34 56 78</div></div>
+                  <div class="d-field"><label>Knop</label><div class="val">Bekijk mijn website → {{ brand('domain') }}/s/dewit-interieur</div></div>
+                </div>
+                <div class="d-preview d-anim" style="--d:.2s">
+                  <div class="cap"><span>Voorbeeld</span><span>In je huisstijl</span></div>
+                  <div class="d-vcard">
+                    <div class="qr"><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i></div>
+                    <div class="who"><div class="av">S</div><div><div class="nm">Sanne de Wit</div><div class="rl">Interieurstylist · De Wit Interieur</div></div></div>
+                    <div class="ln">06 - 12 34 56 78</div>
+                    <div class="ln">sanne@dewitinterieur.nl</div>
+                    <div class="ln site">Bekijk mijn website →</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-tiles">
+                <div class="d-tile d-anim" style="--d:.3s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg></div><div><b>QR-code downloaden</b><span>PNG of SVG, voor op je offerte</span></div></div>
+                <div class="d-tile d-anim" style="--d:.36s"><div class="ic copper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div><div><b>Link kopiëren</b><span>deel via WhatsApp of e-mail</span></div></div>
+                <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div><div><b>Opslaan in contacten</b><span>vCard met één tik, op elke telefoon</span></div></div>
+              </div>
+            </section>
+
+            <!-- SCHERM 5: Website -->
+            <section class="d-screen" data-screen="website">
+              <div class="d-shead d-anim" style="--d:.04s">
+                <div><div class="d-h1">Website</div><div class="d-sub">{{ brand('domain') }}/s/dewit-interieur · berichten komen binnen als leads</div></div>
+                <div class="d-toggle"><i></i>Online</div>
+              </div>
+              <div class="d-two even">
+                <div class="d-form d-anim" style="--d:.1s">
+                  <div class="d-field"><label>Wat doe je?</label><div class="val multi">Interieuradvies en styling voor woningen en kleine horeca.</div></div>
+                  <div class="d-field"><label>Voor wie?</label><div class="val multi">Particulieren en ondernemers in en rond Utrecht.</div></div>
+                  <div class="d-field"><label>Waarom jij?</label><div class="val multi">Persoonlijk, binnen budget en in drie weken klaar.</div></div>
+                  <div class="d-field"><label>Uitstraling</label><div class="val">Warm en persoonlijk</div></div>
+                  <div><span class="d-ai">✦ Tekst laten schrijven</span></div>
+                </div>
+                <div class="d-preview d-anim" style="--d:.2s">
+                  <div class="cap"><span>Voorbeeld</span><span>Volledig bewerkbaar</span></div>
+                  <div class="d-site">
+                    <div class="bar"><i></i><i></i><i></i></div>
+                    <div class="nav">De Wit Interieur<div><span></span><span></span><span></span></div></div>
+                    <div class="hero"><div class="h">Ruimtes die bij je passen.</div><div class="p">Interieuradvies voor wie thuis wil komen — persoonlijk, binnen budget, in drie weken klaar.</div><span class="b">Plan een kennismaking</span></div>
+                    <div class="blocks"><div></div><div></div><div></div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-card d-anim" style="--d:.3s; margin-top: 12px;">
+                <div class="d-card-head"><div><div class="d-card-title">Aanvragen via je website</div><div class="d-card-sub">Contactformulier → lead → offerte, zonder overtypen</div></div><span class="d-pill copper">3 deze week</span></div>
+                <div class="d-lead"><span class="d-avatar">FB</span><div class="who"><div class="t">Familie Bakker</div><div class="s">"Kunnen jullie ons helpen met de woonkamer en keuken?"</div></div><span class="when">2 u · offerte gemaakt</span></div>
+                <div class="d-lead"><span class="d-avatar">GL</span><div class="who"><div class="t">Café De Gouden Leeuw</div><div class="s">"We openen in maart een terras en zoeken een stylist."</div></div><span class="when">gisteren</span></div>
+              </div>
+            </section>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -118,24 +553,55 @@
       <p>De meeste starters kopen drie losse tools: een factuurprogramma, een logo-ontwerper en een websitebouwer. Lopra is alle drie — en ze werken samen.</p>
     </div>
 
-    <div class="lp-cards">
-      <div class="lp-card">
-        <div class="lp-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
-        <h3>Een huisstijl in een kwartier</h3>
-        <p>Nog geen logo, geen kleuren, geen idee waar te beginnen? Vertel wat je doet en voor wie. De AI van Lopra stelt drie huisstijlen voor: kleuren, lettertype, factuursjabloon, slogan en een logo.</p>
-        <p>Eén klik, en je facturen, je visitekaartje en je website dragen dezelfde stijl. Heb je al een huisstijl? Upload je logo en Lopra neemt de kleuren over.</p>
+    <div class="lp-vcards">
+      <div class="lp-vcard">
+        <div class="lp-vcard-visual" aria-hidden="true">
+          <div class="lp-mini-props">
+            <div class="lp-mini-prop"><span class="lg" style="background:#1F3A5F;">DW</span><div>Strak &amp; modern<small>Manrope · "Interieur met karakter."</small></div><div class="sw"><i style="background:#1F3A5F"></i><i style="background:#C9A227"></i><i style="background:#E8E4DD"></i></div></div>
+            <div class="lp-mini-prop on"><span class="lg" style="background:#2E4A3F;">dW</span><div>Warm &amp; ambachtelijk <span class="ok">✓ Gekozen</span><small>Fraunces · "Ruimtes die bij je passen."</small></div><div class="sw"><i style="background:#2E4A3F"></i><i style="background:#D9A066"></i><i style="background:#F3EFE8"></i></div></div>
+            <div class="lp-mini-prop"><span class="lg" style="background:#7A4B2B;">dw.</span><div>Natuurlijk &amp; rustig<small>Lora · "Thuis, opnieuw ontdekt."</small></div><div class="sw"><i style="background:#7A4B2B"></i><i style="background:#B8A48A"></i><i style="background:#F6F1EA"></i></div></div>
+          </div>
+        </div>
+        <div class="lp-vcard-body">
+          <span class="lp-vcard-tag">Huisstijl met AI</span>
+          <h3>Een huisstijl in een kwartier</h3>
+          <p>Nog geen logo of kleuren? Vertel wat je doet en voor wie. Je krijgt drie voorstellen met kleuren, lettertype, factuursjabloon, slogan en logo. Eén klik, en alles draagt dezelfde stijl. Heb je al een logo? Upload het en Lopra neemt de kleuren over.</p>
+        </div>
       </div>
-      <div class="lp-card">
-        <div class="lp-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-        <h3>Zichtbaar zonder webbouwer</h3>
-        <p>Een digitaal visitekaartje met QR-code — bellen, mailen, WhatsApp, opslaan in contacten — en een complete website met diensten, over jou en een contactformulier. Beide in je huisstijl, beide met één klik online.</p>
-        <p>Berichten via je website komen als leads binnen in je administratie, dus je maakt er direct een offerte van.</p>
+
+      <div class="lp-vcard">
+        <div class="lp-vcard-visual" aria-hidden="true">
+          <div class="lp-mini-site">
+            <div class="bar"><i></i><i></i><i></i></div>
+            <div class="nav">De Wit Interieur<div><span></span><span></span><span></span></div></div>
+            <div class="hero"><div class="h">Ruimtes die bij je passen.</div><div class="p">Interieuradvies voor wie thuis wil komen.</div><span class="b">Plan een kennismaking</span></div>
+            <div class="blocks"><div></div><div></div><div></div></div>
+          </div>
+          <span class="lp-online"><i></i>Online · 3 aanvragen deze week</span>
+        </div>
+        <div class="lp-vcard-body">
+          <span class="lp-vcard-tag">Visitekaartje &amp; website</span>
+          <h3>Zichtbaar zonder webbouwer</h3>
+          <p>Een digitaal visitekaartje met QR-code en een complete website met diensten, over jou en een contactformulier — beide in je huisstijl, beide met één klik online. Berichten komen als leads binnen, dus je maakt er direct een offerte van.</p>
+        </div>
       </div>
-      <div class="lp-card">
-        <div class="lp-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></div>
-        <h3>Factureren zoals het hoort</h3>
-        <p>Offertes die je klant digitaal ondertekent, facturen met iDEAL-link en QR-code, herinneringen die vanzelf gaan. Je btw-overzicht staat elk kwartaal klaar in de indeling van de Belastingdienst — overnemen en klaar.</p>
-        <p>Nodig je boekhouder gratis uit om mee te kijken, of exporteer alles wanneer je wilt.</p>
+
+      <div class="lp-vcard">
+        <div class="lp-vcard-visual" aria-hidden="true">
+          <div class="lp-mini-inv">
+            <div class="top"><div class="t">Factuur 2026-0007</div><span class="lg">dW</span></div>
+            <div class="row"><span>Interieuradvies woonkamer</span><span>€ 750,00</span></div>
+            <div class="row"><span>Stylingdag incl. materialen</span><span>€ 250,00</span></div>
+            <div class="row"><span>Btw 21%</span><span>€ 210,00</span></div>
+            <div class="row tot"><span>Totaal</span><span>€ 1.210,00</span></div>
+          </div>
+          <span class="lp-mini-badge">✓ Betaald via iDEAL</span>
+        </div>
+        <div class="lp-vcard-body">
+          <span class="lp-vcard-tag">Factureren &amp; btw</span>
+          <h3>Factureren zoals het hoort</h3>
+          <p>Offertes die je klant digitaal ondertekent, facturen met iDEAL-link en QR-code, herinneringen die vanzelf gaan. Je btw-overzicht staat elk kwartaal klaar in de indeling van de Belastingdienst. Je boekhouder kijkt gratis mee.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -161,26 +627,29 @@
         </div>
       </div>
 
-      <div class="lp-card-demo" aria-hidden="true">
-        <div class="who">
-          <div class="avatar">S</div>
-          <div>
-            <div class="name">Sanne de Wit</div>
-            <div class="role">Interieurstylist · De Wit Interieur</div>
+      <div>
+        <div class="lp-card-demo" aria-hidden="true">
+          <div class="who">
+            <div class="avatar">S</div>
+            <div>
+              <div class="name">Sanne de Wit</div>
+              <div class="role">Interieurstylist · De Wit Interieur</div>
+            </div>
+          </div>
+          <div class="lines">
+            <div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>06 - 12 34 56 78</div>
+            <div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>sanne@dewitinterieur.nl</div>
+            <div class="line site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Bekijk mijn website →</div>
+          </div>
+          <div class="qr">
+            <i></i><i></i><i></i><i class="o"></i><i></i>
+            <i></i><i class="o"></i><i></i><i></i><i class="o"></i>
+            <i></i><i></i><i class="o"></i><i></i><i></i>
+            <i class="o"></i><i></i><i></i><i class="o"></i><i></i>
+            <i></i><i class="o"></i><i></i><i></i><i></i>
           </div>
         </div>
-        <div class="lines">
-          <div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>06 - 12 34 56 78</div>
-          <div class="line"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>sanne@dewitinterieur.nl</div>
-          <div class="line site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>Bekijk mijn website →</div>
-        </div>
-        <div class="qr">
-          <i></i><i></i><i></i><i class="o"></i><i></i>
-          <i></i><i class="o"></i><i></i><i></i><i class="o"></i>
-          <i></i><i></i><i class="o"></i><i></i><i></i>
-          <i class="o"></i><i></i><i></i><i class="o"></i><i></i>
-          <i></i><i class="o"></i><i></i><i></i><i></i>
-        </div>
+        <div class="lp-card-cap">Het digitale visitekaartje van een starter — in haar eigen huisstijl, gemaakt in Lopra.</div>
       </div>
     </div>
   </div>
@@ -405,4 +874,88 @@
     <div style="margin-top:16px;font-size:13px;opacity:0.8;">Geen creditcard nodig · Daarna vanaf € 12,10/maand incl. btw</div>
   </div>
 </section>
+
+<script>
+(function () {
+  var mock = document.getElementById('lpDash');
+  if (!mock) return;
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var screens = Array.prototype.slice.call(mock.querySelectorAll('.d-screen'));
+  var navitems = Array.prototype.slice.call(mock.querySelectorAll('.d-navitem'));
+  var urlEl = document.getElementById('lpUrl');
+  var progEl = document.getElementById('lpProgress');
+  var domain = urlEl ? urlEl.textContent.split('/')[0] : 'lopra.nl';
+  var slugs = ['dashboard', 'facturen', 'instellingen/huisstijl', 'instellingen/visitekaartje', 'instellingen/website'];
+  var DWELL = 4400;
+  if (!screens.length) return;
+
+  function fmt(n) { return n.toLocaleString('nl-NL'); }
+  function setNum(el, val) { el.textContent = (el.getAttribute('data-prefix') || '') + fmt(Math.round(val)) + (el.getAttribute('data-suffix') || ''); }
+  function countUp(el) {
+    var target = parseFloat(el.getAttribute('data-count')) || 0;
+    if (reduce) { setNum(el, target); return; }
+    var dur = 1100, s = null;
+    function step(ts) {
+      if (s === null) s = ts;
+      var p = Math.min((ts - s) / dur, 1);
+      setNum(el, target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step); else setNum(el, target);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var current = -1, timer = null, hovering = false, started = false;
+
+  function restartProgress() {
+    if (!progEl || reduce) return;
+    progEl.style.transition = 'none';
+    progEl.style.width = '0%';
+    void progEl.offsetWidth;
+    progEl.style.transition = 'width ' + DWELL + 'ms linear';
+    progEl.style.width = '100%';
+  }
+
+  function show(idx) {
+    idx = ((idx % screens.length) + screens.length) % screens.length;
+    if (idx === current) return;
+    current = idx;
+    for (var i = 0; i < screens.length; i++) screens[i].classList.toggle('active', i === idx);
+    for (var j = 0; j < navitems.length; j++) navitems[j].classList.toggle('active', j === idx);
+    if (urlEl && slugs[idx]) urlEl.textContent = domain + '/' + slugs[idx];
+    var nums = screens[idx].querySelectorAll('[data-count]');
+    for (var k = 0; k < nums.length; k++) countUp(nums[k]);
+    restartProgress();
+  }
+
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+  function play() { stop(); if (reduce) return; timer = setInterval(function () { show(current + 1); }, DWELL); }
+
+  navitems.forEach(function (item, i) {
+    item.addEventListener('click', function () { show(i); if (!hovering && !reduce) play(); });
+  });
+  mock.addEventListener('mouseenter', function () { hovering = true; stop(); });
+  mock.addEventListener('mouseleave', function () { hovering = false; if (started) { restartProgress(); play(); } });
+
+  mock.classList.add('js-ready');
+
+  function onEnter() {
+    if (!started) { started = true; show(0); }
+    if (!hovering) play();
+  }
+
+  if (reduce) { show(0); return; }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) {
+        if (entries[i].isIntersecting) onEnter(); else stop();
+      }
+    }, { threshold: 0.3 });
+    io.observe(mock);
+  } else {
+    onEnter();
+  }
+})();
+</script>
 @endsection

@@ -2,6 +2,7 @@
 import { useForm, Head, usePage } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import Turnstile from '@/Components/Turnstile.vue';
+import LopraAuthHero from '@/Components/LopraAuthHero.vue';
 
 const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
 const brand = usePage().props.brand;
@@ -28,7 +29,9 @@ const submit = () => {
   <Head title="Inloggen" />
   <AuthLayout>
     <template #hero>
-      <div class="auth-copy">
+      <!-- Lopra heeft een eigen, korte hero met visual; EasyInvoice houdt de uitgebreide SEO-tekst. -->
+      <LopraAuthHero v-if="brand.key === 'lopra'" mode="login" />
+      <div v-else class="auth-copy">
         <h1 class="auth-h1">Inloggen bij {{ brand.name }}</h1>
         <p>Welkom terug. Log in en ga verder waar je gebleven was: je facturen, offertes, klanten en het btw-overzicht staan klaar. {{ brand.name }} is het Nederlandse facturatieprogramma voor zzp'ers en mkb — facturatie zonder gedoe, vanaf € 12,10 per maand (incl. 21% btw) en maandelijks opzegbaar.</p>
         <div class="login-features">

@@ -6,6 +6,7 @@ use App\Models\Invoice;
 use App\Models\PurchaseInvoice;
 use App\Models\Quote;
 use App\Services\VatService;
+use App\Support\Sql;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -187,7 +188,7 @@ class DashboardController extends Controller
     {
         return Invoice::whereNotIn('status', ['draft', 'cancelled'])
             ->whereYear('invoice_date', $year)
-            ->selectRaw('EXTRACT(MONTH FROM invoice_date) AS m, SUM(CASE WHEN is_credit THEN -subtotal ELSE subtotal END) AS total')
+            ->selectRaw(Sql::month('invoice_date') . ' AS m, SUM(CASE WHEN is_credit THEN -subtotal ELSE subtotal END) AS total')
             ->groupBy('m')
             ->pluck('total', 'm')
             ->mapWithKeys(fn ($v, $k) => [(int) $k => (float) $v])
@@ -198,7 +199,7 @@ class DashboardController extends Controller
     private function monthlyCosts(int $year): array
     {
         return PurchaseInvoice::whereYear('invoice_date', $year)
-            ->selectRaw('EXTRACT(MONTH FROM invoice_date) AS m, SUM(subtotal) AS total')
+            ->selectRaw(Sql::month('invoice_date') . ' AS m, SUM(subtotal) AS total')
             ->groupBy('m')
             ->pluck('total', 'm')
             ->mapWithKeys(fn ($v, $k) => [(int) $k => (float) $v])

@@ -10,8 +10,12 @@ const brand = usePage().props.brand;
       <!-- Let op: gewone <a>, geen Inertia <Link>. De homepage is een Blade-pagina
            (geen Inertia-response); met <Link> toont Inertia een debug-modal i.p.v. te navigeren. -->
       <a href="/" class="auth-logo">
-        <img :src="brand.icon" class="logo-mark" :alt="brand.name" />
-        <span>{{ brand.name }}</span>
+        <!-- Merk met een woordmerk voor donkere vlakken (Lopra) toont dat; anders beeldmerk + naam. -->
+        <img v-if="brand.wordmark_dark" :src="brand.wordmark_dark" class="logo-wordmark" :alt="brand.name" />
+        <template v-else>
+          <img :src="brand.icon" class="logo-mark" :alt="brand.name" />
+          <span>{{ brand.name }}</span>
+        </template>
       </a>
       <div class="auth-tagline">
         <slot name="hero">

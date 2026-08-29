@@ -3,6 +3,7 @@ import { useForm, Head, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import Turnstile from '@/Components/Turnstile.vue';
+import LopraAuthHero from '@/Components/LopraAuthHero.vue';
 
 const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
 const brand = usePage().props.brand;
@@ -59,7 +60,9 @@ const submit = () => form.post(route('register'));
   <Head title="Registreren" />
   <AuthLayout>
     <template #hero>
-      <div class="auth-copy">
+      <!-- Lopra heeft een eigen, korte hero met visual; EasyInvoice houdt de uitgebreide SEO-tekst. -->
+      <LopraAuthHero v-if="brand.key === 'lopra'" mode="register" />
+      <div v-else class="auth-copy">
         <h1 class="auth-h1">Maak gratis een {{ brand.name }}-account aan</h1>
         <p>Begin vandaag met je administratie: je maakt in één minuut een account aan en verstuurt binnen vijf minuten je eerste professionele factuur. De eerste 14 dagen zijn gratis, zonder creditcard en zonder verplichtingen — daarna vanaf € 12,10 per maand (incl. 21% btw), maandelijks opzegbaar.</p>
         <ul class="hero-bullets">

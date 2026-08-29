@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\VatFiling;
 use App\Services\VatService;
+use App\Support\Sql;
 use App\Support\VatPaymentReference;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
@@ -29,7 +30,7 @@ class VatController extends Controller
 
         $allYears = Invoice::regular()
             ->whereNotIn('status', ['draft', 'cancelled'])
-            ->selectRaw('DISTINCT EXTRACT(YEAR FROM invoice_date) AS yr')
+            ->selectRaw('DISTINCT ' . Sql::year('invoice_date') . ' AS yr')
             ->pluck('yr')
             ->map(fn ($y) => (int) $y)
             ->push(now()->year)

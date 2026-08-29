@@ -44,6 +44,8 @@ return [
             // Beeldmateriaal.
             'mark' => '/images/easyinvoice-favicon-180.png',   // vierkant beeldmerk: navigatie
             'email_mark' => '/images/easyinvoice-favicon-180.png', // idem als PNG, voor e-mails (SVG wordt daar vaak niet getoond)
+            'sidebar_mark' => null,      // beeldmerk voor een donkere zijbalk; null = 'mark'
+            'dark_sidebar' => false,
             'icon' => '/images/easyinvoice-icon-512.png',      // groot beeldmerk: inlogpagina, mails
             'favicon_32' => '/images/easyinvoice-favicon-32.png',
             'favicon_512' => '/images/easyinvoice-favicon-512.png',
@@ -95,6 +97,8 @@ return [
 
             'mark' => '/brand/lopra/lopra-icon.svg',
             'email_mark' => '/brand/lopra/lopra-icon-180.png',
+            'sidebar_mark' => '/brand/lopra/lopra-mark-white.svg',
+            'dark_sidebar' => true,
             'icon' => '/brand/lopra/lopra-icon-512.png',
             'favicon_32' => '/brand/lopra/lopra-icon-32.png',
             'favicon_512' => '/brand/lopra/lopra-icon-512.png',

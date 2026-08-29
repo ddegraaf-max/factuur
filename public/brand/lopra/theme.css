@@ -59,8 +59,39 @@ html[data-brand="lopra"] .nav-brand img,
 html[data-brand="lopra"] .footer-brand img { border-radius: 8px; }
 html[data-brand="lopra"] footer { background: #132F49; }
 html[data-brand="lopra"] .cta-final { background: linear-gradient(135deg, #1C4E7A 0%, #132F49 100%); }
+html[data-brand="lopra"] .app-mockup { box-shadow: 0 30px 80px rgba(19, 47, 73, 0.22), 0 8px 24px rgba(19, 47, 73, 0.10); }
 
 /* Display-letter iets ruimer: Fraunces oogt compacter dan Bricolage. */
 html[data-brand="lopra"] h1,
 html[data-brand="lopra"] h2,
 html[data-brand="lopra"] h3 { letter-spacing: -0.01em; }
+
+/* ===== App: diepblauwe zijbalk met koperaccent ===== */
+html[data-brand="lopra"] .sidebar {
+  background: linear-gradient(180deg, #163E62 0%, #132F49 100%);
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+html[data-brand="lopra"] .sidebar-brand { border-bottom-color: rgba(255, 255, 255, 0.08); }
+html[data-brand="lopra"] .sidebar-brand .logo-mark { border-radius: 0; object-fit: contain; width: 40px; height: 30px; }
+html[data-brand="lopra"] .sidebar-brand .brand-name { color: #fff; font-size: 18px; font-weight: 600; letter-spacing: 0.01em; }
+html[data-brand="lopra"] .nav-section-title { color: rgba(255, 255, 255, 0.42); }
+html[data-brand="lopra"] .nav-item { color: rgba(255, 255, 255, 0.76); }
+html[data-brand="lopra"] .nav-item svg { opacity: 0.85; }
+html[data-brand="lopra"] .nav-item:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+html[data-brand="lopra"] .nav-item.active { background: rgba(255, 255, 255, 0.12); color: #fff; }
+html[data-brand="lopra"] .nav-item.active::before { background: var(--accent-light); }
+html[data-brand="lopra"] .nav-badge { background: var(--accent); color: #fff; }
+html[data-brand="lopra"] .sidebar-user { border-top-color: rgba(255, 255, 255, 0.08); }
+html[data-brand="lopra"] .sidebar-user:hover { background: rgba(255, 255, 255, 0.07); }
+html[data-brand="lopra"] .sidebar .avatar { background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%); }
+html[data-brand="lopra"] .sidebar .user-name { color: #fff; }
+html[data-brand="lopra"] .sidebar .user-co { color: rgba(255, 255, 255, 0.55); }
+html[data-brand="lopra"] .sidebar-version { color: rgba(255, 255, 255, 0.35); }
+html[data-brand="lopra"] .sidebar .user-menu { color: var(--text); }
+html[data-brand="lopra"] .sidebar-nav::-webkit-scrollbar { width: 6px; }
+html[data-brand="lopra"] .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 3px; }
+
+/* Inlog-/registratiepagina: warme gloed op het blauwe paneel. */
+html[data-brand="lopra"] .auth-shell .auth-hero { background: linear-gradient(160deg, #1C4E7A 0%, #163E62 55%, #132F49 100%); }
+html[data-brand="lopra"] .auth-shell .auth-hero::before { background: radial-gradient(circle, rgba(224, 165, 92, 0.22) 0%, transparent 70%); width: 560px; height: 560px; top: -180px; right: -160px; }
+html[data-brand="lopra"] .auth-shell .auth-logo .logo-wordmark { height: 34px; width: auto; display: block; }

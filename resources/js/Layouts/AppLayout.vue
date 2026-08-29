@@ -154,7 +154,7 @@ const logout = () => {
   <div class="app">
     <aside class="sidebar" :class="{ open: sidebarOpen }">
       <Link :href="route('dashboard')" class="sidebar-brand">
-        <img :src="brand.mark" class="logo-mark" :alt="brand.name" />
+        <img :src="brand.sidebar_mark || brand.mark" class="logo-mark" :alt="brand.name" />
         <span class="brand-name">{{ brand.name }}</span>
       </Link>
 
