@@ -20,11 +20,11 @@ class OwnerAccess
 {
     public static function allows(?User $user): bool
     {
-        if (! $user || static::isDemo($user)) {
+        if (! $user || self::isDemo($user)) {
             return false;
         }
 
-        $allowed = static::configured();
+        $allowed = self::configured();
 
         return $allowed->isNotEmpty()
             ? $allowed->contains(mb_strtolower($user->email))
@@ -38,7 +38,7 @@ class OwnerAccess
      */
     public static function owner(): ?User
     {
-        $configured = static::configured();
+        $configured = self::configured();
 
         if ($configured->isNotEmpty()) {
             $user = User::query()

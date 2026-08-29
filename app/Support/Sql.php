@@ -14,7 +14,7 @@ class Sql
     /** Maandnummer (1–12) van een datumkolom, als integer. */
     public static function month(string $column): string
     {
-        return static::driver() === 'sqlite'
+        return self::driver() === 'sqlite'
             ? "CAST(strftime('%m', {$column}) AS INTEGER)"
             : "EXTRACT(MONTH FROM {$column})";
     }
@@ -22,7 +22,7 @@ class Sql
     /** Jaartal van een datumkolom, als integer. */
     public static function year(string $column): string
     {
-        return static::driver() === 'sqlite'
+        return self::driver() === 'sqlite'
             ? "CAST(strftime('%Y', {$column}) AS INTEGER)"
             : "EXTRACT(YEAR FROM {$column})";
     }
