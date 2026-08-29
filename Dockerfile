@@ -107,4 +107,8 @@ EXPOSE 8080
 # btw-herinnering, demo-opschoning, merkdossier …) draait als achtergrond-
 # proces náást de webserver. Railway heeft één container; zonder dit proces
 # draait er géén enkele geplande taak. Uitvoer gaat naar dezelfde stdout.
-CMD ["sh", "-c", "php artisan config:cache || true; php artisan view:cache || true; (php artisan schedule:work --no-ansi 2>&1 | sed -u 's/^/[scheduler] /' &); exec frankenphp php-server --listen :${PORT:-8080} --root /app/public"]
+# Migraties óók bij het opstarten (idempotent: "Nothing to migrate" als het
+# pre-deploy-commando ze al draaide). Zo werkt een nieuwe service (bijv. Lopra)
+# ook als Railway het preDeployCommand uit railway.json niet overneemt; mislukt
+# de migratie, dan start de container niet en blijft de vorige deploy live.
+CMD ["sh", "-c", "php artisan migrate --force --no-interaction 2>&1 | sed -u 's/^/[migrate] /'; php artisan migrate:status --no-ansi >/dev/null 2>&1 || exit 1; php artisan config:cache || true; php artisan view:cache || true; (php artisan schedule:work --no-ansi 2>&1 | sed -u 's/^/[scheduler] /' &); exec frankenphp php-server --listen :${PORT:-8080} --root /app/public"]
