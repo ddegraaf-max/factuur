@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Factureren met AI — koppel je administratie aan Claude of ChatGPT — EasyInvoice')
-@section('description', 'EasyInvoice is het Nederlandse facturatieprogramma met AI: bonnetjes automatisch inboeken, offertes uit een omschrijving en een directe koppeling met Claude en ChatGPT. Vraag je AI-assistent een factuur te maken — hij staat als concept klaar.')
+@section('title', 'Factureren met AI — koppel je administratie aan Claude of ChatGPT — ' . brand('name'))
+@section('description', brand('name') . ' is het Nederlandse facturatieprogramma met AI: bonnetjes automatisch inboeken, offertes uit een omschrijving en een directe koppeling met Claude en ChatGPT. Vraag je AI-assistent een factuur te maken — hij staat als concept klaar.')
 
 @push('styles')
 <style>
@@ -25,7 +25,7 @@
 @section('content')
 <section class="page-hero">
   <div class="container page-hero-inner">
-    <span class="eyebrow">EasyInvoice Slim</span>
+    <span class="eyebrow">{{ brand('name') }} Slim</span>
     <h1>Factureren met <span style="color:var(--brand);">AI</span></h1>
     <p class="lead">Bonnetjes die zichzelf inboeken, offertes uit een paar zinnen — en een directe koppeling met Claude en ChatGPT. Vraag je AI-assistent om een factuur en hij staat als concept voor je klaar.</p>
     <div class="hero-ctas" style="margin-top:28px;">
@@ -84,7 +84,7 @@
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div>
         <div class="feature-title">Koppeling met Claude &amp; ChatGPT</div>
-        <div class="feature-desc">Koppel EasyInvoice als tool aan je AI-assistent (via MCP). Vraag om een factuur of offerte, zoek klanten op of check welke facturen nog openstaan — vanuit je chatvenster.</div>
+        <div class="feature-desc">Koppel {{ brand('name') }} als tool aan je AI-assistent (via MCP). Vraag om een factuur of offerte, zoek klanten op of check welke facturen nog openstaan — vanuit je chatvenster.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
@@ -110,7 +110,7 @@
       <div>
         <div class="step-num">1</div>
         <h3 style="font-size:19px;margin-bottom:8px;">Zet de koppeling aan</h3>
-        <p style="color:var(--text-2);font-size:14.5px;">Ga in EasyInvoice naar Instellingen → Koppelingen en kopieer je persoonlijke koppelingsadres. Voeg het in Claude of ChatGPT toe als connector.</p>
+        <p style="color:var(--text-2);font-size:14.5px;">Ga in {{ brand('name') }} naar Instellingen → Koppelingen en kopieer je persoonlijke koppelingsadres. Voeg het in Claude of ChatGPT toe als connector.</p>
       </div>
       <div>
         <div class="step-num">2</div>
@@ -120,7 +120,7 @@
       <div>
         <div class="step-num">3</div>
         <h3 style="font-size:19px;margin-bottom:8px;">Controleer en verstuur</h3>
-        <p style="color:var(--text-2);font-size:14.5px;">Alles verschijnt als concept in EasyInvoice. Eén blik, eventueel een aanpassing, en versturen — jij blijft eindverantwoordelijk.</p>
+        <p style="color:var(--text-2);font-size:14.5px;">Alles verschijnt als concept in {{ brand('name') }}. Eén blik, eventueel een aanpassing, en versturen — jij blijft eindverantwoordelijk.</p>
       </div>
     </div>
   </div>
@@ -147,7 +147,7 @@
       </details>
       <details class="faq-item">
         <summary>Kan de AI zomaar facturen versturen namens mij? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Nee. Alles wat via de AI binnenkomt — facturen, offertes — wordt als concept aangemaakt. Versturen kan alleen jij, vanuit EasyInvoice zelf, na controle.</div>
+        <div class="faq-content">Nee. Alles wat via de AI binnenkomt — facturen, offertes — wordt als concept aangemaakt. Versturen kan alleen jij, vanuit {{ brand('name') }} zelf, na controle.</div>
       </details>
       <details class="faq-item">
         <summary>Wat gebeurt er met mijn gegevens? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -164,7 +164,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Je administratie, op de automatische piloot</h2>
-    <p>Probeer EasyInvoice Slim 14 dagen gratis — inclusief alle AI-functies en de koppeling met Claude en ChatGPT.</p>
+    <p>Probeer {{ brand('name') }} Slim 14 dagen gratis — inclusief alle AI-functies en de koppeling met Claude en ChatGPT.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Start gratis →</a>
       <a href="{{ route('demo') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Eerst rondkijken in de demo</a>
@@ -179,7 +179,7 @@
   "mainEntity": [
     {
       "@@type": "Question",
-      "name": "Met welke AI-assistenten werkt EasyInvoice?",
+      "name": "Met welke AI-assistenten werkt {{ brand('name') }}?",
       "acceptedAnswer": { "@@type": "Answer", "text": "Met alle assistenten die het open MCP-protocol ondersteunen, waaronder Claude en ChatGPT. Je koppelt via een persoonlijk koppelingsadres dat je op elk moment kunt intrekken." }
     },
     {

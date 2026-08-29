@@ -32,7 +32,7 @@
             <div class="header">
                 <div class="logo">
                     <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-                        <td><img src="{{ rtrim(config('app.url'), '/') }}/images/easyinvoice-icon-512.png" alt="EasyInvoice"></td>
+                        <td><img src="{{ \App\Support\Brand::asset('icon') }}" alt="{{ brand('name') }}"></td>
                         <td><div class="name">Easy<span>Invoice</span></div><div class="tag">🔒 Klantenportaal · beveiligde omgeving</div></td>
                     </tr></table>
                 </div>
@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="footer">
-                © {{ date('Y') }} EasyInvoice · Beveiligd klantenportaal voor facturen en offertes
+                © {{ date('Y') }} {{ brand('name') }} · Beveiligd klantenportaal voor facturen en offertes
             </div>
         </div>
     </div>

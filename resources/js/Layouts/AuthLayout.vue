@@ -1,6 +1,7 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
 const version = usePage().props.version;
+const brand = usePage().props.brand;
 </script>
 
 <template>
@@ -9,16 +10,16 @@ const version = usePage().props.version;
       <!-- Let op: gewone <a>, geen Inertia <Link>. De homepage is een Blade-pagina
            (geen Inertia-response); met <Link> toont Inertia een debug-modal i.p.v. te navigeren. -->
       <a href="/" class="auth-logo">
-        <img src="/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice" />
-        <span>EasyInvoice</span>
+        <img :src="brand.icon" class="logo-mark" :alt="brand.name" />
+        <span>{{ brand.name }}</span>
       </a>
       <div class="auth-tagline">
         <slot name="hero">
-          <h2>Facturen maken zonder gedoe</h2>
-          <p>Nederlandse facturatie voor MKB en ZZP'ers.</p>
+          <h2>{{ brand.auth_title }}</h2>
+          <p>{{ brand.auth_subtitle }}</p>
         </slot>
       </div>
-      <div class="auth-footer-text">© 2026 EasyInvoice · {{ version }}</div>
+      <div class="auth-footer-text">© {{ new Date().getFullYear() }} {{ brand.name }} · {{ version }}</div>
     </div>
     <div class="auth-form-pane">
       <slot />

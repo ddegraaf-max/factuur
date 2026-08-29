@@ -13,7 +13,7 @@
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
         .container { max-width: 560px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
-        .header { background: linear-gradient(135deg, #E8231F 0%, #B81814 100%); padding: 28px 36px; color: white; }
+        .header { background: linear-gradient(135deg, {{ brand('color') }} 0%, {{ brand('color_dark') }} 100%); padding: 28px 36px; color: white; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
         .logo-mark { width: 34px; height: 34px; display: block; border: 0; }
         .header-sub { font-size: 13px; opacity: 0.9; margin-top: 6px; }
@@ -27,7 +27,7 @@
         .facts .v { font-weight: 600; color: #1C1917; }
         .reason { background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.6; margin: 0 0 18px; }
         .tip { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.6; margin: 0 0 20px; color: #166534; }
-        .btn-td { border-radius: 8px; background: #E8231F; }
+        .btn-td { border-radius: 8px; background: {{ brand('color') }}; }
         .btn { display: inline-block; padding: 13px 26px; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 8px; }
         .meta { font-size: 13px; color: #78716C; margin-top: 24px; padding-top: 20px; border-top: 1px solid #E7E5E4; line-height: 1.6; }
         .footer { padding: 20px 36px 28px; font-size: 12px; color: #A8A29E; text-align: center; }
@@ -38,15 +38,15 @@
         <div class="container">
             <div class="header">
                 <div class="logo">
-                    <img src="{{ $appUrl }}/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice">
-                    <span>EasyInvoice</span>
+                    <img src="{{ \App\Support\Brand::asset('icon') }}" class="logo-mark" alt="{{ brand('name') }}">
+                    <span>{{ brand('name') }}</span>
                 </div>
                 <div class="header-sub">Offerte {{ $quote->number }} · {{ $quote->customer_name }}</div>
             </div>
             <div class="body">
                 @if($accepted)
                     <h1>🎉 Offerte {{ $quote->number }} is ondertekend</h1>
-                    <p><strong>{{ $quote->signed_name ?: $quote->customer_name }}</strong> heeft de offerte digitaal ondertekend. Het akkoord staat zwart-op-wit — met handtekening en bewijsdossier bij de offerte in EasyInvoice.</p>
+                    <p><strong>{{ $quote->signed_name ?: $quote->customer_name }}</strong> heeft de offerte digitaal ondertekend. Het akkoord staat zwart-op-wit — met handtekening en bewijsdossier bij de offerte in {{ brand('name') }}.</p>
                     <table class="facts" role="presentation">
                         <tr><td class="k">Klant</td><td class="v">{{ $quote->customer_name }}</td></tr>
                         <tr><td class="k">Ondertekend door</td><td class="v">{{ $quote->signed_name ?: '—' }}@if($quote->signed_email) <span style="font-weight:400;color:#78716C;">({{ $quote->signed_email }})</span>@endif</td></tr>
@@ -74,7 +74,7 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 8px 0 4px;">
                     <tr>
                         <td class="btn-td">
-                            <a href="{{ route('quotes.show', $quote->id) }}" class="btn">Open de offerte in EasyInvoice&nbsp;&nbsp;→</a>
+                            <a href="{{ route('quotes.show', $quote->id) }}" class="btn">Open de offerte in {{ brand('name') }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
@@ -84,7 +84,7 @@
                 </div>
             </div>
             <div class="footer">
-                © {{ date('Y') }} EasyInvoice · Nederlandse facturatie voor MKB en ZZP
+                © {{ date('Y') }} {{ brand('name') }} · {{ brand('positioning') }}
             </div>
         </div>
     </div>

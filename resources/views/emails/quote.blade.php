@@ -12,7 +12,7 @@
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
         .container { max-width: 520px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
-        .header { background: {{ $company->brand_color ?: '#E8231F' }}; padding: 26px 36px; color: white; }
+        .header { background: {{ $company->brand_color ?: brand('color') }}; padding: 26px 36px; color: white; }
         .header .co { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
         .header .kind { font-size: 13px; opacity: 0.9; margin-top: 3px; }
         .body { padding: 32px 36px 28px; }
@@ -70,7 +70,7 @@
             @if ($quote->portal_token)
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px auto 4px;">
                     <tr>
-                        <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+                        <td style="border-radius:8px;background:{{ $company->brand_color ?: brand('color') }};">
                             <a href="{{ route('portal.quote', $quote->portal_token) }}"
                                style="display:inline-block;padding:13px 24px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
                                 {{ __('doc.mail_view_quote') }}&nbsp;&nbsp;→

@@ -1,6 +1,8 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   valid: Boolean,
@@ -30,7 +32,7 @@ const submit = () => {
       <h2>Je bent uitgenodigd</h2>
       <p v-if="valid">
         {{ invitedBy || 'Een beheerder' }} nodigt je uit om mee te werken in de
-        EasyInvoice-omgeving van {{ company }}.
+        {{ brand.name }}-omgeving van {{ company }}.
       </p>
       <p v-else>Deze uitnodigingslink is helaas niet (meer) geldig.</p>
       <ul v-if="valid" class="hero-bullets">
@@ -44,7 +46,7 @@ const submit = () => {
       <template v-if="valid && existing">
         <div class="login-form-title">Administratie koppelen</div>
         <div class="login-form-sub">
-          Je hebt al een EasyInvoice-account op <strong>{{ email }}</strong>.
+          Je hebt al een {{ brand.name }}-account op <strong>{{ email }}</strong>.
           Koppel <strong>{{ company }}</strong> ({{ roleLabel }}) aan die inlog —
           je wisselt daarna moeiteloos tussen je administraties.
         </div>

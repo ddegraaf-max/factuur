@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Overstappen van ' . $from['name'] . ' naar EasyInvoice — in 10 minuten geregeld')
-@section('description', 'Stap over van ' . $from['name'] . ' naar EasyInvoice: klanten, producten en openstaande facturen neem je met de overstapwizard in tien minuten over. Onbeperkt factureren, offertes met digitale ondertekening, iDEAL, Peppol en incasso — zonder verbruikslimieten.')
+@section('title', 'Overstappen van ' . $from['name'] . ' naar ' . brand('name') . ' — in 10 minuten geregeld')
+@section('description', 'Stap over van ' . $from['name'] . ' naar ' . brand('name') . ': klanten, producten en openstaande facturen neem je met de overstapwizard in tien minuten over. Onbeperkt factureren, offertes met digitale ondertekening, iDEAL, Peppol en incasso — zonder verbruikslimieten.')
 
 @section('content')
 <style>
@@ -26,7 +26,7 @@
 <section class="page-hero">
   <div class="container page-hero-inner">
     <span class="eyebrow">Overstappen van {{ $from['name'] }}</span>
-    <h1>Van {{ $from['name'] }} naar EasyInvoice in tien minuten</h1>
+    <h1>Van {{ $from['name'] }} naar {{ brand('name') }} in tien minuten</h1>
     <p class="lead">{{ $from['intro'] }} Je klanten, producten en openstaande facturen neem je zelf over met de overstapwizard — of je mailt ons je export en wij doen het.</p>
     <div class="hero-ctas" style="margin-top:28px;">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Start gratis proefperiode →</a>
@@ -43,10 +43,10 @@
     </div>
     <div class="ov-steps">
       <div class="ov-step"><div class="nr">1</div><h3>Exporteer in {{ $from['name'] }}</h3><p>{{ $from['export'] }}</p></div>
-      <div class="ov-step"><div class="nr">2</div><h3>Upload in de overstapwizard</h3><p>In EasyInvoice ga je naar Instellingen → Overstappen. Upload de CSV; de kolommen (naam, e-mail, adres, KvK, btw-nummer, prijzen) worden automatisch herkend. Je ziet een voorbeeld en klikt op importeren. Dubbele klanten worden overgeslagen.</p></div>
+      <div class="ov-step"><div class="nr">2</div><h3>Upload in de overstapwizard</h3><p>In {{ brand('name') }} ga je naar Instellingen → Overstappen. Upload de CSV; de kolommen (naam, e-mail, adres, KvK, btw-nummer, prijzen) worden automatisch herkend. Je ziet een voorbeeld en klikt op importeren. Dubbele klanten worden overgeslagen.</p></div>
       <div class="ov-step"><div class="nr">3</div><h3>Openstaande facturen mee</h3><p>Exporteer alleen de nog open facturen (nummer, klant, datum, vervaldatum, bedrag). Ze komen als "verstuurd" binnen, zodat herinneringen, het debiteurenoverzicht en het klantenportaal meteen kloppen. Betaalde historie blijft in je oude pakket of in je auditfile.</p></div>
     </div>
-    <p class="ov-note">Liever niet zelf? Mail je export naar <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a> — wij zetten hem kosteloos over, meestal dezelfde werkdag.</p>
+    <p class="ov-note">Liever niet zelf? Mail je export naar <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> — wij zetten hem kosteloos over, meestal dezelfde werkdag.</p>
   </div>
 </section>
 
@@ -57,7 +57,7 @@
       <p>{{ $from['compare_intro'] }}</p>
     </div>
     <table class="ov-table">
-      <thead><tr><th></th><th>{{ $from['name'] }}</th><th>EasyInvoice</th></tr></thead>
+      <thead><tr><th></th><th>{{ $from['name'] }}</th><th>{{ brand('name') }}</th></tr></thead>
       <tbody>
         @foreach($from['rows'] as $row)
           <tr><td>{{ $row[0] }}</td><td>{{ $row[1] }}</td><td class="ov-yes">{{ $row[2] }}</td></tr>
@@ -76,7 +76,7 @@
     <h3>Blijven mijn factuurnummers doorlopen?</h3>
     <p>Ja. Bij Instellingen → Nummering stel je het startnummer en het formaat in, zodat je nieuwe facturen netjes aansluiten op je laatste nummer in {{ $from['name'] }}.</p>
     <h3>Wat gebeurt er met mijn betaalde facturen van vorige jaren?</h3>
-    <p>Die hoef je niet over te nemen; de fiscale bewaarplicht (7 jaar) regel je met een export uit {{ $from['name'] }} of met een auditfile. EasyInvoice maakt vanaf de overstap zelf ook een XAF-auditfile per boekjaar voor je accountant.</p>
+    <p>Die hoef je niet over te nemen; de fiscale bewaarplicht (7 jaar) regel je met een export uit {{ $from['name'] }} of met een auditfile. {{ brand('name') }} maakt vanaf de overstap zelf ook een XAF-auditfile per boekjaar voor je accountant.</p>
     <h3>Kan mijn boekhouder meekijken?</h3>
     <p>Ja, gratis. Je nodigt hem of haar uit als boekhouder (alleen-lezen); daarnaast krijgt je boekhouder desgewenst automatisch een kopie (BCC) van elke factuur en een XAF-auditfile per jaar.</p>
     <h3>Zit ik ergens aan vast?</h3>

@@ -2,6 +2,7 @@
 
 namespace App\Services\Peppol;
 
+use App\Support\Brand;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
@@ -157,7 +158,7 @@ class RecommandClient
 
         throw new \DomainException(match (true) {
             $response->status() === 401 => 'De Recommand API-sleutel is ongeldig of verlopen.',
-            $response->status() === 402 => 'Het Recommand-abonnement van EasyInvoice is niet actief.',
+            $response->status() === 402 => 'Het Recommand-abonnement van ' . Brand::name() . ' is niet actief.',
             $response->status() === 422 => 'Het Peppol-netwerk heeft het document geweigerd' . ($detail ? ": {$detail}" : '.'),
             $detail !== null => $fallback . ' ' . $detail,
             default => $fallback,

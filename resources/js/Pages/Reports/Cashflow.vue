@@ -1,8 +1,10 @@
 <script setup>
-import { Head } from '@inertiajs/vue3';
+import { Head, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 import { computed } from 'vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   months: Array,       // [{ key, label, in_open, in_recurring, out_open, out_recurring, in, out, net, cumulative }]
@@ -120,7 +122,7 @@ const bar = (value) => Math.max(value / maxFlow.value * 100, value > 0 ? 2 : 0) 
         uitgaven op de vervaldatum van je inkoop en de boekingsdatum van je vaste lasten. In werkelijkheid betalen
         klanten soms later — de regel "al vervallen" laat zien wat er nu al opeisbaar is.
         <template v-if="incasso_total > 0.009">Facturen in het incassotraject ({{ eur(incasso_total) }}) tellen niet mee: die ontvangst is onzeker.</template>
-        Privé-opnames, belastingen en loonkosten staan niet in EasyInvoice en zitten dus niet in dit beeld.
+        Privé-opnames, belastingen en loonkosten staan niet in {{ brand.name }} en zitten dus niet in dit beeld.
       </div>
     </div>
   </AppLayout>

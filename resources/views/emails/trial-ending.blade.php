@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je EasyInvoice-proefperiode</title>
+    <title>Je {{ brand('name') }}-proefperiode</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
         .container { max-width: 520px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
-        .header { background: linear-gradient(135deg, #E8231F 0%, #B81814 100%); padding: 28px 36px; color: white; }
+        .header { background: linear-gradient(135deg, {{ brand('color') }} 0%, {{ brand('color_dark') }} 100%); padding: 28px 36px; color: white; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
         .logo-mark { width: 34px; height: 34px; display: block; border: 0; }
         .body { padding: 36px 36px 32px; }
@@ -16,8 +16,8 @@
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
         .days-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
         .days-num { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; color: #7F1310; line-height: 1; }
-        .days-label { font-size: 13px; font-weight: 600; color: #B81814; margin-top: 6px; }
-        .btn { display: inline-block; background: #E8231F; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 13px 26px; border-radius: 8px; }
+        .days-label { font-size: 13px; font-weight: 600; color: {{ brand('color_dark') }}; margin-top: 6px; }
+        .btn { display: inline-block; background: {{ brand('color') }}; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 13px 26px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 28px 0 8px; }
         .price { font-size: 13px; color: #78716C; text-align: center; margin-top: 6px; }
         .feats { margin: 8px 0 0; padding: 0; list-style: none; }
@@ -33,17 +33,17 @@
         <div class="container">
             <div class="header">
                 <div class="logo">
-                    <img src="{{ rtrim(config('app.url'), '/') }}/images/easyinvoice-icon-512.png" class="logo-mark" alt="EasyInvoice">
-                    <span>EasyInvoice</span>
+                    <img src="{{ \App\Support\Brand::asset('icon') }}" class="logo-mark" alt="{{ brand('name') }}">
+                    <span>{{ brand('name') }}</span>
                 </div>
             </div>
             <div class="body">
                 <h1>Hi {{ $firstName }},</h1>
 
                 @if ($daysLeft === 1)
-                    <p>Je gratis proefperiode van EasyInvoice eindigt <strong>morgen</strong>. Sluit nu een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
+                    <p>Je gratis proefperiode van {{ brand('name') }} eindigt <strong>morgen</strong>. Sluit nu een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
                 @else
-                    <p>Je gratis proefperiode van EasyInvoice eindigt over <strong>{{ $daysLeft }} dagen</strong>. Sluit op tijd een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
+                    <p>Je gratis proefperiode van {{ brand('name') }} eindigt over <strong>{{ $daysLeft }} dagen</strong>. Sluit op tijd een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
                 @endif
 
                 <div class="days-box">
@@ -64,11 +64,11 @@
                 <div class="price">Veilig betalen · maandelijks opzegbaar</div>
 
                 <div class="meta">
-                    Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op <a href="mailto:hallo@easyinvoice.nl" style="color:#E8231F;">hallo@easyinvoice.nl</a>.
+                    Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
                 </div>
             </div>
             <div class="footer">
-                © {{ date('Y') }} EasyInvoice · Nederlandse facturatie voor MKB en ZZP
+                © {{ date('Y') }} {{ brand('name') }} · {{ brand('positioning') }}
             </div>
         </div>
     </div>

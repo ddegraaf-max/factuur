@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Support\Brand;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -242,7 +243,7 @@ class ImportService
             'customer_city' => $customer->city, 'customer_country' => $customer->country, 'customer_vat_number' => $customer->vat_number,
             'customer_kvk_number' => $customer->kvk_number, 'customer_email' => $customer->email,
             'subtotal' => $subtotal, 'vat_total' => $vat, 'total' => $total, 'paid_total' => min($paid, $total),
-            'vat_breakdown' => [(string) $rate => $vat], 'notes' => 'Overgenomen uit vorig pakket bij de overstap naar EasyInvoice.',
+            'vat_breakdown' => [(string) $rate => $vat], 'notes' => 'Overgenomen uit vorig pakket bij de overstap naar ' . Brand::name() . '.',
             'sent_at' => $date->toDateTimeString(), 'paid_at' => $status === 'paid' ? now() : null,
             'portal_token' => bin2hex(random_bytes(32)),
         ])->save();

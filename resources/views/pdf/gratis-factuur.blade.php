@@ -125,7 +125,7 @@
   </div>
 @endif
 
-<div class="credit">Gemaakt met EasyInvoice &mdash; gratis facturen maken op easyinvoice.nl</div>
+<div class="credit">Gemaakt met {{ brand('name') }} &mdash; gratis facturen maken op {{ brand('domain') }}</div>
 
 </body>
 </html>

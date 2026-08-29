@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Marketing-inzichten — EasyInvoice</title>
-<link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
+<title>Marketing-inzichten — {{ brand('name') }}</title>
+<link rel="icon" type="image/png" sizes="32x32" href="{{ brand('favicon_32') }}">
 <style>
   :root {
-    --brand: #E8231F; --text: #1C1917; --text-2: #44403C; --text-3: #78716C;
+    --brand: {{ brand('color') }}; --text: #1C1917; --text-2: #44403C; --text-3: #78716C;
     --bg: #FAFAF9; --surface: #FFFFFF; --border: #E7E5E4; --success: #059669;
   }
   * { box-sizing: border-box; }
@@ -45,7 +45,7 @@
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="{{ route('dashboard') }}">← Terug naar EasyInvoice</a>
+  <a class="back" href="{{ route('dashboard') }}">← Terug naar {{ brand('name') }}</a>
   <h1 style="margin-top:14px;">Marketing-inzichten</h1>
   <div class="sub">Publieke pagina's, afgelopen {{ $days }} dagen. First-party gemeten, zonder cookies — bots en ingelogde gebruikers tellen niet mee.</div>
   <div class="sub" style="margin-top:6px;"><a href="{{ route('brand.index') }}">Merkbewaking →</a> verwarringslog en maandelijkse merkgebruik-dossiers. &nbsp;·&nbsp; <a href="{{ route('owner.companies.index') }}">Administraties →</a> alle accounts, testaccounts opruimen.</div>

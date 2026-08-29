@@ -50,9 +50,11 @@ Schedule::command('purchases:scan-inbox')
     ->withoutOverlapping();
 
 // Maandelijks (de 1e, 07:30): merkgebruik-dossier van de vorige maand naar de eigenaar.
+// Alleen voor het geregistreerde merk (EasyInvoice); de Lopra-omgeving slaat dit over.
 Schedule::command('brand:evidence')
     ->monthlyOn(1, '07:30')
-    ->timezone('Europe/Amsterdam');
+    ->timezone('Europe/Amsterdam')
+    ->when(fn () => \App\Support\Brand::watchesTrademark());
 
 // Elk uur: ruim verlopen demo-omgevingen op.
 Schedule::command('demo:cleanup')->hourly();

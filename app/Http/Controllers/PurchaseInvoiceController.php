@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attachment;
 use App\Models\PurchaseInvoice;
 use App\Services\ReceiptScanService;
+use App\Support\Brand;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -394,7 +395,7 @@ class PurchaseInvoiceController extends Controller
             ->orderBy('id')
             ->get();
 
-        $filename = sprintf('easyinvoice-inkoop-%s-tm-%s.csv', $from->format('Y-m-d'), $to->format('Y-m-d'));
+        $filename = sprintf('%s-inkoop-%s-tm-%s.csv', Brand::key(), $from->format('Y-m-d'), $to->format('Y-m-d'));
 
         return response()->streamDownload(function () use ($purchases) {
             $out = fopen('php://output', 'w');

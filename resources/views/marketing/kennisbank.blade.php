@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Kennisbank voor zzp\'ers en mkb — factureren, btw en betaald krijgen — EasyInvoice')
+@section('title', 'Kennisbank voor zzp\'ers en mkb — factureren, btw en betaald krijgen — ' . brand('name'))
 @section('description', 'Praktische uitleg over factureren, btw en betaald krijgen voor Nederlandse zzp\'ers en mkb: factuureisen, factuurnummers, btw-tarieven, de KOR en aanmanen.')
 
 @section('content')

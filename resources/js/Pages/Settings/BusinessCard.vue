@@ -1,8 +1,10 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import QRCode from 'qrcode';
 import { computed, ref, watch } from 'vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   card: Object,
@@ -132,7 +134,7 @@ const initial = computed(() => (props.company.name || 'B').trim().charAt(0).toUp
             <div v-if="qr"><a :href="qr" download="visitekaartje-qr.png" class="btn btn-secondary btn-sm" style="margin-top:10px;">Download PNG</a></div>
           </div>
         </div>
-        <div v-if="site_published" class="card"><div class="card-body" style="font-size:13px;color:var(--text-2);">De knop "Website" op je kaartje verwijst naar je EasyInvoice-website.</div></div>
+        <div v-if="site_published" class="card"><div class="card-body" style="font-size:13px;color:var(--text-2);">De knop "Website" op je kaartje verwijst naar je {{ brand.name }}-website.</div></div>
       </div>
     </div>
   </AppLayout>

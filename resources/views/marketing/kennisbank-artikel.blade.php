@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', $article['title'] . ' — Kennisbank — EasyInvoice')
+@section('title', $article['title'] . ' — Kennisbank — ' . brand('name'))
 @section('description', $article['intro'])
 
 @push('styles')
@@ -61,7 +61,7 @@
 
       <div class="article-cta">
         <h3>Factureren zonder erover na te denken</h3>
-        <p>EasyInvoice zet automatisch alle verplichte gegevens op je factuur, nummert netjes door en herinnert je klanten als ze te laat zijn. Vanaf € 12,10 per maand, 14 dagen gratis te proberen.</p>
+        <p>{{ brand('name') }} zet automatisch alle verplichte gegevens op je factuur, nummert netjes door en herinnert je klanten als ze te laat zijn. Vanaf € 12,10 per maand, 14 dagen gratis te proberen.</p>
         <a href="{{ route('register') }}" class="btn btn-primary">Probeer gratis →</a>
         <a href="{{ route('gratis-factuur') }}" class="btn btn-ghost">Of maak eerst gratis een factuur</a>
       </div>
@@ -77,7 +77,7 @@
   "description": {!! json_encode($article['intro']) !!},
   "inLanguage": "nl",
   "mainEntityOfPage": {!! json_encode(url()->current()) !!},
-  "author": { "@@type": "Organization", "name": "EasyInvoice", "url": {!! json_encode(url('/')) !!} },
+  "author": { "@@type": "Organization", "name": {!! json_encode(brand('name')) !!}, "url": {!! json_encode(url('/')) !!} },
   "publisher": { "@@type": "Organization", "name": "Creditline B.V." }
 }
 </script>

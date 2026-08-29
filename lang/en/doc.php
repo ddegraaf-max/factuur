@@ -68,7 +68,7 @@ return [
     'mail_view_pay_invoice' => 'View and pay online (iDEAL)',
     'mail_portal_hint' => 'In the secure online environment you can view the invoice and its payment status, and download the PDF again. For your security, you will first confirm your e-mail address with a one-time code.',
     'mail_regards' => 'Kind regards,',
-    'mail_sent_via' => 'Sent via EasyInvoice on behalf of :name.',
+    'mail_sent_via' => 'Sent via :brand on behalf of :name.',
 
     // Bedankmail na betaling
     'mail_thanks_subject' => 'Thank you for your payment — invoice :number',

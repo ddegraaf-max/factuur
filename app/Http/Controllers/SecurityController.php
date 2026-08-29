@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -32,7 +33,7 @@ class SecurityController extends Controller
         ]);
 
         $otpauth = $g2fa->getQRCodeUrl(
-            'EasyInvoice',
+            Brand::name(),
             $user->email,
             $secret
         );

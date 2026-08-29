@@ -1,7 +1,7 @@
 @php
     $money = fn ($v) => ($v < 0 ? '- ' : '') . '€ ' . number_format(abs((float) $v), 2, ',', '.');
     $whole = fn ($v) => ($v < 0 ? '- ' : '') . '€ ' . number_format(abs((float) $v), 0, ',', '.');
-    $brand = $company->brand_color ?: '#E8231F';
+    $brand = $company->brand_color ?: brand('color');
     $typeLabel = ['quarter' => 'kwartaal', 'month' => 'maand', 'year' => 'jaar'][$period_type] ?? 'kwartaal';
     $statusLabel = function ($p) {
         if ($p['paid']) return 'Aangegeven en betaald';
@@ -129,7 +129,7 @@
   @endforeach
 
   <div class="disclaimer">
-    Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's in EasyInvoice. 0%-regels zijn op klantland
+    Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's in {{ brand('name') }}. 0%-regels zijn op klantland
     verdeeld over 1e (Nederland), 3b (EU) en 3a (buiten de EU). De voorbelasting (5b) komt uit de ingeboekte inkoopfacturen, plus wat u zelf
     hebt aangevuld. Afgeronde bedragen zijn in uw voordeel afgerond (te betalen btw en grondslagen omlaag, voorbelasting omhoog), zoals de
     Belastingdienst toestaat. Dit overzicht is een hulpmiddel — controleer de cijfers met uw boekhouder voordat u aangifte doet.

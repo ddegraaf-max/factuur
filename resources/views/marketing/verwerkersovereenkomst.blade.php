@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Verwerkersovereenkomst EasyInvoice — AVG-afspraken voor jouw administratie')
-@section('description', 'De verwerkersovereenkomst tussen jou (verwerkingsverantwoordelijke) en Creditline B.V. / EasyInvoice (verwerker): doel, subverwerkers, beveiliging, datalekken, bewaartermijn en verwijdering. Automatisch van kracht bij gebruik.')
+@section('title', 'Verwerkersovereenkomst ' . brand('name') . ' — AVG-afspraken voor jouw administratie')
+@section('description', 'De verwerkersovereenkomst tussen jou (verwerkingsverantwoordelijke) en Creditline B.V. / ' . brand('name') . ' (verwerker): doel, subverwerkers, beveiliging, datalekken, bewaartermijn en verwijdering. Automatisch van kracht bij gebruik.')
 
 @section('content')
 <style>
@@ -31,16 +31,16 @@
     <div class="meta">Versie 1.0 · van kracht sinds 29 augustus 2026 · maakt deel uit van de <a href="{{ route('voorwaarden') }}">algemene voorwaarden</a></div>
 
     <div class="entity">
-      <strong>Verwerker:</strong> Creditline B.V., handelend onder de naam <strong>EasyInvoice®</strong><br>
+      <strong>Verwerker:</strong> Creditline B.V., handelend onder de naam <strong>{{ \App\Support\Brand::legalName() }}</strong><br>
       Torenlaan 5B · 1402 AT Bussum · Nederland · KvK 59683198 · BTW NL853603108B01<br>
-      <strong>Verwerkingsverantwoordelijke:</strong> de ondernemer of organisatie die een EasyInvoice-administratie aanmaakt ("jij").<br>
-      Vragen: <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>
+      <strong>Verwerkingsverantwoordelijke:</strong> de ondernemer of organisatie die een {{ brand('name') }}-administratie aanmaakt ("jij").<br>
+      Vragen: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
-    <p>Jij voert in EasyInvoice gegevens in van je klanten, leveranciers en medewerkers. Voor die gegevens ben jij de verwerkingsverantwoordelijke in de zin van de AVG en zijn wij de verwerker. Deze overeenkomst legt vast wat wij met die gegevens mogen doen — en vooral wat niet. Hij geldt automatisch zodra je een administratie aanmaakt; een aparte handtekening is niet nodig. Wil je een ondertekend exemplaar voor je eigen dossier, mail ons dan.</p>
+    <p>Jij voert in {{ brand('name') }} gegevens in van je klanten, leveranciers en medewerkers. Voor die gegevens ben jij de verwerkingsverantwoordelijke in de zin van de AVG en zijn wij de verwerker. Deze overeenkomst legt vast wat wij met die gegevens mogen doen — en vooral wat niet. Hij geldt automatisch zodra je een administratie aanmaakt; een aparte handtekening is niet nodig. Wil je een ondertekend exemplaar voor je eigen dossier, mail ons dan.</p>
 
     <h2>1. Onderwerp en doel</h2>
-    <p>Wij verwerken persoonsgegevens uitsluitend om de dienst EasyInvoice aan jou te leveren: het opstellen, versturen, innen en bewaren van facturen, offertes en inkoopfacturen, het bijbehorende klantenportaal, herinneringen, rapportages en — als je dat aanzet — de AI-functies (bonherkenning, offerte uit tekst). Wij verwerken niets voor eigen doeleinden en verkopen nooit gegevens.</p>
+    <p>Wij verwerken persoonsgegevens uitsluitend om de dienst {{ brand('name') }} aan jou te leveren: het opstellen, versturen, innen en bewaren van facturen, offertes en inkoopfacturen, het bijbehorende klantenportaal, herinneringen, rapportages en — als je dat aanzet — de AI-functies (bonherkenning, offerte uit tekst). Wij verwerken niets voor eigen doeleinden en verkopen nooit gegevens.</p>
 
     <h2>2. Welke gegevens en van wie</h2>
     <table>
@@ -52,7 +52,7 @@
     </table>
 
     <h2>3. Instructies</h2>
-    <p>Wij verwerken de gegevens alleen volgens jouw instructies, dat wil zeggen: zoals de functies van EasyInvoice werken en zoals jij ze instelt. Vinden wij een instructie in strijd met de AVG, dan melden we dat. Wij kijken niet in je administratie, behalve wanneer jij ons daar bij een supportvraag om vraagt of wanneer dat technisch noodzakelijk is om een storing te verhelpen — en dan alleen zo kort mogelijk.</p>
+    <p>Wij verwerken de gegevens alleen volgens jouw instructies, dat wil zeggen: zoals de functies van {{ brand('name') }} werken en zoals jij ze instelt. Vinden wij een instructie in strijd met de AVG, dan melden we dat. Wij kijken niet in je administratie, behalve wanneer jij ons daar bij een supportvraag om vraagt of wanneer dat technisch noodzakelijk is om een storing te verhelpen — en dan alleen zo kort mogelijk.</p>
 
     <h2>4. Subverwerkers</h2>
     <p>Om de dienst te leveren schakelen wij de volgende partijen in. Wij hebben met elk van hen een verwerkersovereenkomst of gelijkwaardige afspraken (waaronder de EU-modelcontracten waar nodig).</p>
@@ -60,7 +60,7 @@
       <tr><th>Subverwerker</th><th>Doel</th><th>Locatie</th></tr>
       <tr><td>Railway Corp.</td><td>hosting van applicatie en database</td><td>EU (Amsterdam)</td></tr>
       <tr><td>Resend, Inc.</td><td>verzenden van e-mail (facturen, offertes, portaalcodes, meldingen)</td><td>EU/VS · EU-modelcontracten</td></tr>
-      <tr><td>Stripe Payments Europe</td><td>afhandeling van jouw EasyInvoice-abonnement (geen klantgegevens)</td><td>EU</td></tr>
+      <tr><td>Stripe Payments Europe</td><td>afhandeling van jouw {{ brand('name') }}-abonnement (geen klantgegevens)</td><td>EU</td></tr>
       <tr><td>Recommand BV</td><td>Peppol e-facturatie — alleen als je Peppol activeert</td><td>EU (België)</td></tr>
       <tr><td>Anthropic PBC</td><td>AI-functies: herkennen van bonnen en inkoopfacturen, offerte uit tekst — alleen als je die functies gebruikt; geen training op jouw gegevens</td><td>VS · EU-modelcontracten</td></tr>
       <tr><td>Cloudflare, Inc.</td><td>bescherming van formulieren tegen misbruik (Turnstile)</td><td>EU/VS</td></tr>
@@ -73,14 +73,14 @@
       <li>Tweestapsverificatie voor gebruikers; klantenportaal alleen toegankelijk met een eenmalige code naar het e-mailadres van de klant.</li>
       <li>Strikte scheiding tussen administraties; rollen (eigenaar, medewerker, boekhouder) beperken de toegang.</li>
       <li>Dagelijkse back-ups op een aparte locatie binnen de EU; logboek van alle handelingen per administratie.</li>
-      <li>Toegang tot productiesystemen alleen voor de beheerder van EasyInvoice, met tweestapsverificatie.</li>
+      <li>Toegang tot productiesystemen alleen voor de beheerder van {{ brand('name') }}, met tweestapsverificatie.</li>
     </ul>
 
     <h2>6. Datalekken</h2>
     <p>Ontdekken wij een inbreuk in verband met persoonsgegevens die jouw administratie raakt, dan informeren wij je <strong>zonder onredelijke vertraging en uiterlijk binnen 48 uur</strong> na ontdekking per e-mail, met wat er bekend is over aard, omvang en getroffen gegevens, de gevolgen en de genomen maatregelen. Jij beoordeelt of melding bij de Autoriteit Persoonsgegevens en/of betrokkenen nodig is; wij helpen daarbij.</p>
 
     <h2>7. Rechten van betrokkenen en bijstand</h2>
-    <p>Vraagt een klant of medewerker van jou om inzage, correctie of verwijdering, dan kun je dat vrijwel altijd zelf afhandelen in EasyInvoice. Lukt dat niet, dan helpen wij binnen vijf werkdagen. Verzoeken die wij rechtstreeks ontvangen sturen wij naar jou door.</p>
+    <p>Vraagt een klant of medewerker van jou om inzage, correctie of verwijdering, dan kun je dat vrijwel altijd zelf afhandelen in {{ brand('name') }}. Lukt dat niet, dan helpen wij binnen vijf werkdagen. Verzoeken die wij rechtstreeks ontvangen sturen wij naar jou door.</p>
 
     <h2>8. Geheimhouding</h2>
     <p>Iedereen die bij ons toegang heeft tot persoonsgegevens is gebonden aan geheimhouding. Wij verstrekken geen gegevens aan derden, tenzij een wettelijke verplichting ons daartoe dwingt — dan informeren wij je vooraf, voor zover toegestaan.</p>
@@ -89,7 +89,7 @@
     <p>Je mag ons één keer per jaar (en na een datalek) schriftelijk vragen om aan te tonen dat wij deze overeenkomst naleven. Wij beantwoorden zulke vragen binnen 30 dagen met een beschrijving van de maatregelen en, waar beschikbaar, verklaringen van onze subverwerkers.</p>
 
     <h2>10. Duur, export en verwijdering</h2>
-    <p>Deze overeenkomst geldt zolang je een EasyInvoice-administratie hebt. Je kunt op elk moment je volledige administratie exporteren (Instellingen → Bedrijfsgegevens → Jouw gegevens). Verwijder je je administratie, dan wissen wij alle gegevens direct uit de productiedatabase; back-ups worden na maximaal 30 dagen automatisch overschreven. Wettelijke bewaarplichten (zoals de fiscale bewaartermijn van 7 jaar) rusten op jou — exporteer daarom vóór verwijdering.</p>
+    <p>Deze overeenkomst geldt zolang je een {{ brand('name') }}-administratie hebt. Je kunt op elk moment je volledige administratie exporteren (Instellingen → Bedrijfsgegevens → Jouw gegevens). Verwijder je je administratie, dan wissen wij alle gegevens direct uit de productiedatabase; back-ups worden na maximaal 30 dagen automatisch overschreven. Wettelijke bewaarplichten (zoals de fiscale bewaartermijn van 7 jaar) rusten op jou — exporteer daarom vóór verwijdering.</p>
 
     <h2>11. Aansprakelijkheid en recht</h2>
     <p>Voor aansprakelijkheid geldt wat in de <a href="{{ route('voorwaarden') }}">algemene voorwaarden</a> staat. Op deze overeenkomst is Nederlands recht van toepassing; geschillen worden voorgelegd aan de bevoegde rechter in Midden-Nederland.</p>

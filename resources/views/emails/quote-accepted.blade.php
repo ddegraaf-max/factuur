@@ -1,7 +1,7 @@
 @php
     /* Bevestiging na akkoord: vinkje, bevestiging met datum/ondertekenaar,
        overzicht, eventueel termijnplan, "hoe nu verder", PDF-bijlage. */
-    $brand = $company->brand_color ?: '#E8231F';
+    $brand = $company->brand_color ?: brand('color');
     $logo = $company->logoBinary();
     $total = number_format((float) $quote->total, 2, ',', '.');
     $acceptedAt = $quote->signed_at ?? $quote->accepted_at ?? now();
@@ -88,7 +88,7 @@
         <p style="margin:22px 0 0;">{{ __('doc.mail_regards') }}<br>{{ $company->name }}</p>
       </div>
     </div>
-    <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">{{ __('doc.mail_sent_via', ['name' => $company->name]) }}</p>
+    <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">{{ __('doc.mail_sent_via', ['name' => $company->name, 'brand' => brand('name')]) }}</p>
   </div>
 </body>
 </html>

@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Invoice;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -41,7 +42,7 @@ class InvoiceMail extends Mailable
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::invoiceVars($this->invoice, $company))
                 : __('doc.mail_invoice_subject', [
                     'number' => $this->invoice->number,
-                    'company' => $company->name ?? 'EasyInvoice',
+                    'company' => $company->name ?? Brand::name(),
                 ]),
         );
     }

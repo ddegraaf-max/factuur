@@ -13,7 +13,7 @@
 @if($company->logo_data)<link rel="icon" href="{{ $company->logo_data }}">@endif
 <style>
   :root {
-    --brand: {{ $company->brand_color ?: '#E8231F' }};
+    --brand: {{ $company->brand_color ?: brand('color') }};
     --accent: {{ $company->accent_color ?: '#1C1917' }};
     --font: {!! ($company->invoice_font ?? 'sans') === 'serif' ? "Georgia, 'Times New Roman', serif" : "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" !!};
     --text: #1c1917; --text-2: #57534e; --bg: #fafaf9; --surface: #ffffff; --border: #e7e5e4;
@@ -33,6 +33,6 @@
 </head>
 <body>
 @yield('content')
-<div class="made">Gemaakt met <a href="{{ config('app.url') }}/?utm_source=publiek&utm_medium={{ $madeWith ?? 'kaart' }}" rel="noopener">EasyInvoice</a> — factureren en je bedrijf presenteren, in één.</div>
+<div class="made">Gemaakt met <a href="{{ config('app.url') }}/?utm_source=publiek&utm_medium={{ $madeWith ?? 'kaart' }}" rel="noopener">{{ brand('name') }}</a> — factureren en je bedrijf presenteren, in één.</div>
 </body>
 </html>

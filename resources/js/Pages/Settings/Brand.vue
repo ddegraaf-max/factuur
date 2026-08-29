@@ -1,8 +1,11 @@
 <script setup>
 import { ref, computed, reactive } from 'vue';
-import { router, useForm, Head, Link } from '@inertiajs/vue3';
+import { router, useForm, Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+
+// Het platform-merk (EasyInvoice/Lopra) — niet te verwarren met de huisstijl van de gebruiker hieronder.
+const brand = usePage().props.brand;
 
 const props = defineProps({
   company: Object,
@@ -397,7 +400,7 @@ const removeLogo = () => {
           <div class="card-header">
             <div>
               <div class="card-title">Eigen briefpapier</div>
-              <div class="card-subtitle">Je volledige eigen ontwerp (bijv. door AI gemaakt) als ondergrond — EasyInvoice zet er alleen de factuurinhoud op</div>
+              <div class="card-subtitle">Je volledige eigen ontwerp (bijv. door AI gemaakt) als ondergrond — {{ brand.name }} zet er alleen de factuurinhoud op</div>
             </div>
           </div>
           <div class="card-body">

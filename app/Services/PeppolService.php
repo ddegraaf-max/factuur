@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\PurchaseInboxItem;
 use App\Services\Peppol\RecommandClient;
+use App\Support\Brand;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -144,7 +145,7 @@ class PeppolService
     public function register(Company $company): string
     {
         if (! $this->configured()) {
-            throw new \DomainException('Peppol is nog niet ingericht door de beheerder van EasyInvoice.');
+            throw new \DomainException('Peppol is nog niet ingericht door de beheerder van ' . Brand::name() . '.');
         }
         if ($missing = $this->registrationBlockers($company)) {
             throw new \DomainException('Vul eerst ' . implode(', ', $missing) . ' in bij Instellingen → Bedrijfsgegevens.');
@@ -317,7 +318,7 @@ class PeppolService
         if (! $this->sendingEnabled($company)) {
             throw new \DomainException($this->configured()
                 ? 'Peppol is voor deze administratie nog niet geactiveerd of geverifieerd (Instellingen → Koppelingen).'
-                : 'Peppol is nog niet ingericht door de beheerder van EasyInvoice.');
+                : 'Peppol is nog niet ingericht door de beheerder van ' . Brand::name() . '.');
         }
         if ($invoice->status === 'draft' || ! $invoice->number) {
             throw new \DomainException('Verstuur de factuur eerst; concepten kunnen niet via Peppol.');

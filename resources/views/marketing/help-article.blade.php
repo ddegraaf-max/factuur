@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', $article['title'] . ' — Helpcentrum — EasyInvoice')
+@section('title', $article['title'] . ' — Helpcentrum — ' . brand('name'))
 @section('description', $article['intro'])
 
 @push('styles')
@@ -51,7 +51,7 @@
       @endforeach
 
       <hr class="divider" style="margin:40px 0;">
-      <p style="color:var(--text-3);">Niet helemaal duidelijk? <a href="{{ route('contact') }}">Neem contact op</a> of mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a> — we helpen je graag.</p>
+      <p style="color:var(--text-3);">Niet helemaal duidelijk? <a href="{{ route('contact') }}">Neem contact op</a> of mail <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> — we helpen je graag.</p>
     </article>
   </div>
 </section>

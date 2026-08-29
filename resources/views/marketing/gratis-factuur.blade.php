@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Gratis factuur maken (PDF) — zonder account — EasyInvoice')
+@section('title', 'Gratis factuur maken (PDF) — zonder account — ' . brand('name'))
 @section('description', 'Maak gratis een professionele factuur als PDF. Zonder account, zonder watermerk, met correcte btw. Vul je gegevens in en download direct — gemaakt voor Nederlandse zzp\'ers en mkb.')
 
 @push('styles')
@@ -226,7 +226,7 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>Is deze factuur-generator echt gratis? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Ja, helemaal. Geen account, geen watermerk, geen verborgen kosten. EasyInvoice is het betaalde facturatieprogramma erachter — handig zodra je vaker factureert — maar deze tool blijft gewoon gratis.</div>
+        <div class="faq-content">Ja, helemaal. Geen account, geen watermerk, geen verborgen kosten. {{ brand('name') }} is het betaalde facturatieprogramma erachter — handig zodra je vaker factureert — maar deze tool blijft gewoon gratis.</div>
       </details>
       <details class="faq-item">
         <summary>Worden mijn gegevens opgeslagen? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -238,7 +238,7 @@
       </details>
       <details class="faq-item">
         <summary>Kan ik ook offertes maken of facturen automatisch laten herinneren? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Daarvoor is er EasyInvoice zelf: offertes met digitale ondertekening, automatische betalingsherinneringen, btw-overzicht voor je aangifte, urenregistratie en meer. Je probeert het <a href="{{ route('register') }}">14 dagen gratis</a>, of kijk eerst rond in de <a href="{{ route('demo') }}">demo</a>.</div>
+        <div class="faq-content">Daarvoor is er {{ brand('name') }} zelf: offertes met digitale ondertekening, automatische betalingsherinneringen, btw-overzicht voor je aangifte, urenregistratie en meer. Je probeert het <a href="{{ route('register') }}">14 dagen gratis</a>, of kijk eerst rond in de <a href="{{ route('demo') }}">demo</a>.</div>
       </details>
     </div>
   </div>
@@ -247,7 +247,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Vaker facturen sturen?</h2>
-    <p>Met EasyInvoice verstuur je facturen in een paar klikken, herinnert het systeem je klanten automatisch en staat je btw-overzicht altijd klaar. Vanaf € 12,10 per maand, incl. btw.</p>
+    <p>Met {{ brand('name') }} verstuur je facturen in een paar klikken, herinnert het systeem je klanten automatisch en staat je btw-overzicht altijd klaar. Vanaf € 12,10 per maand, incl. btw.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Probeer 14 dagen gratis →</a>
       <a href="{{ route('demo') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Bekijk de demo</a>
@@ -263,7 +263,7 @@
     {
       "@@type": "Question",
       "name": "Is deze factuur-generator echt gratis?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "Ja, helemaal. Geen account, geen watermerk, geen verborgen kosten. EasyInvoice is het betaalde facturatieprogramma erachter, maar deze tool blijft gratis." }
+      "acceptedAnswer": { "@@type": "Answer", "text": "Ja, helemaal. Geen account, geen watermerk, geen verborgen kosten. {{ brand('name') }} is het betaalde facturatieprogramma erachter, maar deze tool blijft gratis." }
     },
     {
       "@@type": "Question",

@@ -1,8 +1,10 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { router, useForm, Head, Link } from '@inertiajs/vue3';
+import { router, useForm, Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   year: Number,
@@ -205,7 +207,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
     <p class="btw-disclaimer">
       Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's. 0%-regels worden op klantland verdeeld over 1e (Nederland), 3b (EU) en 3a (buiten de EU).
       De voorbelasting (5b) komt uit je <Link :href="route('purchases.index')" style="color:var(--brand);font-weight:500;">ingeboekte inkoopfacturen</Link> — dat cijfer is dus zo volledig als je inboekt.
-      Wat EasyInvoice niet kan weten (verlegde btw, inkoop uit het buitenland, privégebruik) vul je per tijdvak zelf aan. Controleer de cijfers altijd met je boekhouder.
+      Wat {{ brand.name }} niet kan weten (verlegde btw, inkoop uit het buitenland, privégebruik) vul je per tijdvak zelf aan. Controleer de cijfers altijd met je boekhouder.
     </p>
 
     <!-- Aangifte-klaar: detail per tijdvak -->
@@ -225,7 +227,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
         </div>
         <div class="modal-body">
           <ol class="steps">
-            <li class="done">Controleer de rubrieken hieronder — en vul aan wat EasyInvoice niet weet</li>
+            <li class="done">Controleer de rubrieken hieronder — en vul aan wat {{ brand.name }} niet weet</li>
             <li>Neem ze over in <a :href="mbz_url" target="_blank" rel="noopener">Mijn Belastingdienst Zakelijk ↗</a> (klik op een bedrag om het te kopiëren)</li>
             <li :class="{ done: detail.filed }">Markeer hieronder als aangegeven</li>
             <li v-if="detail.payment.amount > 0" :class="{ done: detail.paid }">Betaal {{ whole(detail.payment.amount) }} vóór {{ detail.deadline_label }} — de betaalgegevens staan klaar</li>
@@ -262,7 +264,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
               </tr>
               <tr class="rub-manual" v-if="manualForm['5b']">
                 <td></td>
-                <td>Extra voorbelasting buiten EasyInvoice <span class="rub-note">bijv. bonnetjes die je niet hebt ingeboekt — telt op bij 5b</span></td>
+                <td>Extra voorbelasting buiten {{ brand.name }} <span class="rub-note">bijv. bonnetjes die je niet hebt ingeboekt — telt op bij 5b</span></td>
                 <td></td>
                 <td class="right"><input type="number" step="0.01" v-model.number="manualForm['5b'].vat" class="rub-input" placeholder="0"></td>
               </tr>
@@ -385,7 +387,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
             <input v-else type="text" v-model="settingsForm.ob_number" placeholder="123456789B01" maxlength="30">
             <div class="hint">
               Staat bovenaan je aangiftebrief en in Mijn Belastingdienst Zakelijk. Bij een eenmanszaak is dit een <b>ander</b> nummer dan het btw-id op je facturen.
-              Het wordt versleuteld opgeslagen en nooit getoond; EasyInvoice berekent er alleen het betalingskenmerk mee.
+              Het wordt versleuteld opgeslagen en nooit getoond; {{ brand.name }} berekent er alleen het betalingskenmerk mee.
             </div>
             <div v-if="settingsForm.errors.ob_number" class="field-error">{{ settingsForm.errors.ob_number }}</div>
           </div>

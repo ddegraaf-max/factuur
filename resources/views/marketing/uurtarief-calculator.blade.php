@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Uurtarief berekenen als zzp\'er — gratis calculator — EasyInvoice')
+@section('title', 'Uurtarief berekenen als zzp\'er — gratis calculator — ' . brand('name'))
 @section('description', 'Bereken welk uurtarief je als zzp\'er moet vragen op basis van je gewenste inkomen, declarabele uren, vakantie en kosten. Gratis calculator met uitleg.')
 
 @push('styles')
@@ -71,7 +71,7 @@
         <li><strong>Lege periodes</strong> — tussen twee opdrachten zit soms een gat; een buffer hoort in je tarief.</li>
         <li><strong>Belastingen</strong> — over je winst betaal je inkomstenbelasting en Zvw-bijdrage; ondernemersaftrekken (zoals de zelfstandigenaftrek) verzachten dat, maar worden de laatste jaren stap voor stap afgebouwd.</li>
       </ul>
-      <p>Wil je achteraf zien wat een klant je per uur écht oplevert? EasyInvoice heeft <a href="{{ url('/') }}#functies">urenregistratie</a> ingebouwd en rekent per klant je effectieve uurtarief uit: omzet gedeeld door bestede uren. Zo zie je precies welke klanten renderen — en waar je tarief omhoog moet.</p>
+      <p>Wil je achteraf zien wat een klant je per uur écht oplevert? {{ brand('name') }} heeft <a href="{{ url('/') }}#functies">urenregistratie</a> ingebouwd en rekent per klant je effectieve uurtarief uit: omzet gedeeld door bestede uren. Zo zie je precies welke klanten renderen — en waar je tarief omhoog moet.</p>
     </div>
   </div>
 </section>
@@ -79,7 +79,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Uren schrijven en direct factureren</h2>
-    <p>Registreer je uren in EasyInvoice en zet ze met één klik op een factuur. Inclusief btw-overzicht, herinneringen en inzicht in wat elke klant oplevert.</p>
+    <p>Registreer je uren in {{ brand('name') }} en zet ze met één klik op een factuur. Inclusief btw-overzicht, herinneringen en inzicht in wat elke klant oplevert.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Probeer 14 dagen gratis →</a>
       <a href="{{ route('demo') }}" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Bekijk de demo</a>

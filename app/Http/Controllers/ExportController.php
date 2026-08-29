@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Support\Brand;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -70,7 +71,7 @@ class ExportController extends Controller
             ->orderBy('number')
             ->get();
 
-        $filename = sprintf('easyinvoice-export-%s-tm-%s.csv', $from->format('Y-m-d'), $to->format('Y-m-d'));
+        $filename = sprintf('%s-export-%s-tm-%s.csv', Brand::key(), $from->format('Y-m-d'), $to->format('Y-m-d'));
 
         return response()->streamDownload(function () use ($invoices) {
             $out = fopen('php://output', 'w');

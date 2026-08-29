@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Support\Brand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -110,11 +111,11 @@ class CheckMailSetup extends Command
 
             try {
                 Mail::raw(
-                    "Dit is een testbericht van EasyInvoice.\n\n"
+                    'Dit is een testbericht van ' . Brand::name() . ".\n\n"
                     ."Als je dit leest, werkt de e-mailconfiguratie.\n"
                     ."Verstuurd op: ".now()->toDateTimeString()."\n"
                     ."Afzender: {$fromName} <{$from}>",
-                    fn ($m) => $m->to($email)->subject('EasyInvoice — testbericht')
+                    fn ($m) => $m->to($email)->subject(Brand::name() . ' — testbericht')
                 );
 
                 $this->info("Verstuurd naar {$email}.");

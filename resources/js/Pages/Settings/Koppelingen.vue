@@ -17,7 +17,7 @@ const domainDisconnect = useForm({});
 const connectDomain = () => domainForm.post(route('settings.integrations.maildomain.connect'), { preserveScroll: true });
 const refreshDomain = () => domainRefresh.post(route('settings.integrations.maildomain.refresh'), { preserveScroll: true });
 const disconnectDomain = () => {
-  if (confirm('Eigen afzenderadres loskoppelen? Mail gaat dan weer uit via easyinvoice.nl.')) domainDisconnect.delete(route('settings.integrations.maildomain.disconnect'), { preserveScroll: true });
+  if (confirm(`Eigen afzenderadres loskoppelen? Mail gaat dan weer uit via ${brand.value.domain}.`)) domainDisconnect.delete(route('settings.integrations.maildomain.disconnect'), { preserveScroll: true });
 };
 const domainStatusLabel = computed(() => ({ none: 'Uit', pending: 'DNS instellen', verified: 'Actief', failed: 'DNS niet gevonden' }[props.mail_domain?.status] || 'Uit'));
 const copyValue = (v) => navigator.clipboard?.writeText(v);
@@ -39,6 +39,7 @@ const peppolStatusLabel = computed(() => ({
 
 const page = usePage();
 const flash = computed(() => page.props.flash || {});
+const brand = computed(() => page.props.brand);
 
 const rotateForm = useForm({});
 const disableForm = useForm({});
@@ -80,7 +81,7 @@ const copyUrl = async () => {
     <div class="page-header">
       <div>
         <h1 class="page-title">Koppelingen</h1>
-        <p class="page-subtitle">Verbind EasyInvoice met de tools waarmee je werkt.</p>
+        <p class="page-subtitle">Verbind {{ brand.name }} met de tools waarmee je werkt.</p>
       </div>
     </div>
 
@@ -146,7 +147,7 @@ const copyUrl = async () => {
           </div>
           <div v-else class="kop-locked">
             De identiteitscontrole is {{ peppol.status === 'rejected' ? 'afgewezen' : 'niet gelukt' }}. Neem contact met ons op via
-            <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:600;">hallo@easyinvoice.nl</a>.
+            <a :href="'mailto:' + brand.email" style="color:var(--brand);font-weight:600;">{{ brand.email }}</a>.
           </div>
           <div class="kop-actions">
             <button v-if="peppol.status !== 'pending'" class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">Status vernieuwen</button>
@@ -227,9 +228,9 @@ const copyUrl = async () => {
               <span v-else class="kop-pill off">Uit</span>
             </div>
             <p class="kop-desc">
-              Schrijf je offertes in een gesprek met Claude en zeg simpelweg <i>"zet deze offerte in EasyInvoice"</i> —
+              Schrijf je offertes in een gesprek met Claude en zeg simpelweg <i>"zet deze offerte in {{ brand.name }}"</i> —
               Claude maakt het concept direct in je administratie aan. Claude kan klanten opzoeken, concept-offertes en
-              concept-facturen aanmaken en je openstaande facturen opvragen. <b>Versturen doe je altijd zelf</b> in EasyInvoice.
+              concept-facturen aanmaken en je openstaande facturen opvragen. <b>Versturen doe je altijd zelf</b> in {{ brand.name }}.
             </p>
           </div>
         </div>
@@ -268,11 +269,11 @@ const copyUrl = async () => {
               <ol>
                 <li>Open <b>claude.ai</b> → Instellingen → <b>Connectors</b> (of in de Claude-desktopapp).</li>
                 <li>Kies <b>"Add custom connector"</b> en plak de koppel-URL hierboven. Geen verdere authenticatie nodig.</li>
-                <li>Klaar! Vraag Claude bijvoorbeeld: <i>"Zoek klant Jansen op in EasyInvoice"</i> of
-                  <i>"Zet deze offerte als concept in EasyInvoice"</i>.</li>
+                <li>Klaar! Vraag Claude bijvoorbeeld: <i>"Zoek klant Jansen op in {{ brand.name }}"</i> of
+                  <i>"Zet deze offerte als concept in {{ brand.name }}"</i>.</li>
               </ol>
               <p class="kop-hint" style="margin-top:6px;">
-                Werkt ook in Claude Code: <code style="font-size:11.5px;">claude mcp add easyinvoice --transport http {{ mcp.url }}</code>
+                Werkt ook in Claude Code: <code style="font-size:11.5px;">claude mcp add {{ brand.key }} --transport http {{ mcp.url }}</code>
               </p>
             </div>
 

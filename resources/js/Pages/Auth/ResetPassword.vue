@@ -1,6 +1,8 @@
 <script setup>
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, usePage } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   email: String,
@@ -24,7 +26,7 @@ const submit = () => form.post(route('password.store'), {
   <AuthLayout>
     <template #hero>
       <h2>Nieuw wachtwoord instellen</h2>
-      <p>Kies een sterk, nieuw wachtwoord voor je EasyInvoice-account (minimaal 8 tekens).</p>
+      <p>Kies een sterk, nieuw wachtwoord voor je {{ brand.name }}-account (minimaal 8 tekens).</p>
     </template>
 
     <div class="login-form-card">

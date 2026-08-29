@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Support\Brand;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -31,8 +32,8 @@ class ResendScheduler
 
     private function fromAddress(): string
     {
-        $address = config('mail.from.address', 'hallo@easyinvoice.nl');
-        $name = config('mail.from.name', 'EasyInvoice');
+        $address = config('mail.from.address', Brand::email());
+        $name = config('mail.from.name', Brand::name());
 
         return $name ? "{$name} <{$address}>" : $address;
     }
@@ -66,7 +67,7 @@ class ResendScheduler
                 ->post(self::BASE.'/emails', [
                     'from' => $this->fromAddress(),
                     'to' => [$toEmail],
-                    'subject' => 'Nog '.self::REMIND_DAYS_BEFORE.' dagen in je EasyInvoice-proefperiode',
+                    'subject' => 'Nog '.self::REMIND_DAYS_BEFORE.' dagen in je '.Brand::name().'-proefperiode',
                     'html' => $html,
                     'scheduled_at' => $sendAt->toIso8601String(),
                 ]);
@@ -114,7 +115,7 @@ class ResendScheduler
                 ->post(self::BASE.'/emails', [
                     'from' => $this->fromAddress(),
                     'to' => [$toEmail],
-                    'subject' => 'Je EasyInvoice-proefperiode is afgelopen',
+                    'subject' => 'Je '.Brand::name().'-proefperiode is afgelopen',
                     'html' => $html,
                     'scheduled_at' => $sendAt->toIso8601String(),
                 ]);

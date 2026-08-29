@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import { router, Head, useForm } from '@inertiajs/vue3';
+import { router, Head, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   enabled: Boolean,
@@ -45,8 +47,8 @@ const copyCodes = () => {
           <span class="pill" :class="enabled ? 'pill-paid' : 'pill-draft'">{{ enabled ? 'Actief' : 'Inactief' }}</span>
         </div>
         <div class="status-detail">
-          <span v-if="enabled">Geactiveerd. Bij elke nieuwe login vraagt EasyInvoice een 6-cijferige code uit je authenticator app.</span>
-          <span v-else>Voeg een extra beveiligingslaag toe. Naast je wachtwoord vraagt EasyInvoice om een tijdelijke code uit een authenticator app.</span>
+          <span v-if="enabled">Geactiveerd. Bij elke nieuwe login vraagt {{ brand.name }} een 6-cijferige code uit je authenticator app.</span>
+          <span v-else>Voeg een extra beveiligingslaag toe. Naast je wachtwoord vraagt {{ brand.name }} om een tijdelijke code uit een authenticator app.</span>
         </div>
       </div>
       <div>

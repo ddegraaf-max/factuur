@@ -6,7 +6,11 @@ import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from 'ziggy-js';
 
-const appName = import.meta.env.VITE_APP_NAME || 'EasyInvoice';
+// Merknaam en -kleur komen van de server (data-attributen op <html>, zie
+// app.blade.php): één build draait voor EasyInvoice én Lopra.
+const brandData = document.documentElement.dataset;
+const appName = brandData.brandName || import.meta.env.VITE_APP_NAME || 'EasyInvoice';
+const brandColor = brandData.brandColor || '#E8231F';
 
 // PWA: installeerbaar op telefoon/desktop; de service worker cachet alleen
 // statische bestanden. Niet in development (zou Vite's hot reload storen).
@@ -41,7 +45,7 @@ createInertiaApp({
             .mount(el);
     },
     progress: {
-        color: '#E8231F',
+        color: brandColor,
         showSpinner: false,
     },
 });

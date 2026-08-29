@@ -69,7 +69,7 @@ return [
     'mail_view_pay_invoice' => 'Bekijk en betaal online (iDEAL)',
     'mail_portal_hint' => 'In de beveiligde online omgeving ziet u de factuur, de betaalstatus en kunt u de PDF opnieuw downloaden. Voor uw veiligheid bevestigt u eerst uw e-mailadres met een eenmalige code.',
     'mail_regards' => 'Met vriendelijke groet,',
-    'mail_sent_via' => 'Verzonden via EasyInvoice namens :name.',
+    'mail_sent_via' => 'Verzonden via :brand namens :name.',
 
     // Bedankmail na betaling
     'mail_thanks_subject' => 'Bedankt voor uw betaling — factuur :number',

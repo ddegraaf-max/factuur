@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\CompanyPurger;
 use App\Support\Audit;
+use App\Support\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -59,12 +60,12 @@ class AccountDataController extends Controller
         }
 
         $zip->addFromString('volledige-export.json', json_encode($all, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-        $zip->addFromString('LEESMIJ.txt', "Export van de EasyInvoice-administratie \"{$company->name}\" op " . now()->format('d-m-Y H:i') . ".\n\nElke CSV is puntkomma-gescheiden (UTF-8) en opent direct in Excel. volledige-export.json bevat dezelfde gegevens in één bestand.\nBijlagen (PDF's, bonnen) zitten niet in deze export; download die per document.\n");
+        $zip->addFromString('LEESMIJ.txt', 'Export van de ' . Brand::name() . "-administratie \"{$company->name}\" op " . now()->format('d-m-Y H:i') . ".\n\nElke CSV is puntkomma-gescheiden (UTF-8) en opent direct in Excel. volledige-export.json bevat dezelfde gegevens in één bestand.\nBijlagen (PDF's, bonnen) zitten niet in deze export; download die per document.\n");
         $zip->close();
 
         Audit::log('exported', null, 'Volledige export van de administratie gedownload (ZIP)');
 
-        return response()->download($path, 'easyinvoice-export-' . now()->format('Y-m-d') . '.zip', ['Content-Type' => 'application/zip'])->deleteFileAfterSend(true);
+        return response()->download($path, Brand::key() . '-export-' . now()->format('Y-m-d') . '.zip', ['Content-Type' => 'application/zip'])->deleteFileAfterSend(true);
     }
 
     public function destroy(Request $request, CompanyPurger $purger)
@@ -96,7 +97,7 @@ class AccountDataController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('flash', "De administratie \"{$name}\" is definitief verwijderd. Bedankt dat je EasyInvoice gebruikte.");
+        return redirect('/')->with('flash', "De administratie \"{$name}\" is definitief verwijderd. Bedankt dat je " . Brand::name() . ' gebruikte.');
     }
 
     private function csv(array $rows): string

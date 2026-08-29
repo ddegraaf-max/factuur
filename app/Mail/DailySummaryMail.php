@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Company;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -24,7 +25,7 @@ class DailySummaryMail extends Mailable
 
         $subject = $overdue > 0
             ? sprintf('%d factu%s vervallen — je dagoverzicht', $overdue, $overdue === 1 ? 'ur' : 'ren')
-            : 'Je dagoverzicht van EasyInvoice';
+            : 'Je dagoverzicht van ' . Brand::name();
 
         return new Envelope(subject: $subject);
     }

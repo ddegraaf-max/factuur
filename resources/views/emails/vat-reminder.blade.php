@@ -16,7 +16,7 @@
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
         .container { max-width: 560px; margin: 0 auto; background: #FFFFFF; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28,25,23,0.08); }
-        .header { background: linear-gradient(135deg, #E8231F 0%, #B81814 100%); padding: 28px 36px; color: white; }
+        .header { background: linear-gradient(135deg, {{ brand('color') }} 0%, {{ brand('color_dark') }} 100%); padding: 28px 36px; color: white; }
         .logo { display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
         .logo-mark { width: 34px; height: 34px; display: block; border: 0; }
         .header-sub { font-size: 13px; opacity: 0.9; margin-top: 6px; }
@@ -35,7 +35,7 @@
         .pay .k { color: #78716C; width: 38%; }
         .pay .v { font-weight: 600; font-family: Menlo, Consolas, monospace; }
         .note { font-size: 13px; color: #78716C; line-height: 1.6; }
-        .btn { display: inline-block; background: #E8231F; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
+        .btn { display: inline-block; background: {{ brand('color') }}; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 24px 0 4px; }
         .footer { padding: 20px 36px 28px; font-size: 12px; color: #A8A29E; text-align: center; line-height: 1.6; }
         .footer a { color: #78716C; }
@@ -46,8 +46,8 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <img src="{{ $appUrl }}/images/easyinvoice-favicon-180.png" class="logo-mark" alt="EasyInvoice">
-                <span>EasyInvoice</span>
+                <img src="{{ \App\Support\Brand::asset('email_mark') }}" class="logo-mark" alt="{{ brand('name') }}">
+                <span>{{ brand('name') }}</span>
             </div>
             <div class="header-sub">Btw-aangifte · {{ $p['label'] }} {{ $p['year'] }}</div>
         </div>
@@ -83,14 +83,14 @@
                         Zet het betalingskenmerk in het veld "Betalingskenmerk" van je bankoverschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.
                         @if($p['payment']['reference_source'] === 'auto') Het kenmerk is berekend uit je omzetbelastingnummer; controleer het met het kenmerk bij je ingestuurde aangifte. @endif
                     @else
-                        Het betalingskenmerk vind je in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte. Stel je omzetbelastingnummer in op de btw-pagina, dan berekent EasyInvoice het voortaan zelf.
+                        Het betalingskenmerk vind je in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte. Stel je omzetbelastingnummer in op de btw-pagina, dan berekent {{ brand('name') }} het voortaan zelf.
                     @endif
                 </p>
             @elseif($p['balance_rounded'] < 0)
                 <p class="note">Je krijgt per saldo btw terug. Dien de aangifte in; de Belastingdienst betaalt het bedrag uit na verwerking.</p>
             @endif
 
-            <p class="note">Alle rubrieken staan klaar in EasyInvoice — in de indeling van Mijn Belastingdienst Zakelijk, dus overnemen is zo gedaan. Markeer het tijdvak daarna als aangegeven, dan stopt deze herinnering.</p>
+            <p class="note">Alle rubrieken staan klaar in {{ brand('name') }} — in de indeling van Mijn Belastingdienst Zakelijk, dus overnemen is zo gedaan. Markeer het tijdvak daarna als aangegeven, dan stopt deze herinnering.</p>
 
             <div class="btn-wrap">
                 <a href="{{ $appUrl }}/btw?year={{ $p['year'] }}" class="btn">Open je btw-aangifte</a>
@@ -98,7 +98,7 @@
         </div>
 
         <div class="footer">
-            Je ontvangt deze herinnering omdat die aanstaat bij Btw-aangifte → Instellingen in EasyInvoice.<br>
+            Je ontvangt deze herinnering omdat die aanstaat bij Btw-aangifte → Instellingen in {{ brand('name') }}.<br>
             Daar kun je hem ook uitzetten.
         </div>
     </div>

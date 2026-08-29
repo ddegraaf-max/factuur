@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\PurchaseInvoice;
+use App\Support\Brand;
 use Carbon\Carbon;
 use XMLWriter;
 
@@ -75,7 +76,7 @@ class XafExporter
         $this->el($w, 'endDate', $end->format('Y-m-d'));
         $this->el($w, 'curCode', 'EUR');
         $this->el($w, 'dateCreated', now()->format('Y-m-d'));
-        $this->el($w, 'softwareDesc', 'EasyInvoice');
+        $this->el($w, 'softwareDesc', Brand::name());
         $this->el($w, 'softwareVersion', mb_substr((string) config('app.version'), 0, 20));
         $w->endElement();
 

@@ -21,7 +21,7 @@ return [
         'een-account-aanmaken' => [
             'category' => 'Aan de slag',
             'title' => 'Een account aanmaken',
-            'intro' => 'In een paar minuten heb je een EasyInvoice-account en kun je je eerste factuur versturen.',
+            'intro' => 'In een paar minuten heb je een {brand}-account en kun je je eerste factuur versturen.',
             'sections' => [
                 ['Account aanmaken', [
                     'Klik rechtsboven op "Start gratis" en vul je naam, e-mailadres en een wachtwoord in. Je kunt direct aan de slag — een creditcard is niet nodig.',
@@ -70,13 +70,13 @@ return [
         'btw-per-regel' => [
             'category' => 'Facturen',
             'title' => 'BTW per regel instellen',
-            'intro' => 'EasyInvoice berekent de btw automatisch per factuurregel — 21%, 9% of 0%.',
+            'intro' => '{brand} berekent de btw automatisch per factuurregel — 21%, 9% of 0%.',
             'sections' => [
                 ['Tarief kiezen', [
                     'Kies bij elke factuurregel het juiste btw-tarief. Het hoge tarief is 21%, het lage 9%, en 0% gebruik je bijvoorbeeld bij btw-verlegd of export.',
                 ]],
                 ['KOR / geen btw', [
-                    'Val je onder de Kleine Ondernemersregeling (KOR)? Dan stel je 0% in en vermeldt EasyInvoice automatisch de KOR-regeling op je factuur.',
+                    'Val je onder de Kleine Ondernemersregeling (KOR)? Dan stel je 0% in en vermeldt {brand} automatisch de KOR-regeling op je factuur.',
                 ]],
                 ['Btw-overzicht', [
                     'Per kwartaal vind je een overzicht van de berekende btw, dat je eenvoudig overneemt bij je aangifte.',
@@ -101,7 +101,7 @@ return [
         'factuurnummering' => [
             'category' => 'Facturen',
             'title' => 'Factuurnummering aanpassen',
-            'intro' => 'EasyInvoice nummert je facturen automatisch en doorlopend per jaar.',
+            'intro' => '{brand} nummert je facturen automatisch en doorlopend per jaar.',
             'sections' => [
                 ['Reeks instellen', [
                     'Bij Instellingen → Nummering bepaal je het startnummer en het formaat van je factuurnummers. Elk jaar start een nieuwe doorlopende reeks.',
@@ -130,7 +130,7 @@ return [
         'automatische-herinneringen' => [
             'category' => 'Betalingen & incasso',
             'title' => 'Automatische herinneringen',
-            'intro' => 'Laat EasyInvoice je betalingsherinneringen versturen, zodat je er zelf niet aan hoeft te denken.',
+            'intro' => 'Laat {brand} je betalingsherinneringen versturen, zodat je er zelf niet aan hoeft te denken.',
             'sections' => [
                 ['Instellen', [
                     'Bij Instellingen → Herinneringen bepaal je wanneer een herinnering wordt verstuurd, bijvoorbeeld een aantal dagen na de vervaldatum.',
@@ -165,7 +165,7 @@ return [
                     'Ga naar Klanten → Nieuwe klant en vul de gegevens in: naam, adres, en voor zakelijke klanten ook KvK- en btw-nummer.',
                 ]],
                 ['Zakelijk of particulier', [
-                    'Geef aan of het een zakelijke of particuliere klant is. EasyInvoice past de factuur hierop aan.',
+                    'Geef aan of het een zakelijke of particuliere klant is. {brand} past de factuur hierop aan.',
                 ]],
             ],
         ],
@@ -261,15 +261,15 @@ return [
                     'Klik op "Aangifte-klaar" bij een tijdvak: je ziet de rubrieken in hele euro\'s, afgerond in je voordeel zoals de Belastingdienst toestaat. Klik op een bedrag om het te kopiëren en plak het in Mijn Belastingdienst Zakelijk. Onder "Onderbouwing" zie je welke facturen in welke rubriek zitten.',
                 ]],
                 ['Wat je zelf aanvult', [
-                    'Wat EasyInvoice niet kan weten, vul je per tijdvak zelf in: verlegde btw (2a), inkoop uit het buitenland (4a/4b), privégebruik (1d), overige tarieven (1c) en voorbelasting die je niet hebt ingeboekt. Easy bewaart het per tijdvak en telt het op in 5a en 5b.',
+                    'Wat {brand} niet kan weten, vul je per tijdvak zelf in: verlegde btw (2a), inkoop uit het buitenland (4a/4b), privégebruik (1d), overige tarieven (1c) en voorbelasting die je niet hebt ingeboekt. {brand} bewaart het per tijdvak en telt het op in 5a en 5b.',
                 ]],
                 ['Betalen en afvinken', [
                     'Bij een te betalen saldo staan het bedrag, het rekeningnummer van de Belastingdienst (sinds 1 mei 2026: NL04 RABO 0200 1122 44) en het betalingskenmerk klaar om te kopiëren. Zet het kenmerk in het veld "Betalingskenmerk" van je overschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.',
-                    'Het betalingskenmerk berekent Easy uit je omzetbelastingnummer (Instellingen op de btw-pagina). Let op: bij een eenmanszaak is dat een ander nummer dan het btw-id op je facturen. Geen nummer ingesteld? Plak dan het kenmerk dat je na het insturen ziet in Mijn Belastingdienst Zakelijk. Vink daarna "Aangifte ingediend" en "Betaald" af; de historie staat op de kaart.',
+                    'Het betalingskenmerk berekent {brand} uit je omzetbelastingnummer (Instellingen op de btw-pagina). Let op: bij een eenmanszaak is dat een ander nummer dan het btw-id op je facturen. Geen nummer ingesteld? Plak dan het kenmerk dat je na het insturen ziet in Mijn Belastingdienst Zakelijk. Vink daarna "Aangifte ingediend" en "Betaald" af; de historie staat op de kaart.',
                 ]],
                 ['Herinnering en dashboard', [
                     'Twee weken en drie dagen vóór de deadline (een maand na afloop van het tijdvak; bij jaaraangifte 31 maart) krijg je een e-mail met de cijfers en de betaalgegevens — zolang je het tijdvak niet als aangegeven hebt gemarkeerd. Op het dashboard zie je een balk zodra een aangifte openstaat.',
-                    'De cijfers worden berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota\'s. De voorbelasting is zo volledig als je inkoopadministratie — boek dus al je inkoop in. Controleer de aangifte altijd met je boekhouder; EasyInvoice stuurt (nog) niets naar de Belastingdienst.',
+                    'De cijfers worden berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota\'s. De voorbelasting is zo volledig als je inkoopadministratie — boek dus al je inkoop in. Controleer de aangifte altijd met je boekhouder; {brand} stuurt (nog) niets naar de Belastingdienst.',
                 ]],
             ],
         ],
@@ -281,7 +281,7 @@ return [
             'intro' => 'Boek binnengekomen facturen van leveranciers in — de BTW telt automatisch mee als voorbelasting in je aangifte.',
             'sections' => [
                 ['Inboeken', [
-                    'Ga naar Inkoop → Inkoopfacturen → "Inkoopfactuur inboeken". Vul de leverancier (met suggesties uit eerdere boekingen), het factuurnummer, de kostencategorie en de bedragen in. Je kunt bedragen exclusief óf inclusief BTW invoeren — EasyInvoice rekent het andere bedrag uit.',
+                    'Ga naar Inkoop → Inkoopfacturen → "Inkoopfactuur inboeken". Vul de leverancier (met suggesties uit eerdere boekingen), het factuurnummer, de kostencategorie en de bedragen in. Je kunt bedragen exclusief óf inclusief BTW invoeren — {brand} rekent het andere bedrag uit.',
                 ]],
                 ['Met een foto of PDF', [
                     'Voeg een foto of PDF van de bon toe: kies een bestand of tik op "Foto maken" (op je telefoon opent direct de camera). De foto verschijnt groot naast het formulier, zodat je overtypt terwijl je de bon ziet.',
@@ -319,7 +319,7 @@ return [
             'intro' => 'Laat klanten het openstaande bedrag direct met iDEAL betalen vanuit de factuurmail en het klantenportaal — via je eigen Mollie-account.',
             'sections' => [
                 ['Mollie koppelen', [
-                    'Maak een gratis account op mollie.com en kopieer je API-key (Developers → API-keys). Plak die bij Instellingen → Bedrijfsgegevens onder "Online betalingen". Het geld gaat rechtstreeks naar jouw rekening — EasyInvoice zit er niet tussen en rekent er niets voor (Mollie rekent per transactie een klein bedrag, zie mollie.com/pricing). Met een test_-key kun je eerst veilig proefdraaien.',
+                    'Maak een gratis account op mollie.com en kopieer je API-key (Developers → API-keys). Plak die bij Instellingen → Bedrijfsgegevens onder "Online betalingen". Het geld gaat rechtstreeks naar jouw rekening — {brand} zit er niet tussen en rekent er niets voor (Mollie rekent per transactie een klein bedrag, zie mollie.com/pricing). Met een test_-key kun je eerst veilig proefdraaien.',
                 ]],
                 ['Zo betaalt je klant', [
                     'In de factuurmail verandert de knop in "Bekijk en betaal online (iDEAL)". In het beveiligde klantenportaal staat een betaalknop met het openstaande bedrag — deelbetalingen en verrekeningen worden automatisch afgetrokken. Na het afronden bij de bank wordt de betaling direct op de factuur geboekt en springt de status op betaald (of deels betaald).',
@@ -371,7 +371,7 @@ return [
         'cashflow-prognose' => [
             'category' => 'Rapporten',
             'title' => 'De cashflow-prognose',
-            'intro' => 'Zie in één oogopslag wat er de komende maanden naar verwachting binnenkomt en uitgaat — op basis van wat er al in Easy staat.',
+            'intro' => 'Zie in één oogopslag wat er de komende maanden naar verwachting binnenkomt en uitgaat — op basis van wat er al in {brand} staat.',
             'sections' => [
                 ['Wat je ziet', [
                     'Ga naar Rapporten → Cashflow. Per maand (de huidige plus drie vooruit) zie je de verwachte ontvangsten en uitgaven, het netto verschil en het cumulatieve verloop. De regel "Al vervallen" toont wat er nú al opeisbaar is: facturen waarvan de vervaldatum is verstreken, en inkoop die je zelf nog moet betalen.',
@@ -380,7 +380,7 @@ return [
                     'Ontvangsten: je openstaande facturen op hun vervaldatum, plus je terugkerende facturen (verwachte ontvangst = factuurdatum + betaaltermijn). Uitgaven: openstaande inkoopfacturen op hun vervaldatum, plus je vaste lasten op de boekingsdatum. Hoe beter je terugkerende facturen en vaste lasten zijn ingevuld, hoe scherper de prognose.',
                 ]],
                 ['Wat het bewust niet is', [
-                    'Dit is een prognose, geen banksaldo: klanten betalen soms later dan de vervaldatum, en privé-opnames, belastingen en loonkosten staan niet in EasyInvoice. Facturen in het incassotraject tellen niet mee — die ontvangst is te onzeker. Gebruik het rapport om krappe maanden vroeg te zien aankomen, niet als boekhoudkundige waarheid.',
+                    'Dit is een prognose, geen banksaldo: klanten betalen soms later dan de vervaldatum, en privé-opnames, belastingen en loonkosten staan niet in {brand}. Facturen in het incassotraject tellen niet mee — die ontvangst is te onzeker. Gebruik het rapport om krappe maanden vroeg te zien aankomen, niet als boekhoudkundige waarheid.',
                 ]],
             ],
         ],
@@ -391,7 +391,7 @@ return [
             'intro' => 'Bepaal zelf het onderwerp en de tekst van de e-mails die met je facturen en offertes worden meegestuurd.',
             'sections' => [
                 ['Zo werkt het', [
-                    'Ga naar Instellingen → E-mailteksten. Vul een eigen onderwerp en/of bericht in voor de factuurmail en de offertemail. Gebruik variabelen zoals {klant}, {factuurnummer}, {bedrag} en {vervaldatum} — die worden bij het versturen automatisch ingevuld. Laat je een veld leeg, dan gebruikt Easy de standaardtekst.',
+                    'Ga naar Instellingen → E-mailteksten. Vul een eigen onderwerp en/of bericht in voor de factuurmail en de offertemail. Gebruik variabelen zoals {klant}, {factuurnummer}, {bedrag} en {vervaldatum} — die worden bij het versturen automatisch ingevuld. Laat je een veld leeg, dan gebruikt {brand} de standaardtekst.',
                     'Begin je factuurbericht zelf met een aanhef (bijv. "Beste {klant},"): bij een eigen tekst vervalt de standaard-aanhef. Bij de offertemail staat de aanhef er als kop automatisch boven.',
                 ]],
                 ['Wat automatisch blijft', [
@@ -406,7 +406,7 @@ return [
         'bedankmail-na-betaling' => [
             'category' => 'Betalingen & incasso',
             'title' => 'Bedankmail na betaling',
-            'intro' => 'Zodra een factuur volledig is betaald, kan EasyInvoice je klant automatisch een vriendelijk bedankje sturen — in jouw huisstijl, met de factuur als betaalbewijs.',
+            'intro' => 'Zodra een factuur volledig is betaald, kan {brand} je klant automatisch een vriendelijk bedankje sturen — in jouw huisstijl, met de factuur als betaalbewijs.',
             'sections' => [
                 ['Wat je klant ontvangt', [
                     'Een korte, vriendelijke e-mail met een overzicht van de betaling (factuurnummer, bedrag, ontvangstdatum en betaalwijze), een knop naar het klantenportaal en de factuur als PDF met het stempel BETAALD — handig als betaalbewijs voor zijn administratie. Afzendernaam, logo en kleur volgen je huisstijl of handelsnaam; de standaardtekst volgt automatisch de taal van de klant (Nederlands of Engels).',
@@ -435,7 +435,7 @@ return [
                     'Zorg dat KvK-nummer, adres en e-mailadres bij Bedrijfsgegevens zijn ingevuld; die gegevens gaan mee in de registratie.',
                 ]],
                 ['Verzenden', [
-                    'EasyInvoice controleert per klant (op KvK-nummer of een eigen Peppol-ID op de klantkaart) of die op Peppol bereikbaar is; je ziet dan een ⚡-badge op de factuur. Na het versturen verschijnt de knop "Via Peppol afleveren". De e-factuur gaat als NLCIUS — of als Peppol BIS 3 wanneer de ontvanger alleen dat accepteert — en de referentie komt in de factuurhistorie.',
+                    '{brand} controleert per klant (op KvK-nummer of een eigen Peppol-ID op de klantkaart) of die op Peppol bereikbaar is; je ziet dan een ⚡-badge op de factuur. Na het versturen verschijnt de knop "Via Peppol afleveren". De e-factuur gaat als NLCIUS — of als Peppol BIS 3 wanneer de ontvanger alleen dat accepteert — en de referentie komt in de factuurhistorie.',
                 ]],
                 ['Ontvangen', [
                     'Geef je leveranciers je Peppol-ID door (staat bij Koppelingen). Hun e-facturen verschijnen automatisch in Postvak IN, met leverancier, factuurnummer, datums en btw per tarief al ingevuld en een PDF-weergave. Controleren, categorie kiezen, inboeken — klaar. Creditnota\'s komen met negatieve bedragen binnen.',
@@ -516,14 +516,14 @@ return [
         'vaste-lasten' => [
             'category' => 'Inkoop',
             'title' => 'Vaste lasten automatisch inboeken',
-            'intro' => 'Huur, software-abonnementen, verzekeringen: stel ze eenmalig in en Easy boekt ze voortaan automatisch in als inkoopfactuur.',
+            'intro' => 'Huur, software-abonnementen, verzekeringen: stel ze eenmalig in en {brand} boekt ze voortaan automatisch in als inkoopfactuur.',
             'sections' => [
                 ['Een vaste last aanmaken', [
                     'Ga naar Inkoop → Vaste lasten en klik op "Nieuwe vaste last". Vul de leverancier, categorie, frequentie (wekelijks t/m jaarlijks), de datum van de volgende inboeking en het bedrag per periode in. Vinkje "direct op betaald zetten" aan voor kosten via automatische incasso — de inboeking krijgt dan meteen de juiste betaalstatus en betaalwijze.',
                     'Sneller: open een bestaande inkoopfactuur en klik op "Maak terugkerend" — dezelfde kosten worden dan voortaan maandelijks ingeboekt (frequentie daarna aan te passen).',
                 ]],
                 ['Wat er automatisch gebeurt', [
-                    'Elke ochtend boekt Easy de vaste lasten in die aan de beurt zijn, als gewone inkoopfactuur met de notitie "Automatisch ingeboekt". De BTW telt direct mee als voorbelasting (rubriek 5b) in je BTW-overzicht, en de kosten verschijnen in je dashboards en het jaaroverzicht. Stond de app een tijdje stil, dan worden gemiste periodes dag voor dag ingehaald.',
+                    'Elke ochtend boekt {brand} de vaste lasten in die aan de beurt zijn, als gewone inkoopfactuur met de notitie "Automatisch ingeboekt". De BTW telt direct mee als voorbelasting (rubriek 5b) in je BTW-overzicht, en de kosten verschijnen in je dashboards en het jaaroverzicht. Stond de app een tijdje stil, dan worden gemiste periodes dag voor dag ingehaald.',
                 ]],
                 ['Beheren', [
                     'Pauzeren en hervatten kan met één klik; een einddatum stopt het profiel vanzelf (handig bij opzeggingen). Verwijder je een profiel, dan blijven de al ingeboekte inkoopfacturen gewoon bewaard. Maandprofielen houden vast aan de dag van de startdatum — gestart op de 31e wordt in februari de 28e en in maart weer de 31e.',
@@ -595,7 +595,7 @@ return [
                     'Liever niet akkoord? Afwijzen kan ook, met een toelichting die jij te lezen krijgt.',
                 ]],
                 ['Rechtsgeldig bewijsdossier', [
-                    'Bij de handtekening legt EasyInvoice vast: het geverifieerde e-mailadres, de ingevulde naam, de handtekening zelf, het tijdstip en het IP-adres. Dat dossier zie je op de offertepagina, en de handtekening komt ook op de offerte-PDF te staan — die kan je klant direct downloaden voor zijn eigen administratie.',
+                    'Bij de handtekening legt {brand} vast: het geverifieerde e-mailadres, de ingevulde naam, de handtekening zelf, het tijdstip en het IP-adres. Dat dossier zie je op de offertepagina, en de handtekening komt ook op de offerte-PDF te staan — die kan je klant direct downloaden voor zijn eigen administratie.',
                 ]],
                 ['Bevestiging voor je klant', [
                     'Zodra je klant tekent, krijgt hij automatisch een bevestiging in jouw huisstijl: datum en naam van de ondertekenaar, het totaal, het termijnplan als dat er is, een "hoe nu verder"-tekst en de ondertekende offerte als PDF — zo hebben jullie allebei hetzelfde document. Markeer je een offerte zelf als geaccepteerd (bijv. akkoord per telefoon), dan kies je per offerte of de bevestiging meegaat; opnieuw sturen kan altijd vanaf de offertepagina.',
@@ -619,7 +619,7 @@ return [
                     'Klik linksonder op je naam: onder "Administraties" staan al je bedrijven, met een vinkje bij de actieve. Eén klik en je zit in de andere administratie — met de klanten, facturen, huisstijl en instellingen van dát bedrijf. Administraties zien elkaars gegevens nooit, en je rol kan per administratie verschillen.',
                 ]],
                 ['Eén inlog voor je boekhouder of collega', [
-                    'Nodig je via Instellingen → Team iemand uit die al een EasyInvoice-account heeft, dan hoeft die geen nieuw account te maken: de uitnodigingslink koppelt jouw administratie aan zijn bestaande inlog. Zo werkt een boekhouder met één inlog voor al zijn klanten.',
+                    'Nodig je via Instellingen → Team iemand uit die al een {brand}-account heeft, dan hoeft die geen nieuw account te maken: de uitnodigingslink koppelt jouw administratie aan zijn bestaande inlog. Zo werkt een boekhouder met één inlog voor al zijn klanten.',
                 ]],
             ],
         ],

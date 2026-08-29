@@ -1,9 +1,9 @@
-/* EasyInvoice service worker — maakt de app installeerbaar (PWA) en houdt de
+/* Service worker (EasyInvoice én Lopra) — maakt de app installeerbaar (PWA) en houdt de
  * statische bestanden (JS/CSS/afbeeldingen) in een cache. Pagina's en gegevens
  * komen altijd van het netwerk; alleen bij geen verbinding tonen we een
  * eenvoudige offline-melding. */
-const VERSION = 'ei-v1';
-const OFFLINE_HTML = '<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline · EasyInvoice</title><style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#FAFAF9;color:#1C1917;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}div{max-width:360px;text-align:center;padding:24px}h1{font-size:20px;margin:0 0 8px}p{color:#57534E;line-height:1.6}a{color:#E8231F;font-weight:600}</style></head><body><div><h1>Geen verbinding</h1><p>EasyInvoice heeft internet nodig om je administratie te laden. Controleer je verbinding en <a href="javascript:location.reload()">probeer opnieuw</a>.</p></div></body></html>';
+const VERSION = 'app-v2';
+const OFFLINE_HTML = '<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline</title><style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#FAFAF9;color:#1C1917;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0}div{max-width:360px;text-align:center;padding:24px}h1{font-size:20px;margin:0 0 8px}p{color:#57534E;line-height:1.6}a{color:#E8231F;font-weight:600}</style></head><body><div><h1>Geen verbinding</h1><p>Deze app heeft internet nodig om je administratie te laden. Controleer je verbinding en <a href="javascript:location.reload()">probeer opnieuw</a>.</p></div></body></html>';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();

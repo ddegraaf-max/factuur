@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Status van de EasyInvoice-systemen — live en actueel')
-@section('description', 'Live status van de EasyInvoice-systemen: app, e-mailbezorging en betalingen. Bij een storing lees je hier direct wat er speelt en waar we aan werken.')
+@section('title', 'Status van de ' . brand('name') . '-systemen — live en actueel')
+@section('description', 'Live status van de ' . brand('name') . '-systemen: app, e-mailbezorging en betalingen. Bij een storing lees je hier direct wat er speelt en waar we aan werken.')
 
 @push('styles')
 <style>
@@ -53,7 +53,7 @@
     <p class="status-note">
       Deze pagina controleert de systemen <strong>live</strong> op het moment dat je hem opent —
       er wordt niets vooraf ingevuld. Ervaar je toch een probleem dat hier niet wordt getoond?
-      Mail ons op <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a>.
+      Mail ons op <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a>.
     </p>
 
     <div class="status-note" style="margin-top:28px;">
@@ -70,7 +70,7 @@
         wordt dagelijks geback-upt. Geplande factuurverzendingen en herinneringen worden na herstel
         automatisch alsnog verwerkt — je hoeft zelf niets opnieuw te doen. Duurt een storing langer of heb
         je er direct last van, mail dan gerust naar
-        <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a> —
+        <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a> —
         ook tijdens een storing lezen we mee. Zie ook het
         <a href="{{ route('helpcentrum') }}" style="color:var(--brand);font-weight:500;">helpcentrum</a> voor
         antwoorden op veelvoorkomende vragen.

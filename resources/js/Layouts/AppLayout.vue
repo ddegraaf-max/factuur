@@ -9,6 +9,7 @@ const page = usePage();
 const user = computed(() => page.props.auth.user);
 const company = computed(() => page.props.auth.company);
 const version = computed(() => page.props.version);
+const brand = computed(() => page.props.brand);
 const sidebarOpen = ref(false);
 
 const initials = computed(() => {
@@ -90,7 +91,8 @@ const rawNav = [
     title: 'Eigenaar',
     items: [
       { name: 'Marketing-inzichten', route: 'marketing.inzichten', icon: 'chart', can: 'platform', external: true },
-      { name: 'Merkbewaking', route: 'brand.index', icon: 'shield', can: 'platform' },
+      // Merkbewaking hoort bij het geregistreerde merk EasyInvoice; onder Lopra verborgen.
+      { name: 'Merkbewaking', route: 'brand.index', icon: 'shield', can: 'platform', brand: 'easyinvoice' },
       { name: 'Administraties', route: 'owner.companies.index', icon: 'users', can: 'platform' },
     ],
   },
@@ -101,7 +103,7 @@ const nav = computed(() =>
   rawNav
     .map(section => ({
       ...section,
-      items: section.items.filter(item => !item.can || can.value[item.can]),
+      items: section.items.filter(item => (!item.can || can.value[item.can]) && (!item.brand || item.brand === page.props.brand?.key)),
     }))
     .filter(section => section.items.length > 0)
 );
@@ -152,8 +154,8 @@ const logout = () => {
   <div class="app">
     <aside class="sidebar" :class="{ open: sidebarOpen }">
       <Link :href="route('dashboard')" class="sidebar-brand">
-        <img src="/images/easyinvoice-favicon-180.png" class="logo-mark" alt="EasyInvoice" />
-        <span class="brand-name">EasyInvoice</span>
+        <img :src="brand.mark" class="logo-mark" :alt="brand.name" />
+        <span class="brand-name">{{ brand.name }}</span>
       </Link>
 
       <nav class="sidebar-nav">
@@ -254,7 +256,7 @@ const logout = () => {
       <div v-if="isDemo" class="demo-banner">
         <span class="demo-chip">Demo</span>
         <span class="demo-text">
-          Je bekijkt de <strong>echte EasyInvoice</strong> met voorbeeldgegevens. Klik gerust overal op —
+          Je bekijkt de <strong>echte {{ brand.name }}</strong> met voorbeeldgegevens. Klik gerust overal op —
           er wordt niets verstuurd naar echte klanten.
         </span>
         <div class="demo-actions">

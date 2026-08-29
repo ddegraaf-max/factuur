@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -30,7 +31,7 @@ class ErrorAlertMail extends Mailable
         $where = $this->context['url'] ?? $this->context['console'] ?? 'onbekend';
 
         return new Envelope(
-            subject: '⚠️ EasyInvoice-fout: ' . class_basename($this->exception) . ' — ' . mb_substr($where, 0, 60),
+            subject: '⚠️ ' . Brand::name() . '-fout: ' . class_basename($this->exception) . ' — ' . mb_substr($where, 0, 60),
         );
     }
 

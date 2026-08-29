@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Cookiebeleid van EasyInvoice — welke cookies en waarom')
-@section('description', 'EasyInvoice gebruikt alleen functionele cookies — geen tracking en geen advertenties. Lees welke cookies we plaatsen, waarvoor en hoelang ze bewaard blijven.')
+@section('title', 'Cookiebeleid van ' . brand('name') . ' — welke cookies en waarom')
+@section('description', brand('name') . ' gebruikt alleen functionele cookies — geen tracking en geen advertenties. Lees welke cookies we plaatsen, waarvoor en hoelang ze bewaard blijven.')
 
 @section('content')
 <style>
@@ -28,14 +28,14 @@
     <div class="meta">Laatst bijgewerkt: 14 juni 2026</div>
 
     <div class="entity">
-      <strong>EasyInvoice®</strong> is een dienst van<br>
+      <strong>{{ \App\Support\Brand::legalName() }}</strong> is een dienst van<br>
       <strong>Creditline B.V.</strong><br>
       Torenlaan 5B · 1402 AT Bussum · Nederland<br>
       KvK 59683198 · BTW NL853603108B01<br>
-      E-mail: <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>
+      E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
-    <p>EasyInvoice gebruikt cookies om de website goed te laten werken en het gebruik te kunnen analyseren. We gebruiken geen advertentie- of tracking-cookies van derden.</p>
+    <p>{{ brand('name') }} gebruikt cookies om de website goed te laten werken en het gebruik te kunnen analyseren. We gebruiken geen advertentie- of tracking-cookies van derden.</p>
 
     <h2>Welke cookies we gebruiken</h2>
 
@@ -49,7 +49,7 @@
     <p>Je kunt cookies op elk moment beheren of verwijderen via de instellingen van je browser. Houd er rekening mee dat het uitschakelen van functionele cookies de werking van de dienst kan beperken.</p>
 
     <h2>Meer informatie</h2>
-    <p>Lees ook ons <a href="{{ route('privacy') }}">privacybeleid</a> voor hoe we met je persoonsgegevens omgaan. Vragen? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
+    <p>Lees ook ons <a href="{{ route('privacy') }}">privacybeleid</a> voor hoe we met je persoonsgegevens omgaan. Vragen? Mail <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</p>
 
   </div>
 </section>

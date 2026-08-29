@@ -12,6 +12,7 @@ use App\Models\Quote;
 use App\Models\RecurringInvoice;
 use App\Models\ReminderLog;
 use App\Models\User;
+use App\Support\Brand;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -100,7 +101,7 @@ class DemoDataBuilder
         $user = User::create([
             'name' => 'Jan Jansen',
             // Uniek adres per demo; er wordt toch nooit echt naartoe gemaild.
-            'email' => 'demo+'.Str::lower(Str::random(10)).'@easyinvoice.nl',
+            'email' => 'demo+'.Str::lower(Str::random(10)).'@'.Brand::domain(),
             'password' => Hash::make(Str::random(40)),
             'company_id' => $company->id,
         ]);
@@ -595,11 +596,12 @@ class DemoDataBuilder
                 '<html><body style="font-family:sans-serif;padding:40px;">'
                 .'<h1 style="font-size:20px;">%s</h1>'
                 .'<p style="font-size:13px;line-height:1.6;color:#333;">%s</p>'
-                .'<p style="font-size:12px;color:#777;margin-top:40px;">%s — voorbeelddocument uit de EasyInvoice-demo.</p>'
+                .'<p style="font-size:12px;color:#777;margin-top:40px;">%s — voorbeelddocument uit de %s-demo.</p>'
                 .'</body></html>',
                 e($title),
                 e($body),
-                e($company->name)
+                e($company->name),
+                e(Brand::name())
             );
 
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)->setPaper('a4')->output();

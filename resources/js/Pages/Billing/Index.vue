@@ -18,6 +18,7 @@ const usagePct = computed(() => {
 
 const page = usePage();
 const flash = computed(() => page.props.flash || {});
+const brand = computed(() => page.props.brand);
 
 const sub = computed(() => props.subscription || {});
 const status = computed(() => sub.value.status);
@@ -71,7 +72,7 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
     <div class="page-header">
       <div>
         <h1 class="page-title">Abonnement</h1>
-        <p class="page-subtitle">Beheer je EasyInvoice-abonnement en bekijk hoeveel dagen je nog hebt.</p>
+        <p class="page-subtitle">Beheer je {{ brand.name }}-abonnement en bekijk hoeveel dagen je nog hebt.</p>
       </div>
     </div>
 
@@ -147,7 +148,7 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
               {{ portal.processing ? 'Bezig…' : 'Abonnement beheren' }}
             </button>
             <p v-if="currentPlan === plan.key" class="plan-hint">Wijzig je betaalmethode of zeg op via het beveiligde Stripe-portaal.</p>
-            <p v-else class="plan-hint">Overstappen? Mail <a href="mailto:hallo@easyinvoice.nl" style="color:var(--brand);font-weight:500;">hallo@easyinvoice.nl</a> — wij regelen het zonder dubbele kosten.</p>
+            <p v-else class="plan-hint">Overstappen? Mail <a :href="'mailto:' + brand.email" style="color:var(--brand);font-weight:500;">{{ brand.email }}</a> — wij regelen het zonder dubbele kosten.</p>
           </template>
           <template v-else>
             <button
@@ -219,7 +220,7 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
     </div>
 
     <p class="bill-foot">
-      Vragen over je abonnement? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.
+      Vragen over je abonnement? Mail <a :href="'mailto:' + brand.email">{{ brand.email }}</a>.
     </p>
   </AppLayout>
 </template>

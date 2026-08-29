@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <title>Fout in EasyInvoice</title>
+    <title>Fout in {{ brand('name') }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; padding: 32px 16px; }
@@ -20,7 +20,7 @@
 </head>
 <body>
 <div class="wrapper"><div class="container">
-    <div class="header"><h1>⚠️ Onverwachte fout in EasyInvoice</h1></div>
+    <div class="header"><h1>⚠️ Onverwachte fout in {{ brand('name') }}</h1></div>
     <div class="body">
         <div class="msg">{{ get_class($exception) }}
 {{ $exception->getMessage() ?: '(geen melding)' }}</div>

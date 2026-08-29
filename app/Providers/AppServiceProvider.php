@@ -10,7 +10,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Globale helpers (brand() …) — hier geladen zodat er geen composer dump-autoload nodig is.
+        require_once app_path('Support/helpers.php');
     }
 
     public function boot(): void

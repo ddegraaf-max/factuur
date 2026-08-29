@@ -8,6 +8,7 @@ const props = defineProps({
 });
 
 const page = usePage();
+const brand = computed(() => page.props.brand);
 const flash = computed(() => page.props.flash?.flash || null);
 const flashError = computed(() => page.props.flash?.error || null);
 
@@ -20,10 +21,10 @@ const logout = () => {
   <div class="portal-shell">
     <header class="portal-topbar">
       <div class="portal-topbar-inner">
-        <a href="https://easyinvoice.nl" target="_blank" rel="noopener" class="portal-brand">
-          <img src="/images/easyinvoice-favicon-180.png" class="portal-logo" alt="EasyInvoice">
+        <a :href="brand.url" target="_blank" rel="noopener" class="portal-brand">
+          <img :src="brand.mark" class="portal-logo" :alt="brand.name">
           <div>
-            <div class="portal-brand-name">Easy<span>Invoice</span></div>
+            <div class="portal-brand-name">{{ brand.name }}</div>
             <div class="portal-brand-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Klantenportaal · beveiligde omgeving</div>
           </div>
         </a>
@@ -42,7 +43,7 @@ const logout = () => {
 
     <footer class="portal-footer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span>Beveiligd portaal · mogelijk gemaakt door <a href="https://easyinvoice.nl" target="_blank" rel="noopener">EasyInvoice</a></span>
+      <span>Beveiligd portaal · mogelijk gemaakt door <a :href="brand.url" target="_blank" rel="noopener">{{ brand.name }}</a></span>
     </footer>
   </div>
 </template>
@@ -76,7 +77,6 @@ const logout = () => {
   box-shadow: 0 1px 2px rgba(28,25,23,0.18);
 }
 .portal-brand-name { font-family: var(--font-display); font-weight: 800; font-size: 17px; letter-spacing: -0.02em; line-height: 1.15; color: var(--text); }
-.portal-brand-name span { color: var(--brand); }
 .portal-brand-sub { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
 .portal-brand-sub svg { width: 12px; height: 12px; color: var(--success); }
 .portal-user { display: flex; align-items: center; gap: 12px; min-width: 0; }

@@ -102,7 +102,7 @@
   geen fiscale winst-en-verliesrekening.
 </div>
 
-<div class="footer">Gegenereerd met EasyInvoice · {{ $company->name }} · Jaaroverzicht {{ $year }}</div>
+<div class="footer">Gegenereerd met {{ brand('name') }} · {{ $company->name }} · Jaaroverzicht {{ $year }}</div>
 
 </body>
 </html>

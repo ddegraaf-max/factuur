@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\MailDomainService;
 use App\Support\Audit;
+use App\Support\Brand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,7 @@ class MailDomainController extends Controller
         ]);
 
         $domain = mb_strtolower($data['domain']);
-        if (in_array($domain, ['gmail.com', 'hotmail.com', 'outlook.com', 'live.nl', 'ziggo.nl', 'kpnmail.nl', 'icloud.com', 'yahoo.com', 'easyinvoice.nl'], true)) {
+        if (in_array($domain, ['gmail.com', 'hotmail.com', 'outlook.com', 'live.nl', 'ziggo.nl', 'kpnmail.nl', 'icloud.com', 'yahoo.com', Brand::domain()], true)) {
             return back()->with('error', 'Dit werkt alleen met een eigen domeinnaam — niet met een gratis maildienst.');
         }
 
@@ -65,6 +66,6 @@ class MailDomainController extends Controller
         $this->domains->disconnect($company);
         Audit::log('updated', $company, "Eigen afzenderdomein {$domain} losgekoppeld");
 
-        return back()->with('flash', 'Losgekoppeld. Mail gaat weer uit via easyinvoice.nl, met jouw bedrijfsnaam als afzender.');
+        return back()->with('flash', 'Losgekoppeld. Mail gaat weer uit via ' . Brand::domain() . ', met jouw bedrijfsnaam als afzender.');
     }
 }

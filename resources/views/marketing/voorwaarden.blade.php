@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Algemene voorwaarden — EasyInvoice')
-@section('description', 'De algemene voorwaarden van EasyInvoice, een dienst van Creditline B.V.')
+@section('title', 'Algemene voorwaarden — ' . brand('name'))
+@section('description', 'De algemene voorwaarden van ' . brand('name') . ', een dienst van Creditline B.V.')
 
 @section('content')
 <style>
@@ -28,17 +28,17 @@
     <div class="meta">Laatst bijgewerkt: 14 juni 2026</div>
 
     <div class="entity">
-      <strong>EasyInvoice®</strong> is een dienst van<br>
+      <strong>{{ \App\Support\Brand::legalName() }}</strong> is een dienst van<br>
       <strong>Creditline B.V.</strong><br>
       Torenlaan 5B · 1402 AT Bussum · Nederland<br>
       KvK 59683198 · BTW NL853603108B01<br>
-      E-mail: <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>
+      E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
-    <p>Deze algemene voorwaarden zijn van toepassing op het gebruik van EasyInvoice, online facturatiesoftware aangeboden door Creditline B.V., gevestigd te Bussum (KvK 59683198, BTW NL853603108B01). Door een account aan te maken ga je akkoord met deze voorwaarden.</p>
+    <p>Deze algemene voorwaarden zijn van toepassing op het gebruik van {{ brand('name') }}, online facturatiesoftware aangeboden door Creditline B.V., gevestigd te Bussum (KvK 59683198, BTW NL853603108B01). Door een account aan te maken ga je akkoord met deze voorwaarden.</p>
 
     <h2>1. De dienst</h2>
-    <p>EasyInvoice is online facturatiesoftware waarmee je facturen kunt opstellen, klanten kunt beheren, btw kunt bijhouden en betalingen kunt opvolgen. We spannen ons in om de dienst beschikbaar en betrouwbaar te houden, maar kunnen geen ononderbroken beschikbaarheid garanderen.</p>
+    <p>{{ brand('name') }} is online facturatiesoftware waarmee je facturen kunt opstellen, klanten kunt beheren, btw kunt bijhouden en betalingen kunt opvolgen. We spannen ons in om de dienst beschikbaar en betrouwbaar te houden, maar kunnen geen ononderbroken beschikbaarheid garanderen.</p>
 
     <h2>2. Gratis proefperiode</h2>
     <p>Nieuwe accounts krijgen een gratis proefperiode van 14 dagen met volledige toegang tot alle functies. Tijdens de proefperiode hoef je geen betaalgegevens op te geven. Na afloop van de proefperiode is een betaald abonnement nodig om te blijven werken; je gegevens blijven bewaard.</p>
@@ -63,10 +63,10 @@
     <p>We kunnen deze voorwaarden van tijd tot tijd aanpassen. Bij belangrijke wijzigingen informeren we je per e-mail.</p>
 
     <h2>9. Toepasselijk recht</h2>
-    <p>Op deze voorwaarden en het gebruik van EasyInvoice is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement waar Creditline B.V. is gevestigd.</p>
+    <p>Op deze voorwaarden en het gebruik van {{ brand('name') }} is Nederlands recht van toepassing. Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement waar Creditline B.V. is gevestigd.</p>
 
     <h2>10. Contact</h2>
-    <p>Vragen over deze voorwaarden? Mail ons via <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a> of bekijk de <a href="{{ route('contact') }}">contactpagina</a>.</p>
+    <p>Vragen over deze voorwaarden? Mail ons via <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> of bekijk de <a href="{{ route('contact') }}">contactpagina</a>.</p>
 
   </div>
 </section>

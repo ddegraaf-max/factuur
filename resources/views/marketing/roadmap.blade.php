@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Roadmap van EasyInvoice — waar we nu aan werken')
-@section('description', 'Waar we aan werken. Bekijk wat er op de planning staat voor EasyInvoice.')
+@section('title', 'Roadmap van ' . brand('name') . ' — waar we nu aan werken')
+@section('description', 'Waar we aan werken. Bekijk wat er op de planning staat voor ' . brand('name') . '.')
 
 @push('styles')
 <style>
@@ -23,7 +23,7 @@
   <div class="container page-hero-inner">
     <div class="eyebrow">Roadmap</div>
     <h1>Waar we aan werken</h1>
-    <p class="lead">EasyInvoice wordt gebouwd samen met onze gebruikers. Dit staat op de planning — heb je een wens? Laat het ons weten.</p>
+    <p class="lead">{{ brand('name') }} wordt gebouwd samen met onze gebruikers. Dit staat op de planning — heb je een wens? Laat het ons weten.</p>
     <div style="margin-top:24px;"><a href="{{ route('contact') }}" class="btn btn-primary">Deel je idee</a></div>
   </div>
 </section>
@@ -33,7 +33,7 @@
     <div class="road-grid">
       <div>
         <h2 class="road-head road-idea"><span class="road-dot"></span> In onderzoek</h2>
-        <div class="road-card"><h3>BTW-aangifte direct indienen</h3><p>De kwartaalaangifte omzetbelasting rechtstreeks vanuit EasyInvoice indienen bij de Belastingdienst.</p></div>
+        <div class="road-card"><h3>BTW-aangifte direct indienen</h3><p>De kwartaalaangifte omzetbelasting rechtstreeks vanuit {{ brand('name') }} indienen bij de Belastingdienst.</p></div>
         <div class="road-card"><h3>Meerdere valuta</h3><p>Factureren in dollars, ponden of andere valuta — met de juiste BTW-behandeling en de wisselkoers vastgelegd op de factuur.</p></div>
       </div>
       <div>

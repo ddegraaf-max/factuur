@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Services\InvoiceManager;
 use App\Services\QuoteManager;
+use App\Support\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +47,7 @@ class McpController extends Controller
 
         $company = Company::where('mcp_token', $token)->first();
         if (! $company) {
-            return $this->rpcError(null, -32000, 'Onbekende of ingetrokken koppeling. Maak in EasyInvoice (Instellingen → Koppelingen) een nieuwe koppel-URL aan.');
+            return $this->rpcError(null, -32000, 'Onbekende of ingetrokken koppeling. Maak in ' . Brand::name() . ' (Instellingen → Koppelingen) een nieuwe koppel-URL aan.');
         }
 
         $message = $request->json()->all();
@@ -79,15 +80,15 @@ class McpController extends Controller
             'protocolVersion' => $version,
             'capabilities' => ['tools' => new \stdClass()],
             'serverInfo' => [
-                'name' => 'EasyInvoice',
+                'name' => Brand::name(),
                 'version' => (string) config('app.version', '1.0'),
             ],
-            'instructions' => 'EasyInvoice is de facturatie-administratie van de gebruiker. '
+            'instructions' => Brand::name() . ' is de facturatie-administratie van de gebruiker. '
                 . 'Gebruik klanten_zoeken om de juiste klant te vinden voordat je een offerte of factuur aanmaakt. '
-                . 'Alles wat je aanmaakt is een concept: de gebruiker controleert en verstuurt het zelf in EasyInvoice. '
+                . 'Alles wat je aanmaakt is een concept: de gebruiker controleert en verstuurt het zelf in ' . Brand::name() . '. '
                 . 'Prijzen geef je altijd exclusief btw op, met het btw-tarief (21, 9 of 0) per regel. '
                 . 'Heb je een uitgebreid offertedocument of plan van aanpak geschreven? Stuur het mee als bijlage '
-                . '(veld "bijlage" met "tekst" in markdown) — EasyInvoice maakt er een nette PDF van die met de mail naar de klant meegaat.',
+                . '(veld "bijlage" met "tekst" in markdown) — ' . Brand::name() . ' maakt er een nette PDF van die met de mail naar de klant meegaat.',
         ]);
     }
 
@@ -122,7 +123,7 @@ class McpController extends Controller
             ],
             [
                 'name' => 'offerte_aanmaken',
-                'description' => 'Maak een CONCEPT-offerte aan voor een bestaande klant. Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. het volledige offertedocument of plan van aanpak): EasyInvoice maakt er een PDF in de eigen huisstijl van die met de offertemail meegaat. Ook een handelsnaam kiezen kan. De gebruiker controleert en verstuurt alles zelf in EasyInvoice.',
+                'description' => 'Maak een CONCEPT-offerte aan voor een bestaande klant. Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. het volledige offertedocument of plan van aanpak): ' . Brand::name() . ' maakt er een PDF in de eigen huisstijl van die met de offertemail meegaat. Ook een handelsnaam kiezen kan. De gebruiker controleert en verstuurt alles zelf in ' . Brand::name() . '.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
@@ -141,7 +142,7 @@ class McpController extends Controller
             ],
             [
                 'name' => 'factuur_aanmaken',
-                'description' => 'Maak een CONCEPT-factuur aan voor een bestaande klant (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. een urenspecificatie): EasyInvoice maakt er een PDF in de eigen huisstijl van die met de factuurmail meegaat. De gebruiker controleert en verstuurt alles zelf in EasyInvoice.',
+                'description' => 'Maak een CONCEPT-factuur aan voor een bestaande klant (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. een urenspecificatie): ' . Brand::name() . ' maakt er een PDF in de eigen huisstijl van die met de factuurmail meegaat. De gebruiker controleert en verstuurt alles zelf in ' . Brand::name() . '.',
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
@@ -168,12 +169,14 @@ class McpController extends Controller
     /** Schema voor de optionele bijlage bij offerte_aanmaken / factuur_aanmaken. */
     protected function attachmentSchema(string $doc): array
     {
+        $brand = Brand::name();
+
         return [
             'type' => 'object',
-            'description' => "Optioneel: een bijlage die met de {$doc} wordt meegestuurd naar de klant. Geef ÓF \"tekst\" (bijv. het volledige offertedocument of een plan van aanpak in markdown — EasyInvoice maakt er een nette PDF van) ÓF \"base64\" met \"bestandsnaam\" voor een echt bestand (PDF/PNG/JPG/WEBP, max 10 MB).",
+            'description' => "Optioneel: een bijlage die met de {$doc} wordt meegestuurd naar de klant. Geef ÓF \"tekst\" (bijv. het volledige offertedocument of een plan van aanpak in markdown — {$brand} maakt er een nette PDF van) ÓF \"base64\" met \"bestandsnaam\" voor een echt bestand (PDF/PNG/JPG/WEBP, max 10 MB).",
             'properties' => [
                 'titel' => ['type' => 'string', 'description' => 'Titel van het document (wordt ook de bestandsnaam), bijv. "Plan van aanpak".'],
-                'tekst' => ['type' => 'string', 'description' => 'De documenttekst in markdown of platte tekst — EasyInvoice zet dit om naar een verzorgde PDF.'],
+                'tekst' => ['type' => 'string', 'description' => 'De documenttekst in markdown of platte tekst — ' . $brand . ' zet dit om naar een verzorgde PDF.'],
                 'bestandsnaam' => ['type' => 'string', 'description' => 'Bestandsnaam inclusief extensie (alleen samen met base64).'],
                 'base64' => ['type' => 'string', 'description' => 'De base64-inhoud van het bestand (alleen voor echte bestanden; gebruik anders "tekst").'],
             ],
@@ -214,14 +217,14 @@ class McpController extends Controller
         } elseif (filled($bijlage['base64'] ?? null)) {
             $binary = base64_decode(preg_replace('/\s+/', '', (string) $bijlage['base64']), true);
             if ($binary === false || strlen($binary) === 0) {
-                throw new \DomainException('De bijlage kon niet worden gelezen (ongeldige base64). Gebruik anders "tekst" — dan maakt EasyInvoice er zelf een PDF van.');
+                throw new \DomainException('De bijlage kon niet worden gelezen (ongeldige base64). Gebruik anders "tekst" — dan maakt ' . Brand::name() . ' er zelf een PDF van.');
             }
             if (strlen($binary) > 10 * 1024 * 1024) {
                 throw new \DomainException('De bijlage is groter dan 10 MB.');
             }
             $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'application/octet-stream';
             if (! in_array($mime, ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'], true)) {
-                throw new \DomainException('Alleen PDF-, PNG-, JPG- of WEBP-bijlagen zijn toegestaan. Gebruik anders "tekst" — dan maakt EasyInvoice er zelf een PDF van.');
+                throw new \DomainException('Alleen PDF-, PNG-, JPG- of WEBP-bijlagen zijn toegestaan. Gebruik anders "tekst" — dan maakt ' . Brand::name() . ' er zelf een PDF van.');
             }
             $filename = mb_substr(trim((string) ($bijlage['bestandsnaam'] ?? 'bijlage.pdf')), 0, 255) ?: 'bijlage.pdf';
         } else {
@@ -247,7 +250,7 @@ class McpController extends Controller
     {
         // De Claude-koppeling hoort bij de AI-functies (Slim-abonnement).
         if (! $company->hasAiAccess()) {
-            return $this->toolText($id, 'De Claude-koppeling zit in het Slim-abonnement van EasyInvoice. Upgrade via Instellingen → Abonnement.', true);
+            return $this->toolText($id, 'De Claude-koppeling zit in het Slim-abonnement van ' . Brand::name() . '. Upgrade via Instellingen → Abonnement.', true);
         }
 
         $name = $params['name'] ?? '';
@@ -268,7 +271,7 @@ class McpController extends Controller
         } catch (\Throwable $e) {
             Log::error('MCP-tool mislukt', ['company' => $company->id, 'tool' => $name, 'error' => $e->getMessage()]);
 
-            return $this->toolText($id, 'Er ging iets mis in EasyInvoice. Probeer het opnieuw of maak het document handmatig aan.', true);
+            return $this->toolText($id, 'Er ging iets mis in ' . Brand::name() . '. Probeer het opnieuw of maak het document handmatig aan.', true);
         }
     }
 
@@ -287,8 +290,8 @@ class McpController extends Controller
 
         if ($customers->isEmpty()) {
             return $term === ''
-                ? 'Er staan nog geen klanten in deze administratie. Voeg eerst een klant toe in EasyInvoice (Verkoop → Klanten).'
-                : "Geen klanten gevonden voor \"{$term}\". Controleer de spelling of voeg de klant eerst toe in EasyInvoice (Verkoop → Klanten).";
+                ? 'Er staan nog geen klanten in deze administratie. Voeg eerst een klant toe in ' . Brand::name() . ' (Verkoop → Klanten).'
+                : "Geen klanten gevonden voor \"{$term}\". Controleer de spelling of voeg de klant eerst toe in " . Brand::name() . ' (Verkoop → Klanten).';
         }
 
         $lines = $customers->map(fn ($c) => '- ' . $c->name
@@ -349,7 +352,7 @@ class McpController extends Controller
             return Customer::withoutGlobalScope('company')->findOrFail($matches->first()->id);
         }
         if ($matches->isEmpty()) {
-            throw new \DomainException("Klant \"{$name}\" staat niet in de administratie. Gebruik klanten_zoeken om de juiste naam te vinden, of voeg de klant eerst toe in EasyInvoice.");
+            throw new \DomainException("Klant \"{$name}\" staat niet in de administratie. Gebruik klanten_zoeken om de juiste naam te vinden, of voeg de klant eerst toe in " . Brand::name() . '.');
         }
 
         throw new \DomainException("Meerdere klanten matchen op \"{$name}\": "

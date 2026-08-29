@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 44" width="60" height="44" role="img" aria-label="Lopra">
+  <title>Lopra</title>
+  <rect x="0" y="12" width="46" height="10" rx="5" fill="#1C4E7A"/>
+  <circle cx="8" cy="17" r="13" fill="none" stroke="#1C4E7A" stroke-width="10"/>
+  <rect x="34" y="22" width="7" height="12" rx="2" fill="#1C4E7A"/>
+  <rect x="46" y="22" width="7" height="18" rx="2" fill="#C8752A"/>
+</svg>

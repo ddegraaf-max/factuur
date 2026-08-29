@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="nl" data-brand="{{ \App\Support\Brand::key() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="@yield('description', 'EasyInvoice — eenvoudige facturatie voor Nederlandse ondernemers. Facturen, BTW, klanten en incasso vanaf € 12,10 per maand (incl. 21% btw), met AI vanaf € 21,18.')">
-<title>@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')</title>
+{{-- Merknaam, logo's en teksten komen uit config/brand.php (EasyInvoice of Lopra). --}}
+<meta name="description" content="@yield('description', brand('seo_description'))">
+<title>@yield('title', brand('seo_title'))</title>
 
 {{-- SEO: canonical + social preview + structured data --}}
 <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="EasyInvoice">
+<meta property="og:site_name" content="{{ brand('name') }}">
 <meta property="og:locale" content="nl_NL">
 <meta property="og:url" content="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
-<meta property="og:title" content="@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')">
-<meta property="og:description" content="@yield('description', 'Eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW en incasso — met AI die je administratie invult.')">
-<meta property="og:image" content="{{ url('/images/og-easyinvoice.png') }}">
+<meta property="og:title" content="@yield('title', brand('seo_title'))">
+<meta property="og:description" content="@yield('description', brand('og_description'))">
+<meta property="og:image" content="{{ \App\Support\Brand::asset('og_image') }}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="@yield('title', 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand')">
-<meta name="twitter:description" content="@yield('description', 'Eenvoudige facturatie voor Nederlandse ondernemers. Facturen, offertes, BTW en incasso — met AI die je administratie invult.')">
-<meta name="twitter:image" content="{{ url('/images/og-easyinvoice.png') }}">
+<meta name="twitter:title" content="@yield('title', brand('seo_title'))">
+<meta name="twitter:description" content="@yield('description', brand('og_description'))">
+<meta name="twitter:image" content="{{ \App\Support\Brand::asset('og_image') }}">
 <script type="application/ld+json">
 {
   "@@context": "https://schema.org",
   "@@graph": [
     {
       "@@type": "SoftwareApplication",
-      "name": "EasyInvoice",
+      "name": "{{ brand('name') }}",
       "url": "{{ url('/') }}",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
       "inLanguage": "nl",
-      "description": "Online facturatieprogramma voor Nederlandse ondernemers: facturen, offertes met digitale ondertekening, BTW-overzicht, incasso, urenregistratie en AI die de administratie invult.",
-      "image": "{{ url('/images/og-easyinvoice.png') }}",
+      "description": "{{ brand('app_description') }}",
+      "image": "{{ \App\Support\Brand::asset('og_image') }}",
       "offers": [
         {
           "@@type": "Offer",
@@ -54,19 +55,22 @@
     },
     {
       "@@type": "Organization",
-      "name": "EasyInvoice",
+      "name": "{{ brand('name') }}",
       "url": "{{ url('/') }}",
-      "logo": "{{ url('/images/easyinvoice-favicon-512.png') }}",
-      "email": "hallo@easyinvoice.nl",
+      "logo": "{{ \App\Support\Brand::asset('favicon_512') }}",
+      "email": "{{ brand('email') }}",
       "address": { "@@type": "PostalAddress", "addressLocality": "Bussum", "addressCountry": "NL" }
     }
   ]
 }
 </script>
 
-<link rel="icon" type="image/png" sizes="32x32" href="/images/easyinvoice-favicon-32.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/images/easyinvoice-favicon-512.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/images/easyinvoice-favicon-180.png">
+@if(brand('favicon_svg'))
+<link rel="icon" type="image/svg+xml" href="{{ brand('favicon_svg') }}">
+@endif
+<link rel="icon" type="image/png" sizes="32x32" href="{{ brand('favicon_32') }}">
+<link rel="icon" type="image/png" sizes="512x512" href="{{ brand('favicon_512') }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ brand('apple_touch') }}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 {{-- Lettertypen laden zonder de eerste render te blokkeren (LCP): met display=swap
@@ -478,6 +482,13 @@
   .footer-trademark a:hover { color: rgba(255,255,255,0.8); }
 </style>
 @stack('styles')
+@if(brand('fonts_url'))
+<link href="{{ brand('fonts_url') }}" rel="stylesheet">
+@endif
+@if(brand('theme_css'))
+{{-- Merkkleuren bovenop de standaard-tokens; html[data-brand] wint van :root. --}}
+<link rel="stylesheet" href="{{ brand('theme_css') }}?v={{ \App\Support\Brand::versionNumber() }}">
+@endif
 </head>
 <body>
 
@@ -486,11 +497,11 @@
   <input type="checkbox" id="navToggle" class="nav-toggle-cb" aria-label="Menu openen of sluiten">
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
-      <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice logo">
-      EasyInvoice
+      <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
+      {{ brand('name') }}
     </a>
     <nav class="nav-links">
-      <a href="/#waarom" class="nav-link">Waarom EasyInvoice</a>
+      <a href="/#waarom" class="nav-link">Waarom {{ brand('name') }}</a>
       <a href="/#functies" class="nav-link">Functies</a>
       <a href="{{ route('ai') }}" class="nav-link">Factureren met AI</a>
       <a href="/#prijzen" class="nav-link">Prijzen</a>
@@ -504,7 +515,7 @@
     <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
   </div>
   <div class="nav-mobile">
-    <a href="/#waarom" class="nav-mobile-link">Waarom EasyInvoice</a>
+    <a href="/#waarom" class="nav-mobile-link">Waarom {{ brand('name') }}</a>
     <a href="/#functies" class="nav-mobile-link">Functies</a>
     <a href="{{ route('ai') }}" class="nav-mobile-link">Factureren met AI</a>
     <a href="/#prijzen" class="nav-mobile-link">Prijzen</a>
@@ -525,11 +536,11 @@
     <div class="footer-grid">
       <div class="footer-brand-block">
         <div class="footer-brand">
-          <img src="/images/easyinvoice-favicon-180.png" alt="EasyInvoice logo">
-          EasyInvoice<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>
+          <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
+          {{ brand('name') }}@if(brand('registered'))<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>@endif
         </div>
         <div class="footer-desc">
-          Eenvoudige facturatie voor Nederlandse ondernemers. Vanaf € 12,10 per maand (incl. 21% btw). Gemaakt in Bussum.
+          {{ brand('footer_description') }}
         </div>
         <div class="footer-legal">
           Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Nederland
@@ -539,13 +550,15 @@
       <div>
         <div class="footer-col-title">Product</div>
         <ul class="footer-links">
-          <li><a href="/#waarom">Waarom EasyInvoice</a></li>
+          <li><a href="/#waarom">Waarom {{ brand('name') }}</a></li>
           <li><a href="/#functies">Functies</a></li>
           <li><a href="{{ route('ai') }}">Factureren met AI</a></li>
           <li><a href="/#prijzen">Prijzen</a></li>
           <li><a href="{{ route('changelog') }}">Wat is nieuw</a></li>
           <li><a href="{{ route('roadmap') }}">Roadmap</a></li>
-          <li><a href="{{ route('confusion') }}">Zocht u een ander EasyInvoice?</a></li>
+          @if(\App\Support\Brand::watchesTrademark())
+          <li><a href="{{ route('confusion') }}">Zocht u een ander {{ brand('name') }}?</a></li>
+          @endif
         </ul>
       </div>
 
@@ -577,14 +590,14 @@
           <li><a href="{{ route('helpcentrum') }}">Helpcentrum</a></li>
           <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
           <li><a href="{{ route('faq') }}">Veelgestelde vragen</a></li>
-          <li><a href="mailto:hallo@easyinvoice.nl">E-mail support</a></li>
+          <li><a href="mailto:{{ brand('email') }}">E-mail support</a></li>
           <li><a href="{{ route('status') }}">Status</a></li>
         </ul>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01 · <span class="footer-version">{{ config('app.version') }}</span></div>
+      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01 · <span class="footer-version">{{ \App\Support\Brand::version() }}</span></div>
       <div class="footer-bottom-links">
         <a href="{{ route('voorwaarden') }}">Algemene voorwaarden</a>
         <a href="{{ route('privacy') }}">Privacybeleid</a>
@@ -593,10 +606,12 @@
       </div>
     </div>
 
+    @if($tm = brand('trademark'))
     <div class="footer-trademark">
-      EasyInvoice&reg; is een geregistreerd Benelux-merk van Creditline B.V. &mdash;
-      <a href="https://www.boip.int/nl/merkenregister?app=%2Fitem%2Fbx1485323&amp;query=easyinvoice" target="_blank" rel="noopener">BOIP-inschrijving nr.&nbsp;1485323</a>.
+      {{ brand('name') }}&reg; is een geregistreerd Benelux-merk van Creditline B.V. &mdash;
+      <a href="{{ $tm['url'] }}" target="_blank" rel="noopener">BOIP-inschrijving nr.&nbsp;{{ $tm['number'] }}</a>.
     </div>
+    @endif
   </div>
 </footer>
 

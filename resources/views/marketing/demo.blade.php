@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Demo — bekijk EasyInvoice van binnen')
-@section('description', 'Klik door de échte EasyInvoice met voorbeeldgegevens. Geen account, geen creditcard — je bent er in één klik.')
+@section('title', 'Demo — bekijk ' . brand('name') . ' van binnen')
+@section('description', 'Klik door de échte ' . brand('name') . ' met voorbeeldgegevens. Geen account, geen creditcard — je bent er in één klik.')
 
 @push('styles')
 <style>
@@ -28,7 +28,7 @@
     <div class="eyebrow">Demo</div>
     <h1>Kijk eerst rond, beslis daarna</h1>
     <p class="lead">
-      Dit is geen filmpje en geen plaatje: je stapt in de <strong>echte EasyInvoice</strong>, gevuld met
+      Dit is geen filmpje en geen plaatje: je stapt in de <strong>echte {{ brand('name') }}</strong>, gevuld met
       voorbeeldgegevens van een fictief webdesignbureau. Maak facturen, registreer betalingen,
       bekijk het incassodossier — precies zoals je het straks zelf gebruikt.
     </p>

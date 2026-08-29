@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use App\Models\Invitation;
 use App\Models\User;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -22,10 +23,10 @@ class TeamInviteMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $company = $this->invitation->company?->name ?? 'EasyInvoice';
+        $company = $this->invitation->company?->name ?? Brand::name();
 
         return new Envelope(
-            subject: "{$this->inviterName} nodigt je uit voor {$company} op EasyInvoice",
+            subject: "{$this->inviterName} nodigt je uit voor {$company} op " . Brand::name(),
         );
     }
 

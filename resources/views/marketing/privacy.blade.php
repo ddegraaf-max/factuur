@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Privacybeleid EasyInvoice — zo gaan we met je gegevens om')
-@section('description', 'Hoe EasyInvoice omgaat met je persoonsgegevens: wat we opslaan, waarom, hoelang en met welke verwerkers. AVG-compliant en zonder verkoop van data.')
+@section('title', 'Privacybeleid ' . brand('name') . ' — zo gaan we met je gegevens om')
+@section('description', 'Hoe ' . brand('name') . ' omgaat met je persoonsgegevens: wat we opslaan, waarom, hoelang en met welke verwerkers. AVG-compliant en zonder verkoop van data.')
 
 @section('content')
 <style>
@@ -29,10 +29,10 @@
 
     <div class="entity">
       Verwerkingsverantwoordelijke:<br>
-      <strong>Creditline B.V.</strong> (handelend onder de naam <strong>EasyInvoice®</strong>)<br>
+      <strong>Creditline B.V.</strong> (handelend onder de naam <strong>{{ \App\Support\Brand::legalName() }}</strong>)<br>
       Torenlaan 5B · 1402 AT Bussum · Nederland<br>
       KvK 59683198 · BTW NL853603108B01<br>
-      Privacyvragen: <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>
+      Privacyvragen: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
     <p>Creditline B.V. respecteert je privacy en verwerkt persoonsgegevens conform de Algemene Verordening Gegevensbescherming (AVG/GDPR). In dit beleid lees je welke gegevens we verzamelen en waarom.</p>
@@ -40,7 +40,7 @@
     <h2>Welke gegevens we verwerken</h2>
     <ul>
       <li><strong>Accountgegevens:</strong> naam, e-mailadres en bedrijfsgegevens (KvK, btw, IBAN).</li>
-      <li><strong>Factuurgegevens:</strong> de facturen, klanten en producten die je in EasyInvoice invoert.</li>
+      <li><strong>Factuurgegevens:</strong> de facturen, klanten en producten die je in {{ brand('name') }} invoert.</li>
       <li><strong>Gebruiksgegevens:</strong> technische gegevens zoals IP-adres en logbestanden, om de dienst veilig en betrouwbaar te houden.</li>
     </ul>
 
@@ -62,13 +62,13 @@
     <p>We bewaren je gegevens zolang je een account hebt en daarna niet langer dan wettelijk verplicht of redelijkerwijs noodzakelijk.</p>
 
     <h2>Jouw rechten</h2>
-    <p>Je hebt het recht op inzage, correctie, verwijdering en overdraagbaarheid van je gegevens. Je kunt je data op elk moment exporteren vanuit je account. Voor verzoeken mail je <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>. Ook kun je een klacht indienen bij de Autoriteit Persoonsgegevens.</p>
+    <p>Je hebt het recht op inzage, correctie, verwijdering en overdraagbaarheid van je gegevens. Je kunt je data op elk moment exporteren vanuit je account. Voor verzoeken mail je <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>. Ook kun je een klacht indienen bij de Autoriteit Persoonsgegevens.</p>
 
     <h2>Cookies</h2>
     <p>We gebruiken alleen functionele en analytische cookies. Lees meer op onze <a href="{{ route('cookies') }}">cookiepagina</a>.</p>
 
     <h2>Contact</h2>
-    <p>Vragen over je privacy? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a>.</p>
+    <p>Vragen over je privacy? Mail <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</p>
 
   </div>
 </section>

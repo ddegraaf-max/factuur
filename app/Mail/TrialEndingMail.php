@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Company;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -23,7 +24,7 @@ class TrialEndingMail extends Mailable
     {
         $subject = $this->daysLeft === 1
             ? 'Je proefperiode eindigt morgen'
-            : "Nog {$this->daysLeft} dagen in je EasyInvoice-proefperiode";
+            : "Nog {$this->daysLeft} dagen in je " . Brand::name() . '-proefperiode';
 
         return new Envelope(subject: $subject);
     }

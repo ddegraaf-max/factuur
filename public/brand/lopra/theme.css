@@ -1,0 +1,66 @@
+/* Lopra — kleuren en typografie bovenop de standaard-ontwerptokens.
+ * Wordt alleen geladen als APP_BRAND=lopra (zie config/brand.php);
+ * html[data-brand] wint van :root, dus de volgorde van laden maakt niet uit.
+ *
+ * Inktblauw #1C4E7A · Diepblauw #132F49 · Koper #C8752A (spaarzaam, alleen de
+ * belangrijkste actie) · Zand #F4F2EE · Grafiet #3A3733 · Gedempt #8A8681 · Rand #D6D3CE
+ */
+html[data-brand="lopra"] {
+  --brand: #1C4E7A;
+  --brand-dark: #163E62;
+  --brand-darker: #132F49;
+  --brand-tint: #EEF3F8;
+  --brand-tint-2: #DCE6F0;
+  --brand-border: #BFD0E0;
+
+  --accent: #C8752A;
+  --accent-dark: #A85E1E;
+  --accent-light: #E0A55C;
+  --accent-tint: #FBF1E7;
+
+  --bg: #F4F2EE;
+  --surface: #FFFFFF;
+  --surface-2: #EDEAE4;
+  --surface-3: #E4E0D9;
+  --border: #D6D3CE;
+  --border-strong: #C4C0BA;
+
+  --text: #2A2724;
+  --text-2: #3A3733;
+  --text-3: #8A8681;
+  --text-4: #ABA7A1;
+
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+
+  --shadow-brand: 0 12px 40px rgba(28, 78, 122, 0.18);
+}
+
+/* Koper voor de primaire actie; blauw blijft voor navigatie, koppen en links. */
+html[data-brand="lopra"] .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px rgba(200, 117, 42, 0.22);
+}
+html[data-brand="lopra"] .btn-primary:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  box-shadow: 0 6px 20px rgba(200, 117, 42, 0.32);
+}
+html[data-brand="lopra"] .btn-white { color: var(--brand); }
+
+/* Marketing-layout: rode gloed en schaduwen die hard in de CSS staan. */
+html[data-brand="lopra"] .eyebrow::before { box-shadow: 0 0 0 4px rgba(28, 78, 122, 0.14); }
+html[data-brand="lopra"] .hero::before { background: radial-gradient(circle, rgba(28, 78, 122, 0.07) 0%, transparent 60%); }
+html[data-brand="lopra"] .hero h1,
+html[data-brand="lopra"] .section-header h2,
+html[data-brand="lopra"] .page-hero h1 { color: var(--brand-darker); }
+html[data-brand="lopra"] .hero h1 .accent { color: var(--accent); }
+html[data-brand="lopra"] .nav-brand img,
+html[data-brand="lopra"] .footer-brand img { border-radius: 8px; }
+html[data-brand="lopra"] footer { background: #132F49; }
+html[data-brand="lopra"] .cta-final { background: linear-gradient(135deg, #1C4E7A 0%, #132F49 100%); }
+
+/* Display-letter iets ruimer: Fraunces oogt compacter dan Bricolage. */
+html[data-brand="lopra"] h1,
+html[data-brand="lopra"] h2,
+html[data-brand="lopra"] h3 { letter-spacing: -0.01em; }

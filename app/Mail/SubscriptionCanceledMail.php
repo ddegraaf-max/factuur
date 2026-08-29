@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Company;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -23,7 +24,7 @@ class SubscriptionCanceledMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Je EasyInvoice-abonnement is opgezegd',
+            subject: 'Je ' . Brand::name() . '-abonnement is opgezegd',
         );
     }
 

@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\Quote;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -37,7 +38,7 @@ class QuoteMail extends Mailable
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::quoteVars($this->quote, $company))
                 : __('doc.mail_quote_subject', [
                     'number' => $this->quote->number,
-                    'company' => $company->name ?? 'EasyInvoice',
+                    'company' => $company->name ?? Brand::name(),
                 ]),
         );
     }

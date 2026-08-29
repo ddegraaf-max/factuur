@@ -1,8 +1,10 @@
 <script setup>
-import { Head, router } from '@inertiajs/vue3';
+import { Head, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 import { computed } from 'vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   year: Number,
@@ -84,7 +86,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div>
         <strong>Dit is de basis, nog geen complete fiscale winst-en-verliesrekening.</strong>
-        Dit overzicht bevat alles wat je in EasyInvoice registreert: omzet (factuurdatum, excl. btw, creditnota's negatief),
+        Dit overzicht bevat alles wat je in {{ brand.name }} registreert: omzet (factuurdatum, excl. btw, creditnota's negatief),
         ingeboekte kosten en de kilometeraftrek (€ 0,23/km voor privévervoermiddelen). Wat je boekhouder nog toevoegt vóór de
         aangifte inkomstenbelasting: <b>afschrijvingen</b> (bijv. een bus of apparatuur), eventuele <b>loonkosten</b>,
         <b>bijtelling</b> bij een zakelijke auto, en de <b>ondernemersaftrekken</b> (zelfstandigenaftrek, startersaftrek,

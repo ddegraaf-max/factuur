@@ -30,7 +30,17 @@ use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'landing')->name('home');
+// Homepage per merk (config/brand.php): EasyInvoice en Lopra hebben elk een eigen landingspagina.
+Route::get('/', fn () => view(\App\Support\Brand::is('lopra') ? 'lopra.landing' : 'landing'))->name('home');
+
+// PWA-manifest en robots.txt per merk — geen statische bestanden, want naam,
+// iconen, kleuren en de sitemap-URL verschillen per omgeving.
+Route::get('/manifest.webmanifest', fn () => response()->json(
+    \App\Support\Brand::manifest(), 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+))->name('manifest');
+Route::get('/robots.txt', fn () => response(
+    "User-agent: *\nDisallow:\n\nSitemap: " . \App\Support\Brand::url('sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']
+))->name('robots');
 
 // ---------- DEMO-OMGEVING ----------
 // Elke bezoeker krijgt een eigen sandbox met voorbeeldgegevens en ziet daarin
@@ -49,6 +59,13 @@ Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum');
 Route::get('/helpcentrum/{slug}', function (string $slug) {
     $articles = config('help.articles');
     abort_unless(isset($articles[$slug]), 404);
+
+    // Merknaam, -adres en -domein invullen in de vaste teksten ({brand}, {brand_email}, {brand_domain}).
+    array_walk_recursive($articles, function (&$value) {
+        if (is_string($value)) {
+            $value = \App\Support\Brand::fill($value);
+        }
+    });
 
     return view('marketing.help-article', [
         'slug' => $slug,
@@ -75,6 +92,7 @@ Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders');
 
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
+    $brand = \App\Support\Brand::name();
     $ov = [
         'wefact' => [
             'name' => 'WeFact',
@@ -92,13 +110,13 @@ Route::get('/overstappen-van/{pakket}', function (string $pakket) {
                 ['AI: bonnen en inkoopfacturen automatisch inlezen', 'Niet standaard', 'In Slim: bonherkenning, Postvak IN en offerte uit tekst'],
                 ['Auditfile (XAF 3.2) voor de accountant', 'Ondersteund', 'Inbegrepen, per boekjaar'],
             ],
-            'compare_note' => 'Vergelijking op hoofdlijnen; controleer de actuele voorwaarden van WeFact op hun eigen website. EasyInvoice Basis: € 10 per maand excl. btw (€ 12,10 incl.), maandelijks opzegbaar.',
+            'compare_note' => 'Vergelijking op hoofdlijnen; controleer de actuele voorwaarden van WeFact op hun eigen website. ' . $brand . ' Basis: € 10 per maand excl. btw (€ 12,10 incl.), maandelijks opzegbaar.',
         ],
         'moneybird' => [
             'name' => 'Moneybird',
-            'intro' => 'Moneybird is een volledig boekhoudpakket. Wil je vooral snel en netjes factureren, offertes laten ondertekenen en je btw op orde hebben — zonder de complexiteit van een grootboek — dan is EasyInvoice lichter, sneller en goedkoper.',
+            'intro' => 'Moneybird is een volledig boekhoudpakket. Wil je vooral snel en netjes factureren, offertes laten ondertekenen en je btw op orde hebben — zonder de complexiteit van een grootboek — dan is ' . $brand . ' lichter, sneller en goedkoper.',
             'export' => 'Ga in Moneybird naar Contacten → Exporteren (CSV) en naar Producten → Exporteren. Openstaande facturen: Verkoopfacturen → filter "Openstaand" → Exporteren als CSV.',
-            'compare_intro' => 'Waar EasyInvoice bewust anders is dan een boekhoudpakket.',
+            'compare_intro' => 'Waar ' . $brand . ' bewust anders is dan een boekhoudpakket.',
             'rows' => [
                 ['Opzet', 'Volledige boekhouding met grootboek en journaalposten', 'Facturatie-eerst: factureren, innen, btw — de boekhouder krijgt een XAF-auditfile'],
                 ['Facturen en offertes', 'Ondersteund', 'Onbeperkt, met digitale ondertekening en klantenportaal'],
@@ -113,9 +131,9 @@ Route::get('/overstappen-van/{pakket}', function (string $pakket) {
         ],
         'e-boekhouden' => [
             'name' => 'e-Boekhouden.nl',
-            'intro' => 'e-Boekhouden.nl is sterk in boekhouden, maar factureren en offertes voelen er vaak als bijzaak. EasyInvoice draait dat om: alles wat met verkopen, innen en klantcontact te maken heeft staat centraal — en je boekhouder krijgt precies wat hij nodig heeft.',
+            'intro' => 'e-Boekhouden.nl is sterk in boekhouden, maar factureren en offertes voelen er vaak als bijzaak. ' . $brand . ' draait dat om: alles wat met verkopen, innen en klantcontact te maken heeft staat centraal — en je boekhouder krijgt precies wat hij nodig heeft.',
             'export' => 'Ga in e-Boekhouden.nl naar Relaties → Exporteren (CSV) en naar Producten/Artikelen → Exporteren. Openstaande facturen: Facturen → Openstaande posten → Exporteren.',
-            'compare_intro' => 'Waar EasyInvoice bewust anders is dan een boekhoudpakket.',
+            'compare_intro' => 'Waar ' . $brand . ' bewust anders is dan een boekhoudpakket.',
             'rows' => [
                 ['Opzet', 'Boekhouding met grootboek', 'Facturatie-eerst; auditfile (XAF) en exports voor de boekhouding'],
                 ['Offertes met digitale handtekening', 'Beperkt', 'Inbegrepen, met bewijsdossier en automatische bevestiging'],
@@ -203,8 +221,14 @@ Route::view('/cookies', 'marketing.cookies')->name('cookies');
 Route::view('/verwerkersovereenkomst', 'marketing.verwerkersovereenkomst')->name('verwerkersovereenkomst');
 
 // Merkbewaking: "Zocht u een ander EasyInvoice?" — spontaan bewijs van verwarring, door derden zelf vastgelegd.
-Route::get('/zocht-u-een-ander-easyinvoice', fn () => view('marketing.verwarring'))->name('confusion');
+// Alleen voor het geregistreerde merk (brand_watch in config/brand.php); bij Lopra bestaat de pagina niet.
+Route::get('/zocht-u-een-ander-easyinvoice', function () {
+    abort_unless(\App\Support\Brand::watchesTrademark(), 404);
+
+    return view('marketing.verwarring');
+})->name('confusion');
 Route::post('/zocht-u-een-ander-easyinvoice', function (\Illuminate\Http\Request $request) {
+    abort_unless(\App\Support\Brand::watchesTrademark(), 404);
     $data = $request->validate([
         'looking_for' => ['required', 'string', 'max:2000'],
         'how' => ['nullable', 'string', 'max:300'],
@@ -255,7 +279,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 
     try {
         \Illuminate\Support\Facades\Mail::raw($body, function ($mail) use ($data, $subject) {
-            $mail->to('hallo@easyinvoice.nl')
+            $mail->to(\App\Support\Brand::contactInbox())
                 ->replyTo($data['email'], $data['name'])
                 ->subject('[Contact] '.$subject);
         });
@@ -267,7 +291,7 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 
         return back()
             ->withInput()
-            ->with('contact_error', 'Er ging iets mis bij het versturen. Mail ons gerust direct op hallo@easyinvoice.nl.');
+            ->with('contact_error', 'Er ging iets mis bij het versturen. Mail ons gerust direct op ' . \App\Support\Brand::email() . '.');
     }
 
     return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');

@@ -17,7 +17,7 @@
           <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}"
                alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
         @else
-          <div style="font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+          <div style="font-weight:700;font-size:18px;color:{{ $company->brand_color ?: brand('color') }};">{{ $company->name }}</div>
         @endif
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;">
@@ -59,7 +59,7 @@
         @if($invoice->portal_token)
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 6px;">
             <tr>
-              <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+              <td style="border-radius:8px;background:{{ $company->brand_color ?: brand('color') }};">
                 <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
                    style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
                   {{ (filled($company->mollie_api_key ?? null) && $openRaw > 0.009) ? __('doc.mail_view_pay_invoice') : __('doc.mail_view_invoice') }}&nbsp;&nbsp;→
@@ -78,7 +78,7 @@
       </div>
     </div>
     <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
-      {{ __('doc.mail_sent_via', ['name' => $company->name]) }}
+      {{ __('doc.mail_sent_via', ['name' => $company->name, 'brand' => brand('name')]) }}
     </p>
   </div>
 </body>

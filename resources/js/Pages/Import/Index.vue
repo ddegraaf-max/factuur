@@ -1,7 +1,9 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({ types: Object, fields: Object, preview: Object, result: Object });
 
@@ -34,8 +36,8 @@ const help = {
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Overstappen naar EasyInvoice</h1>
-        <p class="page-subtitle">Neem in tien minuten je klanten, producten en openstaande facturen over uit WeFact, Moneybird, e-Boekhouden, Excel of elk ander pakket. Upload een CSV-export; EasyInvoice herkent de kolommen en slaat dubbelen over.</p>
+        <h1 class="page-title">Overstappen naar {{ brand.name }}</h1>
+        <p class="page-subtitle">Neem in tien minuten je klanten, producten en openstaande facturen over uit WeFact, Moneybird, e-Boekhouden, Excel of elk ander pakket. Upload een CSV-export; {{ brand.name }} herkent de kolommen en slaat dubbelen over.</p>
       </div>
     </div>
 
@@ -76,11 +78,11 @@ const help = {
         <div class="card-body">
           <ol>
             <li>Exporteer in je oude pakket als <b>CSV</b> (Excel-bestanden eerst opslaan als CSV).</li>
-            <li>Upload het hier — EasyInvoice herkent kolommen als naam, e-mail, adres, KvK, btw-nummer, prijs.</li>
+            <li>Upload het hier — {{ brand.name }} herkent kolommen als naam, e-mail, adres, KvK, btw-nummer, prijs.</li>
             <li>Controleer de koppeling in het voorbeeld en klik op importeren. Bestaande klanten (zelfde e-mail of naam) worden overgeslagen, dus je kunt het gerust twee keer draaien.</li>
             <li>Volgorde: eerst klanten, dan producten, dan openstaande facturen.</li>
           </ol>
-          <div class="muted-sm">Historie van betaalde facturen hoef je niet over te nemen; die blijft in je oude pakket (of in je <Link :href="route('export.index')" style="color:var(--brand);">XAF-auditfile</Link>). Loop je vast? Mail je export naar hallo@easyinvoice.nl — wij zetten hem voor je over.</div>
+          <div class="muted-sm">Historie van betaalde facturen hoef je niet over te nemen; die blijft in je oude pakket (of in je <Link :href="route('export.index')" style="color:var(--brand);">XAF-auditfile</Link>). Loop je vast? Mail je export naar <a :href="'mailto:' + brand.email" style="color:var(--brand);">{{ brand.email }}</a> — wij zetten hem voor je over.</div>
         </div>
       </div>
     </div>
@@ -89,7 +91,7 @@ const help = {
       <div class="card-header">
         <div>
           <div class="card-title">2. Kolommen koppelen — {{ preview.filename }}</div>
-          <div class="card-subtitle">{{ preview.total }} regels gevonden · {{ types[preview.type] }}. Kies per kolom uit je bestand het EasyInvoice-veld (of "overslaan").</div>
+          <div class="card-subtitle">{{ preview.total }} regels gevonden · {{ types[preview.type] }}. Kies per kolom uit je bestand het {{ brand.name }}-veld (of "overslaan").</div>
         </div>
       </div>
       <div class="card-body-flush imp-scroll">

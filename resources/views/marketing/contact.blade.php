@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Contact met EasyInvoice — we reageren binnen één werkdag')
-@section('description', 'Vragen over facturen, je abonnement of een functie? Mail het EasyInvoice-team via hallo@easyinvoice.nl — we reageren binnen één werkdag, ook tijdens je proefperiode.')
+@section('title', 'Contact met ' . brand('name') . ' — we reageren binnen één werkdag')
+@section('description', 'Vragen over facturen, je abonnement of een functie? Mail het ' . brand('name') . '-team via ' . brand('email') . ' — we reageren binnen één werkdag, ook tijdens je proefperiode.')
 
 @push('styles')
 <style>
@@ -56,12 +56,14 @@
           <textarea id="message" name="message" rows="6" required>{{ old('message') }}</textarea>
           @error('message')<div class="m-err">{{ $message }}</div>@enderror
         </div>
+        @if(\App\Support\Brand::watchesTrademark())
         <div class="m-field" style="margin-top:-4px;">
           <label style="display:flex;align-items:flex-start;gap:10px;font-weight:400;font-size:13.5px;color:var(--text-2);cursor:pointer;">
             <input type="checkbox" name="confusion" value="1" style="margin-top:3px;" {{ old('confusion') ? 'checked' : '' }}>
-            <span>Ik zocht eigenlijk een <b>ander</b> bedrijf met de naam EasyInvoice (bijv. over een uitbetaling of een account dat ik niet bij easyinvoice.nl heb).</span>
+            <span>Ik zocht eigenlijk een <b>ander</b> bedrijf met de naam {{ brand('name') }} (bijv. over een uitbetaling of een account dat ik niet bij {{ brand('domain') }} heb).</span>
           </label>
         </div>
+        @endif
         @if(config('services.turnstile.sitekey'))
           <div class="cf-turnstile" data-sitekey="{{ config('services.turnstile.sitekey') }}" style="margin-bottom:14px;"></div>
           @error('cf-turnstile-response')<div class="m-err">{{ $message }}</div>@enderror
@@ -76,7 +78,7 @@
         <h2 style="font-size:18px;margin-bottom:14px;">Direct contact</h2>
         <div class="contact-line">
           <span class="contact-ic">✉</span>
-          <div><div style="font-size:13px;color:var(--text-3);">E-mail</div><a href="mailto:hallo@easyinvoice.nl" style="font-weight:600;color:var(--brand);">hallo@easyinvoice.nl</a></div>
+          <div><div style="font-size:13px;color:var(--text-3);">E-mail</div><a href="mailto:{{ brand('email') }}" style="font-weight:600;color:var(--brand);">{{ brand('email') }}</a></div>
         </div>
         <div class="contact-line">
           <span class="contact-ic">⏱</span>

@@ -81,12 +81,12 @@
 
         <p style="margin:22px 0 0;font-size:13px;color:#78716c;line-height:1.6;">
           Met vriendelijke groet,<br>
-          {{ $company->name }} · via EasyInvoice
+          {{ $company->name }} · via {{ brand('name') }}
         </p>
       </div>
     </div>
     <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
-      Automatisch gegenereerd door EasyInvoice namens {{ $company->name }}.
+      Automatisch gegenereerd door {{ brand('name') }} namens {{ $company->name }}.
     </p>
   </div>
 </body>

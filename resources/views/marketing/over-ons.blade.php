@@ -1,14 +1,14 @@
 @extends('layouts.marketing')
 
-@section('title', 'Over EasyInvoice — facturatie zonder gedoe, uit Bussum')
-@section('description', 'Het verhaal achter EasyInvoice: facturatie terug naar de basis, voor elke Nederlandse ondernemer.')
+@section('title', 'Over ' . brand('name') . ' — facturatie zonder gedoe, uit Bussum')
+@section('description', 'Het verhaal achter ' . brand('name') . ': facturatie terug naar de basis, voor elke Nederlandse ondernemer.')
 
 @section('content')
 <section class="page-hero">
   <div class="container page-hero-inner">
     <div class="eyebrow">Over ons</div>
     <h1>Facturatie, terug naar de basis</h1>
-    <p class="lead">EasyInvoice is ontstaan uit frustratie: bestaande boekhoudsoftware is duur, log en overweldigend voor een gewone ondernemer. Dat kon beter.</p>
+    <p class="lead">{{ brand('name') }} is ontstaan uit frustratie: bestaande boekhoudsoftware is duur, log en overweldigend voor een gewone ondernemer. Dat kon beter.</p>
   </div>
 </section>
 
@@ -20,7 +20,7 @@
       <p>Daarom bouwen we de eenvoudigste facturatietool van Nederland. Eén heldere prijs, alle functies die je écht nodig hebt, en ondersteuning van echte mensen in Bussum.</p>
 
       <h2>Een dienst van Creditline B.V.</h2>
-      <p>EasyInvoice is een dienst van Creditline B.V. uit Bussum, met ruim 25 jaar ervaring in kredietbeheer en incasso. Uit die praktijk kennen we het grootste probleem van ondernemers niet van horen zeggen, maar van dichtbij: facturen die te laat of helemaal niet betaald worden.</p>
+      <p>{{ brand('name') }} is een dienst van Creditline B.V. uit Bussum, met ruim 25 jaar ervaring in kredietbeheer en incasso. Uit die praktijk kennen we het grootste probleem van ondernemers niet van horen zeggen, maar van dichtbij: facturen die te laat of helemaal niet betaald worden.</p>
       <p>Die ervaring zit overal in het product verwerkt — van automatische <a href="{{ route('helpcentrum') }}">herinneringen en aanmaningen</a> tot het klantenportaal met inzagelog en de directe lijn naar incasso. Niet als losse extra's, maar als vast onderdeel van elk abonnement. Bekijk onze <a href="{{ route('faq') }}">veelgestelde vragen</a> of <a href="{{ route('roadmap') }}">roadmap</a> om te zien waar we naartoe werken.</p>
     </div>
   </div>
@@ -41,7 +41,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Klaar om te beginnen?</h2>
-    <p>Probeer EasyInvoice 14 dagen gratis en ervaar zelf hoe eenvoudig factureren kan zijn.</p>
+    <p>Probeer {{ brand('name') }} 14 dagen gratis en ervaar zelf hoe eenvoudig factureren kan zijn.</p>
     <a href="{{ route('register') }}" class="btn btn-white btn-lg">Start 14 dagen gratis</a>
   </div>
 </section>

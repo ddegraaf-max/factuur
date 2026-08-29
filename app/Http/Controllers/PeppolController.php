@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Services\PeppolService;
+use App\Support\Brand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -46,7 +47,7 @@ class PeppolController extends Controller
 
         return back()->with('flash', match ($status) {
             'verified' => 'Je administratie is geverifieerd: je kunt nu via Peppol verzenden en ontvangen.',
-            'rejected' => 'De identiteitscontrole is afgewezen. Neem contact op met EasyInvoice.',
+            'rejected' => 'De identiteitscontrole is afgewezen. Neem contact op met ' . Brand::name() . '.',
             'none' => 'Peppol is nog niet geactiveerd.',
             default => 'De identiteitscontrole is nog niet afgerond.',
         });

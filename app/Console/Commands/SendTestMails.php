@@ -19,6 +19,7 @@ use App\Models\QuoteLine;
 use App\Models\User;
 use App\Services\UblGenerator;
 use App\Services\VatCalculator;
+use App\Support\Brand;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
@@ -297,7 +298,7 @@ class SendTestMails extends Command
             'invoice_template' => 'modern',
             'invoice_font' => 'sans',
             'default_payment_terms' => 14,
-            'invoice_footer' => 'Bedankt voor de samenwerking! Dit is een proefbericht uit EasyInvoice.',
+            'invoice_footer' => 'Bedankt voor de samenwerking! Dit is een proefbericht uit ' . Brand::name() . '.',
         ]);
 
         // Niet opslaan: dit exemplaar bestaat alleen tijdens deze opdracht.
@@ -341,7 +342,7 @@ class SendTestMails extends Command
             'total' => $totals['total'],
             'paid_total' => 0,
             'vat_breakdown' => $totals['vat_breakdown'],
-            'notes' => 'Dit is een testbericht van EasyInvoice. Er is geen factuur aangemaakt en er is niets opgeslagen.',
+            'notes' => 'Dit is een testbericht van ' . Brand::name() . '. Er is geen factuur aangemaakt en er is niets opgeslagen.',
             'footer' => $company->invoice_footer,
         ]);
         $invoice->id = 0;
@@ -401,7 +402,7 @@ class SendTestMails extends Command
             'vat_total' => $totals['vat_total'],
             'total' => $totals['total'],
             'vat_breakdown' => $totals['vat_breakdown'],
-            'intro' => 'Dit is een testbericht van EasyInvoice — er is geen offerte aangemaakt en niets opgeslagen.',
+            'intro' => 'Dit is een testbericht van ' . Brand::name() . ' — er is geen offerte aangemaakt en niets opgeslagen.',
             'footer' => $company->invoice_footer,
         ]);
         $quote->id = 0;

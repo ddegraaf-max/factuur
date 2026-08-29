@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Helpcentrum EasyInvoice — antwoorden en handleidingen')
+@section('title', 'Helpcentrum ' . brand('name') . ' — antwoorden en handleidingen')
 @section('description', 'Vind snel antwoord op je vraag: facturen maken, BTW, herinneringen, incasso, koppelingen en meer. Kom je er niet uit? We helpen je persoonlijk verder.')
 
 @push('styles')
@@ -112,7 +112,7 @@
       <h2 style="font-size:22px;margin-bottom:8px;">Niet gevonden wat je zocht?</h2>
       <p style="margin-bottom:20px;">Ons team helpt je graag persoonlijk verder.</p>
       <a href="{{ route('contact') }}" class="btn btn-primary" style="margin-right:8px;">Neem contact op</a>
-      <a href="mailto:hallo@easyinvoice.nl" class="btn btn-secondary">E-mailondersteuning</a>
+      <a href="mailto:{{ brand('email') }}" class="btn btn-secondary">E-mailondersteuning</a>
     </div>
   </div>
 </section>

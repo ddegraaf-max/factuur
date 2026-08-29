@@ -4,7 +4,7 @@
      * herinnering: geen betaalverzoek, wél een feestje. Tabellen en inline
      * stijlen zodat Gmail, Outlook en Apple Mail het allemaal netjes tonen.
      */
-    $brand = $company->brand_color ?: '#E8231F';
+    $brand = $company->brand_color ?: brand('color');
     $logo = $company->logoBinary();
     $total = number_format((float) $invoice->total, 2, ',', '.');
     $paidOn = $payment?->paid_on ?? $invoice->paid_at;
@@ -134,7 +134,7 @@
       </div>
     </div>
     <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
-      {{ __('doc.mail_sent_via', ['name' => $company->name]) }}
+      {{ __('doc.mail_sent_via', ['name' => $company->name, 'brand' => brand('name')]) }}
     </p>
   </div>
 </body>

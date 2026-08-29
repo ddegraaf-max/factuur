@@ -12,7 +12,7 @@
           <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}"
                alt="{{ $company->name }}" style="max-height:44px;max-width:220px;display:block;border:0;">
         @else
-          <div style="font-family:Arial,sans-serif;font-weight:700;font-size:18px;color:{{ $company->brand_color ?: '#E8231F' }};">{{ $company->name }}</div>
+          <div style="font-family:Arial,sans-serif;font-weight:700;font-size:18px;color:{{ $company->brand_color ?: brand('color') }};">{{ $company->name }}</div>
         @endif
       </div>
       <div style="padding:24px;font-size:14px;line-height:1.7;color:#1c1917;white-space:pre-wrap;">{{ $bodyText }}</div>
@@ -20,7 +20,7 @@
         @if($invoice->portal_token)
           <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 14px;">
             <tr>
-              <td style="border-radius:8px;background:{{ $company->brand_color ?: '#E8231F' }};">
+              <td style="border-radius:8px;background:{{ $company->brand_color ?: brand('color') }};">
                 <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
                    style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
                   Bekijk factuur online&nbsp;&nbsp;→
@@ -33,7 +33,7 @@
       </div>
     </div>
     <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
-      Verzonden via EasyInvoice namens {{ $company->name }}.
+      Verzonden via {{ brand('name') }} namens {{ $company->name }}.
     </p>
   </div>
 </body>

@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-@section('title', 'Btw-calculator — btw berekenen (21%, 9% of 0%) — EasyInvoice')
+@section('title', 'Btw-calculator — btw berekenen (21%, 9% of 0%) — ' . brand('name'))
 @section('description', 'Bereken direct de btw over een bedrag: van exclusief naar inclusief én andersom, met 21% of 9%. Gratis btw-calculator voor Nederlandse ondernemers, met uitleg.')
 
 @push('styles')
@@ -65,7 +65,7 @@
       <p><strong>Van inclusief naar exclusief</strong> gaat vaak mis. Je mag níet 21% van het totaalbedrag aftrekken — je moet délen door 1,21. Van € 121 inclusief is het exclusieve bedrag € 121 ÷ 1,21 = € 100, en de btw € 21. Wie "21% eraf" rekent, komt op € 95,59 uit en zit ernaast.</p>
       <h2>Welk tarief gebruik je?</h2>
       <p>Het <strong>algemene tarief van 21%</strong> geldt voor de meeste diensten en producten — ook voor vrijwel al het werk van zzp'ers zoals ontwerp, advies, bouw en IT. Het <strong>verlaagde tarief van 9%</strong> geldt onder meer voor voedingsmiddelen, boeken, kappers en fietsenmakers. Het <strong>0%-tarief</strong> is vooral voor export en internationale diensten binnen de EU (btw verlegd). Twijfel je? Check de site van de Belastingdienst of vraag het je boekhouder.</p>
-      <p>Factureer je regelmatig? In <a href="{{ url('/') }}">EasyInvoice</a> kies je het tarief per factuurregel en staat je <a href="{{ route('kennisbank.artikel', 'btw-tarieven') }}">btw-overzicht voor de aangifte</a> automatisch klaar. Of maak eerst eens <a href="{{ route('gratis-factuur') }}">gratis een factuur</a>.</p>
+      <p>Factureer je regelmatig? In <a href="{{ url('/') }}">{{ brand('name') }}</a> kies je het tarief per factuurregel en staat je <a href="{{ route('kennisbank.artikel', 'btw-tarieven') }}">btw-overzicht voor de aangifte</a> automatisch klaar. Of maak eerst eens <a href="{{ route('gratis-factuur') }}">gratis een factuur</a>.</p>
     </div>
   </div>
 </section>

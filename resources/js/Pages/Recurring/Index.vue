@@ -1,7 +1,9 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
+
+const brand = usePage().props.brand;
 
 const props = defineProps({
   profiles: Array,
@@ -65,7 +67,7 @@ const destroy = (p) => {
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
       <div>
         <b>Zo werkt het:</b> open een bestaande factuur en kies <b>“Maak terugkerend”</b>.
-        EasyInvoice maakt dan elke periode automatisch een nieuwe factuur aan — als concept om zelf
+        {{ brand.name }} maakt dan elke periode automatisch een nieuwe factuur aan — als concept om zelf
         te controleren, of direct verstuurd naar je klant.
       </div>
     </div>

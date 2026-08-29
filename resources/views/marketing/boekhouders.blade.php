@@ -1,14 +1,14 @@
 @extends('layouts.marketing')
 
-@section('title', 'Voor boekhouders en accountants — gratis meekijken — EasyInvoice')
-@section('description', 'Werk je als boekhouder of accountant voor zzp\'ers en mkb? Kijk gratis mee in de administratie van je klanten in EasyInvoice: btw-overzicht, jaaroverzicht en exports, met één inlog voor al je klanten.')
+@section('title', 'Voor boekhouders en accountants — gratis meekijken — ' . brand('name'))
+@section('description', 'Werk je als boekhouder of accountant voor zzp\'ers en mkb? Kijk gratis mee in de administratie van je klanten in ' . brand('name') . ': btw-overzicht, jaaroverzicht en exports, met één inlog voor al je klanten.')
 
 @section('content')
 <section class="page-hero">
   <div class="container page-hero-inner">
     <span class="eyebrow">Voor boekhouders &amp; accountants</span>
     <h1>Kijk gratis mee met je klanten</h1>
-    <p class="lead">Klanten die in EasyInvoice factureren, kunnen jou als boekhouder uitnodigen. Jij krijgt leestoegang tot hun administratie — zonder kosten, met één inlog voor al je klanten.</p>
+    <p class="lead">Klanten die in {{ brand('name') }} factureren, kunnen jou als boekhouder uitnodigen. Jij krijgt leestoegang tot hun administratie — zonder kosten, met één inlog voor al je klanten.</p>
     <div class="hero-ctas" style="margin-top:28px;">
       <a href="{{ route('contact') }}" class="btn btn-primary btn-lg">Neem contact op →</a>
       <a href="{{ route('demo') }}" class="btn btn-secondary btn-lg">Bekijk de demo</a>
@@ -19,7 +19,7 @@
 <section class="section section-alt">
   <div class="container">
     <div class="section-header">
-      <h2>Waarom boekhouders EasyInvoice aanraden</h2>
+      <h2>Waarom boekhouders {{ brand('name') }} aanraden</h2>
       <p>Geen schoenendozen met bonnetjes meer, geen heen-en-weer gemailde Excelletjes: de administratie van je klant staat er netjes in — en jij kunt er altijd bij.</p>
     </div>
     <div class="features-grid">
@@ -62,13 +62,13 @@
     <div class="prose">
       <h2>Zo werkt het</h2>
       <ol>
-        <li><strong>Je klant nodigt je uit</strong> via Instellingen → Team, met de rol "boekhouder". Heb je al een EasyInvoice-inlog, dan wordt de administratie daaraan gekoppeld.</li>
+        <li><strong>Je klant nodigt je uit</strong> via Instellingen → Team, met de rol "boekhouder". Heb je al een {{ brand('name') }}-inlog, dan wordt de administratie daaraan gekoppeld.</li>
         <li><strong>Jij kijkt mee wanneer het jou uitkomt</strong> — voor de btw-aangifte pak je het kwartaaloverzicht erbij, voor de IB-aangifte het jaaroverzicht.</li>
         <li><strong>Meerdere klanten?</strong> Elke uitnodiging hangt onder dezelfde inlog. Linksonder wissel je met één klik van administratie.</li>
       </ol>
       <h2>Heb je klanten die nog met Word of Excel factureren?</h2>
-      <p>Dan weet je hoe dat aan jouw kant binnenkomt. Wijs ze op EasyInvoice: voor € 12,10 per maand (incl. btw) factureren ze netjes, en jij krijgt een administratie die klopt. Wil je EasyInvoice eerst zelf bekijken? <a href="{{ route('demo') }}">Open de demo</a> — daar staat een complete voorbeeldadministratie in.</p>
-      <p>Vragen, of eens sparren over meerdere klanten tegelijk? Mail <a href="mailto:hallo@easyinvoice.nl">hallo@easyinvoice.nl</a> — je krijgt antwoord van de makers zelf.</p>
+      <p>Dan weet je hoe dat aan jouw kant binnenkomt. Wijs ze op {{ brand('name') }}: voor € 12,10 per maand (incl. btw) factureren ze netjes, en jij krijgt een administratie die klopt. Wil je {{ brand('name') }} eerst zelf bekijken? <a href="{{ route('demo') }}">Open de demo</a> — daar staat een complete voorbeeldadministratie in.</p>
+      <p>Vragen, of eens sparren over meerdere klanten tegelijk? Mail <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> — je krijgt antwoord van de makers zelf.</p>
     </div>
   </div>
 </section>
@@ -76,7 +76,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Administraties die kloppen, klanten die blij zijn</h2>
-    <p>Laat je klanten factureren in EasyInvoice en kijk zelf gratis mee. Vragen? We denken graag met je mee.</p>
+    <p>Laat je klanten factureren in {{ brand('name') }} en kijk zelf gratis mee. Vragen? We denken graag met je mee.</p>
     <div class="hero-ctas">
       <a href="{{ route('contact') }}" class="btn btn-white btn-lg">Neem contact op →</a>
     </div>

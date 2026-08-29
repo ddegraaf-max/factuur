@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\User;
+use App\Support\Brand;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -21,7 +22,7 @@ class VerificationCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Je EasyInvoice verificatiecode: ' . $this->code,
+            subject: 'Je ' . Brand::name() . ' verificatiecode: ' . $this->code,
         );
     }
 
