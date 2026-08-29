@@ -26,6 +26,8 @@ return [
 
         'easyinvoice' => [
             'name' => 'EasyInvoice',
+            'market' => 'nl',            // zie config/markets.php
+            'home_view' => 'landing',
             'version_prefix' => 'Easy',
             'tagline' => 'Facturatie zonder gedoe',
             'assistant' => 'EASY',        // naam van de AI-assistent in de app
@@ -82,6 +84,8 @@ return [
 
         'lopra' => [
             'name' => 'Lopra',
+            'market' => 'nl',
+            'home_view' => 'lopra.landing',
             'version_prefix' => 'Lopra',
             'tagline' => 'Je hele administratie op één plek',
             'assistant' => 'Lo',
@@ -123,6 +127,59 @@ return [
             'login_seo_description' => 'Log in bij Lopra en ga verder met je administratie: facturen, offertes, btw, huisstijl en je website.',
             'register_seo_title' => 'Probeer Lopra 14 dagen gratis — account aanmaken',
             'register_seo_description' => 'Maak in één minuut je Lopra-account aan en probeer alles 14 dagen gratis — geen creditcard nodig, daarna vanaf € 12,10 per maand.',
+
+            'registered' => false,
+            'trademark' => null,
+            'brand_watch' => false,
+        ],
+
+        // Lopra Polska: hetzelfde merk, markt 'pl' (taal, PLN, btw 23/8/5/0, NIP,
+        // BLIK/Przelewy24, KSeF) en Creditline Polska als windykacja-partner.
+        'lopra_pl' => [
+            'name' => 'Lopra',
+            'market' => 'pl',
+            'home_view' => 'lopra-pl.landing',
+            'version_prefix' => 'Lopra',
+            'tagline' => 'Cała Twoja firma w jednym miejscu',
+            'assistant' => 'Lo',
+            'positioning' => 'Fakturowanie, marka i windykacja dla firm w Polsce',
+            'domain' => 'lopra.pl',
+            'email' => 'kontakt@lopra.pl',
+            'contact_inbox' => null,
+
+            'color' => '#1C4E7A',
+            'color_dark' => '#132F49',
+            'accent' => '#C8752A',
+            'background' => '#F4F2EE',
+            'fonts_url' => 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap&subset=latin-ext',
+            'theme_css' => '/brand/lopra/theme.css',
+
+            'mark' => '/brand/lopra/lopra-icon.svg',
+            'email_mark' => '/brand/lopra/lopra-icon-180.png',
+            'sidebar_mark' => '/brand/lopra/lopra-mark-white.svg',
+            'dark_sidebar' => true,
+            'icon' => '/brand/lopra/lopra-icon-512.png',
+            'favicon_32' => '/brand/lopra/lopra-icon-32.png',
+            'favicon_512' => '/brand/lopra/lopra-icon-512.png',
+            'favicon_svg' => '/brand/lopra/favicon.svg',
+            'favicon_ico' => '/brand/lopra/favicon.ico',
+            'apple_touch' => '/brand/lopra/lopra-icon-180.png',
+            'og_image' => '/brand/lopra/og-lopra-pl.png',
+            'wordmark' => '/brand/lopra/lopra-logo.svg',
+            'wordmark_dark' => '/brand/lopra/lopra-logo-dark.svg',
+
+            'seo_title' => 'Lopra — faktury, marka i windykacja w jednym miejscu, od 49 zł miesięcznie',
+            'seo_description' => 'Lopra to kompletne narzędzie dla polskich firm: faktury i oferty (gotowe do KSeF), rozliczenie VAT, identyfikacja wizualna z AI, wizytówka i strona www, import z Fakturowni, iFirmy, wFirmy i inFaktu oraz windykacja z Creditline Polska. 14 dni za darmo.',
+            'og_description' => 'Faktury, oferty, VAT, marka, strona www i windykacja należności — cała Twoja firma w jednym miejscu.',
+            'app_description' => 'Program do fakturowania i prowadzenia firmy w Polsce: faktury VAT gotowe do KSeF, oferty z podpisem online, rozliczenie VAT, identyfikacja wizualna z AI, wizytówka cyfrowa, strona www oraz windykacja należności z Creditline Polska.',
+            'pwa_description' => 'Faktury, oferty, marka i windykacja — cała Twoja firma w jednym miejscu.',
+            'footer_description' => 'Cała Twoja firma w jednym miejscu: faktury, oferty, VAT, marka, strona www i windykacja z Creditline Polska. Od startu po dojrzały biznes.',
+            'auth_title' => 'Cała Twoja firma w jednym miejscu',
+            'auth_subtitle' => 'Faktury, oferty, identyfikacja wizualna, strona www i windykacja — od pierwszego dnia działalności.',
+            'login_seo_title' => 'Logowanie do Lopra — Twoja firma w jednym miejscu',
+            'login_seo_description' => 'Zaloguj się do Lopra i wróć do swoich faktur, ofert, rozliczeń VAT, marki i strony www.',
+            'register_seo_title' => 'Wypróbuj Lopra 14 dni za darmo — załóż konto',
+            'register_seo_description' => 'Załóż konto w Lopra w minutę i przetestuj wszystko 14 dni za darmo — bez karty, potem od 49 zł netto miesięcznie.',
 
             'registered' => false,
             'trademark' => null,

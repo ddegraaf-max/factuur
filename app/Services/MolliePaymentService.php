@@ -182,6 +182,8 @@ class MolliePaymentService
     {
         return match ($mollieMethod) {
             'ideal' => 'ideal',
+            'blik' => 'blik',
+            'przelewy24' => 'p24',
             'creditcard' => 'card',
             'directdebit' => 'direct_debit',
             'banktransfer' => 'bank_transfer',

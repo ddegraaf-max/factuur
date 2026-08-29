@@ -16,6 +16,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Taal van de markt (nl of pl) voor de hele app én voor Carbon
+        // (translatedFormat in PDF's/mails). Klantdocumenten kunnen daar per
+        // document van afwijken via App\Support\DocumentLocale.
+        $locale = \App\Support\Market::locale();
+        $this->app->setLocale($locale);
+        \Carbon\Carbon::setLocale($locale);
+
         // Forceer HTTPS in productie (nodig achter proxy's zoals Railway)
         if ($this->app->environment('production')) {
             URL::forceScheme('https');

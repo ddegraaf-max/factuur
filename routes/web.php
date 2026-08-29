@@ -31,7 +31,7 @@ use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage per merk (config/brand.php): EasyInvoice en Lopra hebben elk een eigen landingspagina.
-Route::get('/', fn () => view(\App\Support\Brand::is('lopra') ? 'lopra.landing' : 'landing'))->name('home');
+Route::get('/', fn () => view((string) brand('home_view', 'landing')))->name('home');
 
 // PWA-manifest en robots.txt per merk — geen statische bestanden, want naam,
 // iconen, kleuren en de sitemap-URL verschillen per omgeving.
@@ -51,11 +51,11 @@ Route::post('/demo', [DemoController::class, 'start'])
 Route::post('/demo/verlaten', [DemoController::class, 'stop'])->name('demo.stop');
 
 // ---------- PUBLIEKE MARKETINGPAGINA'S ----------
-Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq');
-Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog');
-Route::view('/roadmap', 'marketing.roadmap')->name('roadmap');
-Route::view('/over-ons', 'marketing.over-ons')->name('over');
-Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum');
+Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq')->middleware('market:nl');
+Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog')->middleware('market:nl');
+Route::view('/roadmap', 'marketing.roadmap')->name('roadmap')->middleware('market:nl');
+Route::view('/over-ons', 'marketing.over-ons')->name('over')->middleware('market:nl');
+Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum')->middleware('market:nl');
 Route::get('/helpcentrum/{slug}', function (string $slug) {
     $articles = config('help.articles');
     abort_unless(isset($articles[$slug]), 404);
@@ -72,7 +72,7 @@ Route::get('/helpcentrum/{slug}', function (string $slug) {
         'article' => $articles[$slug],
         'articles' => $articles,
     ]);
-})->name('help.article');
+})->name('help.article')->middleware('market:nl');
 Route::get('/status', [StatusController::class, 'index'])->name('status');
 // Machineleesbare gezondheidscheck (database + planner-hartslag) voor externe bewaking.
 Route::get('/health', \App\Http\Controllers\HealthController::class)->middleware('throttle:60,1')->name('health');
@@ -80,15 +80,15 @@ Route::get('/health', \App\Http\Controllers\HealthController::class)->middleware
 // ---------- GRATIS TOOLS ----------
 // Instapkanaal voor nieuwe klanten: zonder account een factuur maken of iets
 // uitrekenen, met onderaan een uitnodiging om EasyInvoice te proberen.
-Route::get('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'show'])->name('gratis-factuur');
+Route::get('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'show'])->name('gratis-factuur')->middleware('market:nl');
 Route::post('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'download'])
-    ->middleware(['throttle:15,1', 'turnstile'])->name('gratis-factuur.download');
-Route::view('/btw-calculator', 'marketing.btw-calculator')->name('btw-calculator');
-Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uurtarief-calculator');
+    ->middleware(['throttle:15,1', 'turnstile'])->name('gratis-factuur.download')->middleware('market:nl');
+Route::view('/btw-calculator', 'marketing.btw-calculator')->name('btw-calculator')->middleware('market:nl');
+Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uurtarief-calculator')->middleware('market:nl');
 
 // ---------- EXTRA MARKETINGPAGINA'S ----------
-Route::view('/facturatie-met-ai', 'marketing.facturatie-met-ai')->name('ai');
-Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders');
+Route::view('/facturatie-met-ai', 'marketing.facturatie-met-ai')->name('ai')->middleware('market:nl');
+Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders')->middleware('market:nl');
 
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
@@ -149,11 +149,11 @@ Route::get('/overstappen-van/{pakket}', function (string $pakket) {
     abort_unless(isset($ov[$pakket]), 404);
 
     return view('marketing.overstappen', ['from' => $ov[$pakket]]);
-})->where('pakket', '[a-z-]+')->name('overstappen.van');
+})->where('pakket', '[a-z-]+')->name('overstappen.van')->middleware('market:nl');
 
 // ---------- KENNISBANK ----------
 // SEO-artikelen over factureren, btw en betaald krijgen (config/kennisbank.php).
-Route::view('/kennisbank', 'marketing.kennisbank')->name('kennisbank');
+Route::view('/kennisbank', 'marketing.kennisbank')->name('kennisbank')->middleware('market:nl');
 Route::get('/kennisbank/{slug}', function (string $slug) {
     $articles = config('kennisbank.articles');
     abort_unless(isset($articles[$slug]), 404);
@@ -163,7 +163,7 @@ Route::get('/kennisbank/{slug}', function (string $slug) {
         'article' => $articles[$slug],
         'articles' => $articles,
     ]);
-})->name('kennisbank.artikel');
+})->name('kennisbank.artikel')->middleware('market:nl');
 
 // ---------- MARKETING-INZICHTEN (intern) ----------
 // Bezoekersstatistieken van de publieke pagina's; alleen voor de eigenaar
@@ -188,22 +188,50 @@ Route::middleware(['auth', 'owner'])->prefix('merkbewaking')->name('brand.')->gr
     Route::get('/dossier/{month}/{file}', [\App\Http\Controllers\BrandEvidenceController::class, 'file'])->name('dossier.file');
 });
 
+// ---------- LOPRA POLSKA: Poolse marketingpagina's (alleen in markt pl) ----------
+Route::middleware('market:pl')->name('pl.')->group(function () {
+    Route::view('/faq', 'lopra-pl.faq')->name('faq');
+    Route::view('/kontakt', 'lopra-pl.kontakt')->name('kontakt');
+    Route::view('/o-nas', 'lopra-pl.o-nas')->name('o-nas');
+    Route::view('/regulamin', 'lopra-pl.regulamin')->name('regulamin');
+    Route::view('/polityka-prywatnosci', 'lopra-pl.prywatnosc')->name('prywatnosc');
+    // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én Creditline Polska.
+    Route::view('/kalkulator-odsetek', 'lopra-pl.kalkulator')->name('kalkulator');
+    // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
+    Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
+        $packages = config('przenies.packages', []);
+        abort_unless(isset($packages[$pakiet]), 404);
+
+        return view('lopra-pl.przenies', ['slug' => $pakiet, 'pkg' => $packages[$pakiet], 'packages' => $packages]);
+    })->name('przenies');
+});
+
 // ---------- SITEMAP (voor zoekmachines) ----------
 // Dynamisch: nieuwe helpartikelen in config/help.php lopen automatisch mee.
 Route::get('/sitemap.xml', function () {
-    $paths = [
-        '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum',
-        '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
-        '/login', '/register',
-        '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
-        '/facturatie-met-ai', '/boekhouders', '/kennisbank', '/verwerkersovereenkomst',
-        '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
-    ];
-    foreach (array_keys(config('help.articles', [])) as $slug) {
-        $paths[] = '/helpcentrum/' . $slug;
-    }
-    foreach (array_keys(config('kennisbank.articles', [])) as $slug) {
-        $paths[] = '/kennisbank/' . $slug;
+    if (\App\Support\Market::isPl()) {
+        // Lopra Polska: alleen de Poolse pagina's.
+        $paths = [
+            '/', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/kalkulator-odsetek',
+            '/status', '/login', '/register',
+            '/przenies-sie-z/fakturownia', '/przenies-sie-z/ifirma', '/przenies-sie-z/wfirma', '/przenies-sie-z/infakt',
+        ];
+    } else {
+        $paths = [
+            '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum',
+            '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
+            '/login', '/register',
+            '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
+            '/facturatie-met-ai', '/boekhouders', '/kennisbank', '/verwerkersovereenkomst',
+            '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
+        ];
+        foreach (array_keys(config('help.articles', [])) as $slug) {
+            $paths[] = '/helpcentrum/' . $slug;
+        }
+        foreach (array_keys(config('kennisbank.articles', [])) as $slug) {
+            $paths[] = '/kennisbank/' . $slug;
+        }
+
     }
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
@@ -215,10 +243,10 @@ Route::get('/sitemap.xml', function () {
 
     return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
 })->name('sitemap');
-Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden');
-Route::view('/privacy', 'marketing.privacy')->name('privacy');
-Route::view('/cookies', 'marketing.cookies')->name('cookies');
-Route::view('/verwerkersovereenkomst', 'marketing.verwerkersovereenkomst')->name('verwerkersovereenkomst');
+Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden')->middleware('market:nl');
+Route::view('/privacy', 'marketing.privacy')->name('privacy')->middleware('market:nl');
+Route::view('/cookies', 'marketing.cookies')->name('cookies')->middleware('market:nl');
+Route::view('/verwerkersovereenkomst', 'marketing.verwerkersovereenkomst')->name('verwerkersovereenkomst')->middleware('market:nl');
 
 // Merkbewaking: "Zocht u een ander EasyInvoice?" — spontaan bewijs van verwarring, door derden zelf vastgelegd.
 // Alleen voor het geregistreerde merk (brand_watch in config/brand.php); bij Lopra bestaat de pagina niet.
@@ -246,7 +274,7 @@ Route::post('/zocht-u-een-ander-easyinvoice', function (\Illuminate\Http\Request
     return redirect()->route('confusion')->with('confusion_sent', true);
 })->middleware(['throttle:10,1', 'turnstile'])->name('confusion.send');
 
-Route::get('/contact', fn () => view('marketing.contact'))->name('contact');
+Route::get('/contact', fn () => view('marketing.contact'))->name('contact')->middleware('market:nl');
 Route::post('/contact', function (\Illuminate\Http\Request $request) {
     $data = $request->validate([
         'name' => ['required', 'string', 'max:120'],
@@ -455,6 +483,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
             ->middleware('throttle:30,1')->name('kvk.search');
         Route::get('kvk/profiel/{kvkNumber}', [\App\Http\Controllers\KvkController::class, 'profile'])
             ->middleware('throttle:30,1')->name('kvk.profile');
+        // Poolse markt: bedrijfsgegevens op NIP uit de "biała lista" van het Ministerstwo Finansów.
+        Route::get('nip/{nip}', [\App\Http\Controllers\NipController::class, 'lookup'])
+            ->middleware('throttle:30,1')->name('nip.lookup');
 
     // Products
     Route::resource('products', ProductController::class);
@@ -590,6 +621,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('incasso', [IncassoController::class, 'index'])->name('incasso.index');
     Route::post('invoices/{invoice}/incasso', [IncassoController::class, 'send'])->name('incasso.send');
     Route::patch('invoices/{invoice}/incasso/phase', [IncassoController::class, 'updatePhase'])->name('incasso.phase');
+    // Windykacja (Poolse markt): vordering berekenen, wezwanie do zapłaty (PDF) en factuur te koop aanbieden.
+    Route::get('invoices/{invoice}/windykacja', [\App\Http\Controllers\WindykacjaController::class, 'claim'])->name('windykacja.claim');
+    Route::get('invoices/{invoice}/wezwanie', [\App\Http\Controllers\WindykacjaController::class, 'wezwanie'])->name('windykacja.wezwanie');
+    Route::post('invoices/{invoice}/wykup', [\App\Http\Controllers\WindykacjaController::class, 'sale'])->name('windykacja.wykup');
 
     // Attachments
     Route::post('invoices/{invoice}/attachments', [AttachmentController::class, 'store'])->name('invoices.attachments.store');

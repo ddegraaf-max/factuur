@@ -41,8 +41,8 @@ class IncassoController extends Controller
                 'oldest_days' => $oldest,
             ],
             'handler' => [
-                'name' => config('incasso.partner_name'),
-                'email' => config('incasso.claims_email'),
+                'name' => \App\Support\Market::incasso('partner_name'),
+                'email' => \App\Support\Market::incasso('claims_email'),
                 'tagline' => 'Gerechtsdeurwaarder · vaste incassopartner',
             ],
         ]);
@@ -57,7 +57,7 @@ class IncassoController extends Controller
             return back()->withErrors(['incasso' => $e->getMessage()]);
         }
 
-        return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} overgedragen aan " . config('incasso.partner_name') . " en per e-mail verzonden.");
+        return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} overgedragen aan " . \App\Support\Market::incasso('partner_name') . " en per e-mail verzonden.");
     }
 
     public function updatePhase(Request $request, Invoice $invoice)

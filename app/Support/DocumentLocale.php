@@ -11,11 +11,19 @@ use Carbon\Carbon;
  */
 class DocumentLocale
 {
-    public const SUPPORTED = ['nl', 'en'];
+    public const SUPPORTED = ['nl', 'en', 'pl'];
+
+    /** Standaardtaal van documenten: die van de markt (nl in Nederland, pl in Polen). */
+    public static function default(): string
+    {
+        $locale = Market::locale();
+
+        return in_array($locale, self::SUPPORTED, true) ? $locale : 'nl';
+    }
 
     public static function using(?string $language, \Closure $callback): mixed
     {
-        $language = in_array($language, self::SUPPORTED, true) ? $language : 'nl';
+        $language = in_array($language, self::SUPPORTED, true) ? $language : self::default();
 
         $previousApp = app()->getLocale();
         $previousCarbon = Carbon::getLocale();

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl" data-brand="{{ \App\Support\Brand::key() }}" data-brand-name="{{ brand('name') }}" data-brand-color="{{ brand('color') }}">
+<html lang="{{ market('locale') }}" data-brand="{{ \App\Support\Brand::key() }}" data-brand-name="{{ brand('name') }}" data-brand-color="{{ brand('color') }}" data-locale="{{ market('locale') }}" data-currency="{{ market('currency') }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -19,7 +19,7 @@
           Beste Armaere,<br><br>
           Hierbij dragen wij namens onze klant een achterstallige vordering ter incasso aan u over.
           De opdrachtgever heeft de opdracht bevestigd en gaat daarmee akkoord met overdracht aan
-          {{ config('incasso.partner_name') }}. Het volledige dossier vindt u hieronder en in de bijlagen.
+          {{ \App\Support\Market::incasso('partner_name') }}. Het volledige dossier vindt u hieronder en in de bijlagen.
         </p>
 
         <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">Opdrachtgever (crediteur)</h3>

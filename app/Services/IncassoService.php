@@ -30,7 +30,7 @@ class IncassoService
             'status' => 'incasso',
             'incasso_sent_at' => now(),
             'incasso_reference' => $reference,
-            'incasso_handler' => config('incasso.partner_name'),
+            'incasso_handler' => \App\Support\Market::incasso('partner_name'),
             'incasso_phase' => 'minnelijk',
         ]);
 
@@ -81,8 +81,8 @@ class IncassoService
             }
 
             // Demo-/voorbeeldadministraties mailen de incassopartner nooit echt.
-            Mail::mailer($invoice->company?->is_demo ? 'log' : null)->to(config('incasso.claims_email'))
-                ->cc(config('incasso.cc'))
+            Mail::mailer($invoice->company?->is_demo ? 'log' : null)->to(\App\Support\Market::incasso('claims_email'))
+                ->cc(\App\Support\Market::incasso('cc'))
                 ->send(new IncassoDossierMail($invoice, $pdf, $files));
         } catch (\Throwable $e) {
             Log::error('Incasso-dossier versturen mislukt', [

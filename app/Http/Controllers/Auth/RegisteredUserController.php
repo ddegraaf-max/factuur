@@ -33,35 +33,51 @@ class RegisteredUserController extends Controller
             ]);
         }
 
+        // Identificatie per markt: Nederland KvK (verplicht) + btw-nummer,
+        // Polen NIP (verplicht, met controlecijfer) + REGON (optioneel).
+        $pl = \App\Support\Market::isPl();
+        if ($pl && filled($request->input('vatNumber'))) {
+            $request->merge(['vatNumber' => \App\Services\NipService::normalize($request->input('vatNumber'))]);
+        }
+
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:60'],
             'lastName' => ['required', 'string', 'max:60'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
             'companyName' => ['required', 'string', 'max:255'],
-            'companyType' => ['required', 'in:eenmanszaak,bv,vof,maatschap,stichting,vereniging,other'],
-            'kvkNumber' => ['required', 'digits:8', 'unique:companies,kvk_number'],
-            'vatNumber' => ['nullable', 'regex:/^NL\d{9}B\d{2}$/i', 'unique:companies,vat_number'],
+            'companyType' => ['required', 'in:' . implode(',', array_keys(\App\Support\Market::companyTypes()))],
+            'kvkNumber' => $pl
+                ? ['nullable', 'regex:/^\d{9}(\d{5})?$/', 'unique:companies,kvk_number']
+                : ['required', 'digits:8', 'unique:companies,kvk_number'],
+            'vatNumber' => $pl
+                ? ['required', 'digits:10', function ($attr, $value, $fail) { if (! \App\Services\NipService::valid($value)) { $fail(__('Nieprawidłowy numer NIP — sprawdź cyfry.')); } }, 'unique:companies,vat_number']
+                : ['nullable', 'regex:/^NL\d{9}B\d{2}$/i', 'unique:companies,vat_number'],
             'acceptTerms' => ['accepted'],
             'newsletter' => ['boolean'],
         ], [
-            'kvkNumber.unique' => 'Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.',
-            'vatNumber.regex' => 'Vul een geldig Nederlands BTW-nummer in, bijvoorbeeld NL123456789B01.',
-            'vatNumber.unique' => 'Er bestaat al een account met dit BTW-nummer. Neem contact met ons op als dit onterecht is.',
+            'kvkNumber.unique' => __('Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.'),
+            'kvkNumber.regex' => __('Vul een geldig REGON-nummer in (9 of 14 cijfers).'),
+            'vatNumber.regex' => __('Vul een geldig Nederlands BTW-nummer in, bijvoorbeeld NL123456789B01.'),
+            'vatNumber.digits' => __('Vul een geldig NIP-nummer in (10 cijfers).'),
+            'vatNumber.unique' => __('Er bestaat al een account met dit BTW-nummer. Neem contact met ons op als dit onterecht is.'),
         ]);
 
-        $user = DB::transaction(function () use ($data) {
+        $user = DB::transaction(function () use ($data, $pl) {
             $company = Company::create([
                 'name' => $data['companyName'],
-                'kvk_number' => $data['kvkNumber'],
+                'kvk_number' => $data['kvkNumber'] ?? null,
                 'vat_number' => ! empty($data['vatNumber']) ? strtoupper($data['vatNumber']) : null,
                 'email' => $data['email'],
-                'country' => 'NL',
-                'currency' => 'EUR',
-                'brand_color' => '#E8231F',
-                'default_payment_terms' => 30,
-                'invoice_number_format' => '{year}-{sequence:4}',
-                'invoice_footer' => 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.',
+                // Land, valuta, huisstijlkleur, betaaltermijn en factuurvoettekst volgen markt en merk.
+                'country' => \App\Support\Market::country(),
+                'currency' => \App\Support\Market::currency(),
+                'brand_color' => (string) brand('color', '#E8231F'),
+                'default_payment_terms' => $pl ? 14 : 30,
+                'invoice_number_format' => $pl ? 'FV/{year}/{sequence:4}' : '{year}-{sequence:4}',
+                'invoice_footer' => $pl
+                    ? (string) \App\Support\Market::get('invoice_footer')
+                    : 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.',
                 'invoice_template' => 'modern',
                 'invoice_font' => 'sans',
                 'price_mode' => 'excl',

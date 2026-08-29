@@ -21,6 +21,8 @@ class HandleInertiaRequests extends Middleware
             'version' => \App\Support\Brand::version(),
             // Het actieve merk (EasyInvoice of Lopra): naam, logo's, kleuren — zie config/brand.php.
             'brand' => \App\Support\Brand::forClient(),
+            // De markt (nl/pl): taal, valuta, btw-tarieven, NIP/KvK-labels — zie config/markets.php.
+            'market' => \App\Support\Market::forClient(),
             'auth' => [
                 'user' => $request->user(),
                 'company' => $request->user()?->company,

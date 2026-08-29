@@ -5,6 +5,7 @@ import { createApp, h } from 'vue';
 import { createInertiaApp, router } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from 'ziggy-js';
+import { t, setLocale } from './i18n';
 
 // Merknaam en -kleur komen van de server (data-attributen op <html>, zie
 // app.blade.php): één build draait voor EasyInvoice én Lopra.
@@ -39,7 +40,12 @@ createInertiaApp({
         import.meta.glob('./Pages/**/*.vue'),
     ),
     setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
+        // Taal van de markt (nl/pl): $t('Nederlandse tekst') vertaalt in de templates.
+        setLocale(props.initialPage?.props?.market?.locale || brandData.locale || 'nl');
+        const app = createApp({ render: () => h(App, props) });
+        app.config.globalProperties.$t = t;
+        app.provide('t', t);
+        return app
             .use(plugin)
             .use(ZiggyVue)
             .mount(el);

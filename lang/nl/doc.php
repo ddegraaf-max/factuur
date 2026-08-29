@@ -86,6 +86,8 @@ return [
     'mail_thanks_review_cta' => 'Laat een review achter',
     'pay_method_bank_transfer' => 'Bankoverschrijving',
     'pay_method_ideal' => 'iDEAL',
+    'pay_method_blik' => 'BLIK',
+    'pay_method_p24' => 'Przelewy24',
     'pay_method_cash' => 'Contant',
     'pay_method_card' => 'Pinpas / creditcard',
     'pay_method_direct_debit' => 'Automatische incasso',

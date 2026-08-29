@@ -1,0 +1,102 @@
+<?php
+
+/*
+ * Markten: alles wat per land verschilt — taal, valuta, btw-tarieven,
+ * identificatienummers, rechtsvormen, betaalmethoden, e-facturatie en de
+ * incassopartner. Een merk (config/brand.php) verwijst met 'market' naar
+ * één van deze sleutels. Gebruik App\Support\Market, market('…') of
+ * $page.props.market in Vue.
+ */
+return [
+
+    'nl' => [
+        'locale' => 'nl',
+        'country' => 'NL',
+        'country_name' => 'Nederland',
+        'phone_prefix' => '+31',
+        'currency' => 'EUR',
+        'currency_symbol' => '€',
+        'symbol_position' => 'before',
+        'thousands_separator' => '.',
+        'decimal_separator' => ',',
+        'date_format' => 'd-m-Y',
+
+        'vat_rates' => [21, 9, 0],
+        'default_vat' => 21,
+        'vat_return' => 'nl',              // rubrieken van de Belastingdienst
+        'tax_authority' => 'Belastingdienst',
+        'e_invoicing' => 'peppol',
+
+        // Identificatie van een onderneming.
+        'tax_id' => ['label' => 'Btw-nummer', 'short' => 'BTW', 'placeholder' => 'NL123456789B01', 'regex' => '/^NL\d{9}B\d{2}$/i', 'required' => false, 'maxlength' => 14],
+        'registry' => ['label' => 'KvK-nummer', 'short' => 'KVK', 'placeholder' => '12345678', 'digits' => [8, 8], 'required' => true],
+        'company_types' => [
+            'eenmanszaak' => 'ZZP / Eenmanszaak',
+            'bv' => 'B.V.',
+            'vof' => 'V.O.F.',
+            'maatschap' => 'Maatschap',
+            'stichting' => 'Stichting',
+            'vereniging' => 'Vereniging',
+            'other' => 'Anders',
+        ],
+
+        'payment' => ['online_label' => 'iDEAL', 'mollie_methods' => ['ideal']],
+        'km_rate' => 0.23,
+        'invoice_footer' => 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer.',
+
+        'incasso' => [
+            'partner_name' => 'Armaere Gerechtsdeurwaarders',
+            'claims_email' => 'j.backers@armaere.nl',
+            'cc' => 'info@creditline.nl',
+        ],
+    ],
+
+    'pl' => [
+        'locale' => 'pl',
+        'country' => 'PL',
+        'country_name' => 'Polska',
+        'phone_prefix' => '+48',
+        'currency' => 'PLN',
+        'currency_symbol' => 'zł',
+        'symbol_position' => 'after',
+        'thousands_separator' => "\u{00A0}", // vaste spatie: "1 234,50 zł" breekt nooit af
+        'decimal_separator' => ',',
+        'date_format' => 'd.m.Y',
+
+        'vat_rates' => [23, 8, 5, 0],
+        'default_vat' => 23,
+        'vat_return' => 'pl',              // JPK_V7: VAT należny/naliczony per stawka
+        'tax_authority' => 'Urząd Skarbowy',
+        'e_invoicing' => 'ksef',           // Krajowy System e-Faktur (FA-XML)
+
+        'tax_id' => ['label' => 'NIP', 'short' => 'NIP', 'placeholder' => '1234567890', 'regex' => '/^(PL)?\d{10}$/', 'required' => true, 'maxlength' => 13],
+        'registry' => ['label' => 'REGON', 'short' => 'REGON', 'placeholder' => '123456789', 'digits' => [9, 14], 'required' => false],
+        'company_types' => [
+            'jdg' => 'Jednoosobowa działalność gospodarcza',
+            'sp_zoo' => 'Spółka z o.o.',
+            'sp_j' => 'Spółka jawna',
+            'sp_k' => 'Spółka komandytowa',
+            'sa' => 'Spółka akcyjna',
+            'sp_cywilna' => 'Spółka cywilna',
+            'fundacja' => 'Fundacja / stowarzyszenie',
+            'other' => 'Inna',
+        ],
+
+        'payment' => ['online_label' => 'BLIK / Przelewy24', 'mollie_methods' => ['blik', 'przelewy24', 'creditcard']],
+        'km_rate' => 1.15,
+        'invoice_footer' => 'Dziękujemy za zaufanie! Prosimy o zapłatę w terminie, podając numer faktury w tytule przelewu.',
+
+        // Windykacja: odsetki ustawowe za opóźnienie w transakcjach handlowych
+        // (stopa referencyjna NBP + 10 p.p.) en de vaste rekompensata (art. 10
+        // ustawy z 8 marca 2013 r.) van 40/70/100 EUR, omgerekend naar PLN.
+        'interest_rate' => 0.14,
+        'eur_pln' => 4.30,
+        'incasso' => [
+            'partner_name' => 'Creditline Polska',
+            'claims_email' => 'sprawy@creditline.pl',
+            'cc' => 'info@creditline.nl',
+            'phone' => '+48 22 000 00 00',
+            'website' => 'https://creditline.pl',
+        ],
+    ],
+];

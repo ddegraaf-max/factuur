@@ -118,6 +118,7 @@ class Brand
     {
         return [
             'key' => static::key(),
+            'market' => (string) static::get('market', 'nl'),
             'name' => static::name(),
             'tagline' => static::tagline(),
             'assistant' => (string) static::get('assistant', 'EASY'),
@@ -152,7 +153,7 @@ class Brand
             'name' => static::name(),
             'short_name' => static::name(),
             'description' => (string) static::get('pwa_description', ''),
-            'lang' => 'nl',
+            'lang' => Market::locale(),
             'start_url' => '/dashboard',
             'scope' => '/',
             'display' => 'standalone',

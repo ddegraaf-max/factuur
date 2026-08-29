@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl" data-brand="{{ \App\Support\Brand::key() }}">
+<html lang="{{ market('locale') }}" data-brand="{{ \App\Support\Brand::key() }}" data-locale="{{ market('locale') }}" data-currency="{{ market('currency') }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ brand('name') }}">
-<meta property="og:locale" content="nl_NL">
+<meta property="og:locale" content="{{ market('locale') === 'pl' ? 'pl_PL' : 'nl_NL' }}">
 <meta property="og:url" content="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:title" content="@yield('title', brand('seo_title'))">
 <meta property="og:description" content="@yield('description', brand('og_description'))">
@@ -32,25 +32,10 @@
       "url": "{{ url('/') }}",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
-      "inLanguage": "nl",
+      "inLanguage": "{{ market('locale') }}",
       "description": "{{ brand('app_description') }}",
       "image": "{{ \App\Support\Brand::asset('og_image') }}",
-      "offers": [
-        {
-          "@@type": "Offer",
-          "name": "Basis",
-          "price": "12.10",
-          "priceCurrency": "EUR",
-          "description": "Het volledige facturatiepakket voor € 12,10 per maand (incl. 21% btw), maandelijks opzegbaar."
-        },
-        {
-          "@@type": "Offer",
-          "name": "Slim",
-          "price": "21.18",
-          "priceCurrency": "EUR",
-          "description": "Alles uit Basis plus de AI-functies voor € 21,18 per maand (incl. 21% btw), maandelijks opzegbaar."
-        }
-      ],
+      "offers": {!! json_encode(array_map(fn ($o) => ['@type' => 'Offer'] + $o, config('marketing.' . \App\Support\Brand::key() . '.offers', config('marketing.easyinvoice.offers', []))), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!},
       "publisher": { "@@type": "Organization", "name": "Creditline B.V." }
     },
     {
@@ -59,7 +44,8 @@
       "url": "{{ url('/') }}",
       "logo": "{{ \App\Support\Brand::asset('favicon_512') }}",
       "email": "{{ brand('email') }}",
-      "address": { "@@type": "PostalAddress", "addressLocality": "Bussum", "addressCountry": "NL" }
+      "address": { "@@type": "PostalAddress", "addressLocality": "Bussum", "addressCountry": "NL" },
+      "areaServed": "{{ market('country') }}"
     }
   ]
 }
@@ -500,30 +486,38 @@
       <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
       {{ brand('name') }}
     </a>
+    @php
+      // Navigatie en voettekst per merk (config/marketing.php); routes die hier niet bestaan worden overgeslagen.
+      $mk = config('marketing.' . \App\Support\Brand::key(), config('marketing.easyinvoice'));
+      $mkUrl = function (array $l) {
+          if (! empty($l['mailto'])) return 'mailto:' . brand('email');
+          if (! empty($l['url'])) return $l['url'];
+          if (empty($l['route']) || ! \Illuminate\Support\Facades\Route::has($l['route'])) return null;
+          return route($l['route'], $l['params'] ?? []) . ($l['fragment'] ?? '');
+      };
+      $mkLabel = fn (array $l) => str_replace('{brand}', brand('name'), $l['label']);
+      $mkShow = fn (array $l) => (empty($l['brand_watch']) || \App\Support\Brand::watchesTrademark()) && $mkUrl($l);
+    @endphp
     <nav class="nav-links">
-      <a href="/#waarom" class="nav-link">Waarom {{ brand('name') }}</a>
-      <a href="/#functies" class="nav-link">Functies</a>
-      <a href="{{ route('ai') }}" class="nav-link">Factureren met AI</a>
-      <a href="/#prijzen" class="nav-link">Prijzen</a>
-      <a href="{{ route('gratis-factuur') }}" class="nav-link">Gratis factuur</a>
-      <a href="{{ route('faq') }}" class="nav-link">Veelgestelde vragen</a>
+      @foreach($mk['nav'] as $l)@if($mkShow($l))
+      <a href="{{ $mkUrl($l) }}" class="nav-link">{{ $mkLabel($l) }}</a>
+      @endif
+      @endforeach
     </nav>
     <div class="nav-actions">
-      <a href="{{ route('login') }}" class="btn btn-ghost">Inloggen</a>
-      <a href="{{ route('register') }}" class="btn btn-primary">Start gratis →</a>
+      <a href="{{ route('login') }}" class="btn btn-ghost">{{ $mk['login'] }}</a>
+      <a href="{{ route('register') }}" class="btn btn-primary">{{ $mk['cta'] }}</a>
     </div>
     <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
   </div>
   <div class="nav-mobile">
-    <a href="/#waarom" class="nav-mobile-link">Waarom {{ brand('name') }}</a>
-    <a href="/#functies" class="nav-mobile-link">Functies</a>
-    <a href="{{ route('ai') }}" class="nav-mobile-link">Factureren met AI</a>
-    <a href="/#prijzen" class="nav-mobile-link">Prijzen</a>
-    <a href="{{ route('gratis-factuur') }}" class="nav-mobile-link">Gratis factuur maken</a>
-    <a href="{{ route('faq') }}" class="nav-mobile-link">Veelgestelde vragen</a>
+    @foreach($mk['nav'] as $l)@if($mkShow($l))
+    <a href="{{ $mkUrl($l) }}" class="nav-mobile-link">{{ $mkLabel($l) }}</a>
+    @endif
+      @endforeach
     <div class="nav-mobile-actions">
-      <a href="{{ route('login') }}" class="btn btn-secondary btn-block">Inloggen</a>
-      <a href="{{ route('register') }}" class="btn btn-primary btn-block">Start gratis →</a>
+      <a href="{{ route('login') }}" class="btn btn-secondary btn-block">{{ $mk['login'] }}</a>
+      <a href="{{ route('register') }}" class="btn btn-primary btn-block">{{ $mk['cta'] }}</a>
     </div>
   </div>
 </header>
@@ -543,73 +537,37 @@
           {{ brand('footer_description') }}
         </div>
         <div class="footer-legal">
-          Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Nederland
+          {{ $mk['company_line'] }}
         </div>
       </div>
 
+      @foreach($mk['footer'] as $col)
       <div>
-        <div class="footer-col-title">Product</div>
+        <div class="footer-col-title">{{ $col['title'] }}</div>
         <ul class="footer-links">
-          <li><a href="/#waarom">Waarom {{ brand('name') }}</a></li>
-          <li><a href="/#functies">Functies</a></li>
-          <li><a href="{{ route('ai') }}">Factureren met AI</a></li>
-          <li><a href="/#prijzen">Prijzen</a></li>
-          <li><a href="{{ route('changelog') }}">Wat is nieuw</a></li>
-          <li><a href="{{ route('roadmap') }}">Roadmap</a></li>
-          @if(\App\Support\Brand::watchesTrademark())
-          <li><a href="{{ route('confusion') }}">Zocht u een ander {{ brand('name') }}?</a></li>
+          @foreach($col['links'] as $l)@if($mkShow($l))
+          <li><a href="{{ $mkUrl($l) }}"@if(! empty($l['url'])) target="_blank" rel="noopener"@endif>{{ $mkLabel($l) }}</a></li>
           @endif
+      @endforeach
         </ul>
       </div>
-
-      <div>
-        <div class="footer-col-title">Gratis tools</div>
-        <ul class="footer-links">
-          <li><a href="{{ route('gratis-factuur') }}">Gratis factuur maken</a></li>
-          <li><a href="{{ route('btw-calculator') }}">Btw-calculator</a></li>
-          <li><a href="{{ route('uurtarief-calculator') }}">Uurtarief-calculator</a></li>
-          <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
-          <li><a href="{{ route('overstappen.van', 'wefact') }}">Overstappen van WeFact</a></li>
-          <li><a href="{{ route('overstappen.van', 'moneybird') }}">Overstappen van Moneybird</a></li>
-          <li><a href="{{ route('overstappen.van', 'e-boekhouden') }}">Overstappen van e-Boekhouden</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="footer-col-title">Bedrijf</div>
-        <ul class="footer-links">
-          <li><a href="{{ route('over') }}">Over ons</a></li>
-          <li><a href="{{ route('boekhouders') }}">Voor boekhouders</a></li>
-          <li><a href="{{ route('contact') }}">Contact</a></li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="footer-col-title">Hulp</div>
-        <ul class="footer-links">
-          <li><a href="{{ route('helpcentrum') }}">Helpcentrum</a></li>
-          <li><a href="{{ route('kennisbank') }}">Kennisbank</a></li>
-          <li><a href="{{ route('faq') }}">Veelgestelde vragen</a></li>
-          <li><a href="mailto:{{ brand('email') }}">E-mail support</a></li>
-          <li><a href="{{ route('status') }}">Status</a></li>
-        </ul>
-      </div>
+      @endforeach
     </div>
 
     <div class="footer-bottom">
-      <div>© 2026 Creditline B.V. · KvK 59683198 · BTW NL853603108B01 · <span class="footer-version">{{ \App\Support\Brand::version() }}</span></div>
+      <div>{{ str_replace(':year', date('Y'), $mk['copyright']) }} · <span class="footer-version">{{ \App\Support\Brand::version() }}</span></div>
       <div class="footer-bottom-links">
-        <a href="{{ route('voorwaarden') }}">Algemene voorwaarden</a>
-        <a href="{{ route('privacy') }}">Privacybeleid</a>
-        <a href="{{ route('verwerkersovereenkomst') }}">Verwerkersovereenkomst</a>
-        <a href="{{ route('cookies') }}">Cookies</a>
+        @foreach($mk['legal'] as $l)@if($mkUrl($l))
+        <a href="{{ $mkUrl($l) }}">{{ $mkLabel($l) }}</a>
+        @endif
+      @endforeach
       </div>
     </div>
 
-    @if($tm = brand('trademark'))
+    @if(($tm = brand('trademark')) && ! empty($mk['trademark_line']))
     <div class="footer-trademark">
-      {{ brand('name') }}&reg; is een geregistreerd Benelux-merk van Creditline B.V. &mdash;
-      <a href="{{ $tm['url'] }}" target="_blank" rel="noopener">BOIP-inschrijving nr.&nbsp;{{ $tm['number'] }}</a>.
+      {!! str_replace(':brand', e(brand('name')), $mk['trademark_line']) !!}
+      <a href="{{ $tm['url'] }}" target="_blank" rel="noopener">{!! str_replace(':number', e($tm['number']), $mk['trademark_link']) !!}</a>.
     </div>
     @endif
   </div>

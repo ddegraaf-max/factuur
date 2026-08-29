@@ -85,6 +85,8 @@ return [
     'mail_thanks_review_cta' => 'Leave a review',
     'pay_method_bank_transfer' => 'Bank transfer',
     'pay_method_ideal' => 'iDEAL',
+    'pay_method_blik' => 'BLIK',
+    'pay_method_p24' => 'Przelewy24',
     'pay_method_cash' => 'Cash',
     'pay_method_card' => 'Debit / credit card',
     'pay_method_direct_debit' => 'Direct debit',

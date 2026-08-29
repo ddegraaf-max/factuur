@@ -307,7 +307,7 @@ class DemoDataBuilder
             'status' => 'incasso',
             'incasso_sent_at' => now()->subDays(45),
             'incasso_reference' => sprintf('ARM-%d-0001', $year),
-            'incasso_handler' => config('incasso.partner_name', 'Armaere Gerechtsdeurwaarders'),
+            'incasso_handler' => \App\Support\Market::incasso('partner_name'),
             'incasso_phase' => 'minnelijk',
         ])->save();
         DB::table('incasso_sequences')->insert([
