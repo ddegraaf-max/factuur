@@ -120,6 +120,7 @@ class Brand
             'key' => static::key(),
             'name' => static::name(),
             'tagline' => static::tagline(),
+            'assistant' => (string) static::get('assistant', 'EASY'),
             'positioning' => (string) static::get('positioning', ''),
             'email' => static::email(),
             'domain' => static::domain(),

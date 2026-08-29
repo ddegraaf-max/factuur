@@ -28,6 +28,7 @@ return [
             'name' => 'EasyInvoice',
             'version_prefix' => 'Easy',
             'tagline' => 'Facturatie zonder gedoe',
+            'assistant' => 'EASY',        // naam van de AI-assistent in de app
             'positioning' => 'Nederlandse facturatie voor MKB en ZZP',
             'domain' => 'easyinvoice.nl',
             'email' => 'hallo@easyinvoice.nl',
@@ -83,6 +84,7 @@ return [
             'name' => 'Lopra',
             'version_prefix' => 'Lopra',
             'tagline' => 'Je hele administratie op één plek',
+            'assistant' => 'Lo',
             'positioning' => 'Administratie en online zichtbaarheid voor startende ondernemers',
             'domain' => 'lopra.nl',
             'email' => 'hallo@lopra.nl',

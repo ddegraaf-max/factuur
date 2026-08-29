@@ -3,6 +3,9 @@ import { ref, computed } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 
 const page = usePage();
+// Naam van de assistent per merk (EASY bij EasyInvoice, Lo bij Lopra) — zie config/brand.php.
+const assistant = computed(() => page.props.brand?.assistant || 'EASY');
+const initial = computed(() => assistant.value.charAt(0).toUpperCase());
 const open = ref(false);
 const messages = ref([]);
 const initialized = ref(false);
@@ -28,7 +31,7 @@ const toggle = () => {
     const userName = (page.props.auth?.user?.name || '').split(' ')[0] || 'daar';
     messages.value.push({
       from: 'bot',
-      text: `Hoi **${userName}**! Ik ben **EASY**, je administratie-assistent. Vraag bijvoorbeeld naar **openstaand**, **achterstallig** of je **topklanten**.`,
+      text: `Hoi **${userName}**! Ik ben **${assistant.value}**, je administratie-assistent. Vraag bijvoorbeeld naar **openstaand**, **achterstallig** of je **topklanten**.`,
     });
   }
 };
@@ -88,8 +91,8 @@ const quick = (q) => send(q);
 </script>
 
 <template>
-  <button class="easy-fab" @click="toggle" title="Vraag EASY iets">
-    E
+  <button class="easy-fab" @click="toggle" :title="'Vraag ' + assistant + ' iets'">
+    {{ initial }}
     <span v-if="urgent > 0 && !open" class="pulse">{{ urgent }}</span>
   </button>
 
@@ -98,9 +101,9 @@ const quick = (q) => send(q);
   <div class="panel" :class="{ open }">
     <div class="header">
       <div class="identity">
-        <div class="avatar">E</div>
+        <div class="avatar">{{ initial }}</div>
         <div>
-          <div class="name">EASY</div>
+          <div class="name">{{ assistant }}</div>
           <div class="tagline">Je administratie-assistent</div>
         </div>
       </div>
@@ -122,7 +125,7 @@ const quick = (q) => send(q);
 
       <div v-if="messages.length" class="messages">
         <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.from">
-          <div v-if="m.from === 'bot'" class="msg-avatar">E</div>
+          <div v-if="m.from === 'bot'" class="msg-avatar">{{ initial }}</div>
           <div class="bubble" style="white-space: pre-wrap;">
             <template v-for="(part, p) in parts(m.text)" :key="p">
               <b v-if="p % 2">{{ part }}</b><template v-else>{{ part }}</template>
@@ -140,7 +143,7 @@ const quick = (q) => send(q);
     </div>
 
     <div class="input-row">
-      <input ref="inputRef" type="text" placeholder="Stel een vraag aan EASY..."
+      <input ref="inputRef" type="text" :placeholder="'Stel een vraag aan ' + assistant + '...'"
         @keydown.enter="send($event.target.value)" />
       <button class="send-btn" @click="send(inputRef.value)">→</button>
     </div>

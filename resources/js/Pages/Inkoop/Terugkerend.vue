@@ -270,7 +270,7 @@ const lineError = computed(() => {
     <div v-else-if="!showForm" class="card card-empty">
       <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen vaste lasten</div>
       <div style="margin-bottom:20px;">
-        Zet je terugkerende kosten hier eenmalig klaar — Easy boekt ze voortaan automatisch in,
+        Zet je terugkerende kosten hier eenmalig klaar — {{ $page.props.brand.name }} boekt ze voortaan automatisch in,
         inclusief de BTW als voorbelasting. Tip: op een bestaande inkoopfactuur staat ook een knop "Maak terugkerend".
       </div>
       <button type="button" class="btn btn-primary btn-sm" style="display:inline-flex;" @click="startAdd">

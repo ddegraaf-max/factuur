@@ -138,8 +138,8 @@
         <h2>Btw-aangifte: aangifte-klaar, met betalingskenmerk</h2>
         <ul class="tl-list">
           <li><b>Alle rubrieken klaar</b> — per tijdvak (kwartaal, maand of jaar) staan 1a t/m 5c precies in de indeling van Mijn Belastingdienst Zakelijk, in hele euro's en afgerond in je voordeel. Klik op een bedrag om het te kopiëren; onder "Onderbouwing" zie je welke facturen in welke rubriek zitten. Export en EU-leveringen (3a/3b) worden op klantland herkend.</li>
-          <li><b>Vul aan wat Easy niet weet</b> — verlegde btw, inkoop uit het buitenland, privégebruik en niet-ingeboekte voorbelasting vul je per tijdvak zelf in; het wordt bewaard en meegeteld.</li>
-          <li><b>Zo overgemaakt</b> — bedrag, het (nieuwe) rekeningnummer van de Belastingdienst en het betalingskenmerk staan klaar. Het kenmerk berekent Easy uit je omzetbelastingnummer volgens de officiële specificatie van de Belastingdienst — of je plakt het kenmerk uit je ingestuurde aangifte.</li>
+          <li><b>Vul aan wat {{ brand('name') }} niet weet</b> — verlegde btw, inkoop uit het buitenland, privégebruik en niet-ingeboekte voorbelasting vul je per tijdvak zelf in; het wordt bewaard en meegeteld.</li>
+          <li><b>Zo overgemaakt</b> — bedrag, het (nieuwe) rekeningnummer van de Belastingdienst en het betalingskenmerk staan klaar. Het kenmerk berekent {{ brand('name') }} uit je omzetbelastingnummer volgens de officiële specificatie van de Belastingdienst — of je plakt het kenmerk uit je ingestuurde aangifte.</li>
           <li><b>Niets meer vergeten</b> — vink "aangegeven" en "betaald" af, krijg twee weken en drie dagen vóór de deadline een herinnering met de cijfers erbij, en zie op het dashboard direct of er een aangifte openstaat. Het btw-kpi op het dashboard toont nu het saldo ná voorbelasting.</li>
           <li><b>Offertes op het dashboard</b> — je laatste offertes met status, wat er openstaat bij klanten (en wat bijna verloopt), wat geaccepteerd is maar nog gefactureerd moet worden, en je acceptatiegraad van dit jaar. Plus "Nieuwe offerte" bij de snelle acties.</li>
           <li><b>Klantpagina</b> — klik op een klant en zie alles bij elkaar: openstaand bedrag, omzet dit jaar en in totaal, betaalgedrag (gemiddeld aantal dagen en hoe vaak op tijd), offertes met acceptatiegraad, nog te factureren uren, alle facturen en offertes, gegevens en notities. Met knoppen om direct een factuur of offerte voor die klant te maken. Op de klantenkaarten staat nu ook het aantal offertes.</li>
@@ -314,7 +314,7 @@
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · {{ brand('version_prefix') }} 1.19.0</div>
         <h2>Vaste lasten — terugkerende inkoop automatisch inboeken</h2>
         <ul class="tl-list">
-          <li><b>Eén keer instellen, nooit meer vergeten</b> — huur, software-abonnementen, verzekeringen: zet ze klaar als vaste last (wekelijks t/m jaarlijks) en Easy boekt ze voortaan automatisch in als inkoopfactuur. De BTW telt vanzelf mee als voorbelasting in je aangifte.</li>
+          <li><b>Eén keer instellen, nooit meer vergeten</b> — huur, software-abonnementen, verzekeringen: zet ze klaar als vaste last (wekelijks t/m jaarlijks) en {{ brand('name') }} boekt ze voortaan automatisch in als inkoopfactuur. De BTW telt vanzelf mee als voorbelasting in je aangifte.</li>
           <li><b>Incasso? Direct op betaald</b> — vaste lasten via automatische incasso worden meteen als betaald ingeboekt, met de juiste betaalwijze. Pauzeren, een einddatum of aanpassen kan altijd.</li>
           <li><b>Snelstart vanaf een bestaande factuur</b> — op elke inkoopfactuur staat nu "Maak terugkerend": één klik en dezelfde kosten worden voortaan maandelijks ingeboekt. Gemiste periodes worden automatisch ingehaald.</li>
         </ul>
@@ -447,7 +447,7 @@
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 19 augustus 2026 · {{ brand('version_prefix') }} 1.7.0</div>
         <h2>Verzending via Peppol</h2>
         <ul class="tl-list">
-          <li><b>Peppol-bereikbaarheid</b> — Easy controleert automatisch (via de officiële Peppol Directory) of je klant is aangesloten op het Peppol-netwerk. Is dat zo, dan zie je een ⚡-badge op de factuur.</li>
+          <li><b>Peppol-bereikbaarheid</b> — {{ brand('name') }} controleert automatisch (via de officiële Peppol Directory) of je klant is aangesloten op het Peppol-netwerk. Is dat zo, dan zie je een ⚡-badge op de factuur.</li>
           <li><b>E-factuur rechtstreeks afleveren</b> — met één klik lever je de UBL-factuur (NLCIUS) af in het boekhoudpakket van je klant, via een gecertificeerd Peppol Access Point. Geen mailbox ertussen, geen overtypen bij de ontvanger.</li>
           <li>Eigen Peppol-ID per klant instelbaar (standaard afgeleid van het KvK-nummer); afleveringen verschijnen in de historie van de factuur.</li>
         </ul>
@@ -479,7 +479,7 @@
         <h2>Bank &amp; transacties — afschriften importeren en koppelen</h2>
         <ul class="tl-list">
           <li><b>Bankafschriften importeren</b> — sleep je CAMT.053- of MT940-bestand (te downloaden bij elke Nederlandse bank) in het nieuwe Bank-menu. Dubbele transacties worden automatisch overgeslagen.</li>
-          <li><b>Slimme koppel-suggesties</b> — Easy herkent factuurnummer, bedrag en klantnaam in de omschrijving en stelt de juiste factuur voor. Eén klik en de betaling is geboekt.</li>
+          <li><b>Slimme koppel-suggesties</b> — {{ brand('name') }} herkent factuurnummer, bedrag en klantnaam in de omschrijving en stelt de juiste factuur voor. Eén klik en de betaling is geboekt.</li>
           <li><b>Ook voor inkoop</b> — afschrijvingen koppel je aan inkoopfacturen, die daarmee direct op betaald staan.</li>
           <li><b>Alles terug te draaien</b> — verwerkte transacties kun je ontkoppelen (de betaling wordt teruggedraaid) en genegeerde weer herstellen.</li>
         </ul>
@@ -538,7 +538,7 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 mei 2026 · {{ brand('version_prefix') }} 1.0.0</div>
-        <h2>EASY-assistent: je slimme hulp</h2>
+        <h2>{{ brand('assistant') }}-assistent: je slimme hulp</h2>
         <ul class="tl-list">
           <li>Stel vragen over je administratie en krijg direct antwoord.</li>
           <li>Suggesties terwijl je een factuur opstelt.</li>
@@ -548,7 +548,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 2 april 2026 · Easy 0.9</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 2 april 2026 · {{ brand('name') }} 0.9</div>
         <h2>Incassotraject in fases</h2>
         <ul class="tl-list">
           <li>Gefaseerd traject: herinnering → aanmaning → incasso.</li>
@@ -559,7 +559,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 maart 2026 · Easy 0.8</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 maart 2026 · {{ brand('name') }} 0.8</div>
         <h2>Creditfacturen &amp; deelbetalingen</h2>
         <ul class="tl-list">
           <li>Maak in één klik een creditnota op een bestaande factuur.</li>
@@ -569,7 +569,7 @@
 
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 5 februari 2026 · Easy 0.7</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--success-bg);color:var(--success);border-color:#6EE7B7;">Verbetering</span> 5 februari 2026 · {{ brand('name') }} 0.7</div>
         <h2>Nieuwe factuursjablonen</h2>
         <ul class="tl-list">
           <li>Modern sjabloon met meer ruimte voor je huisstijl.</li>

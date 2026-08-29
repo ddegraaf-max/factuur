@@ -33,7 +33,7 @@
                 <div class="logo">
                     <table role="presentation" cellpadding="0" cellspacing="0"><tr>
                         <td><img src="{{ \App\Support\Brand::asset('icon') }}" alt="{{ brand('name') }}"></td>
-                        <td><div class="name">Easy<span>Invoice</span></div><div class="tag">🔒 Klantenportaal · beveiligde omgeving</div></td>
+                        <td><div class="name">{{ brand('name') }}</div><div class="tag">🔒 Klantenportaal · beveiligde omgeving</div></td>
                     </tr></table>
                 </div>
             </div>

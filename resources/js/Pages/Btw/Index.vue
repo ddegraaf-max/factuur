@@ -271,7 +271,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
             </tbody>
           </table>
           <div class="rub-actions">
-            <span class="rub-hint">Invulvelden bewaart Easy per tijdvak; de rest rekent hij zelf uit.</span>
+            <span class="rub-hint">Invulvelden bewaart {{ $page.props.brand.name }} per tijdvak; de rest rekent hij zelf uit.</span>
             <button class="btn btn-sm" :class="manualDirty ? 'btn-primary' : 'btn-secondary'" :disabled="!manualDirty || manualSaving" @click="saveManual">Aanvullingen opslaan</button>
           </div>
 
@@ -323,7 +323,7 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
             <div class="pay-note">
               Zet het kenmerk in het veld <b>Betalingskenmerk</b> van je overschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.
               <template v-if="detail.payment.reference_source === 'auto'"> Controleer het met het kenmerk bij je ingestuurde aangifte.</template>
-              <template v-if="!detail.payment.reference"> Je vindt het in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte — plak het hieronder. Of <button type="button" class="link" @click="showSettings = true">stel je omzetbelastingnummer in</button>, dan berekent Easy het voortaan zelf.</template>
+              <template v-if="!detail.payment.reference"> Je vindt het in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte — plak het hieronder. Of <button type="button" class="link" @click="showSettings = true">stel je omzetbelastingnummer in</button>, dan berekent {{ $page.props.brand.name }} het voortaan zelf.</template>
             </div>
             <form class="ref-form" @submit.prevent="saveReference">
               <input type="text" v-model="refForm.payment_reference" maxlength="30" :placeholder="detail.payment.reference ? 'Afwijkend kenmerk van de Belastingdienst? Plak het hier' : 'Betalingskenmerk (16 cijfers)'">
