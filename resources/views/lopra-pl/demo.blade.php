@@ -63,9 +63,9 @@
       <div class="demo-feat">
         <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>
-          Windykacja<span class="demo-tag">Creditline</span>
+          Windykacja<span class="demo-tag">sprzedamfakture.pl</span>
         </h2>
-        <p>Przeterminowana faktura z wyliczonymi odsetkami i rekompensatą: pobierz wezwanie do zapłaty, przekaż sprawę do Creditline Polska albo zgłoś fakturę do wykupu.</p>
+        <p>Przeterminowana faktura z wyliczonymi odsetkami i rekompensatą: pobierz wezwanie do zapłaty, przekaż sprawę do sprzedamfakture.pl albo zgłoś fakturę do wykupu.</p>
       </div>
       <div class="demo-feat">
         <h2>

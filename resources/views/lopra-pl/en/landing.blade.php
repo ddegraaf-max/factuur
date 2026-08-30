@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- Lopra Polska home page, English version (APP_BRAND=lopra_pl): invoices, brand, website and debt collection with Creditline Polska — from day one to an established business. --}}
+{{-- Lopra Polska home page, English version (APP_BRAND=lopra_pl): invoices, brand, website and debt collection with sprzedamfakture.pl — from day one to an established business. --}}
 
 @section('title', 'Lopra — invoices, brand and debt collection in one place, from 49 zł a month')
-@section('description', 'The complete tool for businesses in Poland: KSeF-ready invoices, quotes, VAT returns, AI-designed brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with Creditline Polska. 14 days free.')
+@section('description', 'The complete tool for businesses in Poland: KSeF-ready invoices, quotes, VAT returns, AI-designed brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with sprzedamfakture.pl. 14 days free.')
 
 @push('styles')
 @include('lopra.partials.landing-styles')
@@ -33,7 +33,7 @@
   .wd-card .acts span { font-size: 12.5px; font-weight: 600; padding: 9px 13px; border-radius: 9px; border: 1px solid var(--border-strong); }
   .wd-card .acts span.main { background: var(--accent); color: #fff; border-color: var(--accent); }
   .wd-partner { display: flex; align-items: center; gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); font-size: 14px; }
-  .wd-partner .lg { width: 44px; height: 44px; border-radius: 12px; background: #ec3013; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wd-partner .lg { width: 44px; height: 44px; border-radius: 12px; background: #E0A55C; color: #132F49; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .wd-partner b { color: #fff; display: block; }
   @media (max-width: 900px) { .wd-grid { grid-template-columns: 1fr; } }
 
@@ -59,7 +59,7 @@
     <div class="eyebrow">For businesses in Poland — from start-up to established company</div>
     <h1>Your whole business <span class="accent">in one place.</span></h1>
     <p class="hero-sub">
-      Invoices ready for KSeF (the national e-invoicing system), quotes, VAT returns, brand identity, your own website — and debt collection with Creditline Polska when a client won't pay. One tool, one subscription, zero accounting jargon.
+      Invoices ready for KSeF (the national e-invoicing system), quotes, VAT returns, brand identity, your own website — and debt collection with sprzedamfakture.pl when a client won't pay. One tool, one subscription, zero accounting jargon.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -187,7 +187,7 @@
             <section class="d-screen" data-screen="windykacja">
               <div class="d-shead d-anim" style="--d:.04s">
                 <div><div class="d-h1">Debt collection</div><div class="d-sub">FV/2026/0004 · TransLog Polska Sp. z o.o. · 44 days overdue</div></div>
-                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Hand over to Creditline</div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Hand over to sprzedamfakture.pl</div>
               </div>
               <div class="d-two even">
                 <div class="d-card d-anim" style="--d:.1s" style="margin:0;">
@@ -210,7 +210,7 @@
               </div>
               <div class="d-tiles">
                 <div class="d-tile d-anim" style="--d:.3s"><div class="ic copper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><b>Payment demand</b><span>ready to send, 7-day deadline</span></div></div>
-                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>Creditline Polska</b><span>amicable and court collection, KRD/BIG</span></div></div>
+                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>sprzedamfakture.pl</b><span>amicable and court collection, KRD/BIG</span></div></div>
                 <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><b>Sell the invoice</b><span>purchase offer within 1 working day</span></div></div>
               </div>
             </section>
@@ -402,8 +402,8 @@
         </div>
         <div class="lp-vcard-body">
           <span class="lp-vcard-tag">Debt collection</span>
-          <h3>Not paying? Creditline recovers it.</h3>
-          <p>Reminders go out automatically. When that does not work, one click creates a wezwanie do zapłaty (formal payment demand) with statutory interest and compensation — and then you hand the case to Creditline Polska: amicable and court collection, a KRD/BIG debtor-register listing, or selling the invoice. All from your invoice, with no retyping.</p>
+          <h3>Not paying? sprzedamfakture.pl recovers it.</h3>
+          <p>Reminders go out automatically. When that does not work, one click creates a wezwanie do zapłaty (formal payment demand) with statutory interest and compensation — and then you hand the case to sprzedamfakture.pl: amicable and court collection, a KRD/BIG debtor-register listing, or selling the invoice. All from your invoice, with no retyping.</p>
         </div>
       </div>
     </div>
@@ -415,14 +415,14 @@
   <div class="container">
     <div class="eyebrow">Debt collection built into your invoicing</div>
     <h2>From reminder to recovered payment — without switching tools.</h2>
-    <p class="lead">In Poland, one in three B2B invoices is paid late. Lopra keeps an eye on due dates for you, and when it comes to it, Creditline Polska takes over the case — with all the data from your invoice.</p>
+    <p class="lead">In Poland, one in three B2B invoices is paid late. Lopra keeps an eye on due dates for you, and when it comes to it, sprzedamfakture.pl takes over the case — with all the data from your invoice.</p>
 
     <div class="wd-grid">
       <div class="wd-steps">
         <div class="wd-step"><div class="nr">1</div><div><b>Reminders and follow-ups — automatically</b><p>Before the due date, after it and after 14 days: e-mail and SMS in your tone of voice, with a link to pay by BLIK or Przelewy24.</p><span class="tag">included in your subscription</span></div></div>
         <div class="wd-step"><div class="nr">2</div><div><b>Payment demand with interest and compensation</b><p>One click: a formal pre-court demand (PDF) with statutory late-payment interest and the 40/70/100 EUR compensation under Art. 10 of the Late Payment Act — ready to send.</p><span class="tag">included in your subscription</span></div></div>
-        <div class="wd-step"><div class="nr">3</div><div><b>Hand-over to Creditline Polska</b><p>The complete file (invoice, contact history, demand) goes to the collection team. Amicable collection, a KRD/BIG listing and, if needed, court proceedings — at the debtor's expense.</p><span class="tag">quote before you commit · no upfront fees</span></div></div>
-        <div class="wd-step"><div class="nr">4</div><div><b>Sell the invoice</b><p>Need the cash now? Submit the receivable for purchase — Creditline Polska prepares an assignment offer within one working day.</p><span class="tag">receivables purchase</span></div></div>
+        <div class="wd-step"><div class="nr">3</div><div><b>Hand-over to sprzedamfakture.pl</b><p>The complete file (invoice, contact history, demand) goes to the collection team. Amicable collection, a KRD/BIG listing and, if needed, court proceedings — at the debtor's expense.</p><span class="tag">quote before you commit · no upfront fees</span></div></div>
+        <div class="wd-step"><div class="nr">4</div><div><b>Sell the invoice</b><p>Need the cash now? Submit the receivable for purchase — sprzedamfakture.pl prepares an assignment offer within one working day.</p><span class="tag">receivables purchase</span></div></div>
       </div>
 
       <div>
@@ -434,11 +434,11 @@
             <tr><td>Art. 10 compensation (40 EUR)</td><td class="r">172,00 zł</td></tr>
             <tr class="tot"><td>Total due</td><td class="r">2 632,84 zł</td></tr>
           </table>
-          <div class="acts"><span class="main">Download demand (PDF)</span><span>Hand over to Creditline</span><span>Sell the invoice</span></div>
+          <div class="acts"><span class="main">Download demand (PDF)</span><span>Hand over to sprzedamfakture.pl</span><span>Sell the invoice</span></div>
         </div>
         <div class="wd-partner">
-          <div class="lg">C</div>
-          <div><b>Creditline Polska</b>Lopra's debt collection partner — AI-assisted receivables collection, invoice purchase, interest calculator. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a></div>
+          <div class="lg">SF</div>
+          <div><b>sprzedamfakture.pl</b>Lopra's debt collection partner — AI-assisted receivables collection, invoice purchase, interest calculator. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a></div>
         </div>
       </div>
     </div>
@@ -489,7 +489,7 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg></div>
-        <div class="feature-title">Debt collection with Creditline Polska</div>
+        <div class="feature-title">Debt collection with sprzedamfakture.pl</div>
         <div class="feature-desc">Reminders, a payment demand with interest and compensation, case hand-over and invoice sale — straight from the invoice.</div>
       </div>
       <div class="feature-card">
@@ -558,7 +558,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>VAT return per rate, every month</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Digital business card with QR code and a website</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Your own logo, colours and templates</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Reminders, payment demand, hand-over to Creditline</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Reminders, payment demand, hand-over to sprzedamfakture.pl</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BLIK / Przelewy24 payment link on the invoice</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Hours, mileage, recurring invoices</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Extra users and your accountant free of charge</li>
@@ -583,7 +583,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Expenses from a photo: receipts and purchase invoices recognised automatically</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Quote from text: paste a description, the form fills itself in</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Claude integration: invoices and quotes straight from a conversation</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority handling of your collection cases at Creditline</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority handling of your collection cases at sprzedamfakture.pl</li>
           </ul>
           <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Try 14 days free</a>
           <div class="pricing-fineprint">No card needed · cancel at any time</div>
@@ -612,8 +612,8 @@
         <div class="faq-content">Your NIP (tax ID) and a business bank account. Lopra pulls your company name, address and REGON from the VAT taxpayer register (the "white list") and sets up invoice numbering and VAT. Your brand, business card and website take fifteen minutes. VAT-exempt? Tick the box — the correct note appears on your invoices.</div>
       </details>
       <details class="faq-item">
-        <summary>How much does debt collection with Creditline Polska cost?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Reminders and the payment demand are included in your subscription. Handing a case to Creditline Polska is quoted before you commit — no upfront fees; as a rule, collection costs and interest are charged to the debtor (under the Polish act on counteracting excessive delays in commercial transactions). You receive an invoice purchase offer within one working day.</div>
+        <summary>How much does debt collection with sprzedamfakture.pl cost?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Reminders and the payment demand are included in your subscription. Handing a case to sprzedamfakture.pl is quoted before you commit — no upfront fees; as a rule, collection costs and interest are charged to the debtor (under the Polish act on counteracting excessive delays in commercial transactions). You receive an invoice purchase offer within one working day.</div>
       </details>
       <details class="faq-item">
         <summary>My invoices are in Fakturownia / iFirma / wFirma / inFakt. Is switching difficult?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -638,7 +638,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Start today. Professional from your very first invoice — and calm when someone doesn't pay.</h2>
-    <p>Account, brand, business card, website and your first invoice — all before dinner. And if a client does not pay, Creditline Polska is one click away.</p>
+    <p>Account, brand, business card, website and your first invoice — all before dinner. And if a client does not pay, sprzedamfakture.pl is one click away.</p>
     <a href="{{ route('register') }}" class="btn btn-white btn-lg">
       Try 14 days free
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

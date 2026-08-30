@@ -79,7 +79,7 @@ $pl = [
         ['title' => 'Produkt', 'links' => [
             ['route' => 'home', 'fragment' => '#dlaczego', 'label' => 'Dlaczego Lopra'],
             ['route' => 'home', 'fragment' => '#funkcje', 'label' => 'Funkcje'],
-            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Windykacja z Creditline'],
+            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Windykacja ze sprzedamfakture.pl'],
             ['route' => 'home', 'fragment' => '#cennik', 'label' => 'Cennik'],
             ['route' => 'demo', 'label' => 'Demo'],
         ]],
@@ -93,7 +93,7 @@ $pl = [
         ['title' => 'Firma', 'links' => [
             ['route' => 'pl.o-nas', 'label' => 'O nas'],
             ['route' => 'pl.kontakt', 'label' => 'Kontakt'],
-            ['url' => 'https://creditline.pl', 'label' => 'Creditline Polska'],
+            ['url' => 'https://sprzedamfakture.pl', 'label' => 'sprzedamfakture.pl'],
         ]],
         ['title' => 'Pomoc', 'links' => [
             ['route' => 'pl.faq', 'label' => 'Najczęstsze pytania'],
@@ -105,7 +105,7 @@ $pl = [
         ['route' => 'pl.regulamin', 'label' => 'Regulamin'],
         ['route' => 'pl.prywatnosc', 'label' => 'Polityka prywatności'],
     ],
-    'company_line' => 'Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Holandia · we współpracy z Creditline Polska',
+    'company_line' => 'Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Holandia · we współpracy ze sprzedamfakture.pl',
     'copyright' => '© :year Creditline B.V. · KvK 59683198 · VAT NL853603108B01',
     'trademark_line' => '',
     'trademark_link' => '',
@@ -131,7 +131,7 @@ $plEn = [
         ['title' => 'Product', 'links' => [
             ['route' => 'home', 'fragment' => '#dlaczego', 'label' => 'Why Lopra'],
             ['route' => 'home', 'fragment' => '#funkcje', 'label' => 'Features'],
-            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Debt collection with Creditline'],
+            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Debt collection with sprzedamfakture.pl'],
             ['route' => 'home', 'fragment' => '#cennik', 'label' => 'Pricing'],
             ['route' => 'demo', 'label' => 'Demo'],
         ]],
@@ -145,7 +145,7 @@ $plEn = [
         ['title' => 'Company', 'links' => [
             ['route' => 'pl.o-nas', 'label' => 'About us'],
             ['route' => 'pl.kontakt', 'label' => 'Contact'],
-            ['url' => 'https://creditline.pl', 'label' => 'Creditline Polska'],
+            ['url' => 'https://sprzedamfakture.pl', 'label' => 'sprzedamfakture.pl'],
         ]],
         ['title' => 'Support', 'links' => [
             ['route' => 'pl.faq', 'label' => 'Frequently asked questions'],
@@ -157,7 +157,7 @@ $plEn = [
         ['route' => 'pl.regulamin', 'label' => 'Terms of service'],
         ['route' => 'pl.prywatnosc', 'label' => 'Privacy policy'],
     ],
-    'company_line' => 'Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · the Netherlands · in partnership with Creditline Polska',
+    'company_line' => 'Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · the Netherlands · in partnership with sprzedamfakture.pl',
     'copyright' => '© :year Creditline B.V. · KvK 59683198 · VAT NL853603108B01',
     'trademark_line' => '',
     'trademark_link' => '',

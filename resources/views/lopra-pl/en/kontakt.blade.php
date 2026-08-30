@@ -90,10 +90,10 @@
       <div class="contact-card" style="margin-top:16px;">
         <div class="contact-partner" style="margin-bottom:10px;">
           <div class="lg">C</div>
-          <div><div style="font-weight:700;">Creditline Polska</div><div style="font-size:13px;color:var(--text-3);">Debt collection partner of {{ brand('name') }}</div></div>
+          <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Debt collection partner of {{ brand('name') }}</div></div>
         </div>
-        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Collection cases, receivables purchase and questions about cases already handed over are handled directly by Creditline Polska.</p>
-        <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-secondary">creditline.pl →</a>
+        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Collection cases, receivables purchase and questions about cases already handed over are handled directly by sprzedamfakture.pl.</p>
+        <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">sprzedamfakture.pl →</a>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">
@@ -117,7 +117,7 @@
         <strong>Your subscription or an invoice from us</strong> — questions about the Podstawowy and Smart plans, changing plan or cancelling. Switching from Fakturownia, iFirma, wFirma or inFakt? We will help you move your clients, products and open invoices free of charge.
       </p>
       <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0;">
-        <strong>Debt collection</strong> — for cases already handed over, quotes and receivables purchase, ask <a href="https://creditline.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">Creditline Polska</a> directly.
+        <strong>Debt collection</strong> — for cases already handed over, quotes and receivables purchase, ask <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">sprzedamfakture.pl</a> directly.
         Something not working? Check the <a href="{{ route('status') }}" style="color:var(--brand);font-weight:500;">system status</a> first.
       </p>
     </div>

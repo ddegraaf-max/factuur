@@ -23,7 +23,7 @@ use Tests\TestCase;
 /**
  * De demo-sandbox volgt de markt: onder Lopra Polska bouwt DemoDataBuilder een
  * Poolse voorbeeldadministratie (Studio Wnętrz Kowalska — PLN, btw 23/8%, NIP,
- * FV-nummers, windykacja bij Creditline Polska), en de Nederlandse demo
+ * FV-nummers, windykacja bij sprzedamfakture.pl), en de Nederlandse demo
  * (Jansen Webdesign) blijft precies zoals hij was.
  */
 class DemoPlTest extends TestCase
@@ -107,7 +107,7 @@ class DemoPlTest extends TestCase
         $this->assertTrue($lines->contains('description', 'Nadzór autorski'));
         $this->assertFalse($lines->contains('unit', 'stuk'));
 
-        // --- Windykacja: één factuur ruim over de termijn, één dossier bij Creditline Polska ---
+        // --- Windykacja: één factuur ruim over de termijn, één dossier bij sprzedamfakture.pl ---
         $overdue = $invoices->where('status', 'overdue');
         $this->assertTrue(
             $overdue->contains(fn ($i) => $i->due_date->lt(now()->subDays(30))),
@@ -115,7 +115,7 @@ class DemoPlTest extends TestCase
         );
         $incasso = $invoices->where('status', 'incasso');
         $this->assertCount(1, $incasso);
-        $this->assertSame('Creditline Polska', $incasso->first()->incasso_handler);
+        $this->assertSame('sprzedamfakture.pl', $incasso->first()->incasso_handler);
         $this->assertSame('minnelijk', $incasso->first()->incasso_phase);
         $trail = ReminderLog::withoutGlobalScopes()->where('invoice_id', $incasso->first()->id)->pluck('type');
         $this->assertContains('Pierwsze przypomnienie', $trail->all());

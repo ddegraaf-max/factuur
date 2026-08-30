@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 
 /**
  * Windykacja (Poolse markt): wat een ondernemer zelf kan doen vóór de
- * overdracht aan Creditline Polska, en de aanvraag om een vordering te verkopen.
+ * overdracht aan sprzedamfakture.pl, en de aanvraag om een vordering te verkopen.
  *
  *  - Odsetki ustawowe za opóźnienie w transakcjach handlowych: stopa
  *    referencyjna NBP + 10 p.p. (config markets.pl.interest_rate), per dag.
@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Mail;
  *    2013 r.): 40 / 70 / 100 EUR per vordering, naar hoogte van de hoofdsom,
  *    omgerekend naar PLN.
  *  - Wezwanie do zapłaty: formele (voor-gerechtelijke) aanmaning als PDF.
- *  - Wykup wierzytelności: verzoek aan Creditline Polska om de factuur te kopen.
+ *  - Wykup wierzytelności: verzoek aan sprzedamfakture.pl om de factuur te kopen.
  */
 class WindykacjaService
 {

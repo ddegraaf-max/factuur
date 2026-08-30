@@ -1,16 +1,16 @@
 @extends('layouts.marketing')
 
-{{-- Najczęstsze pytania — Lopra Polska (APP_BRAND=lopra_pl). Treść spójna ze stroną główną: KSeF, biała lista, VAT, import, marka, windykacja z Creditline Polska, cennik 49/79 zł netto. --}}
+{{-- Najczęstsze pytania — Lopra Polska (APP_BRAND=lopra_pl). Treść spójna ze stroną główną: KSeF, biała lista, VAT, import, marka, windykacja ze sprzedamfakture.pl, cennik 49/79 zł netto. --}}
 
 @section('title', 'Najczęstsze pytania — ' . brand('name'))
-@section('description', 'Odpowiedzi na najczęstsze pytania o ' . brand('name') . ': KSeF, NIP i biała lista, stawki VAT, import z Fakturowni, iFirmy, wFirmy i inFaktu, marka i strona www, windykacja z Creditline Polska, cennik i bezpieczeństwo danych.')
+@section('description', 'Odpowiedzi na najczęstsze pytania o ' . brand('name') . ': KSeF, NIP i biała lista, stawki VAT, import z Fakturowni, iFirmy, wFirmy i inFaktu, marka i strona www, windykacja ze sprzedamfakture.pl, cennik i bezpieczeństwo danych.')
 
 @php
   // Jedno źródło dla widocznej listy pytań i schematu FAQPage (rich results):
   // pytanie + odpowiedź (odpowiedź może zawierać prostą składnię HTML, np. <b>).
   $faqGroups = [
     'Start & konto' => [
-      ['Czym jest ' . brand('name') . ' i dla kogo?', brand('name') . ' to jedno narzędzie dla polskich firm: faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna, wizytówka cyfrowa i strona www — oraz windykacja należności z Creditline Polska, gdy klient nie płaci. Sprawdzi się u jednoosobowej działalności, spółki z o.o. i małej firmy z kilkoma osobami. Nie potrzebujesz wiedzy księgowej: wszystko jest opisane po polsku, bez żargonu.'],
+      ['Czym jest ' . brand('name') . ' i dla kogo?', brand('name') . ' to jedno narzędzie dla polskich firm: faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna, wizytówka cyfrowa i strona www — oraz windykacja należności ze sprzedamfakture.pl, gdy klient nie płaci. Sprawdzi się u jednoosobowej działalności, spółki z o.o. i małej firmy z kilkoma osobami. Nie potrzebujesz wiedzy księgowej: wszystko jest opisane po polsku, bez żargonu.'],
       ['Co potrzebuję, żeby zacząć?', 'Tylko NIP i adres e-mail. Po podaniu NIP-u ' . brand('name') . ' pobierze nazwę firmy, adres i REGON z Wykazu podatników VAT (białej listy), ustawi numerację faktur i domyślną stawkę VAT. Pierwszą fakturę wystawisz w kilka minut, a markę, wizytówkę i stronę www zrobisz w kwadrans.'],
       ['Czy mogę wypróbować ' . brand('name') . ' za darmo?', 'Tak. Pierwsze 14 dni jest bezpłatne, ze wszystkimi funkcjami — także tymi z pakietu Smart (AI). Nie podajesz karty ani danych do płatności. Po okresie próbnym wybierasz abonament albo po prostu przestajesz korzystać; Twoje dane pozostają do pobrania.'],
       ['Czy mogę zaprosić współpracowników?', 'Tak, dodatkowi użytkownicy nie kosztują nic. Każdej osobie nadajesz rolę: administrator (wszystko), pracownik (codzienna praca bez ustawień i raportów) albo księgowa (tylko odczyt). Możesz też prowadzić kilka firm lub marek na jednym koncie.'],
@@ -30,10 +30,10 @@
       ['Nie mam logo ani kolorów. Czy ' . brand('name') . ' mi w tym pomoże?', 'Tak. W pakiecie Smart odpowiadasz na cztery pytania (czym się zajmujesz, dla kogo, jaki styl, jakie kolory), a AI proponuje trzy identyfikacje wizualne: logo, paletę kolorów, czcionkę, szablon faktury i slogan. Jedno kliknięcie ustawia wszystko na fakturach, wizytówce i stronie www. Masz już logo? Wgraj je — resztę dopasujemy.'],
       ['Czym jest wizytówka cyfrowa i strona www w ' . brand('name') . '?', 'Wizytówka cyfrowa to publiczna strona z Twoimi danymi kontaktowymi, przyciskami „zadzwoń”, „napisz” i „WhatsApp”, kodem QR i zapisem do kontaktów (vCard). Strona www to kompletna strona-wizytówka Twojej firmy w Twojej identyfikacji: usługi, dlaczego Ty, o nas i formularz kontaktowy. Wiadomości z formularza trafiają do ' . brand('name') . ' jako zapytania (leady). Obie są w cenie pakietu Podstawowego; tekst strony napisze za Ciebie AI w pakiecie Smart.'],
     ],
-    'Windykacja z Creditline Polska' => [
-      ['Co się dzieje, gdy klient nie płaci?', 'Najpierw ' . brand('name') . ' wysyła w Twoim imieniu przypomnienia i ponaglenia (e-mail, SMS) z linkiem do zapłaty BLIK-iem lub Przelewy24. Jeśli to nie działa, jednym kliknięciem tworzysz formalne wezwanie do zapłaty (PDF) z odsetkami ustawowymi za opóźnienie i rekompensatą 40/70/100 EUR. Ostatni krok to przekazanie sprawy do Creditline Polska — z kompletnym dossier z Twojej faktury, bez przepisywania danych.'],
-      ['Ile kosztuje windykacja z Creditline Polska?', 'Przypomnienia, ponaglenia i wezwanie do zapłaty są w cenie abonamentu. Przekazanie sprawy do Creditline Polska jest <b>wyceniane przed zleceniem</b> — bez opłat wstępnych; koszty windykacji i odsetki co do zasady obciążają dłużnika na podstawie ustawy o przeciwdziałaniu nadmiernym opóźnieniom w transakcjach handlowych. Zawsze wiesz, na co się decydujesz, zanim zlecisz sprawę.'],
-      ['Czy mogę sprzedać niezapłaconą fakturę?', 'Tak. Jeśli potrzebujesz gotówki teraz, zgłoś wierzytelność do wykupu prosto z faktury. Creditline Polska przygotuje ofertę cesji w <b>jeden dzień roboczy</b>. Decyzja zawsze należy do Ciebie.'],
+    'Windykacja ze sprzedamfakture.pl' => [
+      ['Co się dzieje, gdy klient nie płaci?', 'Najpierw ' . brand('name') . ' wysyła w Twoim imieniu przypomnienia i ponaglenia (e-mail, SMS) z linkiem do zapłaty BLIK-iem lub Przelewy24. Jeśli to nie działa, jednym kliknięciem tworzysz formalne wezwanie do zapłaty (PDF) z odsetkami ustawowymi za opóźnienie i rekompensatą 40/70/100 EUR. Ostatni krok to przekazanie sprawy do sprzedamfakture.pl — z kompletnym dossier z Twojej faktury, bez przepisywania danych.'],
+      ['Ile kosztuje windykacja ze sprzedamfakture.pl?', 'Przypomnienia, ponaglenia i wezwanie do zapłaty są w cenie abonamentu. Przekazanie sprawy do sprzedamfakture.pl jest <b>wyceniane przed zleceniem</b> — bez opłat wstępnych; koszty windykacji i odsetki co do zasady obciążają dłużnika na podstawie ustawy o przeciwdziałaniu nadmiernym opóźnieniom w transakcjach handlowych. Zawsze wiesz, na co się decydujesz, zanim zlecisz sprawę.'],
+      ['Czy mogę sprzedać niezapłaconą fakturę?', 'Tak. Jeśli potrzebujesz gotówki teraz, zgłoś wierzytelność do wykupu prosto z faktury. sprzedamfakture.pl przygotuje ofertę cesji w <b>jeden dzień roboczy</b>. Decyzja zawsze należy do Ciebie.'],
       ['Jak policzyć odsetki i rekompensatę za opóźnienie?', 'Skorzystaj z bezpłatnego <a href="' . route('pl.kalkulator') . '">kalkulatora odsetek i rekompensaty</a>: podajesz kwotę faktury i termin płatności, a kalkulator liczy dni opóźnienia, odsetki ustawowe za opóźnienie w transakcjach handlowych i rekompensatę z art. 10 ustawy. Możesz od razu wygenerować wezwanie do zapłaty.'],
     ],
     'Cennik & bezpieczeństwo' => [

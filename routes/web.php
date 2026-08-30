@@ -212,7 +212,7 @@ Route::middleware('market:pl')->name('pl.')->group(function () {
     Route::get('/o-nas', fn () => view(\App\Support\Market::view('lopra-pl.o-nas')))->name('o-nas');
     Route::get('/regulamin', fn () => view(\App\Support\Market::view('lopra-pl.regulamin')))->name('regulamin');
     Route::get('/polityka-prywatnosci', fn () => view(\App\Support\Market::view('lopra-pl.prywatnosc')))->name('prywatnosc');
-    // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én Creditline Polska.
+    // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én sprzedamfakture.pl.
     Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
     // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
     Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {

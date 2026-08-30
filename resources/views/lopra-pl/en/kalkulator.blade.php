@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-{{-- Interest and compensation calculator (lead magnet for Lopra Polska + Creditline Polska), English version: calculates in the browser the days overdue, statutory interest for late payment in commercial transactions (market('interest_rate')) and the 40/70/100 EUR compensation (market('eur_pln')); the button generates a printable payment demand (wezwanie do zapłaty), which stays in Polish because it is addressed to a Polish debtor. --}}
+{{-- Interest and compensation calculator (lead magnet for Lopra Polska + sprzedamfakture.pl), English version: calculates in the browser the days overdue, statutory interest for late payment in commercial transactions (market('interest_rate')) and the 40/70/100 EUR compensation (market('eur_pln')); the button generates a printable payment demand (wezwanie do zapłaty), which stays in Polish because it is addressed to a Polish debtor. --}}
 
 @section('title', 'Late-payment interest and compensation calculator — ' . brand('name'))
 @section('description', 'Free calculator: count the days overdue, the statutory interest for late payment in commercial transactions and the 40/70/100 EUR recovery-cost compensation on an unpaid B2B invoice in Poland. Generate a ready-to-print payment demand (wezwanie do zapłaty).')
@@ -135,7 +135,7 @@
         </div>
         <div class="calc-actions" style="margin-top:10px;">
           <a href="{{ route('register') }}" class="btn btn-secondary">Create an account with {{ brand('name') }} — demand letters in one click</a>
-          <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-secondary">Hand the case to Creditline Polska</a>
+          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Hand the case to sprzedamfakture.pl</a>
         </div>
       </div>
     </div>
@@ -158,8 +158,8 @@
       <p>Interest and compensation are claims you do not need to announce in the contract or on the invoice. In practice many businesses never claim them — yet they are exactly what makes paying late stop being worthwhile for the debtor.</p>
 
       <h2>What if the demand letter doesn't work?</h2>
-      <p>A payment demand with a 7-day deadline is the standard pre-litigation step. If the debtor still does not pay, <a href="https://creditline.pl" target="_blank" rel="noopener">Creditline Polska</a> can take over the case: amicable debt collection, an entry in a debtor register (KRD/BIG) and, if necessary, court proceedings and enforcement — with the costs charged to the debtor. Need the money right away? You can submit the invoice for purchase and receive an assignment offer within one working day.</p>
-      <p>In {{ brand('name') }} the whole process is built into invoicing: reminders go out automatically, the demand letter with interest and compensation is created in one click, and handing the case to Creditline Polska requires no retyping. <a href="{{ route('register') }}">Try it free for 14 days</a>.</p>
+      <p>A payment demand with a 7-day deadline is the standard pre-litigation step. If the debtor still does not pay, <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> can take over the case: amicable debt collection, an entry in a debtor register (KRD/BIG) and, if necessary, court proceedings and enforcement — with the costs charged to the debtor. Need the money right away? You can submit the invoice for purchase and receive an assignment offer within one working day.</p>
+      <p>In {{ brand('name') }} the whole process is built into invoicing: reminders go out automatically, the demand letter with interest and compensation is created in one click, and handing the case to sprzedamfakture.pl requires no retyping. <a href="{{ route('register') }}">Try it free for 14 days</a>.</p>
     </div>
   </div>
 </section>
@@ -222,10 +222,10 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Stop working this out by hand for every invoice</h2>
-    <p>In {{ brand('name') }} reminders go out on their own, the demand letter with interest and compensation is created in one click, and Creditline Polska is one step away — with no retyping.</p>
+    <p>In {{ brand('name') }} reminders go out on their own, the demand letter with interest and compensation is created in one click, and sprzedamfakture.pl is one step away — with no retyping.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Try it free for 14 days →</a>
-      <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Hand the case to Creditline Polska</a>
+      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Hand the case to sprzedamfakture.pl</a>
     </div>
   </div>
 </section>

@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-/** Verzoek aan Creditline Polska om een vordering te kopen (wykup wierzytelności). */
+/** Verzoek aan sprzedamfakture.pl om een vordering te kopen (wykup wierzytelności). */
 class WykupRequestMail extends Mailable
 {
     use Queueable, SerializesModels;

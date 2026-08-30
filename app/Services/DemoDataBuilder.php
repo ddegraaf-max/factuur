@@ -257,7 +257,7 @@ class DemoDataBuilder
         $incasso->forceFill([
             'status' => 'incasso',
             'incasso_sent_at' => now()->subDays(45),
-            'incasso_reference' => sprintf('%s-%d-0001', Market::isPl() ? 'CLP' : 'ARM', $year),
+            'incasso_reference' => sprintf('%s-%d-0001', Market::isPl() ? 'SF' : 'ARM', $year),
             'incasso_handler' => Market::incasso('partner_name'),
             'incasso_phase' => 'minnelijk',
         ])->save();
@@ -839,7 +839,7 @@ class DemoDataBuilder
     /**
      * Polen (Lopra Polska): Studio Wnętrz Kowalska — Anna Kowalska, projektantka
      * wnętrz in Kraków. PLN, btw 23% (8% voor afwerking in woningbouw), NIP en
-     * REGON, nummers FV/2026/0031…, Creditline Polska voor de windykacja.
+     * REGON, nummers FV/2026/0031…, sprzedamfakture.pl voor de windykacja.
      * Bedragen zijn de Nederlandse × 4,3, afgerond op hele złoty.
      */
     protected function datasetPl(): array

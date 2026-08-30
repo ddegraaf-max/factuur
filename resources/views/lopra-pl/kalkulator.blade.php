@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-{{-- Kalkulator odsetek i rekompensaty (lead-magnet Lopra Polska + Creditline Polska): liczy w przeglądarce dni opóźnienia, odsetki ustawowe za opóźnienie w transakcjach handlowych (market('interest_rate')) i rekompensatę 40/70/100 EUR (market('eur_pln')), a przycisk generuje drukowalne wezwanie do zapłaty. --}}
+{{-- Kalkulator odsetek i rekompensaty (lead-magnet Lopra Polska + sprzedamfakture.pl): liczy w przeglądarce dni opóźnienia, odsetki ustawowe za opóźnienie w transakcjach handlowych (market('interest_rate')) i rekompensatę 40/70/100 EUR (market('eur_pln')), a przycisk generuje drukowalne wezwanie do zapłaty. --}}
 
 @section('title', 'Kalkulator odsetek i rekompensaty za opóźnienie w płatności — ' . brand('name'))
 @section('description', 'Bezpłatny kalkulator: policz dni opóźnienia, odsetki ustawowe za opóźnienie w transakcjach handlowych i rekompensatę 40/70/100 EUR za niezapłaconą fakturę B2B. Wygeneruj gotowe wezwanie do zapłaty do druku.')
@@ -135,7 +135,7 @@
         </div>
         <div class="calc-actions" style="margin-top:10px;">
           <a href="{{ route('register') }}" class="btn btn-secondary">Załóż konto w {{ brand('name') }} — wezwania jednym kliknięciem</a>
-          <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-secondary">Przekaż sprawę Creditline Polska</a>
+          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Przekaż sprawę do sprzedamfakture.pl</a>
         </div>
       </div>
     </div>
@@ -158,8 +158,8 @@
       <p>Odsetki i rekompensata są roszczeniami, których nie musisz zapowiadać w umowie ani na fakturze. W praktyce wielu przedsiębiorców z nich nie korzysta — a to właśnie one sprawiają, że opóźnianie płatności przestaje się dłużnikowi opłacać.</p>
 
       <h2>Co dalej, gdy wezwanie nie działa?</h2>
-      <p>Wezwanie do zapłaty z terminem 7 dni to standardowy krok przedsądowy. Jeśli dłużnik nadal nie płaci, sprawę może przejąć <a href="https://creditline.pl" target="_blank" rel="noopener">Creditline Polska</a>: windykacja polubowna, wpis do rejestru dłużników (KRD/BIG), a w razie potrzeby postępowanie sądowe i egzekucja — z kosztami obciążającymi dłużnika. Potrzebujesz pieniędzy od razu? Możesz zgłosić fakturę do wykupu i otrzymać ofertę cesji w jeden dzień roboczy.</p>
-      <p>W {{ brand('name') }} cały ten proces jest wbudowany w fakturowanie: przypomnienia idą automatycznie, wezwanie z odsetkami i rekompensatą tworzysz jednym kliknięciem, a przekazanie do Creditline Polska nie wymaga przepisywania danych. <a href="{{ route('register') }}">Wypróbuj 14 dni za darmo</a>.</p>
+      <p>Wezwanie do zapłaty z terminem 7 dni to standardowy krok przedsądowy. Jeśli dłużnik nadal nie płaci, sprawę może przejąć <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>: windykacja polubowna, wpis do rejestru dłużników (KRD/BIG), a w razie potrzeby postępowanie sądowe i egzekucja — z kosztami obciążającymi dłużnika. Potrzebujesz pieniędzy od razu? Możesz zgłosić fakturę do wykupu i otrzymać ofertę cesji w jeden dzień roboczy.</p>
+      <p>W {{ brand('name') }} cały ten proces jest wbudowany w fakturowanie: przypomnienia idą automatycznie, wezwanie z odsetkami i rekompensatą tworzysz jednym kliknięciem, a przekazanie do sprzedamfakture.pl nie wymaga przepisywania danych. <a href="{{ route('register') }}">Wypróbuj 14 dni za darmo</a>.</p>
     </div>
   </div>
 </section>
@@ -222,10 +222,10 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Nie licz tego ręcznie przy każdej fakturze</h2>
-    <p>W {{ brand('name') }} przypomnienia idą same, wezwanie z odsetkami i rekompensatą powstaje jednym kliknięciem, a Creditline Polska jest o jeden krok — bez przepisywania danych.</p>
+    <p>W {{ brand('name') }} przypomnienia idą same, wezwanie z odsetkami i rekompensatą powstaje jednym kliknięciem, a sprzedamfakture.pl jest o jeden krok — bez przepisywania danych.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Wypróbuj 14 dni za darmo →</a>
-      <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Przekaż sprawę Creditline Polska</a>
+      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Przekaż sprawę do sprzedamfakture.pl</a>
     </div>
   </div>
 </section>

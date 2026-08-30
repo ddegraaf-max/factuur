@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- O nas — Lopra Polska: Lopra jako usługa Creditline B.V. (Bussum, ponad 25 lat w zarządzaniu należnościami) z Creditline Polska jako partnerem windykacyjnym. Bez zmyślonych liczb i osób. --}}
+{{-- O nas — Lopra Polska: Lopra jako usługa Creditline B.V. (Bussum, ponad 25 lat w zarządzaniu należnościami) ze sprzedamfakture.pl jako partnerem windykacyjnym. Bez zmyślonych liczb i osób. --}}
 
-@section('title', 'O nas — ' . brand('name') . ', usługa Creditline')
-@section('description', 'Kim jesteśmy: ' . brand('name') . ' to usługa Creditline B.V. z Bussum (Holandia), firmy z ponad 25-letnim doświadczeniem w zarządzaniu należnościami i windykacji, rozwijana w Polsce we współpracy z Creditline Polska. Jedno narzędzie od pierwszej faktury do windykacji.')
+@section('title', 'O nas — ' . brand('name') . ', usługa Creditline B.V.')
+@section('description', 'Kim jesteśmy: ' . brand('name') . ' to usługa Creditline B.V. z Bussum (Holandia), firmy z ponad 25-letnim doświadczeniem w zarządzaniu należnościami i windykacji, rozwijana w Polsce we współpracy ze sprzedamfakture.pl. Jedno narzędzie od pierwszej faktury do windykacji.')
 
 @section('content')
 <section class="page-hero">
@@ -21,8 +21,8 @@
       <p>{{ brand('name') }} to usługa Creditline B.V. z Bussum w Holandii — firmy, która od ponad 25 lat zajmuje się zarządzaniem należnościami i windykacją. Znamy z codziennej praktyki, a nie z opowieści, co dzieje się z firmą, gdy klienci płacą po terminie albo wcale: napięta płynność, godziny spędzone na ponagleniach i niepewność, czy w ogóle warto walczyć o swoje pieniądze.</p>
       <p>To doświadczenie jest wbudowane w produkt. Przypomnienia, wezwanie do zapłaty z odsetkami ustawowymi i rekompensatą, przekazanie sprawy do windykacji — nie jako dodatek za dopłatą, ale jako stały element każdego abonamentu.</p>
 
-      <h2>Creditline Polska</h2>
-      <p>W Polsce {{ brand('name') }} działa we współpracy z <a href="https://creditline.pl" target="_blank" rel="noopener">Creditline Polska</a> — polską częścią Creditline zajmującą się windykacją należności. Gdy przypomnienia i wezwanie nie skutkują, jednym kliknięciem przekazujesz sprawę: kompletne dossier z faktury, historia kontaktu i wezwanie trafiają do zespołu windykacyjnego, który prowadzi windykację polubowną, wpis do rejestrów dłużników i — w razie potrzeby — drogę sądową. Potrzebujesz gotówki od razu? Creditline Polska przygotuje ofertę wykupu wierzytelności w jeden dzień roboczy.</p>
+      <h2>sprzedamfakture.pl</h2>
+      <p>W Polsce {{ brand('name') }} działa we współpracy z <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> — serwisem windykacyjnym Creditline B.V. dla polskich firm: windykacja należności i wykup wierzytelności. Gdy przypomnienia i wezwanie nie skutkują, jednym kliknięciem przekazujesz sprawę: kompletne dossier z faktury, historia kontaktu i wezwanie trafiają do zespołu windykacyjnego, który prowadzi windykację polubowną, wpis do rejestrów dłużników i — w razie potrzeby — drogę sądową. Potrzebujesz gotówki od razu? sprzedamfakture.pl przygotuje ofertę wykupu wierzytelności w jeden dzień roboczy.</p>
       <p>Każde przekazanie sprawy jest wyceniane przed zleceniem, bez opłat wstępnych. Decyzja zawsze należy do Ciebie.</p>
 
       <h2>Dlaczego jedno narzędzie?</h2>
@@ -47,7 +47,7 @@
     <div class="card-grid cols-2" style="max-width:900px;margin:0 auto;">
       <div class="info-card"><h3>Faktura to dopiero początek</h3><p>Liczy się to, żeby została zapłacona. Dlatego pilnowanie terminów i windykacja są częścią produktu, a nie osobną usługą.</p></div>
       <div class="info-card"><h3>Zbudowane dla małych firm</h3><p>Dla jednoosobowych działalności, spółek z o.o. i zespołów kilkuosobowych — nie dla działów księgowości.</p></div>
-      <div class="info-card"><h3>Doświadczenie z praktyki</h3><p>Ponad 25 lat Creditline w zarządzaniu należnościami przełożone na proste narzędzie.</p></div>
+      <div class="info-card"><h3>Doświadczenie z praktyki</h3><p>Ponad 25 lat Creditline B.V. w zarządzaniu należnościami przełożone na proste narzędzie.</p></div>
       <div class="info-card"><h3>Prywatność przede wszystkim</h3><p>Dane w Unii Europejskiej, szyfrowane połączenie, logowanie dwuskładnikowe i pełny eksport w każdej chwili.</p></div>
     </div>
   </div>

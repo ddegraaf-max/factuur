@@ -95,11 +95,11 @@ return [
         'interest_rate' => 0.14,
         'eur_pln' => 4.30,
         'incasso' => [
-            'partner_name' => 'Creditline Polska',
-            'claims_email' => 'sprawy@creditline.pl',
+            'partner_name' => 'sprzedamfakture.pl',
+            'claims_email' => 'sprawy@sprzedamfakture.pl',
             'cc' => 'info@creditline.nl',
             'phone' => '+48 22 000 00 00',
-            'website' => 'https://creditline.pl',
+            'website' => 'https://sprzedamfakture.pl',
         ],
     ],
 ];

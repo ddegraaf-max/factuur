@@ -90,10 +90,10 @@
       <div class="contact-card" style="margin-top:16px;">
         <div class="contact-partner" style="margin-bottom:10px;">
           <div class="lg">C</div>
-          <div><div style="font-weight:700;">Creditline Polska</div><div style="font-size:13px;color:var(--text-3);">Partner windykacyjny {{ brand('name') }}</div></div>
+          <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Partner windykacyjny {{ brand('name') }}</div></div>
         </div>
-        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Sprawy windykacyjne, wykup wierzytelności i pytania o przekazane sprawy obsługuje bezpośrednio Creditline Polska.</p>
-        <a href="https://creditline.pl" target="_blank" rel="noopener" class="btn btn-secondary">creditline.pl →</a>
+        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Sprawy windykacyjne, wykup wierzytelności i pytania o przekazane sprawy obsługuje bezpośrednio sprzedamfakture.pl.</p>
+        <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">sprzedamfakture.pl →</a>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">
@@ -117,7 +117,7 @@
         <strong>Abonament lub faktura od nas</strong> — pytania o pakiet Podstawowy i Smart, zmianę pakietu lub rezygnację. Przenosisz się z Fakturowni, iFirmy, wFirmy lub inFaktu? Pomożemy bezpłatnie przenieść klientów, produkty i otwarte faktury.
       </p>
       <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0;">
-        <strong>Windykacja</strong> — o przekazane sprawy, wycenę i wykup wierzytelności pytaj bezpośrednio w <a href="https://creditline.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">Creditline Polska</a>.
+        <strong>Windykacja</strong> — o przekazane sprawy, wycenę i wykup wierzytelności pytaj bezpośrednio w <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">sprzedamfakture.pl</a>.
         Coś nie działa? Sprawdź najpierw <a href="{{ route('status') }}" style="color:var(--brand);font-weight:500;">status systemu</a>.
       </p>
     </div>

@@ -40,7 +40,7 @@ class MarketTest extends TestCase
         $this->assertSame(8, Market::nearestVatRate(9));
         $this->assertSame("1\u{00A0}234,50\u{00A0}zł", Market::money(1234.5));
         $this->assertSame('NIP', market('tax_id.label'));
-        $this->assertSame('Creditline Polska', Market::incasso('partner_name'));
+        $this->assertSame('sprzedamfakture.pl', Market::incasso('partner_name'));
         $this->assertSame('BLIK / Przelewy24', Market::forClient()['online_payment_label']);
         $this->assertSame('Lopra', brand('name'));
         $this->assertSame('lopra.pl', brand('domain'));
@@ -53,7 +53,7 @@ class MarketTest extends TestCase
         $home = $this->get('/')->assertOk();
         $home->assertSee('lang="pl"', false);
         $home->assertSee('Cała Twoja firma');
-        $home->assertSee('Creditline');
+        $home->assertSee('sprzedamfakture.pl');
         $this->assertStringNotContainsStringIgnoringCase('easyinvoice', preg_replace('#<script\b[^>]*>.*?</script>#si', '', (string) $home->getContent()));
 
         foreach (['/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/kalkulator-odsetek', '/przenies-sie-z/fakturownia'] as $path) {

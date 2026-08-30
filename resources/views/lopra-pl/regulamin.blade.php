@@ -56,7 +56,7 @@
       Torenlaan 5B · 1402 AT Bussum · Holandia<br>
       Rejestr handlowy (KvK) 59683198 · VAT NL853603108B01<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a><br>
-      Partner windykacyjny w Polsce: <strong>Creditline Polska</strong> (<a href="https://creditline.pl" target="_blank" rel="noopener">creditline.pl</a>)
+      Partner windykacyjny w Polsce: <strong>sprzedamfakture.pl</strong> — serwis windykacyjny Creditline B.V. (<a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>)
     </div>
 
     <h2>§ 1. Definicje</h2>
@@ -85,12 +85,12 @@
       <li>weryfikację NIP kontrahenta w Wykazie podatników VAT oraz listę kontrahentów i produktów;</li>
       <li>zestawienie VAT należnego i naliczonego per stawka, w układzie pomocnym przy sporządzaniu JPK_V7, oraz eksport danych (CSV);</li>
       <li>przypomnienia o płatności, ponaglenia i generowanie wezwania do zapłaty z odsetkami ustawowymi za opóźnienie w transakcjach handlowych i rekompensatą;</li>
-      <li>przekazanie sprawy do partnera windykacyjnego Creditline Polska oraz zgłoszenie wierzytelności do wykupu — na wyraźne zlecenie Użytkownika;</li>
+      <li>przekazanie sprawy do partnera windykacyjnego sprzedamfakture.pl oraz zgłoszenie wierzytelności do wykupu — na wyraźne zlecenie Użytkownika;</li>
       <li>identyfikację wizualną, wizytówkę cyfrową i stronę www Użytkownika, publikowane pod adresem w domenie Usługi;</li>
       <li>w pakiecie Smart — funkcje oparte na sztucznej inteligencji (m.in. propozycje identyfikacji wizualnej, tekst strony www, rozpoznawanie kosztów ze zdjęć, oferty z tekstu).</li>
     </ul>
     <p>2. Usługa jest narzędziem wspierającym Użytkownika. Usługodawca nie świadczy usług księgowych, doradztwa podatkowego ani prawnego. Za poprawność, kompletność i terminowość faktur, rozliczeń podatkowych, wysyłki do KSeF oraz treści wezwań do zapłaty odpowiada Użytkownik.</p>
-    <p>3. Windykacja należności i wykup wierzytelności są usługami Creditline Polska świadczonymi na podstawie odrębnej umowy lub zlecenia między Użytkownikiem a Creditline Polska. Wynagrodzenie za te usługi jest ustalane każdorazowo przed przyjęciem zlecenia; Usługa nie pobiera z tego tytułu opłat wstępnych.</p>
+    <p>3. Windykacja należności i wykup wierzytelności są usługami sprzedamfakture.pl świadczonymi na podstawie odrębnej umowy lub zlecenia między Użytkownikiem a sprzedamfakture.pl. Wynagrodzenie za te usługi jest ustalane każdorazowo przed przyjęciem zlecenia; Usługa nie pobiera z tego tytułu opłat wstępnych.</p>
     <p>4. Treści generowane przez funkcje sztucznej inteligencji stanowią propozycje. Użytkownik sprawdza je przed użyciem i ponosi odpowiedzialność za ich wykorzystanie (w tym za prawa osób trzecich do nazw, sloganów lub znaków).</p>
 
     <h2>§ 4. Konto i okres próbny</h2>

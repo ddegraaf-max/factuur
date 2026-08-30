@@ -55,7 +55,7 @@ const respond = (input) => {
       ? t('Er zijn **:count** achterstallige facturen voor **:total**.', { count: data.overdue.count, total: eur(data.overdue.total) })
       : t('Geen achterstallige facturen op dit moment. 👌');
   }
-  if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline') || q.includes('collection') || q.includes('debt')) {
+  if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline') || q.includes('sprzedam') || q.includes('wykup') || q.includes('collection') || q.includes('debt')) {
     return data.incasso
       ? t('Bij :partner liggen **:count** dossiers voor **:total**.', { partner: page.props.market?.incasso_partner || 'Armaere', count: data.incasso.count, total: eur(data.incasso.total) })
       : t('Geen actieve incasso-dossiers.');

@@ -134,7 +134,7 @@ return [
         ],
 
         // Lopra Polska: hetzelfde merk, markt 'pl' (taal, PLN, btw 23/8/5/0, NIP,
-        // BLIK/Przelewy24, KSeF) en Creditline Polska als windykacja-partner.
+        // BLIK/Przelewy24, KSeF) en sprzedamfakture.pl als windykacja-partner.
         'lopra_pl' => [
             'name' => 'Lopra',
             'market' => 'pl',
@@ -169,11 +169,11 @@ return [
             'wordmark_dark' => '/brand/lopra/lopra-logo-dark.svg',
 
             'seo_title' => 'Lopra — faktury, marka i windykacja w jednym miejscu, od 49 zł miesięcznie',
-            'seo_description' => 'Lopra to kompletne narzędzie dla polskich firm: faktury i oferty (gotowe do KSeF), rozliczenie VAT, identyfikacja wizualna z AI, wizytówka i strona www, import z Fakturowni, iFirmy, wFirmy i inFaktu oraz windykacja z Creditline Polska. 14 dni za darmo.',
+            'seo_description' => 'Lopra to kompletne narzędzie dla polskich firm: faktury i oferty (gotowe do KSeF), rozliczenie VAT, identyfikacja wizualna z AI, wizytówka i strona www, import z Fakturowni, iFirmy, wFirmy i inFaktu oraz windykacja ze sprzedamfakture.pl. 14 dni za darmo.',
             'og_description' => 'Faktury, oferty, VAT, marka, strona www i windykacja należności — cała Twoja firma w jednym miejscu.',
-            'app_description' => 'Program do fakturowania i prowadzenia firmy w Polsce: faktury VAT gotowe do KSeF, oferty z podpisem online, rozliczenie VAT, identyfikacja wizualna z AI, wizytówka cyfrowa, strona www oraz windykacja należności z Creditline Polska.',
+            'app_description' => 'Program do fakturowania i prowadzenia firmy w Polsce: faktury VAT gotowe do KSeF, oferty z podpisem online, rozliczenie VAT, identyfikacja wizualna z AI, wizytówka cyfrowa, strona www oraz windykacja należności ze sprzedamfakture.pl.',
             'pwa_description' => 'Faktury, oferty, marka i windykacja — cała Twoja firma w jednym miejscu.',
-            'footer_description' => 'Cała Twoja firma w jednym miejscu: faktury, oferty, VAT, marka, strona www i windykacja z Creditline Polska. Od startu po dojrzały biznes.',
+            'footer_description' => 'Cała Twoja firma w jednym miejscu: faktury, oferty, VAT, marka, strona www i windykacja ze sprzedamfakture.pl. Od startu po dojrzały biznes.',
             'auth_title' => 'Cała Twoja firma w jednym miejscu',
             'auth_subtitle' => 'Faktury, oferty, identyfikacja wizualna, strona www i windykacja — od pierwszego dnia działalności.',
             'login_seo_title' => 'Logowanie do Lopra — Twoja firma w jednym miejscu',
@@ -188,11 +188,11 @@ return [
                     'tagline' => 'Your whole business in one place',
                     'positioning' => 'Invoicing, brand and debt collection for businesses in Poland',
                     'seo_title' => 'Lopra — invoices, brand and debt collection in one place, from 49 zł a month',
-                    'seo_description' => 'Lopra is the complete toolkit for businesses in Poland: KSeF-ready invoices and quotes, VAT return (JPK_V7), AI brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with Creditline Polska. In Polish and English. 14 days free.',
+                    'seo_description' => 'Lopra is the complete toolkit for businesses in Poland: KSeF-ready invoices and quotes, VAT return (JPK_V7), AI brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with sprzedamfakture.pl. In Polish and English. 14 days free.',
                     'og_description' => 'Invoices, quotes, VAT, brand, website and debt collection — your whole business in one place.',
-                    'app_description' => 'Invoicing and business software for Poland: KSeF-ready VAT invoices, quotes with online signature, VAT return, AI brand identity, digital business card, website and debt collection with Creditline Polska.',
+                    'app_description' => 'Invoicing and business software for Poland: KSeF-ready VAT invoices, quotes with online signature, VAT return, AI brand identity, digital business card, website and debt collection with sprzedamfakture.pl.',
                     'pwa_description' => 'Invoices, quotes, brand and debt collection — your whole business in one place.',
-                    'footer_description' => 'Your whole business in one place: invoices, quotes, VAT, brand, website and debt collection with Creditline Polska. From day one to a mature business.',
+                    'footer_description' => 'Your whole business in one place: invoices, quotes, VAT, brand, website and debt collection with sprzedamfakture.pl. From day one to a mature business.',
                     'auth_title' => 'Your whole business in one place',
                     'auth_subtitle' => 'Invoices, quotes, brand identity, website and debt collection — from the first day of your business.',
                     'login_seo_title' => 'Log in to Lopra — your business in one place',

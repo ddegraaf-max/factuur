@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 /**
  * Windykacja (Poolse markt): wezwanie do zapłaty als PDF en het verzoek om
- * een vordering te verkopen aan Creditline Polska. De overdracht van een
+ * een vordering te verkopen aan sprzedamfakture.pl. De overdracht van een
  * dossier zelf loopt via IncassoController (partner per markt).
  */
 class WindykacjaController extends Controller

@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- About us — Lopra Polska, English edition: Lopra as a service of Creditline B.V. (Bussum, more than 25 years in receivables management) with Creditline Polska as debt collection partner. No invented figures or people. --}}
+{{-- About us — Lopra Polska, English edition: Lopra as a service of Creditline B.V. (Bussum, more than 25 years in receivables management) with sprzedamfakture.pl as debt collection partner. No invented figures or people. --}}
 
-@section('title', 'About us — ' . brand('name') . ', a Creditline service')
-@section('description', 'Who we are: ' . brand('name') . ' is a service of Creditline B.V. from Bussum (the Netherlands), a company with more than 25 years of experience in receivables management and debt collection, developed in Poland together with Creditline Polska. One tool from your first invoice to debt collection.')
+@section('title', 'About us — ' . brand('name') . ', a Creditline B.V. service')
+@section('description', 'Who we are: ' . brand('name') . ' is a service of Creditline B.V. from Bussum (the Netherlands), a company with more than 25 years of experience in receivables management and debt collection, developed in Poland together with sprzedamfakture.pl. One tool from your first invoice to debt collection.')
 
 @section('content')
 <section class="page-hero">
@@ -21,8 +21,8 @@
       <p>{{ brand('name') }} is a service of Creditline B.V. from Bussum in the Netherlands — a company that has specialised in receivables management and debt collection for more than 25 years. We know from daily practice, not from stories, what happens to a business when clients pay late or not at all: strained cash flow, hours spent chasing payments and the nagging doubt whether fighting for your own money is even worth it.</p>
       <p>That experience is built into the product. Reminders, a payment demand with statutory interest and compensation, handing a case over for collection — not as a paid add-on, but as a fixed part of every subscription.</p>
 
-      <h2>Creditline Polska</h2>
-      <p>In Poland, {{ brand('name') }} works together with <a href="https://creditline.pl" target="_blank" rel="noopener">Creditline Polska</a> — the Polish arm of Creditline that handles debt collection. When reminders and a wezwanie do zapłaty (payment demand) get no result, you hand the case over with one click: a complete file built from the invoice, the contact history and the demand go to the collection team, which handles amicable collection, entry in debtor registers and — where necessary — court proceedings. Need cash right away? Creditline Polska will prepare a receivables purchase offer within one working day.</p>
+      <h2>sprzedamfakture.pl</h2>
+      <p>In Poland, {{ brand('name') }} works together with <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> — Creditline B.V.'s debt collection service for businesses in Poland: receivables collection and invoice purchase. When reminders and a wezwanie do zapłaty (payment demand) get no result, you hand the case over with one click: a complete file built from the invoice, the contact history and the demand go to the collection team, which handles amicable collection, entry in debtor registers and — where necessary — court proceedings. Need cash right away? sprzedamfakture.pl will prepare a receivables purchase offer within one working day.</p>
       <p>Every case handover is quoted before you commission it, with no upfront fees. The decision is always yours.</p>
 
       <h2>Why one tool?</h2>
@@ -47,7 +47,7 @@
     <div class="card-grid cols-2" style="max-width:900px;margin:0 auto;">
       <div class="info-card"><h3>An invoice is only the start</h3><p>What matters is that it gets paid. That is why chasing due dates and debt collection are part of the product, not a separate service.</p></div>
       <div class="info-card"><h3>Built for small businesses</h3><p>For sole traders, sp. z o.o. companies and teams of a few people — not for accounting departments.</p></div>
-      <div class="info-card"><h3>Experience from practice</h3><p>More than 25 years of Creditline receivables management, distilled into a simple tool.</p></div>
+      <div class="info-card"><h3>Experience from practice</h3><p>More than 25 years of Creditline B.V. receivables management, distilled into a simple tool.</p></div>
       <div class="info-card"><h3>Privacy first</h3><p>Data in the European Union, an encrypted connection, two-factor authentication and a full export at any time.</p></div>
     </div>
   </div>

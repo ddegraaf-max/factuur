@@ -63,9 +63,9 @@
       <div class="demo-feat">
         <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>
-          Debt collection<span class="demo-tag">Creditline</span>
+          Debt collection<span class="demo-tag">sprzedamfakture.pl</span>
         </h2>
-        <p>An overdue invoice with interest and compensation already calculated: download the wezwanie do zapłaty (payment demand), hand the case to Creditline Polska or submit the invoice for purchase.</p>
+        <p>An overdue invoice with interest and compensation already calculated: download the wezwanie do zapłaty (payment demand), hand the case to sprzedamfakture.pl or submit the invoice for purchase.</p>
       </div>
       <div class="demo-feat">
         <h2>
