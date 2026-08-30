@@ -6,7 +6,7 @@
      */
     $brand = $company->brand_color ?: brand('color');
     $logo = $company->logoBinary();
-    $total = number_format((float) $invoice->total, 2, ',', '.');
+    $total = money($invoice->total);
     $paidOn = $payment?->paid_on ?? $invoice->paid_at;
     $paidOnLabel = $paidOn ? $paidOn->translatedFormat('j F Y') : null;
     $portalUrl = ! empty($preview)
@@ -74,7 +74,7 @@
                 <tr>
                   <td style="padding:6px 0;color:#78716c;border-top:1px solid #ebe9e6;">{{ __('doc.mail_thanks_amount') }}</td>
                   <td style="padding:6px 0;text-align:right;font-weight:700;font-size:15px;border-top:1px solid #ebe9e6;">
-                    € {{ $total }}
+                    {{ $total }}
                     <span style="display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;background:#DCFCE7;color:#166534;font-size:11px;font-weight:700;letter-spacing:0.02em;vertical-align:middle;">{{ __('doc.mail_thanks_settled') }}</span>
                   </td>
                 </tr>

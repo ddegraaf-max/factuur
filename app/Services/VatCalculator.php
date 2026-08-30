@@ -115,14 +115,20 @@ class VatCalculator
     }
 
     /**
-     * Standard NL VAT rates available.
+     * De btw-tarieven van de markt (config/markets.php) als keuzelijst:
+     * NL 21/9/0, PL 23/8/5/0 — met een label in de taal van de markt.
      */
     public static function availableRates(): array
     {
-        return [
-            ['value' => 21.00, 'label' => '21% (hoog tarief)'],
-            ['value' => 9.00, 'label' => '9% (laag tarief)'],
-            ['value' => 0.00, 'label' => '0% / vrijgesteld'],
-        ];
+        $default = \App\Support\Market::defaultVatRate();
+
+        return array_map(fn (int $rate) => [
+            'value' => (float) $rate,
+            'label' => match (true) {
+                $rate === 0 => __('0% / vrijgesteld'),
+                $rate === $default => __(':rate% (hoog tarief)', ['rate' => $rate]),
+                default => __(':rate% (laag tarief)', ['rate' => $rate]),
+            },
+        ], \App\Support\Market::vatRates());
     }
 }

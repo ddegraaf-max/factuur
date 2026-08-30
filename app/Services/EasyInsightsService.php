@@ -17,10 +17,10 @@ class EasyInsightsService
             $total = $overdue->sum(fn ($i) => (float) $i->total - (float) $i->paid_total);
             $insights[] = [
                 'severity' => 'danger',
-                'title' => $overdue->count() . ' achterstallige factu' . ($overdue->count() === 1 ? 'ur' : 'ren'),
+                'title' => trans_choice(':count achterstallige factuur|:count achterstallige facturen', $overdue->count(), ['count' => $overdue->count()]),
                 // Nadruk met **sterretjes**, niet met HTML: de frontend zet dit
                 // veilig om naar vet zonder de tekst als opmaak te vertrouwen.
-                'detail' => 'Totaal openstaand: **€ ' . number_format($total, 2, ',', '.') . '**',
+                'detail' => __('Totaal openstaand: **:amount**', ['amount' => money($total)]),
             ];
         }
 
@@ -28,8 +28,8 @@ class EasyInsightsService
         if ($incasso > 0) {
             $insights[] = [
                 'severity' => 'warning',
-                'title' => $incasso . ' dossier' . ($incasso === 1 ? '' : 's') . ' bij Armaere',
-                'detail' => 'De deurwaarder behandelt deze namens jou.',
+                'title' => trans_choice(':count dossier bij :partner|:count dossiers bij :partner', $incasso, ['count' => $incasso, 'partner' => \App\Support\Market::incasso('partner_name')]),
+                'detail' => __('De deurwaarder behandelt deze namens jou.'),
             ];
         }
 
@@ -41,25 +41,26 @@ class EasyInsightsService
         if ($days > 0 && $days <= 30) {
             $insights[] = [
                 'severity' => 'info',
-                'title' => "BTW Q{$qNum}-aangifte over {$days} dagen",
-                'detail' => 'Deadline ' . $deadline->isoFormat('D MMMM') . '.',
+                'title' => __('BTW Q:quarter-aangifte over :days dagen', ['quarter' => $qNum, 'days' => $days]),
+                'detail' => __('Deadline :date.', ['date' => $deadline->isoFormat('D MMMM')]),
             ];
         }
 
         $incompleteB2B = Customer::where('type', 'business')->whereNull('kvk_number')->count();
         if ($incompleteB2B > 0) {
+            $registry = (string) \App\Support\Market::get('registry.short', 'KVK');
             $insights[] = [
                 'severity' => 'warning',
-                'title' => $incompleteB2B . ' zakelijke klant' . ($incompleteB2B === 1 ? '' : 'en') . ' zonder KVK',
-                'detail' => 'Voeg het KVK-nummer toe voor je administratie.',
+                'title' => trans_choice(':count zakelijke klant zonder :registry|:count zakelijke klanten zonder :registry', $incompleteB2B, ['count' => $incompleteB2B, 'registry' => $registry]),
+                'detail' => __('Voeg het :label toe voor je administratie.', ['label' => \App\Support\Market::get('registry.label', 'KVK-nummer')]),
             ];
         }
 
         if (empty($insights)) {
             $insights[] = [
                 'severity' => 'success',
-                'title' => 'Alles ziet er goed uit',
-                'detail' => 'Geen achterstallige facturen, geen openstaande dossiers.',
+                'title' => __('Alles ziet er goed uit'),
+                'detail' => __('Geen achterstallige facturen, geen openstaande dossiers.'),
             ];
         }
 

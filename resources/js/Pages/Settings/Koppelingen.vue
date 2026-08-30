@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   mcp: Object,     // { active, url }
@@ -10,6 +11,12 @@ const props = defineProps({
   mail_domain: Object, // { configured, status, domain, from_address, records, checked_at_label, default_from, suggested_domain, suggested_local_part }
 });
 
+const page = usePage();
+const flash = computed(() => page.props.flash || {});
+const brand = computed(() => page.props.brand);
+// Markt (nl/pl): e-facturatie via Peppol (NL) of KSeF (PL).
+const market = page.props.market;
+
 /* ---------- Eigen afzenderadres (Resend Domains) ---------- */
 const domainForm = useForm({ domain: props.mail_domain?.suggested_domain || '', local_part: props.mail_domain?.suggested_local_part || 'facturen' });
 const domainRefresh = useForm({});
@@ -17,9 +24,9 @@ const domainDisconnect = useForm({});
 const connectDomain = () => domainForm.post(route('settings.integrations.maildomain.connect'), { preserveScroll: true });
 const refreshDomain = () => domainRefresh.post(route('settings.integrations.maildomain.refresh'), { preserveScroll: true });
 const disconnectDomain = () => {
-  if (confirm(`Eigen afzenderadres loskoppelen? Mail gaat dan weer uit via ${brand.value.domain}.`)) domainDisconnect.delete(route('settings.integrations.maildomain.disconnect'), { preserveScroll: true });
+  if (confirm(t('Eigen afzenderadres loskoppelen? Mail gaat dan weer uit via :domain.', { domain: brand.value.domain }))) domainDisconnect.delete(route('settings.integrations.maildomain.disconnect'), { preserveScroll: true });
 };
-const domainStatusLabel = computed(() => ({ none: 'Uit', pending: 'DNS instellen', verified: 'Actief', failed: 'DNS niet gevonden' }[props.mail_domain?.status] || 'Uit'));
+const domainStatusLabel = computed(() => ({ none: t('Uit'), pending: t('DNS instellen'), verified: t('Actief'), failed: t('DNS niet gevonden') }[props.mail_domain?.status] || t('Uit')));
 const copyValue = (v) => navigator.clipboard?.writeText(v);
 
 /* ---------- Peppol (Recommand) ---------- */
@@ -29,29 +36,25 @@ const peppolDisable = useForm({});
 const activatePeppol = () => peppolActivate.post(route('settings.integrations.peppol.activate'), { preserveScroll: true });
 const refreshPeppol = () => peppolRefresh.post(route('settings.integrations.peppol.refresh'), { preserveScroll: true });
 const disablePeppol = () => {
-  if (confirm('Peppol uitschakelen? Je administratie wordt afgemeld op het netwerk; klanten kunnen je dan geen e-facturen meer sturen en jij kunt niet meer via Peppol afleveren.')) {
+  if (confirm(t('Peppol uitschakelen? Je administratie wordt afgemeld op het netwerk; klanten kunnen je dan geen e-facturen meer sturen en jij kunt niet meer via Peppol afleveren.'))) {
     peppolDisable.delete(route('settings.integrations.peppol.disable'), { preserveScroll: true });
   }
 };
 const peppolStatusLabel = computed(() => ({
-  none: 'Uit', pending: 'Identiteitscontrole', verified: 'Actief', rejected: 'Afgewezen', error: 'Fout',
-}[props.peppol?.status] || 'Uit'));
-
-const page = usePage();
-const flash = computed(() => page.props.flash || {});
-const brand = computed(() => page.props.brand);
+  none: t('Uit'), pending: t('Identiteitscontrole'), verified: t('Actief'), rejected: t('Afgewezen'), error: t('Fout'),
+}[props.peppol?.status] || t('Uit')));
 
 const rotateForm = useForm({});
 const disableForm = useForm({});
 
 const activate = () => rotateForm.post(route('settings.integrations.claude.rotate'), { preserveScroll: true });
 const rotate = () => {
-  if (confirm('Nieuwe koppel-URL aanmaken? De huidige URL werkt dan direct niet meer en moet je in Claude bijwerken.')) {
+  if (confirm(t('Nieuwe koppel-URL aanmaken? De huidige URL werkt dan direct niet meer en moet je in Claude bijwerken.'))) {
     rotateForm.post(route('settings.integrations.claude.rotate'), { preserveScroll: true });
   }
 };
 const disable = () => {
-  if (confirm('Claude-koppeling uitschakelen? Claude kan dan niets meer in deze administratie aanmaken.')) {
+  if (confirm(t('Claude-koppeling uitschakelen? Claude kan dan niets meer in deze administratie aanmaken.'))) {
     disableForm.delete(route('settings.integrations.claude.disable'), { preserveScroll: true });
   }
 };
@@ -64,94 +67,102 @@ const copyUrl = async () => {
     copied.value = true;
     setTimeout(() => (copied.value = false), 2000);
   } catch (e) {
-    prompt('Kopieer de koppel-URL:', props.mcp.url);
+    prompt(t('Kopieer de koppel-URL:'), props.mcp.url);
   }
 };
 </script>
 
 <template>
-  <Head title="Koppelingen" />
+  <Head :title="$t('Koppelingen')" />
   <AppLayout>
     <template #breadcrumb>
-      <span class="breadcrumb">Instellingen</span>
+      <span class="breadcrumb">{{ $t('Instellingen') }}</span>
       <span class="breadcrumb">/</span>
-      <span class="breadcrumb-current">Koppelingen</span>
+      <span class="breadcrumb-current">{{ $t('Koppelingen') }}</span>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Koppelingen</h1>
-        <p class="page-subtitle">Verbind {{ brand.name }} met de tools waarmee je werkt.</p>
+        <h1 class="page-title">{{ $t('Koppelingen') }}</h1>
+        <p class="page-subtitle">{{ $t('Verbind :brand met de tools waarmee je werkt.', { brand: brand.name }) }}</p>
       </div>
     </div>
 
     <div v-if="flash.flash" class="kop-alert ok">{{ flash.flash }}</div>
     <div v-if="flash.error" class="kop-alert err">{{ flash.error }}</div>
 
+    <!-- KSeF (Polen): e-facturen als FA-XML per factuur; directe verzending volgt -->
+    <div v-if="market.e_invoicing === 'ksef'" class="card kop-card">
+      <div class="card-body">
+        <div class="kop-head">
+          <div>
+            <div class="kop-title">KSeF</div>
+            <p class="kop-desc">{{ $t('KSeF-XML per factuur download je op de factuurpagina; directe verzending volgt.') }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Peppol: e-facturen verzenden en ontvangen -->
-    <div v-if="peppol" class="card kop-card">
+    <div v-if="peppol && market.e_invoicing === 'peppol'" class="card kop-card">
       <div class="card-body">
         <div class="kop-head">
           <div>
             <div class="kop-title">
-              Peppol e-facturatie
+              {{ $t('Peppol e-facturatie') }}
               <span class="kop-pill" :class="peppol.status === 'verified' ? 'on' : (peppol.status === 'pending' ? 'wait' : 'off')">{{ peppolStatusLabel }}</span>
             </div>
             <p class="kop-desc">
-              Lever facturen rechtstreeks af in het boekhoudpakket van je klant en ontvang inkoopfacturen van leveranciers
-              automatisch in je Postvak IN — via het Peppol-netwerk, zonder mailbox ertussen. Je administratie wordt een eigen
-              Peppol-deelnemer<template v-if="peppol.participant_id"> (<code style="font-size:12px;">{{ peppol.participant_id }}</code>)</template>.
+              {{ $t('Lever facturen rechtstreeks af in het boekhoudpakket van je klant en ontvang inkoopfacturen van leveranciers automatisch in je Postvak IN — via het Peppol-netwerk, zonder mailbox ertussen. Je administratie wordt een eigen Peppol-deelnemer') }}<template v-if="peppol.participant_id"> (<code style="font-size:12px;">{{ peppol.participant_id }}</code>)</template>.
             </p>
           </div>
         </div>
 
         <div v-if="!peppol.configured" class="kop-locked">
-          Peppol wordt binnenkort geactiveerd. Zodra de koppeling met het netwerk klaar is, kun je hier je administratie aanmelden.
+          {{ $t('Peppol wordt binnenkort geactiveerd. Zodra de koppeling met het netwerk klaar is, kun je hier je administratie aanmelden.') }}
         </div>
 
         <template v-else-if="peppol.status === 'none'">
           <div v-if="peppol.blockers.length" class="kop-locked">
-            Vul eerst {{ peppol.blockers.join(', ') }} in bij
-            <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">Bedrijfsgegevens</Link>.
+            {{ $t('Vul eerst :fields in bij', { fields: peppol.blockers.join(', ') }) }}
+            <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">{{ $t('Bedrijfsgegevens') }}</Link>.
           </div>
           <template v-else>
             <button class="btn btn-primary" :disabled="peppolActivate.processing" @click="activatePeppol">
-              {{ peppolActivate.processing ? 'Bezig…' : 'Peppol activeren' }}
+              {{ peppolActivate.processing ? $t('Bezig…') : $t('Peppol activeren') }}
             </button>
             <p class="kop-hint">
-              Je administratie wordt geregistreerd op het netwerk. Daarna rondt een tekenbevoegd persoon eenmalig een
-              online identiteitscontrole af (een paar minuten) — verplicht voor iedereen op Peppol.
+              {{ $t('Je administratie wordt geregistreerd op het netwerk. Daarna rondt een tekenbevoegd persoon eenmalig een online identiteitscontrole af (een paar minuten) — verplicht voor iedereen op Peppol.') }}
             </p>
           </template>
         </template>
 
         <template v-else>
           <div v-if="peppol.status === 'pending'" class="kop-steps">
-            <div class="kop-steps-title">Nog één stap: de identiteitscontrole</div>
+            <div class="kop-steps-title">{{ $t('Nog één stap: de identiteitscontrole') }}</div>
             <p class="kop-hint" style="margin:0 0 10px;">
-              Geregistreerd op {{ peppol.registered_at_label }}. Verzenden en ontvangen kan zodra een tekenbevoegd persoon de
-              identiteitscontrole heeft afgerond. Niet zelf tekenbevoegd? Stuur de link door.
+              {{ $t('Geregistreerd op :date. Verzenden en ontvangen kan zodra een tekenbevoegd persoon de identiteitscontrole heeft afgerond. Niet zelf tekenbevoegd? Stuur de link door.', { date: peppol.registered_at_label }) }}
             </p>
             <div class="kop-actions" style="margin-top:0;">
-              <a v-if="peppol.verification_url" :href="peppol.verification_url" target="_blank" rel="noopener" class="btn btn-primary btn-sm">Identiteitscontrole afronden ↗</a>
-              <button class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">Status vernieuwen</button>
+              <a v-if="peppol.verification_url" :href="peppol.verification_url" target="_blank" rel="noopener" class="btn btn-primary btn-sm">{{ $t('Identiteitscontrole afronden') }} ↗</a>
+              <button class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">{{ $t('Status vernieuwen') }}</button>
             </div>
           </div>
           <div v-else-if="peppol.status === 'verified'" class="kop-steps">
-            <div class="kop-steps-title">Actief sinds {{ peppol.verified_at_label }}</div>
+            <div class="kop-steps-title">{{ $t('Actief sinds :date', { date: peppol.verified_at_label }) }}</div>
             <ol>
-              <li>Op verstuurde facturen van klanten die op Peppol zitten staat de knop <b>"⚡ Via Peppol afleveren"</b>.</li>
-              <li>E-facturen van leveranciers komen automatisch binnen in <Link :href="route('purchases.inbox.index')" style="color:var(--brand);font-weight:600;">Postvak IN</Link>, met de gegevens al ingevuld.</li>
-              <li>Geef leveranciers je Peppol-ID door: <code style="font-size:12px;">{{ peppol.participant_id }}</code>.</li>
+              <li>{{ $t('Op verstuurde facturen van klanten die op Peppol zitten staat de knop') }} <b>"⚡ {{ $t('Via Peppol afleveren') }}"</b>.</li>
+              <li>{{ $t('E-facturen van leveranciers komen automatisch binnen in') }} <Link :href="route('purchases.inbox.index')" style="color:var(--brand);font-weight:600;">{{ $t('Postvak IN') }}</Link>, {{ $t('met de gegevens al ingevuld.') }}</li>
+              <li>{{ $t('Geef leveranciers je Peppol-ID door:') }} <code style="font-size:12px;">{{ peppol.participant_id }}</code>.</li>
             </ol>
           </div>
           <div v-else class="kop-locked">
-            De identiteitscontrole is {{ peppol.status === 'rejected' ? 'afgewezen' : 'niet gelukt' }}. Neem contact met ons op via
+            {{ peppol.status === 'rejected' ? $t('De identiteitscontrole is afgewezen.') : $t('De identiteitscontrole is niet gelukt.') }} {{ $t('Neem contact met ons op via') }}
             <a :href="'mailto:' + brand.email" style="color:var(--brand);font-weight:600;">{{ brand.email }}</a>.
           </div>
           <div class="kop-actions">
-            <button v-if="peppol.status !== 'pending'" class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">Status vernieuwen</button>
-            <button class="btn btn-danger btn-sm" :disabled="peppolDisable.processing" @click="disablePeppol">Peppol uitschakelen</button>
+            <button v-if="peppol.status !== 'pending'" class="btn btn-secondary btn-sm" :disabled="peppolRefresh.processing" @click="refreshPeppol">{{ $t('Status vernieuwen') }}</button>
+            <button class="btn btn-danger btn-sm" :disabled="peppolDisable.processing" @click="disablePeppol">{{ $t('Peppol uitschakelen') }}</button>
           </div>
         </template>
       </div>
@@ -163,56 +174,55 @@ const copyUrl = async () => {
         <div class="kop-head">
           <div>
             <div class="kop-title">
-              Eigen afzenderadres
+              {{ $t('Eigen afzenderadres') }}
               <span class="kop-pill" :class="mail_domain.status === 'verified' ? 'on' : (mail_domain.status === 'pending' ? 'wait' : 'off')">{{ domainStatusLabel }}</span>
             </div>
             <p class="kop-desc">
-              Facturen, offertes en herinneringen gaan nu uit naam van <b>{{ mail_domain.default_from }}</b> met jouw bedrijfsnaam als afzender
-              (antwoorden komen al bij jou aan). Wil je dat ze echt vanaf <b>jouw</b> domein komen — bijvoorbeeld
-              <code style="font-size:12px;">facturen@{{ mail_domain.suggested_domain || 'jouwbedrijf.nl' }}</code> — koppel dan je domein. Je zet daarvoor
-              eenmalig een paar DNS-records bij je domeinbeheerder (TransIP, Vimexx, Cloudflare, Hostnet …).
+              {{ $t('Facturen, offertes en herinneringen gaan nu uit naam van') }} <b>{{ mail_domain.default_from }}</b> {{ $t('met jouw bedrijfsnaam als afzender (antwoorden komen al bij jou aan). Wil je dat ze echt vanaf') }}
+              <b>{{ $t('jouw') }}</b> {{ $t('domein komen — bijvoorbeeld') }}
+              <code style="font-size:12px;">{{ $t('facturen') }}@{{ mail_domain.suggested_domain || $t('jouwbedrijf.nl') }}</code> — {{ $t('koppel dan je domein. Je zet daarvoor eenmalig een paar DNS-records bij je domeinbeheerder (TransIP, Vimexx, Cloudflare, Hostnet …).') }}
             </p>
           </div>
         </div>
 
-        <div v-if="!mail_domain.configured" class="kop-locked">Deze koppeling is nog niet beschikbaar op dit platform.</div>
+        <div v-if="!mail_domain.configured" class="kop-locked">{{ $t('Deze koppeling is nog niet beschikbaar op dit platform.') }}</div>
 
         <template v-else-if="mail_domain.status === 'none'">
           <div class="dom-form">
-            <div class="form-group"><label>Afzender</label>
-              <div class="dom-from"><input type="text" v-model="domainForm.local_part" placeholder="facturen" style="max-width:160px;"><span>@</span><input type="text" v-model="domainForm.domain" placeholder="jouwbedrijf.nl" style="max-width:260px;"></div>
+            <div class="form-group"><label>{{ $t('Afzender') }}</label>
+              <div class="dom-from"><input type="text" v-model="domainForm.local_part" :placeholder="$t('facturen')" style="max-width:160px;"><span>@</span><input type="text" v-model="domainForm.domain" :placeholder="$t('jouwbedrijf.nl')" style="max-width:260px;"></div>
               <div v-if="domainForm.errors.domain || domainForm.errors.local_part" class="field-error">{{ domainForm.errors.domain || domainForm.errors.local_part }}</div>
             </div>
-            <button class="btn btn-primary" :disabled="domainForm.processing || !domainForm.domain" @click="connectDomain">{{ domainForm.processing ? 'Bezig…' : 'Domein koppelen' }}</button>
+            <button class="btn btn-primary" :disabled="domainForm.processing || !domainForm.domain" @click="connectDomain">{{ domainForm.processing ? $t('Bezig…') : $t('Domein koppelen') }}</button>
           </div>
-          <p class="kop-hint">Werkt alleen met een eigen domeinnaam (geen Gmail/Outlook). Na het koppelen zie je hier precies welke DNS-records je moet toevoegen.</p>
+          <p class="kop-hint">{{ $t('Werkt alleen met een eigen domeinnaam (geen Gmail/Outlook). Na het koppelen zie je hier precies welke DNS-records je moet toevoegen.') }}</p>
         </template>
 
         <template v-else>
           <div class="kop-steps">
             <div class="kop-steps-title">
-              <template v-if="mail_domain.status === 'verified'">Actief — mail gaat uit als {{ mail_domain.from_address }}</template>
-              <template v-else>Zet deze DNS-records bij de beheerder van {{ mail_domain.domain }}</template>
+              <template v-if="mail_domain.status === 'verified'">{{ $t('Actief — mail gaat uit als :from', { from: mail_domain.from_address }) }}</template>
+              <template v-else>{{ $t('Zet deze DNS-records bij de beheerder van :domain', { domain: mail_domain.domain }) }}</template>
             </div>
             <table class="dom-records">
-              <thead><tr><th>Type</th><th>Naam (host)</th><th>Waarde</th><th></th></tr></thead>
+              <thead><tr><th>{{ $t('Type') }}</th><th>{{ $t('Naam (host)') }}</th><th>{{ $t('Waarde') }}</th><th></th></tr></thead>
               <tbody>
                 <tr v-for="r in mail_domain.records" :key="r.name + r.type">
                   <td><b>{{ r.type }}</b><div class="dom-rec-kind">{{ r.record }}</div></td>
                   <td><code>{{ r.name }}</code></td>
-                  <td><code class="dom-value">{{ r.value }}</code><div v-if="r.priority" class="dom-rec-kind">prioriteit {{ r.priority }}</div></td>
-                  <td class="right"><span class="kop-pill" :class="r.status === 'verified' ? 'on' : 'wait'" style="margin-left:0;">{{ r.status === 'verified' ? 'ok' : 'wacht' }}</span> <button type="button" class="dom-copy" @click="copyValue(r.value)" title="Kopieer waarde">kopieer</button></td>
+                  <td><code class="dom-value">{{ r.value }}</code><div v-if="r.priority" class="dom-rec-kind">{{ $t('prioriteit') }} {{ r.priority }}</div></td>
+                  <td class="right"><span class="kop-pill" :class="r.status === 'verified' ? 'on' : 'wait'" style="margin-left:0;">{{ r.status === 'verified' ? $t('ok') : $t('wacht') }}</span> <button type="button" class="dom-copy" @click="copyValue(r.value)" :title="$t('Kopieer waarde')">{{ $t('kopieer') }}</button></td>
                 </tr>
               </tbody>
             </table>
             <p class="kop-hint" style="margin-top:10px;">
-              <template v-if="mail_domain.status === 'verified'">Geverifieerd; laatst gecontroleerd {{ mail_domain.checked_at_label }}. Tip: voeg ook een DMARC-record toe (<code>_dmarc</code> TXT <code>v=DMARC1; p=none;</code>) voor de beste aflevering.</template>
-              <template v-else>DNS-wijzigingen zijn meestal binnen een kwartier zichtbaar, soms pas na een uur. Klik daarna op "Controleer DNS". Tot die tijd gaat je mail gewoon via {{ mail_domain.default_from }}.</template>
+              <template v-if="mail_domain.status === 'verified'">{{ $t('Geverifieerd; laatst gecontroleerd :date.', { date: mail_domain.checked_at_label }) }} {{ $t('Tip: voeg ook een DMARC-record toe') }} (<code>_dmarc</code> TXT <code>v=DMARC1; p=none;</code>) {{ $t('voor de beste aflevering.') }}</template>
+              <template v-else>{{ $t('DNS-wijzigingen zijn meestal binnen een kwartier zichtbaar, soms pas na een uur. Klik daarna op "Controleer DNS". Tot die tijd gaat je mail gewoon via :from.', { from: mail_domain.default_from }) }}</template>
             </p>
           </div>
           <div class="kop-actions">
-            <button class="btn btn-secondary btn-sm" :disabled="domainRefresh.processing" @click="refreshDomain">{{ domainRefresh.processing ? 'Bezig…' : 'Controleer DNS' }}</button>
-            <button class="btn btn-danger btn-sm" :disabled="domainDisconnect.processing" @click="disconnectDomain">Loskoppelen</button>
+            <button class="btn btn-secondary btn-sm" :disabled="domainRefresh.processing" @click="refreshDomain">{{ domainRefresh.processing ? $t('Bezig…') : $t('Controleer DNS') }}</button>
+            <button class="btn btn-danger btn-sm" :disabled="domainDisconnect.processing" @click="disconnectDomain">{{ $t('Loskoppelen') }}</button>
           </div>
         </template>
       </div>
@@ -224,62 +234,60 @@ const copyUrl = async () => {
           <div>
             <div class="kop-title">
               Claude
-              <span v-if="mcp.active" class="kop-pill on">Actief</span>
-              <span v-else class="kop-pill off">Uit</span>
+              <span v-if="mcp.active" class="kop-pill on">{{ $t('Actief') }}</span>
+              <span v-else class="kop-pill off">{{ $t('Uit') }}</span>
             </div>
             <p class="kop-desc">
-              Schrijf je offertes in een gesprek met Claude en zeg simpelweg <i>"zet deze offerte in {{ brand.name }}"</i> —
-              Claude maakt het concept direct in je administratie aan. Claude kan klanten opzoeken, concept-offertes en
-              concept-facturen aanmaken en je openstaande facturen opvragen. <b>Versturen doe je altijd zelf</b> in {{ brand.name }}.
+              {{ $t('Schrijf je offertes in een gesprek met Claude en zeg simpelweg') }} <i>"{{ $t('zet deze offerte in :brand', { brand: brand.name }) }}"</i> —
+              {{ $t('Claude maakt het concept direct in je administratie aan. Claude kan klanten opzoeken, concept-offertes en concept-facturen aanmaken en je openstaande facturen opvragen.') }} <b>{{ $t('Versturen doe je altijd zelf') }}</b> {{ $t('in') }} {{ brand.name }}.
             </p>
           </div>
         </div>
 
         <!-- Slim-vereiste -->
         <div v-if="!has_ai" class="kop-locked">
-          De Claude-koppeling hoort bij de AI-functies van het <b>Slim</b>-abonnement.
-          <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+          {{ $t('De Claude-koppeling hoort bij de AI-functies van het') }} <b>Slim</b>{{ $t('-abonnement.') }}
+          <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">{{ $t('Bekijk de abonnementen') }}</Link>
         </div>
 
         <template v-else>
           <!-- Nog niet actief -->
           <div v-if="!mcp.active">
             <button class="btn btn-primary" :disabled="rotateForm.processing" @click="activate">
-              {{ rotateForm.processing ? 'Bezig…' : 'Koppeling activeren' }}
+              {{ rotateForm.processing ? $t('Bezig…') : $t('Koppeling activeren') }}
             </button>
-            <p class="kop-hint">Je krijgt een geheime koppel-URL die je eenmalig in Claude toevoegt.</p>
+            <p class="kop-hint">{{ $t('Je krijgt een geheime koppel-URL die je eenmalig in Claude toevoegt.') }}</p>
           </div>
 
           <!-- Actief: URL + beheer -->
           <template v-else>
-            <div class="kop-url-label">Jouw geheime koppel-URL</div>
+            <div class="kop-url-label">{{ $t('Jouw geheime koppel-URL') }}</div>
             <div class="kop-url-row">
               <code class="kop-url">{{ mcp.url }}</code>
               <button type="button" class="btn btn-secondary btn-sm" @click="copyUrl">
-                {{ copied ? 'Gekopieerd ✓' : 'Kopiëren' }}
+                {{ copied ? $t('Gekopieerd ✓') : $t('Kopiëren') }}
               </button>
             </div>
             <p class="kop-hint">
-              Behandel deze URL als een wachtwoord: iedereen die hem kent kan concepten in je administratie aanmaken.
-              Uitgelekt? Maak met één klik een nieuwe aan.
+              {{ $t('Behandel deze URL als een wachtwoord: iedereen die hem kent kan concepten in je administratie aanmaken. Uitgelekt? Maak met één klik een nieuwe aan.') }}
             </p>
 
             <div class="kop-steps">
-              <div class="kop-steps-title">Zo koppel je Claude (eenmalig)</div>
+              <div class="kop-steps-title">{{ $t('Zo koppel je Claude (eenmalig)') }}</div>
               <ol>
-                <li>Open <b>claude.ai</b> → Instellingen → <b>Connectors</b> (of in de Claude-desktopapp).</li>
-                <li>Kies <b>"Add custom connector"</b> en plak de koppel-URL hierboven. Geen verdere authenticatie nodig.</li>
-                <li>Klaar! Vraag Claude bijvoorbeeld: <i>"Zoek klant Jansen op in {{ brand.name }}"</i> of
-                  <i>"Zet deze offerte als concept in {{ brand.name }}"</i>.</li>
+                <li>{{ $t('Open claude.ai → Instellingen → Connectors (of in de Claude-desktopapp).') }}</li>
+                <li>{{ $t('Kies') }} <b>"Add custom connector"</b> {{ $t('en plak de koppel-URL hierboven. Geen verdere authenticatie nodig.') }}</li>
+                <li>{{ $t('Klaar! Vraag Claude bijvoorbeeld:') }} <i>"{{ $t('Zoek klant Jansen op in :brand', { brand: brand.name }) }}"</i> {{ $t('of') }}
+                  <i>"{{ $t('Zet deze offerte als concept in :brand', { brand: brand.name }) }}"</i>.</li>
               </ol>
               <p class="kop-hint" style="margin-top:6px;">
-                Werkt ook in Claude Code: <code style="font-size:11.5px;">claude mcp add {{ brand.key }} --transport http {{ mcp.url }}</code>
+                {{ $t('Werkt ook in Claude Code:') }} <code style="font-size:11.5px;">claude mcp add {{ brand.key }} --transport http {{ mcp.url }}</code>
               </p>
             </div>
 
             <div class="kop-actions">
-              <button class="btn btn-secondary btn-sm" :disabled="rotateForm.processing" @click="rotate">Nieuwe koppel-URL</button>
-              <button class="btn btn-danger btn-sm" :disabled="disableForm.processing" @click="disable">Koppeling uitschakelen</button>
+              <button class="btn btn-secondary btn-sm" :disabled="rotateForm.processing" @click="rotate">{{ $t('Nieuwe koppel-URL') }}</button>
+              <button class="btn btn-danger btn-sm" :disabled="disableForm.processing" @click="disable">{{ $t('Koppeling uitschakelen') }}</button>
             </div>
           </template>
         </template>

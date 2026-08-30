@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
-<title>Jaaroverzicht {{ $year }}</title>
+<title>{{ __('Jaaroverzicht :year', ['year' => $year]) }}</title>
 <style>
   @page { margin: 16mm 15mm; }
   body { font-family: 'DejaVu Sans', sans-serif; font-size: 9.5pt; color: #1C1917; line-height: 1.5; }
@@ -21,88 +21,83 @@
 </head>
 <body>
 
-<h1>Jaaroverzicht {{ $year }}</h1>
-<div class="sub">{{ $company->name }}@if($company->kvk_number) · KvK {{ $company->kvk_number }}@endif · gegenereerd op {{ $generated_at }} · bedragen exclusief btw</div>
+<h1>{{ __('Jaaroverzicht :year', ['year' => $year]) }}</h1>
+<div class="sub">{{ $company->name }}@if($company->kvk_number) · {{ __('KvK :kvk', ['kvk' => $company->kvk_number]) }}@endif · {{ __('gegenereerd op :date', ['date' => $generated_at]) }} · {{ __('bedragen exclusief btw') }}</div>
 
-<div class="sect">Resultaat uit facturatie</div>
+<div class="sect">{{ __('Resultaat uit facturatie') }}</div>
 <table>
   <thead>
-    <tr><th>Kwartaal</th><th class="right">Omzet</th><th class="right">Kosten</th><th class="right">Kilometeraftrek</th><th class="right">Resultaat</th></tr>
+    <tr><th>{{ __('Kwartaal') }}</th><th class="right">{{ __('Omzet') }}</th><th class="right">{{ __('Kosten') }}</th><th class="right">{{ __('Kilometeraftrek') }}</th><th class="right">{{ __('Resultaat') }}</th></tr>
   </thead>
   <tbody>
     @foreach($quarters as $q)
       <tr>
         <td>{{ $q['label'] }} {{ $year }}</td>
-        <td class="num right">€&nbsp;{{ number_format($q['revenue'], 2, ',', '.') }}</td>
-        <td class="num right">@if($q['costs'])-&nbsp;€&nbsp;{{ number_format($q['costs'], 2, ',', '.') }}@else—@endif</td>
-        <td class="num right">@if($q['km_amount'])-&nbsp;€&nbsp;{{ number_format($q['km_amount'], 2, ',', '.') }}@else—@endif</td>
-        <td class="num right">€&nbsp;{{ number_format($q['result'], 2, ',', '.') }}</td>
+        <td class="num right">{{ money($q['revenue']) }}</td>
+        <td class="num right">@if($q['costs'])-&nbsp;{{ money($q['costs']) }}@else—@endif</td>
+        <td class="num right">@if($q['km_amount'])-&nbsp;{{ money($q['km_amount']) }}@else—@endif</td>
+        <td class="num right">{{ money($q['result']) }}</td>
       </tr>
     @endforeach
     <tr class="total">
-      <td>Totaal {{ $year }}</td>
-      <td class="num right">€&nbsp;{{ number_format($totals['revenue'], 2, ',', '.') }}</td>
-      <td class="num right">-&nbsp;€&nbsp;{{ number_format($totals['costs'], 2, ',', '.') }}</td>
-      <td class="num right">-&nbsp;€&nbsp;{{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
-      <td class="num right">€&nbsp;{{ number_format($totals['result'], 2, ',', '.') }}</td>
+      <td>{{ __('Totaal :year', ['year' => $year]) }}</td>
+      <td class="num right">{{ money($totals['revenue']) }}</td>
+      <td class="num right">-&nbsp;{{ money($totals['costs']) }}</td>
+      <td class="num right">-&nbsp;{{ money($totals['km_amount']) }}</td>
+      <td class="num right">{{ money($totals['result']) }}</td>
     </tr>
   </tbody>
 </table>
 
-<div class="sect">Kosten per categorie</div>
+<div class="sect">{{ __('Kosten per categorie') }}</div>
 <table>
   <thead>
-    <tr><th>Categorie</th><th class="right">Aantal</th><th class="right">Bedrag excl. btw</th></tr>
+    <tr><th>{{ __('Categorie') }}</th><th class="right">{{ __('Aantal') }}</th><th class="right">{{ __('Bedrag excl. btw') }}</th></tr>
   </thead>
   <tbody>
     @forelse($categories as $c)
       <tr>
         <td>{{ $c['name'] }}</td>
         <td class="num right">{{ $c['count'] }}</td>
-        <td class="num right">€&nbsp;{{ number_format($c['amount'], 2, ',', '.') }}</td>
+        <td class="num right">{{ money($c['amount']) }}</td>
       </tr>
     @empty
-      <tr><td colspan="3">Geen inkoopfacturen in {{ $year }}.</td></tr>
+      <tr><td colspan="3">{{ __('Geen inkoopfacturen in :year.', ['year' => $year]) }}</td></tr>
     @endforelse
   </tbody>
 </table>
 
-<div class="sect">Kilometeradministratie</div>
+<div class="sect">{{ __('Kilometeradministratie') }}</div>
 <table>
   <tbody>
     <tr>
-      <td>Zakelijke kilometers ({{ $totals['trip_count'] }} ritten)</td>
-      <td class="num right">{{ number_format($totals['km'], 1, ',', '.') }} km</td>
-      <td class="num right">€&nbsp;{{ number_format($totals['km_amount'], 2, ',', '.') }}</td>
+      <td>{{ __('Zakelijke kilometers (:count ritten)', ['count' => $totals['trip_count']]) }}</td>
+      <td class="num right">{{ number_format($totals['km'], 1, market('decimal_separator', ','), market('thousands_separator', '.')) }} km</td>
+      <td class="num right">{{ money($totals['km_amount']) }}</td>
     </tr>
   </tbody>
 </table>
 
 @if($previous['revenue'] || $previous['costs'])
-<div class="sect">Ter vergelijking: {{ $year - 1 }}</div>
+<div class="sect">{{ __('Ter vergelijking: :year', ['year' => $year - 1]) }}</div>
 <table>
   <tbody>
     <tr>
-      <td>Omzet €&nbsp;{{ number_format($previous['revenue'], 2, ',', '.') }}</td>
-      <td>Kosten €&nbsp;{{ number_format($previous['costs'], 2, ',', '.') }}</td>
-      <td>Kilometeraftrek €&nbsp;{{ number_format($previous['km_amount'], 2, ',', '.') }}</td>
-      <td class="right"><strong>Resultaat €&nbsp;{{ number_format($previous['result'], 2, ',', '.') }}</strong></td>
+      <td>{{ __('Omzet') }} {{ money($previous['revenue']) }}</td>
+      <td>{{ __('Kosten') }} {{ money($previous['costs']) }}</td>
+      <td>{{ __('Kilometeraftrek') }} {{ money($previous['km_amount']) }}</td>
+      <td class="right"><strong>{{ __('Resultaat') }} {{ money($previous['result']) }}</strong></td>
     </tr>
   </tbody>
 </table>
 @endif
 
 <div class="box">
-  <strong>Toelichting voor de aangifte inkomstenbelasting.</strong>
-  Dit overzicht bevat de cijfers uit de facturatie-administratie: omzet op factuurdatum (factuurstelsel, creditnota's
-  negatief, concepten niet meegeteld), ingeboekte inkoopfacturen en de kilometeraftrek van € 0,23 per zakelijke
-  kilometer met een privévervoermiddel. Nog te verwerken door de boekhouder: afschrijvingen op bedrijfsmiddelen,
-  eventuele loonkosten, bijtelling bij een zakelijke auto, voorraadmutaties en de ondernemersaftrekken
-  (zelfstandigenaftrek, startersaftrek, MKB-winstvrijstelling). Dit document is een administratief overzicht,
-  geen fiscale winst-en-verliesrekening.
+  <strong>{{ __('Toelichting voor de aangifte inkomstenbelasting.') }}</strong>
+  {{ __('Dit overzicht bevat de cijfers uit de facturatie-administratie: omzet op factuurdatum (factuurstelsel, creditnota\'s negatief, concepten niet meegeteld), ingeboekte inkoopfacturen en de kilometeraftrek van :rate per zakelijke kilometer met een privévervoermiddel. Nog te verwerken door de boekhouder: afschrijvingen op bedrijfsmiddelen, eventuele loonkosten, bijtelling bij een zakelijke auto, voorraadmutaties en de ondernemersaftrekken (zelfstandigenaftrek, startersaftrek, MKB-winstvrijstelling). Dit document is een administratief overzicht, geen fiscale winst-en-verliesrekening.', ['rate' => money(market('km_rate'))]) }}
 </div>
 
-<div class="footer">Gegenereerd met {{ brand('name') }} · {{ $company->name }} · Jaaroverzicht {{ $year }}</div>
+<div class="footer">{{ __('Gegenereerd met :brand', ['brand' => brand('name')]) }} · {{ $company->name }} · {{ __('Jaaroverzicht :year', ['year' => $year]) }}</div>
 
 </body>
 </html>

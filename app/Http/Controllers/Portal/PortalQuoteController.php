@@ -103,11 +103,11 @@ class PortalQuoteController extends Controller
             'signature' => ['required', 'string', 'max:200000', 'regex:/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/'],
             'agree' => ['accepted'],
         ], [
-            'signed_name.required' => 'Vul je naam in.',
-            'signature.required' => 'Zet je handtekening in het tekenveld.',
-            'signature.regex' => 'De handtekening kon niet worden gelezen — probeer het opnieuw.',
-            'signature.max' => 'De handtekening is te groot — wis het veld en teken opnieuw.',
-            'agree.accepted' => 'Vink aan dat je akkoord gaat met de offerte.',
+            'signed_name.required' => __('Vul je naam in.'),
+            'signature.required' => __('Zet je handtekening in het tekenveld.'),
+            'signature.regex' => __('De handtekening kon niet worden gelezen — probeer het opnieuw.'),
+            'signature.max' => __('De handtekening is te groot — wis het veld en teken opnieuw.'),
+            'agree.accepted' => __('Vink aan dat je akkoord gaat met de offerte.'),
         ]);
 
         try {
@@ -137,7 +137,7 @@ class PortalQuoteController extends Controller
             }
         }
 
-        return back()->with('flash', 'Bedankt! De offerte is ondertekend — je ontvangt vanzelf bericht.');
+        return back()->with('flash', __('Bedankt! De offerte is ondertekend — je ontvangt vanzelf bericht.'));
     }
 
     /** Afwijzen, met een (optionele) reden voor de afzender. */
@@ -167,7 +167,7 @@ class PortalQuoteController extends Controller
 
         $this->notifyCompany($quote->fresh(), accepted: false);
 
-        return back()->with('flash', 'De offerte is afgewezen — de afzender krijgt hiervan bericht.');
+        return back()->with('flash', __('De offerte is afgewezen — de afzender krijgt hiervan bericht.'));
     }
 
     /** De offerte-PDF (met handtekeningblok zodra ondertekend). */

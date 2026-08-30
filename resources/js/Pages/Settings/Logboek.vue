@@ -18,35 +18,35 @@ const actionClass = { created: 'pill-sent', updated: 'pill-draft', deleted: 'pil
 </script>
 
 <template>
-  <Head title="Logboek" />
+  <Head :title="$t('Logboek')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Logboek</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Logboek') }}</span></template>
     <template #topbar-actions>
-      <a :href="exportUrl()" class="btn btn-secondary btn-sm">Exporteer CSV</a>
+      <a :href="exportUrl()" class="btn btn-secondary btn-sm">{{ $t('Exporteer CSV') }}</a>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Logboek</h1>
-        <p class="page-subtitle">Wie deed wat, wanneer — elke wijziging, verzending en aanmelding in deze administratie. Onuitwisbaar; handig bij vragen van je accountant of bij een geschil.</p>
+        <h1 class="page-title">{{ $t('Logboek') }}</h1>
+        <p class="page-subtitle">{{ $t('Wie deed wat, wanneer — elke wijziging, verzending en aanmelding in deze administratie. Onuitwisbaar; handig bij vragen van je accountant of bij een geschil.') }}</p>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:16px;">
       <div class="card-body lb-filters">
-        <input type="search" v-model="f.q" placeholder="Zoek in omschrijving…" class="lb-q">
-        <select v-model="f.user"><option value="">Iedereen</option><option v-for="u in users" :key="u" :value="u">{{ u }}</option></select>
-        <select v-model="f.type"><option value="">Alle onderwerpen</option><option v-for="t in types" :key="t" :value="t">{{ t }}</option></select>
-        <select v-model="f.action"><option value="">Alle acties</option><option v-for="(label, key) in actions" :key="key" :value="key">{{ label }}</option></select>
+        <input type="search" v-model="f.q" :placeholder="$t('Zoek in omschrijving…')" class="lb-q">
+        <select v-model="f.user"><option value="">{{ $t('Iedereen') }}</option><option v-for="u in users" :key="u" :value="u">{{ u }}</option></select>
+        <select v-model="f.type"><option value="">{{ $t('Alle onderwerpen') }}</option><option v-for="t in types" :key="t" :value="t">{{ t }}</option></select>
+        <select v-model="f.action"><option value="">{{ $t('Alle acties') }}</option><option v-for="(label, key) in actions" :key="key" :value="key">{{ label }}</option></select>
         <input type="date" v-model="f.from"><input type="date" v-model="f.to">
-        <button type="button" class="btn btn-secondary btn-sm" @click="reset">Wis</button>
+        <button type="button" class="btn btn-secondary btn-sm" @click="reset">{{ $t('Wis') }}</button>
       </div>
     </div>
 
     <div class="card">
       <div class="card-body-flush" v-if="logs.data.length">
         <table class="data-table">
-          <thead><tr><th>Wanneer</th><th>Wie</th><th>Actie</th><th>Wat</th><th></th></tr></thead>
+          <thead><tr><th>{{ $t('Wanneer') }}</th><th>{{ $t('Wie') }}</th><th>{{ $t('Actie') }}</th><th>{{ $t('Wat') }}</th><th></th></tr></thead>
           <tbody>
             <template v-for="l in logs.data" :key="l.id">
               <tr>
@@ -54,7 +54,7 @@ const actionClass = { created: 'pill-sent', updated: 'pill-draft', deleted: 'pil
                 <td>{{ l.user }}</td>
                 <td><span class="pill" :class="actionClass[l.action] || 'pill-draft'">{{ l.action_label }}</span></td>
                 <td class="lb-desc">{{ l.description }}</td>
-                <td class="right"><button v-if="l.changes" type="button" class="link-btn" @click="open = open === l.id ? null : l.id">{{ open === l.id ? 'verberg' : 'details' }}</button></td>
+                <td class="right"><button v-if="l.changes" type="button" class="link-btn" @click="open = open === l.id ? null : l.id">{{ open === l.id ? $t('verberg') : $t('details') }}</button></td>
               </tr>
               <tr v-if="open === l.id && l.changes" class="lb-changes-row">
                 <td colspan="5">
@@ -68,7 +68,7 @@ const actionClass = { created: 'pill-sent', updated: 'pill-draft', deleted: 'pil
           </tbody>
         </table>
       </div>
-      <div v-else class="card-empty">Nog niets gelogd — vanaf nu verschijnt hier elke wijziging.</div>
+      <div v-else class="card-empty">{{ $t('Nog niets gelogd — vanaf nu verschijnt hier elke wijziging.') }}</div>
       <div v-if="logs.links && logs.links.length > 3" class="lb-pager">
         <template v-for="link in logs.links" :key="link.label">
           <Link v-if="link.url" :href="link.url" :class="['btn btn-secondary btn-sm', { active: link.active }]" v-html="link.label" preserve-scroll />

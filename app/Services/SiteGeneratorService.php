@@ -32,9 +32,9 @@ class SiteGeneratorService
     public static function blank(): array
     {
         return [
-            'hero' => ['title' => '', 'subtitle' => '', 'cta' => 'Vraag een offerte aan'],
-            'services' => [], 'about' => ['title' => 'Over ons', 'text' => ''], 'usps' => [],
-            'contact' => ['title' => 'Neem contact op', 'text' => ''], 'seo' => ['title' => '', 'description' => ''],
+            'hero' => ['title' => '', 'subtitle' => '', 'cta' => __('Vraag een offerte aan')],
+            'services' => [], 'about' => ['title' => __('Over ons'), 'text' => ''], 'usps' => [],
+            'contact' => ['title' => __('Neem contact op'), 'text' => ''], 'seo' => ['title' => '', 'description' => ''],
         ];
     }
 
@@ -56,11 +56,11 @@ class SiteGeneratorService
         };
 
         return [
-            'hero' => ['title' => $t($c['hero']['title'] ?? '', 90), 'subtitle' => $t($c['hero']['subtitle'] ?? '', 240), 'cta' => $t($c['hero']['cta'] ?? '', 40) ?: 'Vraag een offerte aan'],
+            'hero' => ['title' => $t($c['hero']['title'] ?? '', 90), 'subtitle' => $t($c['hero']['subtitle'] ?? '', 240), 'cta' => $t($c['hero']['cta'] ?? '', 40) ?: __('Vraag een offerte aan')],
             'services' => $list($c['services'] ?? [], 6, 'description', 60, 320),
-            'about' => ['title' => $t($c['about']['title'] ?? '', 80) ?: 'Over ons', 'text' => $t($c['about']['text'] ?? '', 1200)],
+            'about' => ['title' => $t($c['about']['title'] ?? '', 80) ?: __('Over ons'), 'text' => $t($c['about']['text'] ?? '', 1200)],
             'usps' => $list($c['usps'] ?? [], 4, 'text', 60, 220),
-            'contact' => ['title' => $t($c['contact']['title'] ?? '', 80) ?: 'Neem contact op', 'text' => $t($c['contact']['text'] ?? '', 320)],
+            'contact' => ['title' => $t($c['contact']['title'] ?? '', 80) ?: __('Neem contact op'), 'text' => $t($c['contact']['text'] ?? '', 320)],
             'seo' => ['title' => $t($c['seo']['title'] ?? '', 70), 'description' => $t($c['seo']['description'] ?? '', 160)],
         ];
     }
@@ -89,8 +89,10 @@ class SiteGeneratorService
     {
         $clean = fn ($key, $fallback) => mb_substr(trim((string) ($answers[$key] ?? '')), 0, 300) ?: $fallback;
 
+        $language = \App\Support\Market::isPl() ? 'Pools' : 'Nederlands';
+
         return implode("\n", [
-            'Je bent tekstschrijver voor kleine Nederlandse ondernemers. Schrijf de complete inhoud van een one-page website voor dit bedrijf.',
+            'Je bent tekstschrijver voor kleine ondernemers in ' . \App\Support\Market::get('country_name', 'Nederland') . '. Schrijf de complete inhoud van een one-page website voor dit bedrijf.',
             'Bedrijfsnaam: ' . $company->publicName(),
             'Plaats: ' . ($company->city ?: 'onbekend'),
             'Wat het bedrijf doet: ' . $clean('what', 'onbekend'),
@@ -98,7 +100,7 @@ class SiteGeneratorService
             'Waarom klanten voor dit bedrijf kiezen: ' . $clean('why', 'onbekend'),
             'Toon: ' . $clean('tone', 'vriendelijk en professioneel'),
             '',
-            'Regels: schrijf in het Nederlands in de je-vorm naar de klant en de wij-vorm over het bedrijf; concreet en zonder holle marketingtaal; verzin geen certificeringen, prijzen, jaartallen, reviews of cijfers die niet zijn gegeven; vier tot zes diensten; drie tot vier USP\'s; de kop van de hero is maximaal tien woorden.',
+            'Regels: schrijf alle teksten in het ' . $language . ', in de je-vorm naar de klant en de wij-vorm over het bedrijf; concreet en zonder holle marketingtaal; verzin geen certificeringen, prijzen, jaartallen, reviews of cijfers die niet zijn gegeven; vier tot zes diensten; drie tot vier USP\'s; de kop van de hero is maximaal tien woorden.',
         ]);
     }
 }

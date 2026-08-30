@@ -18,10 +18,10 @@ class BrandDesignController extends Controller
         $user = $request->user();
         $company = $user->company;
         if (! $company->hasAiAccess()) {
-            return response()->json(['message' => 'Huisstijl ontwerpen met AI zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.'], 403);
+            return response()->json(['message' => __('Huisstijl ontwerpen met AI zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.')], 403);
         }
         if ($company->aiLimitReached()) {
-            return response()->json(['message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.'], 429);
+            return response()->json(['message' => __('Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.')], 429);
         }
 
         $answers = $request->validate([
@@ -29,7 +29,7 @@ class BrandDesignController extends Controller
             'audience' => ['nullable', 'string', 'max:200'],
             'tone' => ['nullable', 'string', 'max:120'],
             'colors' => ['nullable', 'string', 'max:120'],
-        ], ['sector.required' => 'Vertel kort wat je bedrijf doet.', 'sector.min' => 'Vertel iets meer over wat je bedrijf doet.']);
+        ], ['sector.required' => __('Vertel kort wat je bedrijf doet.'), 'sector.min' => __('Vertel iets meer over wat je bedrijf doet.')]);
 
         try {
             $directions = $designer->propose($company, $answers);

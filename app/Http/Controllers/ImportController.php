@@ -19,8 +19,8 @@ class ImportController extends Controller
         $preview = $request->session()->get('import_preview');
 
         return Inertia::render('Import/Index', [
-            'types' => ImportService::TYPES,
-            'fields' => collect(ImportService::FIELDS)->map(fn ($fields) => collect($fields)->map(fn ($f, $key) => ['key' => $key, 'label' => $f[0], 'required' => $f[1]])->values())->all(),
+            'types' => array_map(fn ($label) => __($label), ImportService::TYPES),
+            'fields' => collect(ImportService::FIELDS)->map(fn ($fields) => collect($fields)->map(fn ($f, $key) => ['key' => $key, 'label' => __($f[0]), 'required' => $f[1]])->values())->all(),
             'preview' => $preview,
             'result' => $request->session()->get('import_result'),
         ]);
@@ -32,7 +32,7 @@ class ImportController extends Controller
         $data = $request->validate([
             'type' => ['required', 'in:' . implode(',', array_keys(ImportService::TYPES))],
             'file' => ['required', 'file', 'max:10240', 'mimes:csv,txt'],
-        ], ['file.mimes' => 'Upload een CSV-bestand (exporteer vanuit je oude pakket als CSV, niet als Excel).']);
+        ], ['file.mimes' => __('Upload een CSV-bestand (exporteer vanuit je oude pakket als CSV, niet als Excel).')]);
 
         try {
             $parsed = $this->import->parse($request->file('file')->get());
@@ -48,6 +48,8 @@ class ImportController extends Controller
             'type' => $data['type'],
             'filename' => $request->file('file')->getClientOriginalName(),
             'headers' => $parsed['headers'],
+            // Herkend bronpakket (Fakturownia, iFirma, wFirma, inFakt, WeFact, Moneybird, e-Boekhouden) of null.
+            'package' => ImportService::detectPackage($parsed['headers']),
             'sample' => array_slice($parsed['rows'], 0, 5),
             'total' => count($parsed['rows']),
             'mapping' => $this->import->suggestMapping($data['type'], $parsed['headers']),
@@ -64,7 +66,7 @@ class ImportController extends Controller
 
         $cached = Cache::pull('import:' . $request->user()->id . ':' . $data['token']);
         if (! $cached) {
-            return redirect()->route('import.index')->with('error', 'Het voorbeeld is verlopen — upload het bestand opnieuw.');
+            return redirect()->route('import.index')->with('error', __('Het voorbeeld is verlopen — upload het bestand opnieuw.'));
         }
 
         $mapping = array_filter($data['mapping'], fn ($v) => $v !== null && $v !== '');
@@ -72,16 +74,16 @@ class ImportController extends Controller
             if ($required && ! isset($mapping[$field])) {
                 Cache::put('import:' . $request->user()->id . ':' . $data['token'], $cached, now()->addMinutes(30));
 
-                return back()->with('error', "Koppel eerst de kolom voor \"{$label}\".")->with('import_preview', [
-                    'token' => $data['token'], 'type' => $cached['type'], 'filename' => 'bestand', 'headers' => $cached['headers'],
+                return back()->with('error', __('Koppel eerst de kolom voor ":label".', ['label' => __($label)]))->with('import_preview', [
+                    'token' => $data['token'], 'type' => $cached['type'], 'filename' => __('bestand'), 'headers' => $cached['headers'],
                     'sample' => array_slice($cached['rows'], 0, 5), 'total' => count($cached['rows']), 'mapping' => $mapping,
                 ]);
             }
         }
 
         $result = $this->import->import($request->user()->company, $cached['type'], $cached['rows'], $mapping);
-        $label = ImportService::TYPES[$cached['type']];
-        Audit::log('created', null, "Import {$label}: {$result['created']} toegevoegd, {$result['skipped']} overgeslagen");
+        $label = __(ImportService::TYPES[$cached['type']]);
+        Audit::log('created', null, __('Import :label: :created toegevoegd, :skipped overgeslagen', ['label' => $label, 'created' => $result['created'], 'skipped' => $result['skipped']]));
 
         return redirect()->route('import.index')->with('import_result', $result + ['type' => $cached['type'], 'label' => $label]);
     }

@@ -26,7 +26,7 @@ class IncassoDossierMail extends Mailable
 
     public function envelope(): Envelope
     {
-        $ref = $this->invoice->incasso_reference ?: ('factuur ' . $this->invoice->number);
+        $ref = $this->invoice->incasso_reference ?: __('factuur :number', ['number' => $this->invoice->number]);
         $company = $this->invoice->company;
         $replyTo = $company?->email ?: $company?->copy_email;
 
@@ -34,7 +34,7 @@ class IncassoDossierMail extends Mailable
         return new Envelope(
             from: \App\Support\Sender::address($company, $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
-            subject: 'Nieuwe incasso-opdracht ' . $ref . ' — ' . $this->invoice->customer_name,
+            subject: __('Nieuwe incasso-opdracht :ref — :customer', ['ref' => $ref, 'customer' => $this->invoice->customer_name]),
         );
     }
 

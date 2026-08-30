@@ -1,6 +1,7 @@
 <script setup>
 import { Head, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   users: Array,
@@ -9,9 +10,9 @@ const props = defineProps({
 });
 
 const roleDescriptions = {
-  owner: 'Volledige toegang: ook instellingen, rapporten, abonnement en teambeheer.',
-  staff: 'Dagelijks werk: offertes, facturen, klanten, producten en inkoop. Geen instellingen, rapporten of abonnement.',
-  accountant: 'Mag alles inzien en rapporten/exports gebruiken (o.a. BTW-overzicht), maar niets aanmaken of wijzigen.',
+  owner: t('Volledige toegang: ook instellingen, rapporten, abonnement en teambeheer.'),
+  staff: t('Dagelijks werk: offertes, facturen, klanten, producten en inkoop. Geen instellingen, rapporten of abonnement.'),
+  accountant: t('Mag alles inzien en rapporten/exports gebruiken (o.a. BTW-overzicht), maar niets aanmaken of wijzigen.'),
 };
 
 const inviteForm = useForm({
@@ -40,7 +41,7 @@ const changeRole = (user, event) => {
 };
 
 const removeUser = (user) => {
-  if (confirm(`${user.name} verwijderen uit het team? Diegene kan daarna niet meer inloggen.`)) {
+  if (confirm(t(':name verwijderen uit het team? Diegene kan daarna niet meer inloggen.', { name: user.name }))) {
     router.delete(route('settings.team.remove', user.id), { preserveScroll: true });
   }
 };
@@ -50,23 +51,23 @@ const resend = (inv) => {
 };
 
 const revoke = (inv) => {
-  if (confirm(`Uitnodiging voor ${inv.email} intrekken?`)) {
+  if (confirm(t('Uitnodiging voor :email intrekken?', { email: inv.email }))) {
     router.delete(route('settings.team.invite.revoke', inv.id), { preserveScroll: true });
   }
 };
 </script>
 
 <template>
-  <Head title="Team" />
+  <Head :title="$t('Team')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Instellingen / <span class="breadcrumb-current">Team</span></div>
+      <div class="breadcrumb">{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Team') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Team</h1>
-        <p class="page-subtitle">Nodig collega's of je boekhouder uit en bepaal per persoon wat diegene mag — zonder extra kosten.</p>
+        <h1 class="page-title">{{ $t('Team') }}</h1>
+        <p class="page-subtitle">{{ $t("Nodig collega's of je boekhouder uit en bepaal per persoon wat diegene mag — zonder extra kosten.") }}</p>
       </div>
     </div>
 
@@ -75,18 +76,18 @@ const revoke = (inv) => {
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Iemand uitnodigen</div>
-            <div class="card-subtitle">Diegene ontvangt een e-mail met een beveiligde link (7 dagen geldig) en kiest zelf een wachtwoord.</div>
+            <div class="card-title">{{ $t('Iemand uitnodigen') }}</div>
+            <div class="card-subtitle">{{ $t('Diegene ontvangt een e-mail met een beveiligde link (7 dagen geldig) en kiest zelf een wachtwoord.') }}</div>
           </div>
         </div>
         <div class="card-body">
           <div class="form-group">
-            <label>E-mailadres *</label>
-            <input type="email" v-model="inviteForm.email" placeholder="collega@bedrijf.nl" maxlength="180">
+            <label>{{ $t('E-mailadres') }} *</label>
+            <input type="email" v-model="inviteForm.email" :placeholder="$t('collega@bedrijf.nl')" maxlength="180">
             <div v-if="inviteForm.errors.email" class="field-error">{{ inviteForm.errors.email }}</div>
           </div>
 
-          <label style="display:block;font-size:13px;font-weight:500;color:var(--text-2);margin-bottom:8px;">Rol</label>
+          <label style="display:block;font-size:13px;font-weight:500;color:var(--text-2);margin-bottom:8px;">{{ $t('Rol') }}</label>
           <div class="role-options">
             <label v-for="(label, key) in roles" :key="key" class="role-opt" :class="{ on: inviteForm.role === key }">
               <input type="radio" :value="key" v-model="inviteForm.role">
@@ -100,14 +101,14 @@ const revoke = (inv) => {
 
           <button class="btn btn-primary" style="margin-top:14px;" :disabled="inviteForm.processing" @click="invite">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            {{ inviteForm.processing ? 'Versturen…' : 'Uitnodiging versturen' }}
+            {{ inviteForm.processing ? $t('Versturen…') : $t('Uitnodiging versturen') }}
           </button>
         </div>
       </div>
 
       <!-- Openstaande uitnodigingen -->
       <div v-if="invitations.length > 0" class="card" style="margin-top:16px;">
-        <div class="card-header"><div class="card-title">Openstaande uitnodigingen</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Openstaande uitnodigingen') }}</div></div>
         <div class="card-body" style="padding-top:6px;">
           <div v-for="inv in invitations" :key="inv.id" class="team-row">
             <span class="team-avatar pending">
@@ -117,12 +118,12 @@ const revoke = (inv) => {
               <div class="team-name">{{ inv.email }}</div>
               <div class="team-meta">
                 {{ roles[inv.role] || inv.role }} ·
-                <span v-if="inv.expired" style="color:var(--brand);font-weight:600;">verlopen</span>
-                <span v-else>geldig tot {{ inv.expires_label }}</span>
+                <span v-if="inv.expired" style="color:var(--brand);font-weight:600;">{{ $t('verlopen') }}</span>
+                <span v-else>{{ $t('geldig tot :date', { date: inv.expires_label }) }}</span>
               </div>
             </div>
-            <button class="btn btn-secondary btn-sm" @click="resend(inv)">Opnieuw versturen</button>
-            <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="revoke(inv)">Intrekken</button>
+            <button class="btn btn-secondary btn-sm" @click="resend(inv)">{{ $t('Opnieuw versturen') }}</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="revoke(inv)">{{ $t('Intrekken') }}</button>
           </div>
         </div>
       </div>
@@ -131,8 +132,8 @@ const revoke = (inv) => {
       <div class="card" style="margin-top:16px;">
         <div class="card-header">
           <div>
-            <div class="card-title">Teamleden</div>
-            <div class="card-subtitle">{{ users.length }} {{ users.length === 1 ? 'persoon heeft' : 'personen hebben' }} toegang tot deze omgeving.</div>
+            <div class="card-title">{{ $t('Teamleden') }}</div>
+            <div class="card-subtitle">{{ users.length === 1 ? $t('1 persoon heeft toegang tot deze omgeving.') : $t(':n personen hebben toegang tot deze omgeving.', { n: users.length }) }}</div>
           </div>
         </div>
         <div class="card-body" style="padding-top:6px;">
@@ -141,24 +142,24 @@ const revoke = (inv) => {
             <div class="team-info">
               <div class="team-name">
                 {{ u.name }}
-                <span v-if="u.is_self" class="team-self">jij</span>
-                <span v-if="u.two_factor" class="team-2fa" title="Tweestapsverificatie ingeschakeld">
+                <span v-if="u.is_self" class="team-self">{{ $t('jij') }}</span>
+                <span v-if="u.two_factor" class="team-2fa" :title="$t('Tweestapsverificatie ingeschakeld')">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                   2FA
                 </span>
               </div>
-              <div class="team-meta">{{ u.email }} · sinds {{ u.joined_label }}</div>
+              <div class="team-meta">{{ u.email }} · {{ $t('sinds :date', { date: u.joined_label }) }}</div>
             </div>
             <select
               class="team-role-select"
               :value="u.role"
               :disabled="u.is_self"
-              :title="u.is_self ? 'Je kunt je eigen rol niet aanpassen' : 'Rol aanpassen'"
+              :title="u.is_self ? $t('Je kunt je eigen rol niet aanpassen') : $t('Rol aanpassen')"
               @change="changeRole(u, $event)"
             >
               <option v-for="(label, key) in roles" :key="key" :value="key">{{ label }}</option>
             </select>
-            <button v-if="!u.is_self" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeUser(u)">Verwijder</button>
+            <button v-if="!u.is_self" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeUser(u)">{{ $t('Verwijder') }}</button>
           </div>
         </div>
       </div>

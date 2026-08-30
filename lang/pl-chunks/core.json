@@ -1,0 +1,23 @@
+{
+  "Alleen een verstuurde, onbetaalde factuur kan te koop worden aangeboden.": "Do wykupu można zgłosić tylko wysłaną, nieopłaconą fakturę.",
+  "Alleen voor verstuurde facturen.": "Tylko dla wysłanych faktur.",
+  "Dit is geen geldig KSeF-nummer (vorm NIP-JJJJMMDD-XXXXXX-XXXXXX-XX).": "To nie jest prawidłowy numer KSeF (format NIP-RRRRMMDD-XXXXXX-XXXXXX-XX).",
+  "Er bestaat al een account met dit BTW-nummer. Neem contact met ons op als dit onterecht is.": "Istnieje już konto z tym numerem NIP. Skontaktuj się z nami, jeśli to pomyłka.",
+  "Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.": "Istnieje już konto z tym numerem REGON. Skontaktuj się z nami, jeśli to pomyłka.",
+  "Factuur :number te koop aangeboden aan :partner": "Faktura :number zgłoszona do wykupu do :partner",
+  "KSeF-nummer opgeslagen.": "Numer KSeF zapisany.",
+  "Verzoek verstuurd naar :partner — zij nemen binnen één werkdag contact met je op.": "Wniosek wysłany do :partner — skontaktują się z Tobą w ciągu jednego dnia roboczego.",
+  "Vul een geldig NIP-nummer in (10 cijfers).": "Podaj prawidłowy numer NIP (10 cyfr).",
+  "Vul een geldig Nederlands BTW-nummer in, bijvoorbeeld NL123456789B01.": "Podaj prawidłowy numer NIP.",
+  "Vul een geldig REGON-nummer in (9 of 14 cijfers).": "Podaj prawidłowy numer REGON (9 lub 14 cyfr).",
+  "— concept —": "— szkic —",
+  "Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.": "Dziękujemy! Wiadomość została wysłana — odpowiemy w ciągu jednego dnia roboczego.",
+  "Er ging iets mis bij het versturen. Mail ons gerust direct op :email.": "Coś poszło nie tak przy wysyłce. Napisz do nas bezpośrednio na :email.",
+  "Gemarkeerd als aangegeven.": "Oznaczono jako złożone.",
+  "Markering \"aangegeven\" verwijderd.": "Usunięto oznaczenie „złożone”.",
+  "Gemarkeerd als betaald.": "Oznaczono jako zapłacone.",
+  "Markering \"betaald\" verwijderd.": "Usunięto oznaczenie „zapłacone”.",
+  "Betalingskenmerk opgeslagen.": "Tytuł przelewu zapisany.",
+  "Aangifte bijgewerkt.": "Deklaracja zaktualizowana.",
+  "Btw-instellingen opgeslagen.": "Ustawienia VAT zapisane."
+}

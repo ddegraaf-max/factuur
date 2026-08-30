@@ -68,7 +68,7 @@ class CustomerController extends Controller
     {
         $data = $this->validated($request);
         $customer = Customer::create($data);
-        return redirect()->route('customers.index')->with('flash', "Klant {$customer->name} aangemaakt.");
+        return redirect()->route('customers.index')->with('flash', __('Klant :name aangemaakt.', ['name' => $customer->name]));
     }
 
     public function edit(Customer $customer): Response
@@ -139,7 +139,7 @@ class CustomerController extends Controller
             ],
             'invoices' => $invoices->take(50)->values()->map(fn ($i) => [
                 'id' => $i->id,
-                'number' => $i->number ?: '— concept —',
+                'number' => $i->number ?: __('— concept —'),
                 'is_credit' => (bool) $i->is_credit,
                 'invoice_date_label' => $i->invoice_date->translatedFormat('j M Y'),
                 'due_date_label' => $i->due_date?->translatedFormat('j M Y'),
@@ -151,7 +151,7 @@ class CustomerController extends Controller
             'invoices_total' => $invoices->count(),
             'quotes' => $quotes->take(50)->values()->map(fn ($q) => [
                 'id' => $q->id,
-                'number' => $q->number ?: '— concept —',
+                'number' => $q->number ?: __('— concept —'),
                 'quote_date_label' => $q->quote_date->translatedFormat('j M Y'),
                 'valid_until_label' => $q->valid_until?->translatedFormat('j M Y'),
                 'status' => $q->status,
@@ -169,21 +169,26 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer): RedirectResponse
     {
         $customer->update($this->validated($request));
-        return redirect()->route('customers.show', $customer)->with('flash', 'Klant bijgewerkt.');
+        return redirect()->route('customers.show', $customer)->with('flash', __('Klant bijgewerkt.'));
     }
 
     public function destroy(Customer $customer): RedirectResponse
     {
         if ($customer->invoices()->exists()) {
-            return back()->withErrors(['delete' => 'Kan klant niet verwijderen: er bestaan facturen.']);
+            return back()->withErrors(['delete' => __('Kan klant niet verwijderen: er bestaan facturen.')]);
         }
         $customer->delete();
-        return redirect()->route('customers.index')->with('flash', 'Klant verwijderd.');
+        return redirect()->route('customers.index')->with('flash', __('Klant verwijderd.'));
     }
 
     protected function validated(Request $request): array
     {
         $data = $this->validatedRules($request);
+
+        // Pools NIP: alleen de cijfers bewaren (klanten krijgen geen controlecijfer-check).
+        if (\App\Support\Market::isPl() && filled($data['vat_number'] ?? null)) {
+            $data['vat_number'] = preg_replace('/\D/', '', $data['vat_number']) ?: null;
+        }
 
         // Automatische incasso: een machtiging krijgt automatisch een kenmerk en staat aan zodra er een IBAN is.
         if (filled($data['mandate_iban'] ?? null)) {
@@ -203,7 +208,7 @@ class CustomerController extends Controller
         return $request->validate([
             'mandate_reference' => ['nullable', 'string', 'max:35', 'regex:/^[A-Za-z0-9+?\/\-:().,\' ]+$/'],
             'mandate_iban' => ['nullable', 'string', 'max:40', function ($attr, $value, $fail) {
-                if (filled($value) && ! \App\Support\Iban::valid($value)) $fail('Dit is geen geldig IBAN.');
+                if (filled($value) && ! \App\Support\Iban::valid($value)) $fail(__('Dit is geen geldig IBAN.'));
             }],
             'mandate_holder' => ['nullable', 'string', 'max:70'],
             'mandate_signed_on' => ['nullable', 'date'],
@@ -221,7 +226,7 @@ class CustomerController extends Controller
             'postal_code' => ['nullable', 'string', 'max:20'],
             'city' => ['nullable', 'string', 'max:100'],
             'country' => ['required', 'string', 'size:2'],
-            'language' => ['nullable', 'in:nl,en'],
+            'language' => ['nullable', 'in:nl,en,pl'],
             'payment_terms' => ['nullable', 'integer', 'min:0', 'max:365'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'notes' => ['nullable', 'string'],

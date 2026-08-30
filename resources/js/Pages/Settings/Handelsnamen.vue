@@ -1,14 +1,18 @@
 <script setup>
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref } from 'vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   profiles: Array,  // handelsnamen incl. logo_data en invoices_count
   company: Object,  // { name, brand_color, invoice_template } — de standaard
 });
 
-const TEMPLATES = { modern: 'Modern', classic: 'Klassiek', minimal: 'Minimaal' };
+// Markt (nl/pl): KvK/REGON- en btw/NIP-benaming.
+const market = usePage().props.market;
+
+const TEMPLATES = { modern: t('Modern'), classic: t('Klassiek'), minimal: t('Minimaal') };
 
 /* ---------- Formulier (toevoegen of bewerken) ---------- */
 const editingId = ref(null);
@@ -82,55 +86,53 @@ const submit = () => {
 
 const removeProfile = (p) => {
   const warning = p.invoices_count > 0
-    ? `Er zijn ${p.invoices_count} facturen onder deze handelsnaam gemaakt; die vallen terug op je standaard huisstijl.\n\n`
+    ? t('Er zijn :n facturen onder deze handelsnaam gemaakt; die vallen terug op je standaard huisstijl.', { n: p.invoices_count }) + '\n\n'
     : '';
-  if (confirm(`${warning}Handelsnaam "${p.name}" verwijderen?`)) {
+  if (confirm(warning + t('Handelsnaam ":name" verwijderen?', { name: p.name }))) {
     router.delete(route('settings.brands.destroy', p.id), { preserveScroll: true });
   }
 };
 
 const effectiveColor = (p) => p.brand_color || props.company.brand_color;
-const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.invoice_template] || 'Modern';
+const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.invoice_template] || TEMPLATES.modern;
 </script>
 
 <template>
-  <Head title="Handelsnamen" />
+  <Head :title="$t('Handelsnamen')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Instellingen / <span class="breadcrumb-current">Handelsnamen</span></div>
+      <div class="breadcrumb">{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Handelsnamen') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Handelsnamen</h1>
+        <h1 class="page-title">{{ $t('Handelsnamen') }}</h1>
         <p class="page-subtitle">
-          Factureer onder meerdere handelsnamen, elk met een eigen logo, kleur en sjabloon —
-          binnen één administratie. KvK, BTW-nummer, IBAN en de factuurnummering blijven gewoon van
-          {{ company.name }}.
+          {{ $t('Factureer onder meerdere handelsnamen, elk met een eigen logo, kleur en sjabloon — binnen één administratie. :registry, :taxid, IBAN en de factuurnummering blijven gewoon van :name.', { registry: market.registry.short, taxid: market.tax_id.label, name: company.name }) }}
         </p>
       </div>
       <button v-if="!showForm" type="button" class="btn btn-primary" @click="startAdd">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Handelsnaam toevoegen
+        {{ $t('Handelsnaam toevoegen') }}
       </button>
     </div>
 
     <!-- Formulier -->
     <div v-if="showForm" class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="hn-form-title">{{ editingId ? 'Handelsnaam bewerken' : 'Nieuwe handelsnaam' }}</div>
+        <div class="hn-form-title">{{ editingId ? $t('Handelsnaam bewerken') : $t('Nieuwe handelsnaam') }}</div>
         <form @submit.prevent="submit">
           <div class="form-row">
             <div class="form-group">
-              <label>Handelsnaam *<span class="label-hint">(zo staat de afzender op de factuur)</span></label>
-              <input type="text" v-model="form.name" maxlength="190" placeholder="Bijv. Vries Webdesign">
+              <label>{{ $t('Handelsnaam') }} *<span class="label-hint">{{ $t('(zo staat de afzender op de factuur)') }}</span></label>
+              <input type="text" v-model="form.name" maxlength="190" :placeholder="$t('Bijv. Vries Webdesign')">
               <div v-if="form.errors.name" class="field-error">{{ form.errors.name }}</div>
             </div>
             <div class="form-group">
-              <label>Factuurkleur<span class="label-hint">(leeg = standaard huisstijl)</span></label>
+              <label>{{ $t('Factuurkleur') }}<span class="label-hint">{{ $t('(leeg = standaard huisstijl)') }}</span></label>
               <div style="display:flex;gap:10px;align-items:center;">
                 <input type="color" :value="form.brand_color || company.brand_color" @input="form.brand_color = $event.target.value" style="width:48px;height:42px;padding:2px;cursor:pointer;">
-                <input type="text" v-model="form.brand_color" maxlength="7" class="mono" style="width:120px;" placeholder="Standaard">
+                <input type="text" v-model="form.brand_color" maxlength="7" class="mono" style="width:120px;" :placeholder="$t('Standaard')">
               </div>
               <div v-if="form.errors.brand_color" class="field-error">{{ form.errors.brand_color }}</div>
             </div>
@@ -138,7 +140,7 @@ const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.i
 
           <div class="form-row">
             <div class="form-group">
-              <label>Eigen logo<span class="label-hint">(PNG/JPG/SVG/WEBP, max 2 MB)</span></label>
+              <label>{{ $t('Eigen logo') }}<span class="label-hint">{{ $t('(PNG/JPG/SVG/WEBP, max 2 MB)') }}</span></label>
               <div class="hn-logo-row">
                 <div class="hn-logo-preview">
                   <img v-if="logoPreview" :src="logoPreview" alt="">
@@ -149,36 +151,36 @@ const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.i
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
                     <input type="file" accept=".png,.jpg,.jpeg,.svg,.webp" style="display:none;" @change="pickLogo">
-                    {{ logoPreview ? 'Ander logo kiezen' : 'Logo uploaden' }}
+                    {{ logoPreview ? $t('Ander logo kiezen') : $t('Logo uploaden') }}
                   </label>
-                  <button v-if="logoPreview" type="button" class="btn btn-secondary btn-sm" @click="clearLogo">Logo weghalen</button>
+                  <button v-if="logoPreview" type="button" class="btn btn-secondary btn-sm" @click="clearLogo">{{ $t('Logo weghalen') }}</button>
                 </div>
               </div>
-              <div class="hn-hint">Zonder eigen logo toont de factuur een letter-embleem met de gekozen kleur — niet het logo van {{ company.name }}.</div>
+              <div class="hn-hint">{{ $t('Zonder eigen logo toont de factuur een letter-embleem met de gekozen kleur — niet het logo van :name.', { name: company.name }) }}</div>
               <div v-if="form.errors.logo" class="field-error">{{ form.errors.logo }}</div>
             </div>
             <div class="form-group">
-              <label>Factuursjabloon<span class="label-hint">(leeg = standaard huisstijl)</span></label>
+              <label>{{ $t('Factuursjabloon') }}<span class="label-hint">{{ $t('(leeg = standaard huisstijl)') }}</span></label>
               <select v-model="form.invoice_template">
-                <option value="">Standaard ({{ TEMPLATES[company.invoice_template] || 'Modern' }})</option>
-                <option value="modern">Modern</option>
-                <option value="classic">Klassiek</option>
-                <option value="minimal">Minimaal</option>
+                <option value="">{{ $t('Standaard') }} ({{ TEMPLATES[company.invoice_template] || TEMPLATES.modern }})</option>
+                <option value="modern">{{ TEMPLATES.modern }}</option>
+                <option value="classic">{{ TEMPLATES.classic }}</option>
+                <option value="minimal">{{ TEMPLATES.minimal }}</option>
               </select>
-              <label style="margin-top:14px;">Logo-grootte<span class="label-hint">{{ form.logo_scale }}%</span></label>
+              <label style="margin-top:14px;">{{ $t('Logo-grootte') }}<span class="label-hint">{{ form.logo_scale }}%</span></label>
               <input type="range" v-model.number="form.logo_scale" min="50" max="200" step="5">
             </div>
           </div>
 
           <div class="form-group">
-            <label>Voetnoot op de factuur<span class="label-hint">(leeg = standaard voetnoot)</span></label>
-            <textarea v-model="form.invoice_footer" rows="2" maxlength="1000" placeholder="Bijv. betalingsvoorwaarden voor deze handelsnaam"></textarea>
+            <label>{{ $t('Voetnoot op de factuur') }}<span class="label-hint">{{ $t('(leeg = standaard voetnoot)') }}</span></label>
+            <textarea v-model="form.invoice_footer" rows="2" maxlength="1000" :placeholder="$t('Bijv. betalingsvoorwaarden voor deze handelsnaam')"></textarea>
           </div>
 
           <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button type="button" class="btn btn-secondary" @click="showForm = false">Annuleren</button>
+            <button type="button" class="btn btn-secondary" @click="showForm = false">{{ $t('Annuleren') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="form.processing">
-              {{ form.processing ? 'Bezig…' : (editingId ? 'Wijzigingen opslaan' : 'Handelsnaam toevoegen') }}
+              {{ form.processing ? $t('Bezig…') : (editingId ? $t('Wijzigingen opslaan') : $t('Handelsnaam toevoegen')) }}
             </button>
           </div>
         </form>
@@ -197,15 +199,15 @@ const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.i
           <div style="flex:1;min-width:0;">
             <div class="hn-name">{{ p.name }}</div>
             <div class="hn-meta">
-              Sjabloon: {{ effectiveTemplate(p) }}
-              · {{ p.invoices_count }} {{ p.invoices_count === 1 ? 'factuur' : 'facturen' }}
+              {{ $t('Sjabloon:') }} {{ effectiveTemplate(p) }}
+              · {{ p.invoices_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: p.invoices_count }) }}
             </div>
           </div>
           <div style="display:flex;gap:4px;">
-            <button type="button" class="icon-btn" title="Bewerken" @click="startEdit(p)">
+            <button type="button" class="icon-btn" :title="$t('Bewerken')" @click="startEdit(p)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
             </button>
-            <button type="button" class="icon-btn" title="Verwijderen" @click="removeProfile(p)">
+            <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeProfile(p)">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
             </button>
           </div>
@@ -213,14 +215,13 @@ const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.i
       </div>
     </div>
     <div v-else-if="!showForm" class="card card-empty">
-      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen handelsnamen</div>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">{{ $t('Nog geen handelsnamen') }}</div>
       <div style="margin-bottom:20px;">
-        Handig als je onder meerdere namen werkt: elke handelsnaam krijgt een eigen logo, kleur en
-        sjabloon op de factuur, terwijl je administratie en nummering gewoon één geheel blijven.
+        {{ $t('Handig als je onder meerdere namen werkt: elke handelsnaam krijgt een eigen logo, kleur en sjabloon op de factuur, terwijl je administratie en nummering gewoon één geheel blijven.') }}
       </div>
       <button type="button" class="btn btn-primary btn-sm" style="display:inline-flex;" @click="startAdd">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Eerste handelsnaam toevoegen
+        {{ $t('Eerste handelsnaam toevoegen') }}
       </button>
     </div>
   </AppLayout>

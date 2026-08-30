@@ -23,7 +23,7 @@ class PontoController extends Controller
         /** @var User $user */
         $user = $request->user();
         if (! $ponto->available()) {
-            return redirect()->route('bank.index')->with('error', 'De bankkoppeling is op dit moment niet beschikbaar.');
+            return redirect()->route('bank.index')->with('error', __('De bankkoppeling is op dit moment niet beschikbaar.'));
         }
         if ($blocker = $billing->connectBlocker($user->company)) {
             return redirect()->route('bank.index')->with('error', $blocker);
@@ -37,7 +37,7 @@ class PontoController extends Controller
         if ($request->filled('error')) {
             $reason = $request->input('error_description') ?: $request->input('error');
 
-            return redirect()->route('bank.index')->with('error', "Koppelen afgebroken: {$reason}");
+            return redirect()->route('bank.index')->with('error', __('Koppelen afgebroken: :reason', ['reason' => $reason]));
         }
 
         /** @var User $user */
@@ -61,7 +61,7 @@ class PontoController extends Controller
         $billing->syncQuantity($connection);
 
         return redirect()->route('bank.index')
-            ->with('flash', "Bank gekoppeld: {$accounts} rekening(en), {$imported} transactie(s) opgehaald.");
+            ->with('flash', __('Bank gekoppeld: :accounts rekening(en), :imported transactie(s) opgehaald.', ['accounts' => $accounts, 'imported' => $imported]));
     }
 
     public function sync(Request $request, PontoSyncer $syncer): RedirectResponse
@@ -77,7 +77,7 @@ class PontoController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('flash', $imported > 0 ? "{$imported} nieuwe transactie(s) opgehaald." : 'Bijgewerkt — geen nieuwe transacties.');
+        return back()->with('flash', $imported > 0 ? __(':count nieuwe transactie(s) opgehaald.', ['count' => $imported]) : __('Bijgewerkt — geen nieuwe transacties.'));
     }
 
     public function toggleAccount(Request $request, PontoAccount $account, PontoBilling $billing): RedirectResponse
@@ -92,8 +92,8 @@ class PontoController extends Controller
         }
 
         return back()->with('flash', $account->sync_enabled
-            ? "Rekening {$account->label()} wordt weer gesynchroniseerd."
-            : "Rekening {$account->label()} wordt overgeslagen en niet meer afgerekend.");
+            ? __('Rekening :account wordt weer gesynchroniseerd.', ['account' => $account->label()])
+            : __('Rekening :account wordt overgeslagen en niet meer afgerekend.', ['account' => $account->label()]));
     }
 
     public function disconnect(Request $request, PontoService $ponto, PontoBilling $billing): RedirectResponse
@@ -106,6 +106,6 @@ class PontoController extends Controller
         $billing->syncQuantity($connection, 0);
         $ponto->disconnect($connection);
 
-        return back()->with('flash', 'Bankkoppeling verbroken; de toeslag stopt. Al opgehaalde transacties blijven staan.');
+        return back()->with('flash', __('Bankkoppeling verbroken; de toeslag stopt. Al opgehaalde transacties blijven staan.'));
     }
 }

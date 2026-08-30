@@ -3,7 +3,7 @@
        overzicht, eventueel termijnplan, "hoe nu verder", PDF-bijlage. */
     $brand = $company->brand_color ?: brand('color');
     $logo = $company->logoBinary();
-    $total = number_format((float) $quote->total, 2, ',', '.');
+    $total = money($quote->total);
     $acceptedAt = $quote->signed_at ?? $quote->accepted_at ?? now();
     $signed = (bool) $quote->signed_at;
     $installments = $quote->relationLoaded('installments') ? $quote->installments : collect();
@@ -65,13 +65,13 @@
               @if($signed)
               <tr><td style="padding:6px 0;color:#78716c;border-top:1px solid #ebe9e6;">{{ __('doc.mail_accept_signed_by') }}</td><td style="padding:6px 0;text-align:right;font-weight:600;border-top:1px solid #ebe9e6;">{{ $quote->signed_name }}</td></tr>
               @endif
-              <tr><td style="padding:6px 0;color:#78716c;border-top:1px solid #ebe9e6;">{{ __('doc.mail_accept_total') }}</td><td style="padding:6px 0;text-align:right;font-weight:700;font-size:15px;border-top:1px solid #ebe9e6;">€ {{ $total }}</td></tr>
+              <tr><td style="padding:6px 0;color:#78716c;border-top:1px solid #ebe9e6;">{{ __('doc.mail_accept_total') }}</td><td style="padding:6px 0;text-align:right;font-weight:700;font-size:15px;border-top:1px solid #ebe9e6;">{{ $total }}</td></tr>
             </table>
             @if($installments->isNotEmpty())
               <div style="margin:12px 0 4px;font-size:11px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#78716c;">{{ __('doc.mail_accept_installments') }}</div>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:1.5;">
                 @foreach($installments as $i)
-                  <tr><td style="padding:4px 0;color:#44403c;">{{ $i->description }}@if($i->percentage) <span style="color:#a8a29e;">({{ rtrim(rtrim(number_format((float) $i->percentage, 2, ',', '.'), '0'), ',') }}%)</span>@endif</td><td style="padding:4px 0;text-align:right;font-weight:600;">€ {{ number_format((float) $i->amount, 2, ',', '.') }}</td></tr>
+                  <tr><td style="padding:4px 0;color:#44403c;">{{ $i->description }}@if($i->percentage) <span style="color:#a8a29e;">({{ rtrim(rtrim(number_format((float) $i->percentage, 2, ',', '.'), '0'), ',') }}%)</span>@endif</td><td style="padding:4px 0;text-align:right;font-weight:600;">{{ money((float) $i->amount) }}</td></tr>
                 @endforeach
               </table>
             @endif

@@ -57,17 +57,17 @@ class SiteController extends Controller
         $user = $request->user();
         $company = $user->company;
         if (! $company->hasAiAccess()) {
-            return response()->json(['message' => 'Website maken met AI zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.'], 403);
+            return response()->json(['message' => __('Website maken met AI zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.')], 403);
         }
         if ($company->aiLimitReached()) {
-            return response()->json(['message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.'], 429);
+            return response()->json(['message' => __('Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.')], 429);
         }
         $answers = $request->validate([
             'what' => ['required', 'string', 'min:3', 'max:300'],
             'audience' => ['nullable', 'string', 'max:200'],
             'why' => ['nullable', 'string', 'max:300'],
             'tone' => ['nullable', 'string', 'max:60'],
-        ], ['what.required' => 'Vertel kort wat je bedrijf doet.']);
+        ], ['what.required' => __('Vertel kort wat je bedrijf doet.')]);
 
         try {
             $content = $generator->generate($company, $answers);
@@ -90,13 +90,13 @@ class SiteController extends Controller
         $content = SiteGeneratorService::sanitize($data['content']);
         $published = ! empty($data['published']);
         if ($published && $content['hero']['title'] === '') {
-            return back()->withErrors(['content' => 'Geef je website minimaal een kop (hero) voordat je hem online zet.']);
+            return back()->withErrors(['content' => __('Geef je website minimaal een kop (hero) voordat je hem online zet.')]);
         }
 
         $company->ensurePublicSlug();
         CompanySite::updateOrCreate(['company_id' => $company->id], ['content' => $content, 'published' => $published]);
 
-        return back()->with('flash', $published ? 'Website opgeslagen en online.' : 'Website opgeslagen (nog niet online).');
+        return back()->with('flash', $published ? __('Website opgeslagen en online.') : __('Website opgeslagen (nog niet online).'));
     }
 
     /* ===================== Publiek ===================== */
@@ -133,7 +133,7 @@ class SiteController extends Controller
             }
         }
 
-        return redirect()->to(route('site.show', $slug) . '#contact')->with('site_success', 'Bedankt! Je bericht is verstuurd — je hoort snel van ons.');
+        return redirect()->to(route('site.show', $slug) . '#contact')->with('site_success', __('Bedankt! Je bericht is verstuurd — je hoort snel van ons.'));
     }
 
     /** @return array{0: Company, 1: CompanySite} */

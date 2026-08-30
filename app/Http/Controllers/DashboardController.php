@@ -63,7 +63,7 @@ class DashboardController extends Controller
             ->get()
             ->map(fn ($i) => [
                 'id' => $i->id,
-                'number' => $i->number ?? '— concept —',
+                'number' => $i->number ?? __('— concept —'),
                 'customer_name' => $i->customer_name,
                 'invoice_date' => $i->invoice_date->format('d M Y'),
                 'status' => $i->status,
@@ -95,7 +95,7 @@ class DashboardController extends Controller
                 : null,
             'recent' => Quote::latest('quote_date')->latest('id')->limit(6)->get()->map(fn ($q) => [
                 'id' => $q->id,
-                'number' => $q->number ?? '— concept —',
+                'number' => $q->number ?? __('— concept —'),
                 'customer_name' => $q->customer_name,
                 'quote_date' => $q->quote_date->format('d M Y'),
                 'status' => $q->status,
@@ -177,7 +177,7 @@ class DashboardController extends Controller
                     'profit' => $profitYtd,
                     'revenue_growth' => $growth($revYtd, $revPrevYtd),
                     'profit_growth' => $growth($profitYtd, $profitPrevYtd),
-                    'period_label' => 'jan t/m ' . now()->translatedFormat('M'),
+                    'period_label' => __('jan t/m :month', ['month' => now()->translatedFormat('M')]),
                 ],
             ],
         ]);

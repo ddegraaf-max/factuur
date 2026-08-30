@@ -2,65 +2,72 @@
 // Linkerpaneel van de inlog- en registratiepagina onder het merk Lopra:
 // korte belofte, drie kernpunten en een voorbeeld-visitekaartje in de
 // huisstijl van een (fictieve) starter. EasyInvoice houdt zijn eigen tekst.
+import { usePage } from '@inertiajs/vue3';
+
 defineProps({
   mode: { type: String, default: 'login' }, // 'login' | 'register'
 });
+
+// Fictieve starter op het voorbeeldkaartje, passend bij de markt (nl/pl).
+const sample = usePage().props.market?.key === 'pl'
+  ? { name: 'Anna Kowalska', role: 'Projektantka wnętrz · Studio Wnętrz Kowalska', phone: '+48 600 123 456', email: 'anna@studiokowalska.pl' }
+  : { name: 'Sanne de Wit', role: 'Interieurstylist · De Wit Interieur', phone: '06 - 12 34 56 78', email: 'sanne@dewitinterieur.nl' };
 </script>
 
 <template>
   <div class="lh">
     <h1 class="auth-h1">
-      <template v-if="mode === 'register'">Begin vandaag.<br>Professioneel vanaf de eerste factuur.</template>
-      <template v-else>Welkom terug.</template>
+      <template v-if="mode === 'register'">{{ $t('Begin vandaag.') }}<br>{{ $t('Professioneel vanaf de eerste factuur.') }}</template>
+      <template v-else>{{ $t('Welkom terug.') }}</template>
     </h1>
     <p class="lh-sub">
-      <template v-if="mode === 'register'">14 dagen gratis, geen creditcard. Account, huisstijl, visitekaartje, website en je eerste factuur — allemaal vandaag nog.</template>
-      <template v-else>Log in en ga verder waar je gebleven was: je facturen, offertes, huisstijl en website staan klaar.</template>
+      <template v-if="mode === 'register'">{{ $t('14 dagen gratis, geen creditcard. Account, huisstijl, visitekaartje, website en je eerste factuur — allemaal vandaag nog.') }}</template>
+      <template v-else>{{ $t('Log in en ga verder waar je gebleven was: je facturen, offertes, huisstijl en website staan klaar.') }}</template>
     </p>
 
     <ul class="lh-points">
       <li>
         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/></svg></i>
-        <div><b>Factureren zoals het hoort</b><span>Offertes met digitale handtekening, iDEAL-link op elke factuur, btw-overzicht klaar voor de aangifte.</span></div>
+        <div><b>{{ $t('Factureren zoals het hoort') }}</b><span>{{ $t('Offertes met digitale handtekening, iDEAL-link op elke factuur, btw-overzicht klaar voor de aangifte.') }}</span></div>
       </li>
       <li>
         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></i>
-        <div><b>Huisstijl in een kwartier</b><span>Drie AI-voorstellen met kleuren, lettertype, slogan en logo — of upload je eigen logo.</span></div>
+        <div><b>{{ $t('Huisstijl in een kwartier') }}</b><span>{{ $t('Drie AI-voorstellen met kleuren, lettertype, slogan en logo — of upload je eigen logo.') }}</span></div>
       </li>
       <li>
         <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></i>
-        <div><b>Visitekaartje en website in één klik online</b><span>Met QR-code en contactformulier; aanvragen komen als leads in je administratie.</span></div>
+        <div><b>{{ $t('Visitekaartje en website in één klik online') }}</b><span>{{ $t('Met QR-code en contactformulier; aanvragen komen als leads in je administratie.') }}</span></div>
       </li>
     </ul>
 
     <div class="lh-card" aria-hidden="true">
       <div class="lh-card-top">
-        <div class="lh-av">S</div>
+        <div class="lh-av">{{ sample.name.charAt(0) }}</div>
         <div>
-          <div class="lh-nm">Sanne de Wit</div>
-          <div class="lh-rl">Interieurstylist · De Wit Interieur</div>
+          <div class="lh-nm">{{ sample.name }}</div>
+          <div class="lh-rl">{{ sample.role }}</div>
         </div>
         <div class="lh-qr"><i></i><i></i><i class="o"></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i><i class="o"></i><i></i><i></i></div>
       </div>
       <div class="lh-lines">
-        <span>06 - 12 34 56 78</span>
-        <span>sanne@dewitinterieur.nl</span>
-        <span class="site">Bekijk mijn website →</span>
+        <span>{{ sample.phone }}</span>
+        <span>{{ sample.email }}</span>
+        <span class="site">{{ $t('Bekijk mijn website →') }}</span>
       </div>
-      <div class="lh-cap">Voorbeeld: visitekaartje in de eigen huisstijl van een starter</div>
+      <div class="lh-cap">{{ $t('Voorbeeld: visitekaartje in de eigen huisstijl van een starter') }}</div>
     </div>
 
     <ul class="auth-links">
       <template v-if="mode === 'register'">
-        <li><a :href="route('demo')">Eerst de demo bekijken</a></li>
-        <li><a :href="route('faq')">Veelgestelde vragen</a></li>
-        <li><a :href="route('login')">Al een account? Inloggen</a></li>
+        <li><a :href="route('demo')">{{ $t('Eerst de demo bekijken') }}</a></li>
+        <li><a :href="route('faq')">{{ $t('Veelgestelde vragen') }}</a></li>
+        <li><a :href="route('login')">{{ $t('Al een account? Inloggen') }}</a></li>
       </template>
       <template v-else>
-        <li><a :href="route('register')">Gratis account aanmaken</a></li>
-        <li><a :href="route('demo')">Demo bekijken</a></li>
-        <li><a :href="route('helpcentrum')">Helpcentrum</a></li>
-        <li><a :href="route('portal.login')">Klantenportaal</a></li>
+        <li><a :href="route('register')">{{ $t('Gratis account aanmaken') }}</a></li>
+        <li><a :href="route('demo')">{{ $t('Demo bekijken') }}</a></li>
+        <li><a :href="route('helpcentrum')">{{ $t('Helpcentrum') }}</a></li>
+        <li><a :href="route('portal.login')">{{ $t('Klantenportaal') }}</a></li>
       </template>
     </ul>
   </div>

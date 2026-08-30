@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Status van de ' . brand('name') . '-systemen — live en actueel')
-@section('description', 'Live status van de ' . brand('name') . '-systemen: app, e-mailbezorging en betalingen. Bij een storing lees je hier direct wat er speelt en waar we aan werken.')
+@section('title', __('Status van de :brand-systemen — live en actueel', ['brand' => brand('name')]))
+@section('description', __('Live status van de :brand-systemen: app, e-mailbezorging en betalingen. Bij een storing lees je hier direct wat er speelt en waar we aan werken.', ['brand' => brand('name')]))
 
 @push('styles')
 <style>
@@ -30,9 +30,9 @@
     <div class="status-banner {{ $allOk ? 'ok' : 'down' }}">
       <span class="status-big-dot"></span>
       <div>
-        <h1>{{ $allOk ? 'Alle systemen operationeel' : 'Storing bij een of meer onderdelen' }}</h1>
+        <h1>{{ $allOk ? __('Alle systemen operationeel') : __('Storing bij een of meer onderdelen') }}</h1>
         <p style="color:var(--text-3);margin:2px 0 0;font-size:14px;">
-          Laatst gecontroleerd: {{ $checkedAt->format('d-m-Y H:i') }} uur · live
+          {{ __('Laatst gecontroleerd: :time uur · live', ['time' => $checkedAt->format(market('date_format') . ' H:i')]) }}
         </p>
       </div>
     </div>
@@ -42,38 +42,31 @@
         <div class="status-row">
           <span style="font-weight:500;">{{ $component['label'] }}</span>
           @if ($component['ok'])
-            <span class="status-tag ok"><span class="dot"></span> Operationeel</span>
+            <span class="status-tag ok"><span class="dot"></span> {{ __('Operationeel') }}</span>
           @else
-            <span class="status-tag down"><span class="dot"></span> Storing</span>
+            <span class="status-tag down"><span class="dot"></span> {{ __('Storing') }}</span>
           @endif
         </div>
       @endforeach
     </div>
 
     <p class="status-note">
-      Deze pagina controleert de systemen <strong>live</strong> op het moment dat je hem opent —
-      er wordt niets vooraf ingevuld. Ervaar je toch een probleem dat hier niet wordt getoond?
-      Mail ons op <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a>.
+      {!! __('Deze pagina controleert de systemen <strong>live</strong> op het moment dat je hem opent — er wordt niets vooraf ingevuld. Ervaar je toch een probleem dat hier niet wordt getoond? Mail ons op') !!}
+      <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a>.
     </p>
 
     <div class="status-note" style="margin-top:28px;">
-      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">Wat controleren we hier?</h2>
+      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">{{ __('Wat controleren we hier?') }}</h2>
       <p style="margin:0 0 14px;">
-        We meten de onderdelen waar je administratie van afhankelijk is: de applicatie zelf, de database
-        waarin je facturen en klanten staan, de e-mailbezorging (factuur- en offertemails, herinneringen)
-        en de betaalkoppelingen. Elke controle gebeurt op het moment dat jij deze pagina opent, dus wat je
-        hier ziet is de werkelijke situatie van nu — geen cache en geen handmatig bijgewerkte melding.
+        {{ __('We meten de onderdelen waar je administratie van afhankelijk is: de applicatie zelf, de database waarin je facturen en klanten staan, de e-mailbezorging (factuur- en offertemails, herinneringen) en de betaalkoppelingen. Elke controle gebeurt op het moment dat jij deze pagina opent, dus wat je hier ziet is de werkelijke situatie van nu — geen cache en geen handmatig bijgewerkte melding.') }}
       </p>
-      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">Wat als er een storing is?</h2>
+      <h2 style="font-size:16px;color:var(--text);margin-bottom:8px;">{{ __('Wat als er een storing is?') }}</h2>
       <p style="margin:0;">
-        Je gegevens zijn ook tijdens een storing veilig: alles staat versleuteld op servers binnen de EU en
-        wordt dagelijks geback-upt. Geplande factuurverzendingen en herinneringen worden na herstel
-        automatisch alsnog verwerkt — je hoeft zelf niets opnieuw te doen. Duurt een storing langer of heb
-        je er direct last van, mail dan gerust naar
-        <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a> —
-        ook tijdens een storing lezen we mee. Zie ook het
-        <a href="{{ route('helpcentrum') }}" style="color:var(--brand);font-weight:500;">helpcentrum</a> voor
-        antwoorden op veelvoorkomende vragen.
+        {{ __('Je gegevens zijn ook tijdens een storing veilig: alles staat versleuteld op servers binnen de EU en wordt dagelijks geback-upt. Geplande factuurverzendingen en herinneringen worden na herstel automatisch alsnog verwerkt — je hoeft zelf niets opnieuw te doen. Duurt een storing langer of heb je er direct last van, mail dan gerust naar') }}
+        <a href="mailto:{{ brand('email') }}" style="color:var(--brand);font-weight:500;">{{ brand('email') }}</a>
+        {{ __('— ook tijdens een storing lezen we mee. Zie ook het') }}
+        <a href="{{ route('helpcentrum') }}" style="color:var(--brand);font-weight:500;">{{ __('helpcentrum') }}</a>
+        {{ __('voor antwoorden op veelvoorkomende vragen.') }}
       </p>
     </div>
   </div>

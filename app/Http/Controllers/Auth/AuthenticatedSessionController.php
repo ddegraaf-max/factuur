@@ -44,7 +44,7 @@ class AuthenticatedSessionController extends Controller
 
         if (! $passwordOk) {
             throw ValidationException::withMessages([
-                'email' => 'Deze inloggegevens kloppen niet.',
+                'email' => __('Deze inloggegevens kloppen niet.'),
             ]);
         }
 

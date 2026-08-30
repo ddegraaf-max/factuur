@@ -24,7 +24,7 @@ class SubscriptionCanceledMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Je ' . Brand::name() . '-abonnement is opgezegd',
+            subject: __('Je :brand-abonnement is opgezegd', ['brand' => Brand::name()]),
         );
     }
 

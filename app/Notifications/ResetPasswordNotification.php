@@ -16,12 +16,12 @@ class ResetPasswordNotification extends BaseResetPassword
         ], false));
 
         return (new MailMessage)
-            ->subject('Stel je ' . Brand::name() . '-wachtwoord opnieuw in')
-            ->greeting('Hallo,')
-            ->line('Je ontving deze e-mail omdat er een verzoek is gedaan om het wachtwoord van je ' . Brand::name() . '-account opnieuw in te stellen.')
-            ->action('Wachtwoord opnieuw instellen', $url)
-            ->line('Deze link verloopt over 60 minuten.')
-            ->line('Heb je dit niet aangevraagd? Dan hoef je niets te doen — je wachtwoord blijft ongewijzigd.')
-            ->salutation('Groet, het ' . Brand::name() . '-team');
+            ->subject(__('Stel je :brand-wachtwoord opnieuw in', ['brand' => Brand::name()]))
+            ->greeting(__('Hallo,'))
+            ->line(__('Je ontving deze e-mail omdat er een verzoek is gedaan om het wachtwoord van je :brand-account opnieuw in te stellen.', ['brand' => Brand::name()]))
+            ->action(__('Wachtwoord opnieuw instellen'), $url)
+            ->line(__('Deze link verloopt over 60 minuten.'))
+            ->line(__('Heb je dit niet aangevraagd? Dan hoef je niets te doen — je wachtwoord blijft ongewijzigd.'))
+            ->salutation(__('Groet, het :brand-team', ['brand' => Brand::name()]));
     }
 }

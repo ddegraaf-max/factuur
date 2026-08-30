@@ -31,8 +31,8 @@ class MailDomainService
         }
 
         $data = $company->mail_domain_id
-            ? $this->json($this->http()->get('/domains/' . $company->mail_domain_id), 'Het domein kon niet worden opgehaald.')
-            : $this->json($this->http()->post('/domains', ['name' => $domain, 'region' => 'eu-west-1']), 'Het domein kon niet worden aangemeld.');
+            ? $this->json($this->http()->get('/domains/' . $company->mail_domain_id), __('Het domein kon niet worden opgehaald.'))
+            : $this->json($this->http()->post('/domains', ['name' => $domain, 'region' => 'eu-west-1']), __('Het domein kon niet worden aangemeld.'));
 
         $company->forceFill([
             'mail_domain' => $domain,
@@ -57,7 +57,7 @@ class MailDomainService
         } catch (\Throwable $e) {
             Log::info('Resend: verify-aanroep mislukt', ['error' => $e->getMessage()]);
         }
-        $data = $this->json($this->http()->get('/domains/' . $company->mail_domain_id), 'De domeinstatus kon niet worden opgehaald.');
+        $data = $this->json($this->http()->get('/domains/' . $company->mail_domain_id), __('De domeinstatus kon niet worden opgehaald.'));
 
         $company->forceFill([
             'mail_domain_status' => $this->status($data['status'] ?? 'pending'),

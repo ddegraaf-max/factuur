@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { eur } from '@/format.js';
+import { usePage } from '@inertiajs/vue3';
+import { eur, marketLocale } from '@/format.js';
 
 /**
  * Resultaat per maand: omzet- en inkoopbalken naast elkaar, met daaronder de
@@ -79,14 +80,19 @@ const prevProfitLine = computed(() =>
   linePoints(m => ((profitMax.value - m.prev_profit) / profitRange.value) * 100));
 
 /* ---------- Assen ---------- */
+// Valutasymbool en positie van de markt: nl "€ 1,5k", pl "1,5k zł".
+const market = usePage().props.market || {};
+const symbol = market.symbol || '€';
+const withSymbol = (s) => market.symbol_position === 'after' ? `${s} ${symbol}` : `${symbol} ${s}`;
+
 const fmtCompact = (v) => {
   const abs = Math.abs(v);
   const sign = v < 0 ? '−' : '';
   if (abs >= 1000) {
     const k = abs / 1000;
-    return sign + '€ ' + k.toLocaleString('nl-NL', { maximumFractionDigits: k < 10 ? 1 : 0 }) + 'k';
+    return sign + withSymbol(k.toLocaleString(marketLocale, { maximumFractionDigits: k < 10 ? 1 : 0 }) + 'k');
   }
-  return sign + '€ ' + Math.round(abs).toLocaleString('nl-NL');
+  return sign + withSymbol(Math.round(abs).toLocaleString(marketLocale));
 };
 
 const revenueTicks = computed(() => [
@@ -118,19 +124,19 @@ const totals = computed(() => props.chart.totals || {});
 
 const growthLabel = (g) => (g === null || g === undefined)
   ? null
-  : `${g >= 0 ? '↑' : '↓'} ${Math.abs(g).toLocaleString('nl-NL')}%`;
+  : `${g >= 0 ? '↑' : '↓'} ${Math.abs(g).toLocaleString(marketLocale)}%`;
 </script>
 
 <template>
   <div class="card rc-card">
     <div class="card-header rc-head">
       <div>
-        <div class="card-title">Resultaat per maand</div>
-        <div class="card-subtitle">Omzet, inkoop en winst · {{ chart.year }}<template v-if="chart.has_prev"> vergeleken met {{ chart.prev_year }}</template> · excl. BTW</div>
+        <div class="card-title">{{ $t('Resultaat per maand') }}</div>
+        <div class="card-subtitle">{{ $t('Omzet, inkoop en winst') }} · {{ chart.year }}<template v-if="chart.has_prev"> {{ $t('vergeleken met :year', { year: chart.prev_year }) }}</template> · {{ $t('excl. BTW') }}</div>
       </div>
       <div class="rc-legend">
-        <span class="rc-key"><i class="rc-swatch" :style="{ background: C.revenue }"></i>Omzet</span>
-        <span class="rc-key"><i class="rc-swatch" :style="{ background: C.costs }"></i>Inkoop</span>
+        <span class="rc-key"><i class="rc-swatch" :style="{ background: C.revenue }"></i>{{ $t('Omzet') }}</span>
+        <span class="rc-key"><i class="rc-swatch" :style="{ background: C.costs }"></i>{{ $t('Inkoop') }}</span>
         <span v-if="chart.has_prev" class="rc-key">
           <svg class="rc-dash" viewBox="0 0 26 6"><line x1="1" y1="3" x2="25" y2="3" :stroke="C.prev" stroke-width="2" stroke-dasharray="4 3" stroke-linecap="round"/></svg>
           {{ chart.prev_year }}
@@ -139,14 +145,14 @@ const growthLabel = (g) => (g === null || g === undefined)
     </div>
 
     <div v-if="isEmpty" class="rc-empty">
-      Nog geen cijfers voor {{ chart.year }}. Zodra je factureert (en inkoop inboekt) zie je hier je omzet en winst per maand.
+      {{ $t('Nog geen cijfers voor :year. Zodra je factureert (en inkoop inboekt) zie je hier je omzet en winst per maand.', { year: chart.year }) }}
     </div>
 
     <template v-else>
       <!-- Kerncijfers: dit jaar t.o.v. dezelfde periode vorig jaar -->
       <div class="rc-stats">
         <div class="rc-stat">
-          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: C.revenue }"></i>Omzet · {{ totals.period_label }}</div>
+          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: C.revenue }"></i>{{ $t('Omzet') }} · {{ totals.period_label }}</div>
           <div class="rc-stat-value">{{ eur(totals.revenue) }}</div>
           <div class="rc-stat-delta">
             <span v-if="growthLabel(totals.revenue_growth)" :class="totals.revenue_growth >= 0 ? 'up' : 'down'">{{ growthLabel(totals.revenue_growth) }}</span>
@@ -155,12 +161,12 @@ const growthLabel = (g) => (g === null || g === undefined)
           </div>
         </div>
         <div class="rc-stat">
-          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: C.costs }"></i>Inkoop · {{ totals.period_label }}</div>
+          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: C.costs }"></i>{{ $t('Inkoop') }} · {{ totals.period_label }}</div>
           <div class="rc-stat-value">{{ eur(totals.costs) }}</div>
           <div class="rc-stat-delta"><span>&nbsp;</span></div>
         </div>
         <div class="rc-stat">
-          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: totals.profit >= 0 ? C.profit : C.loss }"></i>{{ totals.profit >= 0 ? 'Winst' : 'Verlies' }} · {{ totals.period_label }}</div>
+          <div class="rc-stat-label"><i class="rc-swatch" :style="{ background: totals.profit >= 0 ? C.profit : C.loss }"></i>{{ totals.profit >= 0 ? $t('Winst') : $t('Verlies') }} · {{ totals.period_label }}</div>
           <div class="rc-stat-value">{{ eur(totals.profit) }}</div>
           <div class="rc-stat-delta">
             <span v-if="growthLabel(totals.profit_growth)" :class="totals.profit_growth >= 0 ? 'up' : 'down'">{{ growthLabel(totals.profit_growth) }}</span>
@@ -174,13 +180,13 @@ const growthLabel = (g) => (g === null || g === undefined)
         <!-- Tooltip -->
         <div v-if="hoverIdx !== null" class="rc-tooltip" :style="tooltipStyle">
           <div class="rc-tt-title">{{ months[hoverIdx].label }} {{ chart.year }}</div>
-          <div class="rc-tt-row"><i class="rc-swatch" :style="{ background: C.revenue }"></i>Omzet<span class="num">{{ eur(months[hoverIdx].revenue) }}</span></div>
-          <div class="rc-tt-row"><i class="rc-swatch" :style="{ background: C.costs }"></i>Inkoop<span class="num">{{ eur(months[hoverIdx].costs) }}</span></div>
-          <div class="rc-tt-row rc-tt-strong"><i class="rc-swatch" :style="{ background: months[hoverIdx].profit >= 0 ? C.profit : C.loss }"></i>{{ months[hoverIdx].profit >= 0 ? 'Winst' : 'Verlies' }}<span class="num">{{ eur(months[hoverIdx].profit) }}</span></div>
+          <div class="rc-tt-row"><i class="rc-swatch" :style="{ background: C.revenue }"></i>{{ $t('Omzet') }}<span class="num">{{ eur(months[hoverIdx].revenue) }}</span></div>
+          <div class="rc-tt-row"><i class="rc-swatch" :style="{ background: C.costs }"></i>{{ $t('Inkoop') }}<span class="num">{{ eur(months[hoverIdx].costs) }}</span></div>
+          <div class="rc-tt-row rc-tt-strong"><i class="rc-swatch" :style="{ background: months[hoverIdx].profit >= 0 ? C.profit : C.loss }"></i>{{ months[hoverIdx].profit >= 0 ? $t('Winst') : $t('Verlies') }}<span class="num">{{ eur(months[hoverIdx].profit) }}</span></div>
           <template v-if="chart.has_prev">
             <div class="rc-tt-sep"></div>
-            <div class="rc-tt-row muted">Omzet {{ chart.prev_year }}<span class="num">{{ eur(months[hoverIdx].prev_revenue) }}</span></div>
-            <div class="rc-tt-row muted">Winst {{ chart.prev_year }}<span class="num">{{ eur(months[hoverIdx].prev_profit) }}</span></div>
+            <div class="rc-tt-row muted">{{ $t('Omzet') }} {{ chart.prev_year }}<span class="num">{{ eur(months[hoverIdx].prev_revenue) }}</span></div>
+            <div class="rc-tt-row muted">{{ $t('Winst') }} {{ chart.prev_year }}<span class="num">{{ eur(months[hoverIdx].prev_profit) }}</span></div>
           </template>
         </div>
 
@@ -215,15 +221,15 @@ const growthLabel = (g) => (g === null || g === undefined)
 
         <!-- Paneel 2: winst / verlies -->
         <div class="rc-panel-title">
-          Winst per maand
-          <span class="rc-mini-key"><i class="rc-swatch" :style="{ background: C.profit }"></i>winst</span>
-          <span class="rc-mini-key"><i class="rc-swatch" :style="{ background: C.loss }"></i>verlies</span>
+          {{ $t('Winst per maand') }}
+          <span class="rc-mini-key"><i class="rc-swatch" :style="{ background: C.profit }"></i>{{ $t('winst') }}</span>
+          <span class="rc-mini-key"><i class="rc-swatch" :style="{ background: C.loss }"></i>{{ $t('verlies') }}</span>
         </div>
         <div class="rc-panel rc-panel-profit">
           <div v-for="t in profitTicks" :key="t.pct" class="rc-grid" :style="{ top: t.pct + '%' }">
             <span class="rc-tick">{{ t.label }}</span>
           </div>
-          <div class="rc-zero" :style="{ top: zeroPct + '%' }"><span class="rc-tick">€ 0</span></div>
+          <div class="rc-zero" :style="{ top: zeroPct + '%' }"><span class="rc-tick">{{ withSymbol('0') }}</span></div>
           <div class="rc-cols">
             <div
               v-for="(m, i) in months"
@@ -249,8 +255,8 @@ const growthLabel = (g) => (g === null || g === undefined)
         </div>
 
         <div v-if="!chart.has_costs" class="rc-note">
-          Nog geen inkoop ingeboekt — de winst is nu gelijk aan je omzet.
-          Boek je <a :href="route('purchases.index')">inkoopfacturen</a> in voor een echt winstbeeld.
+          {{ $t('Nog geen inkoop ingeboekt — de winst is nu gelijk aan je omzet.') }}
+          {{ $t('Boek je') }} <a :href="route('purchases.index')">{{ $t('inkoopfacturen') }}</a> {{ $t('in voor een echt winstbeeld.') }}
         </div>
       </div>
     </template>

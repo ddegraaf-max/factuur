@@ -49,14 +49,14 @@ class StatusController extends Controller
         );
 
         $components = [
-            ['label' => 'Webapplicatie',            'ok' => true], // rendert = draait
-            ['label' => 'Database',                 'ok' => $dbOk],
-            ['label' => 'Inloggen & 2FA',           'ok' => $dbOk],
-            ['label' => 'Facturen & PDF-generatie', 'ok' => $pdfOk],
-            ['label' => 'Opslag (bijlagen)',        'ok' => $storageOk],
-            ['label' => 'Cache',                    'ok' => $cacheOk],
-            ['label' => 'E-mail versturen',         'ok' => $mailOk],
-            ['label' => 'Herinneringen & incasso',  'ok' => $dbOk && $mailOk],
+            ['label' => __('Webapplicatie'),            'ok' => true], // rendert = draait
+            ['label' => __('Database'),                 'ok' => $dbOk],
+            ['label' => __('Inloggen & 2FA'),           'ok' => $dbOk],
+            ['label' => __('Facturen & PDF-generatie'), 'ok' => $pdfOk],
+            ['label' => __('Opslag (bijlagen)'),        'ok' => $storageOk],
+            ['label' => __('Cache'),                    'ok' => $cacheOk],
+            ['label' => __('E-mail versturen'),         'ok' => $mailOk],
+            ['label' => __('Herinneringen & incasso'),  'ok' => $dbOk && $mailOk],
         ];
 
         $allOk = collect($components)->every(fn ($c) => $c['ok']);

@@ -23,6 +23,8 @@ class IncassoController extends Controller
                 'incasso_reference' => $inv->incasso_reference,
                 'incasso_sent_at' => $inv->incasso_sent_at?->toIso8601String(),
                 'incasso_phase' => $inv->incasso_phase,
+                // Windykacja (Poolse markt): al te koop aangeboden aan de partner?
+                'sale_requested_at' => $inv->sale_requested_at,
                 'customer_name' => $inv->customer_name,
                 'total' => (float) $inv->total,
                 'paid_total' => (float) $inv->paid_total,
@@ -43,7 +45,7 @@ class IncassoController extends Controller
             'handler' => [
                 'name' => \App\Support\Market::incasso('partner_name'),
                 'email' => \App\Support\Market::incasso('claims_email'),
-                'tagline' => 'Gerechtsdeurwaarder · vaste incassopartner',
+                'tagline' => __('Gerechtsdeurwaarder · vaste incassopartner'),
             ],
         ]);
     }
@@ -57,13 +59,13 @@ class IncassoController extends Controller
             return back()->withErrors(['incasso' => $e->getMessage()]);
         }
 
-        return back()->with('flash', "Dossier {$invoice->fresh()->incasso_reference} overgedragen aan " . \App\Support\Market::incasso('partner_name') . " en per e-mail verzonden.");
+        return back()->with('flash', __('Dossier :reference overgedragen aan :partner en per e-mail verzonden.', ['reference' => $invoice->fresh()->incasso_reference, 'partner' => \App\Support\Market::incasso('partner_name')]));
     }
 
     public function updatePhase(Request $request, Invoice $invoice)
     {
         $phase = $request->validate(['phase' => 'required|in:minnelijk,gerechtelijk,executie'])['phase'];
         $this->service->updatePhase($invoice, $phase);
-        return back()->with('flash', 'Incasso-fase bijgewerkt.');
+        return back()->with('flash', __('Incasso-fase bijgewerkt.'));
     }
 }

@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
+import { fmtDateLong } from '@/format';
 
 const props = defineProps({
   subscription: Object,
@@ -19,6 +21,14 @@ const usagePct = computed(() => {
 const page = usePage();
 const flash = computed(() => page.props.flash || {});
 const brand = computed(() => page.props.brand);
+// Markt (nl/pl): valutasymbool en -positie voor de prijs per abonnement.
+const market = page.props.market;
+
+// Prijs zoals de server hem aanlevert (price_label, marktbewust) — anders bedrag + symbool van de markt.
+const priceLabel = (plan) => {
+  if (plan.price_label) return plan.price_label;
+  return market.symbol_position === 'after' ? `${plan.amount} ${market.symbol}` : `${market.symbol} ${plan.amount}`;
+};
 
 const sub = computed(() => props.subscription || {});
 const status = computed(() => sub.value.status);
@@ -27,8 +37,7 @@ const daysLeft = computed(() => sub.value.days_left ?? 0);
 const endsAtLabel = computed(() => {
   if (!sub.value.ends_at) return null;
   try {
-    return new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })
-      .format(new Date(sub.value.ends_at));
+    return fmtDateLong(sub.value.ends_at);
   } catch (e) {
     return null;
   }
@@ -36,15 +45,15 @@ const endsAtLabel = computed(() => {
 
 const statusMeta = computed(() => {
   if (status.value === 'exempt') {
-    return { pill: 'Vrijgesteld', cls: 'ok', note: 'Dit account is vrijgesteld — je hebt altijd volledige toegang tot alles, inclusief de AI-functies.' };
+    return { pill: t('Vrijgesteld'), cls: 'ok', note: t('Dit account is vrijgesteld — je hebt altijd volledige toegang tot alles, inclusief de AI-functies.') };
   }
   if (status.value === 'active') {
-    return { pill: 'Actief abonnement', cls: 'ok', note: 'Je abonnement is actief.' };
+    return { pill: t('Actief abonnement'), cls: 'ok', note: t('Je abonnement is actief.') };
   }
   if (status.value === 'trialing') {
-    return { pill: 'Proefperiode', cls: 'trial', note: 'Je zit in de gratis proefperiode — je probeert nu alles, inclusief de AI-functies uit Slim.' };
+    return { pill: t('Proefperiode'), cls: 'trial', note: t('Je zit in de gratis proefperiode — je probeert nu alles, inclusief de AI-functies uit Slim.') };
   }
-  return { pill: 'Verlopen', cls: 'expired', note: 'Je toegang is verlopen. Sluit een abonnement af om verder te gaan.' };
+  return { pill: t('Verlopen'), cls: 'expired', note: t('Je toegang is verlopen. Sluit een abonnement af om verder te gaan.') };
 });
 
 const checkout = useForm({ plan: 'basis' });
@@ -61,18 +70,18 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
 </script>
 
 <template>
-  <Head title="Abonnement" />
+  <Head :title="$t('Abonnement')" />
   <AppLayout>
     <template #breadcrumb>
-      <span class="breadcrumb">Instellingen</span>
+      <span class="breadcrumb">{{ $t('Instellingen') }}</span>
       <span class="breadcrumb">/</span>
-      <span class="breadcrumb-current">Abonnement</span>
+      <span class="breadcrumb-current">{{ $t('Abonnement') }}</span>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Abonnement</h1>
-        <p class="page-subtitle">Beheer je {{ brand.name }}-abonnement en bekijk hoeveel dagen je nog hebt.</p>
+        <h1 class="page-title">{{ $t('Abonnement') }}</h1>
+        <p class="page-subtitle">{{ $t('Beheer je :brand-abonnement en bekijk hoeveel dagen je nog hebt.', { brand: brand.name }) }}</p>
       </div>
     </div>
 
@@ -90,28 +99,28 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
           <template v-if="status === 'exempt'">
             <div class="days-wrap">
               <div class="days-num">∞</div>
-              <div class="days-label">altijd toegang</div>
+              <div class="days-label">{{ $t('altijd toegang') }}</div>
             </div>
           </template>
           <template v-else>
             <div class="days-wrap" v-if="status !== 'expired'">
               <div class="days-num">{{ daysLeft }}</div>
-              <div class="days-label">{{ daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
+              <div class="days-label">{{ daysLeft === 1 ? $t('dag resterend') : $t('dagen resterend') }}</div>
             </div>
             <div class="days-wrap expired" v-else>
               <div class="days-num">0</div>
-              <div class="days-label">dagen resterend</div>
+              <div class="days-label">{{ $t('dagen resterend') }}</div>
             </div>
           </template>
 
           <p class="status-note">{{ statusMeta.note }}</p>
           <p v-if="status === 'active'" class="status-sub">
-            Huidig abonnement: <strong>{{ currentPlan === 'slim' ? 'Slim' : 'Basis' }}</strong>
+            {{ $t('Huidig abonnement:') }} <strong>{{ currentPlan === 'slim' ? 'Slim' : 'Basis' }}</strong>
           </p>
           <p v-if="endsAtLabel && status !== 'exempt'" class="status-sub">
-            <template v-if="status === 'active'">Volgende verlenging op <strong>{{ endsAtLabel }}</strong></template>
-            <template v-else-if="status === 'trialing'">Proefperiode loopt tot <strong>{{ endsAtLabel }}</strong></template>
-            <template v-else>Verlopen op <strong>{{ endsAtLabel }}</strong></template>
+            <template v-if="status === 'active'">{{ $t('Volgende verlenging op') }} <strong>{{ endsAtLabel }}</strong></template>
+            <template v-else-if="status === 'trialing'">{{ $t('Proefperiode loopt tot') }} <strong>{{ endsAtLabel }}</strong></template>
+            <template v-else>{{ $t('Verlopen op') }} <strong>{{ endsAtLabel }}</strong></template>
           </p>
 
           <!-- progress bar during trial -->
@@ -126,12 +135,12 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
         <div class="card-body">
           <div class="plan-head">
             <div class="plan-name">{{ plan.name }}</div>
-            <span v-if="currentPlan === plan.key" class="plan-current">Huidig</span>
-            <span v-else-if="plan.key === 'slim'" class="plan-ai-badge">Met AI</span>
+            <span v-if="currentPlan === plan.key" class="plan-current">{{ $t('Huidig') }}</span>
+            <span v-else-if="plan.key === 'slim'" class="plan-ai-badge">{{ $t('Met AI') }}</span>
           </div>
           <div class="plan-price">
-            <span class="plan-amount">€ {{ plan.amount }}</span>
-            <span class="plan-period">/ maand</span>
+            <span class="plan-amount">{{ priceLabel(plan) }}</span>
+            <span class="plan-period">{{ $t('/ maand') }}</span>
           </div>
           <div class="plan-vat">{{ plan.vat_note }}</div>
           <p class="plan-tagline">{{ plan.tagline }}</p>
@@ -141,14 +150,14 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
           </ul>
 
           <template v-if="status === 'exempt'">
-            <p class="plan-hint">Vrijgesteld account — afsluiten is niet nodig.</p>
+            <p class="plan-hint">{{ $t('Vrijgesteld account — afsluiten is niet nodig.') }}</p>
           </template>
           <template v-else-if="status === 'active'">
             <button v-if="currentPlan === plan.key" class="btn btn-secondary btn-block" :disabled="portal.processing" @click="openPortal">
-              {{ portal.processing ? 'Bezig…' : 'Abonnement beheren' }}
+              {{ portal.processing ? $t('Bezig…') : $t('Abonnement beheren') }}
             </button>
-            <p v-if="currentPlan === plan.key" class="plan-hint">Wijzig je betaalmethode of zeg op via het beveiligde Stripe-portaal.</p>
-            <p v-else class="plan-hint">Overstappen? Mail <a :href="'mailto:' + brand.email" style="color:var(--brand);font-weight:500;">{{ brand.email }}</a> — wij regelen het zonder dubbele kosten.</p>
+            <p v-if="currentPlan === plan.key" class="plan-hint">{{ $t('Wijzig je betaalmethode of zeg op via het beveiligde Stripe-portaal.') }}</p>
+            <p v-else class="plan-hint">{{ $t('Overstappen? Mail') }} <a :href="'mailto:' + brand.email" style="color:var(--brand);font-weight:500;">{{ brand.email }}</a> — {{ $t('wij regelen het zonder dubbele kosten.') }}</p>
           </template>
           <template v-else>
             <button
@@ -156,10 +165,10 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
               :disabled="checkout.processing || !plan.available"
               @click="startCheckout(plan.key)"
             >
-              {{ checkout.processing && checkout.plan === plan.key ? 'Bezig…' : `Kies ${plan.name}` }}
+              {{ checkout.processing && checkout.plan === plan.key ? $t('Bezig…') : $t('Kies :plan', { plan: plan.name }) }}
             </button>
-            <p v-if="!plan.available" class="plan-hint err-text">Dit abonnement is momenteel niet af te sluiten. Probeer het later opnieuw.</p>
-            <p v-else class="plan-hint">Veilig betalen via Stripe. Maandelijks opzegbaar.</p>
+            <p v-if="!plan.available" class="plan-hint err-text">{{ $t('Dit abonnement is momenteel niet af te sluiten. Probeer het later opnieuw.') }}</p>
+            <p v-else class="plan-hint">{{ $t('Veilig betalen via Stripe. Maandelijks opzegbaar.') }}</p>
           </template>
         </div>
       </div>
@@ -170,21 +179,21 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
       <div class="card-body">
         <div class="au-head">
           <div>
-            <div class="au-title">AI-gebruik · {{ ai_usage.month_label }}</div>
-            <div class="au-sub">Scan &amp; herken en Offerte uit tekst — de teller staat elke maand weer op nul.</div>
+            <div class="au-title">{{ $t('AI-gebruik') }} · {{ ai_usage.month_label }}</div>
+            <div class="au-sub">{{ $t('Scan & herken en Offerte uit tekst — de teller staat elke maand weer op nul.') }}</div>
           </div>
           <div class="au-total">
             <b>{{ ai_usage.total }}</b>
-            <span v-if="ai_usage.limit"> van {{ ai_usage.limit }}</span>
-            <span v-else> · onbeperkt</span>
+            <span v-if="ai_usage.limit"> {{ $t('van') }} {{ ai_usage.limit }}</span>
+            <span v-else> · {{ $t('onbeperkt') }}</span>
           </div>
         </div>
         <div v-if="ai_usage.limit" class="au-bar">
           <div class="au-bar-fill" :class="{ warn: usagePct >= 80 }" :style="{ width: Math.max(2, usagePct) + '%' }"></div>
         </div>
         <div class="au-split">
-          {{ ai_usage.receipt_scans }} {{ ai_usage.receipt_scans === 1 ? 'bon of factuur gescand' : 'bonnen en facturen gescand' }}
-          · {{ ai_usage.quote_parses }} {{ ai_usage.quote_parses === 1 ? 'offerte uit tekst' : 'offertes uit tekst' }}
+          {{ ai_usage.receipt_scans }} {{ ai_usage.receipt_scans === 1 ? $t('bon of factuur gescand') : $t('bonnen en facturen gescand') }}
+          · {{ ai_usage.quote_parses }} {{ ai_usage.quote_parses === 1 ? $t('offerte uit tekst') : $t('offertes uit tekst') }}
         </div>
       </div>
     </div>
@@ -192,12 +201,12 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
     <!-- Platformoverzicht: alleen zichtbaar voor het vrijgestelde beheerdersaccount -->
     <div v-if="platform_ai" class="card au-card">
       <div class="card-body">
-        <div class="au-title">AI-gebruik hele platform <span class="au-admin-badge">beheer</span></div>
-        <div class="au-sub" style="margin-bottom:12px;">Alle administraties samen — om de AI-kosten en de fair-use-grens te bewaken.</div>
+        <div class="au-title">{{ $t('AI-gebruik hele platform') }} <span class="au-admin-badge">{{ $t('beheer') }}</span></div>
+        <div class="au-sub" style="margin-bottom:12px;">{{ $t('Alle administraties samen — om de AI-kosten en de fair-use-grens te bewaken.') }}</div>
 
         <table class="au-table">
           <thead>
-            <tr><th>Maand</th><th class="right">Bonscans</th><th class="right">Offertes</th><th class="right">Totaal</th></tr>
+            <tr><th>{{ $t('Maand') }}</th><th class="right">{{ $t('Bonscans') }}</th><th class="right">{{ $t('Offertes') }}</th><th class="right">{{ $t('Totaal') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="m in platform_ai.months" :key="m.label">
@@ -210,17 +219,17 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
         </table>
 
         <template v-if="platform_ai.top.length">
-          <div class="au-sub" style="margin:14px 0 6px;">Meeste AI-acties deze maand</div>
+          <div class="au-sub" style="margin:14px 0 6px;">{{ $t('Meeste AI-acties deze maand') }}</div>
           <div v-for="t in platform_ai.top" :key="t.name" class="au-top-row">
             <span>{{ t.name }}</span><span class="num">{{ t.total }}</span>
           </div>
         </template>
-        <div v-else class="au-sub" style="margin-top:10px;">Nog geen AI-gebruik deze maand.</div>
+        <div v-else class="au-sub" style="margin-top:10px;">{{ $t('Nog geen AI-gebruik deze maand.') }}</div>
       </div>
     </div>
 
     <p class="bill-foot">
-      Vragen over je abonnement? Mail <a :href="'mailto:' + brand.email">{{ brand.email }}</a>.
+      {{ $t('Vragen over je abonnement? Mail') }} <a :href="'mailto:' + brand.email">{{ brand.email }}</a>.
     </p>
   </AppLayout>
 </template>

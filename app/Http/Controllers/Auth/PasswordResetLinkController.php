@@ -28,7 +28,7 @@ class PasswordResetLinkController extends Controller
 
         return back()->with(
             'status',
-            'Als dit e-mailadres bij ons bekend is, ontvang je zo een link om je wachtwoord opnieuw in te stellen.'
+            __('Als dit e-mailadres bij ons bekend is, ontvang je zo een link om je wachtwoord opnieuw in te stellen.')
         );
     }
 }

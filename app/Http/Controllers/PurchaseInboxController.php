@@ -109,8 +109,8 @@ class PurchaseInboxController extends Controller
             $totalIncl
         );
         if ($dupe) {
-            return back()->with('flash', 'Niet direct ingeboekt. ' . $dupe->duplicateWarningText()
-                . ' Wil je hem tóch inboeken, gebruik dan "Controleer eerst".');
+            return back()->with('flash', __('Niet direct ingeboekt.') . ' ' . $dupe->duplicateWarningText()
+                . ' ' . __('Wil je hem tóch inboeken, gebruik dan "Controleer eerst".'));
         }
 
         $lines = [];
@@ -124,7 +124,7 @@ class PurchaseInboxController extends Controller
             $vatTotal += $vat;
         }
         if ($lines === []) {
-            return back()->with('flash', 'Dit voorstel bevat geen bedragen — boek het in via "Controleer eerst".');
+            return back()->with('flash', __('Dit voorstel bevat geen bedragen — boek het in via "Controleer eerst".'));
         }
 
         // Herkende verrekeningen (bijv. "reeds ontvangen"): verlagen het te
@@ -132,13 +132,13 @@ class PurchaseInboxController extends Controller
         $deductions = collect($scan['deductions'] ?? [])
             ->filter(fn ($d) => (float) ($d['amount'] ?? 0) > 0)
             ->map(fn ($d) => [
-                'description' => mb_substr(trim($d['description'] ?? 'Reeds ontvangen/verrekend'), 0, 190),
+                'description' => mb_substr(trim($d['description'] ?? __('Reeds ontvangen/verrekend')), 0, 190),
                 'date' => $scan['invoice_date'] ?? null,
                 'amount' => round((float) $d['amount'], 2),
             ])->values()->all();
 
         $purchase = \App\Models\PurchaseInvoice::create([
-            'supplier_name' => $scan['supplier_name'] ?: 'Onbekende leverancier',
+            'supplier_name' => $scan['supplier_name'] ?: __('Onbekende leverancier'),
             'supplier_reference' => $scan['supplier_reference'] ?? null,
             'category' => $scan['category'] ?? null,
             'invoice_date' => $scan['invoice_date'] ?? $item->received_at->toDateString(),
@@ -149,7 +149,7 @@ class PurchaseInboxController extends Controller
             'total' => round($subtotal + $vatTotal, 2),
             'vat_lines' => $lines,
             'deductions' => $deductions ?: null,
-            'notes' => trim(($scan['notes'] ?? '') . "\nAutomatisch herkend uit e-mail (Postvak IN)."),
+            'notes' => trim(($scan['notes'] ?? '') . "\n" . __('Automatisch herkend uit e-mail (Postvak IN).')),
         ]);
 
         \App\Models\Attachment::create([
@@ -164,7 +164,7 @@ class PurchaseInboxController extends Controller
         $item->update(['status' => 'processed', 'purchase_invoice_id' => $purchase->id]);
 
         return redirect()->route('purchases.show', $purchase)
-            ->with('flash', 'Inkoopfactuur ingeboekt vanuit het Postvak IN.');
+            ->with('flash', __('Inkoopfactuur ingeboekt vanuit het Postvak IN.'));
     }
 
     /** Het bestand zelf (voor voorbeeld/thumbnail en het inkoopformulier). */
@@ -184,14 +184,14 @@ class PurchaseInboxController extends Controller
             $item->update(['status' => 'dismissed']);
         }
 
-        return back()->with('flash', 'Item afgewezen — je kunt het later alsnog verwijderen.');
+        return back()->with('flash', __('Item afgewezen — je kunt het later alsnog verwijderen.'));
     }
 
     public function destroy(PurchaseInboxItem $item): RedirectResponse
     {
         $item->delete();
 
-        return back()->with('flash', 'Item verwijderd uit het postvak.');
+        return back()->with('flash', __('Item verwijderd uit het postvak.'));
     }
 
     /** Nieuw inboek-adres genereren (het oude adres vervalt meteen). */
@@ -201,6 +201,6 @@ class PurchaseInboxController extends Controller
         $company->forceFill(['inbound_token' => null])->saveQuietly();
         $company->ensureInboundToken();
 
-        return back()->with('flash', 'Nieuw inboek-adres aangemaakt — het oude adres werkt niet meer.');
+        return back()->with('flash', __('Nieuw inboek-adres aangemaakt — het oude adres werkt niet meer.'));
     }
 }

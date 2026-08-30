@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ brand('name') }} verificatiecode</title>
+    <title>{{ __(':brand verificatiecode', ['brand' => brand('name')]) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -32,18 +32,18 @@
                 </div>
             </div>
             <div class="body">
-                <h1>Hi {{ $firstName }},</h1>
-                <p>Welkom bij {{ brand('name') }}! Gebruik onderstaande code om je e-mailadres te bevestigen en je account te activeren.</p>
+                <h1>{{ __('Hi :name,', ['name' => $firstName]) }}</h1>
+                <p>{{ __('Welkom bij :brand! Gebruik onderstaande code om je e-mailadres te bevestigen en je account te activeren.', ['brand' => brand('name')]) }}</p>
 
                 <div class="code-box">
-                    <div class="code-label">Je verificatiecode</div>
+                    <div class="code-label">{{ __('Je verificatiecode') }}</div>
                     <div class="code">{{ $code }}</div>
                 </div>
 
-                <p>Deze code is <strong>15 minuten</strong> geldig. Voer hem in op de verificatiepagina die je net geopend hebt.</p>
+                <p>{!! __('Deze code is <strong>15 minuten</strong> geldig. Voer hem in op de verificatiepagina die je net geopend hebt.') !!}</p>
 
                 <div class="meta">
-                    Heb jij dit niet aangevraagd? Dan kun je deze e-mail negeren — er gebeurt niets met je gegevens.
+                    {{ __('Heb jij dit niet aangevraagd? Dan kun je deze e-mail negeren — er gebeurt niets met je gegevens.') }}
                 </div>
             </div>
             <div class="footer">

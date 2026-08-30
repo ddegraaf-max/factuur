@@ -58,16 +58,16 @@ class BusinessCardController extends Controller
             'show_address' => ['boolean'],
             'public_slug' => ['required', 'string', 'min:3', 'max:60', 'regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/', 'unique:companies,public_slug,' . $company->id],
         ], [
-            'public_slug.regex' => 'Gebruik alleen kleine letters, cijfers en koppeltekens.',
-            'public_slug.unique' => 'Dit adres is al in gebruik door een andere administratie.',
-            'whatsapp.regex' => 'Vul een telefoonnummer in, bijvoorbeeld 06 12345678.',
+            'public_slug.regex' => __('Gebruik alleen kleine letters, cijfers en koppeltekens.'),
+            'public_slug.unique' => __('Dit adres is al in gebruik door een andere administratie.'),
+            'whatsapp.regex' => __('Vul een telefoonnummer in, bijvoorbeeld 06 12345678.'),
         ]);
 
         $company->forceFill(['public_slug' => $data['public_slug']])->save();
         unset($data['public_slug']);
         BusinessCard::updateOrCreate(['company_id' => $company->id], $data);
 
-        return back()->with('flash', ! empty($data['published']) ? 'Visitekaartje opgeslagen en online.' : 'Visitekaartje opgeslagen (nog niet online).');
+        return back()->with('flash', ! empty($data['published']) ? __('Visitekaartje opgeslagen en online.') : __('Visitekaartje opgeslagen (nog niet online).'));
     }
 
     /* ===================== Publiek ===================== */
@@ -98,9 +98,9 @@ class BusinessCardController extends Controller
         if ($company->email) { $lines[] = 'EMAIL;TYPE=WORK:' . self::v($company->email); }
         if ($company->website) { $lines[] = 'URL:' . self::v($company->website); }
         if ($card->show_address && ($company->address_line || $company->city)) {
-            $lines[] = 'ADR;TYPE=WORK:;;' . self::v($company->address_line) . ';' . self::v($company->city) . ';;' . self::v($company->postal_code) . ';' . self::v($company->country ?: 'Nederland');
+            $lines[] = 'ADR;TYPE=WORK:;;' . self::v($company->address_line) . ';' . self::v($company->city) . ';;' . self::v($company->postal_code) . ';' . self::v($company->country ?: (string) \App\Support\Market::get('country_name', 'Nederland'));
         }
-        $lines[] = 'NOTE:' . self::v('Digitaal visitekaartje: ' . route('card.show', $slug));
+        $lines[] = 'NOTE:' . self::v(__('Digitaal visitekaartje: :url', ['url' => route('card.show', $slug)]));
         $lines[] = 'END:VCARD';
 
         return response(implode("\r\n", $lines) . "\r\n", 200, [

@@ -38,9 +38,9 @@
 <h1>Factuur</h1>
 <div class="meta">
   Factuurnummer {{ $data['factuurnummer'] }}
-  &nbsp;·&nbsp; Factuurdatum {{ \Carbon\Carbon::parse($data['factuurdatum'])->format('d-m-Y') }}
+  &nbsp;·&nbsp; Factuurdatum {{ \Carbon\Carbon::parse($data['factuurdatum'])->format(market('date_format')) }}
   @if (!empty($data['vervaldatum']))
-    &nbsp;·&nbsp; Vervaldatum {{ \Carbon\Carbon::parse($data['vervaldatum'])->format('d-m-Y') }}
+    &nbsp;·&nbsp; Vervaldatum {{ \Carbon\Carbon::parse($data['vervaldatum'])->format(market('date_format')) }}
   @endif
 </div>
 
@@ -81,9 +81,9 @@
       <tr>
         <td>{{ $row['omschrijving'] }}</td>
         <td class="right">{{ rtrim(rtrim(number_format($row['aantal'], 2, ',', '.'), '0'), ',') }}</td>
-        <td class="right">&euro; {{ number_format($row['prijs'], 2, ',', '.') }}</td>
+        <td class="right">{{ money($row['prijs']) }}</td>
         <td class="right">{{ $data['btw_type'] === 'normaal' ? $row['btw'].'%' : '—' }}</td>
-        <td class="right">&euro; {{ number_format($row['bedrag'], 2, ',', '.') }}</td>
+        <td class="right">{{ money($row['bedrag']) }}</td>
       </tr>
     @endforeach
   </tbody>
@@ -92,17 +92,17 @@
 <table class="totals">
   <tr>
     <td>Subtotaal (excl. btw)</td>
-    <td class="value">&euro; {{ number_format($subtotal, 2, ',', '.') }}</td>
+    <td class="value">{{ money($subtotal) }}</td>
   </tr>
   @foreach ($vatTotals as $rate => $amount)
     <tr>
       <td>Btw {{ $rate }}%</td>
-      <td class="value">&euro; {{ number_format($amount, 2, ',', '.') }}</td>
+      <td class="value">{{ money($amount) }}</td>
     </tr>
   @endforeach
   <tr class="grand">
     <td>Totaal</td>
-    <td class="value">&euro; {{ number_format($total, 2, ',', '.') }}</td>
+    <td class="value">{{ money($total) }}</td>
   </tr>
 </table>
 
@@ -119,7 +119,7 @@
 @if (!empty($data['van_iban']))
   <div class="pay">
     Graag het totaalbedrag
-    @if (!empty($data['vervaldatum'])) vóór {{ \Carbon\Carbon::parse($data['vervaldatum'])->format('d-m-Y') }} @endif
+    @if (!empty($data['vervaldatum'])) vóór {{ \Carbon\Carbon::parse($data['vervaldatum'])->format(market('date_format')) }} @endif
     overmaken naar {{ $data['van_iban'] }} ten name van {{ $data['van_bedrijf'] }},
     onder vermelding van factuurnummer {{ $data['factuurnummer'] }}.
   </div>

@@ -19,15 +19,15 @@ class SearchController extends Controller
             return response()->json(['groups' => [], 'actions' => $this->actions('')]);
         }
         $like = '%' . str_replace(['%', '_'], ['\%', '\_'], mb_strtolower($q)) . '%';
-        $money = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $money = fn ($v) => money($v);
         $groups = [];
 
         $invoices = Invoice::query()
             ->where(fn ($w) => $w->whereRaw('LOWER(number) LIKE ?', [$like])->orWhereRaw('LOWER(customer_name) LIKE ?', [$like])->orWhereRaw('LOWER(COALESCE(reference, \'\')) LIKE ?', [$like]))
             ->orderByDesc('invoice_date')->limit(6)->get();
         if ($invoices->isNotEmpty()) {
-            $groups[] = ['title' => 'Facturen', 'items' => $invoices->map(fn ($i) => [
-                'title' => ($i->is_credit ? 'Creditnota ' : 'Factuur ') . ($i->number ?: 'concept'),
+            $groups[] = ['title' => __('Facturen'), 'items' => $invoices->map(fn ($i) => [
+                'title' => ($i->is_credit ? __('Creditnota') : __('Factuur')) . ' ' . ($i->number ?: __('concept')),
                 'subtitle' => $i->customer_name . ' · ' . $money($i->total) . ' · ' . $this->status($i->status),
                 'url' => route('invoices.show', $i), 'icon' => 'invoice',
             ])->all()];
@@ -37,8 +37,8 @@ class SearchController extends Controller
             ->where(fn ($w) => $w->whereRaw('LOWER(COALESCE(number, \'\')) LIKE ?', [$like])->orWhereRaw('LOWER(customer_name) LIKE ?', [$like]))
             ->orderByDesc('quote_date')->limit(4)->get();
         if ($quotes->isNotEmpty()) {
-            $groups[] = ['title' => 'Offertes', 'items' => $quotes->map(fn ($qt) => [
-                'title' => 'Offerte ' . ($qt->number ?: 'concept'),
+            $groups[] = ['title' => __('Offertes'), 'items' => $quotes->map(fn ($qt) => [
+                'title' => __('Offerte') . ' ' . ($qt->number ?: __('concept')),
                 'subtitle' => $qt->customer_name . ' · ' . $money($qt->total) . ' · ' . $this->status($qt->status),
                 'url' => route('quotes.show', $qt), 'icon' => 'quote',
             ])->all()];
@@ -48,18 +48,18 @@ class SearchController extends Controller
             ->where(fn ($w) => $w->whereRaw('LOWER(name) LIKE ?', [$like])->orWhereRaw('LOWER(COALESCE(email, \'\')) LIKE ?', [$like])->orWhereRaw('LOWER(COALESCE(contact_name, \'\')) LIKE ?', [$like])->orWhereRaw('LOWER(COALESCE(city, \'\')) LIKE ?', [$like]))
             ->orderBy('name')->limit(5)->get();
         if ($customers->isNotEmpty()) {
-            $groups[] = ['title' => 'Klanten', 'items' => $customers->map(fn ($c) => [
+            $groups[] = ['title' => __('Klanten'), 'items' => $customers->map(fn ($c) => [
                 'title' => $c->name,
-                'subtitle' => trim(($c->email ?: '') . ($c->city ? ' · ' . $c->city : '')) ?: 'Klant',
+                'subtitle' => trim(($c->email ?: '') . ($c->city ? ' · ' . $c->city : '')) ?: __('Klant'),
                 'url' => route('customers.show', $c), 'icon' => 'users',
             ])->all()];
         }
 
         $products = Product::query()->whereRaw('LOWER(name) LIKE ?', [$like])->orderBy('name')->limit(4)->get();
         if ($products->isNotEmpty()) {
-            $groups[] = ['title' => 'Producten', 'items' => $products->map(fn ($p) => [
+            $groups[] = ['title' => __('Producten'), 'items' => $products->map(fn ($p) => [
                 'title' => $p->name,
-                'subtitle' => $money($p->price) . ' · ' . (int) $p->vat_rate . '% btw',
+                'subtitle' => $money($p->price) . ' · ' . __(':rate% btw', ['rate' => (int) $p->vat_rate]),
                 'url' => route('products.edit', $p), 'icon' => 'box',
             ])->all()];
         }
@@ -68,7 +68,7 @@ class SearchController extends Controller
             ->where(fn ($w) => $w->whereRaw('LOWER(supplier_name) LIKE ?', [$like])->orWhereRaw('LOWER(COALESCE(supplier_reference, \'\')) LIKE ?', [$like]))
             ->orderByDesc('invoice_date')->limit(4)->get();
         if ($purchases->isNotEmpty()) {
-            $groups[] = ['title' => 'Inkoop', 'items' => $purchases->map(fn ($p) => [
+            $groups[] = ['title' => __('Inkoop'), 'items' => $purchases->map(fn ($p) => [
                 'title' => $p->supplier_name . ($p->supplier_reference ? ' · ' . $p->supplier_reference : ''),
                 'subtitle' => $money($p->total) . ' · ' . $p->invoice_date?->translatedFormat('j M Y'),
                 'url' => route('purchases.show', $p), 'icon' => 'receipt',
@@ -81,18 +81,20 @@ class SearchController extends Controller
     /** Snelle acties en pagina's die op de zoekterm passen. */
     private function actions(string $q): array
     {
+        // Titels en trefwoorden zijn vertaalbaar; de Nederlandse trefwoorden
+        // blijven altijd meezoeken, zodat een bekende term nooit verdwijnt.
         $all = [
-            ['title' => 'Nieuwe factuur', 'url' => route('invoices.create'), 'keywords' => 'factuur nieuw maken aanmaken'],
-            ['title' => 'Nieuwe offerte', 'url' => route('quotes.create'), 'keywords' => 'offerte nieuw maken aanmaken'],
-            ['title' => 'Nieuwe klant', 'url' => route('customers.create'), 'keywords' => 'klant nieuw toevoegen relatie'],
-            ['title' => 'Banktransacties importeren', 'url' => route('bank.index'), 'keywords' => 'bank afschrift importeren camt mt940 transacties'],
-            ['title' => 'Btw-aangifte', 'url' => route('vat.index'), 'keywords' => 'btw aangifte omzetbelasting kwartaal'],
-            ['title' => 'Export naar boekhouder / auditfile', 'url' => route('export.index'), 'keywords' => 'export boekhouder accountant xaf auditfile csv'],
-            ['title' => 'Automatische incasso', 'url' => route('direct-debit.index'), 'keywords' => 'incasso sepa machtiging batch'],
-            ['title' => 'Bedrijfsgegevens', 'url' => route('settings.company'), 'keywords' => 'instellingen bedrijf gegevens logo iban mollie'],
-            ['title' => 'Koppelingen', 'url' => route('settings.integrations'), 'keywords' => 'koppelingen peppol domein mail claude'],
-            ['title' => 'Logboek', 'url' => route('settings.activity'), 'keywords' => 'logboek wie deed wat audit'],
-            ['title' => 'Overstappen / importeren', 'url' => route('import.index'), 'keywords' => 'import overstappen csv wefact moneybird'],
+            ['title' => __('Nieuwe factuur'), 'url' => route('invoices.create'), 'keywords' => __('factuur nieuw maken aanmaken') . ' factuur nieuw maken aanmaken'],
+            ['title' => __('Nieuwe offerte'), 'url' => route('quotes.create'), 'keywords' => __('offerte nieuw maken aanmaken') . ' offerte nieuw maken aanmaken'],
+            ['title' => __('Nieuwe klant'), 'url' => route('customers.create'), 'keywords' => __('klant nieuw toevoegen relatie') . ' klant nieuw toevoegen relatie'],
+            ['title' => __('Banktransacties importeren'), 'url' => route('bank.index'), 'keywords' => __('bank afschrift importeren camt mt940 transacties') . ' bank afschrift importeren camt mt940 transacties'],
+            ['title' => __('Btw-aangifte'), 'url' => route('vat.index'), 'keywords' => __('btw aangifte omzetbelasting kwartaal') . ' btw aangifte omzetbelasting kwartaal'],
+            ['title' => __('Export naar boekhouder / auditfile'), 'url' => route('export.index'), 'keywords' => __('export boekhouder accountant xaf auditfile csv') . ' export boekhouder accountant xaf auditfile csv'],
+            ['title' => __('Automatische incasso'), 'url' => route('direct-debit.index'), 'keywords' => __('incasso sepa machtiging batch') . ' incasso sepa machtiging batch'],
+            ['title' => __('Bedrijfsgegevens'), 'url' => route('settings.company'), 'keywords' => __('instellingen bedrijf gegevens logo iban mollie') . ' instellingen bedrijf gegevens logo iban mollie'],
+            ['title' => __('Koppelingen'), 'url' => route('settings.integrations'), 'keywords' => __('koppelingen peppol domein mail claude') . ' koppelingen peppol domein mail claude'],
+            ['title' => __('Logboek'), 'url' => route('settings.activity'), 'keywords' => __('logboek wie deed wat audit') . ' logboek wie deed wat audit'],
+            ['title' => __('Overstappen / importeren'), 'url' => route('import.index'), 'keywords' => __('import overstappen csv wefact moneybird') . ' import overstappen csv wefact moneybird'],
         ];
         $needle = mb_strtolower($q);
 
@@ -101,6 +103,8 @@ class SearchController extends Controller
 
     private function status(string $status): string
     {
-        return ['draft' => 'concept', 'sent' => 'verstuurd', 'partial' => 'deels betaald', 'overdue' => 'vervallen', 'paid' => 'betaald', 'incasso' => 'incasso', 'cancelled' => 'geannuleerd', 'accepted' => 'geaccepteerd', 'rejected' => 'afgewezen', 'expired' => 'verlopen'][$status] ?? $status;
+        $label = ['draft' => 'concept', 'sent' => 'verstuurd', 'partial' => 'deels betaald', 'overdue' => 'vervallen', 'paid' => 'betaald', 'incasso' => 'incasso', 'cancelled' => 'geannuleerd', 'accepted' => 'geaccepteerd', 'rejected' => 'afgewezen', 'expired' => 'verlopen'][$status] ?? null;
+
+        return $label === null ? $status : (string) __($label);
     }
 }

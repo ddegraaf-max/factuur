@@ -42,6 +42,10 @@ Route::get('/robots.txt', fn () => response(
     "User-agent: *\nDisallow:\n\nSitemap: " . \App\Support\Brand::url('sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']
 ))->name('robots');
 
+// Poolse markt: NIP-opzoeken (biała lista) ook vóór het inloggen, voor het registratieformulier.
+Route::get('/api/nip/{nip}', [\App\Http\Controllers\NipController::class, 'lookup'])
+    ->middleware(['market:pl', 'throttle:20,1'])->name('nip.public');
+
 // ---------- DEMO-OMGEVING ----------
 // Elke bezoeker krijgt een eigen sandbox met voorbeeldgegevens en ziet daarin
 // de échte applicatie. Zie App\Http\Middleware\DemoMode voor de beveiliging.
@@ -319,10 +323,10 @@ Route::post('/contact', function (\Illuminate\Http\Request $request) {
 
         return back()
             ->withInput()
-            ->with('contact_error', 'Er ging iets mis bij het versturen. Mail ons gerust direct op ' . \App\Support\Brand::email() . '.');
+            ->with('contact_error', __('Er ging iets mis bij het versturen. Mail ons gerust direct op :email.', ['email' => \App\Support\Brand::email()]));
     }
 
-    return back()->with('contact_success', 'Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.');
+    return back()->with('contact_success', __('Bedankt! Je bericht is verstuurd — we reageren binnen één werkdag.'));
 })->middleware(['throttle:5,1', 'turnstile'])->name('contact.send');
 
 // ---------- PUBLIEKE PAGINA'S VAN ADMINISTRATIES ----------
@@ -625,6 +629,8 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('invoices/{invoice}/windykacja', [\App\Http\Controllers\WindykacjaController::class, 'claim'])->name('windykacja.claim');
     Route::get('invoices/{invoice}/wezwanie', [\App\Http\Controllers\WindykacjaController::class, 'wezwanie'])->name('windykacja.wezwanie');
     Route::post('invoices/{invoice}/wykup', [\App\Http\Controllers\WindykacjaController::class, 'sale'])->name('windykacja.wykup');
+    Route::get('invoices/{invoice}/ksef.xml', [\App\Http\Controllers\KsefController::class, 'xml'])->name('ksef.xml');
+    Route::patch('invoices/{invoice}/ksef', [\App\Http\Controllers\KsefController::class, 'number'])->name('ksef.number');
 
     // Attachments
     Route::post('invoices/{invoice}/attachments', [AttachmentController::class, 'store'])->name('invoices.attachments.store');

@@ -18,7 +18,8 @@ class DemoController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('marketing.demo');
+        // Demo-uitleg per markt: Poolse pagina onder Lopra Polska.
+        return view(\App\Support\Market::isPl() ? 'lopra-pl.demo' : 'marketing.demo');
     }
 
     /** Bouw een verse demo-omgeving en log de bezoeker in. */
@@ -38,7 +39,7 @@ class DemoController extends Controller
         } catch (\Throwable $e) {
             Log::error('Demo-omgeving aanmaken mislukt', ['error' => $e->getMessage()]);
 
-            return back()->with('error', 'De demo kon even niet worden gestart. Probeer het zo nog eens.');
+            return back()->with('error', __('De demo kon even niet worden gestart. Probeer het zo nog eens.'));
         }
 
         Auth::login($user);
@@ -46,7 +47,7 @@ class DemoController extends Controller
         $request->session()->put('is_demo', true);
 
         return redirect()->route('dashboard')
-            ->with('flash', 'Welkom in de demo! Alle gegevens zijn voorbeelden — klik gerust overal op.');
+            ->with('flash', __('Welkom in de demo! Alle gegevens zijn voorbeelden — klik gerust overal op.'));
     }
 
     /**

@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed, ref } from 'vue';
 
@@ -7,6 +7,10 @@ const props = defineProps({
   defaults: Object,
   accountant_email: String,
 });
+
+// Markt (nl/pl): de btw-tarieven in de uitleg komen van de server.
+const market = usePage().props.market || {};
+const vatRatesLabel = (market.vat_rates || [21, 9, 0]).map(r => r + '%').join(' / ');
 
 const from = ref(props.defaults.from);
 const to = ref(props.defaults.to);
@@ -64,55 +68,55 @@ const xafUrl = computed(() => route('export.xaf', { year: xafYear.value }));
 </script>
 
 <template>
-  <Head title="Export naar boekhouder" />
+  <Head :title="$t('Export naar boekhouder')" />
   <AppLayout>
-    <template #breadcrumb>Rapporten / <span class="breadcrumb-current">Export boekhouder</span></template>
+    <template #breadcrumb>{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Export boekhouder') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Export naar boekhouder</h1>
-        <p class="page-subtitle">Download al je facturen als CSV — met grondslag en BTW per tarief, klaar voor je accountant</p>
+        <h1 class="page-title">{{ $t('Export naar boekhouder') }}</h1>
+        <p class="page-subtitle">{{ $t('Download al je facturen als CSV — met grondslag en BTW per tarief, klaar voor je accountant') }}</p>
       </div>
     </div>
 
     <div class="export-grid">
       <div class="card">
         <div class="card-header">
-          <div class="card-title">Periode &amp; filters</div>
+          <div class="card-title">{{ $t('Periode & filters') }}</div>
         </div>
         <div class="card-body">
           <div class="preset-row">
-            <button class="filter-chip" @click="setPreset('this_month')">Deze maand</button>
-            <button class="filter-chip" @click="setPreset('last_month')">Vorige maand</button>
-            <button class="filter-chip" @click="setPreset('this_quarter')">Dit kwartaal</button>
-            <button class="filter-chip" @click="setPreset('last_quarter')">Vorig kwartaal</button>
-            <button class="filter-chip" @click="setPreset('this_year')">Dit jaar</button>
-            <button class="filter-chip" @click="setPreset('last_year')">Vorig jaar</button>
+            <button class="filter-chip" @click="setPreset('this_month')">{{ $t('Deze maand') }}</button>
+            <button class="filter-chip" @click="setPreset('last_month')">{{ $t('Vorige maand') }}</button>
+            <button class="filter-chip" @click="setPreset('this_quarter')">{{ $t('Dit kwartaal') }}</button>
+            <button class="filter-chip" @click="setPreset('last_quarter')">{{ $t('Vorig kwartaal') }}</button>
+            <button class="filter-chip" @click="setPreset('this_year')">{{ $t('Dit jaar') }}</button>
+            <button class="filter-chip" @click="setPreset('last_year')">{{ $t('Vorig jaar') }}</button>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label>Van</label>
+              <label>{{ $t('Van') }}</label>
               <input type="date" v-model="from">
             </div>
             <div class="form-group">
-              <label>Tot en met</label>
+              <label>{{ $t('Tot en met') }}</label>
               <input type="date" v-model="to">
             </div>
           </div>
 
           <div class="form-group">
-            <label>Facturen</label>
+            <label>{{ $t('Facturen') }}</label>
             <select v-model="status">
-              <option value="all">Alle definitieve facturen</option>
-              <option value="open">Alleen openstaand</option>
-              <option value="paid">Alleen betaald</option>
+              <option value="all">{{ $t('Alle definitieve facturen') }}</option>
+              <option value="open">{{ $t('Alleen openstaand') }}</option>
+              <option value="paid">{{ $t('Alleen betaald') }}</option>
             </select>
           </div>
 
           <label class="check-row">
             <input type="checkbox" v-model="includeCredit">
-            <span>Creditnota's meenemen</span>
+            <span>{{ $t("Creditnota's meenemen") }}</span>
           </label>
 
           <a
@@ -122,45 +126,45 @@ const xafUrl = computed(() => route('export.xaf', { year: xafYear.value }));
             style="margin-top:18px;"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download CSV-export
+            {{ $t('Download CSV-export') }}
           </a>
         </div>
       </div>
 
       <div>
         <div class="card" style="margin-bottom:16px;">
-          <div class="card-header"><div class="card-title">Auditfile (XAF 3.2) <span class="pill pill-sent" style="margin-left:6px;">Nieuw</span></div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Auditfile (XAF 3.2)') }} <span class="pill pill-sent" style="margin-left:6px;">{{ $t('Nieuw') }}</span></div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--text-2);">
-            <p style="margin:0 0 12px;">Het standaardbestand dat elke Nederlandse accountant en de Belastingdienst direct kunnen inlezen (Twinfield, Exact, e-Boekhouden, AFAS, Snelstart …). Bevat per boekjaar het verkoopboek, inkoopboek en bankboek met btw per tarief, klanten en leveranciers — sluitend in debet en credit.</p>
+            <p style="margin:0 0 12px;">{{ $t('Het standaardbestand dat elke Nederlandse accountant en de Belastingdienst direct kunnen inlezen (Twinfield, Exact, e-Boekhouden, AFAS, Snelstart …). Bevat per boekjaar het verkoopboek, inkoopboek en bankboek met btw per tarief, klanten en leveranciers — sluitend in debet en credit.') }}</p>
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-              <select v-model="xafYear" style="max-width:140px;"><option v-for="y in xafYears" :key="y" :value="y">Boekjaar {{ y }}</option></select>
-              <a :href="xafUrl" class="btn btn-primary btn-sm">Download auditfile</a>
+              <select v-model="xafYear" style="max-width:140px;"><option v-for="y in xafYears" :key="y" :value="y">{{ $t('Boekjaar :year', { year: y }) }}</option></select>
+              <a :href="xafUrl" class="btn btn-primary btn-sm">{{ $t('Download auditfile') }}</a>
             </div>
           </div>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
           <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--text-2);">
-            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;">Wat zit er in de export?</div>
+            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;">{{ $t('Wat zit er in de export?') }}</div>
             <ul style="padding-left:18px;margin:0;">
-              <li>Alle definitieve facturen in de gekozen periode (concepten blijven buiten beschouwing)</li>
-              <li>Per factuur: nummer, datum, klant, status en referentie</li>
-              <li>Grondslag en BTW uitgesplitst per tarief (21% / 9% / 0%)</li>
-              <li>Betaald, openstaand en betaaldatum</li>
-              <li>Controletotalen onderaan het bestand</li>
+              <li>{{ $t('Alle definitieve facturen in de gekozen periode (concepten blijven buiten beschouwing)') }}</li>
+              <li>{{ $t('Per factuur: nummer, datum, klant, status en referentie') }}</li>
+              <li>{{ $t('Grondslag en BTW uitgesplitst per tarief (:rates)', { rates: vatRatesLabel }) }}</li>
+              <li>{{ $t('Betaald, openstaand en betaaldatum') }}</li>
+              <li>{{ $t('Controletotalen onderaan het bestand') }}</li>
             </ul>
-            <div style="margin-top:12px;color:var(--text-3);">Het bestand opent direct goed in Excel (puntkomma-gescheiden, Nederlandse notatie).</div>
+            <div style="margin-top:12px;color:var(--text-3);">{{ $t('Het bestand opent direct goed in Excel (puntkomma-gescheiden, Nederlandse notatie).') }}</div>
           </div>
         </div>
 
         <div class="card">
           <div class="card-body" style="font-size:13px;line-height:1.7;color:var(--text-2);">
-            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;">Tip: automatische kopie</div>
+            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;">{{ $t('Tip: automatische kopie') }}</div>
             <template v-if="accountant_email">
-              Je boekhouder (<b>{{ accountant_email }}</b>) ontvangt al automatisch een kopie (BCC) van elke verstuurde factuur.
+              {{ $t('Je boekhouder') }} (<b>{{ accountant_email }}</b>) {{ $t('ontvangt al automatisch een kopie (BCC) van elke verstuurde factuur.') }}
             </template>
             <template v-else>
-              Stel bij <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">Bedrijfsgegevens</Link> het e-mailadres van je boekhouder in — die ontvangt dan automatisch een kopie (BCC) van elke verstuurde factuur.
+              {{ $t('Stel bij') }} <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">{{ $t('Bedrijfsgegevens') }}</Link> {{ $t('het e-mailadres van je boekhouder in — die ontvangt dan automatisch een kopie (BCC) van elke verstuurde factuur.') }}
             </template>
           </div>
         </div>

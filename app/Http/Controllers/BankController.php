@@ -72,11 +72,11 @@ class BankController extends Controller
             'ponto' => app(PontoSyncer::class)->summary(auth()->user()->company, auth()->user()->isOwner()),
             'open_invoices' => $openInvoices->map(fn ($i) => [
                 'id' => $i->id,
-                'label' => trim("{$i->number} · {$i->customer_name} · € " . number_format($i->total - $i->paid_total, 2, ',', '.')),
+                'label' => trim("{$i->number} · {$i->customer_name} · " . money($i->total - $i->paid_total)),
             ]),
             'open_purchases' => $openPurchases->map(fn ($p) => [
                 'id' => $p->id,
-                'label' => trim("{$p->supplier_name}" . ($p->supplier_reference ? " · {$p->supplier_reference}" : '') . ' · € ' . number_format($p->total, 2, ',', '.')),
+                'label' => trim("{$p->supplier_name}" . ($p->supplier_reference ? " · {$p->supplier_reference}" : '') . ' · ' . money($p->total)),
             ]),
         ]);
     }
@@ -87,8 +87,8 @@ class BankController extends Controller
         $request->validate([
             'file' => ['required', 'file', 'max:10240'],
         ], [
-            'file.required' => 'Kies een bankafschrift (CAMT.053 of MT940).',
-            'file.max' => 'Het bestand mag maximaal 10 MB zijn.',
+            'file.required' => __('Kies een bankafschrift (CAMT.053 of MT940).'),
+            'file.max' => __('Het bestand mag maximaal 10 MB zijn.'),
         ]);
 
         try {
@@ -124,9 +124,9 @@ class BankController extends Controller
             $added++;
         }
 
-        $message = "{$added} transactie(s) geïmporteerd.";
+        $message = __(':count transactie(s) geïmporteerd.', ['count' => $added]);
         if ($skipped > 0) {
-            $message .= " {$skipped} overgeslagen (stonden er al in).";
+            $message .= ' ' . __(':count overgeslagen (stonden er al in).', ['count' => $skipped]);
         }
 
         return back()->with('flash', $message);
@@ -144,7 +144,7 @@ class BankController extends Controller
         $remaining = (float) $invoice->remaining_amount;
         $amount = min(abs((float) $transaction->amount), $remaining);
         if ($amount < 0.01) {
-            return back()->withErrors(['match' => 'Er staat niets meer open op deze factuur.']);
+            return back()->withErrors(['match' => __('Er staat niets meer open op deze factuur.')]);
         }
 
         $payment = Payment::create([
@@ -163,16 +163,16 @@ class BankController extends Controller
         ]);
 
         $note = abs((float) $transaction->amount) - $amount > 0.009
-            ? ' Let op: de transactie was hoger dan het openstaande bedrag; er is ' . '€ ' . number_format($amount, 2, ',', '.') . ' geboekt.'
+            ? ' ' . __('Let op: de transactie was hoger dan het openstaande bedrag; er is :amount geboekt.', ['amount' => money($amount)])
             : '';
 
         // Volledig voldaan? Dan (als dat aanstaat) meteen een bedankje naar de klant.
         $invoice->refresh();
         if ($invoice->status === 'paid' && $thanks->sendIfEnabled($invoice)) {
-            $note .= " Bedankmail verstuurd naar {$invoice->customer_email}.";
+            $note .= ' ' . __('Bedankmail verstuurd naar :email.', ['email' => $invoice->customer_email]);
         }
 
-        return back()->with('flash', "Gekoppeld aan factuur {$invoice->number} — betaling geboekt.{$note}");
+        return back()->with('flash', __('Gekoppeld aan factuur :number — betaling geboekt.', ['number' => $invoice->number]) . $note);
     }
 
     /** Koppel een afschrijving aan een inkoopfactuur en zet die op betaald. */
@@ -195,7 +195,7 @@ class BankController extends Controller
             'matched_purchase_id' => $purchase->id,
         ]);
 
-        return back()->with('flash', "Gekoppeld aan inkoopfactuur van {$purchase->supplier_name} — op betaald gezet.");
+        return back()->with('flash', __('Gekoppeld aan inkoopfactuur van :supplier — op betaald gezet.', ['supplier' => $purchase->supplier_name]));
     }
 
     /** Transactie negeren (privé-opname, interne overboeking, enz.). */
@@ -204,7 +204,7 @@ class BankController extends Controller
         abort_unless($transaction->status === 'open', 422);
         $transaction->update(['status' => 'ignored']);
 
-        return back()->with('flash', 'Transactie genegeerd.');
+        return back()->with('flash', __('Transactie genegeerd.'));
     }
 
     /** Koppeling of negeren ongedaan maken. */
@@ -226,7 +226,7 @@ class BankController extends Controller
             'payment_id' => null,
         ]);
 
-        return back()->with('flash', 'Transactie staat weer open.');
+        return back()->with('flash', __('Transactie staat weer open.'));
     }
 
     /* ===================== Suggesties ===================== */

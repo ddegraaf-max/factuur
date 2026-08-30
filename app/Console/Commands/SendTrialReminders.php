@@ -44,7 +44,7 @@ class SendTrialReminders extends Command
             }
 
             foreach ($recipients as $user) {
-                $firstName = explode(' ', trim($user->name ?? ''))[0] ?: 'daar';
+                $firstName = explode(' ', trim($user->name ?? ''))[0] ?: __('daar');
 
                 try {
                     Mail::to($user->email)->send(new TrialEndingMail($company, $daysLeft, $firstName));

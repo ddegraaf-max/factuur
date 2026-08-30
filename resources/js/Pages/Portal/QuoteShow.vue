@@ -3,6 +3,7 @@ import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, onMounted, ref } from 'vue';
 import PortalLayout from '@/Layouts/PortalLayout.vue';
 import { eur } from '@/format.js';
+import { t } from '@/i18n';
 
 const props = defineProps({
   quote: Object,
@@ -75,7 +76,7 @@ const form = useForm({
 
 const sign = () => {
   if (!hasDrawn.value) {
-    form.setError('signature', 'Zet eerst je handtekening in het tekenveld.');
+    form.setError('signature', t('Zet eerst je handtekening in het tekenveld.'));
     return;
   }
   form.signature = canvasEl.value.toDataURL('image/png');
@@ -86,14 +87,14 @@ const sign = () => {
 const showDecline = ref(false);
 const declineForm = useForm({ reason: '' });
 const decline = () => {
-  if (confirm('Weet je zeker dat je deze offerte wilt afwijzen?')) {
+  if (confirm(t('Weet je zeker dat je deze offerte wilt afwijzen?'))) {
     declineForm.post(route('portal.quote.decline', props.quote.token), { preserveScroll: true });
   }
 };
 </script>
 
 <template>
-  <Head :title="`Offerte ${quote.number} · Klantenportaal`" />
+  <Head :title="$t('Offerte :number · Klantenportaal', { number: quote.number })" />
   <PortalLayout :email="email">
     <div class="portal-card portal-invoice">
       <!-- Kop met huisstijl van de afzender -->
@@ -101,11 +102,11 @@ const decline = () => {
         <div>
           <img v-if="company.logo_data" :src="company.logo_data" :alt="company.name" class="pq-logo">
           <div v-else class="pq-company" :style="{ color: brand }">{{ company.name }}</div>
-          <div class="pq-doc">Offerte <strong>{{ quote.number }}</strong></div>
+          <div class="pq-doc">{{ $t('Offerte') }} <strong>{{ quote.number }}</strong></div>
         </div>
         <div class="pq-head-right">
           <div class="pq-total">{{ eur(quote.total) }}</div>
-          <div class="pq-total-sub">incl. btw</div>
+          <div class="pq-total-sub">{{ $t('incl. btw') }}</div>
         </div>
       </div>
 
@@ -113,18 +114,17 @@ const decline = () => {
       <div v-if="quote.status === 'accepted'" class="pq-banner ok">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         <span v-if="quote.signed_name">
-          Digitaal ondertekend door <strong>{{ quote.signed_name }}</strong> op {{ quote.signed_at_label }}.
-          Download hieronder de ondertekende PDF voor je eigen administratie.
+          {{ $t('Digitaal ondertekend door') }} <strong>{{ quote.signed_name }}</strong> {{ $t('op :date.', { date: quote.signed_at_label }) }}
+          {{ $t('Download hieronder de ondertekende PDF voor je eigen administratie.') }}
         </span>
-        <span v-else>Deze offerte is geaccepteerd{{ quote.accepted_at_label ? ` op ${quote.accepted_at_label}` : '' }}.</span>
+        <span v-else>{{ quote.accepted_at_label ? $t('Deze offerte is geaccepteerd op :date.', { date: quote.accepted_at_label }) : $t('Deze offerte is geaccepteerd.') }}</span>
       </div>
       <div v-else-if="quote.status === 'rejected'" class="pq-banner warn">
-        Deze offerte is afgewezen{{ quote.rejected_at_label ? ` op ${quote.rejected_at_label}` : '' }}.
-        Van gedachten veranderd? Neem contact op met {{ company.name }}.
+        {{ quote.rejected_at_label ? $t('Deze offerte is afgewezen op :date.', { date: quote.rejected_at_label }) : $t('Deze offerte is afgewezen.') }}
+        {{ $t('Van gedachten veranderd? Neem contact op met :company.', { company: company.name }) }}
       </div>
       <div v-else-if="quote.is_expired || quote.status === 'expired'" class="pq-banner warn">
-        De geldigheid van deze offerte is verlopen ({{ quote.valid_until_label }}). Ondertekenen kan nog —
-        of neem even contact op met {{ company.name }}.
+        {{ $t('De geldigheid van deze offerte is verlopen (:date). Ondertekenen kan nog — of neem even contact op met :company.', { date: quote.valid_until_label, company: company.name }) }}
       </div>
 
       <!-- Inhoud -->
@@ -133,7 +133,7 @@ const decline = () => {
 
         <table class="pq-lines">
           <thead>
-            <tr><th>Omschrijving</th><th class="right">Aantal</th><th class="right">Prijs</th><th class="right">Totaal</th></tr>
+            <tr><th>{{ $t('Omschrijving') }}</th><th class="right">{{ $t('Aantal') }}</th><th class="right">{{ $t('Prijs') }}</th><th class="right">{{ $t('Totaal') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="l in quote.lines" :key="l.id">
@@ -149,35 +149,35 @@ const decline = () => {
         </table>
 
         <div class="pq-totals">
-          <div><span>Subtotaal</span><span class="num">{{ eur(quote.subtotal) }}</span></div>
-          <div><span>BTW</span><span class="num">{{ eur(quote.vat_total) }}</span></div>
-          <div class="grand"><span>Totaal</span><span class="num">{{ eur(quote.total) }}</span></div>
+          <div><span>{{ $t('Subtotaal') }}</span><span class="num">{{ eur(quote.subtotal) }}</span></div>
+          <div><span>{{ $t('BTW') }}</span><span class="num">{{ eur(quote.vat_total) }}</span></div>
+          <div class="grand"><span>{{ $t('Totaal') }}</span><span class="num">{{ eur(quote.total) }}</span></div>
         </div>
 
         <div class="pq-meta">
-          <span>Offertedatum: <strong>{{ quote.quote_date_label }}</strong></span>
-          <span>Geldig tot: <strong>{{ quote.valid_until_label }}</strong></span>
-          <span v-if="quote.reference">Referentie: <strong>{{ quote.reference }}</strong></span>
+          <span>{{ $t('Offertedatum') }}: <strong>{{ quote.quote_date_label }}</strong></span>
+          <span>{{ $t('Geldig tot') }}: <strong>{{ quote.valid_until_label }}</strong></span>
+          <span v-if="quote.reference">{{ $t('Referentie') }}: <strong>{{ quote.reference }}</strong></span>
         </div>
 
         <div v-if="quote.notes" class="pq-notes">{{ quote.notes }}</div>
 
         <!-- Ondertekenen -->
         <div v-if="canDecide" class="pq-sign" :style="{ borderColor: brand }">
-          <div class="pq-sign-title">Akkoord? Onderteken digitaal</div>
+          <div class="pq-sign-title">{{ $t('Akkoord? Onderteken digitaal') }}</div>
           <p class="pq-sign-sub">
-            Zet hieronder je handtekening — dat is rechtsgeldig en scheelt printen en scannen.
-            Je geverifieerde e-mailadres ({{ email }}), het tijdstip en je handtekening worden bij de offerte vastgelegd.
+            {{ $t('Zet hieronder je handtekening — dat is rechtsgeldig en scheelt printen en scannen.') }}
+            {{ $t('Je geverifieerde e-mailadres (:email), het tijdstip en je handtekening worden bij de offerte vastgelegd.', { email }) }}
           </p>
 
           <div class="form-group">
-            <label>Je volledige naam *</label>
-            <input type="text" v-model="form.signed_name" maxlength="120" placeholder="Voor- en achternaam">
+            <label>{{ $t('Je volledige naam') }} *</label>
+            <input type="text" v-model="form.signed_name" maxlength="120" :placeholder="$t('Voor- en achternaam')">
             <div v-if="form.errors.signed_name" class="field-error">{{ form.errors.signed_name }}</div>
           </div>
 
           <div class="form-group">
-            <label>Handtekening *<span class="pq-hint-inline">(teken met muis of vinger)</span></label>
+            <label>{{ $t('Handtekening') }} *<span class="pq-hint-inline">{{ $t('(teken met muis of vinger)') }}</span></label>
             <div class="pq-canvas-wrap">
               <canvas
                 ref="canvasEl"
@@ -188,32 +188,32 @@ const decline = () => {
                 @pointerup="endDraw"
                 @pointercancel="endDraw"
               ></canvas>
-              <button type="button" class="pq-clear" @click="clearSignature">Wissen</button>
+              <button type="button" class="pq-clear" @click="clearSignature">{{ $t('Wissen') }}</button>
             </div>
             <div v-if="form.errors.signature" class="field-error">{{ form.errors.signature }}</div>
           </div>
 
           <label class="pq-agree">
             <input type="checkbox" v-model="form.agree">
-            <span>Ik ga akkoord met deze offerte van {{ company.name }} en onderteken deze digitaal.</span>
+            <span>{{ $t('Ik ga akkoord met deze offerte van :company en onderteken deze digitaal.', { company: company.name }) }}</span>
           </label>
           <div v-if="form.errors.agree" class="field-error">{{ form.errors.agree }}</div>
 
           <button type="button" class="pq-sign-btn" :style="{ background: brand }" :disabled="form.processing" @click="sign">
-            {{ form.processing ? 'Bezig…' : 'Onderteken en ga akkoord' }}
+            {{ form.processing ? $t('Bezig…') : $t('Onderteken en ga akkoord') }}
           </button>
 
           <div class="pq-decline">
             <button v-if="!showDecline" type="button" class="pq-decline-link" @click="showDecline = true">
-              Liever niet akkoord? Offerte afwijzen
+              {{ $t('Liever niet akkoord? Offerte afwijzen') }}
             </button>
             <div v-else>
               <div class="form-group">
-                <label>Toelichting<span class="pq-hint-inline">(optioneel, gaat naar {{ company.name }})</span></label>
-                <textarea v-model="declineForm.reason" rows="2" maxlength="500" placeholder="Bijv. we kiezen voor een andere aanpak"></textarea>
+                <label>{{ $t('Toelichting') }}<span class="pq-hint-inline">{{ $t('(optioneel, gaat naar :company)', { company: company.name }) }}</span></label>
+                <textarea v-model="declineForm.reason" rows="2" maxlength="500" :placeholder="$t('Bijv. we kiezen voor een andere aanpak')"></textarea>
               </div>
               <button type="button" class="pq-decline-btn" :disabled="declineForm.processing" @click="decline">
-                {{ declineForm.processing ? 'Bezig…' : 'Offerte definitief afwijzen' }}
+                {{ declineForm.processing ? $t('Bezig…') : $t('Offerte definitief afwijzen') }}
               </button>
             </div>
           </div>
@@ -223,10 +223,10 @@ const decline = () => {
         <div class="pq-actions">
           <a :href="route('portal.quote.pdf', quote.token)" class="btn btn-secondary">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Download PDF
+            {{ $t('Download PDF') }}
           </a>
-          <a v-if="company.email" :href="`mailto:${company.email}?subject=Vraag over offerte ${quote.number}`" class="btn btn-secondary">
-            Vraag stellen
+          <a v-if="company.email" :href="`mailto:${company.email}?subject=${$t('Vraag over offerte :number', { number: quote.number })}`" class="btn btn-secondary">
+            {{ $t('Vraag stellen') }}
           </a>
         </div>
       </div>

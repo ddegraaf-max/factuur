@@ -1,13 +1,17 @@
 <script setup>
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur } from '@/format.js';
+import { eur, marketLocale } from '@/format.js';
+import { t } from '@/i18n';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
   quote: Object,
   company: Object,
 });
+
+// Voor v-html-teksten met opmaak: dynamische waarden veilig invoegen.
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const page = usePage();
 const pageError = computed(() => (page.props.errors || {}).quote ?? null);
@@ -24,7 +28,7 @@ const pillClass = computed(() => ({
 }[props.quote.status] ?? 'pill-draft'));
 
 const send = () => {
-  const label = props.quote.status === 'sent' ? 'Offerte opnieuw versturen?' : 'Offerte versturen naar de klant?';
+  const label = props.quote.status === 'sent' ? t('Offerte opnieuw versturen?') : t('Offerte versturen naar de klant?');
   if (confirm(label)) {
     router.post(route('quotes.send', props.quote.id), {}, { preserveScroll: true });
   }
@@ -43,19 +47,19 @@ const accept = () => {
   });
 };
 const sendConfirmation = () => {
-  const again = props.quote.accept_mail_sent_at_label ? `Er is al een bevestiging gemaild op ${props.quote.accept_mail_sent_at_label}.\n\n` : '';
-  if (confirm(`${again}Bevestiging van het akkoord mailen naar ${props.quote.customer_email}? De offerte gaat mee als PDF.`)) {
+  const again = props.quote.accept_mail_sent_at_label ? t('Er is al een bevestiging gemaild op :date.', { date: props.quote.accept_mail_sent_at_label }) + '\n\n' : '';
+  if (confirm(again + t('Bevestiging van het akkoord mailen naar :email? De offerte gaat mee als PDF.', { email: props.quote.customer_email }))) {
     router.post(route('quotes.confirm', props.quote.id), {}, { preserveScroll: true });
   }
 };
 const reject = () => {
-  if (confirm('Offerte markeren als afgewezen?')) {
+  if (confirm(t('Offerte markeren als afgewezen?'))) {
     router.post(route('quotes.reject', props.quote.id), {}, { preserveScroll: true });
   }
 };
 
 const convert = () => {
-  if (confirm('Van deze offerte een concept-factuur maken? De offerte blijft bewaard.')) {
+  if (confirm(t('Van deze offerte een concept-factuur maken? De offerte blijft bewaard.'))) {
     router.post(route('quotes.convert', props.quote.id));
   }
 };
@@ -68,12 +72,12 @@ const copySignLink = async () => {
     signLinkCopied.value = true;
     setTimeout(() => { signLinkCopied.value = false; }, 2500);
   } catch (e) {
-    prompt('Kopieer de link handmatig:', props.quote.portal_url);
+    prompt(t('Kopieer de link handmatig:'), props.quote.portal_url);
   }
 };
 
 const destroy = () => {
-  if (confirm('Concept verwijderen?')) {
+  if (confirm(t('Concept verwijderen?'))) {
     router.delete(route('quotes.destroy', props.quote.id));
   }
 };
@@ -97,7 +101,7 @@ const uploadAttachments = (event) => {
 };
 
 const removeAttachment = (att) => {
-  if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
+  if (confirm(t('Bijlage ":name" verwijderen?', { name: att.filename }))) {
     router.delete(route('attachments.destroy', att.id), { preserveScroll: true });
   }
 };
@@ -110,22 +114,22 @@ const toggleAttachmentVisibility = (att) => {
 const installmentsError = computed(() => (page.props.errors || {}).installments ?? null);
 const showPlanner = ref(false);
 const planRows = ref([
-  { description: 'Termijn 1: bij opdracht', percentage: 30 },
-  { description: 'Termijn 2: bij oplevering', percentage: 70 },
+  { description: t('Termijn 1: bij opdracht'), percentage: 30 },
+  { description: t('Termijn 2: bij oplevering'), percentage: 70 },
 ]);
 
 const applyPreset = (parts) => {
   const labels = {
-    2: ['bij opdracht', 'bij oplevering'],
-    3: ['bij opdracht', 'tussentijds', 'bij oplevering'],
+    2: [t('bij opdracht'), t('bij oplevering')],
+    3: [t('bij opdracht'), t('tussentijds'), t('bij oplevering')],
   };
   planRows.value = parts.map((pct, i) => ({
-    description: `Termijn ${i + 1}: ${(labels[parts.length] || [])[i] || ''}`.trim(),
+    description: `${t('Termijn :n', { n: i + 1 })}: ${(labels[parts.length] || [])[i] || ''}`.trim(),
     percentage: pct,
   }));
 };
 
-const addPlanRow = () => planRows.value.push({ description: `Termijn ${planRows.value.length + 1}`, percentage: 0 });
+const addPlanRow = () => planRows.value.push({ description: t('Termijn :n', { n: planRows.value.length + 1 }), percentage: 0 });
 const removePlanRow = (i) => { if (planRows.value.length > 2) planRows.value.splice(i, 1); };
 
 const planSum = computed(() => Math.round(planRows.value.reduce((s, r) => s + (Number(r.percentage) || 0), 0) * 100) / 100);
@@ -138,13 +142,13 @@ const savePlan = () => {
 };
 
 const deletePlan = () => {
-  if (confirm('Termijnplan verwijderen? De offerte kan daarna weer in één keer worden gefactureerd.')) {
+  if (confirm(t('Termijnplan verwijderen? De offerte kan daarna weer in één keer worden gefactureerd.'))) {
     router.delete(route('quotes.installments.destroy', props.quote.id), { preserveScroll: true });
   }
 };
 
 const invoiceInstallment = (inst) => {
-  if (confirm(`Conceptfactuur maken voor "${inst.description}" (${eur(inst.amount)})?`)) {
+  if (confirm(t('Conceptfactuur maken voor ":description" (:amount)?', { description: inst.description, amount: eur(inst.amount) }))) {
     router.post(route('quotes.installments.invoice', [props.quote.id, inst.id]));
   }
 };
@@ -153,12 +157,12 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 </script>
 
 <template>
-  <Head :title="`Offerte ${quote.number || 'concept'}`" />
+  <Head :title="$t('Offerte :number', { number: quote.number || $t('concept') })" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Verkoop / <Link :href="route('quotes.index')" style="color:var(--text-3);">Offertes</Link> /
-        <span class="breadcrumb-current">{{ quote.number || 'Concept' }}</span>
+        {{ $t('Verkoop') }} / <Link :href="route('quotes.index')" style="color:var(--text-3);">{{ $t('Offertes') }}</Link> /
+        <span class="breadcrumb-current">{{ quote.number || $t('Concept') }}</span>
       </div>
     </template>
 
@@ -166,16 +170,16 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       <div>
         <Link :href="route('quotes.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Terug
+          {{ $t('Terug') }}
         </Link>
-        <h1 class="page-title">Offerte {{ quote.number || '— concept —' }}</h1>
+        <h1 class="page-title">{{ $t('Offerte') }} {{ quote.number || $t('— concept —') }}</h1>
         <p class="page-subtitle">
-          <template v-if="quote.status === 'draft'">Concept · nog niet verstuurd</template>
-          <template v-else-if="quote.status === 'accepted'">Geaccepteerd op {{ quote.accepted_at_label }}<template v-if="quote.accept_mail_sent_at_label"> · bevestiging gemaild {{ quote.accept_mail_sent_at_label }}</template></template>
-          <template v-else-if="quote.status === 'rejected'">Afgewezen op {{ quote.rejected_at_label }}</template>
-          <template v-else-if="quote.sent_at_label">Verstuurd op {{ quote.sent_at_label }}</template>
-          <template v-if="quote.brand_profile_name"> · als <b>{{ quote.brand_profile_name }}</b></template>
-          <template v-if="quote.language === 'en'"> · Engelstalig</template>
+          <template v-if="quote.status === 'draft'">{{ $t('Concept · nog niet verstuurd') }}</template>
+          <template v-else-if="quote.status === 'accepted'">{{ $t('Geaccepteerd op :date', { date: quote.accepted_at_label }) }}<template v-if="quote.accept_mail_sent_at_label"> · {{ $t('bevestiging gemaild :date', { date: quote.accept_mail_sent_at_label }) }}</template></template>
+          <template v-else-if="quote.status === 'rejected'">{{ $t('Afgewezen op :date', { date: quote.rejected_at_label }) }}</template>
+          <template v-else-if="quote.sent_at_label">{{ $t('Verstuurd op :date', { date: quote.sent_at_label }) }}</template>
+          <template v-if="quote.brand_profile_name"> · {{ $t('als') }} <b>{{ quote.brand_profile_name }}</b></template>
+          <template v-if="quote.language === 'en'"> · {{ $t('Engelstalig') }}</template>
         </p>
       </div>
       <div class="page-actions">
@@ -186,16 +190,16 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <button
           v-if="quote.status === 'accepted' && quote.customer_email"
           class="btn btn-secondary btn-sm"
-          :title="quote.accept_mail_sent_at_label ? `Bevestiging gemaild op ${quote.accept_mail_sent_at_label} — nogmaals sturen` : 'Stuur de klant een bevestiging van het akkoord, met de offerte als PDF'"
+          :title="quote.accept_mail_sent_at_label ? $t('Bevestiging gemaild op :date — nogmaals sturen', { date: quote.accept_mail_sent_at_label }) : $t('Stuur de klant een bevestiging van het akkoord, met de offerte als PDF')"
           @click="sendConfirmation"
         >
-          {{ quote.accept_mail_sent_at_label ? 'Bevestiging opnieuw mailen' : 'Bevestiging mailen' }}
+          {{ quote.accept_mail_sent_at_label ? $t('Bevestiging opnieuw mailen') : $t('Bevestiging mailen') }}
         </button>
-        <Link v-if="canEdit" :href="route('quotes.edit', quote.id)" class="btn btn-secondary btn-sm">Bewerken</Link>
-        <button v-if="quote.status === 'draft'" class="btn btn-danger btn-sm" @click="destroy">Verwijder</button>
+        <Link v-if="canEdit" :href="route('quotes.edit', quote.id)" class="btn btn-secondary btn-sm">{{ $t('Bewerken') }}</Link>
+        <button v-if="quote.status === 'draft'" class="btn btn-danger btn-sm" @click="destroy">{{ $t('Verwijder') }}</button>
         <button v-if="canEdit" class="btn btn-primary btn-sm" @click="send">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          {{ quote.status === 'sent' ? 'Opnieuw versturen' : 'Versturen' }}
+          {{ quote.status === 'sent' ? $t('Opnieuw versturen') : $t('Versturen') }}
         </button>
       </div>
     </div>
@@ -208,14 +212,14 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     <!-- Beslisbalk: wat is er met dit voorstel gebeurd? -->
     <div v-if="isOpen" class="decide">
       <div class="decide-text">
-        <strong>Wat heeft de klant besloten?</strong>
-        <span v-if="quote.status === 'expired'">Deze offerte is verlopen op {{ quote.valid_until_label }}, maar je kunt hem alsnog afronden.</span>
-        <span v-else-if="quote.days_left > 0">Nog {{ quote.days_left }} {{ quote.days_left === 1 ? 'dag' : 'dagen' }} geldig.</span>
+        <strong>{{ $t('Wat heeft de klant besloten?') }}</strong>
+        <span v-if="quote.status === 'expired'">{{ $t('Deze offerte is verlopen op :date, maar je kunt hem alsnog afronden.', { date: quote.valid_until_label }) }}</span>
+        <span v-else-if="quote.days_left > 0">{{ quote.days_left === 1 ? $t('Nog 1 dag geldig.') : $t('Nog :n dagen geldig.', { n: quote.days_left }) }}</span>
       </div>
       <div class="decide-actions">
-        <button v-if="quote.can_installments && !(quote.installments || []).length" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">In termijnen</button>
-        <button class="btn btn-secondary btn-sm" @click="reject">Afgewezen</button>
-        <button class="btn btn-primary btn-sm" @click="showAcceptModal = true">Geaccepteerd</button>
+        <button v-if="quote.can_installments && !(quote.installments || []).length" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">{{ $t('In termijnen') }}</button>
+        <button class="btn btn-secondary btn-sm" @click="reject">{{ $t('Afgewezen') }}</button>
+        <button class="btn btn-primary btn-sm" @click="showAcceptModal = true">{{ $t('Geaccepteerd') }}</button>
       </div>
     </div>
 
@@ -223,20 +227,20 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     <div v-if="showAcceptModal" class="modal-overlay" @click.self="showAcceptModal = false">
       <div class="modal">
         <div class="modal-header">
-          <div class="modal-title">Offerte markeren als geaccepteerd</div>
+          <div class="modal-title">{{ $t('Offerte markeren als geaccepteerd') }}</div>
           <button class="icon-btn" @click="showAcceptModal = false">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="modal-body">
-          <p class="modal-text">De klant is akkoord (bijv. per telefoon of e-mail). De offerte krijgt de status <b>Geaccepteerd</b>; daarna kun je hem omzetten naar een factuur.</p>
+          <p class="modal-text" v-html="$t('De klant is akkoord (bijv. per telefoon of e-mail). De offerte krijgt de status <b>Geaccepteerd</b>; daarna kun je hem omzetten naar een factuur.')"></p>
           <label class="opt" :class="{ on: acceptForm.send_confirmation && quote.customer_email, off: !quote.customer_email }">
             <input type="checkbox" v-model="acceptForm.send_confirmation" :disabled="!quote.customer_email">
             <div>
-              <div class="opt-title">Bevestiging mailen naar de klant</div>
+              <div class="opt-title">{{ $t('Bevestiging mailen naar de klant') }}</div>
               <div class="opt-sub">
-                <template v-if="!quote.customer_email">Deze klant heeft geen e-mailadres.</template>
-                <template v-else>Stuurt direct een bevestiging van het akkoord naar {{ quote.customer_email }}, met de offerte als PDF.</template>
+                <template v-if="!quote.customer_email">{{ $t('Deze klant heeft geen e-mailadres.') }}</template>
+                <template v-else>{{ $t('Stuurt direct een bevestiging van het akkoord naar :email, met de offerte als PDF.', { email: quote.customer_email }) }}</template>
               </div>
             </div>
           </label>
@@ -244,8 +248,8 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <div class="modal-footer">
           <div></div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-secondary btn-sm" @click="showAcceptModal = false">Annuleren</button>
-            <button class="btn btn-primary btn-sm" @click="accept" :disabled="acceptForm.processing">Markeren als geaccepteerd</button>
+            <button class="btn btn-secondary btn-sm" @click="showAcceptModal = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" @click="accept" :disabled="acceptForm.processing">{{ $t('Markeren als geaccepteerd') }}</button>
           </div>
         </div>
       </div>
@@ -253,12 +257,12 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 
     <div v-if="quote.status === 'accepted' && !quote.invoice && !(quote.installments || []).length" class="decide accepted">
       <div class="decide-text">
-        <strong>De klant is akkoord.</strong>
-        <span>Zet de offerte om in een factuur — of factureer in termijnen (bijv. 30% vooraf).</span>
+        <strong>{{ $t('De klant is akkoord.') }}</strong>
+        <span>{{ $t('Zet de offerte om in een factuur — of factureer in termijnen (bijv. 30% vooraf).') }}</span>
       </div>
       <div class="decide-actions">
-        <button v-if="quote.can_installments" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">In termijnen</button>
-        <button class="btn btn-primary btn-sm" @click="convert">Omzetten naar factuur</button>
+        <button v-if="quote.can_installments" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">{{ $t('In termijnen') }}</button>
+        <button class="btn btn-primary btn-sm" @click="convert">{{ $t('Omzetten naar factuur') }}</button>
       </div>
     </div>
 
@@ -267,30 +271,30 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       <div class="sig-info">
         <div class="sig-title">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
-          Digitaal ondertekend
+          {{ $t('Digitaal ondertekend') }}
         </div>
-        <div class="sig-line">Door <strong>{{ quote.signed_name }}</strong> op {{ quote.signed_at_label }}</div>
-        <div class="sig-meta">Geverifieerd e-mailadres: {{ quote.signed_email }} · IP: {{ quote.signed_ip }}</div>
-        <div class="sig-meta" v-if="quote.accept_mail_sent_at_label">✓ Bevestiging gemaild naar {{ quote.accept_mail_sent_to }} op {{ quote.accept_mail_sent_at_label }}</div>
+        <div class="sig-line" v-html="$t('Door <strong>:name</strong> op :date', { name: esc(quote.signed_name), date: esc(quote.signed_at_label) })"></div>
+        <div class="sig-meta">{{ $t('Geverifieerd e-mailadres') }}: {{ quote.signed_email }} · IP: {{ quote.signed_ip }}</div>
+        <div class="sig-meta" v-if="quote.accept_mail_sent_at_label">✓ {{ $t('Bevestiging gemaild naar :email op :date', { email: quote.accept_mail_sent_to, date: quote.accept_mail_sent_at_label }) }}</div>
       </div>
-      <img v-if="quote.signature_data" :src="quote.signature_data" alt="Handtekening" class="sig-img">
+      <img v-if="quote.signature_data" :src="quote.signature_data" :alt="$t('Handtekening')" class="sig-img">
     </div>
 
     <!-- Ondertekenlink delen (bijv. via WhatsApp) -->
     <div v-if="quote.portal_url && ['sent', 'expired'].includes(quote.status)" class="sig-share">
-      <span>Je klant kan de offerte online bekijken en <b>digitaal ondertekenen</b> via de beveiligde link uit de mail.</span>
+      <span v-html="$t('Je klant kan de offerte online bekijken en <b>digitaal ondertekenen</b> via de beveiligde link uit de mail.')"></span>
       <button type="button" class="btn btn-secondary btn-sm" @click="copySignLink">
-        {{ signLinkCopied ? 'Gekopieerd ✓' : 'Kopieer ondertekenlink' }}
+        {{ signLinkCopied ? $t('Gekopieerd ✓') : $t('Kopieer ondertekenlink') }}
       </button>
     </div>
 
     <div v-if="quote.invoice" class="decide accepted">
       <div class="decide-text">
-        <strong>Gefactureerd.</strong>
-        <span>Deze offerte is omgezet in factuur {{ quote.invoice.number || '(concept)' }}.</span>
+        <strong>{{ $t('Gefactureerd.') }}</strong>
+        <span>{{ $t('Deze offerte is omgezet in factuur :number.', { number: quote.invoice.number || $t('(concept)') }) }}</span>
       </div>
       <div class="decide-actions">
-        <Link :href="route('invoices.show', quote.invoice.id)" class="btn btn-secondary btn-sm">Bekijk factuur</Link>
+        <Link :href="route('invoices.show', quote.invoice.id)" class="btn btn-secondary btn-sm">{{ $t('Bekijk factuur') }}</Link>
       </div>
     </div>
 
@@ -303,24 +307,24 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     <div v-if="(quote.installments || []).length" class="card term-card">
       <div class="card-header">
         <div>
-          <div class="card-title">Termijnfacturen</div>
-          <div class="card-subtitle">{{ invoicedCount }} van {{ quote.installments.length }} termijnen gefactureerd · samen {{ eur(quote.total) }}</div>
+          <div class="card-title">{{ $t('Termijnfacturen') }}</div>
+          <div class="card-subtitle">{{ $t(':done van :total termijnen gefactureerd · samen :amount', { done: invoicedCount, total: quote.installments.length, amount: eur(quote.total) }) }}</div>
         </div>
-        <button v-if="!quote.installments_locked" type="button" class="btn btn-secondary btn-sm" @click="deletePlan">Plan verwijderen</button>
+        <button v-if="!quote.installments_locked" type="button" class="btn btn-secondary btn-sm" @click="deletePlan">{{ $t('Plan verwijderen') }}</button>
       </div>
       <div class="card-body" style="padding-top:6px;">
         <div v-for="(inst, i) in quote.installments" :key="inst.id" class="term-row">
           <div class="term-num" :class="{ done: inst.invoice }">{{ i + 1 }}</div>
           <div class="term-info">
             <div class="term-desc">{{ inst.description }}</div>
-            <div class="term-sub">{{ Number(inst.percentage).toLocaleString('nl-NL') }}% · {{ eur(inst.amount) }} incl. btw</div>
+            <div class="term-sub">{{ Number(inst.percentage).toLocaleString(marketLocale) }}% · {{ eur(inst.amount) }} {{ $t('incl. btw') }}</div>
           </div>
           <div class="term-action">
             <Link v-if="inst.invoice" :href="route('invoices.show', inst.invoice.id)" class="pill pill-paid" style="text-decoration:none;">
-              {{ inst.invoice.number || 'Concept' }}
+              {{ inst.invoice.number || $t('Concept') }}
             </Link>
-            <button v-else-if="inst.is_next" type="button" class="btn btn-primary btn-sm" @click="invoiceInstallment(inst)">Maak factuur</button>
-            <span v-else class="pill pill-draft">Wacht op eerdere termijn</span>
+            <button v-else-if="inst.is_next" type="button" class="btn btn-primary btn-sm" @click="invoiceInstallment(inst)">{{ $t('Maak factuur') }}</button>
+            <span v-else class="pill pill-draft">{{ $t('Wacht op eerdere termijn') }}</span>
           </div>
         </div>
       </div>
@@ -330,8 +334,8 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     <div v-else-if="showPlanner && quote.can_installments" class="card term-card">
       <div class="card-header">
         <div>
-          <div class="card-title">In termijnen factureren</div>
-          <div class="card-subtitle">Verdeel {{ eur(quote.total) }} over termijnen — de laatste termijn wordt automatisch het restant</div>
+          <div class="card-title">{{ $t('In termijnen factureren') }}</div>
+          <div class="card-subtitle">{{ $t('Verdeel :amount over termijnen — de laatste termijn wordt automatisch het restant', { amount: eur(quote.total) }) }}</div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button type="button" class="btn btn-secondary btn-sm" @click="applyPreset([30, 70])">30 / 70</button>
@@ -341,17 +345,17 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       </div>
       <div class="card-body">
         <div v-for="(row, i) in planRows" :key="i" class="term-edit-row">
-          <input type="text" v-model="row.description" maxlength="200" placeholder="Omschrijving (komt op de factuur)">
+          <input type="text" v-model="row.description" maxlength="200" :placeholder="$t('Omschrijving (komt op de factuur)')">
           <input type="number" v-model.number="row.percentage" min="0.01" max="100" step="0.01" class="num right" style="width:90px;">
           <span class="term-pct">%</span>
-          <button type="button" class="li-remove-sm" :disabled="planRows.length <= 2" @click="removePlanRow(i)" title="Termijn verwijderen">✕</button>
+          <button type="button" class="li-remove-sm" :disabled="planRows.length <= 2" @click="removePlanRow(i)" :title="$t('Termijn verwijderen')">✕</button>
         </div>
         <div class="term-foot">
-          <button type="button" class="btn btn-ghost btn-sm" @click="addPlanRow">+ Termijn toevoegen</button>
+          <button type="button" class="btn btn-ghost btn-sm" @click="addPlanRow">+ {{ $t('Termijn toevoegen') }}</button>
           <div :style="{ color: Math.abs(planSum - 100) > 0.01 ? 'var(--brand-dark)' : 'var(--success)', fontWeight: 600, fontSize: '13px' }">
-            Totaal: {{ planSum.toLocaleString('nl-NL') }}%
+            {{ $t('Totaal') }}: {{ planSum.toLocaleString(marketLocale) }}%
           </div>
-          <button type="button" class="btn btn-primary btn-sm" :disabled="Math.abs(planSum - 100) > 0.01" @click="savePlan">Plan opslaan</button>
+          <button type="button" class="btn btn-primary btn-sm" :disabled="Math.abs(planSum - 100) > 0.01" @click="savePlan">{{ $t('Plan opslaan') }}</button>
         </div>
       </div>
     </div>
@@ -360,27 +364,27 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       <div class="inv-detail-header">
         <div class="inv-detail-top">
           <div>
-            <div class="inv-number">{{ quote.number || '— concept —' }}</div>
+            <div class="inv-number">{{ quote.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;">
               <span class="pill" :class="pillClass">{{ quote.status_label }}</span>
             </div>
           </div>
           <div style="text-align:right">
-            <div class="inv-meta-label" style="margin-bottom:6px;">Totaal</div>
+            <div class="inv-meta-label" style="margin-bottom:6px;">{{ $t('Totaal') }}</div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.02em;">{{ eur(quote.total) }}</div>
           </div>
         </div>
         <div class="inv-detail-meta">
           <div>
-            <div class="inv-meta-label">Offertedatum</div>
+            <div class="inv-meta-label">{{ $t('Offertedatum') }}</div>
             <div class="inv-meta-value">{{ quote.quote_date_label }}</div>
           </div>
           <div>
-            <div class="inv-meta-label">Geldig tot</div>
+            <div class="inv-meta-label">{{ $t('Geldig tot') }}</div>
             <div class="inv-meta-value">{{ quote.valid_until_label }}</div>
           </div>
           <div v-if="quote.reference">
-            <div class="inv-meta-label">Referentie</div>
+            <div class="inv-meta-label">{{ $t('Referentie') }}</div>
             <div class="inv-meta-value mono">{{ quote.reference }}</div>
           </div>
         </div>
@@ -389,13 +393,13 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       <div class="inv-body">
         <div class="inv-parties">
           <div>
-            <div class="inv-party-label">Van</div>
+            <div class="inv-party-label">{{ $t('Van') }}</div>
             <div class="inv-party-name">{{ company.name }}</div>
             <div v-if="company.address_line" class="inv-party-line">{{ company.address_line }}</div>
             <div v-if="company.postal_code || company.city" class="inv-party-line">{{ company.postal_code }} {{ company.city }}</div>
           </div>
           <div>
-            <div class="inv-party-label">Voor</div>
+            <div class="inv-party-label">{{ $t('Voor') }}</div>
             <div class="inv-party-name">{{ quote.customer_name }}</div>
             <div v-if="quote.customer_address_line" class="inv-party-line">{{ quote.customer_address_line }}</div>
             <div v-if="quote.customer_postal_code || quote.customer_city" class="inv-party-line">
@@ -410,11 +414,11 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <table class="inv-lines stacked-table">
           <thead>
             <tr>
-              <th style="width:55%">Omschrijving</th>
-              <th style="text-align:right">Aantal</th>
-              <th style="text-align:right">Prijs</th>
-              <th style="text-align:center">BTW</th>
-              <th style="text-align:right">Totaal</th>
+              <th style="width:55%">{{ $t('Omschrijving') }}</th>
+              <th style="text-align:right">{{ $t('Aantal') }}</th>
+              <th style="text-align:right">{{ $t('Prijs') }}</th>
+              <th style="text-align:center">{{ $t('BTW') }}</th>
+              <th style="text-align:right">{{ $t('Totaal') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -423,34 +427,34 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
                 <div style="font-weight:500;margin-bottom:2px;">{{ line.description }}</div>
                 <div v-if="line.details" style="font-size:12px;color:var(--text-3);">{{ line.details }}</div>
               </td>
-              <td class="mono" style="text-align:right" data-label="Aantal">{{ Number(line.quantity) }}</td>
-              <td class="mono" style="text-align:right" data-label="Prijs">
+              <td class="mono" style="text-align:right" :data-label="$t('Aantal')">{{ Number(line.quantity) }}</td>
+              <td class="mono" style="text-align:right" :data-label="$t('Prijs')">
                 {{ eur(line.unit_price) }}
-                <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% korting</span>
+                <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% {{ $t('korting') }}</span>
               </td>
-              <td style="text-align:center" data-label="BTW">{{ Number(line.vat_rate) }}%</td>
-              <td class="mono" style="text-align:right" data-label="Totaal">{{ eur(line.line_subtotal) }}</td>
+              <td style="text-align:center" :data-label="$t('BTW')">{{ Number(line.vat_rate) }}%</td>
+              <td class="mono" style="text-align:right" :data-label="$t('Totaal')">{{ eur(line.line_subtotal) }}</td>
             </tr>
           </tbody>
         </table>
 
         <div class="inv-totals">
           <div class="inv-total-row">
-            <span class="label">Subtotaal</span>
+            <span class="label">{{ $t('Subtotaal') }}</span>
             <span class="value mono">{{ eur(quote.subtotal) }}</span>
           </div>
           <div v-for="(amount, rate) in quote.vat_breakdown" :key="rate" class="inv-total-row">
-            <span class="label">BTW {{ Number(rate) }}%</span>
+            <span class="label">{{ $t('BTW') }} {{ Number(rate) }}%</span>
             <span class="value mono">{{ eur(amount) }}</span>
           </div>
           <div class="inv-total-row grand">
-            <span class="label">Totaal</span>
+            <span class="label">{{ $t('Totaal') }}</span>
             <span class="value mono">{{ eur(quote.total) }}</span>
           </div>
         </div>
 
         <div v-if="quote.notes" style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-3);">
-          <div style="margin-bottom:8px;color:var(--text-2);font-weight:500;">Opmerking</div>
+          <div style="margin-bottom:8px;color:var(--text-2);font-weight:500;">{{ $t('Opmerking') }}</div>
           {{ quote.notes }}
         </div>
       </div>
@@ -460,19 +464,19 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     <div class="card" style="margin-top:16px;">
       <div class="card-header">
         <div>
-          <div class="card-title">Bijlagen</div>
-          <div class="card-subtitle">Bijv. een specificatie of plan van aanpak — gaat mee met de offertemail naar de klant</div>
+          <div class="card-title">{{ $t('Bijlagen') }}</div>
+          <div class="card-subtitle">{{ $t('Bijv. een specificatie of plan van aanpak — gaat mee met de offertemail naar de klant') }}</div>
         </div>
         <div>
           <input ref="attFileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadAttachments">
           <button class="btn btn-secondary btn-sm" :disabled="attUploading" @click="attFileInput?.click()">
-            {{ attUploading ? 'Uploaden…' : 'Bijlage toevoegen' }}
+            {{ attUploading ? $t('Uploaden…') : $t('Bijlage toevoegen') }}
           </button>
         </div>
       </div>
       <div class="card-body">
         <div v-if="!quote.attachments || quote.attachments.length === 0" class="qa-empty">
-          Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand.
+          {{ $t('Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand.') }}
         </div>
         <div v-else>
           <div v-for="att in quote.attachments" :key="att.id" class="qa-row">
@@ -485,13 +489,13 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
             </div>
             <button
               class="btn btn-ghost btn-sm"
-              :title="att.for_customer ? 'Gaat mee met de offertemail — klik om alleen intern te maken' : 'Alleen intern — klik om mee te sturen naar de klant'"
+              :title="att.for_customer ? $t('Gaat mee met de offertemail — klik om alleen intern te maken') : $t('Alleen intern — klik om mee te sturen naar de klant')"
               @click="toggleAttachmentVisibility(att)"
             >
-              {{ att.for_customer ? 'Voor de klant ✓' : 'Alleen intern' }}
+              {{ att.for_customer ? $t('Voor de klant ✓') : $t('Alleen intern') }}
             </button>
-            <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">Download</a>
-            <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">Verwijder</button>
+            <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">{{ $t('Download') }}</a>
+            <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">{{ $t('Verwijder') }}</button>
           </div>
         </div>
       </div>

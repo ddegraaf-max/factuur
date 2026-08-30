@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   reminders: Object,
@@ -14,20 +15,20 @@ const timeline = computed(() => {
   const r = form;
   const basePT = props.default_payment_terms || 7;
   const events = [];
-  events.push({ type: 'send', day: 0, name: 'Factuur versturen' });
-  events.push({ type: 'sub',  day: basePT, name: 'Einde betaaltermijn' });
+  events.push({ type: 'send', day: 0, name: t('Factuur versturen') });
+  events.push({ type: 'sub',  day: basePT, name: t('Einde betaaltermijn') });
   let day = basePT + 1 + (Number(r.reminder_delay) || 0);
   for (let i = 1; i <= r.num_reminders; i++) {
-    events.push({ type: 'reminder', day, name: i === 1 ? 'Eerste herinnering' : i === 2 ? 'Tweede herinnering' : `${i}e herinnering` });
+    events.push({ type: 'reminder', day, name: i === 1 ? t('Eerste herinnering') : i === 2 ? t('Tweede herinnering') : t(':ne herinnering', { n: i }) });
     day += Number(r.payment_term_reminder) || 0;
-    events.push({ type: 'sub', day, name: 'Einde betaaltermijn' });
+    events.push({ type: 'sub', day, name: t('Einde betaaltermijn') });
     day += 1;
   }
   day += Number(r.warning_delay) || 0;
   for (let i = 1; i <= 2; i++) {
-    events.push({ type: 'warning', day, name: i === 1 ? 'Eerste aanmaning' : 'Tweede aanmaning' });
+    events.push({ type: 'warning', day, name: i === 1 ? t('Eerste aanmaning') : t('Tweede aanmaning') });
     day += Number(r.payment_term_warning) || 0;
-    events.push({ type: 'sub', day, name: 'Einde betaaltermijn' });
+    events.push({ type: 'sub', day, name: t('Einde betaaltermijn') });
     day += 1;
   }
   return events;
@@ -37,105 +38,105 @@ const submit = () => form.patch(route('settings.reminders.update'), { preserveSc
 </script>
 
 <template>
-  <Head title="Herinneringen" />
+  <Head :title="$t('Herinneringen')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Herinneringen</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Herinneringen') }}</span></template>
     <template #topbar-actions>
-      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">Opslaan</button>
+      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">{{ $t('Opslaan') }}</button>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Herinneringen en aanmaningen</h1>
-        <p class="page-subtitle">Stel het herinneringsschema in voor te late betalers</p>
+        <h1 class="page-title">{{ $t('Herinneringen en aanmaningen') }}</h1>
+        <p class="page-subtitle">{{ $t('Stel het herinneringsschema in voor te late betalers') }}</p>
       </div>
     </div>
 
     <div class="single-col">
       <div class="card">
-        <div class="card-header"><div class="card-title">Herinneringen en aanmaningen</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Herinneringen en aanmaningen') }}</div></div>
         <div class="card-body">
           <div class="setting-line">
-            <div>Betaaltermijn herinnering</div>
-            <div><input type="number" v-model.number="form.payment_term_reminder" min="0" max="60" /> <span>dagen</span></div>
+            <div>{{ $t('Betaaltermijn herinnering') }}</div>
+            <div><input type="number" v-model.number="form.payment_term_reminder" min="0" max="60" /> <span>{{ $t('dagen') }}</span></div>
           </div>
           <div class="setting-line">
-            <div>Betaaltermijn aanmaning</div>
-            <div><input type="number" v-model.number="form.payment_term_warning" min="0" max="60" /> <span>dagen</span></div>
+            <div>{{ $t('Betaaltermijn aanmaning') }}</div>
+            <div><input type="number" v-model.number="form.payment_term_warning" min="0" max="60" /> <span>{{ $t('dagen') }}</span></div>
           </div>
           <div class="setting-line">
-            <div>Aantal herinneringen</div>
+            <div>{{ $t('Aantal herinneringen') }}</div>
             <div><input type="number" v-model.number="form.num_reminders" min="0" max="5" /></div>
           </div>
           <div class="setting-line">
-            <div>Tweede herinnering e-mail</div>
+            <div>{{ $t('Tweede herinnering e-mail') }}</div>
             <div>
               <select v-model="form.second_reminder_email">
-                <option value="first">Als eerste herinnering</option>
-                <option value="custom">Eigen tekst</option>
+                <option value="first">{{ $t('Als eerste herinnering') }}</option>
+                <option value="custom">{{ $t('Eigen tekst') }}</option>
               </select>
             </div>
           </div>
           <div class="setting-line">
-            <div>Negatief openstaand bedrag</div>
+            <div>{{ $t('Negatief openstaand bedrag') }}</div>
             <div>
-              <label><input type="checkbox" v-model="form.negative_outstanding" /> Stuur wel herinneringen indien het openstaand bedrag negatief is.</label>
+              <label><input type="checkbox" v-model="form.negative_outstanding" /> {{ $t('Stuur wel herinneringen indien het openstaand bedrag negatief is.') }}</label>
             </div>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-top:14px;">
-        <div class="card-header"><div class="card-title">Later herinneren en/of aanmanen</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Later herinneren en/of aanmanen') }}</div></div>
         <div class="card-body">
           <div class="setting-line">
-            <div>Herinneringen later versturen</div>
-            <div><input type="number" v-model.number="form.reminder_delay" min="0" max="30" /> <span>dagen</span></div>
+            <div>{{ $t('Herinneringen later versturen') }}</div>
+            <div><input type="number" v-model.number="form.reminder_delay" min="0" max="30" /> <span>{{ $t('dagen') }}</span></div>
           </div>
           <div class="setting-line">
-            <div>Aanmaningen later versturen</div>
-            <div><input type="number" v-model.number="form.warning_delay" min="0" max="30" /> <span>dagen</span></div>
+            <div>{{ $t('Aanmaningen later versturen') }}</div>
+            <div><input type="number" v-model.number="form.warning_delay" min="0" max="30" /> <span>{{ $t('dagen') }}</span></div>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-top:14px;">
-        <div class="card-header"><div class="card-title">Teksten</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Teksten') }}</div></div>
         <div class="card-body" style="padding:18px 20px;">
           <p class="txt-help">
-            Deze teksten worden verstuurd. Gebruik variabelen — ze worden automatisch ingevuld:
+            {{ $t('Deze teksten worden verstuurd. Gebruik variabelen — ze worden automatisch ingevuld:') }}
             <code>{klant}</code> <code>{factuurnummer}</code> <code>{factuurdatum}</code>
             <code>{vervaldatum}</code> <code>{bedrag}</code> <code>{openstaand}</code>
             <code>{termijn}</code> <code>{iban}</code> <code>{bedrijf}</code>
           </p>
 
           <div class="txt-block">
-            <div class="txt-label">Herinnering — onderwerp</div>
+            <div class="txt-label">{{ $t('Herinnering — onderwerp') }}</div>
             <input type="text" v-model="form.reminder_subject" />
-            <div class="txt-label">Herinnering — bericht</div>
+            <div class="txt-label">{{ $t('Herinnering — bericht') }}</div>
             <textarea v-model="form.reminder_body" rows="8"></textarea>
           </div>
 
           <div class="txt-block">
-            <div class="txt-label">Aanmaning — onderwerp</div>
+            <div class="txt-label">{{ $t('Aanmaning — onderwerp') }}</div>
             <input type="text" v-model="form.warning_subject" />
-            <div class="txt-label">Aanmaning — bericht</div>
+            <div class="txt-label">{{ $t('Aanmaning — bericht') }}</div>
             <textarea v-model="form.warning_body" rows="8"></textarea>
           </div>
         </div>
       </div>
 
       <div class="tl-preview-card">
-        <div class="tl-title">Hoe werken betalingsherinneringen op basis van jouw instellingen?</div>
+        <div class="tl-title">{{ $t('Hoe werken betalingsherinneringen op basis van jouw instellingen?') }}</div>
         <div class="reminder-timeline">
           <template v-for="(e, i) in timeline" :key="i">
             <div v-if="e.type === 'sub'" class="tl-row sub">
-              <span class="tl-day">Dag {{ e.day }}</span>
+              <span class="tl-day">{{ $t('Dag :n', { n: e.day }) }}</span>
               <span class="tl-name">{{ e.name }}</span>
             </div>
             <div v-else class="tl-row main" :class="e.type">
               <span class="tl-dot"></span>
-              <span class="tl-day">Dag {{ e.day }}</span>
+              <span class="tl-day">{{ $t('Dag :n', { n: e.day }) }}</span>
               <span class="tl-name">{{ e.name }}</span>
             </div>
           </template>

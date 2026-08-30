@@ -44,30 +44,30 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
 </script>
 
 <template>
-  <Head title="Beveiliging instellen" />
+  <Head :title="$t('Beveiliging instellen')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / Beveiliging / <span class="breadcrumb-current">Activeren</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / {{ $t('Beveiliging') }} / <span class="breadcrumb-current">{{ $t('Activeren') }}</span></template>
 
     <div class="single-col">
       <div class="card">
         <div class="card-body">
           <div class="wizard-stepper">
             <div class="step" :class="{ active: step === 'qr' }">
-              <div class="num">1</div><span>Scan QR-code</span>
+              <div class="num">1</div><span>{{ $t('Scan QR-code') }}</span>
             </div>
             <div class="div"></div>
             <div class="step" :class="{ active: step === 'qr' }">
-              <div class="num">2</div><span>Verifiëren</span>
+              <div class="num">2</div><span>{{ $t('Verifiëren') }}</span>
             </div>
             <div class="div"></div>
             <div class="step" :class="{ active: step === 'backup' }">
-              <div class="num">3</div><span>Backup codes</span>
+              <div class="num">3</div><span>{{ $t('Backup codes') }}</span>
             </div>
           </div>
 
           <div v-if="step === 'qr'" class="wizard-content">
-            <h2>Koppel je authenticator app</h2>
-            <p class="muted">Scan de QR-code met Google Authenticator, Authy of 1Password — of typ de geheime code handmatig over.</p>
+            <h2>{{ $t('Koppel je authenticator app') }}</h2>
+            <p class="muted">{{ $t('Scan de QR-code met Google Authenticator, Authy of 1Password — of typ de geheime code handmatig over.') }}</p>
 
             <div class="qr-layout">
               <div class="qr-box">
@@ -76,13 +76,13 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
               </div>
               <div class="qr-instructions">
                 <ol>
-                  <li>Download een authenticator-app uit je app store</li>
-                  <li>Tik op "Account toevoegen" / "+"</li>
-                  <li>Scan deze QR met je telefoon</li>
-                  <li>Voer hieronder de 6-cijferige code in</li>
+                  <li>{{ $t('Download een authenticator-app uit je app store') }}</li>
+                  <li>{{ $t('Tik op "Account toevoegen" / "+"') }}</li>
+                  <li>{{ $t('Scan deze QR met je telefoon') }}</li>
+                  <li>{{ $t('Voer hieronder de 6-cijferige code in') }}</li>
                 </ol>
                 <div class="manual-key">
-                  <div class="key-label">Of voer handmatig in:</div>
+                  <div class="key-label">{{ $t('Of voer handmatig in:') }}</div>
                   <div class="key-value">{{ secret }}</div>
                 </div>
               </div>
@@ -100,8 +100,8 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
             </div>
 
             <div class="wizard-footer">
-              <button class="btn btn-secondary" @click="cancel">Annuleren</button>
-              <button class="btn btn-primary" @click="verify" :disabled="form.processing">Verifiëren</button>
+              <button class="btn btn-secondary" @click="cancel">{{ $t('Annuleren') }}</button>
+              <button class="btn btn-primary" @click="verify" :disabled="form.processing">{{ $t('Verifiëren') }}</button>
             </div>
           </div>
 
@@ -109,11 +109,11 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
             <div class="success-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-            <h2 style="text-align:center;">Bijna klaar — bewaar je backup codes</h2>
-            <p class="muted" style="text-align:center;">Bewaar deze codes op een veilige plek. Je kunt ze gebruiken om in te loggen als je geen toegang hebt tot je authenticator.</p>
+            <h2 style="text-align:center;">{{ $t('Bijna klaar — bewaar je backup codes') }}</h2>
+            <p class="muted" style="text-align:center;">{{ $t('Bewaar deze codes op een veilige plek. Je kunt ze gebruiken om in te loggen als je geen toegang hebt tot je authenticator.') }}</p>
 
             <div class="backup-warning">
-              <b>Belangrijk:</b> deze codes worden maar één keer getoond. Elke code werkt eenmalig.
+              <b>{{ $t('Belangrijk:') }}</b> {{ $t('deze codes worden maar één keer getoond. Elke code werkt eenmalig.') }}
             </div>
 
             <div class="backup-codes">
@@ -123,11 +123,11 @@ const copyCodes = () => navigator.clipboard.writeText(props.backup_codes.join('\
             </div>
 
             <div style="margin-top:14px;">
-              <button class="btn btn-secondary btn-sm" @click="copyCodes">Kopiëren</button>
+              <button class="btn btn-secondary btn-sm" @click="copyCodes">{{ $t('Kopiëren') }}</button>
             </div>
 
             <div class="wizard-footer">
-              <button class="btn btn-primary" @click="finish">Codes bewaard — voltooien</button>
+              <button class="btn btn-primary" @click="finish">{{ $t('Codes bewaard — voltooien') }}</button>
             </div>
           </div>
         </div>

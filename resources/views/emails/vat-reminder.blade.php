@@ -1,17 +1,17 @@
 @php
-    $eur = fn ($n) => ($n < 0 ? '− ' : '') . '€ ' . number_format(abs((float) $n), 2, ',', '.');
-    $whole = fn ($n) => ($n < 0 ? '− ' : '') . '€ ' . number_format(abs((float) $n), 0, ',', '.');
+    $eur = fn ($n) => money($n);
+    $whole = fn ($n) => money($n, true, 0);
     $appUrl = rtrim(config('app.url'), '/');
     $r = collect($p['rubrieken'])->keyBy('key');
     $days = (int) ($p['days_left'] ?? 0);
     $amount = (float) $p['payment']['amount'];
 @endphp
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Btw-aangifte {{ $p['label'] }} {{ $p['year'] }}</title>
+    <title>{{ __('Btw-aangifte') }} {{ $p['label'] }} {{ $p['year'] }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -49,57 +49,60 @@
                 <img src="{{ \App\Support\Brand::asset('email_mark') }}" class="logo-mark" alt="{{ brand('name') }}">
                 <span>{{ brand('name') }}</span>
             </div>
-            <div class="header-sub">Btw-aangifte · {{ $p['label'] }} {{ $p['year'] }}</div>
+            <div class="header-sub">{{ __('Btw-aangifte') }} · {{ $p['label'] }} {{ $p['year'] }}</div>
         </div>
 
         <div class="body">
-            <h1>{{ $final ? 'Laatste herinnering: ' : '' }}tijd voor je btw-aangifte</h1>
+            <h1>{{ $final ? __('Laatste herinnering: tijd voor je btw-aangifte') : __('Tijd voor je btw-aangifte') }}</h1>
             <p>
-                Het tijdvak <strong>{{ $p['label'] }} {{ $p['year'] }}</strong> van {{ $company->name }} is afgesloten.
-                Aangifte én betaling moeten uiterlijk <strong>{{ $p['deadline_label'] }}</strong> binnen zijn bij de
-                Belastingdienst — {{ $days === 0 ? 'dat is vandaag' : 'nog ' . $days . ($days === 1 ? ' dag' : ' dagen') }}.
+                {!! __('Het tijdvak <strong>:period</strong> van :company is afgesloten. Aangifte én betaling moeten uiterlijk <strong>:deadline</strong> binnen zijn bij de Belastingdienst — :remaining.', [
+                    'period' => e($p['label'] . ' ' . $p['year']),
+                    'company' => e($company->name),
+                    'deadline' => e($p['deadline_label']),
+                    'remaining' => $days === 0 ? __('dat is vandaag') : ($days === 1 ? __('nog 1 dag') : __('nog :days dagen', ['days' => $days])),
+                ]) !!}
             </p>
 
             <table class="kpis">
                 <tr>
-                    <td class="kpi" width="33%"><div class="kpi-val">{{ $eur($r['5a']['vat']) }}</div><div class="kpi-lbl">Btw over omzet (5a)</div></td>
-                    <td class="kpi" width="33%"><div class="kpi-val">{{ $eur($r['5b']['vat']) }}</div><div class="kpi-lbl">Voorbelasting (5b)</div></td>
-                    <td class="kpi tint" width="33%"><div class="kpi-val">{{ $whole($p['balance_rounded']) }}</div><div class="kpi-lbl">{{ $p['balance_rounded'] < 0 ? 'Terug te ontvangen' : 'Te betalen (5c)' }}</div></td>
+                    <td class="kpi" width="33%"><div class="kpi-val">{{ $eur($r['5a']['vat']) }}</div><div class="kpi-lbl">{{ __('Btw over omzet (5a)') }}</div></td>
+                    <td class="kpi" width="33%"><div class="kpi-val">{{ $eur($r['5b']['vat']) }}</div><div class="kpi-lbl">{{ __('Voorbelasting (5b)') }}</div></td>
+                    <td class="kpi tint" width="33%"><div class="kpi-val">{{ $whole($p['balance_rounded']) }}</div><div class="kpi-lbl">{{ $p['balance_rounded'] < 0 ? __('Terug te ontvangen') : __('Te betalen (5c)') }}</div></td>
                 </tr>
             </table>
 
             @if($amount > 0)
-                <p><strong>Zo betaal je:</strong></p>
+                <p><strong>{{ __('Zo betaal je:') }}</strong></p>
                 <table class="pay">
-                    <tr><td class="k">Bedrag</td><td class="v">{{ $whole($amount) }}</td></tr>
+                    <tr><td class="k">{{ __('Bedrag') }}</td><td class="v">{{ $whole($amount) }}</td></tr>
                     <tr><td class="k">IBAN</td><td class="v">{{ $p['payment']['iban'] }}</td></tr>
-                    <tr><td class="k">Ten name van</td><td class="v">{{ $p['payment']['beneficiary'] }}</td></tr>
+                    <tr><td class="k">{{ __('Ten name van') }}</td><td class="v">{{ $p['payment']['beneficiary'] }}</td></tr>
                     @if($p['payment']['reference_formatted'])
-                        <tr><td class="k">Betalingskenmerk</td><td class="v">{{ $p['payment']['reference_formatted'] }}</td></tr>
+                        <tr><td class="k">{{ __('Betalingskenmerk') }}</td><td class="v">{{ $p['payment']['reference_formatted'] }}</td></tr>
                     @endif
                 </table>
                 <p class="note">
                     @if($p['payment']['reference_formatted'])
-                        Zet het betalingskenmerk in het veld "Betalingskenmerk" van je bankoverschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.
-                        @if($p['payment']['reference_source'] === 'auto') Het kenmerk is berekend uit je omzetbelastingnummer; controleer het met het kenmerk bij je ingestuurde aangifte. @endif
+                        {{ __('Zet het betalingskenmerk in het veld "Betalingskenmerk" van je bankoverschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.') }}
+                        @if($p['payment']['reference_source'] === 'auto') {{ __('Het kenmerk is berekend uit je omzetbelastingnummer; controleer het met het kenmerk bij je ingestuurde aangifte.') }} @endif
                     @else
-                        Het betalingskenmerk vind je in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte. Stel je omzetbelastingnummer in op de btw-pagina, dan berekent {{ brand('name') }} het voortaan zelf.
+                        {{ __('Het betalingskenmerk vind je in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte. Stel je omzetbelastingnummer in op de btw-pagina, dan berekent :brand het voortaan zelf.', ['brand' => brand('name')]) }}
                     @endif
                 </p>
             @elseif($p['balance_rounded'] < 0)
-                <p class="note">Je krijgt per saldo btw terug. Dien de aangifte in; de Belastingdienst betaalt het bedrag uit na verwerking.</p>
+                <p class="note">{{ __('Je krijgt per saldo btw terug. Dien de aangifte in; de Belastingdienst betaalt het bedrag uit na verwerking.') }}</p>
             @endif
 
-            <p class="note">Alle rubrieken staan klaar in {{ brand('name') }} — in de indeling van Mijn Belastingdienst Zakelijk, dus overnemen is zo gedaan. Markeer het tijdvak daarna als aangegeven, dan stopt deze herinnering.</p>
+            <p class="note">{{ __('Alle rubrieken staan klaar in :brand — in de indeling van Mijn Belastingdienst Zakelijk, dus overnemen is zo gedaan. Markeer het tijdvak daarna als aangegeven, dan stopt deze herinnering.', ['brand' => brand('name')]) }}</p>
 
             <div class="btn-wrap">
-                <a href="{{ $appUrl }}/btw?year={{ $p['year'] }}" class="btn">Open je btw-aangifte</a>
+                <a href="{{ $appUrl }}/btw?year={{ $p['year'] }}" class="btn">{{ __('Open je btw-aangifte') }}</a>
             </div>
         </div>
 
         <div class="footer">
-            Je ontvangt deze herinnering omdat die aanstaat bij Btw-aangifte → Instellingen in {{ brand('name') }}.<br>
-            Daar kun je hem ook uitzetten.
+            {{ __('Je ontvangt deze herinnering omdat die aanstaat bij Btw-aangifte → Instellingen in :brand.', ['brand' => brand('name')]) }}<br>
+            {{ __('Daar kun je hem ook uitzetten.') }}
         </div>
     </div>
 </div>

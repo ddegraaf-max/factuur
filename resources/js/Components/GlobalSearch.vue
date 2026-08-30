@@ -54,18 +54,18 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
 </script>
 
 <template>
-  <button type="button" class="gs-trigger" @click="show" title="Zoeken (Ctrl+K)">
+  <button type="button" class="gs-trigger" @click="show" :title="$t('Zoeken (Ctrl+K)')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <span class="gs-trigger-text">Zoeken…</span>
+    <span class="gs-trigger-text">{{ $t('Zoeken…') }}</span>
     <kbd class="gs-kbd">{{ isMac ? '⌘' : 'Ctrl' }} K</kbd>
   </button>
 
   <Teleport to="body">
     <div v-if="open" class="gs-overlay" @mousedown.self="hide">
-      <div class="gs-panel" role="dialog" aria-label="Zoeken">
+      <div class="gs-panel" role="dialog" :aria-label="$t('Zoeken')">
         <div class="gs-input-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input ref="input" v-model="q" type="text" placeholder="Zoek factuur, offerte, klant, product… of typ een actie" autocomplete="off" spellcheck="false">
+          <input ref="input" v-model="q" type="text" :placeholder="$t('Zoek factuur, offerte, klant, product… of typ een actie')" autocomplete="off" spellcheck="false">
           <span v-if="loading" class="gs-spinner"></span>
           <kbd class="gs-kbd" @click="hide">Esc</kbd>
         </div>
@@ -79,15 +79,15 @@ const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigat
               </button>
             </template>
             <template v-if="actions.length">
-              <div class="gs-group">Acties &amp; pagina's</div>
+              <div class="gs-group">{{ $t("Acties & pagina's") }}</div>
               <button v-for="a in actions" :key="'a' + a.url" type="button" class="gs-item gs-action" :class="{ active: flat[active]?.url === a.url && flat[active]?.group === 'Acties' }" @mouseenter="active = flat.findIndex(f => f.url === a.url && f.group === 'Acties')" @click="go(a)">
                 <span class="gs-item-title">→ {{ a.title }}</span>
               </button>
             </template>
           </template>
-          <div v-else class="gs-empty">{{ q.length < 2 ? 'Typ minimaal twee tekens — bijvoorbeeld een factuurnummer, klantnaam of "nieuwe offerte".' : (loading ? 'Zoeken…' : 'Niets gevonden.') }}</div>
+          <div v-else class="gs-empty">{{ q.length < 2 ? $t('Typ minimaal twee tekens — bijvoorbeeld een factuurnummer, klantnaam of "nieuwe offerte".') : (loading ? $t('Zoeken…') : $t('Niets gevonden.')) }}</div>
         </div>
-        <div class="gs-foot"><span>↑↓ kiezen</span><span>↵ openen</span><span>Esc sluiten</span></div>
+        <div class="gs-foot"><span>{{ $t('↑↓ kiezen') }}</span><span>{{ $t('↵ openen') }}</span><span>{{ $t('Esc sluiten') }}</span></div>
       </div>
     </div>
   </Teleport>

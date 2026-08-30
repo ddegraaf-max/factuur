@@ -22,6 +22,7 @@ return [
     'coc' => 'KVK',
     'vat_no' => 'BTW',
     'invoice_date' => 'Factuurdatum',
+    'sale_date' => 'Leverdatum',
     'due_date' => 'Vervaldatum',
     'quote_date' => 'Offertedatum',
     'valid_until' => 'Geldig tot',
@@ -39,6 +40,9 @@ return [
     'already_settled' => 'Reeds doorgestort',
     'amount_due' => 'Te betalen',
     'note' => 'Opmerking',
+    'vat_summary' => 'Btw-overzicht',
+    'net' => 'Netto',
+    'gross' => 'Bruto',
 
     // Betaalinstructie op de factuur
     'pay_instruction' => 'Gelieve het bedrag binnen <strong>:days dagen</strong> over te maken naar <strong>:iban</strong> ten name van <strong>:name</strong>',
@@ -56,8 +60,8 @@ return [
     // Factuurmail
     'mail_invoice_subject' => 'Factuur :number — :company',
     'mail_greeting' => 'Beste :name,',
-    'mail_invoice_intro' => 'Hierbij ontvangt u factuur <strong>:number</strong> van :date voor een bedrag van <strong>€ :total</strong>. De factuur vindt u als PDF in de bijlage.',
-    'mail_settled_partial' => 'Hierop is reeds <strong>€ :settled</strong> verrekend/doorgestort; het te betalen bedrag is <strong>€ :open</strong>.',
+    'mail_invoice_intro' => 'Hierbij ontvangt u factuur <strong>:number</strong> van :date voor een bedrag van <strong>:total</strong>. De factuur vindt u als PDF in de bijlage.',
+    'mail_settled_partial' => 'Hierop is reeds <strong>:settled</strong> verrekend/doorgestort; het te betalen bedrag is <strong>:open</strong>.',
     'mail_settled_full' => 'Het volledige bedrag is reeds verrekend/doorgestort — u hoeft niets meer te betalen.',
     'mail_the_amount' => 'het bedrag',
     'mail_remaining_amount' => 'het resterende bedrag',

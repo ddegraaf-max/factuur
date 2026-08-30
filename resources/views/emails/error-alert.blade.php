@@ -30,7 +30,7 @@
             @if(!empty($context['console']))<tr><td>Commando</td><td>{{ $context['console'] }}</td></tr>@endif
             @if(!empty($context['user']))<tr><td>Gebruiker</td><td>{{ $context['user'] }}@if(!empty($context['company'])) · {{ $context['company'] }}@endif</td></tr>@endif
             @if(!empty($context['ip']))<tr><td>IP</td><td>{{ $context['ip'] }}</td></tr>@endif
-            <tr><td>Tijd</td><td>{{ $context['time'] ?? now()->format('d-m-Y H:i:s') }} · {{ $context['version'] ?? '' }}</td></tr>
+            <tr><td>Tijd</td><td>{{ $context['time'] ?? now()->format(market('date_format') . ' H:i:s') }} · {{ $context['version'] ?? '' }}</td></tr>
         </table>
         <pre>{{ implode("\n", $trace) }}</pre>
         <div class="foot">Dezelfde fout wordt maximaal één keer per uur gemeld. Volledige details staan in het Railway-log.</div>

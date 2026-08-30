@@ -53,8 +53,8 @@ class PortalAuthController extends Controller
         $data = $request->validate([
             'email' => ['required', 'email', 'max:180'],
         ], [
-            'email.required' => 'Vul je e-mailadres in.',
-            'email.email' => 'Dit is geen geldig e-mailadres.',
+            'email.required' => __('Vul je e-mailadres in.'),
+            'email.email' => __('Dit is geen geldig e-mailadres.'),
         ]);
 
         $email = mb_strtolower(trim($data['email']));
@@ -98,14 +98,14 @@ class PortalAuthController extends Controller
         $cooldown = $this->resendCooldown($request);
         if ($cooldown > 0) {
             throw ValidationException::withMessages([
-                'code' => "Wacht nog {$cooldown} seconde(n) voordat je een nieuwe code aanvraagt.",
+                'code' => __('Wacht nog :seconds seconde(n) voordat je een nieuwe code aanvraagt.', ['seconds' => $cooldown]),
             ]);
         }
 
         $this->guardSendRate($request, $email);
         $this->sendCodeIfDocumentsExist($request, $email);
 
-        return back()->with('flash', 'Code verstuurd. Kijk ook even in je spam-map.');
+        return back()->with('flash', __('Code verstuurd. Kijk ook even in je spam-map.'));
     }
 
     /** Stap 2: de 6-cijferige code controleren. */
@@ -119,9 +119,9 @@ class PortalAuthController extends Controller
         $data = $request->validate([
             'code' => ['required', 'string', 'size:6', 'regex:/^[0-9]{6}$/'],
         ], [
-            'code.required' => 'Voer de 6-cijferige code in.',
-            'code.size' => 'De code bestaat uit precies 6 cijfers.',
-            'code.regex' => 'De code mag alleen cijfers bevatten.',
+            'code.required' => __('Voer de 6-cijferige code in.'),
+            'code.size' => __('De code bestaat uit precies 6 cijfers.'),
+            'code.regex' => __('De code mag alleen cijfers bevatten.'),
         ]);
 
         $session = $request->session();
@@ -131,13 +131,13 @@ class PortalAuthController extends Controller
 
         if (! $hash || ! $expires || now()->timestamp > $expires) {
             throw ValidationException::withMessages([
-                'code' => 'De code is verlopen. Vraag een nieuwe code aan.',
+                'code' => __('De code is verlopen. Vraag een nieuwe code aan.'),
             ]);
         }
 
         if ($attempts >= self::MAX_ATTEMPTS) {
             throw ValidationException::withMessages([
-                'code' => 'Te veel pogingen. Vraag een nieuwe code aan.',
+                'code' => __('Te veel pogingen. Vraag een nieuwe code aan.'),
             ]);
         }
 
@@ -147,8 +147,8 @@ class PortalAuthController extends Controller
 
             throw ValidationException::withMessages([
                 'code' => $remaining > 0
-                    ? "De code is onjuist. Nog {$remaining} poging(en)."
-                    : 'Te veel pogingen. Vraag een nieuwe code aan.',
+                    ? __('De code is onjuist. Nog :remaining poging(en).', ['remaining' => $remaining])
+                    : __('Te veel pogingen. Vraag een nieuwe code aan.'),
             ]);
         }
 
@@ -174,7 +174,7 @@ class PortalAuthController extends Controller
         ]);
         $request->session()->regenerate();
 
-        return redirect()->route('portal.login')->with('flash', 'Je bent uitgelogd.');
+        return redirect()->route('portal.login')->with('flash', __('Je bent uitgelogd.'));
     }
 
     /* ===================== Helpers ===================== */
@@ -219,8 +219,8 @@ class PortalAuthController extends Controller
             if (RateLimiter::tooManyAttempts($key, 3)) {
                 $minutes = (int) ceil(RateLimiter::availableIn($key) / 60);
                 throw ValidationException::withMessages([
-                    'email' => "Te veel aanvragen. Probeer het over {$minutes} minuut/minuten opnieuw.",
-                    'code' => "Te veel aanvragen. Probeer het over {$minutes} minuut/minuten opnieuw.",
+                    'email' => __('Te veel aanvragen. Probeer het over :minutes minuut/minuten opnieuw.', ['minutes' => $minutes]),
+                    'code' => __('Te veel aanvragen. Probeer het over :minutes minuut/minuten opnieuw.', ['minutes' => $minutes]),
                 ]);
             }
             RateLimiter::hit($key, 600);

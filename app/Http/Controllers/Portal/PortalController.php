@@ -70,10 +70,10 @@ class PortalController extends Controller
             'number' => $quote->number,
             'status' => $expired ? 'expired' : $quote->status,
             'status_label' => match (true) {
-                $expired => 'Verlopen',
-                $quote->status === 'accepted' => 'Geaccepteerd',
-                $quote->status === 'rejected' => 'Afgewezen',
-                default => 'Wacht op uw reactie',
+                $expired => __('Verlopen'),
+                $quote->status === 'accepted' => __('Geaccepteerd'),
+                $quote->status === 'rejected' => __('Afgewezen'),
+                default => __('Wacht op uw reactie'),
             },
             'awaiting' => ! $expired && $quote->status === 'sent',
             'company_name' => $quote->company?->name,
@@ -171,15 +171,16 @@ class PortalController extends Controller
                     'paid_on_label' => $p->paid_on?->translatedFormat('j M Y'),
                     'amount' => (float) $p->amount,
                     'label' => $p->kind === 'advance'
-                        ? ($p->reference ?: 'Verrekend / reeds doorgestort')
-                        : 'Betaling ontvangen',
+                        ? ($p->reference ?: __('Verrekend / reeds doorgestort'))
+                        : __('Betaling ontvangen'),
                 ])->values(),
                 'attachments' => $customerAttachments,
             ]),
-            // Betaallink (iDEAL): alleen als de afzender Mollie heeft gekoppeld.
+            // Betaallink (iDEAL / BLIK): alleen als de afzender Mollie heeft gekoppeld.
             'payment' => [
                 'enabled' => $mollie->payable($invoice),
                 'just_returned' => $request->boolean('betaald'),
+                'label' => (string) \App\Support\Market::get('payment.online_label', 'iDEAL'),
             ],
             'company' => [
                 'name' => $company?->name,

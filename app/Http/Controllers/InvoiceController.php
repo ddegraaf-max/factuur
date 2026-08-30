@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Services\InvoiceManager;
 use App\Services\PaymentThanksService;
 use App\Services\UblGenerator;
-use App\Services\VatCalculator;
+use App\Support\Market;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -86,7 +86,7 @@ class InvoiceController extends Controller
             'invoice' => null,
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
-            'vat_rates' => VatCalculator::availableRates(),
+            'vat_rates' => Market::vatRateOptions(),
             'preselect_customer_id' => $request->input('customer_id'),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
@@ -111,10 +111,10 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', "Factuur {$invoice->number} verstuurd.");
+            return redirect()->route('invoices.show', $invoice)->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
         }
 
-        return redirect()->route('invoices.show', $invoice)->with('flash', 'Concept opgeslagen.');
+        return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept opgeslagen.'));
     }
 
     public function show(Invoice $invoice): Response
@@ -200,7 +200,7 @@ class InvoiceController extends Controller
         if ($invoice->status !== 'draft') {
             return Inertia::render('Invoices/Show', [
                 'invoice' => $invoice->load('lines', 'payments'),
-                'flash' => ['error' => 'Verstuurde facturen kunnen niet worden gewijzigd. Maak een creditnota aan.'],
+                'flash' => ['error' => __('Verstuurde facturen kunnen niet worden gewijzigd. Maak een creditnota aan.')],
             ]);
         }
 
@@ -215,7 +215,7 @@ class InvoiceController extends Controller
             ])->values(),
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
-            'vat_rates' => VatCalculator::availableRates(),
+            'vat_rates' => Market::vatRateOptions(),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
@@ -225,7 +225,7 @@ class InvoiceController extends Controller
     public function update(Request $request, Invoice $invoice): RedirectResponse
     {
         if ($invoice->status !== 'draft') {
-            return back()->withErrors(['status' => 'Verstuurde facturen kunnen niet worden gewijzigd.']);
+            return back()->withErrors(['status' => __('Verstuurde facturen kunnen niet worden gewijzigd.')]);
         }
 
         $data = $this->validated($request);
@@ -241,16 +241,16 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', "Factuur {$invoice->number} verstuurd.");
+            return redirect()->route('invoices.show', $invoice)->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
         }
 
-        return redirect()->route('invoices.show', $invoice)->with('flash', 'Concept bijgewerkt.');
+        return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept bijgewerkt.'));
     }
 
     public function send(Invoice $invoice): RedirectResponse
     {
         $this->manager->send($invoice);
-        return back()->with('flash', "Factuur {$invoice->number} verstuurd.");
+        return back()->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
     }
 
     /** Maak een nieuw concept met dezelfde klant en regels. */
@@ -279,7 +279,7 @@ class InvoiceController extends Controller
         }
 
         return redirect()->route('invoices.edit', $copy)
-            ->with('flash', "Kopie aangemaakt van factuur {$invoice->number}. Controleer en verstuur wanneer je klaar bent.");
+            ->with('flash', __('Kopie aangemaakt van factuur :number. Controleer en verstuur wanneer je klaar bent.', ['number' => $invoice->number]));
     }
 
     /** Interne notitie — alleen zichtbaar in de app, nooit voor de klant. */
@@ -291,41 +291,41 @@ class InvoiceController extends Controller
 
         $invoice->update(['internal_notes' => $data['internal_notes'] ?: null]);
 
-        return back()->with('flash', 'Interne notitie opgeslagen.');
+        return back()->with('flash', __('Interne notitie opgeslagen.'));
     }
 
     /** Plan een concept in om automatisch te versturen. */
     public function schedule(Request $request, Invoice $invoice): RedirectResponse
     {
         if ($invoice->status !== 'draft') {
-            return back()->withErrors(['schedule' => 'Alleen concepten kunnen worden ingepland.']);
+            return back()->withErrors(['schedule' => __('Alleen concepten kunnen worden ingepland.')]);
         }
 
         $data = $request->validate([
             'send_on' => ['required', 'date', 'after_or_equal:tomorrow'],
         ], [
-            'send_on.after_or_equal' => 'Kies een datum vanaf morgen — vandaag versturen doe je met de knop "Versturen".',
+            'send_on.after_or_equal' => __('Kies een datum vanaf morgen — vandaag versturen doe je met de knop "Versturen".'),
         ]);
 
         $invoice->update(['scheduled_send_on' => $data['send_on']]);
 
-        return back()->with('flash', 'Factuur ingepland voor ' . $invoice->fresh()->scheduled_send_on->translatedFormat('j F Y') . '.');
+        return back()->with('flash', __('Factuur ingepland voor :date.', ['date' => $invoice->fresh()->scheduled_send_on->translatedFormat('j F Y')]));
     }
 
     public function unschedule(Invoice $invoice): RedirectResponse
     {
         $invoice->update(['scheduled_send_on' => null]);
 
-        return back()->with('flash', 'Inplanning geannuleerd — de factuur blijft een concept.');
+        return back()->with('flash', __('Inplanning geannuleerd — de factuur blijft een concept.'));
     }
 
     public function destroy(Invoice $invoice): RedirectResponse
     {
         if ($invoice->status !== 'draft') {
-            return back()->withErrors(['delete' => 'Alleen concepten kunnen worden verwijderd.']);
+            return back()->withErrors(['delete' => __('Alleen concepten kunnen worden verwijderd.')]);
         }
         $invoice->delete();
-        return redirect()->route('invoices.index')->with('flash', 'Concept verwijderd.');
+        return redirect()->route('invoices.index')->with('flash', __('Concept verwijderd.'));
     }
 
     public function pdf(Invoice $invoice): HttpResponse
@@ -347,7 +347,7 @@ class InvoiceController extends Controller
     public function ubl(Invoice $invoice, UblGenerator $generator): HttpResponse|RedirectResponse
     {
         if ($invoice->status === 'draft') {
-            return back()->withErrors(['ubl' => 'Verstuur de factuur eerst; concepten hebben nog geen factuurnummer.']);
+            return back()->withErrors(['ubl' => __('Verstuur de factuur eerst; concepten hebben nog geen factuurnummer.')]);
         }
 
         $invoice->load('lines');
@@ -371,10 +371,10 @@ class InvoiceController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->withErrors(['reminder' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+            return back()->withErrors(['reminder' => __('Versturen is niet gelukt. Probeer het later opnieuw.')]);
         }
 
-        return back()->with('flash', "{$label} verstuurd naar {$invoice->customer_email}.");
+        return back()->with('flash', __(':label verstuurd naar :email.', ['label' => $label, 'email' => $invoice->customer_email]));
     }
 
     /**
@@ -393,10 +393,10 @@ class InvoiceController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->withErrors(['thanks' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+            return back()->withErrors(['thanks' => __('Versturen is niet gelukt. Probeer het later opnieuw.')]);
         }
 
-        return back()->with('flash', "Bedankmail verstuurd naar {$invoice->customer_email}.");
+        return back()->with('flash', __('Bedankmail verstuurd naar :email.', ['email' => $invoice->customer_email]));
     }
 
     public function recordPayment(Request $request, Invoice $invoice, PaymentThanksService $thanks): RedirectResponse
@@ -428,9 +428,9 @@ class InvoiceController extends Controller
         ]);
 
         $flash = match ($kind) {
-            'write_off' => 'Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.',
-            'advance' => 'Verrekening geregistreerd — de PDF toont het bedrag als "reeds doorgestort"; omzet en BTW blijven ongewijzigd.',
-            default => 'Betaling geregistreerd.',
+            'write_off' => __('Afboeking geregistreerd — je omzet en BTW blijven ongewijzigd.'),
+            'advance' => __('Verrekening geregistreerd — de PDF toont het bedrag als "reeds doorgestort"; omzet en BTW blijven ongewijzigd.'),
+            default => __('Betaling geregistreerd.'),
         };
 
         // Volledig voldaan én de ondernemer wil bedanken? Dan direct de bedankmail.
@@ -439,15 +439,15 @@ class InvoiceController extends Controller
             if ($invoice->status === 'paid') {
                 try {
                     $thanks->send($invoice);
-                    $flash .= " Bedankmail verstuurd naar {$invoice->customer_email}.";
+                    $flash .= ' ' . __('Bedankmail verstuurd naar :email.', ['email' => $invoice->customer_email]);
                 } catch (\DomainException $e) {
-                    $flash .= ' Geen bedankmail: ' . $e->getMessage();
+                    $flash .= ' ' . __('Geen bedankmail: :reason', ['reason' => $e->getMessage()]);
                 } catch (\Throwable $e) {
                     \Illuminate\Support\Facades\Log::error('Bedankmail na betaling mislukt', [
                         'invoice' => $invoice->id,
                         'error' => $e->getMessage(),
                     ]);
-                    $flash .= ' De bedankmail kon niet worden verstuurd — probeer het straks via "Bedankmail sturen".';
+                    $flash .= ' ' . __('De bedankmail kon niet worden verstuurd — probeer het straks via "Bedankmail sturen".');
                 }
             }
         }
@@ -468,35 +468,34 @@ class InvoiceController extends Controller
             }
         };
 
-        $push($invoice->created_at, 'plus', 'Aangemaakt');
-        $push($invoice->sent_at, 'send', 'Verstuurd' . ($invoice->customer_email ? " naar {$invoice->customer_email}" : ''));
-        $push($invoice->peppol_sent_at, 'send', 'Afgeleverd via het Peppol-netwerk' . ($invoice->peppol_reference ? " (ref. {$invoice->peppol_reference})" : ''));
-        $push($invoice->first_viewed_at, 'eye', 'Voor het eerst bekeken door de klant');
+        $push($invoice->created_at, 'plus', __('Aangemaakt'));
+        $push($invoice->sent_at, 'send', $invoice->customer_email ? __('Verstuurd naar :email', ['email' => $invoice->customer_email]) : __('Verstuurd'));
+        $push($invoice->peppol_sent_at, 'send', __('Afgeleverd via het Peppol-netwerk') . ($invoice->peppol_reference ? ' ' . __('(ref. :reference)', ['reference' => $invoice->peppol_reference]) : ''));
+        $push($invoice->first_viewed_at, 'eye', __('Voor het eerst bekeken door de klant'));
 
         foreach ($invoice->reminderLogs as $log) {
-            $push($log->sent_at, $log->kind === 'warning' ? 'alert' : 'bell', "{$log->type} verstuurd naar {$log->sent_to}");
+            $push($log->sent_at, $log->kind === 'warning' ? 'alert' : 'bell', __(':label verstuurd naar :email', ['label' => $log->type, 'email' => $log->sent_to]));
         }
 
         foreach ($invoice->payments as $payment) {
             $label = match ($payment->kind) {
-                'write_off' => 'Afgeboekt: € ',
-                'advance' => 'Verrekend / reeds doorgestort: € ',
-                default => 'Betaling ontvangen: € ',
+                'write_off' => __('Afgeboekt: :amount', ['amount' => money($payment->amount)]),
+                'advance' => __('Verrekend / reeds doorgestort: :amount', ['amount' => money($payment->amount)]),
+                default => __('Betaling ontvangen: :amount', ['amount' => money($payment->amount)]),
             };
-            $push($payment->paid_on, $payment->kind === 'write_off' ? 'credit' : 'euro',
-                $label . number_format((float) $payment->amount, 2, ',', '.'));
+            $push($payment->paid_on, $payment->kind === 'write_off' ? 'credit' : 'euro', $label);
         }
 
         if ($invoice->status === 'paid') {
-            $push($invoice->paid_at, 'check', 'Volledig betaald');
+            $push($invoice->paid_at, 'check', __('Volledig betaald'));
         }
 
-        $push($invoice->thanks_sent_at, 'heart', 'Bedankmail verstuurd' . ($invoice->thanks_sent_to ? " naar {$invoice->thanks_sent_to}" : ''));
+        $push($invoice->thanks_sent_at, 'heart', $invoice->thanks_sent_to ? __('Bedankmail verstuurd naar :email', ['email' => $invoice->thanks_sent_to]) : __('Bedankmail verstuurd'));
 
-        $push($invoice->incasso_sent_at, 'gavel', 'Overgedragen aan incasso' . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));
+        $push($invoice->incasso_sent_at, 'gavel', __('Overgedragen aan incasso') . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));
 
         foreach ($invoice->creditNotes as $credit) {
-            $push($credit->created_at, 'credit', 'Creditnota ' . ($credit->number ?: '(concept)') . ' aangemaakt');
+            $push($credit->created_at, 'credit', __('Creditnota :number aangemaakt', ['number' => $credit->number ?: __('(concept)')]));
         }
 
         return $events->sortByDesc('ts')->values()->map(fn ($e) => [
@@ -508,6 +507,11 @@ class InvoiceController extends Controller
 
     protected function validated(Request $request): array
     {
+        // Btw-tarieven van de markt (nl: 21/9/0, pl: 23/8/5/0), oplopend voor de foutmelding.
+        $rates = Market::vatRates();
+        sort($rates);
+        $lastRate = array_pop($rates);
+
         $data = $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
             // Hoe de prijzen in dít formulier zijn ingetypt (schakelaar op het
@@ -528,7 +532,7 @@ class InvoiceController extends Controller
             // Negatief mag: een korting of verrekening als losse regel is
             // gangbaar. Alleen het factuurtotaal mag niet onder nul (zie onder).
             'lines.*.unit_price' => ['required', 'numeric', 'min:-1000000', 'max:1000000'],
-            'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
+            'lines.*.vat_rate' => ['required', 'numeric', 'in:' . implode(',', Market::vatRates())],
             'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'action' => ['nullable', 'in:draft,send'],
             'files' => ['nullable', 'array', 'max:10'],
@@ -542,34 +546,34 @@ class InvoiceController extends Controller
             'advances.*.date' => ['nullable', 'date'],
             'advances.*.amount' => ['required', 'numeric', 'min:0.01'],
         ], [
-            'customer_id.required' => 'Kies een klant voor deze factuur.',
-            'customer_id.exists' => 'Kies een klant voor deze factuur.',
-            'invoice_date.required' => 'Vul een factuurdatum in.',
-            'invoice_date.date' => 'Vul een geldige factuurdatum in.',
-            'payment_terms.required' => 'Vul een betalingstermijn in dagen in.',
-            'payment_terms.integer' => 'De betalingstermijn moet een heel aantal dagen zijn.',
-            'payment_terms.min' => 'De betalingstermijn kan niet negatief zijn.',
-            'payment_terms.max' => 'De betalingstermijn kan maximaal 365 dagen zijn.',
-            'lines.required' => 'Voeg minstens één factuurregel toe.',
-            'lines.min' => 'Voeg minstens één factuurregel toe.',
-            'lines.*.description.required' => 'Vul een omschrijving in.',
-            'lines.*.description.max' => 'De omschrijving mag maximaal 500 tekens lang zijn.',
-            'lines.*.quantity.required' => 'Vul een aantal in.',
-            'lines.*.quantity.numeric' => 'Het aantal moet een getal zijn.',
-            'lines.*.quantity.min' => 'Het aantal kan niet negatief zijn.',
-            'lines.*.unit_price.required' => 'Vul een prijs in.',
-            'lines.*.unit_price.numeric' => 'De prijs moet een getal zijn (gebruik een punt als decimaalteken).',
-            'lines.*.unit_price.min' => 'De prijs valt buiten het toegestane bereik.',
-            'lines.*.unit_price.max' => 'De prijs valt buiten het toegestane bereik.',
-            'lines.*.vat_rate.required' => 'Kies een btw-tarief.',
-            'lines.*.vat_rate.in' => 'Kies een geldig btw-tarief (0, 9 of 21%).',
-            'lines.*.discount_pct.numeric' => 'De korting moet een getal zijn.',
-            'lines.*.discount_pct.min' => 'De korting kan niet negatief zijn.',
-            'lines.*.discount_pct.max' => 'De korting kan maximaal 100% zijn.',
-            'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
-            'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
-            'advances.*.description' => 'Geef elke verrekening een omschrijving (bijv. "Reeds doorgestort").',
-            'advances.*.amount' => 'Vul bij elke verrekening een bedrag in.',
+            'customer_id.required' => __('Kies een klant voor deze factuur.'),
+            'customer_id.exists' => __('Kies een klant voor deze factuur.'),
+            'invoice_date.required' => __('Vul een factuurdatum in.'),
+            'invoice_date.date' => __('Vul een geldige factuurdatum in.'),
+            'payment_terms.required' => __('Vul een betalingstermijn in dagen in.'),
+            'payment_terms.integer' => __('De betalingstermijn moet een heel aantal dagen zijn.'),
+            'payment_terms.min' => __('De betalingstermijn kan niet negatief zijn.'),
+            'payment_terms.max' => __('De betalingstermijn kan maximaal 365 dagen zijn.'),
+            'lines.required' => __('Voeg minstens één factuurregel toe.'),
+            'lines.min' => __('Voeg minstens één factuurregel toe.'),
+            'lines.*.description.required' => __('Vul een omschrijving in.'),
+            'lines.*.description.max' => __('De omschrijving mag maximaal 500 tekens lang zijn.'),
+            'lines.*.quantity.required' => __('Vul een aantal in.'),
+            'lines.*.quantity.numeric' => __('Het aantal moet een getal zijn.'),
+            'lines.*.quantity.min' => __('Het aantal kan niet negatief zijn.'),
+            'lines.*.unit_price.required' => __('Vul een prijs in.'),
+            'lines.*.unit_price.numeric' => __('De prijs moet een getal zijn (gebruik een punt als decimaalteken).'),
+            'lines.*.unit_price.min' => __('De prijs valt buiten het toegestane bereik.'),
+            'lines.*.unit_price.max' => __('De prijs valt buiten het toegestane bereik.'),
+            'lines.*.vat_rate.required' => __('Kies een btw-tarief.'),
+            'lines.*.vat_rate.in' => __('Kies een geldig btw-tarief (:rates of :last%).', ['rates' => implode(', ', $rates), 'last' => $lastRate]),
+            'lines.*.discount_pct.numeric' => __('De korting moet een getal zijn.'),
+            'lines.*.discount_pct.min' => __('De korting kan niet negatief zijn.'),
+            'lines.*.discount_pct.max' => __('De korting kan maximaal 100% zijn.'),
+            'files.*.mimetypes' => __('Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.'),
+            'files.*.max' => __('Elk bestand mag maximaal 10 MB groot zijn.'),
+            'advances.*.description' => __('Geef elke verrekening een omschrijving (bijv. "Reeds doorgestort").'),
+            'advances.*.amount' => __('Vul bij elke verrekening een bedrag in.'),
         ]);
 
         // Losse regels mogen negatief zijn, maar de optelsom niet: voor een
@@ -583,7 +587,7 @@ class InvoiceController extends Controller
 
         if ($sum < -0.005) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'lines' => 'Het factuurtotaal kan niet negatief zijn. Wil je geld terugbetalen of iets crediteren? Maak dan een creditnota bij de oorspronkelijke factuur.',
+                'lines' => __('Het factuurtotaal kan niet negatief zijn. Wil je geld terugbetalen of iets crediteren? Maak dan een creditnota bij de oorspronkelijke factuur.'),
             ]);
         }
 
@@ -602,7 +606,7 @@ class InvoiceController extends Controller
 
         $rows = collect($request->input('advances', []));
         if ($rows->sum('amount') > (float) $invoice->total + 0.009) {
-            throw new \DomainException('De verrekeningen zijn samen hoger dan het factuurtotaal.');
+            throw new \DomainException(__('De verrekeningen zijn samen hoger dan het factuurtotaal.'));
         }
 
         // Via de modellen verwijderen zodat paid_total netjes wordt herrekend.

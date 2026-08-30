@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="utf-8">
 <style>
@@ -54,7 +54,7 @@
     </td>
     <td style="text-align: right;">
       <div class="doc-title">{{ $title }}</div>
-      <div class="doc-meta">{{ $company->name }} · bijlage bij {{ $documentLabel }}</div>
+      <div class="doc-meta">{{ $company->name }} · {{ __('bijlage bij :document', ['document' => $documentLabel]) }}</div>
     </td>
   </tr>
 </table>

@@ -67,7 +67,7 @@ class ResendScheduler
                 ->post(self::BASE.'/emails', [
                     'from' => $this->fromAddress(),
                     'to' => [$toEmail],
-                    'subject' => 'Nog '.self::REMIND_DAYS_BEFORE.' dagen in je '.Brand::name().'-proefperiode',
+                    'subject' => __('Nog :days dagen in je :brand-proefperiode', ['days' => self::REMIND_DAYS_BEFORE, 'brand' => Brand::name()]),
                     'html' => $html,
                     'scheduled_at' => $sendAt->toIso8601String(),
                 ]);
@@ -115,7 +115,7 @@ class ResendScheduler
                 ->post(self::BASE.'/emails', [
                     'from' => $this->fromAddress(),
                     'to' => [$toEmail],
-                    'subject' => 'Je '.Brand::name().'-proefperiode is afgelopen',
+                    'subject' => __('Je :brand-proefperiode is afgelopen', ['brand' => Brand::name()]),
                     'html' => $html,
                     'scheduled_at' => $sendAt->toIso8601String(),
                 ]);

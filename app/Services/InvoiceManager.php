@@ -93,7 +93,7 @@ class InvoiceManager
     public function update(Invoice $invoice, array $data): Invoice
     {
         if ($invoice->status !== 'draft') {
-            throw new \DomainException('Alleen concept-facturen kunnen worden gewijzigd.');
+            throw new \DomainException(__('Alleen concept-facturen kunnen worden gewijzigd.'));
         }
 
         return DB::transaction(function () use ($invoice, $data) {
@@ -181,7 +181,7 @@ class InvoiceManager
     public function send(Invoice $invoice): Invoice
     {
         if ($invoice->status !== 'draft') {
-            throw new \DomainException('Alleen concepten kunnen worden verstuurd.');
+            throw new \DomainException(__('Alleen concepten kunnen worden verstuurd.'));
         }
 
         $invoice = DB::transaction(function () use ($invoice) {
@@ -207,7 +207,9 @@ class InvoiceManager
 
         $this->emailInvoice($invoice);
 
-        \App\Support\Audit::log('sent', $invoice, \App\Support\Audit::label($invoice) . ' verstuurd' . ($invoice->customer_email ? ' naar ' . $invoice->customer_email : ' (zonder e-mail)'));
+        \App\Support\Audit::log('sent', $invoice, $invoice->customer_email
+            ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($invoice), 'email' => $invoice->customer_email])
+            : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($invoice)]));
 
         return $invoice;
     }
@@ -314,7 +316,7 @@ class InvoiceManager
                 'description' => $line['description'] ?? '',
                 'details' => $line['details'] ?? null,
                 'quantity' => $qty,
-                'unit' => $line['unit'] ?? 'stuk',
+                'unit' => $line['unit'] ?? __('stuk'),
                 'unit_price' => $storedPrice,
                 'vat_rate' => $rate,
                 'discount_pct' => $discount > 0 ? $discount : null,

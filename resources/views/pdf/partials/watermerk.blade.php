@@ -29,13 +29,14 @@
     ];
 
     // Tekst + kleur. De kleur is de merkkleur op 48% over wit.
+    // De tekst volgt de documenttaal (JSON-vertalingen: 'BETAALD' → 'ZAPŁACONO').
     $wmStijlen = [
-        'concept'      => ['CONCEPT',      '#B8BABD'],
-        'betaald'      => ['BETAALD',      '#93D0B0'],
-        'vervallen'    => ['VERVALLEN',    '#E2AA85'],
-        'herinnering'  => ['HERINNERING',  '#FFBF90'],
-        'aanmaning'    => ['AANMANING',    '#E39892'],
-        'gecrediteerd' => ['GECREDITEERD', '#B8BABD'],
+        'concept'      => [__('CONCEPT'),      '#B8BABD'],
+        'betaald'      => [__('BETAALD'),      '#93D0B0'],
+        'vervallen'    => [__('VERVALLEN'),    '#E2AA85'],
+        'herinnering'  => [__('HERINNERING'),  '#FFBF90'],
+        'aanmaning'    => [__('AANMANING'),    '#E39892'],
+        'gecrediteerd' => [__('GECREDITEERD'), '#B8BABD'],
     ];
 
     // Geen stempel bij sent / verzonden / open: een gewone openstaande

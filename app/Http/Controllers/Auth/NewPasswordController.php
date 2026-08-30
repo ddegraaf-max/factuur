@@ -44,13 +44,13 @@ class NewPasswordController extends Controller
 
         if ($status !== Password::PASSWORD_RESET) {
             throw ValidationException::withMessages([
-                'email' => 'Deze reset-link is ongeldig of verlopen. Vraag een nieuwe aan.',
+                'email' => __('Deze reset-link is ongeldig of verlopen. Vraag een nieuwe aan.'),
             ]);
         }
 
         return redirect()->route('login')->with(
             'status',
-            'Je wachtwoord is opnieuw ingesteld. Je kunt nu inloggen.'
+            __('Je wachtwoord is opnieuw ingesteld. Je kunt nu inloggen.')
         );
     }
 }

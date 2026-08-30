@@ -26,12 +26,12 @@ class PeppolController extends Controller
         } catch (\Throwable $e) {
             Log::error('Peppol activeren mislukt', ['company' => $company->id, 'error' => $e->getMessage()]);
 
-            return back()->with('error', 'Activeren is niet gelukt. Probeer het later opnieuw.');
+            return back()->with('error', __('Activeren is niet gelukt. Probeer het later opnieuw.'));
         }
 
         return back()->with('flash', $url
-            ? 'Geregistreerd op het Peppol-netwerk. Rond nu de identiteitscontrole af via de knop hieronder.'
-            : 'Geregistreerd op het Peppol-netwerk.');
+            ? __('Geregistreerd op het Peppol-netwerk. Rond nu de identiteitscontrole af via de knop hieronder.')
+            : __('Geregistreerd op het Peppol-netwerk.'));
     }
 
     /** Verificatiestatus opnieuw ophalen. */
@@ -46,10 +46,10 @@ class PeppolController extends Controller
         }
 
         return back()->with('flash', match ($status) {
-            'verified' => 'Je administratie is geverifieerd: je kunt nu via Peppol verzenden en ontvangen.',
-            'rejected' => 'De identiteitscontrole is afgewezen. Neem contact op met ' . Brand::name() . '.',
-            'none' => 'Peppol is nog niet geactiveerd.',
-            default => 'De identiteitscontrole is nog niet afgerond.',
+            'verified' => __('Je administratie is geverifieerd: je kunt nu via Peppol verzenden en ontvangen.'),
+            'rejected' => __('De identiteitscontrole is afgewezen. Neem contact op met :brand.', ['brand' => Brand::name()]),
+            'none' => __('Peppol is nog niet geactiveerd.'),
+            default => __('De identiteitscontrole is nog niet afgerond.'),
         });
     }
 
@@ -58,7 +58,7 @@ class PeppolController extends Controller
     {
         $this->peppol->deregister(auth()->user()->company);
 
-        return back()->with('flash', 'Peppol is uitgeschakeld voor deze administratie.');
+        return back()->with('flash', __('Peppol is uitgeschakeld voor deze administratie.'));
     }
 
     /** Handmatig de Peppol-bereikbaarheid van een klant (opnieuw) controleren. */
@@ -67,9 +67,9 @@ class PeppolController extends Controller
         $result = $this->peppol->checkCustomer($customer, force: true);
 
         return back()->with('flash', match ($result) {
-            true => "{$customer->name} is bereikbaar via Peppol.",
-            false => "{$customer->name} is (nog) niet aangesloten op Peppol.",
-            default => 'Geen Peppol-ID afleidbaar — vul een KvK-nummer of Peppol-ID in bij de klant.',
+            true => __(':name is bereikbaar via Peppol.', ['name' => $customer->name]),
+            false => __(':name is (nog) niet aangesloten op Peppol.', ['name' => $customer->name]),
+            default => __('Geen Peppol-ID afleidbaar — vul een KvK-nummer of Peppol-ID in bij de klant.'),
         });
     }
 
@@ -83,9 +83,9 @@ class PeppolController extends Controller
         } catch (\Throwable $e) {
             Log::error('Peppol-verzending onverwacht mislukt', ['invoice' => $invoice->id, 'error' => $e->getMessage()]);
 
-            return back()->withErrors(['peppol' => 'Afleveren via Peppol is niet gelukt. Probeer het later opnieuw.']);
+            return back()->withErrors(['peppol' => __('Afleveren via Peppol is niet gelukt. Probeer het later opnieuw.')]);
         }
 
-        return back()->with('flash', "Factuur {$invoice->number} afgeleverd via Peppol (referentie {$reference}).");
+        return back()->with('flash', __('Factuur :number afgeleverd via Peppol (referentie :reference).', ['number' => $invoice->number, 'reference' => $reference]));
     }
 }

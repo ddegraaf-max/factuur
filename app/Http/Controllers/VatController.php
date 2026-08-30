@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\VatFiling;
+use App\Services\VatPlService;
 use App\Services\VatService;
+use App\Support\Market;
 use App\Support\Sql;
 use App\Support\VatPaymentReference;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -38,6 +40,36 @@ class VatController extends Controller
             ->sortDesc()
             ->values()
             ->all();
+
+        // Polen: geen rubrieken van de Belastingdienst maar de kwoty voor
+        // JPK_V7M/JPK_V7K per okres (maand of kwartaal). Okres-type en okres
+        // komen uit de query (?type=&period=), anders de instelling / het
+        // laatst afgesloten okres. De status per okres deelt het VatFiling-
+        // model en de route vat.filing.update met de Nederlandse flow.
+        if (Market::isPl()) {
+            $pl = app(VatPlService::class);
+            $type = (string) $request->input('type', '');
+            $type = in_array($type, VatPlService::PERIOD_TYPES, true) ? $type : VatPlService::periodType($company);
+            $period = (int) $request->input('period', 0);
+            if ($period < 1 || $period > VatPlService::periodCount($type)) {
+                $period = $pl->defaultPeriod($type, $year);
+            }
+
+            return Inertia::render('Btw/IndexPl', [
+                'summary' => $pl->summary($company, $type, $year, $period),
+                'year' => $year,
+                'allYears' => $allYears,
+                'periodType' => $type,
+                'period' => $period,
+                'periods' => $pl->periodList($company, $type, $year),
+                'settings' => [
+                    'vat_period' => VatPlService::periodType($company),
+                    'vat_reminder_enabled' => (bool) $company->vat_reminder_enabled,
+                ],
+                'eus_url' => 'https://www.podatki.gov.pl/e-urzad-skarbowy/',
+                'microaccount_url' => 'https://www.podatki.gov.pl/generator-mikrorachunku-podatkowego/',
+            ]);
+        }
 
         return Inertia::render('Btw/Index', array_merge($this->vat->overview($company, $year), [
             'year' => $year,
@@ -135,12 +167,12 @@ class VatController extends Controller
         $filing->save();
 
         $flash = match (true) {
-            $request->has('filed') && $request->boolean('filed') => 'Gemarkeerd als aangegeven.',
-            $request->has('filed') => 'Markering "aangegeven" verwijderd.',
-            $request->has('paid') && $request->boolean('paid') => 'Gemarkeerd als betaald.',
-            $request->has('paid') => 'Markering "betaald" verwijderd.',
-            $request->has('payment_reference') => 'Betalingskenmerk opgeslagen.',
-            default => 'Aangifte bijgewerkt.',
+            $request->has('filed') && $request->boolean('filed') => __('Gemarkeerd als aangegeven.'),
+            $request->has('filed') => __('Markering "aangegeven" verwijderd.'),
+            $request->has('paid') && $request->boolean('paid') => __('Gemarkeerd als betaald.'),
+            $request->has('paid') => __('Markering "betaald" verwijderd.'),
+            $request->has('payment_reference') => __('Betalingskenmerk opgeslagen.'),
+            default => __('Aangifte bijgewerkt.'),
         };
 
         return back()->with('flash', $flash);
@@ -178,7 +210,7 @@ class VatController extends Controller
 
         $company->update($update);
 
-        return back()->with('flash', 'Btw-instellingen opgeslagen.');
+        return back()->with('flash', __('Btw-instellingen opgeslagen.'));
     }
 
     /** Alleen de laatste cijfers tonen: het nummer is BSN-gebaseerd. */

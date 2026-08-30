@@ -23,57 +23,57 @@ const riskClass = (row) => {
 </script>
 
 <template>
-  <Head title="Debiteuren" />
+  <Head :title="$t('Debiteuren')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Rapporten / <span class="breadcrumb-current">Debiteuren</span></div>
+      <div class="breadcrumb">{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Debiteuren') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Ouderdomsanalyse debiteuren</h1>
-        <p class="page-subtitle">Wie staat er hoe lang open — zodat je precies weet waar je achteraan moet.</p>
+        <h1 class="page-title">{{ $t('Ouderdomsanalyse debiteuren') }}</h1>
+        <p class="page-subtitle">{{ $t('Wie staat er hoe lang open — zodat je precies weet waar je achteraan moet.') }}</p>
       </div>
     </div>
 
     <!-- KPI's -->
     <div class="kpi-grid">
       <div class="kpi">
-        <div class="lbl">Totaal openstaand</div>
+        <div class="lbl">{{ $t('Totaal openstaand') }}</div>
         <div class="val">{{ eur(totals.total) }}</div>
-        <div class="meta">{{ totals.count }} facturen</div>
+        <div class="meta">{{ $t(':n facturen', { n: totals.count }) }}</div>
       </div>
       <div class="kpi" :class="overdue_total > 0.009 ? 'alert' : 'good'">
-        <div class="lbl">Waarvan vervallen</div>
+        <div class="lbl">{{ $t('Waarvan vervallen') }}</div>
         <div class="val">{{ eur(overdue_total) }}</div>
-        <div class="meta">{{ pct }}% van het openstaande bedrag</div>
+        <div class="meta">{{ $t(':pct% van het openstaande bedrag', { pct }) }}</div>
       </div>
       <div class="kpi" :class="totals.b90plus > 0.009 ? 'alert' : ''">
-        <div class="lbl">Ouder dan 90 dagen</div>
+        <div class="lbl">{{ $t('Ouder dan 90 dagen') }}</div>
         <div class="val">{{ eur(totals.b90plus) }}</div>
-        <div class="meta">hoogste risico op wanbetaling</div>
+        <div class="meta">{{ $t('hoogste risico op wanbetaling') }}</div>
       </div>
       <div class="kpi">
-        <div class="lbl">Nog niet vervallen</div>
+        <div class="lbl">{{ $t('Nog niet vervallen') }}</div>
         <div class="val">{{ eur(totals.current) }}</div>
-        <div class="meta">binnen de betaaltermijn</div>
+        <div class="meta">{{ $t('binnen de betaaltermijn') }}</div>
       </div>
     </div>
 
     <!-- Per klant -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="ag-title">Per klant</div>
+        <div class="ag-title">{{ $t('Per klant') }}</div>
         <table v-if="rows.length" class="data-table ag-table">
           <thead>
             <tr>
-              <th>Klant</th>
-              <th class="right">Niet vervallen</th>
-              <th class="right">1–30 dgn</th>
-              <th class="right">31–60 dgn</th>
-              <th class="right">61–90 dgn</th>
-              <th class="right">90+ dgn</th>
-              <th class="right">Totaal open</th>
+              <th>{{ $t('Klant') }}</th>
+              <th class="right">{{ $t('Niet vervallen') }}</th>
+              <th class="right">{{ $t('1–30 dgn') }}</th>
+              <th class="right">{{ $t('31–60 dgn') }}</th>
+              <th class="right">{{ $t('61–90 dgn') }}</th>
+              <th class="right">{{ $t('90+ dgn') }}</th>
+              <th class="right">{{ $t('Totaal open') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -82,9 +82,9 @@ const riskClass = (row) => {
                 <Link v-if="row.customer_id" :href="route('customers.show', row.customer_id)" class="ag-name">{{ row.name }}</Link>
                 <span v-else class="ag-name">{{ row.name }}</span>
                 <div class="ag-sub">
-                  {{ row.count }} {{ row.count === 1 ? 'factuur' : 'facturen' }}
-                  <template v-if="row.oldest_days > 0"> · oudste {{ row.oldest_days }} dgn te laat</template>
-                  <template v-if="row.incasso > 0"> · {{ row.incasso }} in incasso</template>
+                  {{ row.count }} {{ row.count === 1 ? $t('factuur') : $t('facturen') }}
+                  <template v-if="row.oldest_days > 0"> · {{ $t('oudste :n dgn te laat', { n: row.oldest_days }) }}</template>
+                  <template v-if="row.incasso > 0"> · {{ $t(':n in incasso', { n: row.incasso }) }}</template>
                 </div>
               </td>
               <td class="num right">{{ row.current ? eur(row.current) : '—' }}</td>
@@ -95,7 +95,7 @@ const riskClass = (row) => {
               <td class="num right" style="font-weight:600;">{{ eur(row.total) }}</td>
             </tr>
             <tr class="ag-total">
-              <td>Totaal</td>
+              <td>{{ $t('Totaal') }}</td>
               <td class="num right">{{ eur(totals.current) }}</td>
               <td class="num right">{{ eur(totals.b30) }}</td>
               <td class="num right">{{ eur(totals.b60) }}</td>
@@ -105,22 +105,22 @@ const riskClass = (row) => {
             </tr>
           </tbody>
         </table>
-        <div v-else class="muted" style="font-size:13px;">Er staat momenteel niets open — mooi zo.</div>
+        <div v-else class="muted" style="font-size:13px;">{{ $t('Er staat momenteel niets open — mooi zo.') }}</div>
       </div>
     </div>
 
     <!-- Oudste vervallen facturen -->
     <div v-if="oldest.length" class="card">
       <div class="card-body">
-        <div class="ag-title">Langst vervallen facturen</div>
+        <div class="ag-title">{{ $t('Langst vervallen facturen') }}</div>
         <table class="data-table">
           <thead>
-            <tr><th>Factuur</th><th>Klant</th><th>Vervaldatum</th><th class="right">Dagen te laat</th><th class="right">Openstaand</th></tr>
+            <tr><th>{{ $t('Factuur') }}</th><th>{{ $t('Klant') }}</th><th>{{ $t('Vervaldatum') }}</th><th class="right">{{ $t('Dagen te laat') }}</th><th class="right">{{ $t('Openstaand') }}</th></tr>
           </thead>
           <tbody>
             <tr v-for="inv in oldest" :key="inv.id">
               <td><Link :href="route('invoices.show', inv.id)" class="ag-name">{{ inv.number }}</Link>
-                <span v-if="inv.status === 'incasso'" class="pill pill-muted" style="margin-left:6px;">incasso</span>
+                <span v-if="inv.status === 'incasso'" class="pill pill-muted" style="margin-left:6px;">{{ $t('incasso') }}</span>
               </td>
               <td>{{ inv.customer_name }}</td>
               <td>{{ inv.due_label }}</td>
@@ -130,8 +130,7 @@ const riskClass = (row) => {
           </tbody>
         </table>
         <div class="ag-hint">
-          Tip: herinneringen en aanmaningen gaan automatisch (Instellingen → Herinneringen);
-          voor hardnekkige gevallen is er het incassotraject.
+          {{ $t('Tip: herinneringen en aanmaningen gaan automatisch (Instellingen → Herinneringen); voor hardnekkige gevallen is er het incassotraject.') }}
         </div>
       </div>
     </div>

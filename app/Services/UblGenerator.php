@@ -27,7 +27,7 @@ class UblGenerator
 
         $id = $invoice->number ?: ('CONCEPT-'.$invoice->id);
         $typeCode = $invoice->is_credit ? '381' : '380';
-        $currency = $company->currency ?: 'EUR';
+        $currency = $company->currency ?: \App\Support\Market::currency();
 
         $xml = [];
         $xml[] = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -93,7 +93,7 @@ class UblGenerator
             $xml[] = '  </cac:PaymentMeans>';
         }
         if ($invoice->payment_terms) {
-            $xml[] = '  <cac:PaymentTerms><cbc:Note>'.$this->e("Betaling binnen {$invoice->payment_terms} dagen").'</cbc:Note></cac:PaymentTerms>';
+            $xml[] = '  <cac:PaymentTerms><cbc:Note>'.$this->e(__('Betaling binnen :days dagen', ['days' => $invoice->payment_terms])).'</cbc:Note></cac:PaymentTerms>';
         }
 
         // ---------- BTW-totalen per tarief ----------
@@ -114,7 +114,7 @@ class UblGenerator
             $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $rate).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $rate).'</cbc:Percent>';
             if ((float) $rate === 0.0) {
-                $xml[] = '        <cbc:TaxExemptionReason>Nultarief of vrijgesteld van BTW</cbc:TaxExemptionReason>';
+                $xml[] = '        <cbc:TaxExemptionReason>'.$this->e(__('Nultarief of vrijgesteld van BTW')).'</cbc:TaxExemptionReason>';
             }
             $xml[] = '        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>';
             $xml[] = '      </cac:TaxCategory>';
@@ -140,7 +140,7 @@ class UblGenerator
             if ($line->details) {
                 $xml[] = '      <cbc:Description>'.$this->e($line->details).'</cbc:Description>';
             }
-            $xml[] = '      <cbc:Name>'.$this->e(mb_substr($line->description, 0, 100) ?: 'Regel '.($index + 1)).'</cbc:Name>';
+            $xml[] = '      <cbc:Name>'.$this->e(mb_substr($line->description, 0, 100) ?: __('Regel :n', ['n' => $index + 1])).'</cbc:Name>';
             $xml[] = '      <cac:ClassifiedTaxCategory>';
             $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $line->vat_rate).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $line->vat_rate).'</cbc:Percent>';
@@ -189,7 +189,7 @@ class UblGenerator
             $p[] = '      </cac:PartyTaxScheme>';
         }
         $p[] = '      <cac:PartyLegalEntity>';
-        $p[] = '        <cbc:RegistrationName>'.$this->e($legalName ?: ($name ?: 'Onbekend')).'</cbc:RegistrationName>';
+        $p[] = '        <cbc:RegistrationName>'.$this->e($legalName ?: ($name ?: __('Onbekend'))).'</cbc:RegistrationName>';
         if ($kvkNumber) {
             // schemeID 0106 = NL KVK-nummer
             $p[] = '        <cbc:CompanyID schemeID="0106">'.$this->e($kvkNumber).'</cbc:CompanyID>';
@@ -209,23 +209,24 @@ class UblGenerator
         return $rate > 0 ? 'S' : 'Z';
     }
 
-    /** Landnaam of -code → ISO 3166-1 alpha-2 (default NL). */
+    /** Landnaam of -code → ISO 3166-1 alpha-2 (standaard: het land van de markt). */
     protected function countryCode(?string $country): string
     {
         $c = trim((string) $country);
-        if ($c === '') return 'NL';
+        if ($c === '') return \App\Support\Market::country();
         if (strlen($c) === 2) return strtoupper($c);
 
         return match (mb_strtolower($c)) {
             'nederland', 'the netherlands', 'netherlands', 'holland' => 'NL',
             'belgië', 'belgie', 'belgium' => 'BE',
-            'duitsland', 'germany', 'deutschland' => 'DE',
+            'duitsland', 'germany', 'deutschland', 'niemcy' => 'DE',
             'frankrijk', 'france' => 'FR',
             'luxemburg', 'luxembourg' => 'LU',
             'verenigd koninkrijk', 'united kingdom' => 'GB',
             'spanje', 'spain' => 'ES',
             'italië', 'italie', 'italy' => 'IT',
-            default => 'NL',
+            'polen', 'poland', 'polska' => 'PL',
+            default => \App\Support\Market::country(),
         };
     }
 

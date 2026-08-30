@@ -42,7 +42,7 @@ class SettingsController extends Controller
                 'checked_at_label' => $company->mail_domain_checked_at?->translatedFormat('j M Y, H:i'),
                 'default_from' => config('mail.from.address'),
                 'suggested_domain' => filled($company->email) && ! preg_match('/@(gmail|hotmail|outlook|live|icloud|yahoo|ziggo|kpnmail)\./i', $company->email) ? substr(strrchr($company->email, '@'), 1) : '',
-                'suggested_local_part' => filled($company->email) ? strstr($company->email, '@', true) : 'facturen',
+                'suggested_local_part' => filled($company->email) ? strstr($company->email, '@', true) : __('facturen'),
             ],
         ]);
     }
@@ -53,22 +53,22 @@ class SettingsController extends Controller
         $company = auth()->user()->company;
 
         if (! $company->hasAiAccess()) {
-            return back()->with('error', 'De Claude-koppeling zit in het Slim-abonnement.');
+            return back()->with('error', __('De Claude-koppeling zit in het Slim-abonnement.'));
         }
 
         $wasActive = $company->mcp_token !== null;
         $company->rotateMcpToken();
 
         return back()->with('flash', $wasActive
-            ? 'Nieuwe koppel-URL aangemaakt — de oude werkt niet meer. Werk de connector in Claude bij.'
-            : 'Claude-koppeling geactiveerd! Voeg de koppel-URL toe in Claude als custom connector.');
+            ? __('Nieuwe koppel-URL aangemaakt — de oude werkt niet meer. Werk de connector in Claude bij.')
+            : __('Claude-koppeling geactiveerd! Voeg de koppel-URL toe in Claude als custom connector.'));
     }
 
     public function disableMcpToken()
     {
         auth()->user()->company->disableMcpToken();
 
-        return back()->with('flash', 'Claude-koppeling uitgeschakeld — de koppel-URL is ingetrokken.');
+        return back()->with('flash', __('Claude-koppeling uitgeschakeld — de koppel-URL is ingetrokken.'));
     }
 
     // ----- COMPANY / BEDRIJFSGEGEVENS -----
@@ -124,8 +124,8 @@ class SettingsController extends Controller
             'invoice_number_format' => ['nullable', 'string', 'max:50'],
             'brand_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ], [
-            'kvk_number.unique' => 'Er bestaat al een account met dit KvK-nummer.',
-            'vat_number.unique' => 'Er bestaat al een account met dit BTW-nummer.',
+            'kvk_number.unique' => __('Er bestaat al een account met dit :label.', ['label' => \App\Support\Market::get('registry.label', 'KvK-nummer')]),
+            'vat_number.unique' => __('Er bestaat al een account met dit :label.', ['label' => \App\Support\Market::get('tax_id.label', 'BTW-nummer')]),
         ]);
 
         // Drop nulls so we don't overwrite existing values with null
@@ -147,7 +147,7 @@ class SettingsController extends Controller
         unset($data['mollie_disconnect']);
 
         $company->update($data);
-        return back()->with('flash', 'Bedrijfsgegevens opgeslagen.');
+        return back()->with('flash', __('Bedrijfsgegevens opgeslagen.'));
     }
 
     // ----- NUMBERING -----
@@ -167,7 +167,7 @@ class SettingsController extends Controller
             'numbering.*.start' => 'required|integer|min:1',
         ]);
         auth()->user()->company->update(['numbering_settings' => $data['numbering']]);
-        return back()->with('flash', 'Nummering opgeslagen.');
+        return back()->with('flash', __('Nummering opgeslagen.'));
     }
 
     // ----- BRAND / HUISSTIJL -----
@@ -224,8 +224,8 @@ class SettingsController extends Controller
             $request->validate([
                 'stationery' => 'image|mimes:png,jpg,jpeg,webp|max:4096',
             ], [
-                'stationery.mimes' => 'Upload het briefpapier als PNG of JPG (exporteer een PDF eerst als afbeelding).',
-                'stationery.max' => 'Het briefpapier mag maximaal 4 MB groot zijn — het gaat met elke factuur-PDF mee.',
+                'stationery.mimes' => __('Upload het briefpapier als PNG of JPG (exporteer een PDF eerst als afbeelding).'),
+                'stationery.max' => __('Het briefpapier mag maximaal 4 MB groot zijn — het gaat met elke factuur-PDF mee.'),
             ]);
             $file = $request->file('stationery');
             $data['stationery_data'] = 'data:' . $file->getMimeType() . ';base64,'
@@ -236,11 +236,11 @@ class SettingsController extends Controller
         if (($data['invoice_template'] ?? null) === 'stationery'
             && empty($data['stationery_data'])
             && ! $company->stationery_data) {
-            return back()->withErrors(['stationery' => 'Upload eerst je briefpapier voordat je dit sjabloon kiest.']);
+            return back()->withErrors(['stationery' => __('Upload eerst je briefpapier voordat je dit sjabloon kiest.')]);
         }
 
         $company->update($data);
-        return back()->with('flash', 'Huisstijl opgeslagen.');
+        return back()->with('flash', __('Huisstijl opgeslagen.'));
     }
 
     /** Briefpapier verwijderen; het template valt automatisch terug op "modern". */
@@ -253,7 +253,7 @@ class SettingsController extends Controller
         }
         $company->update($changes);
 
-        return back()->with('flash', 'Briefpapier verwijderd.');
+        return back()->with('flash', __('Briefpapier verwijderd.'));
     }
 
     /**
@@ -267,18 +267,18 @@ class SettingsController extends Controller
 
         $company = auth()->user()->company;
         if (! $company->hasAiAccess()) {
-            return response()->json(['message' => 'Huisstijl herkennen zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.'], 403);
+            return response()->json(['message' => __('Huisstijl herkennen zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.')], 403);
         }
         if ($company->aiLimitReached()) {
-            return response()->json(['message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.'], 429);
+            return response()->json(['message' => __('Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.')], 429);
         }
 
         $request->validate([
             'file' => ['required', 'file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
         ], [
-            'file.required' => 'Kies eerst een bestand (PDF of afbeelding).',
-            'file.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden kunnen worden gelezen.',
-            'file.max' => 'Het bestand mag maximaal 10 MB groot zijn.',
+            'file.required' => __('Kies eerst een bestand (PDF of afbeelding).'),
+            'file.mimetypes' => __('Alleen PDF-, PNG-, JPG- of WEBP-bestanden kunnen worden gelezen.'),
+            'file.max' => __('Het bestand mag maximaal 10 MB groot zijn.'),
         ]);
 
         $file = $request->file('file');
@@ -304,7 +304,7 @@ class SettingsController extends Controller
             Storage::disk('public')->delete($company->logo_path);
         }
         $company->update(['logo_path' => null, 'logo_data' => null]);
-        return back()->with('flash', 'Logo verwijderd.');
+        return back()->with('flash', __('Logo verwijderd.'));
     }
 
     // ----- E-MAILTEKSTEN (factuur- en offertemail) -----
@@ -327,16 +327,16 @@ class SettingsController extends Controller
             'thanks_enabled' => (bool) $company->thanks_mail_enabled,
             'review_url' => $company->review_url ?? '',
             'accept_enabled' => (bool) $company->quote_accept_mail_enabled,
-            // De standaardteksten (NL) als voorbeeld/placeholder in het formulier.
+            // De standaardteksten (in de taal van de markt) als voorbeeld/placeholder in het formulier.
             'defaults' => [
-                'invoice_subject' => 'Factuur {factuurnummer} — {bedrijf}',
-                'invoice_body' => "Beste {klant},\n\nHierbij ontvangt u factuur {factuurnummer} van {factuurdatum} voor een bedrag van {bedrag}. De factuur vindt u als PDF in de bijlage.\n\nWij verzoeken u het bedrag uiterlijk {vervaldatum} te voldoen op {iban} onder vermelding van factuurnummer {factuurnummer}.",
-                'quote_subject' => 'Offerte {offertenummer} — {bedrijf}',
-                'quote_body' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
-                'thanks_subject' => 'Bedankt voor uw betaling — factuur {factuurnummer}',
-                'thanks_body' => "Beste {klant},\n\nWij hebben uw betaling voor factuur {factuurnummer} in goede orde ontvangen. Hartelijk dank voor de prettige samenwerking.",
-                'accept_subject' => 'Bevestiging van uw akkoord — offerte {offertenummer}',
-                'accept_body' => "Beste {ondertekenaar},\n\nU heeft offerte {offertenummer} van {bedrijf} op {akkoorddatum} geaccepteerd. Hierbij onze bevestiging.\n\nWij nemen binnenkort contact met u op over de planning en de verdere afspraken. Heeft u in de tussentijd vragen? Beantwoord dan gewoon deze e-mail.",
+                'invoice_subject' => __('Factuur {factuurnummer} — {bedrijf}'),
+                'invoice_body' => __("Beste {klant},\n\nHierbij ontvangt u factuur {factuurnummer} van {factuurdatum} voor een bedrag van {bedrag}. De factuur vindt u als PDF in de bijlage.\n\nWij verzoeken u het bedrag uiterlijk {vervaldatum} te voldoen op {iban} onder vermelding van factuurnummer {factuurnummer}."),
+                'quote_subject' => __('Offerte {offertenummer} — {bedrijf}'),
+                'quote_body' => __('Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.'),
+                'thanks_subject' => __('Bedankt voor uw betaling — factuur {factuurnummer}'),
+                'thanks_body' => __("Beste {klant},\n\nWij hebben uw betaling voor factuur {factuurnummer} in goede orde ontvangen. Hartelijk dank voor de prettige samenwerking."),
+                'accept_subject' => __('Bevestiging van uw akkoord — offerte {offertenummer}'),
+                'accept_body' => __("Beste {ondertekenaar},\n\nU heeft offerte {offertenummer} van {bedrijf} op {akkoorddatum} geaccepteerd. Hierbij onze bevestiging.\n\nWij nemen binnenkort contact met u op over de planning en de verdere afspraken. Heeft u in de tussentijd vragen? Beantwoord dan gewoon deze e-mail."),
             ],
         ]);
     }
@@ -360,7 +360,7 @@ class SettingsController extends Controller
         // Reviewlink: "g.page/r/…" zonder schema is ook goed — wij zetten https:// ervoor.
         $reviewUrl = self::normalizeUrl($data['review_url'] ?? null);
         if ($reviewUrl !== null && ! filter_var($reviewUrl, FILTER_VALIDATE_URL)) {
-            return back()->withErrors(['review_url' => 'Vul een geldige link in, bijvoorbeeld https://g.page/r/… of je Trustpilot-pagina.']);
+            return back()->withErrors(['review_url' => __('Vul een geldige link in, bijvoorbeeld https://g.page/r/… of je Trustpilot-pagina.')]);
         }
 
         // Alleen ingevulde teksten bewaren; leeg = terug naar de standaard.
@@ -377,7 +377,7 @@ class SettingsController extends Controller
             'quote_accept_mail_enabled' => $request->boolean('accept_enabled'),
         ]);
 
-        return back()->with('flash', 'E-mailteksten opgeslagen.');
+        return back()->with('flash', __('E-mailteksten opgeslagen.'));
     }
 
     /**
@@ -400,7 +400,7 @@ class SettingsController extends Controller
         $invoice = new \App\Models\Invoice([
             'number' => date('Y') . '-0042',
             'status' => 'paid',
-            'language' => 'nl',
+            'language' => \App\Support\Market::locale(),
             'invoice_date' => now()->subDays(12),
             'due_date' => now()->addDays(2),
             'paid_at' => now(),
@@ -419,11 +419,11 @@ class SettingsController extends Controller
             'kind' => 'payment',
             'amount' => 1210,
             'paid_on' => now()->toDateString(),
-            'method' => 'ideal',
+            'method' => \App\Support\Market::isPl() ? 'bank_transfer' : 'ideal',
         ]);
         $payment->exists = false;
 
-        $html = \App\Support\DocumentLocale::using('nl', fn () => (new \App\Mail\PaymentThanksMail($invoice, $payment, '', preview: true))->render());
+        $html = \App\Support\DocumentLocale::using(\App\Support\Market::locale(), fn () => (new \App\Mail\PaymentThanksMail($invoice, $payment, '', preview: true))->render());
 
         return response($html)->header('X-Robots-Tag', 'noindex');
     }
@@ -440,7 +440,7 @@ class SettingsController extends Controller
         $quote = new \App\Models\Quote([
             'number' => 'OFF-' . date('Y') . '-0007',
             'status' => 'accepted',
-            'language' => 'nl',
+            'language' => \App\Support\Market::locale(),
             'quote_date' => now()->subDays(6),
             'valid_until' => now()->addDays(24),
             'accepted_at' => now(),
@@ -456,11 +456,11 @@ class SettingsController extends Controller
         $quote->exists = false;
         $quote->setRelation('company', $company);
         $quote->setRelation('installments', collect([
-            new \App\Models\QuoteInstallment(['description' => 'Aanbetaling bij opdracht', 'percentage' => 30, 'amount' => 1542.75]),
-            new \App\Models\QuoteInstallment(['description' => 'Bij oplevering', 'percentage' => 70, 'amount' => 3599.75]),
+            new \App\Models\QuoteInstallment(['description' => __('Aanbetaling bij opdracht'), 'percentage' => 30, 'amount' => 1542.75]),
+            new \App\Models\QuoteInstallment(['description' => __('Bij oplevering'), 'percentage' => 70, 'amount' => 3599.75]),
         ]));
 
-        $html = \App\Support\DocumentLocale::using('nl', fn () => (new \App\Mail\QuoteAcceptedMail($quote, '', preview: true))->render());
+        $html = \App\Support\DocumentLocale::using(\App\Support\Market::locale(), fn () => (new \App\Mail\QuoteAcceptedMail($quote, '', preview: true))->render());
 
         return response($html)->header('X-Robots-Tag', 'noindex');
     }
@@ -505,6 +505,6 @@ class SettingsController extends Controller
             'warning_body' => 'nullable|string|max:4000',
         ]);
         auth()->user()->company->update(['reminder_settings' => $data]);
-        return back()->with('flash', 'Herinneringen opgeslagen.');
+        return back()->with('flash', __('Herinneringen opgeslagen.'));
     }
 }

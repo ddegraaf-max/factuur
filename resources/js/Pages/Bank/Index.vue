@@ -2,6 +2,7 @@
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import PontoCard from '@/Components/PontoCard.vue';
+import { t } from '@/i18n';
 import { eur } from '@/format.js';
 import { reactive, ref } from 'vue';
 
@@ -59,25 +60,25 @@ const ignore = (tx) => router.post(route('bank.ignore', tx.id), {}, { preserveSc
 
 const restore = (tx) => {
   const msg = tx.status === 'matched'
-    ? 'Koppeling ongedaan maken? De geboekte betaling wordt teruggedraaid.'
-    : 'Transactie weer openzetten?';
+    ? t('Koppeling ongedaan maken? De geboekte betaling wordt teruggedraaid.')
+    : t('Transactie weer openzetten?');
   if (confirm(msg)) router.post(route('bank.restore', tx.id), {}, { preserveScroll: true });
 };
 
-const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naam', leverancier: 'leverancier', kenmerk: 'kenmerk' };
+const reasonLabels = { factuurnummer: t('factuurnr.'), bedrag: t('bedrag'), naam: t('naam'), leverancier: t('leverancier'), kenmerk: t('kenmerk') };
 </script>
 
 <template>
-  <Head title="Bank & transacties" />
+  <Head :title="$t('Bank & transacties')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Bank / <span class="breadcrumb-current">Transacties</span></div>
+      <div class="breadcrumb">{{ $t('Bank') }} / <span class="breadcrumb-current">{{ $t('Transacties') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Bank &amp; transacties</h1>
-        <p class="page-subtitle">Importeer je bankafschrift en koppel transacties aan facturen en inkoopfacturen — betalingen worden automatisch geboekt.</p>
+        <h1 class="page-title">{{ $t('Bank & transacties') }}</h1>
+        <p class="page-subtitle">{{ $t('Importeer je bankafschrift en koppel transacties aan facturen en inkoopfacturen — betalingen worden automatisch geboekt.') }}</p>
       </div>
     </div>
 
@@ -95,8 +96,8 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
       >
         <input ref="fileInput" type="file" accept=".xml,.sta,.940,.mt940,.txt,.dat" style="display:none" @change="e => uploadFile(e.target.files?.[0])">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div class="bank-drop-title">{{ uploadForm.processing ? 'Bezig met importeren…' : 'Sleep je bankafschrift hierheen of klik om te kiezen' }}</div>
-        <div class="bank-drop-sub">Ondersteund: CAMT.053 (XML) of MT940 — te downloaden bij alle Nederlandse banken. Dubbele transacties worden automatisch overgeslagen, ook naast de bankkoppeling.</div>
+        <div class="bank-drop-title">{{ uploadForm.processing ? $t('Bezig met importeren…') : $t('Sleep je bankafschrift hierheen of klik om te kiezen') }}</div>
+        <div class="bank-drop-sub">{{ $t('Ondersteund: CAMT.053 (XML) of MT940 — te downloaden bij alle Nederlandse banken. Dubbele transacties worden automatisch overgeslagen, ook naast de bankkoppeling.') }}</div>
         <div v-if="uploadForm.errors.file" class="field-error" style="margin-top:8px;">{{ uploadForm.errors.file }}</div>
       </div>
 
@@ -104,9 +105,9 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
 
     <!-- Tabs -->
     <div class="filter-bar">
-      <button :class="['filter-chip', { active: tab === 'open' }]" @click="setTab('open')">Open <span class="count">{{ counts.open }}</span></button>
-      <button :class="['filter-chip', { active: tab === 'matched' }]" @click="setTab('matched')">Verwerkt <span class="count">{{ counts.matched }}</span></button>
-      <button :class="['filter-chip', { active: tab === 'ignored' }]" @click="setTab('ignored')">Genegeerd <span class="count">{{ counts.ignored }}</span></button>
+      <button :class="['filter-chip', { active: tab === 'open' }]" @click="setTab('open')">{{ $t('Open') }} <span class="count">{{ counts.open }}</span></button>
+      <button :class="['filter-chip', { active: tab === 'matched' }]" @click="setTab('matched')">{{ $t('Verwerkt') }} <span class="count">{{ counts.matched }}</span></button>
+      <button :class="['filter-chip', { active: tab === 'ignored' }]" @click="setTab('ignored')">{{ $t('Genegeerd') }} <span class="count">{{ counts.ignored }}</span></button>
     </div>
 
     <!-- Transacties -->
@@ -115,7 +116,7 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
         <div class="bank-row-main">
           <div class="bank-row-top">
             <span class="bank-date">{{ tx.booking_date_label }}</span>
-            <span class="bank-party">{{ tx.counterparty_name || 'Onbekende tegenpartij' }}</span>
+            <span class="bank-party">{{ tx.counterparty_name || $t('Onbekende tegenpartij') }}</span>
             <span v-if="tx.counterparty_iban" class="bank-iban">{{ tx.counterparty_iban }}</span>
           </div>
           <div class="bank-desc" :title="tx.description">{{ tx.description || '—' }}</div>
@@ -123,7 +124,7 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
           <!-- Suggestie -->
           <div v-if="tx.status === 'open' && tx.suggestion" class="bank-suggestion">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 4 12.7V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.3A7 7 0 0 1 12 2z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>
-            Suggestie: <b>{{ tx.suggestion.label }}</b>
+            {{ $t('Suggestie:') }} <b>{{ tx.suggestion.label }}</b>
             <span class="bank-reasons">({{ tx.suggestion.reasons.map(r => reasonLabels[r] || r).join(' + ') }})</span>
           </div>
 
@@ -131,12 +132,12 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
           <div v-if="tx.status === 'matched'" class="bank-matched">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <template v-if="tx.matched_invoice">
-              Gekoppeld aan factuur
+              {{ $t('Gekoppeld aan factuur') }}
               <Link :href="route('invoices.show', tx.matched_invoice.id)" style="color:var(--brand);font-weight:600;">{{ tx.matched_invoice.number }}</Link>
-              — betaling geboekt
+              — {{ $t('betaling geboekt') }}
             </template>
             <template v-else-if="tx.matched_purchase">
-              Gekoppeld aan inkoopfactuur van
+              {{ $t('Gekoppeld aan inkoopfactuur van') }}
               <Link :href="route('purchases.show', tx.matched_purchase.id)" style="color:var(--brand);font-weight:600;">{{ tx.matched_purchase.supplier_name }}</Link>
             </template>
           </div>
@@ -153,17 +154,17 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
               :value="chosenFor(tx)"
               @change="chosen[tx.id] = Number($event.target.value) || ''"
             >
-              <option value="">{{ tx.amount >= 0 ? '— Kies factuur —' : '— Kies inkoopfactuur —' }}</option>
+              <option value="">{{ tx.amount >= 0 ? $t('— Kies factuur —') : $t('— Kies inkoopfactuur —') }}</option>
               <option v-for="opt in (tx.amount >= 0 ? open_invoices : open_purchases)" :key="opt.id" :value="opt.id">{{ opt.label }}</option>
             </select>
             <div class="bank-actions">
-              <button class="btn btn-primary btn-sm" :disabled="!chosenFor(tx)" @click="match(tx)">Koppelen</button>
-              <button class="btn btn-secondary btn-sm" @click="ignore(tx)">Negeren</button>
+              <button class="btn btn-primary btn-sm" :disabled="!chosenFor(tx)" @click="match(tx)">{{ $t('Koppelen') }}</button>
+              <button class="btn btn-secondary btn-sm" @click="ignore(tx)">{{ $t('Negeren') }}</button>
             </div>
           </template>
           <template v-else>
             <button class="btn btn-secondary btn-sm" @click="restore(tx)">
-              {{ tx.status === 'matched' ? 'Ontkoppelen' : 'Herstellen' }}
+              {{ tx.status === 'matched' ? $t('Ontkoppelen') : $t('Herstellen') }}
             </button>
           </template>
         </div>
@@ -180,12 +181,12 @@ const reasonLabels = { factuurnummer: 'factuurnr.', bedrag: 'bedrag', naam: 'naa
 
     <div v-else class="card card-empty">
       <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">
-        {{ tab === 'open' ? 'Geen open transacties' : tab === 'matched' ? 'Nog niets verwerkt' : 'Niets genegeerd' }}
+        {{ tab === 'open' ? $t('Geen open transacties') : tab === 'matched' ? $t('Nog niets verwerkt') : $t('Niets genegeerd') }}
       </div>
       <div v-if="tab === 'open'">
-        Koppel je bank of importeer een bankafschrift hierboven — daarna koppel je hier elke transactie met één klik aan de juiste factuur.
+        {{ $t('Koppel je bank of importeer een bankafschrift hierboven — daarna koppel je hier elke transactie met één klik aan de juiste factuur.') }}
       </div>
-      <div v-else>Verwerkte en genegeerde transacties verschijnen hier.</div>
+      <div v-else>{{ $t('Verwerkte en genegeerde transacties verschijnen hier.') }}</div>
     </div>
   </AppLayout>
 </template>

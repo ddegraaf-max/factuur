@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue';
-import { useForm, Head } from '@inertiajs/vue3';
+import { useForm, Head, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({
@@ -10,6 +10,9 @@ const props = defineProps({
   review_url: { type: String, default: '' },
   accept_enabled: Boolean,
 });
+
+// Markt (nl/pl): naam van de online betaalmethode (iDEAL / BLIK).
+const market = usePage().props.market;
 
 const form = useForm({
   ...props.texts,
@@ -37,42 +40,41 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
 </script>
 
 <template>
-  <Head title="E-mailteksten" />
+  <Head :title="$t('E-mailteksten')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">E-mailteksten</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('E-mailteksten') }}</span></template>
     <template #topbar-actions>
-      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">Opslaan</button>
+      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">{{ $t('Opslaan') }}</button>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">E-mailteksten</h1>
-        <p class="page-subtitle">Bepaal zelf het onderwerp en de tekst van je factuur-, bedank- en offertemail. Leeg laten = de standaardtekst.</p>
+        <h1 class="page-title">{{ $t('E-mailteksten') }}</h1>
+        <p class="page-subtitle">{{ $t('Bepaal zelf het onderwerp en de tekst van je factuur-, bedank- en offertemail. Leeg laten = de standaardtekst.') }}</p>
       </div>
     </div>
 
     <div class="single-col">
       <div class="card">
-        <div class="card-header"><div class="card-title">Factuurmail</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Factuurmail') }}</div></div>
         <div class="card-body" style="padding:18px 20px;">
           <p class="txt-help">
-            Gebruik variabelen — ze worden automatisch ingevuld:
+            {{ $t('Gebruik variabelen — ze worden automatisch ingevuld:') }}
             <code>{klant}</code> <code>{bedrijf}</code> <code>{factuurnummer}</code>
             <code>{factuurdatum}</code> <code>{vervaldatum}</code> <code>{bedrag}</code>
             <code>{openstaand}</code> <code>{iban}</code>.
-            Begin je bericht zelf met een aanhef, bijvoorbeeld <code>Beste {klant},</code> —
-            de standaard-aanhef vervalt bij een eigen tekst.
+            {{ $t('Begin je bericht zelf met een aanhef, bijvoorbeeld') }} <code>{{ $t('Beste {klant},') }}</code> —
+            {{ $t('de standaard-aanhef vervalt bij een eigen tekst.') }}
           </p>
           <div class="txt-block">
-            <div class="txt-label">Onderwerp</div>
+            <div class="txt-label">{{ $t('Onderwerp') }}</div>
             <input type="text" v-model="form.invoice_subject" maxlength="200" :placeholder="defaults.invoice_subject" />
-            <div class="txt-label">Bericht</div>
+            <div class="txt-label">{{ $t('Bericht') }}</div>
             <textarea v-model="form.invoice_body" rows="8" maxlength="4000" :placeholder="defaults.invoice_body"></textarea>
           </div>
           <div class="txt-note">
-            De knop naar het klantenportaal, verrekeningsmeldingen ("reeds doorgestort") en de PDF-bijlage
-            blijven automatisch onder je tekst staan.
-            <button v-if="form.invoice_subject || form.invoice_body" type="button" class="txt-reset" @click="reset(['invoice_subject', 'invoice_body'])">Terug naar standaard</button>
+            {{ $t('De knop naar het klantenportaal, verrekeningsmeldingen ("reeds doorgestort") en de PDF-bijlage blijven automatisch onder je tekst staan.') }}
+            <button v-if="form.invoice_subject || form.invoice_body" type="button" class="txt-reset" @click="reset(['invoice_subject', 'invoice_body'])">{{ $t('Terug naar standaard') }}</button>
           </div>
         </div>
       </div>
@@ -81,55 +83,54 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
       <div class="card" style="margin-top:14px;">
         <div class="card-header thanks-head">
           <div>
-            <div class="card-title">Bedankmail na betaling</div>
-            <div class="thanks-sub">Een vriendelijk bedankje zodra een factuur volledig is betaald — in jouw huisstijl.</div>
+            <div class="card-title">{{ $t('Bedankmail na betaling') }}</div>
+            <div class="thanks-sub">{{ $t('Een vriendelijk bedankje zodra een factuur volledig is betaald — in jouw huisstijl.') }}</div>
           </div>
           <label class="switch" :class="{ on: form.thanks_enabled }">
             <input type="checkbox" v-model="form.thanks_enabled" />
             <span class="switch-track"><span class="switch-thumb"></span></span>
-            <span class="switch-text">{{ form.thanks_enabled ? 'Aan' : 'Uit' }}</span>
+            <span class="switch-text">{{ form.thanks_enabled ? $t('Ingeschakeld') : $t('Uitgeschakeld') }}</span>
           </label>
         </div>
         <div class="card-body" style="padding:18px 20px;">
           <div class="thanks-flow" :class="{ muted: !form.thanks_enabled }">
             <div class="flow-step">
               <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></span>
-              <div><b>Bankkoppeling</b><span>Automatisch zodra je een ontvangst koppelt.</span></div>
+              <div><b>{{ $t('Bankkoppeling') }}</b><span>{{ $t('Automatisch zodra je een ontvangst koppelt.') }}</span></div>
             </div>
             <div class="flow-step">
               <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-              <div><b>iDEAL via Mollie</b><span>Direct na de online betaling.</span></div>
+              <div><b>{{ $t(':method via Mollie', { method: market.online_payment_label }) }}</b><span>{{ $t('Direct na de online betaling.') }}</span></div>
             </div>
             <div class="flow-step">
               <span class="flow-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-              <div><b>Handmatig geboekt</b><span>Jij kiest het per betaling met een vinkje.</span></div>
+              <div><b>{{ $t('Handmatig geboekt') }}</b><span>{{ $t('Jij kiest het per betaling met een vinkje.') }}</span></div>
             </div>
           </div>
           <p class="txt-help">
-            De mail bevat automatisch een overzicht van de betaling (factuur, bedrag, datum, betaalwijze), een knop naar het
-            klantenportaal en de factuur met het stempel <b>BETAALD</b> als PDF — een betaalbewijs voor de administratie van je klant.
-            Variabelen: <code>{klant}</code> <code>{bedrijf}</code> <code>{factuurnummer}</code> <code>{factuurdatum}</code>
+            {{ $t('De mail bevat automatisch een overzicht van de betaling (factuur, bedrag, datum, betaalwijze), een knop naar het klantenportaal en de factuur met het stempel') }} <b>{{ $t('BETAALD') }}</b> {{ $t('als PDF — een betaalbewijs voor de administratie van je klant.') }}
+            {{ $t('Variabelen:') }} <code>{klant}</code> <code>{bedrijf}</code> <code>{factuurnummer}</code> <code>{factuurdatum}</code>
             <code>{bedrag}</code> <code>{betaaldatum}</code> <code>{betaalwijze}</code>.
-            Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.
+            {{ $t('Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.') }}
           </p>
           <div class="txt-block">
-            <div class="txt-label">Onderwerp</div>
+            <div class="txt-label">{{ $t('Onderwerp') }}</div>
             <input type="text" v-model="form.thanks_subject" maxlength="200" :placeholder="defaults.thanks_subject" />
-            <div class="txt-label">Bericht</div>
+            <div class="txt-label">{{ $t('Bericht') }}</div>
             <textarea v-model="form.thanks_body" rows="5" maxlength="4000" :placeholder="defaults.thanks_body"></textarea>
-            <div class="txt-label">Reviewlink <span class="txt-opt">optioneel</span></div>
-            <input type="text" v-model="form.review_url" maxlength="500" placeholder="https://g.page/r/... of je Trustpilot-, Klantenvertellen- of Google-pagina" />
+            <div class="txt-label">{{ $t('Reviewlink') }} <span class="txt-opt">{{ $t('optioneel') }}</span></div>
+            <input type="text" v-model="form.review_url" maxlength="500" :placeholder="$t('https://g.page/r/... of je Trustpilot-, Klantenvertellen- of Google-pagina')" />
             <div v-if="form.errors.review_url" class="field-error">{{ form.errors.review_url }}</div>
-            <div class="txt-hint">Met een link krijgt de bedankmail een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen.</div>
+            <div class="txt-hint">{{ $t('Met een link krijgt de bedankmail een knop "Laat een review achter". Direct na een betaling is hét moment om erom te vragen.') }}</div>
           </div>
           <div class="txt-note">
             <a :href="previewUrl" target="_blank" rel="noopener" class="txt-preview">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              Bekijk voorbeeld
+              {{ $t('Bekijk voorbeeld') }}
             </a>
             <span class="txt-sep">·</span>
-            <span>Overzicht, portaalknop en PDF-bijlage blijven automatisch staan.</span>
-            <button v-if="form.thanks_subject || form.thanks_body" type="button" class="txt-reset" @click="reset(['thanks_subject', 'thanks_body'])">Terug naar standaard</button>
+            <span>{{ $t('Overzicht, portaalknop en PDF-bijlage blijven automatisch staan.') }}</span>
+            <button v-if="form.thanks_subject || form.thanks_body" type="button" class="txt-reset" @click="reset(['thanks_subject', 'thanks_body'])">{{ $t('Terug naar standaard') }}</button>
           </div>
         </div>
       </div>
@@ -138,60 +139,58 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
       <div class="card" style="margin-top:14px;">
         <div class="card-header thanks-head">
           <div>
-            <div class="card-title">Bevestiging na akkoord op offerte</div>
-            <div class="thanks-sub">Naar de klant zodra hij de offerte in het portaal ondertekent — met de ondertekende offerte als PDF.</div>
+            <div class="card-title">{{ $t('Bevestiging na akkoord op offerte') }}</div>
+            <div class="thanks-sub">{{ $t('Naar de klant zodra hij de offerte in het portaal ondertekent — met de ondertekende offerte als PDF.') }}</div>
           </div>
           <label class="switch" :class="{ on: form.accept_enabled }">
             <input type="checkbox" v-model="form.accept_enabled" />
             <span class="switch-track"><span class="switch-thumb"></span></span>
-            <span class="switch-text">{{ form.accept_enabled ? 'Aan' : 'Uit' }}</span>
+            <span class="switch-text">{{ form.accept_enabled ? $t('Ingeschakeld') : $t('Uitgeschakeld') }}</span>
           </label>
         </div>
         <div class="card-body" style="padding:18px 20px;">
           <p class="txt-help">
-            De mail bevat automatisch het overzicht (offertenummer, datum akkoord, ondertekenaar, totaal), het termijnplan als dat er is,
-            een knop naar het portaal en de offerte als PDF. Markeer je een offerte zelf als geaccepteerd (bijv. akkoord per telefoon),
-            dan kies je per offerte of de bevestiging meegaat. Hier stel je de "hoe nu verder"-tekst in.
-            Variabelen: <code>{klant}</code> <code>{ondertekenaar}</code> <code>{bedrijf}</code> <code>{offertenummer}</code>
+            {{ $t('De mail bevat automatisch het overzicht (offertenummer, datum akkoord, ondertekenaar, totaal), het termijnplan als dat er is, een knop naar het portaal en de offerte als PDF. Markeer je een offerte zelf als geaccepteerd (bijv. akkoord per telefoon), dan kies je per offerte of de bevestiging meegaat. Hier stel je de "hoe nu verder"-tekst in.') }}
+            {{ $t('Variabelen:') }} <code>{klant}</code> <code>{ondertekenaar}</code> <code>{bedrijf}</code> <code>{offertenummer}</code>
             <code>{offertedatum}</code> <code>{akkoorddatum}</code> <code>{bedrag}</code>.
-            Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.
+            {{ $t('Begin je bericht zelf met een aanhef — de standaard-aanhef vervalt bij een eigen tekst.') }}
           </p>
           <div class="txt-block">
-            <div class="txt-label">Onderwerp</div>
+            <div class="txt-label">{{ $t('Onderwerp') }}</div>
             <input type="text" v-model="form.accept_subject" maxlength="200" :placeholder="defaults.accept_subject" />
-            <div class="txt-label">Bericht</div>
+            <div class="txt-label">{{ $t('Bericht') }}</div>
             <textarea v-model="form.accept_body" rows="6" maxlength="4000" :placeholder="defaults.accept_body"></textarea>
           </div>
           <div class="txt-note">
             <a :href="previewAcceptUrl" target="_blank" rel="noopener" class="txt-preview">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              Bekijk voorbeeld
+              {{ $t('Bekijk voorbeeld') }}
             </a>
             <span class="txt-sep">·</span>
-            <span>Overzicht, termijnplan, portaalknop en PDF-bijlage blijven automatisch staan.</span>
-            <button v-if="form.accept_subject || form.accept_body" type="button" class="txt-reset" @click="reset(['accept_subject', 'accept_body'])">Terug naar standaard</button>
+            <span>{{ $t('Overzicht, termijnplan, portaalknop en PDF-bijlage blijven automatisch staan.') }}</span>
+            <button v-if="form.accept_subject || form.accept_body" type="button" class="txt-reset" @click="reset(['accept_subject', 'accept_body'])">{{ $t('Terug naar standaard') }}</button>
           </div>
         </div>
       </div>
 
       <div class="card" style="margin-top:14px;">
-        <div class="card-header"><div class="card-title">Offertemail</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Offertemail') }}</div></div>
         <div class="card-body" style="padding:18px 20px;">
           <p class="txt-help">
-            Variabelen: <code>{klant}</code> <code>{bedrijf}</code> <code>{offertenummer}</code>
+            {{ $t('Variabelen:') }} <code>{klant}</code> <code>{bedrijf}</code> <code>{offertenummer}</code>
             <code>{offertedatum}</code> <code>{geldigtot}</code> <code>{bedrag}</code>.
-            De aanhef ("Beste {klant},") staat er als kop automatisch boven.
-            Vul je bij een specifieke offerte een eigen introtekst in, dan gaat díe voor.
+            {{ $t('De aanhef') }} ("<code>{{ $t('Beste {klant},') }}</code>") {{ $t('staat er als kop automatisch boven.') }}
+            {{ $t('Vul je bij een specifieke offerte een eigen introtekst in, dan gaat díe voor.') }}
           </p>
           <div class="txt-block">
-            <div class="txt-label">Onderwerp</div>
+            <div class="txt-label">{{ $t('Onderwerp') }}</div>
             <input type="text" v-model="form.quote_subject" maxlength="200" :placeholder="defaults.quote_subject" />
-            <div class="txt-label">Bericht</div>
+            <div class="txt-label">{{ $t('Bericht') }}</div>
             <textarea v-model="form.quote_body" rows="5" maxlength="4000" :placeholder="defaults.quote_body"></textarea>
           </div>
           <div class="txt-note">
-            Het totaalbedrag, de geldigheid en de knop "Bekijk en onderteken online" blijven automatisch staan.
-            <button v-if="form.quote_subject || form.quote_body" type="button" class="txt-reset" @click="reset(['quote_subject', 'quote_body'])">Terug naar standaard</button>
+            {{ $t('Het totaalbedrag, de geldigheid en de knop "Bekijk en onderteken online" blijven automatisch staan.') }}
+            <button v-if="form.quote_subject || form.quote_body" type="button" class="txt-reset" @click="reset(['quote_subject', 'quote_body'])">{{ $t('Terug naar standaard') }}</button>
           </div>
         </div>
       </div>
@@ -199,9 +198,8 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
       <div class="txt-lang-note">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>
-          <strong>Let op bij Engelstalige klanten:</strong> een eigen tekst wordt letterlijk gebruikt voor álle klanten,
-          ook klanten met taalinstelling Engels. De standaardteksten (ook die van de bedankmail) volgen wél automatisch de taal van de klant.
-          Herinneringen en aanmaningen hebben hun eigen teksten onder Instellingen → Herinneringen.
+          <strong>{{ $t('Let op bij Engelstalige klanten:') }}</strong> {{ $t('een eigen tekst wordt letterlijk gebruikt voor álle klanten, ook klanten met taalinstelling Engels. De standaardteksten (ook die van de bedankmail) volgen wél automatisch de taal van de klant.') }}
+          {{ $t('Herinneringen en aanmaningen hebben hun eigen teksten onder Instellingen → Herinneringen.') }}
         </div>
       </div>
     </div>

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Mail;
  * Eén centrale plek voor alle drie de boekroutes:
  *  - handmatig registreren  → vinkje in het formulier (send / blocker)
  *  - bankkoppeling          → sendIfEnabled
- *  - iDEAL via Mollie       → sendIfEnabled
+ *  - online (iDEAL/BLIK) via Mollie → sendIfEnabled
  */
 class PaymentThanksService
 {
@@ -31,19 +31,19 @@ class PaymentThanksService
     public function blocker(Invoice $invoice, bool $force = false): ?string
     {
         if ($invoice->is_credit) {
-            return 'Voor een creditnota versturen we geen bedankmail.';
+            return __('Voor een creditnota versturen we geen bedankmail.');
         }
         if ($invoice->status !== 'paid') {
-            return 'De factuur is nog niet volledig betaald.';
+            return __('De factuur is nog niet volledig betaald.');
         }
         if (! $invoice->customer_email) {
-            return 'Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.';
+            return __('Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.');
         }
         if (! $this->lastPayment($invoice)) {
-            return 'Er is geen echte betaling geboekt — alleen een afboeking of verrekening.';
+            return __('Er is geen echte betaling geboekt — alleen een afboeking of verrekening.');
         }
         if ($invoice->thanks_sent_at && ! $force) {
-            return 'Er is al een bedankmail verstuurd op '.$invoice->thanks_sent_at->translatedFormat('j F Y').'.';
+            return __('Er is al een bedankmail verstuurd op :date.', ['date' => $invoice->thanks_sent_at->translatedFormat('j F Y')]);
         }
 
         return null;

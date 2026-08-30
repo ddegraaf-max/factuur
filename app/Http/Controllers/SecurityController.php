@@ -50,12 +50,12 @@ class SecurityController extends Controller
         $request->validate(['code' => 'required|digits:6']);
         $user = auth()->user();
         if (! $user->two_factor_secret) {
-            throw ValidationException::withMessages(['code' => 'Geen setup actief.']);
+            throw ValidationException::withMessages(['code' => __('Geen setup actief.')]);
         }
         $secret = decrypt($user->two_factor_secret);
         $g2fa = new Google2FA();
         if (! $g2fa->verifyKey($secret, $request->input('code'))) {
-            throw ValidationException::withMessages(['code' => 'Ongeldige code, probeer opnieuw.']);
+            throw ValidationException::withMessages(['code' => __('Ongeldige code, probeer opnieuw.')]);
         }
 
         // Generate backup codes
@@ -83,7 +83,7 @@ class SecurityController extends Controller
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ]);
-        return redirect()->route('settings.security')->with('flash', 'Tweestapsverificatie uitgeschakeld.');
+        return redirect()->route('settings.security')->with('flash', __('Tweestapsverificatie uitgeschakeld.'));
     }
 
     public function regenerateBackupCodes()
@@ -98,6 +98,6 @@ class SecurityController extends Controller
 
         $user->update(['two_factor_recovery_codes' => encrypt(json_encode($codes))]);
 
-        return back()->with('flash', 'Nieuwe backup codes gegenereerd.');
+        return back()->with('flash', __('Nieuwe backup codes gegenereerd.'));
     }
 }

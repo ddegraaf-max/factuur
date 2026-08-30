@@ -69,7 +69,7 @@ class TripController extends Controller
 
                 return [
                     'customer_id' => $first->customer_id,
-                    'customer_name' => $first->customer?->name ?? 'Onbekend',
+                    'customer_name' => $first->customer?->name ?? __('Onbekend'),
                     'trips' => $group->count(),
                     'kilometers' => round($group->sum(fn ($t) => (float) $t->kilometers), 1),
                     'amount' => round($group->sum(fn ($t) => $t->amount()), 2),
@@ -90,7 +90,7 @@ class TripController extends Controller
             ],
             'billable_by_customer' => $billable,
             'customers' => Customer::orderBy('name')->get(['id', 'name']),
-            'default_km_rate' => (float) ($company->default_km_rate ?? 0.23),
+            'default_km_rate' => (float) ($company->default_km_rate ?? \App\Support\Market::get('km_rate', 0.23)),
         ]);
     }
 
@@ -98,29 +98,29 @@ class TripController extends Controller
     {
         Trip::create($this->validated($request));
 
-        return back()->with('flash', 'Rit geregistreerd.');
+        return back()->with('flash', __('Rit geregistreerd.'));
     }
 
     public function update(Request $request, Trip $trip): RedirectResponse
     {
         if ($trip->invoice_id) {
-            return back()->with('error', 'Deze rit staat al op een factuur en kan niet meer worden gewijzigd.');
+            return back()->with('error', __('Deze rit staat al op een factuur en kan niet meer worden gewijzigd.'));
         }
 
         $trip->update($this->validated($request));
 
-        return back()->with('flash', 'Rit bijgewerkt.');
+        return back()->with('flash', __('Rit bijgewerkt.'));
     }
 
     public function destroy(Trip $trip): RedirectResponse
     {
         if ($trip->invoice_id) {
-            return back()->with('error', 'Deze rit staat al op een factuur en kan niet worden verwijderd.');
+            return back()->with('error', __('Deze rit staat al op een factuur en kan niet worden verwijderd.'));
         }
 
         $trip->delete();
 
-        return back()->with('flash', 'Rit verwijderd.');
+        return back()->with('flash', __('Rit verwijderd.'));
     }
 
     /**
@@ -131,7 +131,7 @@ class TripController extends Controller
     {
         $data = $request->validate([
             'customer_id' => ['required', 'integer', Rule::exists('customers', 'id')->where('company_id', $request->user()->company_id)],
-            'vat_rate' => ['nullable', 'numeric', 'in:0,9,21'],
+            'vat_rate' => ['nullable', 'numeric', 'in:' . implode(',', \App\Support\Market::vatRates())],
         ]);
 
         $trips = Trip::billable()
@@ -141,7 +141,7 @@ class TripController extends Controller
             ->get();
 
         if ($trips->isEmpty()) {
-            return back()->with('error', 'Er staan geen factureerbare ritten open voor deze klant.');
+            return back()->with('error', __('Er staan geen factureerbare ritten open voor deze klant.'));
         }
 
         $lines = $trips->map(fn ($t) => [
@@ -150,7 +150,7 @@ class TripController extends Controller
             'quantity' => (float) $t->kilometers,
             'unit' => 'km',
             'unit_price' => $t->effectiveRate(),
-            'vat_rate' => (float) ($data['vat_rate'] ?? 21),
+            'vat_rate' => (float) ($data['vat_rate'] ?? \App\Support\Market::defaultVatRate()),
         ])->all();
 
         $invoice = $manager->create([
@@ -163,7 +163,7 @@ class TripController extends Controller
         $km = round($trips->sum(fn ($t) => (float) $t->kilometers), 1);
 
         return redirect()->route('invoices.edit', $invoice)
-            ->with('flash', "Conceptfactuur aangemaakt met {$km} km aan reiskosten — controleer en verstuur 'm.");
+            ->with('flash', __("Conceptfactuur aangemaakt met :km km aan reiskosten — controleer en verstuur 'm.", ['km' => $km]));
     }
 
     /* ===================== Helpers ===================== */
@@ -181,10 +181,10 @@ class TripController extends Controller
             'rate' => ['nullable', 'numeric', 'min:0', 'max:99'],
             'billable' => ['nullable', 'boolean'],
         ], [
-            'from_location.required' => 'Vul de vertreklocatie in.',
-            'to_location.required' => 'Vul de bestemming in.',
-            'kilometers.required' => 'Vul het aantal kilometers in.',
-            'kilometers.min' => 'Vul het aantal kilometers in.',
+            'from_location.required' => __('Vul de vertreklocatie in.'),
+            'to_location.required' => __('Vul de bestemming in.'),
+            'kilometers.required' => __('Vul het aantal kilometers in.'),
+            'kilometers.min' => __('Vul het aantal kilometers in.'),
         ]);
 
         return [

@@ -55,7 +55,7 @@ class RecurringInvoiceController extends Controller
     public function store(Request $request, Invoice $invoice): RedirectResponse
     {
         if ($invoice->is_credit) {
-            return back()->withErrors(['recurring' => 'Een creditnota kan niet terugkerend worden gemaakt.']);
+            return back()->withErrors(['recurring' => __('Een creditnota kan niet terugkerend worden gemaakt.')]);
         }
 
         $data = $request->validate([
@@ -93,7 +93,7 @@ class RecurringInvoiceController extends Controller
         ]);
 
         return redirect()->route('recurring.index')
-            ->with('flash', 'Terugkerend profiel aangemaakt. De eerste factuur volgt op '.Carbon::parse($data['next_run_on'])->translatedFormat('j M Y').'.');
+            ->with('flash', __('Terugkerend profiel aangemaakt. De eerste factuur volgt op :date.', ['date' => Carbon::parse($data['next_run_on'])->translatedFormat('j M Y')]));
     }
 
     public function update(Request $request, RecurringInvoice $recurring): RedirectResponse
@@ -113,13 +113,13 @@ class RecurringInvoiceController extends Controller
 
         $recurring->update($data);
 
-        return back()->with('flash', 'Terugkerend profiel bijgewerkt.');
+        return back()->with('flash', __('Terugkerend profiel bijgewerkt.'));
     }
 
     public function destroy(RecurringInvoice $recurring): RedirectResponse
     {
         $recurring->delete();
 
-        return back()->with('flash', 'Terugkerend profiel verwijderd. Al gegenereerde facturen blijven bestaan.');
+        return back()->with('flash', __('Terugkerend profiel verwijderd. Al gegenereerde facturen blijven bestaan.'));
     }
 }

@@ -52,7 +52,7 @@ class ScanPurchaseInbox extends Command
             try {
                 $contents = $item->contents();
                 if ($contents === null) {
-                    throw new \DomainException('Het bestand kon niet worden gelezen.');
+                    throw new \DomainException(__('Het bestand kon niet worden gelezen.'));
                 }
                 $update['scan'] = $scanner->scan($contents, $item->mime_type);
                 \App\Models\AiUsageEvent::record($item->company_id, 'receipt_scan', 'inbox_auto');
@@ -61,7 +61,8 @@ class ScanPurchaseInbox extends Command
                 $update['scan_error'] = mb_substr($e->getMessage(), 0, 300);
             } catch (\Throwable $e) {
                 Log::warning('Postvak-scan mislukt', ['item' => $item->id, 'error' => $e->getMessage()]);
-                $update['scan_error'] = 'Het bestand kon niet automatisch worden herkend.';
+                // Deze melding ziet de gebruiker op het kaartje in het Postvak IN.
+                $update['scan_error'] = __('Het bestand kon niet automatisch worden herkend.');
             }
 
             $item->forceFill($update)->saveQuietly();

@@ -54,7 +54,7 @@ class TeamController extends Controller
         return Inertia::render('Settings/Team', [
             'users' => $users,
             'invitations' => $invitations,
-            'roles' => User::ROLE_LABELS,
+            'roles' => array_map(fn ($label) => (string) __($label), User::ROLE_LABELS),
         ]);
     }
 
@@ -66,8 +66,8 @@ class TeamController extends Controller
             'email' => ['required', 'email', 'max:180'],
             'role' => ['required', 'in:owner,staff,accountant'],
         ], [
-            'email.required' => 'Vul een e-mailadres in.',
-            'email.email' => 'Dit is geen geldig e-mailadres.',
+            'email.required' => __('Vul een e-mailadres in.'),
+            'email.email' => __('Dit is geen geldig e-mailadres.'),
         ]);
 
         $email = mb_strtolower(trim($data['email']));
@@ -77,7 +77,7 @@ class TeamController extends Controller
         $existing = User::where('email', $email)->first();
         if ($existing && $existing->isMemberOf($me->company)) {
             throw ValidationException::withMessages([
-                'email' => 'Deze persoon is al lid van deze administratie.',
+                'email' => __('Deze persoon is al lid van deze administratie.'),
             ]);
         }
 
@@ -88,7 +88,7 @@ class TeamController extends Controller
 
         if ($pending && $pending->isUsable()) {
             throw ValidationException::withMessages([
-                'email' => 'Er staat al een uitnodiging klaar voor dit adres. Verstuur die zo nodig opnieuw.',
+                'email' => __('Er staat al een uitnodiging klaar voor dit adres. Verstuur die zo nodig opnieuw.'),
             ]);
         }
 
@@ -106,7 +106,7 @@ class TeamController extends Controller
 
         Mail::to($email)->send(new TeamInviteMail($invitation, $me->name));
 
-        return back()->with('flash', "Uitnodiging verstuurd naar {$email}.");
+        return back()->with('flash', __('Uitnodiging verstuurd naar :email.', ['email' => $email]));
     }
 
     public function updateRole(Request $request, User $member): RedirectResponse
@@ -120,11 +120,11 @@ class TeamController extends Controller
         ]);
 
         if ($member->id === $me->id) {
-            return back()->with('error', 'Je kunt je eigen rol niet aanpassen — vraag een andere beheerder.');
+            return back()->with('error', __('Je kunt je eigen rol niet aanpassen — vraag een andere beheerder.'));
         }
 
         if ($membership->pivot->role === 'owner' && $data['role'] !== 'owner' && $this->ownerCount($me->company_id) === 1) {
-            return back()->with('error', 'Er moet minstens één beheerder overblijven.');
+            return back()->with('error', __('Er moet minstens één beheerder overblijven.'));
         }
 
         $me->company->members()->updateExistingPivot($member->id, ['role' => $data['role']]);
@@ -134,7 +134,7 @@ class TeamController extends Controller
             $member->update(['role' => $data['role']]);
         }
 
-        return back()->with('flash', "Rol van {$member->name} aangepast naar " . User::ROLE_LABELS[$data['role']] . '.');
+        return back()->with('flash', __('Rol van :name aangepast naar :role.', ['name' => $member->name, 'role' => __(User::ROLE_LABELS[$data['role']])]));
     }
 
     public function removeUser(Request $request, User $member): RedirectResponse
@@ -144,11 +144,11 @@ class TeamController extends Controller
         abort_unless($membership, 404);
 
         if ($member->id === $me->id) {
-            return back()->with('error', 'Je kunt jezelf niet verwijderen.');
+            return back()->with('error', __('Je kunt jezelf niet verwijderen.'));
         }
 
         if ($membership->pivot->role === 'owner' && $this->ownerCount($me->company_id) === 1) {
-            return back()->with('error', 'Er moet minstens één beheerder overblijven.');
+            return back()->with('error', __('Er moet minstens één beheerder overblijven.'));
         }
 
         $me->company->members()->detach($member->id);
@@ -164,7 +164,7 @@ class TeamController extends Controller
             }
         }
 
-        return back()->with('flash', "{$member->name} is verwijderd uit het team.");
+        return back()->with('flash', __(':name is verwijderd uit het team.', ['name' => $member->name]));
     }
 
     public function resendInvite(Request $request, Invitation $invitation): RedirectResponse
@@ -180,7 +180,7 @@ class TeamController extends Controller
 
         Mail::to($invitation->email)->send(new TeamInviteMail($invitation, $me->name));
 
-        return back()->with('flash', "Uitnodiging opnieuw verstuurd naar {$invitation->email}.");
+        return back()->with('flash', __('Uitnodiging opnieuw verstuurd naar :email.', ['email' => $invitation->email]));
     }
 
     public function revokeInvite(Request $request, Invitation $invitation): RedirectResponse
@@ -189,7 +189,7 @@ class TeamController extends Controller
 
         $invitation->delete();
 
-        return back()->with('flash', 'Uitnodiging ingetrokken — de link werkt niet meer.');
+        return back()->with('flash', __('Uitnodiging ingetrokken — de link werkt niet meer.'));
     }
 
     private function ownerCount(int $companyId): int

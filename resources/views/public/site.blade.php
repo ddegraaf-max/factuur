@@ -41,8 +41,8 @@
       @if($company->logo_data)<img src="{{ $company->logo_data }}" alt="{{ $company->publicName() }}">@else<span class="mono">{{ mb_strtoupper(mb_substr($company->publicName(), 0, 1)) }}</span><span>{{ $company->publicName() }}</span>@endif
     </a>
     <div class="links">
-      @if($content['services'])<a href="#diensten">Diensten</a>@endif
-      @if($content['about']['text'])<a href="#over">Over ons</a>@endif
+      @if($content['services'])<a href="#diensten">{{ __('Diensten') }}</a>@endif
+      @if($content['about']['text'])<a href="#over">{{ __('Over ons') }}</a>@endif
       <a href="#contact" class="btn btn-brand" style="padding:9px 14px;">{{ $content['hero']['cta'] }}</a>
     </div>
   </nav>
@@ -52,12 +52,12 @@
     @if($content['hero']['subtitle'])<p>{{ $content['hero']['subtitle'] }}</p>@endif
     <div class="cta">
       <a class="btn btn-brand" href="#contact">{{ $content['hero']['cta'] }}</a>
-      @if($company->phone)<a class="btn" href="tel:{{ preg_replace('/[^0-9+]/', '', $company->phone) }}">Bel {{ $company->phone }}</a>@endif
+      @if($company->phone)<a class="btn" href="tel:{{ preg_replace('/[^0-9+]/', '', $company->phone) }}">{{ __('Bel :phone', ['phone' => $company->phone]) }}</a>@endif
     </div>
   </header>
 
   @if($content['services'])
-  <section id="diensten"><h2>Wat we doen</h2><div class="grid">@foreach($content['services'] as $s)<div class="box"><h3>{{ $s['title'] }}</h3><p>{{ $s['description'] }}</p></div>@endforeach</div></section>
+  <section id="diensten"><h2>{{ __('Wat we doen') }}</h2><div class="grid">@foreach($content['services'] as $s)<div class="box"><h3>{{ $s['title'] }}</h3><p>{{ $s['description'] }}</p></div>@endforeach</div></section>
   @endif
 
   @if($content['usps'])
@@ -77,27 +77,27 @@
         <form method="post" action="{{ route('site.lead', $company->public_slug) }}">
           @csrf
           <input class="hp" type="text" name="website_url" tabindex="-1" autocomplete="off">
-          <label for="name">Naam</label><input id="name" name="name" value="{{ old('name') }}" required>
+          <label for="name">{{ __('Naam') }}</label><input id="name" name="name" value="{{ old('name') }}" required>
           @error('name')<div class="err">{{ $message }}</div>@enderror
-          <label for="email">E-mail</label><input id="email" name="email" type="email" value="{{ old('email') }}" required>
+          <label for="email">{{ __('E-mail') }}</label><input id="email" name="email" type="email" value="{{ old('email') }}" required>
           @error('email')<div class="err">{{ $message }}</div>@enderror
-          <label for="phone">Telefoon (optioneel)</label><input id="phone" name="phone" value="{{ old('phone') }}">
-          <label for="message">Waar kunnen we je mee helpen?</label><textarea id="message" name="message" required>{{ old('message') }}</textarea>
+          <label for="phone">{{ __('Telefoon (optioneel)') }}</label><input id="phone" name="phone" value="{{ old('phone') }}">
+          <label for="message">{{ __('Waar kunnen we je mee helpen?') }}</label><textarea id="message" name="message" required>{{ old('message') }}</textarea>
           @error('message')<div class="err">{{ $message }}</div>@enderror
-          <button class="btn btn-brand" type="submit" style="margin-top:14px;">Verstuur bericht</button>
+          <button class="btn btn-brand" type="submit" style="margin-top:14px;">{{ __('Verstuur bericht') }}</button>
         </form>
       </div>
       <div class="details">
         <h3 style="margin-bottom:8px;">{{ $company->publicName() }}</h3>
-        @if($company->phone)<p>Telefoon: <b><a href="tel:{{ preg_replace('/[^0-9+]/', '', $company->phone) }}">{{ $company->phone }}</a></b></p>@endif
-        @if($company->email)<p>E-mail: <b><a href="mailto:{{ $company->email }}">{{ $company->email }}</a></b></p>@endif
-        @if($company->full_address)<p>Adres: <b>{{ $company->full_address }}</b></p>@endif
-        @if($company->kvk_number)<p>KvK: <b>{{ $company->kvk_number }}</b></p>@endif
-        @if($card_url)<p><a class="btn" href="{{ $card_url }}" style="margin-top:8px;">Digitaal visitekaartje</a></p>@endif
+        @if($company->phone)<p>{{ __('Telefoon') }}: <b><a href="tel:{{ preg_replace('/[^0-9+]/', '', $company->phone) }}">{{ $company->phone }}</a></b></p>@endif
+        @if($company->email)<p>{{ __('E-mail') }}: <b><a href="mailto:{{ $company->email }}">{{ $company->email }}</a></b></p>@endif
+        @if($company->full_address)<p>{{ __('Adres') }}: <b>{{ $company->full_address }}</b></p>@endif
+        @if($company->kvk_number)<p>{{ __('KvK') }}: <b>{{ $company->kvk_number }}</b></p>@endif
+        @if($card_url)<p><a class="btn" href="{{ $card_url }}" style="margin-top:8px;">{{ __('Digitaal visitekaartje') }}</a></p>@endif
       </div>
     </div>
   </section>
 
-  <footer><span>© {{ date('Y') }} {{ $company->publicName() }}</span>@if($card_url)<a href="{{ $card_url }}">Visitekaartje</a>@endif</footer>
+  <footer><span>© {{ date('Y') }} {{ $company->publicName() }}</span>@if($card_url)<a href="{{ $card_url }}">{{ __('Visitekaartje') }}</a>@endif</footer>
 </div>
 @endsection

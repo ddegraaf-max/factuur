@@ -2,8 +2,17 @@
 import { computed, ref, watch } from 'vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 
 const brand = usePage().props.brand;
+
+// Markt (nl/pl): de pakketten waaruit je overstapt verschillen per land.
+const market = usePage().props.market || {};
+const PACKAGES = {
+  nl: 'WeFact, Moneybird, e-Boekhouden',
+  pl: 'Fakturownia, iFirma, wFirma, inFakt',
+};
+const packages = PACKAGES[market.key] || PACKAGES.nl;
 
 const props = defineProps({ types: Object, fields: Object, preview: Object, result: Object });
 
@@ -23,66 +32,66 @@ const mappedLabel = (i) => { const f = targetFields.value.find(f => String(mappi
 const missingRequired = computed(() => targetFields.value.filter(f => f.required && (mapping.value[f.key] === undefined || mapping.value[f.key] === '' || mapping.value[f.key] === null)));
 
 const help = {
-  customers: 'WeFact: Debiteuren → Exporteren (CSV). Moneybird: Contacten → Exporteren. e-Boekhouden: Relaties → Exporteren. Excel: Opslaan als → CSV (puntkomma).',
-  products: 'WeFact: Producten → Exporteren. Moneybird: Producten → Exporteren. Of een eigen lijst met kolommen Naam, Prijs, Btw.',
-  invoices: 'Exporteer alleen de openstaande facturen: nummer, klant, datum, vervaldatum en totaalbedrag incl. btw. Ze komen als "verstuurd" binnen, zodat herinneringen en debiteurenoverzicht meteen kloppen.',
+  customers: t('WeFact: Debiteuren → Exporteren (CSV). Moneybird: Contacten → Exporteren. e-Boekhouden: Relaties → Exporteren. Excel: Opslaan als → CSV (puntkomma).'),
+  products: t('WeFact: Producten → Exporteren. Moneybird: Producten → Exporteren. Of een eigen lijst met kolommen Naam, Prijs, Btw.'),
+  invoices: t('Exporteer alleen de openstaande facturen: nummer, klant, datum, vervaldatum en totaalbedrag incl. btw. Ze komen als "verstuurd" binnen, zodat herinneringen en debiteurenoverzicht meteen kloppen.'),
 };
 </script>
 
 <template>
-  <Head title="Overstappen" />
+  <Head :title="$t('Overstappen')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Overstappen</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Overstappen') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Overstappen naar {{ brand.name }}</h1>
-        <p class="page-subtitle">Neem in tien minuten je klanten, producten en openstaande facturen over uit WeFact, Moneybird, e-Boekhouden, Excel of elk ander pakket. Upload een CSV-export; {{ brand.name }} herkent de kolommen en slaat dubbelen over.</p>
+        <h1 class="page-title">{{ $t('Overstappen naar :brand', { brand: brand.name }) }}</h1>
+        <p class="page-subtitle">{{ $t('Neem in tien minuten je klanten, producten en openstaande facturen over uit :packages, Excel of elk ander pakket. Upload een CSV-export; :brand herkent de kolommen en slaat dubbelen over.', { packages, brand: brand.name }) }}</p>
       </div>
     </div>
 
     <div v-if="result" class="card" style="margin-bottom:16px;">
       <div class="card-body imp-result">
-        <div class="imp-result-title">✓ {{ result.label }}: {{ result.created }} toegevoegd<span v-if="result.skipped">, {{ result.skipped }} overgeslagen (bestond al of onbruikbaar)</span></div>
+        <div class="imp-result-title">✓ {{ $t(result.label) }}: {{ $t(':n toegevoegd', { n: result.created }) }}<span v-if="result.skipped">, {{ $t(':n overgeslagen (bestond al of onbruikbaar)', { n: result.skipped }) }}</span></div>
         <ul v-if="result.errors && result.errors.length" class="imp-errors"><li v-for="e in result.errors" :key="e">{{ e }}</li></ul>
         <div class="imp-links">
-          <Link v-if="result.type === 'customers'" :href="route('customers.index')" class="btn btn-secondary btn-sm">Bekijk klanten</Link>
-          <Link v-if="result.type === 'products'" :href="route('products.index')" class="btn btn-secondary btn-sm">Bekijk producten</Link>
-          <Link v-if="result.type === 'invoices'" :href="route('invoices.index')" class="btn btn-secondary btn-sm">Bekijk facturen</Link>
+          <Link v-if="result.type === 'customers'" :href="route('customers.index')" class="btn btn-secondary btn-sm">{{ $t('Bekijk klanten') }}</Link>
+          <Link v-if="result.type === 'products'" :href="route('products.index')" class="btn btn-secondary btn-sm">{{ $t('Bekijk producten') }}</Link>
+          <Link v-if="result.type === 'invoices'" :href="route('invoices.index')" class="btn btn-secondary btn-sm">{{ $t('Bekijk facturen') }}</Link>
         </div>
       </div>
     </div>
 
     <div class="imp-grid">
       <div class="card">
-        <div class="card-header"><div class="card-title">1. Bestand uploaden</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('1. Bestand uploaden') }}</div></div>
         <div class="card-body">
           <div class="form-group">
-            <label>Wat wil je importeren?</label>
+            <label>{{ $t('Wat wil je importeren?') }}</label>
             <div class="imp-types">
-              <label v-for="(label, key) in types" :key="key" class="imp-type" :class="{ active: upload.type === key }"><input type="radio" v-model="upload.type" :value="key">{{ label }}</label>
+              <label v-for="(label, key) in types" :key="key" class="imp-type" :class="{ active: upload.type === key }"><input type="radio" v-model="upload.type" :value="key">{{ $t(label) }}</label>
             </div>
             <div class="muted-sm" style="margin-top:6px;">{{ help[upload.type] }}</div>
           </div>
           <div class="form-group">
-            <label>CSV-bestand</label>
+            <label>{{ $t('CSV-bestand') }}</label>
             <input type="file" accept=".csv,.txt,text/csv" @change="upload.file = $event.target.files[0] || null">
             <div v-if="upload.errors.file" class="field-error">{{ upload.errors.file }}</div>
           </div>
-          <button class="btn btn-primary" :disabled="!upload.file || upload.processing" @click="submitUpload">{{ upload.processing ? 'Bezig met inlezen…' : 'Inlezen en controleren' }}</button>
+          <button class="btn btn-primary" :disabled="!upload.file || upload.processing" @click="submitUpload">{{ upload.processing ? $t('Bezig met inlezen…') : $t('Inlezen en controleren') }}</button>
         </div>
       </div>
 
       <div class="card imp-help">
-        <div class="card-header"><div class="card-title">Zo doe je het</div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Zo doe je het') }}</div></div>
         <div class="card-body">
           <ol>
-            <li>Exporteer in je oude pakket als <b>CSV</b> (Excel-bestanden eerst opslaan als CSV).</li>
-            <li>Upload het hier — {{ brand.name }} herkent kolommen als naam, e-mail, adres, KvK, btw-nummer, prijs.</li>
-            <li>Controleer de koppeling in het voorbeeld en klik op importeren. Bestaande klanten (zelfde e-mail of naam) worden overgeslagen, dus je kunt het gerust twee keer draaien.</li>
-            <li>Volgorde: eerst klanten, dan producten, dan openstaande facturen.</li>
+            <li v-html="$t('Exporteer in je oude pakket als <b>CSV</b> (Excel-bestanden eerst opslaan als CSV).')"></li>
+            <li>{{ $t('Upload het hier — :brand herkent kolommen als naam, e-mail, adres, KvK, btw-nummer, prijs.', { brand: brand.name }) }}</li>
+            <li>{{ $t('Controleer de koppeling in het voorbeeld en klik op importeren. Bestaande klanten (zelfde e-mail of naam) worden overgeslagen, dus je kunt het gerust twee keer draaien.') }}</li>
+            <li>{{ $t('Volgorde: eerst klanten, dan producten, dan openstaande facturen.') }}</li>
           </ol>
-          <div class="muted-sm">Historie van betaalde facturen hoef je niet over te nemen; die blijft in je oude pakket (of in je <Link :href="route('export.index')" style="color:var(--brand);">XAF-auditfile</Link>). Loop je vast? Mail je export naar <a :href="'mailto:' + brand.email" style="color:var(--brand);">{{ brand.email }}</a> — wij zetten hem voor je over.</div>
+          <div class="muted-sm">{{ $t('Historie van betaalde facturen hoef je niet over te nemen; die blijft in je oude pakket (of in je') }} <Link :href="route('export.index')" style="color:var(--brand);">{{ $t('XAF-auditfile') }}</Link>). {{ $t('Loop je vast? Mail je export naar') }} <a :href="'mailto:' + brand.email" style="color:var(--brand);">{{ brand.email }}</a> — {{ $t('wij zetten hem voor je over.') }}</div>
         </div>
       </div>
     </div>
@@ -90,18 +99,18 @@ const help = {
     <div v-if="preview" class="card" style="margin-top:16px;">
       <div class="card-header">
         <div>
-          <div class="card-title">2. Kolommen koppelen — {{ preview.filename }}</div>
-          <div class="card-subtitle">{{ preview.total }} regels gevonden · {{ types[preview.type] }}. Kies per kolom uit je bestand het {{ brand.name }}-veld (of "overslaan").</div>
+          <div class="card-title">{{ $t('2. Kolommen koppelen') }} — {{ preview.filename }}</div>
+          <div class="card-subtitle">{{ $t(':n regels gevonden · :type. Kies per kolom uit je bestand het :brand-veld (of "overslaan").', { n: preview.total, type: $t(types[preview.type]), brand: brand.name }) }}</div>
         </div>
       </div>
       <div class="card-body-flush imp-scroll">
         <table class="data-table imp-table">
           <thead>
             <tr><th v-for="(h, i) in preview.headers" :key="i" class="imp-th">
-              <div class="imp-source">{{ h || '(leeg)' }}</div>
+              <div class="imp-source">{{ h || $t('(leeg)') }}</div>
               <select :value="targetFields.find(f => String(mapping[f.key]) === String(i))?.key || ''" @change="e => { for (const f of targetFields) if (String(mapping[f.key]) === String(i)) delete mapping[f.key]; if (e.target.value) mapping[e.target.value] = i; }">
-                <option value="">— overslaan —</option>
-                <option v-for="f in targetFields" :key="f.key" :value="f.key">{{ f.label }}{{ f.required ? ' *' : '' }}</option>
+                <option value="">{{ $t('— overslaan —') }}</option>
+                <option v-for="f in targetFields" :key="f.key" :value="f.key">{{ $t(f.label) }}{{ f.required ? ' *' : '' }}</option>
               </select>
             </th></tr>
           </thead>
@@ -111,8 +120,8 @@ const help = {
         </table>
       </div>
       <div class="imp-footer">
-        <div class="muted-sm"><template v-if="missingRequired.length">Nog te koppelen: <b>{{ missingRequired.map(f => f.label).join(', ') }}</b></template><template v-else>Alle verplichte velden zijn gekoppeld.</template></div>
-        <button class="btn btn-primary" :disabled="missingRequired.length || commit.processing" @click="submitCommit">{{ commit.processing ? 'Bezig met importeren…' : `Importeer ${preview.total} ${types[preview.type].toLowerCase()}` }}</button>
+        <div class="muted-sm"><template v-if="missingRequired.length">{{ $t('Nog te koppelen:') }} <b>{{ missingRequired.map(f => $t(f.label)).join(', ') }}</b></template><template v-else>{{ $t('Alle verplichte velden zijn gekoppeld.') }}</template></div>
+        <button class="btn btn-primary" :disabled="missingRequired.length || commit.processing" @click="submitCommit">{{ commit.processing ? $t('Bezig met importeren…') : $t('Importeer :n :type', { n: preview.total, type: $t(types[preview.type]).toLowerCase() }) }}</button>
       </div>
     </div>
   </AppLayout>

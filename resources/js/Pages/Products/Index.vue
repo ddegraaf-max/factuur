@@ -20,29 +20,29 @@ watch(search, (v) => {
 </script>
 
 <template>
-  <Head title="Producten" />
+  <Head :title="$t('Producten')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Verkoop / <span class="breadcrumb-current">Producten</span></div>
+      <div class="breadcrumb">{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Producten') }}</span></div>
     </template>
     <template #topbar-actions>
       <Link :href="route('products.create')" class="btn btn-primary btn-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nieuw product
+        {{ $t('Nieuw product') }}
       </Link>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Producten &amp; diensten</h1>
-        <p class="page-subtitle">{{ products.total }} items · sjablonen voor factuurregels</p>
+        <h1 class="page-title">{{ $t('Producten & diensten') }}</h1>
+        <p class="page-subtitle">{{ $t(':n items · sjablonen voor factuurregels', { n: products.total }) }}</p>
       </div>
     </div>
 
     <div class="filter-bar">
       <div class="filter-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input v-model="search" type="text" placeholder="Zoek producten...">
+        <input v-model="search" type="text" :placeholder="$t('Zoek producten...')">
       </div>
     </div>
 
@@ -50,12 +50,12 @@ watch(search, (v) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th>Naam</th>
+            <th>{{ $t('Naam') }}</th>
             <th>SKU</th>
-            <th>Eenheid</th>
-            <th class="right">Prijs</th>
-            <th>BTW</th>
-            <th>Status</th>
+            <th>{{ $t('Eenheid') }}</th>
+            <th class="right">{{ $t('Prijs') }}</th>
+            <th>{{ $t('BTW') }}</th>
+            <th>{{ $t('Status') }}</th>
             <th></th>
           </tr>
         </thead>
@@ -66,12 +66,12 @@ watch(search, (v) => {
               <div v-if="p.description" class="product-desc">{{ p.description }}</div>
             </td>
             <td class="mono" style="color:var(--text-3);font-size:12px;" data-label="SKU">{{ p.sku || '—' }}</td>
-            <td data-label="Eenheid">{{ p.unit }}</td>
-            <td class="num right" data-label="Prijs">{{ eur(p.price) }}</td>
-            <td class="num" data-label="BTW">{{ Number(p.vat_rate) }}%</td>
-            <td data-label="Status">
-              <span v-if="p.is_active" class="pill pill-paid" style="font-size:10px;">Actief</span>
-              <span v-else class="pill pill-draft" style="font-size:10px;">Inactief</span>
+            <td :data-label="$t('Eenheid')">{{ p.unit }}</td>
+            <td class="num right" :data-label="$t('Prijs')">{{ eur(p.price) }}</td>
+            <td class="num" :data-label="$t('BTW')">{{ Number(p.vat_rate) }}%</td>
+            <td :data-label="$t('Status')">
+              <span v-if="p.is_active" class="pill pill-paid" style="font-size:10px;">{{ $t('Actief') }}</span>
+              <span v-else class="pill pill-draft" style="font-size:10px;">{{ $t('Inactief') }}</span>
             </td>
             <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg></td>
           </tr>
@@ -84,9 +84,9 @@ watch(search, (v) => {
       </div>
     </div>
     <div v-else class="card card-empty">
-      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen producten</div>
-      <div style="margin-bottom:20px;">Voeg producten of diensten toe om sneller facturen te maken.</div>
-      <Link :href="route('products.create')" class="btn btn-primary btn-sm" style="display:inline-flex;">+ Nieuw product</Link>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">{{ $t('Nog geen producten') }}</div>
+      <div style="margin-bottom:20px;">{{ $t('Voeg producten of diensten toe om sneller facturen te maken.') }}</div>
+      <Link :href="route('products.create')" class="btn btn-primary btn-sm" style="display:inline-flex;">+ {{ $t('Nieuw product') }}</Link>
     </div>
   </AppLayout>
 </template>

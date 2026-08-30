@@ -30,18 +30,18 @@ class CreditNoteController extends Controller
                 'sent_at' => now(),
             ]);
             return redirect()->route('invoices.show', $credit)
-                ->with('flash', 'Creditnota ' . $credit->number . ' aangemaakt en verstuurd.');
+                ->with('flash', __('Creditnota :number aangemaakt en verstuurd.', ['number' => $credit->number]));
         }
 
         // Partial: open as draft to edit
         return redirect()->route('invoices.edit', $credit)
-            ->with('flash', 'Concept creditnota aangemaakt — pas regels aan.');
+            ->with('flash', __('Concept creditnota aangemaakt — pas regels aan.'));
     }
 
     public function finalize(Invoice $invoice)
     {
         if (! $invoice->is_credit || $invoice->status !== 'draft') {
-            abort(422, 'Niet een conceptcreditnota.');
+            abort(422, __('Niet een conceptcreditnota.'));
         }
 
         $invoice->update([
@@ -51,6 +51,6 @@ class CreditNoteController extends Controller
         ]);
 
         return redirect()->route('invoices.show', $invoice)
-            ->with('flash', 'Creditnota ' . $invoice->number . ' verstuurd.');
+            ->with('flash', __('Creditnota :number verstuurd.', ['number' => $invoice->number]));
     }
 }

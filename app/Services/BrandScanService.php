@@ -33,7 +33,7 @@ class BrandScanService
     public function scan(string $bytes, string $mimeType): array
     {
         if (! $this->enabled()) {
-            throw new \DomainException('De AI-herkenning is niet geconfigureerd.');
+            throw new \DomainException(__('De AI-herkenning is niet geconfigureerd.'));
         }
 
         set_time_limit(180);
@@ -73,21 +73,21 @@ class BrandScanService
             $message = $client->beta->messages->create(...$params);
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error('Huisstijlherkenning: ongeldige Anthropic API-key', ['error' => $e->getMessage()]);
-            throw new \DomainException('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).');
+            throw new \DomainException(__('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).'));
         } catch (\Anthropic\Core\Exceptions\RateLimitException) {
-            throw new \DomainException('De AI-dienst is even druk. Probeer het over een minuut opnieuw.');
+            throw new \DomainException(__('De AI-dienst is even druk. Probeer het over een minuut opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIStatusException $e) {
             Log::warning('Huisstijlherkenning: API-fout', ['type' => $e->type?->value, 'error' => mb_substr($e->getMessage(), 0, 300)]);
-            throw new \DomainException('Het document kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.');
+            throw new \DomainException(__('Het document kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIConnectionException) {
-            throw new \DomainException('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.');
+            throw new \DomainException(__('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.'));
         }
 
         if ($message->stopReason === 'refusal') {
-            throw new \DomainException('De AI wilde dit document niet verwerken. Stel de kleuren handmatig in.');
+            throw new \DomainException(__('De AI wilde dit document niet verwerken. Stel de kleuren handmatig in.'));
         }
         if ($message->stopReason === 'max_tokens') {
-            throw new \DomainException('Het document is te complex om automatisch te herkennen. Stel de kleuren handmatig in.');
+            throw new \DomainException(__('Het document is te complex om automatisch te herkennen. Stel de kleuren handmatig in.'));
         }
 
         $json = null;
@@ -100,7 +100,7 @@ class BrandScanService
 
         if (! is_array($json)) {
             Log::warning('Huisstijlherkenning: onleesbaar antwoord van het model');
-            throw new \DomainException('Het document kon niet worden gelezen. Probeer een scherpere afbeelding.');
+            throw new \DomainException(__('Het document kon niet worden gelezen. Probeer een scherpere afbeelding.'));
         }
 
         return $this->sanitize($json);
@@ -123,7 +123,7 @@ class BrandScanService
                     'accent_color' => $nullable($hex + ['description' => 'Een secundaire/accentkleur als hexcode, als die er duidelijk is. Anders null.']),
                     'font' => ['type' => 'string', 'enum' => ['sans', 'serif'], 'description' => 'Straalt de typografie een schreefloze (sans) of schreef- (serif) stijl uit?'],
                     'template' => ['type' => 'string', 'enum' => ['modern', 'classic', 'minimal'], 'description' => 'Welk factuurtemplate past het best: modern (kleurband, stevig), classic (formeel, lijnen/tabellen), minimal (veel witruimte, rustig)?'],
-                    'motivation' => $nullable(['type' => 'string', 'description' => 'Eén korte zin in het Nederlands: waarom deze kleuren en stijl.']),
+                    'motivation' => $nullable(['type' => 'string', 'description' => 'Eén korte zin in het ' . (\App\Support\Market::isPl() ? 'Pools' : 'Nederlands') . ': waarom deze kleuren en stijl.']),
                 ],
                 'required' => ['has_brand', 'brand_color', 'accent_color', 'font', 'template', 'motivation'],
                 'additionalProperties' => false,
@@ -147,7 +147,7 @@ class BrandScanService
         - template: modern = krachtig met kleurband, classic = formeel met
           lijnen en tabellen, minimal = veel witruimte en rust. Kies wat het
           best bij de uitstraling past.
-        - motivation: één korte Nederlandse zin.
+        - motivation: één korte zin, in dezelfde taal als de schema-omschrijving vraagt.
         - Zit er geen herkenbare huisstijl in het document, zet dan has_brand
           op false.
         PROMPT;
@@ -156,7 +156,7 @@ class BrandScanService
     protected function sanitize(array $json): array
     {
         if (($json['has_brand'] ?? false) !== true) {
-            throw new \DomainException('Er is geen herkenbare huisstijl gevonden in dit document. Probeer een huisstijlgids, briefpapier of een bestaande factuur.');
+            throw new \DomainException(__('Er is geen herkenbare huisstijl gevonden in dit document. Probeer een huisstijlgids, briefpapier of een bestaande factuur.'));
         }
 
         $hex = function ($value): ?string {
@@ -167,7 +167,7 @@ class BrandScanService
 
         $brand = $hex($json['brand_color'] ?? null);
         if ($brand === null) {
-            throw new \DomainException('Er kon geen merkkleur worden herkend. Stel de kleur handmatig in.');
+            throw new \DomainException(__('Er kon geen merkkleur worden herkend. Stel de kleur handmatig in.'));
         }
 
         return [

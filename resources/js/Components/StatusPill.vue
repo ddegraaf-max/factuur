@@ -17,7 +17,7 @@ const labels = {
 
 <template>
   <span :class="['pill', `pill-${status}`]">
-    <template v-if="status === 'overdue' && daysOverdue > 0">{{ daysOverdue }} d. over tijd</template>
-    <template v-else>{{ labels[status] || status }}</template>
+    <template v-if="status === 'overdue' && daysOverdue > 0">{{ $t(':n d. over tijd', { n: daysOverdue }) }}</template>
+    <template v-else>{{ $t(labels[status] || status) }}</template>
   </span>
 </template>

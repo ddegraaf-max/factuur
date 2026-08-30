@@ -23,14 +23,14 @@ const copyCodes = () => {
 </script>
 
 <template>
-  <Head title="Beveiliging" />
+  <Head :title="$t('Beveiliging')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Beveiliging</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Beveiliging') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Beveiliging</h1>
-        <p class="page-subtitle">Beheer je inlogbeveiliging en accountveiligheid</p>
+        <h1 class="page-title">{{ $t('Beveiliging') }}</h1>
+        <p class="page-subtitle">{{ $t('Beheer je inlogbeveiliging en accountveiligheid') }}</p>
       </div>
     </div>
 
@@ -43,27 +43,27 @@ const copyCodes = () => {
       </div>
       <div>
         <div class="status-title">
-          Tweestapsverificatie
-          <span class="pill" :class="enabled ? 'pill-paid' : 'pill-draft'">{{ enabled ? 'Actief' : 'Inactief' }}</span>
+          {{ $t('Tweestapsverificatie') }}
+          <span class="pill" :class="enabled ? 'pill-paid' : 'pill-draft'">{{ enabled ? $t('Actief') : $t('Inactief') }}</span>
         </div>
         <div class="status-detail">
-          <span v-if="enabled">Geactiveerd. Bij elke nieuwe login vraagt {{ brand.name }} een 6-cijferige code uit je authenticator app.</span>
-          <span v-else>Voeg een extra beveiligingslaag toe. Naast je wachtwoord vraagt {{ brand.name }} om een tijdelijke code uit een authenticator app.</span>
+          <span v-if="enabled">{{ $t('Geactiveerd. Bij elke nieuwe login vraagt :brand een 6-cijferige code uit je authenticator app.', { brand: brand.name }) }}</span>
+          <span v-else>{{ $t('Voeg een extra beveiligingslaag toe. Naast je wachtwoord vraagt :brand om een tijdelijke code uit een authenticator app.', { brand: brand.name }) }}</span>
         </div>
       </div>
       <div>
-        <button v-if="!enabled" class="btn btn-primary btn-sm" @click="startSetup">Activeren</button>
-        <button v-else class="btn btn-secondary btn-sm" @click="showDisable = true">Deactiveren</button>
+        <button v-if="!enabled" class="btn btn-primary btn-sm" @click="startSetup">{{ $t('Activeren') }}</button>
+        <button v-else class="btn btn-secondary btn-sm" @click="showDisable = true">{{ $t('Deactiveren') }}</button>
       </div>
     </div>
 
     <div v-if="enabled" class="card">
       <div class="card-header">
         <div>
-          <div class="card-title">Backup codes</div>
-          <div class="card-subtitle">{{ backup_codes.length }} codes beschikbaar — gebruik er één als je geen toegang hebt tot je authenticator</div>
+          <div class="card-title">{{ $t('Backup codes') }}</div>
+          <div class="card-subtitle">{{ $t(':n codes beschikbaar — gebruik er één als je geen toegang hebt tot je authenticator', { n: backup_codes.length }) }}</div>
         </div>
-        <button class="btn btn-secondary btn-sm" @click="regenerateCodes">Nieuwe genereren</button>
+        <button class="btn btn-secondary btn-sm" @click="regenerateCodes">{{ $t('Nieuwe genereren') }}</button>
       </div>
       <div class="card-body">
         <div class="backup-codes">
@@ -71,23 +71,23 @@ const copyCodes = () => {
             <span class="n">{{ String(i+1).padStart(2,'0') }}</span> {{ c }}
           </div>
         </div>
-        <button class="btn btn-ghost btn-sm" @click="copyCodes" style="margin-top:12px;">Kopiëren naar klembord</button>
-        <div class="footnote">Tip: print uit of bewaar in je wachtwoordmanager. Elke code werkt eenmalig.</div>
+        <button class="btn btn-ghost btn-sm" @click="copyCodes" style="margin-top:12px;">{{ $t('Kopiëren naar klembord') }}</button>
+        <div class="footnote">{{ $t('Tip: print uit of bewaar in je wachtwoordmanager. Elke code werkt eenmalig.') }}</div>
       </div>
     </div>
 
     <!-- Disable confirm modal -->
     <div v-if="showDisable" class="modal-overlay" @click.self="showDisable = false">
       <div class="modal">
-        <div class="modal-header"><div class="modal-title">Tweestapsverificatie uitschakelen?</div></div>
+        <div class="modal-header"><div class="modal-title">{{ $t('Tweestapsverificatie uitschakelen?') }}</div></div>
         <div class="modal-body">
-          <p>Bevestig met je wachtwoord om door te gaan.</p>
-          <input type="password" v-model="disableForm.password" placeholder="Huidig wachtwoord" />
+          <p>{{ $t('Bevestig met je wachtwoord om door te gaan.') }}</p>
+          <input type="password" v-model="disableForm.password" :placeholder="$t('Huidig wachtwoord')" />
           <div v-if="disableForm.errors.password" class="field-error">{{ disableForm.errors.password }}</div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary btn-sm" @click="showDisable = false">Annuleren</button>
-          <button class="btn btn-danger btn-sm" @click="disable" :disabled="disableForm.processing">Uitschakelen</button>
+          <button class="btn btn-secondary btn-sm" @click="showDisable = false">{{ $t('Annuleren') }}</button>
+          <button class="btn btn-danger btn-sm" @click="disable" :disabled="disableForm.processing">{{ $t('Uitschakelen') }}</button>
         </div>
       </div>
     </div>

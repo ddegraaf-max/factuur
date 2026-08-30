@@ -107,22 +107,22 @@ const logout = () => {
 </script>
 
 <template>
-  <Head title="E-mail bevestigen" />
+  <Head :title="$t('E-mail bevestigen')" />
   <AuthLayout>
     <template #hero>
-      <h2>Bevestig je e-mailadres</h2>
-      <p>We hebben een 6-cijferige code gestuurd. Voer 'm hieronder in om je account te activeren.</p>
+      <h2>{{ $t('Bevestig je e-mailadres') }}</h2>
+      <p>{{ $t("We hebben een 6-cijferige code gestuurd. Voer 'm hieronder in om je account te activeren.") }}</p>
       <ul class="hero-bullets">
-        <li>Code is 15 minuten geldig</li>
-        <li>Check ook je spam-map</li>
-        <li>Nieuwe code? Vraag 'm hieronder aan</li>
+        <li>{{ $t('Code is 15 minuten geldig') }}</li>
+        <li>{{ $t('Check ook je spam-map') }}</li>
+        <li>{{ $t("Nieuwe code? Vraag 'm hieronder aan") }}</li>
       </ul>
     </template>
 
     <div class="login-form-card verify-card">
-      <div class="login-form-title">Bevestig je e-mailadres</div>
+      <div class="login-form-title">{{ $t('Bevestig je e-mailadres') }}</div>
       <div class="login-form-sub">
-        We stuurden een code naar <strong>{{ email }}</strong>.
+        {{ $t('We stuurden een code naar') }} <strong>{{ email }}</strong>.
       </div>
 
       <div v-if="flash" class="status-message">{{ flash }}</div>
@@ -148,18 +148,18 @@ const logout = () => {
         <div v-if="form.errors.code" class="field-error otp-error">{{ form.errors.code }}</div>
 
         <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing || digits.some(d => !d)">
-          {{ form.processing ? 'Bezig…' : 'Bevestigen' }}
+          {{ form.processing ? $t('Bezig…') : $t('Code bevestigen') }}
         </button>
       </form>
 
       <div class="verify-actions">
         <button type="button" class="link-btn" :disabled="cooldown > 0 || resendForm.processing" @click="resend">
-          <span v-if="cooldown > 0">Nieuwe code over {{ cooldown }}s</span>
-          <span v-else-if="resendForm.processing">Versturen…</span>
-          <span v-else>Stuur nieuwe code</span>
+          <span v-if="cooldown > 0">{{ $t('Nieuwe code over :n s', { n: cooldown }) }}</span>
+          <span v-else-if="resendForm.processing">{{ $t('Versturen…') }}</span>
+          <span v-else>{{ $t('Stuur nieuwe code') }}</span>
         </button>
         <span class="verify-sep">·</span>
-        <button type="button" class="link-btn" @click="logout">Andere e-mail gebruiken</button>
+        <button type="button" class="link-btn" @click="logout">{{ $t('Andere e-mail gebruiken') }}</button>
       </div>
     </div>
   </AuthLayout>

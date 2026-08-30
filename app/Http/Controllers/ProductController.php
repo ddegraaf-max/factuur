@@ -38,7 +38,7 @@ class ProductController extends Controller
     public function store(Request $request): RedirectResponse
     {
         Product::create($this->validated($request));
-        return redirect()->route('products.index')->with('flash', 'Product aangemaakt.');
+        return redirect()->route('products.index')->with('flash', __('Product aangemaakt.'));
     }
 
     public function edit(Product $product): Response
@@ -52,13 +52,13 @@ class ProductController extends Controller
     public function update(Request $request, Product $product): RedirectResponse
     {
         $product->update($this->validated($request));
-        return redirect()->route('products.index')->with('flash', 'Product bijgewerkt.');
+        return redirect()->route('products.index')->with('flash', __('Product bijgewerkt.'));
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
-        return redirect()->route('products.index')->with('flash', 'Product verwijderd.');
+        return redirect()->route('products.index')->with('flash', __('Product verwijderd.'));
     }
 
     protected function validated(Request $request): array
@@ -69,7 +69,7 @@ class ProductController extends Controller
             'sku' => ['nullable', 'string', 'max:50'],
             'unit' => ['required', 'string', 'max:30'],
             'price' => ['required', 'numeric', 'min:0'],
-            'vat_rate' => ['required', 'numeric', 'in:0,9,21'],
+            'vat_rate' => ['required', 'numeric', 'in:' . implode(',', \App\Support\Market::vatRates())],
             'is_active' => ['boolean'],
         ]);
     }

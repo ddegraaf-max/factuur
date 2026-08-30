@@ -1,8 +1,8 @@
 @php
     $openRaw = (float) $invoice->total - (float) $invoice->paid_total;
-    $open = number_format($openRaw, 2, ',', '.');
-    $total = number_format((float) $invoice->total, 2, ',', '.');
-    $settled = number_format((float) $invoice->paid_total, 2, ',', '.');
+    $open = money($openRaw);
+    $total = money($invoice->total);
+    $settled = money($invoice->paid_total);
     $terms = (int) ($invoice->payment_terms ?? $company->default_payment_terms ?? 14);
     $logo = $company->logoBinary();
 @endphp

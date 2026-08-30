@@ -17,7 +17,7 @@ class ActivityLogController extends Controller
         $logs = $query->paginate(50)->withQueryString()->through(fn (ActivityLog $l) => [
             'id' => $l->id,
             'when' => $l->created_at->translatedFormat('j M Y · H:i'),
-            'user' => $l->user_name ?: 'Systeem',
+            'user' => $l->user_name ?: __('Systeem'),
             'action' => $l->action,
             'action_label' => $l->action_label,
             'type' => $l->subject_type,
@@ -40,19 +40,19 @@ class ActivityLogController extends Controller
     /** CSV voor de accountant of een geschil: alles binnen de gekozen filters. */
     public function export(Request $request)
     {
-        $rows = ["datum;tijd;gebruiker;actie;onderwerp;omschrijving;wijzigingen;ip"];
+        $rows = [__('datum;tijd;gebruiker;actie;onderwerp;omschrijving;wijzigingen;ip')];
         $this->filtered($request)->orderBy('id')->chunk(500, function ($chunk) use (&$rows) {
             foreach ($chunk as $l) {
                 $clean = fn ($v) => '"' . str_replace('"', '""', (string) $v) . '"';
                 $changes = $l->changes ? implode(' | ', array_map(fn ($k, $c) => "{$k}: " . ($c['van'] ?? '') . ' → ' . ($c['naar'] ?? ''), array_keys($l->changes), $l->changes)) : '';
                 $rows[] = implode(';', [
-                    $l->created_at->format('Y-m-d'), $l->created_at->format('H:i:s'), $clean($l->user_name ?: 'Systeem'),
+                    $l->created_at->format('Y-m-d'), $l->created_at->format('H:i:s'), $clean($l->user_name ?: __('Systeem')),
                     $clean($l->action_label), $clean($l->subject_type), $clean($l->description), $clean($changes), $l->ip,
                 ]);
             }
         });
 
-        Audit::log('exported', null, 'Logboek geëxporteerd als CSV');
+        Audit::log('exported', null, __('Logboek geëxporteerd als CSV'));
 
         return response(implode("\n", $rows) . "\n", 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',

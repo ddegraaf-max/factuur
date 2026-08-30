@@ -24,8 +24,8 @@ class DailySummaryMail extends Mailable
         $overdue = $this->summary['overdue']['count'] ?? 0;
 
         $subject = $overdue > 0
-            ? sprintf('%d factu%s vervallen — je dagoverzicht', $overdue, $overdue === 1 ? 'ur' : 'ren')
-            : 'Je dagoverzicht van ' . Brand::name();
+            ? trans_choice(':count factuur vervallen — je dagoverzicht|:count facturen vervallen — je dagoverzicht', $overdue, ['count' => $overdue])
+            : __('Je dagoverzicht van :brand', ['brand' => Brand::name()]);
 
         return new Envelope(subject: $subject);
     }

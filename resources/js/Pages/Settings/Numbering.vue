@@ -1,7 +1,8 @@
 <script setup>
 import { reactive, computed } from 'vue';
-import { router, Head } from '@inertiajs/vue3';
+import { router, Head, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   numbering: Object,
@@ -9,10 +10,14 @@ const props = defineProps({
 
 const state = reactive({ numbering: JSON.parse(JSON.stringify(props.numbering)) });
 
+// Markt (nl/pl): in Polen is "FV/{year}/{sequence:4}" het gangbare factuurnummer-formaat.
+const market = usePage().props.market;
+const formatExample = market.key === 'pl' ? 'FV/{year}/{sequence:4}' : '{year}-{sequence:4}';
+
 const rows = [
-  { key: 'invoices', label: 'Facturen' },
-  { key: 'customers', label: 'Klanten' },
-  { key: 'products',  label: 'Producten' },
+  { key: 'invoices', label: t('Facturen') },
+  { key: 'customers', label: t('Klanten') },
+  { key: 'products',  label: t('Producten') },
 ];
 
 const next = (key) => {
@@ -26,41 +31,43 @@ const submit = () => router.patch(route('settings.numbering.update'), { numberin
 </script>
 
 <template>
-  <Head title="Nummering" />
+  <Head :title="$t('Nummering')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Nummering</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Nummering') }}</span></template>
     <template #topbar-actions>
-      <button class="btn btn-primary btn-sm" @click="submit">Opslaan</button>
+      <button class="btn btn-primary btn-sm" @click="submit">{{ $t('Opslaan') }}</button>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Nummering</h1>
-        <p class="page-subtitle">Voorvoegsel en startnummer per onderdeel</p>
+        <h1 class="page-title">{{ $t('Nummering') }}</h1>
+        <p class="page-subtitle">{{ $t('Voorvoegsel en startnummer per onderdeel') }}</p>
       </div>
     </div>
 
     <div class="card">
       <div class="card-body">
         <div class="numbering-hint">
-          Je kunt automatisch het jaartal of de maand in het voorvoegsel gebruiken. Gebruik hiervoor:
-          <code>{jaar}</code> of <code>{maand}</code>.
+          {{ $t('Je kunt automatisch het jaartal of de maand in het voorvoegsel gebruiken. Gebruik hiervoor:') }}
+          <code>{jaar}</code> {{ $t('of') }} <code>{maand}</code>.
+          <br>
+          {{ $t('Het volledige factuurnummer-formaat (bijv. :example) stel je in bij Instellingen → Bedrijfsgegevens.', { example: formatExample }) }}
         </div>
         <table class="numbering-table stacked-table">
           <thead>
             <tr>
               <th></th>
-              <th>Voorvoegsel</th>
-              <th>Beginnen op</th>
-              <th>Volgend nummer</th>
+              <th>{{ $t('Voorvoegsel') }}</th>
+              <th>{{ $t('Beginnen op') }}</th>
+              <th>{{ $t('Volgend nummer') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="row in rows" :key="row.key">
               <td class="cell-primary"><b>{{ row.label }}</b></td>
-              <td data-label="Voorvoegsel"><input type="text" v-model="state.numbering[row.key].prefix" maxlength="10" class="mono" /></td>
-              <td data-label="Beginnen op"><input type="number" v-model.number="state.numbering[row.key].start" min="1" /></td>
-              <td data-label="Volgend nummer"><span class="next-pill">{{ next(row.key) }}</span></td>
+              <td :data-label="$t('Voorvoegsel')"><input type="text" v-model="state.numbering[row.key].prefix" maxlength="10" class="mono" /></td>
+              <td :data-label="$t('Beginnen op')"><input type="number" v-model.number="state.numbering[row.key].start" min="1" /></td>
+              <td :data-label="$t('Volgend nummer')"><span class="next-pill">{{ next(row.key) }}</span></td>
             </tr>
           </tbody>
         </table>

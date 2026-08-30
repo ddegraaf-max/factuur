@@ -60,10 +60,10 @@ class AccountDataController extends Controller
         }
 
         $zip->addFromString('volledige-export.json', json_encode($all, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-        $zip->addFromString('LEESMIJ.txt', 'Export van de ' . Brand::name() . "-administratie \"{$company->name}\" op " . now()->format('d-m-Y H:i') . ".\n\nElke CSV is puntkomma-gescheiden (UTF-8) en opent direct in Excel. volledige-export.json bevat dezelfde gegevens in één bestand.\nBijlagen (PDF's, bonnen) zitten niet in deze export; download die per document.\n");
+        $zip->addFromString('LEESMIJ.txt', __('Export van de :brand-administratie ":company" op :date.', ['brand' => Brand::name(), 'company' => $company->name, 'date' => now()->format('d-m-Y H:i')]) . "\n\n" . __('Elke CSV is puntkomma-gescheiden (UTF-8) en opent direct in Excel. volledige-export.json bevat dezelfde gegevens in één bestand.') . "\n" . __("Bijlagen (PDF's, bonnen) zitten niet in deze export; download die per document.") . "\n");
         $zip->close();
 
-        Audit::log('exported', null, 'Volledige export van de administratie gedownload (ZIP)');
+        Audit::log('exported', null, __('Volledige export van de administratie gedownload (ZIP)'));
 
         return response()->download($path, Brand::key() . '-export-' . now()->format('Y-m-d') . '.zip', ['Content-Type' => 'application/zip'])->deleteFileAfterSend(true);
     }
@@ -79,13 +79,13 @@ class AccountDataController extends Controller
         ]);
 
         if (! Hash::check($data['password'], $user->password)) {
-            return back()->with('error', 'Het wachtwoord klopt niet — er is niets verwijderd.');
+            return back()->with('error', __('Het wachtwoord klopt niet — er is niets verwijderd.'));
         }
         if (mb_strtolower(trim($data['confirm'])) !== mb_strtolower($company->name)) {
-            return back()->with('error', 'De bedrijfsnaam komt niet overeen — er is niets verwijderd.');
+            return back()->with('error', __('De bedrijfsnaam komt niet overeen — er is niets verwijderd.'));
         }
         if ($company->is_exempt) {
-            return back()->with('error', 'Deze administratie kan niet via deze weg worden verwijderd.');
+            return back()->with('error', __('Deze administratie kan niet via deze weg worden verwijderd.'));
         }
 
         $name = $company->name;
@@ -97,7 +97,7 @@ class AccountDataController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('flash', "De administratie \"{$name}\" is definitief verwijderd. Bedankt dat je " . Brand::name() . ' gebruikte.');
+        return redirect('/')->with('flash', __('De administratie ":name" is definitief verwijderd. Bedankt dat je :brand gebruikte.', ['name' => $name, 'brand' => Brand::name()]));
     }
 
     private function csv(array $rows): string

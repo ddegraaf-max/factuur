@@ -24,8 +24,8 @@ class SepaDirectDebitService
     public function blockers(Company $company): array
     {
         $missing = [];
-        if (! Iban::valid($company->iban)) $missing[] = 'een geldig IBAN van je bedrijf';
-        if (! preg_match('/^[A-Z]{2}\d{2}[A-Z0-9]{3}\d{6,}$/', strtoupper(preg_replace('/\s/', '', (string) $company->sepa_creditor_id)))) $missing[] = 'je Incassant-ID (bijv. NL12ZZZ123456780000, aan te vragen bij je bank)';
+        if (! Iban::valid($company->iban)) $missing[] = __('een geldig IBAN van je bedrijf');
+        if (! preg_match('/^[A-Z]{2}\d{2}[A-Z0-9]{3}\d{6,}$/', strtoupper(preg_replace('/\s/', '', (string) $company->sepa_creditor_id)))) $missing[] = __('je Incassant-ID (bijv. NL12ZZZ123456780000, aan te vragen bij je bank)');
 
         return $missing;
     }
@@ -49,12 +49,12 @@ class SepaDirectDebitService
     public function createBatch(Company $company, array $invoiceIds, Carbon $collectionDate, ?int $userId = null): DirectDebitBatch
     {
         if ($this->blockers($company)) {
-            throw new \DomainException('Vul eerst ' . implode(' en ', $this->blockers($company)) . ' in bij Bedrijfsgegevens.');
+            throw new \DomainException(__('Vul eerst :missing in bij Bedrijfsgegevens.', ['missing' => implode(' ' . __('en') . ' ', $this->blockers($company))]));
         }
 
         $invoices = $this->collectable($company)->whereIn('id', $invoiceIds);
         if ($invoices->isEmpty()) {
-            throw new \DomainException('Geen incasseerbare facturen gekozen.');
+            throw new \DomainException(__('Geen incasseerbare facturen gekozen.'));
         }
 
         return DB::transaction(function () use ($company, $invoices, $collectionDate, $userId) {
@@ -164,7 +164,7 @@ class SepaDirectDebitService
                 $w->startElement('DbtrAgt'); $w->startElement('FinInstnId'); $w->startElement('Othr'); $w->writeElement('Id', 'NOTPROVIDED'); $w->endElement(); $w->endElement(); $w->endElement();
                 $w->startElement('Dbtr'); $w->writeElement('Nm', $clean($l['holder'])); $w->endElement();
                 $w->startElement('DbtrAcct'); $w->startElement('Id'); $w->writeElement('IBAN', $l['iban']); $w->endElement(); $w->endElement();
-                $w->startElement('RmtInf'); $w->writeElement('Ustrd', $clean('Factuur ' . $l['number'] . ' ' . $company->name, 140)); $w->endElement();
+                $w->startElement('RmtInf'); $w->writeElement('Ustrd', $clean(__('Factuur') . ' ' . $l['number'] . ' ' . $company->name, 140)); $w->endElement();
                 $w->endElement();
             }
             $w->endElement();

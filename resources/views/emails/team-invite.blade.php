@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uitnodiging {{ brand('name') }}</title>
+    <title>{{ __('Uitnodiging :brand', ['brand' => brand('name')]) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -32,26 +32,26 @@
                 </div>
             </div>
             <div class="body">
-                <h1>Je bent uitgenodigd 🎉</h1>
-                <p><strong>{{ $inviter }}</strong> nodigt je uit om mee te werken in de {{ brand('name') }}-omgeving van <strong>{{ $company }}</strong>.</p>
+                <h1>{{ __('Je bent uitgenodigd') }} 🎉</h1>
+                <p>{!! __('<strong>:inviter</strong> nodigt je uit om mee te werken in de :brand-omgeving van <strong>:company</strong>.', ['inviter' => e($inviter), 'brand' => e(brand('name')), 'company' => e($company)]) !!}</p>
 
                 <div class="role-box">
-                    Je rol wordt: <strong>{{ $roleLabel }}</strong>
+                    {!! __('Je rol wordt: <strong>:role</strong>', ['role' => e(__($roleLabel))]) !!}
                 </div>
 
-                <p>Klik op de knop, kies een wachtwoord en je kunt direct aan de slag — een eigen abonnement is niet nodig.</p>
+                <p>{{ __('Klik op de knop, kies een wachtwoord en je kunt direct aan de slag — een eigen abonnement is niet nodig.') }}</p>
 
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 24px 0 8px;">
                     <tr>
                         <td class="btn-td">
-                            <a href="{{ $url }}" class="btn">Uitnodiging accepteren&nbsp;&nbsp;→</a>
+                            <a href="{{ $url }}" class="btn">{{ __('Uitnodiging accepteren') }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
 
                 <div class="meta">
-                    Deze uitnodiging is geldig tot <strong>{{ $expires }}</strong>.
-                    Verwachtte je deze e-mail niet? Dan kun je hem veilig negeren.
+                    {!! __('Deze uitnodiging is geldig tot <strong>:date</strong>.', ['date' => e($expires)]) !!}
+                    {{ __('Verwachtte je deze e-mail niet? Dan kun je hem veilig negeren.') }}
                 </div>
             </div>
             <div class="footer">

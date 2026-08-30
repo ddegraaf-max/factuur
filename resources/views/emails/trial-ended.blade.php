@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je {{ brand('name') }}-proefperiode is afgelopen</title>
+    <title>{{ __('Je :brand-proefperiode is afgelopen', ['brand' => brand('name')]) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -38,29 +38,29 @@
                 </div>
             </div>
             <div class="body">
-                <h1>Hi {{ $firstName }},</h1>
+                <h1>{{ __('Hi :name,', ['name' => $firstName]) }}</h1>
 
-                <p>Je gratis proefperiode van {{ brand('name') }} is vandaag afgelopen. Je account en al je gegevens blijven bewaard — je hebt alleen even geen toegang meer tot de app totdat je een abonnement afsluit.</p>
+                <p>{{ __('Je gratis proefperiode van :brand is vandaag afgelopen. Je account en al je gegevens blijven bewaard — je hebt alleen even geen toegang meer tot de app totdat je een abonnement afsluit.', ['brand' => brand('name')]) }}</p>
 
                 <div class="notice-box">
-                    <div class="notice-title">Je proefperiode is afgelopen</div>
-                    <div class="notice-sub">Sluit een abonnement af om weer verder te gaan</div>
+                    <div class="notice-title">{{ __('Je proefperiode is afgelopen') }}</div>
+                    <div class="notice-sub">{{ __('Sluit een abonnement af om weer verder te gaan') }}</div>
                 </div>
 
-                <p>Vanaf <strong>€ 12,10 per maand</strong> (incl. btw) heb je meteen weer volledige toegang tot alles:</p>
+                <p>{!! __(':price heb je meteen weer volledige toegang tot alles:', ['price' => ucfirst(__('vanaf <strong>€ 12,10 per maand</strong> (incl. btw)'))]) !!}</p>
                 <ul class="feats">
-                    <li>Onbeperkt facturen, klanten en producten</li>
-                    <li>BTW automatisch · herinneringen · incasso</li>
-                    <li>Maandelijks opzegbaar — geen verplichtingen</li>
+                    <li>{{ __('Onbeperkt facturen, klanten en producten') }}</li>
+                    <li>{{ __('BTW automatisch · herinneringen · incasso') }}</li>
+                    <li>{{ __('Maandelijks opzegbaar — geen verplichtingen') }}</li>
                 </ul>
 
                 <div class="btn-wrap">
-                    <a href="{{ $billingUrl }}" class="btn">Abonnement afsluiten</a>
+                    <a href="{{ $billingUrl }}" class="btn">{{ __('Abonnement afsluiten') }}</a>
                 </div>
-                <div class="price">Veilig betalen · maandelijks opzegbaar</div>
+                <div class="price">{{ __('Veilig betalen · maandelijks opzegbaar') }}</div>
 
                 <div class="meta">
-                    Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
+                    {{ __('Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op') }} <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
                 </div>
             </div>
             <div class="footer">

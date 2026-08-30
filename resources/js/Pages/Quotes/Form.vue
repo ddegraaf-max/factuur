@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur, parseDutchNumber } from '@/format.js';
+import { eur, fmtDateLong, parseDutchNumber } from '@/format.js';
+import { t } from '@/i18n';
 import axios from 'axios';
 import { computed, ref } from 'vue';
 
@@ -19,9 +20,12 @@ const props = defineProps({
 });
 
 const isEdit = computed(() => !!props.quote);
+
+// Markt (nl/pl): standaard btw-tarief voor nieuwe regels.
+const market = usePage().props.market;
 // De schakelaar op het formulier (form.price_mode) wint van de bedrijfsinstelling.
 const inclMode = computed(() => form.price_mode === 'incl');
-const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
+const priceLabel = computed(() => inclMode.value ? t('Prijs incl. btw') : t('Prijs'));
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -67,7 +71,7 @@ const form = useForm({
         vat_rate: Number(l.vat_rate),
         discount_pct: Number(l.discount_pct) || 0,
       }))
-    : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21, discount_pct: 0 }],
+    : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: market.default_vat, discount_pct: 0 }],
   action: 'draft',
 });
 
@@ -141,11 +145,11 @@ const lineTotal = (line) => calcLine(line).total;
 const validUntilLabel = computed(() => {
   const d = new Date(form.quote_date);
   d.setDate(d.getDate() + Number(form.valid_days || 0));
-  return d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+  return fmtDateLong(d);
 });
 
 const addLine = () => {
-  form.lines.push({ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: 21, discount_pct: 0 });
+  form.lines.push({ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: market.default_vat, discount_pct: 0 });
 };
 
 const removeLine = (i) => {
@@ -195,10 +199,10 @@ const applyParsed = (r) => {
     }));
   }
 
-  const bits = [`${r.lines.length} regel${r.lines.length === 1 ? '' : 's'} ingevuld`];
-  if (r.customer_id) bits.push('klant herkend');
-  else if (r.customer_name) bits.push(`klant "${r.customer_name}" staat nog niet in je klantenlijst — kies er zelf een`);
-  aiNotice.value = `Offerte overgenomen (${bits.join(', ')}) — controleer alles even voor je opslaat.`;
+  const bits = [r.lines.length === 1 ? t('1 regel ingevuld') : t(':n regels ingevuld', { n: r.lines.length })];
+  if (r.customer_id) bits.push(t('klant herkend'));
+  else if (r.customer_name) bits.push(t('klant ":name" staat nog niet in je klantenlijst — kies er zelf een', { name: r.customer_name }));
+  aiNotice.value = t('Offerte overgenomen (:details) — controleer alles even voor je opslaat.', { details: bits.join(', ') });
   aiWarning.value = r.warning || '';
 };
 
@@ -212,7 +216,7 @@ const parseWithAi = async () => {
   } catch (e) {
     aiError.value = e.response?.data?.message
       || e.response?.data?.errors?.text?.[0]
-      || 'Herkennen is niet gelukt. Probeer het opnieuw of vul het formulier handmatig in.';
+      || t('Herkennen is niet gelukt. Probeer het opnieuw of vul het formulier handmatig in.');
   } finally {
     aiBusy.value = false;
   }
@@ -245,12 +249,12 @@ const submit = (action) => {
 </script>
 
 <template>
-  <Head :title="isEdit ? 'Offerte bewerken' : 'Nieuwe offerte'" />
+  <Head :title="isEdit ? $t('Offerte bewerken') : $t('Nieuwe offerte')" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Verkoop / <Link :href="route('quotes.index')" style="color:var(--text-3);">Offertes</Link> /
-        <span class="breadcrumb-current">{{ isEdit ? 'Bewerken' : 'Nieuw' }}</span>
+        {{ $t('Verkoop') }} / <Link :href="route('quotes.index')" style="color:var(--text-3);">{{ $t('Offertes') }}</Link> /
+        <span class="breadcrumb-current">{{ isEdit ? $t('Bewerken') : $t('Nieuw') }}</span>
       </div>
     </template>
 
@@ -258,23 +262,23 @@ const submit = (action) => {
       <div>
         <Link :href="route('quotes.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Terug
+          {{ $t('Terug') }}
         </Link>
-        <h1 class="page-title">{{ isEdit ? 'Offerte bewerken' : 'Nieuwe offerte' }}</h1>
+        <h1 class="page-title">{{ isEdit ? $t('Offerte bewerken') : $t('Nieuwe offerte') }}</h1>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" :disabled="form.processing" @click="submit('draft')">
-          Opslaan als concept
+          {{ $t('Opslaan als concept') }}
         </button>
         <button class="btn btn-primary btn-sm" :disabled="form.processing" @click="submit('send')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Versturen
+          {{ $t('Versturen') }}
         </button>
       </div>
     </div>
 
     <div v-if="hasErrors" class="form-error-banner">
-      Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.
+      {{ $t('Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.') }}
     </div>
 
     <div class="form-layout">
@@ -283,19 +287,19 @@ const submit = (action) => {
         <div v-if="ai_enabled" class="card" style="margin-bottom:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Offerte uit tekst</div>
-              <div class="card-subtitle">Schrijf je je offertes met Claude of ChatGPT? Plak de tekst hieronder — klant, regels en teksten worden ingevuld en jij controleert ze.</div>
+              <div class="card-title">{{ $t('Offerte uit tekst') }}</div>
+              <div class="card-subtitle">{{ $t('Schrijf je je offertes met Claude of ChatGPT? Plak de tekst hieronder — klant, regels en teksten worden ingevuld en jij controleert ze.') }}</div>
             </div>
           </div>
           <div class="card-body">
-            <textarea v-model="aiText" rows="5" placeholder="Plak hier de volledige offertetekst — inclusief de prijzen…"></textarea>
+            <textarea v-model="aiText" rows="5" :placeholder="$t('Plak hier de volledige offertetekst — inclusief de prijzen…')"></textarea>
             <div class="ai-actions">
               <button type="button" class="btn btn-primary btn-sm" :disabled="aiBusy || !aiText.trim()" @click="parseWithAi">
                 <svg v-if="!aiBusy" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                 <svg v-else class="ai-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>
-                {{ aiBusy ? 'Tekst wordt gelezen…' : 'Formulier invullen' }}
+                {{ aiBusy ? $t('Tekst wordt gelezen…') : $t('Formulier invullen') }}
               </button>
-              <span class="ai-hint">Er wordt niets opgeslagen totdat jij op "Opslaan als concept" of "Versturen" klikt.</span>
+              <span class="ai-hint">{{ $t('Er wordt niets opgeslagen totdat jij op "Opslaan als concept" of "Versturen" klikt.') }}</span>
             </div>
             <div v-if="aiNotice" class="ai-msg ai-ok">{{ aiNotice }}</div>
             <div v-if="aiWarning" class="ai-msg ai-warn">{{ aiWarning }}</div>
@@ -306,58 +310,57 @@ const submit = (action) => {
         <!-- Upgradehint: offerte uit tekst zit in het Slim-abonnement -->
         <div v-if="ai_locked" class="card" style="margin-bottom:16px;">
           <div class="card-body" style="font-size:13px;color:var(--text-2);line-height:1.6;">
-            <b>Offerte uit tekst</b> — plak een offerte die je (bijv. met Claude) schreef en het formulier vult zich automatisch in.
-            Onderdeel van het <b>Slim</b>-abonnement.
-            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+            <span v-html="$t('<b>Offerte uit tekst</b> — plak een offerte die je (bijv. met Claude) schreef en het formulier vult zich automatisch in. Onderdeel van het <b>Slim</b>-abonnement.')"></span>
+            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">{{ $t('Bekijk de abonnementen') }}</Link>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Klant &amp; geldigheid</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Klant & geldigheid') }}</div></div>
           <div class="card-body">
             <div class="form-row">
               <div class="form-group">
-                <label>Klant *</label>
+                <label>{{ $t('Klant') }} *</label>
                 <select v-model="form.customer_id" required>
-                  <option v-if="customers.length === 0" value="">Geen klanten — eerst toevoegen</option>
+                  <option v-if="customers.length === 0" value="">{{ $t('Geen klanten — eerst toevoegen') }}</option>
                   <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
                 <div v-if="form.errors.customer_id" class="field-error">{{ form.errors.customer_id }}</div>
                 <Link v-if="customers.length === 0" :href="route('customers.create')" style="color:var(--brand);font-size:13px;font-weight:500;display:inline-block;margin-top:6px;">
-                  + Nieuwe klant aanmaken
+                  + {{ $t('Nieuwe klant aanmaken') }}
                 </Link>
               </div>
               <div class="form-group">
-                <label>Referentie<span class="label-hint">(optioneel)</span></label>
-                <input type="text" v-model="form.reference" placeholder="Bijv. Verbouwing kantoor" maxlength="255">
+                <label>{{ $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+                <input type="text" v-model="form.reference" :placeholder="$t('Bijv. Verbouwing kantoor')" maxlength="255">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Offertedatum *</label>
+                <label>{{ $t('Offertedatum') }} *</label>
                 <input type="date" v-model="form.quote_date" required>
                 <div v-if="form.errors.quote_date" class="field-error">{{ form.errors.quote_date }}</div>
               </div>
               <div class="form-group">
-                <label>Geldig gedurende (dagen) *</label>
+                <label>{{ $t('Geldig gedurende (dagen)') }} *</label>
                 <input type="number" v-model.number="form.valid_days" min="1" max="365" required>
-                <div style="font-size:11px;color:var(--text-4);margin-top:4px;">Geldig tot en met {{ validUntilLabel }}</div>
+                <div style="font-size:11px;color:var(--text-4);margin-top:4px;">{{ $t('Geldig tot en met :date', { date: validUntilLabel }) }}</div>
                 <div v-if="form.errors.valid_days" class="field-error">{{ form.errors.valid_days }}</div>
               </div>
             </div>
             <div v-if="brand_profiles.length" class="form-row">
               <div class="form-group">
-                <label>Offerte als<span class="label-hint">(handelsnaam op de offerte)</span></label>
+                <label>{{ $t('Offerte als') }}<span class="label-hint">{{ $t('(handelsnaam op de offerte)') }}</span></label>
                 <select v-model="form.brand_profile_id">
-                  <option :value="null">Standaard huisstijl</option>
+                  <option :value="null">{{ $t('Standaard huisstijl') }}</option>
                   <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
                 </select>
               </div>
               <div class="form-group"></div>
             </div>
             <div class="form-group" style="margin:0;">
-              <label>Begeleidende tekst<span class="label-hint">(bovenaan de offerte)</span></label>
-              <textarea v-model="form.intro" rows="3" maxlength="2000" placeholder="Bijv. Naar aanleiding van ons gesprek doen wij je graag het volgende voorstel…"></textarea>
+              <label>{{ $t('Begeleidende tekst') }}<span class="label-hint">{{ $t('(bovenaan de offerte)') }}</span></label>
+              <textarea v-model="form.intro" rows="3" maxlength="2000" :placeholder="$t('Bijv. Naar aanleiding van ons gesprek doen wij je graag het volgende voorstel…')"></textarea>
             </div>
           </div>
         </div>
@@ -366,52 +369,52 @@ const submit = (action) => {
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Offerteregels</div>
-              <div class="card-subtitle">{{ inclMode ? 'Je typt de prijs die de klant betaalt — de btw wordt automatisch teruggerekend' : 'Je typt prijzen exclusief btw' }}</div>
+              <div class="card-title">{{ $t('Offerteregels') }}</div>
+              <div class="card-subtitle">{{ inclMode ? $t('Je typt de prijs die de klant betaalt — de btw wordt automatisch teruggerekend') : $t('Je typt prijzen exclusief btw') }}</div>
             </div>
-            <div class="price-mode-toggle" role="group" aria-label="Prijzen invoeren exclusief of inclusief btw">
-              <button type="button" :class="{ active: !inclMode }" @click="setPriceMode('excl')">excl. btw</button>
-              <button type="button" :class="{ active: inclMode }" @click="setPriceMode('incl')">incl. btw</button>
+            <div class="price-mode-toggle" role="group" :aria-label="$t('Prijzen invoeren exclusief of inclusief btw')">
+              <button type="button" :class="{ active: !inclMode }" @click="setPriceMode('excl')">{{ $t('excl. btw') }}</button>
+              <button type="button" :class="{ active: inclMode }" @click="setPriceMode('incl')">{{ $t('incl. btw') }}</button>
             </div>
           </div>
           <div class="card-body">
             <div class="lines-grid">
               <div class="lines-header">
-                <div>Omschrijving</div>
-                <div style="text-align:right;">Aantal</div>
+                <div>{{ $t('Omschrijving') }}</div>
+                <div style="text-align:right;">{{ $t('Aantal') }}</div>
                 <div style="text-align:right;">{{ priceLabel }}</div>
-                <div style="text-align:right;">Korting</div>
-                <div>BTW</div>
-                <div style="text-align:right;">Totaal</div>
+                <div style="text-align:right;">{{ $t('Korting') }}</div>
+                <div>{{ $t('BTW') }}</div>
+                <div style="text-align:right;">{{ $t('Totaal') }}</div>
                 <div></div>
               </div>
 
               <div v-for="(line, i) in form.lines" :key="i" class="line-row">
                 <div class="line-desc">
                   <div class="line-desc-row">
-                    <select v-if="products.length > 0" v-model="line.product_id" @change="applyProduct(line, $event.target.value)" class="product-select" title="Kies product">
-                      <option :value="null">— Eigen regel —</option>
+                    <select v-if="products.length > 0" v-model="line.product_id" @change="applyProduct(line, $event.target.value)" class="product-select" :title="$t('Kies product')">
+                      <option :value="null">{{ $t('— Eigen regel —') }}</option>
                       <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
-                    <input type="text" v-model="line.description" placeholder="Omschrijving" maxlength="500">
+                    <input type="text" v-model="line.description" :placeholder="$t('Omschrijving')" maxlength="500">
                   </div>
-                  <textarea v-model="line.details" class="line-details" rows="1" placeholder="Toelichting (optioneel)"></textarea>
+                  <textarea v-model="line.details" class="line-details" rows="1" :placeholder="$t('Toelichting (optioneel)')"></textarea>
                 </div>
-                <div class="line-field" data-label="Aantal">
+                <div class="line-field" :data-label="$t('Aantal')">
                   <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
                 </div>
                 <div class="line-field" :data-label="priceLabel">
-                  <input type="number" v-model.number="line.unit_price" step="0.01" class="num right" title="Negatief mag ook — bijv. voor een korting of verrekende aanbetaling">
+                  <input type="number" v-model.number="line.unit_price" step="0.01" class="num right" :title="$t('Negatief mag ook — bijv. voor een korting of verrekende aanbetaling')">
                 </div>
-                <div class="line-field" data-label="Korting %">
-                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" title="Korting in procenten op deze regel">
+                <div class="line-field" :data-label="$t('Korting %')">
+                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" :title="$t('Korting in procenten op deze regel')">
                 </div>
-                <div class="line-field" data-label="BTW">
+                <div class="line-field" :data-label="$t('BTW')">
                   <select v-model.number="line.vat_rate">
                     <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
                   </select>
                 </div>
-                <div class="line-field line-total-field" data-label="Totaal">
+                <div class="line-field line-total-field" :data-label="$t('Totaal')">
                   <div class="num line-total">{{ eur(lineTotal(line)) }}</div>
                 </div>
                 <button class="li-remove" @click="removeLine(i)" :disabled="form.lines.length === 1" type="button">
@@ -422,24 +425,24 @@ const submit = (action) => {
 
             <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
             <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
-              Regel {{ e.line }}: {{ e.msgs.join(' ') }}
+              {{ $t('Regel :n', { n: e.line }) }}: {{ e.msgs.join(' ') }}
             </div>
             <div v-if="totals.total < -0.004" class="field-error" style="margin-top:10px;">
-              Het offertetotaal is negatief. Een negatieve regel (korting) mag wél, zolang het totaal op nul of hoger uitkomt.
+              {{ $t('Het offertetotaal is negatief. Een negatieve regel (korting) mag wél, zolang het totaal op nul of hoger uitkomt.') }}
             </div>
 
             <button class="add-line-btn" @click="addLine" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Regel toevoegen
+              {{ $t('Regel toevoegen') }}
             </button>
           </div>
         </div>
 
         <div class="card" style="margin-top:16px;">
-          <div class="card-header"><div class="card-title">Opmerking</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Opmerking') }}</div></div>
           <div class="card-body">
             <div class="form-group" style="margin:0;">
-              <textarea v-model="form.notes" rows="3" placeholder="Bijv. voorwaarden, planning of aannames bij dit voorstel"></textarea>
+              <textarea v-model="form.notes" rows="3" :placeholder="$t('Bijv. voorwaarden, planning of aannames bij dit voorstel')"></textarea>
             </div>
           </div>
         </div>
@@ -447,17 +450,17 @@ const submit = (action) => {
 
       <div class="form-sidebar">
         <div class="card totals-card">
-          <div class="card-header"><div class="card-title">Totaal</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Totaal') }}</div></div>
           <div class="card-body">
-            <div class="total-row"><span>Subtotaal</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
+            <div class="total-row"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
             <div v-for="b in totals.breakdown" :key="b.rate" class="total-row">
-              <span>BTW {{ b.rate }}%</span>
+              <span>{{ $t('BTW') }} {{ b.rate }}%</span>
               <span class="mono">{{ eur(b.vat) }}</span>
             </div>
-            <div class="total-row grand"><span>Totaal</span><span class="mono">{{ eur(totals.total) }}</span></div>
+            <div class="total-row grand"><span>{{ $t('Totaal') }}</span><span class="mono">{{ eur(totals.total) }}</span></div>
 
             <div style="margin-top:18px;font-size:12px;color:var(--text-3);line-height:1.6;">
-              De offerte krijgt pas een definitief nummer zodra je hem verstuurt.
+              {{ $t('De offerte krijgt pas een definitief nummer zodra je hem verstuurt.') }}
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 <script setup>
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 import { eur } from '@/format.js';
 import { computed, ref } from 'vue';
 
@@ -10,9 +11,15 @@ const props = defineProps({
   categories: Array,
 });
 
+// Markt (nl/pl): btw-tarieven, standaardtarief en online betaalmethode van de server.
+const market = usePage().props.market || {};
+const vatRates = market.vat_rates || [21, 9, 0];
+const defaultVat = Number(market.default_vat ?? 21);
+const onlinePaymentLabel = market.online_payment_label || 'iDEAL';
+
 const FREQUENCIES = {
-  weekly: 'Wekelijks', monthly: 'Maandelijks', quarterly: 'Per kwartaal',
-  halfyearly: 'Per half jaar', yearly: 'Jaarlijks',
+  weekly: t('Wekelijks'), monthly: t('Maandelijks'), quarterly: t('Per kwartaal'),
+  halfyearly: t('Per half jaar'), yearly: t('Jaarlijks'),
 };
 
 /* ---------- Formulier (nieuw / bewerken) ---------- */
@@ -26,7 +33,7 @@ const form = useForm({
   frequency: 'monthly',
   next_run_on: new Date().toISOString().slice(0, 10),
   end_date: '',
-  rows: [{ amount: null, rate: 21, vat: 0 }],
+  rows: [{ amount: null, rate: defaultVat, vat: 0 }],
   auto_paid: true,
   payment_method: 'direct_debit',
   notes: '',
@@ -35,7 +42,7 @@ const form = useForm({
 const recalcVat = (row) => {
   row.vat = round2((Number(row.amount) || 0) * (Number(row.rate) || 0) / 100);
 };
-const addRow = () => form.rows.push({ amount: null, rate: 21, vat: 0 });
+const addRow = () => form.rows.push({ amount: null, rate: defaultVat, vat: 0 });
 const removeRow = (idx) => form.rows.splice(idx, 1);
 
 const totals = computed(() => {
@@ -98,7 +105,7 @@ const toggleActive = (p) => {
 };
 
 const removeProfile = (p) => {
-  if (confirm(`Vaste last "${p.supplier_name}" verwijderen?\n\nAl ingeboekte inkoopfacturen blijven gewoon bewaard.`)) {
+  if (confirm(t('Vaste last ":supplier" verwijderen?\n\nAl ingeboekte inkoopfacturen blijven gewoon bewaard.', { supplier: p.supplier_name }))) {
     router.delete(route('purchases.recurring.destroy', p.id), { preserveScroll: true });
   }
 };
@@ -110,42 +117,41 @@ const lineError = computed(() => {
 </script>
 
 <template>
-  <Head title="Vaste lasten" />
+  <Head :title="$t('Vaste lasten')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Inkoop / <span class="breadcrumb-current">Vaste lasten</span></div>
+      <div class="breadcrumb">{{ $t('Inkoop') }} / <span class="breadcrumb-current">{{ $t('Vaste lasten') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Vaste lasten</h1>
+        <h1 class="page-title">{{ $t('Vaste lasten') }}</h1>
         <p class="page-subtitle">
-          Huur, software, verzekeringen — terugkerende kosten worden automatisch als inkoopfactuur ingeboekt,
-          zodat de BTW vanzelf meetelt als voorbelasting.
+          {{ $t('Huur, software, verzekeringen — terugkerende kosten worden automatisch als inkoopfactuur ingeboekt, zodat de BTW vanzelf meetelt als voorbelasting.') }}
         </p>
       </div>
       <button v-if="!showForm" type="button" class="btn btn-primary" @click="startAdd">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nieuwe vaste last
+        {{ $t('Nieuwe vaste last') }}
       </button>
     </div>
 
     <!-- Formulier -->
     <div v-if="showForm" class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="rp-title">{{ editingId ? 'Vaste last bewerken' : 'Nieuwe vaste last' }}</div>
+        <div class="rp-title">{{ editingId ? $t('Vaste last bewerken') : $t('Nieuwe vaste last') }}</div>
         <form @submit.prevent="submit">
           <div class="form-row">
             <div class="form-group">
-              <label>Leverancier *</label>
-              <input type="text" v-model="form.supplier_name" list="rp-suppliers" maxlength="180" placeholder="Bijv. KPN Zakelijk">
+              <label>{{ $t('Leverancier') }} *</label>
+              <input type="text" v-model="form.supplier_name" list="rp-suppliers" maxlength="180" :placeholder="$t('Bijv. KPN Zakelijk')">
               <datalist id="rp-suppliers"><option v-for="s in suppliers" :key="s" :value="s" /></datalist>
               <div v-if="form.errors.supplier_name" class="field-error">{{ form.errors.supplier_name }}</div>
             </div>
             <div class="form-group">
-              <label>Categorie</label>
+              <label>{{ $t('Categorie') }}</label>
               <select v-model="form.category">
-                <option value="">— Kies een categorie —</option>
+                <option value="">{{ $t('— Kies een categorie —') }}</option>
                 <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
@@ -153,66 +159,64 @@ const lineError = computed(() => {
 
           <div class="form-row-3">
             <div class="form-group">
-              <label>Frequentie *</label>
+              <label>{{ $t('Frequentie') }} *</label>
               <select v-model="form.frequency">
                 <option v-for="(label, key) in FREQUENCIES" :key="key" :value="key">{{ label }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Volgende inboeking *</label>
+              <label>{{ $t('Volgende inboeking') }} *</label>
               <input type="date" v-model="form.next_run_on">
               <div v-if="form.errors.next_run_on" class="field-error">{{ form.errors.next_run_on }}</div>
             </div>
             <div class="form-group">
-              <label>Stopt op<span class="label-hint">(optioneel)</span></label>
+              <label>{{ $t('Stopt op') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
               <input type="date" v-model="form.end_date">
               <div v-if="form.errors.end_date" class="field-error">{{ form.errors.end_date }}</div>
             </div>
           </div>
 
-          <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px;">Bedrag per periode (excl. BTW)</label>
+          <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px;">{{ $t('Bedrag per periode (excl. BTW)') }}</label>
           <div class="rp-rows">
             <div v-for="(row, idx) in form.rows" :key="idx" class="rp-row">
               <input type="number" step="0.01" v-model="row.amount" placeholder="0,00" @input="recalcVat(row)">
               <select v-model="row.rate" @change="recalcVat(row)">
-                <option :value="21">21%</option>
-                <option :value="9">9%</option>
-                <option :value="0">0% / vrijgesteld</option>
+                <option v-for="r in vatRates" :key="r" :value="r">{{ r === 0 ? $t('0% / vrijgesteld') : r + '%' }}</option>
               </select>
-              <input type="number" step="0.01" v-model="row.vat" title="BTW-bedrag — pas aan als de factuur anders afrondt">
+              <input type="number" step="0.01" v-model="row.vat" :title="$t('BTW-bedrag — pas aan als de factuur anders afrondt')">
               <button type="button" class="icon-btn" :disabled="form.rows.length === 1" @click="removeRow(idx)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
           </div>
-          <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" @click="addRow">+ Tarief toevoegen</button>
+          <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" @click="addRow">+ {{ $t('Tarief toevoegen') }}</button>
           <div v-if="lineError" class="field-error" style="margin-top:6px;">{{ lineError }}</div>
-          <div class="rp-total">Per periode: <b>{{ eur(totals.total) }}</b> incl. BTW ({{ eur(totals.vat) }} voorbelasting)</div>
+          <div class="rp-total">{{ $t('Per periode:') }} <b>{{ eur(totals.total) }}</b> {{ $t('incl. BTW (:vat voorbelasting)', { vat: eur(totals.vat) }) }}</div>
 
           <div class="form-row" style="margin-top:14px;">
             <div class="form-group">
               <label class="checkbox-row" style="margin:0 0 8px;">
                 <input type="checkbox" v-model="form.auto_paid">
-                <span>Direct op betaald zetten (bijv. automatische incasso)</span>
+                <span>{{ $t('Direct op betaald zetten (bijv. automatische incasso)') }}</span>
               </label>
               <select v-if="form.auto_paid" v-model="form.payment_method" style="max-width:260px;">
-                <option value="direct_debit">Automatische incasso</option>
-                <option value="bank_transfer">Bankoverschrijving</option>
-                <option value="card">Pinpas / creditcard</option>
-                <option value="ideal">iDEAL</option>
-                <option value="other">Anders</option>
+                <option value="direct_debit">{{ $t('Automatische incasso') }}</option>
+                <option value="bank_transfer">{{ $t('Bankoverschrijving') }}</option>
+                <option value="card">{{ $t('Pinpas / creditcard') }}</option>
+                <option value="ideal">{{ onlinePaymentLabel }}</option>
+                <option value="other">{{ $t('Anders') }}</option>
               </select>
             </div>
             <div class="form-group">
-              <label>Notities<span class="label-hint">(komt op elke inboeking)</span></label>
-              <input type="text" v-model="form.notes" maxlength="2000" placeholder="Bijv. contractnummer">
+              <label>{{ $t('Notities') }}<span class="label-hint">{{ $t('(komt op elke inboeking)') }}</span></label>
+              <input type="text" v-model="form.notes" maxlength="2000" :placeholder="$t('Bijv. contractnummer')">
             </div>
           </div>
 
           <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button type="button" class="btn btn-secondary" @click="showForm = false">Annuleren</button>
+            <button type="button" class="btn btn-secondary" @click="showForm = false">{{ $t('Annuleren') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="form.processing">
-              {{ form.processing ? 'Bezig…' : (editingId ? 'Wijzigingen opslaan' : 'Vaste last aanmaken') }}
+              {{ form.processing ? $t('Bezig…') : (editingId ? $t('Wijzigingen opslaan') : $t('Vaste last aanmaken')) }}
             </button>
           </div>
         </form>
@@ -224,12 +228,12 @@ const lineError = computed(() => {
       <table class="data-table">
         <thead>
           <tr>
-            <th>Leverancier</th>
-            <th>Categorie</th>
-            <th>Frequentie</th>
-            <th class="right">Per periode</th>
-            <th>Volgende inboeking</th>
-            <th>Status</th>
+            <th>{{ $t('Leverancier') }}</th>
+            <th>{{ $t('Categorie') }}</th>
+            <th>{{ $t('Frequentie') }}</th>
+            <th class="right">{{ $t('Per periode') }}</th>
+            <th>{{ $t('Volgende inboeking') }}</th>
+            <th>{{ $t('Status') }}</th>
             <th></th>
           </tr>
         </thead>
@@ -237,29 +241,29 @@ const lineError = computed(() => {
           <tr v-for="p in profiles" :key="p.id">
             <td class="cell-primary">
               {{ p.supplier_name }}
-              <div v-if="p.last_run_label" class="rp-sub">Laatst: {{ p.last_run_label }} · {{ p.purchases_generated }}× ingeboekt</div>
+              <div v-if="p.last_run_label" class="rp-sub">{{ $t('Laatst: :date · :count× ingeboekt', { date: p.last_run_label, count: p.purchases_generated }) }}</div>
             </td>
-            <td data-label="Categorie">{{ p.category || '—' }}</td>
-            <td data-label="Frequentie">{{ p.frequency_label }}</td>
-            <td class="num right" data-label="Per periode">{{ eur(p.total) }}</td>
-            <td data-label="Volgende">
+            <td :data-label="$t('Categorie')">{{ p.category || '—' }}</td>
+            <td :data-label="$t('Frequentie')">{{ $t(p.frequency_label) }}</td>
+            <td class="num right" :data-label="$t('Per periode')">{{ eur(p.total) }}</td>
+            <td :data-label="$t('Volgende')">
               {{ p.next_run_label }}
-              <div v-if="p.end_date_label" class="rp-sub">stopt {{ p.end_date_label }}</div>
+              <div v-if="p.end_date_label" class="rp-sub">{{ $t('stopt :date', { date: p.end_date_label }) }}</div>
             </td>
-            <td data-label="Status">
-              <span v-if="p.active" class="pill pill-paid">Actief</span>
-              <span v-else class="pill pill-muted">Gepauzeerd</span>
-              <span v-if="p.auto_paid" class="pill pill-sent" style="margin-left:4px;" title="Wordt direct als betaald ingeboekt">Incasso</span>
+            <td :data-label="$t('Status')">
+              <span v-if="p.active" class="pill pill-paid">{{ $t('Actief') }}</span>
+              <span v-else class="pill pill-muted">{{ $t('Gepauzeerd') }}</span>
+              <span v-if="p.auto_paid" class="pill pill-sent" style="margin-left:4px;" :title="$t('Wordt direct als betaald ingeboekt')">{{ $t('Automatische incasso') }}</span>
             </td>
             <td class="rp-actions">
-              <button type="button" class="icon-btn" :title="p.active ? 'Pauzeren' : 'Hervatten'" @click="toggleActive(p)">
+              <button type="button" class="icon-btn" :title="p.active ? $t('Pauzeren') : $t('Hervatten')" @click="toggleActive(p)">
                 <svg v-if="p.active" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                 <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               </button>
-              <button type="button" class="icon-btn" title="Bewerken" @click="startEdit(p)">
+              <button type="button" class="icon-btn" :title="$t('Bewerken')" @click="startEdit(p)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
               </button>
-              <button type="button" class="icon-btn" title="Verwijderen" @click="removeProfile(p)">
+              <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeProfile(p)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               </button>
             </td>
@@ -268,14 +272,13 @@ const lineError = computed(() => {
       </table>
     </div>
     <div v-else-if="!showForm" class="card card-empty">
-      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen vaste lasten</div>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">{{ $t('Nog geen vaste lasten') }}</div>
       <div style="margin-bottom:20px;">
-        Zet je terugkerende kosten hier eenmalig klaar — {{ $page.props.brand.name }} boekt ze voortaan automatisch in,
-        inclusief de BTW als voorbelasting. Tip: op een bestaande inkoopfactuur staat ook een knop "Maak terugkerend".
+        {{ $t('Zet je terugkerende kosten hier eenmalig klaar — :brand boekt ze voortaan automatisch in, inclusief de BTW als voorbelasting. Tip: op een bestaande inkoopfactuur staat ook een knop "Maak terugkerend".', { brand: $page.props.brand.name }) }}
       </div>
       <button type="button" class="btn btn-primary btn-sm" style="display:inline-flex;" @click="startAdd">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Eerste vaste last aanmaken
+        {{ $t('Eerste vaste last aanmaken') }}
       </button>
     </div>
   </AppLayout>

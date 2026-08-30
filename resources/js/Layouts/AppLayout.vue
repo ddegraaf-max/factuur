@@ -160,7 +160,7 @@ const logout = () => {
 
       <nav class="sidebar-nav">
         <div v-for="section in nav" :key="section.title" class="nav-section">
-          <div class="nav-section-title">{{ section.title }}</div>
+          <div class="nav-section-title">{{ $t(section.title) }}</div>
           <component
             :is="item.external ? 'a' : Link"
             v-for="item in section.items"
@@ -196,8 +196,8 @@ const logout = () => {
             <svg v-else-if="item.icon === 'quote'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
             <svg v-else-if="item.icon === 'repeat'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
             <svg v-else-if="item.icon === 'download'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            {{ item.name }}
-            <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
+            {{ $t(item.name) }}
+            <span v-if="item.badge" class="nav-badge">{{ $t(item.badge) }}</span>
           </component>
         </div>
       </nav>
@@ -210,7 +210,7 @@ const logout = () => {
         </div>
         <div v-if="userMenuOpen" class="user-menu">
           <template v-if="hasMultipleAdministrations">
-            <div class="user-menu-label">Administraties</div>
+            <div class="user-menu-label">{{ $t('Administraties') }}</div>
             <button
               v-for="a in administrations"
               :key="a.id"
@@ -224,20 +224,20 @@ const logout = () => {
             </button>
             <div class="user-menu-sep"></div>
           </template>
-          <Link :href="route('administrations.index')" class="user-menu-item">Administraties beheren</Link>
-          <Link :href="route('settings.security')" class="user-menu-item">Beveiliging</Link>
-          <button class="user-menu-item" @click.stop="logout">Uitloggen</button>
+          <Link :href="route('administrations.index')" class="user-menu-item">{{ $t('Administraties beheren') }}</Link>
+          <Link :href="route('settings.security')" class="user-menu-item">{{ $t('Beveiliging') }}</Link>
+          <button class="user-menu-item" @click.stop="logout">{{ $t('Uitloggen') }}</button>
         </div>
       </div>
 
-      <div class="sidebar-version" :title="'Softwareversie ' + version">{{ version }}</div>
+      <div class="sidebar-version" :title="$t('Softwareversie :version', { version })">{{ version }}</div>
     </aside>
     <div class="sidebar-overlay" v-if="sidebarOpen" @click="sidebarOpen = false"></div>
 
     <div class="main">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="topbar-toggle" @click="sidebarOpen = true" aria-label="Menu openen">
+          <button class="topbar-toggle" @click="sidebarOpen = true" :aria-label="$t('Menu openen')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
           <slot name="breadcrumb"></slot>
@@ -245,9 +245,9 @@ const logout = () => {
         <div class="topbar-right">
           <GlobalSearch />
           <!-- Boekhouder-rol is alleen-lezen: geen aanmaak-/opslaknoppen tonen. -->
-          <span v-if="can.write === false" class="readonly-badge" title="Je kunt alles inzien en exporteren, maar niets wijzigen.">
+          <span v-if="can.write === false" class="readonly-badge" :title="$t('Je kunt alles inzien en exporteren, maar niets wijzigen.')">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            Alleen inzien
+            {{ $t('Alleen inzien') }}
           </span>
           <slot v-else name="topbar-actions"></slot>
         </div>
@@ -256,28 +256,27 @@ const logout = () => {
       <div v-if="isDemo" class="demo-banner">
         <span class="demo-chip">Demo</span>
         <span class="demo-text">
-          Je bekijkt de <strong>echte {{ brand.name }}</strong> met voorbeeldgegevens. Klik gerust overal op —
-          er wordt niets verstuurd naar echte klanten.
+          {{ $t('Je bekijkt de') }} <strong>{{ $t('echte :brand', { brand: brand.name }) }}</strong> {{ $t('met voorbeeldgegevens. Klik gerust overal op — er wordt niets verstuurd naar echte klanten.') }}
         </span>
         <div class="demo-actions">
           <form method="POST" :action="route('demo.stop')">
             <input type="hidden" name="_token" :value="csrfToken">
-            <button type="submit" class="demo-leave">Demo verlaten</button>
+            <button type="submit" class="demo-leave">{{ $t('Demo verlaten') }}</button>
           </form>
           <form method="POST" :action="route('demo.stop')">
             <input type="hidden" name="_token" :value="csrfToken">
             <input type="hidden" name="to" value="register">
-            <button type="submit" class="demo-cta">Start 14 dagen gratis</button>
+            <button type="submit" class="demo-cta">{{ $t('Start 14 dagen gratis') }}</button>
           </form>
         </div>
       </div>
 
       <div v-if="showTrialBanner" class="trial-banner">
         <span class="trial-banner-text">
-          🎁 Nog <strong>{{ subscription.days_left }}</strong>
-          {{ subscription.days_left === 1 ? 'dag' : 'dagen' }} in je gratis proefperiode.
+          🎁 {{ $t('Nog') }} <strong>{{ subscription.days_left }}</strong>
+          {{ subscription.days_left === 1 ? $t('dag in je gratis proefperiode.') : $t('dagen in je gratis proefperiode.') }}
         </span>
-        <Link :href="route('billing.show')" class="trial-banner-btn">Abonnement afsluiten</Link>
+        <Link :href="route('billing.show')" class="trial-banner-btn">{{ $t('Abonnement afsluiten') }}</Link>
       </div>
 
       <div class="content">

@@ -103,7 +103,7 @@ const sendCode = () => {
 </script>
 
 <template>
-  <Head title="Verificatie · Klantenportaal" />
+  <Head :title="$t('Verificatie · Klantenportaal')" />
   <PortalLayout>
     <div class="portal-center">
       <div class="portal-card portal-verify-card">
@@ -113,20 +113,20 @@ const sendCode = () => {
             <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </span>
           <div>
-            <div class="portal-gate-number">{{ gate.type === 'offerte' ? 'Offerte' : 'Factuur' }} {{ gate.number }}</div>
-            <div v-if="gate.company" class="portal-gate-company">van {{ gate.company }}</div>
+            <div class="portal-gate-number">{{ gate.type === 'offerte' ? $t('Offerte') : $t('Factuur') }} {{ gate.number }}</div>
+            <div v-if="gate.company" class="portal-gate-company">{{ $t('van :company', { company: gate.company }) }}</div>
           </div>
         </div>
 
-        <h1 class="portal-card-title">Bevestig dat jij het bent</h1>
+        <h1 class="portal-card-title">{{ $t('Bevestig dat jij het bent') }}</h1>
         <p class="portal-card-sub">
           <template v-if="codeSent">
-            We hebben een 6-cijferige code gestuurd naar <strong>{{ maskedEmail }}</strong>.
-            Voer die hieronder in.
+            {{ $t('We hebben een 6-cijferige code gestuurd naar') }} <strong>{{ maskedEmail }}</strong>.
+            {{ $t('Voer die hieronder in.') }}
           </template>
           <template v-else>
-            Voor je veiligheid sturen we eerst een eenmalige toegangscode naar
-            <strong>{{ maskedEmail }}</strong> — het e-mailadres waarop deze {{ gate?.type === 'offerte' ? 'offerte' : 'factuur' }} is ontvangen.
+            {{ $t('Voor je veiligheid sturen we eerst een eenmalige toegangscode naar') }}
+            <strong>{{ maskedEmail }}</strong> — {{ gate?.type === 'offerte' ? $t('het e-mailadres waarop deze offerte is ontvangen.') : $t('het e-mailadres waarop deze factuur is ontvangen.') }}
           </template>
         </p>
 
@@ -152,28 +152,28 @@ const sendCode = () => {
             <div v-if="form.errors.code" class="field-error otp-error">{{ form.errors.code }}</div>
 
             <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing || digits.some(d => !d)">
-              {{ form.processing ? 'Controleren…' : 'Toegang krijgen' }}
+              {{ form.processing ? $t('Controleren…') : $t('Toegang krijgen') }}
             </button>
           </form>
 
           <div class="verify-actions">
             <button type="button" class="link-btn" :disabled="cooldown > 0 || sendForm.processing" @click="sendCode">
-              <span v-if="cooldown > 0">Nieuwe code over {{ cooldown }}s</span>
-              <span v-else-if="sendForm.processing">Versturen…</span>
-              <span v-else>Stuur nieuwe code</span>
+              <span v-if="cooldown > 0">{{ $t('Nieuwe code over :ns', { n: cooldown }) }}</span>
+              <span v-else-if="sendForm.processing">{{ $t('Versturen…') }}</span>
+              <span v-else>{{ $t('Stuur nieuwe code') }}</span>
             </button>
             <span class="verify-sep">·</span>
-            <Link :href="route('portal.login')" class="link-btn">Ander e-mailadres</Link>
+            <Link :href="route('portal.login')" class="link-btn">{{ $t('Ander e-mailadres') }}</Link>
           </div>
         </template>
 
         <template v-else>
           <div v-if="sendForm.errors.code" class="field-error" style="margin-bottom:12px;">{{ sendForm.errors.code }}</div>
           <button class="btn btn-primary btn-block" :disabled="sendForm.processing" @click="sendCode">
-            {{ sendForm.processing ? 'Versturen…' : 'Stuur toegangscode' }}
+            {{ sendForm.processing ? $t('Versturen…') : $t('Stuur toegangscode') }}
           </button>
           <p class="portal-verify-note">
-            De code is 10 minuten geldig. Check ook je spam-map.
+            {{ $t('De code is 10 minuten geldig. Check ook je spam-map.') }}
           </p>
         </template>
       </div>

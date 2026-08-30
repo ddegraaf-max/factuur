@@ -15,13 +15,13 @@ class IncassoService
     public function send(Invoice $invoice): Invoice
     {
         if ($invoice->is_credit) {
-            throw new \DomainException('Creditnota kan niet naar incasso.');
+            throw new \DomainException(__('Creditnota kan niet naar incasso.'));
         }
         if ($invoice->status === 'paid') {
-            throw new \DomainException('Betaalde factuur kan niet naar incasso.');
+            throw new \DomainException(__('Betaalde factuur kan niet naar incasso.'));
         }
         if ($invoice->status === 'incasso') {
-            throw new \DomainException('Deze factuur is al bij incasso.');
+            throw new \DomainException(__('Deze factuur is al bij incasso.'));
         }
 
         $reference = $this->nextReference($invoice->company);

@@ -2,7 +2,7 @@
     $logo = $company->logoBinary();
 @endphp
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
 <body style="margin:0;background:#f5f5f4;font-family:Arial,Helvetica,sans-serif;color:#1c1917;">
   <div style="max-width:600px;margin:0 auto;padding:24px;">
@@ -23,17 +23,17 @@
               <td style="border-radius:8px;background:{{ $company->brand_color ?: brand('color') }};">
                 <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
                    style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
-                  Bekijk factuur online&nbsp;&nbsp;→
+                  {{ __('doc.mail_view_invoice') }}&nbsp;&nbsp;→
                 </a>
               </td>
             </tr>
           </table>
         @endif
-        <p style="font-size:12.5px;color:#78716c;margin:0;">De betreffende factuur ({{ $invoice->number }}) is als PDF bijgevoegd.</p>
+        <p style="font-size:12.5px;color:#78716c;margin:0;">{{ __('De betreffende factuur (:number) is als PDF bijgevoegd.', ['number' => $invoice->number]) }}</p>
       </div>
     </div>
     <p style="text-align:center;color:#a8a29e;font-size:11px;margin:14px 0 0;">
-      Verzonden via {{ brand('name') }} namens {{ $company->name }}.
+      {{ __('doc.mail_sent_via', ['brand' => brand('name'), 'name' => $company->name]) }}
     </p>
   </div>
 </body>

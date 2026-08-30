@@ -40,7 +40,7 @@ class QuoteTextScanService
     public function scan(string $text): array
     {
         if (! $this->enabled()) {
-            throw new \DomainException('De AI-herkenning is niet geconfigureerd.');
+            throw new \DomainException(__('De AI-herkenning is niet geconfigureerd.'));
         }
 
         set_time_limit(180);
@@ -76,21 +76,21 @@ class QuoteTextScanService
             $message = $client->beta->messages->create(...$params);
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error('Offerteherkenning: ongeldige Anthropic API-key', ['error' => $e->getMessage()]);
-            throw new \DomainException('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).');
+            throw new \DomainException(__('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).'));
         } catch (\Anthropic\Core\Exceptions\RateLimitException) {
-            throw new \DomainException('De AI-dienst is even druk. Probeer het over een minuut opnieuw.');
+            throw new \DomainException(__('De AI-dienst is even druk. Probeer het over een minuut opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIStatusException $e) {
             Log::warning('Offerteherkenning: API-fout', ['type' => $e->type?->value, 'error' => mb_substr($e->getMessage(), 0, 300)]);
-            throw new \DomainException('De tekst kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.');
+            throw new \DomainException(__('De tekst kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIConnectionException) {
-            throw new \DomainException('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.');
+            throw new \DomainException(__('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.'));
         }
 
         if ($message->stopReason === 'refusal') {
-            throw new \DomainException('De AI wilde deze tekst niet verwerken. Vul het formulier handmatig in.');
+            throw new \DomainException(__('De AI wilde deze tekst niet verwerken. Vul het formulier handmatig in.'));
         }
         if ($message->stopReason === 'max_tokens') {
-            throw new \DomainException('De tekst is te lang of te complex om automatisch te herkennen. Vul het formulier handmatig in.');
+            throw new \DomainException(__('De tekst is te lang of te complex om automatisch te herkennen. Vul het formulier handmatig in.'));
         }
 
         $json = null;
@@ -103,7 +103,7 @@ class QuoteTextScanService
 
         if (! is_array($json)) {
             Log::warning('Offerteherkenning: onleesbaar antwoord van het model');
-            throw new \DomainException('De tekst kon niet worden gelezen. Probeer het opnieuw.');
+            throw new \DomainException(__('De tekst kon niet worden gelezen. Probeer het opnieuw.'));
         }
 
         return $this->sanitize($json);
@@ -141,7 +141,7 @@ class QuoteTextScanService
                                 'quantity' => ['type' => 'number', 'description' => 'Aantal (standaard 1).'],
                                 'unit' => ['type' => 'string', 'description' => 'Eenheid, bijv. stuk, uur, dag, maand, m2 (standaard "stuk").'],
                                 'unit_price' => ['type' => 'number', 'description' => 'Stuksprijs EXCLUSIEF btw.'],
-                                'vat_rate' => ['type' => 'number', 'enum' => [21, 9, 0], 'description' => 'BTW-tarief in procenten.'],
+                                'vat_rate' => ['type' => 'number', 'enum' => \App\Support\Market::vatRates(), 'description' => 'BTW-tarief in procenten.'],
                                 'discount_pct' => $nullable(['type' => 'number', 'description' => 'Korting op deze regel in procenten (0-100).']),
                             ],
                             'required' => ['description', 'details', 'quantity', 'unit', 'unit_price', 'vat_rate', 'discount_pct'],
@@ -159,17 +159,22 @@ class QuoteTextScanService
 
     protected function prompt(): string
     {
-        return <<<'PROMPT'
+        $country = \App\Support\Market::get('country_name', 'Nederland');
+        $rates = implode(', ', \App\Support\Market::vatRates());
+        $default = \App\Support\Market::defaultVatRate();
+
+        return <<<PROMPT
         Hieronder staat de tekst van een offerte of prijsvoorstel van een
-        Nederlandse ondernemer (bijv. geschreven met een AI-assistent of in een
+        ondernemer in {$country} (bijv. geschreven met een AI-assistent of in een
         e-mail). Zet de tekst om naar de velden van het offerteformulier.
 
         Regels:
         - Elk te leveren product of elke dienst wordt één offerteregel: korte
           omschrijving, eventuele toelichting in details, aantal, eenheid
-          (stuk/uur/dag/maand/m2), stuksprijs EXCLUSIEF btw en btw-tarief.
+          (stuk/uur/dag/maand/m2), stuksprijs EXCLUSIEF btw en btw-tarief
+          (toegestane tarieven: {$rates}).
         - Staan prijzen inclusief btw, reken dan terug naar exclusief. Noemt de
-          tekst geen btw, ga dan uit van prijzen exclusief btw en tarief 21.
+          tekst geen btw, ga dan uit van prijzen exclusief btw en tarief {$default}.
         - Een korting zet je als discount_pct op de regel(s) waar hij bij hoort;
           een korting op het totaal zet je als discount_pct op elke regel.
           Prijzen zijn nooit negatief.
@@ -186,7 +191,7 @@ class QuoteTextScanService
     protected function sanitize(array $json): array
     {
         if (($json['is_quote'] ?? false) !== true) {
-            throw new \DomainException('Dit lijkt geen offertetekst te zijn. Plak de volledige offerte, of vul het formulier handmatig in.');
+            throw new \DomainException(__('Dit lijkt geen offertetekst te zijn. Plak de volledige offerte, of vul het formulier handmatig in.'));
         }
 
         $text = function ($value, int $max): ?string {
@@ -201,16 +206,14 @@ class QuoteTextScanService
             if ($description === null) {
                 continue;
             }
-            $rate = (float) ($line['vat_rate'] ?? 21);
-            if (! in_array($rate, [0.0, 9.0, 21.0], true)) {
-                $rate = 21.0;
-            }
+            // Alleen tarieven van de markt; iets anders wordt het dichtstbijzijnde geldige tarief.
+            $rate = (float) \App\Support\Market::nearestVatRate(is_numeric($line['vat_rate'] ?? null) ? (float) $line['vat_rate'] : null);
             $quantity = round((float) ($line['quantity'] ?? 1), 3);
             $lines[] = [
                 'description' => $description,
                 'details' => $text($line['details'] ?? null, 2000),
                 'quantity' => $quantity > 0 ? $quantity : 1.0,
-                'unit' => $text($line['unit'] ?? null, 30) ?? 'stuk',
+                'unit' => $text($line['unit'] ?? null, 30) ?? __('stuk'),
                 'unit_price' => max(0, round((float) ($line['unit_price'] ?? 0), 2)),
                 'vat_rate' => $rate,
                 'discount_pct' => min(100, max(0, round((float) ($line['discount_pct'] ?? 0), 2))),
@@ -218,7 +221,7 @@ class QuoteTextScanService
         }
 
         if ($lines === []) {
-            throw new \DomainException('Er zijn geen offerteregels herkend in de tekst. Controleer of de prijzen erin staan, of vul het formulier handmatig in.');
+            throw new \DomainException(__('Er zijn geen offerteregels herkend in de tekst. Controleer of de prijzen erin staan, of vul het formulier handmatig in.'));
         }
 
         // Controle: kloppen de herkende regels met het totaal dat de tekst noemt?
@@ -229,11 +232,10 @@ class QuoteTextScanService
         )), 2);
         $totalExcl = isset($json['total_excl']) && is_numeric($json['total_excl']) ? round((float) $json['total_excl'], 2) : null;
         if ($totalExcl !== null && abs($sumExcl - $totalExcl) > 0.05) {
-            $warning = sprintf(
-                'De herkende regels tellen op tot € %s excl. btw, maar de tekst noemt € %s — controleer de bedragen.',
-                number_format($sumExcl, 2, ',', '.'),
-                number_format($totalExcl, 2, ',', '.')
-            );
+            $warning = __('De herkende regels tellen op tot :sum excl. btw, maar de tekst noemt :total — controleer de bedragen.', [
+                'sum' => money($sumExcl),
+                'total' => money($totalExcl),
+            ]);
         }
 
         return [

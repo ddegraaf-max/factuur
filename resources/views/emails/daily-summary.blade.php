@@ -1,13 +1,13 @@
 @php
-    $eur = fn ($n) => '€ ' . number_format((float) $n, 2, ',', '.');
+    $eur = fn ($n) => money($n);
     $appUrl = rtrim(config('app.url'), '/');
 @endphp
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je dagoverzicht</title>
+    <title>{{ __('Je dagoverzicht') }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -50,56 +50,56 @@
                 <img src="{{ \App\Support\Brand::asset('email_mark') }}" class="logo-mark" alt="{{ brand('name') }}">
                 <span>{{ brand('name') }}</span>
             </div>
-            <div class="header-sub">Dagoverzicht · {{ now()->translatedFormat('l j F Y') }}</div>
+            <div class="header-sub">{{ __('Dagoverzicht') }} · {{ now()->translatedFormat('l j F Y') }}</div>
         </div>
 
         <div class="body">
-            <h1>Goedemorgen</h1>
-            <p>Dit staat er vandaag open bij {{ $company->name }}.</p>
+            <h1>{{ __('Goedemorgen') }}</h1>
+            <p>{{ __('Dit staat er vandaag open bij :company.', ['company' => $company->name]) }}</p>
 
             <table class="kpis">
                 <tr>
                     <td class="kpi {{ $s['overdue']['count'] > 0 ? 'alert' : '' }}" width="33%">
                         <div class="kpi-val">{{ $eur($s['overdue']['amount']) }}</div>
-                        <div class="kpi-lbl">Vervallen</div>
+                        <div class="kpi-lbl">{{ __('Vervallen') }}</div>
                     </td>
                     <td class="kpi" width="33%">
                         <div class="kpi-val">{{ $eur($s['open']['amount']) }}</div>
-                        <div class="kpi-lbl">Totaal open</div>
+                        <div class="kpi-lbl">{{ __('Totaal open') }}</div>
                     </td>
                     <td class="kpi {{ $s['paid_yesterday']['count'] > 0 ? 'good' : '' }}" width="33%">
                         <div class="kpi-val">{{ $eur($s['paid_yesterday']['amount']) }}</div>
-                        <div class="kpi-lbl">Gisteren binnen</div>
+                        <div class="kpi-lbl">{{ __('Gisteren binnen') }}</div>
                     </td>
                 </tr>
             </table>
 
             @if ($s['overdue']['count'] > 0)
-                <h2>⚠️ Vervallen facturen ({{ $s['overdue']['count'] }})</h2>
+                <h2>⚠️ {{ __('Vervallen facturen (:count)', ['count' => $s['overdue']['count']]) }}</h2>
                 <table class="list">
                     @foreach ($s['overdue']['items'] as $i)
                         <tr>
                             <td>
                                 <span class="who">{{ $i['customer'] }}</span><br>
                                 <span class="nr">{{ $i['number'] }}</span>
-                                <span class="late">· {{ $i['days_overdue'] }} {{ $i['days_overdue'] === 1 ? 'dag' : 'dagen' }} te laat</span>
+                                <span class="late">· {{ $i['days_overdue'] === 1 ? __('1 dag te laat') : __(':days dagen te laat', ['days' => $i['days_overdue']]) }}</span>
                             </td>
                             <td class="amt">{{ $eur($i['amount']) }}</td>
                         </tr>
                     @endforeach
                 </table>
                 @if ($s['overdue']['count'] > count($s['overdue']['items']))
-                    <div class="more">en nog {{ $s['overdue']['count'] - count($s['overdue']['items']) }} andere…</div>
+                    <div class="more">{{ __('en nog :count andere…', ['count' => $s['overdue']['count'] - count($s['overdue']['items'])]) }}</div>
                 @endif
             @endif
 
             @if ($s['paid_yesterday']['count'] > 0)
-                <h2>✅ Gisteren betaald ({{ $s['paid_yesterday']['count'] }})</h2>
+                <h2>✅ {{ __('Gisteren betaald (:count)', ['count' => $s['paid_yesterday']['count']]) }}</h2>
                 <table class="list">
                     @foreach ($s['paid_yesterday']['items'] as $i)
                         <tr>
                             <td>
-                                <span class="who">{{ $i['customer'] ?? 'Onbekend' }}</span><br>
+                                <span class="who">{{ $i['customer'] ?? __('Onbekend') }}</span><br>
                                 <span class="nr">{{ $i['number'] }}</span>
                             </td>
                             <td class="amt">{{ $eur($i['amount']) }}</td>
@@ -109,13 +109,13 @@
             @endif
 
             @if ($s['due_soon']['count'] > 0)
-                <h2>📅 Vervalt binnen 7 dagen ({{ $s['due_soon']['count'] }})</h2>
+                <h2>📅 {{ __('Vervalt binnen 7 dagen (:count)', ['count' => $s['due_soon']['count']]) }}</h2>
                 <table class="list">
                     @foreach ($s['due_soon']['items'] as $i)
                         <tr>
                             <td>
                                 <span class="who">{{ $i['customer'] }}</span><br>
-                                <span class="nr">{{ $i['number'] }} · vervalt {{ $i['due_date'] }}</span>
+                                <span class="nr">{{ $i['number'] }} · {{ __('vervalt :date', ['date' => $i['due_date']]) }}</span>
                             </td>
                             <td class="amt">{{ $eur($i['amount']) }}</td>
                         </tr>
@@ -124,23 +124,23 @@
             @endif
 
             @if ($s['drafts'] > 0)
-                <h2>📝 Nog te versturen</h2>
-                <p style="margin:0;">Je hebt <strong>{{ $s['drafts'] }}</strong> {{ $s['drafts'] === 1 ? 'concept' : 'concepten' }} klaarstaan die nog niet verstuurd zijn.</p>
+                <h2>📝 {{ __('Nog te versturen') }}</h2>
+                <p style="margin:0;">{!! $s['drafts'] === 1 ? __('Je hebt <strong>1</strong> concept klaarstaan dat nog niet verstuurd is.') : __('Je hebt <strong>:count</strong> concepten klaarstaan die nog niet verstuurd zijn.', ['count' => $s['drafts']]) !!}</p>
             @endif
 
             @if ($s['incasso']['count'] > 0)
-                <h2>⚖️ Bij incasso</h2>
-                <p style="margin:0;">{{ $s['incasso']['count'] }} {{ $s['incasso']['count'] === 1 ? 'dossier' : 'dossiers' }} in behandeling · {{ $eur($s['incasso']['amount']) }}</p>
+                <h2>⚖️ {{ __('Bij incasso') }}</h2>
+                <p style="margin:0;">{{ $s['incasso']['count'] === 1 ? __('1 dossier in behandeling') : __(':count dossiers in behandeling', ['count' => $s['incasso']['count']]) }} · {{ $eur($s['incasso']['amount']) }}</p>
             @endif
 
             <div class="btn-wrap">
-                <a href="{{ $appUrl }}/dashboard" class="btn">Open je dashboard</a>
+                <a href="{{ $appUrl }}/dashboard" class="btn">{{ __('Open je dashboard') }}</a>
             </div>
         </div>
 
         <div class="footer">
-            Je ontvangt dit overzicht omdat de dagelijkse notificatie aanstaat.<br>
-            Uitzetten kan bij <a href="{{ $appUrl }}/settings/company">Instellingen → Bedrijfsgegevens</a>.
+            {{ __('Je ontvangt dit overzicht omdat de dagelijkse notificatie aanstaat.') }}<br>
+            {{ __('Uitzetten kan bij') }} <a href="{{ $appUrl }}/settings/company">{{ __('Instellingen → Bedrijfsgegevens') }}</a>.
         </div>
     </div>
 </div>

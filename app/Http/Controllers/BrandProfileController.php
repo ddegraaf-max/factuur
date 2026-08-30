@@ -40,7 +40,7 @@ class BrandProfileController extends Controller
         $data = $this->validated($request);
         BrandProfile::create($data);
 
-        return back()->with('flash', 'Handelsnaam toegevoegd.');
+        return back()->with('flash', __('Handelsnaam toegevoegd.'));
     }
 
     public function update(Request $request, BrandProfile $profile): RedirectResponse
@@ -54,7 +54,7 @@ class BrandProfileController extends Controller
 
         $profile->update($data);
 
-        return back()->with('flash', 'Handelsnaam bijgewerkt.');
+        return back()->with('flash', __('Handelsnaam bijgewerkt.'));
     }
 
     public function destroy(BrandProfile $profile): RedirectResponse
@@ -63,7 +63,7 @@ class BrandProfileController extends Controller
         // standaard huisstijl (database: nullOnDelete).
         $profile->delete();
 
-        return back()->with('flash', 'Handelsnaam verwijderd. Bestaande facturen gebruiken weer de standaard huisstijl.');
+        return back()->with('flash', __('Handelsnaam verwijderd. Bestaande facturen gebruiken weer de standaard huisstijl.'));
     }
 
     protected function validated(Request $request, ?BrandProfile $profile = null): array
@@ -80,8 +80,8 @@ class BrandProfileController extends Controller
             'invoice_footer' => ['nullable', 'string', 'max:1000'],
             'logo_scale' => ['nullable', 'integer', 'min:50', 'max:200'],
         ], [
-            'name.required' => 'Vul de handelsnaam in.',
-            'name.unique' => 'Deze handelsnaam bestaat al.',
+            'name.required' => __('Vul de handelsnaam in.'),
+            'name.unique' => __('Deze handelsnaam bestaat al.'),
         ]);
 
         // Eigen logo, als base64 in de database (overleeft elke deploy).

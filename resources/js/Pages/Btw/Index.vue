@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { router, useForm, Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 import { eur } from '@/format.js';
 
 const brand = usePage().props.brand;
@@ -18,31 +19,31 @@ const props = defineProps({
 
 const setYear = (y) => router.get(route('vat.index'), { year: y }, { preserveState: false, preserveScroll: true });
 
-// Bedragen: met minteken vóór het euroteken; 'whole' = hele euro's zoals op het aangifteformulier.
+// Bedragen: met minteken vóór het valutateken; 'whole' = hele euro's zoals op het aangifteformulier.
 const amount = (n) => (n < 0 ? '− ' : '') + eur(Math.abs(n || 0));
-const whole = (n) => (n < 0 ? '− ' : '') + '€ ' + new Intl.NumberFormat('nl-NL').format(Math.abs(Math.round(n || 0)));
+const whole = (n) => (n < 0 ? '− ' : '') + eur(Math.abs(Math.round(n || 0)), { decimals: 0 });
 
-const typeLabel = { quarter: 'kwartaal', month: 'maand', year: 'jaar' }[props.period_type] || 'kwartaal';
+const typeLabel = { quarter: t('kwartaal'), month: t('maand'), year: t('jaar') }[props.period_type] || t('kwartaal');
 const gridClass = computed(() => ({ quarter: 'cols-2', month: 'cols-3', year: 'cols-1' }[props.period_type] || 'cols-2'));
 const duePeriod = computed(() => props.periods.find((p) => p.declaration_due));
 const rub = (p, key) => p.rubrieken.find((r) => r.key === key) || { base: 0, vat: 0 };
 
 const shortLabels = {
-  '1a': 'Hoog tarief · 21%', '1b': 'Laag tarief · 9%', '1c': 'Overige tarieven', '1d': 'Privégebruik',
-  '1e': 'Nultarief / niet belast', '2a': 'Btw naar u verlegd', '3a': 'Uitvoer buiten de EU',
-  '3b': 'Binnen de EU (ICP)', '3c': 'Afstandsverkopen EU', '4a': 'Inkoop buiten de EU', '4b': 'Inkoop binnen de EU',
+  '1a': t('Hoog tarief · 21%'), '1b': t('Laag tarief · 9%'), '1c': t('Overige tarieven'), '1d': t('Privégebruik'),
+  '1e': t('Nultarief / niet belast'), '2a': t('Btw naar u verlegd'), '3a': t('Uitvoer buiten de EU'),
+  '3b': t('Binnen de EU (ICP)'), '3c': t('Afstandsverkopen EU'), '4a': t('Inkoop buiten de EU'), '4b': t('Inkoop binnen de EU'),
 };
 const isEmpty = (r) => (r.base === null || Math.abs(r.base) < 0.005) && Math.abs(r.vat) < 0.005;
 // Op de kaart: 1a/1b/1e altijd, andere rubrieken alleen als er iets in staat.
 const cardRows = (p) => p.rubrieken.filter((r) => ['1a', '1b', '1e'].includes(r.key) || (['auto', 'manual'].includes(r.source) && !isEmpty(r)));
 
 const chip = (p) => {
-  if (p.paid) return { label: 'Betaald', cls: 'paid' };
-  if (p.filed) return { label: 'Aangegeven', cls: 'filed' };
-  if (p.declaration_due) return { label: p.days_left <= 7 ? `Nog ${p.days_left} ${p.days_left === 1 ? 'dag' : 'dagen'}` : 'Aangifte doen', cls: 'due' };
-  if (p.status === 'current') return { label: 'Loopt nu', cls: 'current' };
-  if (p.status === 'future') return { label: 'Nog niet begonnen', cls: 'future' };
-  return { label: 'Niet gemarkeerd', cls: 'unmarked' };
+  if (p.paid) return { label: t('Betaald'), cls: 'paid' };
+  if (p.filed) return { label: t('Aangegeven'), cls: 'filed' };
+  if (p.declaration_due) return { label: p.days_left <= 7 ? (p.days_left === 1 ? t('Nog 1 dag') : t('Nog :n dagen', { n: p.days_left })) : t('Aangifte doen'), cls: 'due' };
+  if (p.status === 'current') return { label: t('Loopt nu'), cls: 'current' };
+  if (p.status === 'future') return { label: t('Nog niet begonnen'), cls: 'future' };
+  return { label: t('Niet gemarkeerd'), cls: 'unmarked' };
 };
 
 /* ---------- Aangifte-klaar (detail per tijdvak) ---------- */
@@ -114,22 +115,22 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
 </script>
 
 <template>
-  <Head title="Btw-aangifte" />
+  <Head :title="$t('Btw-aangifte')" />
   <AppLayout>
-    <template #breadcrumb>Rapporten / <span class="breadcrumb-current">Btw-aangifte</span></template>
+    <template #breadcrumb>{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Btw-aangifte') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Btw-aangifte</h1>
-        <p class="page-subtitle">Aangifte omzetbelasting per {{ typeLabel }} · alle rubrieken klaar om over te nemen in Mijn Belastingdienst Zakelijk</p>
+        <h1 class="page-title">{{ $t('Btw-aangifte') }}</h1>
+        <p class="page-subtitle">{{ $t('Aangifte omzetbelasting per :type · alle rubrieken klaar om over te nemen in Mijn Belastingdienst Zakelijk', { type: typeLabel }) }}</p>
       </div>
       <div class="btw-header-actions">
         <div class="year-tabs">
           <div v-for="y in allYears" :key="y" class="tab" :class="{ active: year === y }" @click="setYear(y)">{{ y }}</div>
         </div>
-        <button class="btn btn-secondary btn-sm" title="Tijdvak, omzetbelastingnummer en herinnering" @click="showSettings = true">
+        <button class="btn btn-secondary btn-sm" :title="$t('Tijdvak, omzetbelastingnummer en herinnering')" @click="showSettings = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Instellingen
+          {{ $t('Instellingen') }}
         </button>
         <a :href="route('vat.pdf', { year })" class="btn btn-secondary btn-sm">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -142,25 +143,24 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
     <div v-if="duePeriod" class="btw-alert">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div class="btw-alert-text">
-        <strong>Aangifte {{ duePeriod.label }} {{ year }} staat open</strong> — nog {{ duePeriod.days_left }} {{ duePeriod.days_left === 1 ? 'dag' : 'dagen' }}.
-        <template v-if="duePeriod.balance_rounded > 0">Per saldo <strong>{{ whole(duePeriod.balance_rounded) }}</strong> te betalen; aangifte én betaling vóór <strong>{{ duePeriod.deadline_label }}</strong>.</template>
-        <template v-else-if="duePeriod.balance_rounded < 0">Je krijgt <strong>{{ whole(-duePeriod.balance_rounded) }}</strong> terug — dien de aangifte in vóór <strong>{{ duePeriod.deadline_label }}</strong>.</template>
-        <template v-else>Nihilaangifte — ook zonder omzet doe je aangifte, vóór <strong>{{ duePeriod.deadline_label }}</strong>.</template>
+        <strong>{{ $t('Aangifte :period :year staat open', { period: duePeriod.label, year }) }}</strong> — {{ duePeriod.days_left === 1 ? $t('nog 1 dag') : $t('nog :n dagen', { n: duePeriod.days_left }) }}.
+        <span v-if="duePeriod.balance_rounded > 0" v-html="$t('Per saldo <strong>:amount</strong> te betalen; aangifte én betaling vóór <strong>:deadline</strong>.', { amount: whole(duePeriod.balance_rounded), deadline: duePeriod.deadline_label })"></span>
+        <span v-else-if="duePeriod.balance_rounded < 0" v-html="$t('Je krijgt <strong>:amount</strong> terug — dien de aangifte in vóór <strong>:deadline</strong>.', { amount: whole(-duePeriod.balance_rounded), deadline: duePeriod.deadline_label })"></span>
+        <span v-else v-html="$t('Nihilaangifte — ook zonder omzet doe je aangifte, vóór <strong>:deadline</strong>.', { deadline: duePeriod.deadline_label })"></span>
       </div>
-      <button class="btn btn-primary btn-sm" @click="open(duePeriod)">Aangifte voorbereiden →</button>
+      <button class="btn btn-primary btn-sm" @click="open(duePeriod)">{{ $t('Aangifte voorbereiden →') }}</button>
     </div>
 
     <!-- Jaartotalen -->
     <div class="kpi-grid">
-      <div class="kpi"><div class="lbl">Omzet excl. btw · {{ year }}</div><div class="val">{{ amount(totals.base) }}</div><div class="meta">{{ totals.invoice_count }} facturen<span v-if="totals.credit_count"> · {{ totals.credit_count }} creditnota's</span></div></div>
-      <div class="kpi"><div class="lbl">Btw over je omzet (5a)</div><div class="val">{{ amount(totals.vat) }}</div><div class="meta">rubrieken 1 t/m 4</div></div>
-      <div class="kpi"><div class="lbl">Voorbelasting (5b)</div><div class="val">{{ amount(totals.input_vat) }}</div><div class="meta">uit {{ totals.purchase_count }} inkoopfacturen</div></div>
-      <div class="kpi tint"><div class="lbl">{{ totals.balance < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }} · {{ year }}</div><div class="val brand">{{ amount(totals.balance) }}</div><div class="meta">5a min 5b</div></div>
+      <div class="kpi"><div class="lbl">{{ $t('Omzet excl. btw · :year', { year }) }}</div><div class="val">{{ amount(totals.base) }}</div><div class="meta">{{ $t(':n facturen', { n: totals.invoice_count }) }}<span v-if="totals.credit_count"> · {{ $t(":n creditnota's", { n: totals.credit_count }) }}</span></div></div>
+      <div class="kpi"><div class="lbl">{{ $t('Btw over je omzet (5a)') }}</div><div class="val">{{ amount(totals.vat) }}</div><div class="meta">{{ $t('rubrieken 1 t/m 4') }}</div></div>
+      <div class="kpi"><div class="lbl">{{ $t('Voorbelasting (5b)') }}</div><div class="val">{{ amount(totals.input_vat) }}</div><div class="meta">{{ $t('uit :n inkoopfacturen', { n: totals.purchase_count }) }}</div></div>
+      <div class="kpi tint"><div class="lbl">{{ totals.balance < 0 ? $t('Terug te ontvangen') : $t('Per saldo te betalen') }} · {{ year }}</div><div class="val brand">{{ amount(totals.balance) }}</div><div class="meta">{{ $t('5a min 5b') }}</div></div>
     </div>
 
     <div v-if="totals.invoice_count === 0 && totals.credit_count === 0" class="btw-empty-note">
-      Nog geen verstuurde facturen in {{ year }} — de tijdvakken hieronder staan op nul.
-      Ook zonder omzet doe je overigens gewoon (nihil)aangifte.
+      {{ $t('Nog geen verstuurde facturen in :year — de tijdvakken hieronder staan op nul. Ook zonder omzet doe je overigens gewoon (nihil)aangifte.', { year }) }}
     </div>
 
     <!-- Tijdvakken -->
@@ -175,39 +175,39 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
         </div>
 
         <div class="btw-card-amount">
-          <div class="btw-card-amount-label">{{ p.balance_rounded < 0 ? 'Terug te ontvangen' : 'Per saldo te betalen' }}</div>
+          <div class="btw-card-amount-label">{{ p.balance_rounded < 0 ? $t('Terug te ontvangen') : $t('Per saldo te betalen') }}</div>
           <div class="btw-card-amount-value" :class="{ neg: p.balance_rounded < 0 }">{{ whole(p.balance_rounded) }} <small>{{ amount(p.balance) }}</small></div>
         </div>
 
         <table class="btw-table">
-          <thead><tr><th>Rubriek</th><th class="right">Grondslag</th><th class="right">Btw</th></tr></thead>
+          <thead><tr><th>{{ $t('Rubriek') }}</th><th class="right">{{ $t('Grondslag') }}</th><th class="right">{{ $t('Btw') }}</th></tr></thead>
           <tbody>
             <tr v-for="r in cardRows(p)" :key="r.key" :class="{ dim: isEmpty(r) }">
-              <td><span class="btw-rubriek">{{ r.key }}</span>{{ shortLabels[r.key] || r.label }}</td>
+              <td><span class="btw-rubriek">{{ r.key }}</span>{{ shortLabels[r.key] || $t(r.label) }}</td>
               <td class="right num" :class="{ neg: r.base < 0 }">{{ amount(r.base) }}</td>
               <td class="right num" :class="{ neg: r.vat < 0 }">{{ r.no_vat ? '—' : amount(r.vat) }}</td>
             </tr>
-            <tr class="btw-subtotal-row"><td><span class="btw-rubriek">5a</span>Verschuldigde btw</td><td></td><td class="right num">{{ amount(rub(p, '5a').vat) }}</td></tr>
-            <tr><td><span class="btw-rubriek">5b</span>Voorbelasting</td><td class="right muted-cell">{{ p.purchase_count }} inkoopfact.</td><td class="right num vat-in">− {{ amount(rub(p, '5b').vat) }}</td></tr>
-            <tr class="btw-total-row"><td><span class="btw-rubriek">5c</span>{{ p.balance < 0 ? 'Terug te ontvangen' : 'Te betalen' }}</td><td></td><td class="right num" :class="{ neg: p.balance < 0 }">{{ amount(p.balance) }}</td></tr>
+            <tr class="btw-subtotal-row"><td><span class="btw-rubriek">5a</span>{{ $t('Verschuldigde btw') }}</td><td></td><td class="right num">{{ amount(rub(p, '5a').vat) }}</td></tr>
+            <tr><td><span class="btw-rubriek">5b</span>{{ $t('Voorbelasting') }}</td><td class="right muted-cell">{{ $t(':n inkoopfact.', { n: p.purchase_count }) }}</td><td class="right num vat-in">− {{ amount(rub(p, '5b').vat) }}</td></tr>
+            <tr class="btw-total-row"><td><span class="btw-rubriek">5c</span>{{ p.balance < 0 ? $t('Terug te ontvangen') : $t('Te betalen') }}</td><td></td><td class="right num" :class="{ neg: p.balance < 0 }">{{ amount(p.balance) }}</td></tr>
           </tbody>
         </table>
 
         <div class="btw-card-foot">
-          <span>{{ p.invoice_count }} {{ p.invoice_count === 1 ? 'verkoopfactuur' : 'verkoopfacturen' }}<span v-if="p.credit_count"> · {{ p.credit_count }} creditnota's</span></span>
-          <span v-if="p.status !== 'future'" class="btw-deadline" :class="{ urgent: p.declaration_due }">vóór {{ p.deadline_label }}</span>
+          <span>{{ p.invoice_count }} {{ p.invoice_count === 1 ? $t('verkoopfactuur') : $t('verkoopfacturen') }}<span v-if="p.credit_count"> · {{ $t(":n creditnota's", { n: p.credit_count }) }}</span></span>
+          <span v-if="p.status !== 'future'" class="btw-deadline" :class="{ urgent: p.declaration_due }">{{ $t('vóór :date', { date: p.deadline_label }) }}</span>
         </div>
         <div class="btw-card-actions">
-          <button class="btn btn-sm" :class="p.declaration_due ? 'btn-primary' : 'btn-secondary'" @click="open(p)">Aangifte-klaar →</button>
-          <span v-if="p.filed_at_label" class="btw-mark">✓ Aangegeven {{ p.filed_at_label }}<template v-if="p.paid_at_label"> · betaald {{ p.paid_at_label }}</template></span>
+          <button class="btn btn-sm" :class="p.declaration_due ? 'btn-primary' : 'btn-secondary'" @click="open(p)">{{ $t('Aangifte-klaar →') }}</button>
+          <span v-if="p.filed_at_label" class="btw-mark">✓ {{ $t('Aangegeven :date', { date: p.filed_at_label }) }}<template v-if="p.paid_at_label"> · {{ $t('betaald :date', { date: p.paid_at_label }) }}</template></span>
         </div>
       </div>
     </div>
 
     <p class="btw-disclaimer">
-      Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's. 0%-regels worden op klantland verdeeld over 1e (Nederland), 3b (EU) en 3a (buiten de EU).
-      De voorbelasting (5b) komt uit je <Link :href="route('purchases.index')" style="color:var(--brand);font-weight:500;">ingeboekte inkoopfacturen</Link> — dat cijfer is dus zo volledig als je inboekt.
-      Wat {{ brand.name }} niet kan weten (verlegde btw, inkoop uit het buitenland, privégebruik) vul je per tijdvak zelf aan. Controleer de cijfers altijd met je boekhouder.
+      {{ $t("Berekend op factuurdatum (factuurstelsel) over alle verstuurde facturen en creditnota's. 0%-regels worden op klantland verdeeld over 1e (Nederland), 3b (EU) en 3a (buiten de EU).") }}
+      {{ $t('De voorbelasting (5b) komt uit je') }} <Link :href="route('purchases.index')" style="color:var(--brand);font-weight:500;">{{ $t('ingeboekte inkoopfacturen') }}</Link> — {{ $t('dat cijfer is dus zo volledig als je inboekt.') }}
+      {{ $t('Wat :brand niet kan weten (verlegde btw, inkoop uit het buitenland, privégebruik) vul je per tijdvak zelf aan. Controleer de cijfers altijd met je boekhouder.', { brand: brand.name }) }}
     </p>
 
     <!-- Aangifte-klaar: detail per tijdvak -->
@@ -215,74 +215,74 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
       <div class="modal modal-wide">
         <div class="modal-header">
           <div>
-            <div class="modal-title">Aangifte {{ detail.label }} {{ detail.year }}</div>
-            <div class="modal-sub">{{ detail.months }} · aangifte en betaling vóór {{ detail.deadline_label }}</div>
+            <div class="modal-title">{{ $t('Aangifte :period :year', { period: detail.label, year: detail.year }) }}</div>
+            <div class="modal-sub">{{ detail.months }} · {{ $t('aangifte en betaling vóór :date', { date: detail.deadline_label }) }}</div>
           </div>
           <div class="modal-header-actions">
-            <label class="cents-toggle"><input type="checkbox" v-model="showCents"> Toon centen</label>
-            <button class="icon-btn" @click="close" title="Sluiten">
+            <label class="cents-toggle"><input type="checkbox" v-model="showCents"> {{ $t('Toon centen') }}</label>
+            <button class="icon-btn" @click="close" :title="$t('Sluiten')">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
         </div>
         <div class="modal-body">
           <ol class="steps">
-            <li class="done">Controleer de rubrieken hieronder — en vul aan wat {{ brand.name }} niet weet</li>
-            <li>Neem ze over in <a :href="mbz_url" target="_blank" rel="noopener">Mijn Belastingdienst Zakelijk ↗</a> (klik op een bedrag om het te kopiëren)</li>
-            <li :class="{ done: detail.filed }">Markeer hieronder als aangegeven</li>
-            <li v-if="detail.payment.amount > 0" :class="{ done: detail.paid }">Betaal {{ whole(detail.payment.amount) }} vóór {{ detail.deadline_label }} — de betaalgegevens staan klaar</li>
+            <li class="done">{{ $t('Controleer de rubrieken hieronder — en vul aan wat :brand niet weet', { brand: brand.name }) }}</li>
+            <li>{{ $t('Neem ze over in') }} <a :href="mbz_url" target="_blank" rel="noopener">Mijn Belastingdienst Zakelijk ↗</a> {{ $t('(klik op een bedrag om het te kopiëren)') }}</li>
+            <li :class="{ done: detail.filed }">{{ $t('Markeer hieronder als aangegeven') }}</li>
+            <li v-if="detail.payment.amount > 0" :class="{ done: detail.paid }">{{ $t('Betaal :amount vóór :date — de betaalgegevens staan klaar', { amount: whole(detail.payment.amount), date: detail.deadline_label }) }}</li>
           </ol>
 
-          <div class="sect-title">Rubrieken <span class="sect-hint">{{ showCents ? 'exacte bedragen' : "hele euro's, afgerond in je voordeel" }}</span></div>
+          <div class="sect-title">{{ $t('Rubrieken') }} <span class="sect-hint">{{ showCents ? $t('exacte bedragen') : $t("hele euro's, afgerond in je voordeel") }}</span></div>
           <table class="rub-table">
             <thead>
-              <tr><th></th><th>Omschrijving</th><th class="right">Bedrag waarover btw wordt berekend</th><th class="right">Btw</th></tr>
+              <tr><th></th><th>{{ $t('Omschrijving') }}</th><th class="right">{{ $t('Bedrag waarover btw wordt berekend') }}</th><th class="right">{{ $t('Btw') }}</th></tr>
             </thead>
             <tbody>
               <tr v-for="r in detail.rubrieken" :key="r.key" :class="['rub-' + r.source, { total: r.source === 'total', dim: r.source !== 'total' && r.key !== '5b' && isEmpty(r) }]">
                 <td><span class="btw-rubriek">{{ r.key }}</span></td>
                 <td>
-                  {{ r.label }}
-                  <span v-if="r.key === '3a' || r.key === '3b'" class="rub-note">op basis van het land van de klant</span>
-                  <span v-else-if="r.key === '5b'" class="rub-note">{{ amount(r.auto) }} uit inkoopfacturen<template v-if="r.extra"> + {{ amount(r.extra) }} zelf aangevuld</template></span>
-                  <span v-else-if="r.source === 'manual'" class="rub-note">vul zelf in als van toepassing</span>
+                  {{ $t(r.label) }}
+                  <span v-if="r.key === '3a' || r.key === '3b'" class="rub-note">{{ $t('op basis van het land van de klant') }}</span>
+                  <span v-else-if="r.key === '5b'" class="rub-note">{{ $t(':amount uit inkoopfacturen', { amount: amount(r.auto) }) }}<template v-if="r.extra"> + {{ $t(':amount zelf aangevuld', { amount: amount(r.extra) }) }}</template></span>
+                  <span v-else-if="r.source === 'manual'" class="rub-note">{{ $t('vul zelf in als van toepassing') }}</span>
                 </td>
                 <td class="right">
                   <input v-if="r.source === 'manual' && manualForm[r.key]" type="number" step="0.01" v-model.number="manualForm[r.key].base" class="rub-input" placeholder="0">
-                  <button v-else-if="r.base !== null" type="button" class="copy-val" :title="'Kopieer ' + whole(r.base_rounded)" @click="copyValue(r, 'base')">
-                    {{ fmt(val(r, 'base')) }}<span v-if="copied === r.key + '-base'" class="copied">gekopieerd</span>
+                  <button v-else-if="r.base !== null" type="button" class="copy-val" :title="$t('Kopieer :value', { value: whole(r.base_rounded) })" @click="copyValue(r, 'base')">
+                    {{ fmt(val(r, 'base')) }}<span v-if="copied === r.key + '-base'" class="copied">{{ $t('gekopieerd') }}</span>
                   </button>
                   <span v-else class="muted">—</span>
                 </td>
                 <td class="right">
                   <span v-if="r.no_vat" class="muted">—</span>
                   <input v-else-if="r.source === 'manual' && manualForm[r.key]" type="number" step="0.01" v-model.number="manualForm[r.key].vat" class="rub-input" placeholder="0">
-                  <button v-else type="button" class="copy-val" :class="{ strong: r.source === 'total' }" :title="'Kopieer ' + whole(r.vat_rounded)" @click="copyValue(r, 'vat')">
-                    {{ fmt(val(r, 'vat')) }}<span v-if="copied === r.key + '-vat'" class="copied">gekopieerd</span>
+                  <button v-else type="button" class="copy-val" :class="{ strong: r.source === 'total' }" :title="$t('Kopieer :value', { value: whole(r.vat_rounded) })" @click="copyValue(r, 'vat')">
+                    {{ fmt(val(r, 'vat')) }}<span v-if="copied === r.key + '-vat'" class="copied">{{ $t('gekopieerd') }}</span>
                   </button>
                 </td>
               </tr>
               <tr class="rub-manual" v-if="manualForm['5b']">
                 <td></td>
-                <td>Extra voorbelasting buiten {{ brand.name }} <span class="rub-note">bijv. bonnetjes die je niet hebt ingeboekt — telt op bij 5b</span></td>
+                <td>{{ $t('Extra voorbelasting buiten :brand', { brand: brand.name }) }} <span class="rub-note">{{ $t('bijv. bonnetjes die je niet hebt ingeboekt — telt op bij 5b') }}</span></td>
                 <td></td>
                 <td class="right"><input type="number" step="0.01" v-model.number="manualForm['5b'].vat" class="rub-input" placeholder="0"></td>
               </tr>
             </tbody>
           </table>
           <div class="rub-actions">
-            <span class="rub-hint">Invulvelden bewaart {{ $page.props.brand.name }} per tijdvak; de rest rekent hij zelf uit.</span>
-            <button class="btn btn-sm" :class="manualDirty ? 'btn-primary' : 'btn-secondary'" :disabled="!manualDirty || manualSaving" @click="saveManual">Aanvullingen opslaan</button>
+            <span class="rub-hint">{{ $t('Invulvelden bewaart :brand per tijdvak; de rest rekent hij zelf uit.', { brand: $page.props.brand.name }) }}</span>
+            <button class="btn btn-sm" :class="manualDirty ? 'btn-primary' : 'btn-secondary'" :disabled="!manualDirty || manualSaving" @click="saveManual">{{ $t('Aanvullingen opslaan') }}</button>
           </div>
 
-          <div class="sect-title" style="margin-top:22px;">Onderbouwing</div>
+          <div class="sect-title" style="margin-top:22px;">{{ $t('Onderbouwing') }}</div>
           <div class="fold">
             <button type="button" class="fold-head" @click="showInvoices = !showInvoices">
-              <span>Verkoopfacturen &amp; creditnota's <em>{{ detail.invoices.length }}</em></span><span>{{ showInvoices ? '−' : '+' }}</span>
+              <span>{{ $t("Verkoopfacturen & creditnota's") }} <em>{{ detail.invoices.length }}</em></span><span>{{ showInvoices ? '−' : '+' }}</span>
             </button>
             <table v-if="showInvoices && detail.invoices.length" class="list-table">
               <tr v-for="i in detail.invoices" :key="i.id">
-                <td><Link :href="route('invoices.show', i.id)" class="lnk">{{ i.number }}</Link><span v-if="i.is_credit" class="cc">credit</span></td>
+                <td><Link :href="route('invoices.show', i.id)" class="lnk">{{ i.number }}</Link><span v-if="i.is_credit" class="cc">{{ $t('credit') }}</span></td>
                 <td class="grow">{{ i.customer_name }}<span v-if="i.country !== 'NL'" class="cc">{{ i.country }}</span></td>
                 <td class="muted">{{ i.date_label }}</td>
                 <td class="right num">{{ amount(i.base) }}</td>
@@ -290,71 +290,71 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
                 <td class="tags"><span v-for="k in i.rubrieken" :key="k" class="btw-rubriek">{{ k }}</span></td>
               </tr>
             </table>
-            <div v-else-if="showInvoices" class="fold-empty">Geen verkoopfacturen in dit tijdvak.</div>
+            <div v-else-if="showInvoices" class="fold-empty">{{ $t('Geen verkoopfacturen in dit tijdvak.') }}</div>
           </div>
           <div class="fold">
             <button type="button" class="fold-head" @click="showPurchases = !showPurchases">
-              <span>Inkoopfacturen (voorbelasting) <em>{{ detail.purchases.length }}</em></span><span>{{ showPurchases ? '−' : '+' }}</span>
+              <span>{{ $t('Inkoopfacturen (voorbelasting)') }} <em>{{ detail.purchases.length }}</em></span><span>{{ showPurchases ? '−' : '+' }}</span>
             </button>
             <table v-if="showPurchases && detail.purchases.length" class="list-table">
               <tr v-for="i in detail.purchases" :key="i.id">
                 <td class="grow"><Link :href="route('purchases.show', i.id)" class="lnk">{{ i.supplier_name }}</Link></td>
                 <td class="muted">{{ i.date_label }}</td>
-                <td class="right num muted">{{ amount(i.total) }} incl.</td>
+                <td class="right num muted">{{ amount(i.total) }} {{ $t('incl.') }}</td>
                 <td class="right num vat-in">{{ amount(i.vat) }}</td>
               </tr>
             </table>
-            <div v-else-if="showPurchases" class="fold-empty">Geen inkoopfacturen in dit tijdvak — <Link :href="route('purchases.index')" class="lnk">boek ze in</Link> om je voorbelasting terug te vragen.</div>
+            <div v-else-if="showPurchases" class="fold-empty">{{ $t('Geen inkoopfacturen in dit tijdvak —') }} <Link :href="route('purchases.index')" class="lnk">{{ $t('boek ze in') }}</Link> {{ $t('om je voorbelasting terug te vragen.') }}</div>
           </div>
 
-          <div class="sect-title" style="margin-top:22px;">Betalen</div>
+          <div class="sect-title" style="margin-top:22px;">{{ $t('Betalen') }}</div>
           <div v-if="detail.payment.amount > 0" class="pay-box">
-            <div class="pay-row"><span class="pay-k">Bedrag</span><button type="button" class="copy-val" @click="copy(detail.payment.amount, 'pay-amount')">{{ whole(detail.payment.amount) }}<span v-if="copied === 'pay-amount'" class="copied">gekopieerd</span></button></div>
-            <div class="pay-row"><span class="pay-k">IBAN</span><button type="button" class="copy-val mono" @click="copy(detail.payment.iban.replace(/ /g, ''), 'pay-iban')">{{ detail.payment.iban }}<span v-if="copied === 'pay-iban'" class="copied">gekopieerd</span></button></div>
-            <div class="pay-row"><span class="pay-k">Ten name van</span><span class="pay-v">{{ detail.payment.beneficiary }}</span></div>
+            <div class="pay-row"><span class="pay-k">{{ $t('Bedrag') }}</span><button type="button" class="copy-val" @click="copy(detail.payment.amount, 'pay-amount')">{{ whole(detail.payment.amount) }}<span v-if="copied === 'pay-amount'" class="copied">{{ $t('gekopieerd') }}</span></button></div>
+            <div class="pay-row"><span class="pay-k">IBAN</span><button type="button" class="copy-val mono" @click="copy(detail.payment.iban.replace(/ /g, ''), 'pay-iban')">{{ detail.payment.iban }}<span v-if="copied === 'pay-iban'" class="copied">{{ $t('gekopieerd') }}</span></button></div>
+            <div class="pay-row"><span class="pay-k">{{ $t('Ten name van') }}</span><span class="pay-v">{{ detail.payment.beneficiary }}</span></div>
             <div class="pay-row">
-              <span class="pay-k">Betalingskenmerk</span>
+              <span class="pay-k">{{ $t('Betalingskenmerk') }}</span>
               <template v-if="detail.payment.reference">
-                <button type="button" class="copy-val mono" @click="copy(detail.payment.reference, 'pay-ref')">{{ detail.payment.reference_formatted }}<span v-if="copied === 'pay-ref'" class="copied">gekopieerd</span></button>
-                <span class="pay-src">{{ detail.payment.reference_source === 'auto' ? 'berekend uit je omzetbelastingnummer' : 'zelf ingevuld' }}</span>
+                <button type="button" class="copy-val mono" @click="copy(detail.payment.reference, 'pay-ref')">{{ detail.payment.reference_formatted }}<span v-if="copied === 'pay-ref'" class="copied">{{ $t('gekopieerd') }}</span></button>
+                <span class="pay-src">{{ detail.payment.reference_source === 'auto' ? $t('berekend uit je omzetbelastingnummer') : $t('zelf ingevuld') }}</span>
               </template>
-              <span v-else class="pay-v muted">nog niet bekend</span>
+              <span v-else class="pay-v muted">{{ $t('nog niet bekend') }}</span>
             </div>
             <div class="pay-note">
-              Zet het kenmerk in het veld <b>Betalingskenmerk</b> van je overschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.
-              <template v-if="detail.payment.reference_source === 'auto'"> Controleer het met het kenmerk bij je ingestuurde aangifte.</template>
-              <template v-if="!detail.payment.reference"> Je vindt het in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte — plak het hieronder. Of <button type="button" class="link" @click="showSettings = true">stel je omzetbelastingnummer in</button>, dan berekent {{ $page.props.brand.name }} het voortaan zelf.</template>
+              <span v-html="$t('Zet het kenmerk in het veld <b>Betalingskenmerk</b> van je overschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.')"></span>
+              <template v-if="detail.payment.reference_source === 'auto'"> {{ $t('Controleer het met het kenmerk bij je ingestuurde aangifte.') }}</template>
+              <template v-if="!detail.payment.reference"> {{ $t('Je vindt het in Mijn Belastingdienst Zakelijk bij je ingestuurde aangifte — plak het hieronder. Of') }} <button type="button" class="link" @click="showSettings = true">{{ $t('stel je omzetbelastingnummer in') }}</button>{{ $t(', dan berekent :brand het voortaan zelf.', { brand: $page.props.brand.name }) }}</template>
             </div>
             <form class="ref-form" @submit.prevent="saveReference">
-              <input type="text" v-model="refForm.payment_reference" maxlength="30" :placeholder="detail.payment.reference ? 'Afwijkend kenmerk van de Belastingdienst? Plak het hier' : 'Betalingskenmerk (16 cijfers)'">
-              <button class="btn btn-secondary btn-sm" type="submit" :disabled="!refForm.payment_reference || refForm.processing">Opslaan</button>
+              <input type="text" v-model="refForm.payment_reference" maxlength="30" :placeholder="detail.payment.reference ? $t('Afwijkend kenmerk van de Belastingdienst? Plak het hier') : $t('Betalingskenmerk (16 cijfers)')">
+              <button class="btn btn-secondary btn-sm" type="submit" :disabled="!refForm.payment_reference || refForm.processing">{{ $t('Opslaan') }}</button>
             </form>
             <div v-if="refForm.errors.payment_reference" class="field-error">{{ refForm.errors.payment_reference }}</div>
           </div>
-          <div v-else-if="detail.balance_rounded < 0" class="pay-box neutral">Je krijgt per saldo <b>{{ whole(-detail.balance_rounded) }}</b> terug. Dien de aangifte in; de Belastingdienst betaalt uit na verwerking.</div>
-          <div v-else class="pay-box neutral">Per saldo niets te betalen (nihilaangifte). Dien de aangifte wél in — ook bij € 0.</div>
+          <div v-else-if="detail.balance_rounded < 0" class="pay-box neutral" v-html="$t('Je krijgt per saldo <b>:amount</b> terug. Dien de aangifte in; de Belastingdienst betaalt uit na verwerking.', { amount: whole(-detail.balance_rounded) })"></div>
+          <div v-else class="pay-box neutral">{{ $t('Per saldo niets te betalen (nihilaangifte). Dien de aangifte wél in — ook bij :zero.', { zero: whole(0) }) }}</div>
 
-          <div class="sect-title" style="margin-top:22px;">Status</div>
+          <div class="sect-title" style="margin-top:22px;">{{ $t('Status') }}</div>
           <div class="status-row">
             <label class="opt" :class="{ on: detail.filed }">
               <input type="checkbox" :checked="detail.filed" @change="toggle(detail, 'filed', $event.target.checked)">
               <div>
-                <div class="opt-title">Aangifte ingediend</div>
-                <div class="opt-sub">{{ detail.filed_at_label ? 'Gemarkeerd op ' + detail.filed_at_label : 'Vink aan zodra je de aangifte hebt verstuurd; de herinneringen stoppen dan.' }}</div>
+                <div class="opt-title">{{ $t('Aangifte ingediend') }}</div>
+                <div class="opt-sub">{{ detail.filed_at_label ? $t('Gemarkeerd op :date', { date: detail.filed_at_label }) : $t('Vink aan zodra je de aangifte hebt verstuurd; de herinneringen stoppen dan.') }}</div>
               </div>
             </label>
             <label v-if="detail.payment.amount > 0" class="opt" :class="{ on: detail.paid }">
               <input type="checkbox" :checked="detail.paid" @change="toggle(detail, 'paid', $event.target.checked)">
               <div>
-                <div class="opt-title">Betaald</div>
-                <div class="opt-sub">{{ detail.paid_at_label ? 'Gemarkeerd op ' + detail.paid_at_label : whole(detail.payment.amount) + ' overgemaakt aan de Belastingdienst.' }}</div>
+                <div class="opt-title">{{ $t('Betaald') }}</div>
+                <div class="opt-sub">{{ detail.paid_at_label ? $t('Gemarkeerd op :date', { date: detail.paid_at_label }) : $t(':amount overgemaakt aan de Belastingdienst.', { amount: whole(detail.payment.amount) }) }}</div>
               </div>
             </label>
           </div>
         </div>
         <div class="modal-footer">
-          <a :href="mbz_url" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Open Mijn Belastingdienst Zakelijk ↗</a>
-          <button class="btn btn-primary btn-sm" @click="close">Sluiten</button>
+          <a :href="mbz_url" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">{{ $t('Open Mijn Belastingdienst Zakelijk ↗') }}</a>
+          <button class="btn btn-primary btn-sm" @click="close">{{ $t('Sluiten') }}</button>
         </div>
       </div>
     </div>
@@ -363,47 +363,44 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
     <div v-if="showSettings" class="modal-overlay" @click.self="showSettings = false">
       <div class="modal">
         <div class="modal-header">
-          <div class="modal-title">Btw-instellingen</div>
-          <button class="icon-btn" @click="showSettings = false" title="Sluiten">
+          <div class="modal-title">{{ $t('Btw-instellingen') }}</div>
+          <button class="icon-btn" @click="showSettings = false" :title="$t('Sluiten')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label>Aangiftetijdvak</label>
+            <label>{{ $t('Aangiftetijdvak') }}</label>
             <select v-model="settingsForm.vat_period">
-              <option value="quarter">Per kwartaal (meest gebruikelijk)</option>
-              <option value="month">Per maand</option>
-              <option value="year">Per jaar</option>
+              <option value="quarter">{{ $t('Per kwartaal (meest gebruikelijk)') }}</option>
+              <option value="month">{{ $t('Per maand') }}</option>
+              <option value="year">{{ $t('Per jaar') }}</option>
             </select>
-            <div class="hint">Zoals de Belastingdienst het aan je heeft toegewezen — staat in je brief en in Mijn Belastingdienst Zakelijk.</div>
+            <div class="hint">{{ $t('Zoals de Belastingdienst het aan je heeft toegewezen — staat in je brief en in Mijn Belastingdienst Zakelijk.') }}</div>
           </div>
           <div class="form-group">
-            <label>Omzetbelastingnummer <span class="lbl-hint">(voor het betalingskenmerk)</span></label>
+            <label>{{ $t('Omzetbelastingnummer') }} <span class="lbl-hint">{{ $t('(voor het betalingskenmerk)') }}</span></label>
             <div v-if="settings.has_ob_number && !settingsForm.ob_number_clear" class="ob-current">
-              Ingesteld: <b>{{ settings.ob_number_hint }}</b>
-              <button type="button" class="link" @click="settingsForm.ob_number_clear = true">wissen</button>
+              {{ $t('Ingesteld:') }} <b>{{ settings.ob_number_hint }}</b>
+              <button type="button" class="link" @click="settingsForm.ob_number_clear = true">{{ $t('wissen') }}</button>
             </div>
             <input v-else type="text" v-model="settingsForm.ob_number" placeholder="123456789B01" maxlength="30">
-            <div class="hint">
-              Staat bovenaan je aangiftebrief en in Mijn Belastingdienst Zakelijk. Bij een eenmanszaak is dit een <b>ander</b> nummer dan het btw-id op je facturen.
-              Het wordt versleuteld opgeslagen en nooit getoond; {{ brand.name }} berekent er alleen het betalingskenmerk mee.
-            </div>
+            <div class="hint" v-html="$t('Staat bovenaan je aangiftebrief en in Mijn Belastingdienst Zakelijk. Bij een eenmanszaak is dit een <b>ander</b> nummer dan het btw-id op je facturen. Het wordt versleuteld opgeslagen en nooit getoond; :brand berekent er alleen het betalingskenmerk mee.', { brand: brand.name })"></div>
             <div v-if="settingsForm.errors.ob_number" class="field-error">{{ settingsForm.errors.ob_number }}</div>
           </div>
           <label class="opt" :class="{ on: settingsForm.vat_reminder_enabled }">
             <input type="checkbox" v-model="settingsForm.vat_reminder_enabled">
             <div>
-              <div class="opt-title">Herinnering per e-mail</div>
-              <div class="opt-sub">Twee weken en drie dagen vóór de deadline naar {{ settings.reminder_email }} — alleen zolang het tijdvak niet als aangegeven is gemarkeerd.</div>
+              <div class="opt-title">{{ $t('Herinnering per e-mail') }}</div>
+              <div class="opt-sub">{{ $t('Twee weken en drie dagen vóór de deadline naar :email — alleen zolang het tijdvak niet als aangegeven is gemarkeerd.', { email: settings.reminder_email }) }}</div>
             </div>
           </label>
         </div>
         <div class="modal-footer">
           <div></div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-secondary btn-sm" @click="showSettings = false">Annuleren</button>
-            <button class="btn btn-primary btn-sm" @click="saveSettings" :disabled="settingsForm.processing">Opslaan</button>
+            <button class="btn btn-secondary btn-sm" @click="showSettings = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" @click="saveSettings" :disabled="settingsForm.processing">{{ $t('Opslaan') }}</button>
           </div>
         </div>
       </div>

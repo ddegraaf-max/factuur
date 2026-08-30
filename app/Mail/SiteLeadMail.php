@@ -22,7 +22,7 @@ class SiteLeadMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Nieuw bericht via je website van ' . $this->lead->name,
+            subject: __('Nieuw bericht via je website van :name', ['name' => $this->lead->name]),
             replyTo: [$this->lead->email],
         );
     }

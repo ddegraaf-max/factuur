@@ -1,12 +1,20 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
+import { eur, fmtDate } from '@/format';
+import { computed } from 'vue';
 
-defineProps({
+const props = defineProps({
   cases: Array,
   stats: Object,
   handler: Object,
 });
+
+// Markt (nl/pl): de incassopartner komt van de server, met de marktinstelling als vangnet.
+const market = usePage().props.market || {};
+const isPl = computed(() => market.key === 'pl');
+const partnerName = computed(() => props.handler?.name || market.incasso_partner || '');
 
 // De fase bepaalt hoe ver het traject is: eerst minnelijk (schikken), dan via
 // de rechter, en ten slotte executie (beslag).
@@ -15,25 +23,34 @@ const changePhase = (invoice, phase) => {
   router.patch(route('incasso.phase', invoice.id), { phase }, { preserveScroll: true });
 };
 
-const eur = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const formatDate = (s) => s ? new Date(s).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const formatDate = (s) => s ? fmtDate(s, { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
 const phaseLabels = {
-  minnelijk: 'Minnelijk traject',
-  gerechtelijk: 'Gerechtelijke procedure',
-  executie: 'Executie',
+  minnelijk: t('Minnelijk traject'),
+  gerechtelijk: t('Gerechtelijke procedure'),
+  executie: t('Executie'),
+};
+
+// Alleen in Polen (windykacja): de factuur te koop aanbieden aan de incassopartner.
+const requestSale = (invoice) => {
+  const msg = t('Factuur :number te koop aanbieden aan :partner? Zij nemen daarna contact met je op over de voorwaarden.', {
+    number: invoice.number,
+    partner: partnerName.value,
+  });
+  if (!confirm(msg)) return;
+  router.post(route('windykacja.wykup', invoice.id), {}, { preserveScroll: true });
 };
 </script>
 
 <template>
-  <Head title="Incasso" />
+  <Head :title="$t('Incasso')" />
   <AppLayout>
-    <template #breadcrumb>Verkoop / <span class="breadcrumb-current">Incasso</span></template>
+    <template #breadcrumb>{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Incasso') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Incasso</h1>
-        <p class="page-subtitle">Facturen die zijn overgedragen aan de deurwaarder</p>
+        <h1 class="page-title">{{ $t('Incasso') }}</h1>
+        <p class="page-subtitle">{{ $t('Facturen die zijn overgedragen aan de deurwaarder') }}</p>
       </div>
     </div>
 
@@ -44,73 +61,80 @@ const phaseLabels = {
         </svg>
       </div>
       <div>
-        <div class="eyebrow">Incassopartner</div>
-        <div class="name">{{ handler.name }}</div>
-        <div class="sub">{{ handler.tagline }}</div>
+        <div class="eyebrow">{{ $t('Incassopartner') }}</div>
+        <div class="name">{{ partnerName }}</div>
+        <div class="sub">{{ $t(handler.tagline) }}</div>
       </div>
       <div class="contacts">
         <div>✉ <b>{{ handler.email }}</b></div>
-        <div style="opacity:.7;font-size:12px;margin-top:4px;">Nieuwe dossiers worden automatisch<br>per e-mail aangeleverd.</div>
+        <div style="opacity:.7;font-size:12px;margin-top:4px;">{{ $t('Nieuwe dossiers worden automatisch per e-mail aangeleverd.') }}</div>
       </div>
     </div>
 
     <div class="stat-grid">
       <div class="stat-card">
-        <div class="lbl">Actieve dossiers</div>
+        <div class="lbl">{{ $t('Actieve dossiers') }}</div>
         <div class="val">{{ stats.count }}</div>
       </div>
       <div class="stat-card">
-        <div class="lbl">Totaal in incasso</div>
+        <div class="lbl">{{ $t('Totaal in incasso') }}</div>
         <div class="val">{{ eur(stats.total_open) }}</div>
       </div>
       <div class="stat-card">
-        <div class="lbl">Langst lopende dossier</div>
-        <div class="val">{{ stats.oldest_days > 0 ? stats.oldest_days + ' dagen' : '—' }}</div>
+        <div class="lbl">{{ $t('Langst lopende dossier') }}</div>
+        <div class="val">{{ stats.oldest_days > 0 ? $t(':n dagen', { n: stats.oldest_days }) : '—' }}</div>
       </div>
     </div>
 
     <div v-if="cases.length === 0" class="card empty">
-      <div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:6px;">Geen actieve dossiers</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:6px;">{{ $t('Geen actieve dossiers') }}</div>
       <div style="color:var(--text-3);margin-bottom:18px;">
-        Open een achterstallige factuur en klik daar op <b>“Naar incasso”</b> om het dossier over te dragen aan {{ handler.name }}.
+        {{ $t('Open een achterstallige factuur en klik daar op') }} <b>{{ $t('“Naar incasso”') }}</b> {{ $t('om het dossier over te dragen aan :partner.', { partner: partnerName }) }}
       </div>
       <Link :href="route('invoices.index', { status: 'overdue' })" class="btn btn-primary btn-sm" style="display:inline-flex;">
-        Bekijk verlopen facturen
+        {{ $t('Bekijk verlopen facturen') }}
       </Link>
     </div>
 
     <div v-else class="card">
       <div class="card-header">
         <div>
-          <div class="card-title">Actieve dossiers</div>
-          <div class="card-subtitle">{{ cases.length }} {{ cases.length === 1 ? 'factuur' : 'facturen' }} in behandeling bij {{ handler.name }}</div>
+          <div class="card-title">{{ $t('Actieve dossiers') }}</div>
+          <div class="card-subtitle">{{ cases.length }} {{ cases.length === 1 ? $t('factuur') : $t('facturen') }} {{ $t('in behandeling bij :partner', { partner: partnerName }) }}</div>
         </div>
       </div>
       <table class="data-table">
         <thead>
           <tr>
-            <th>Dossier</th>
-            <th>Factuur</th>
-            <th>Klant</th>
-            <th>Overdracht</th>
-            <th>Looptijd</th>
-            <th>Fase</th>
-            <th class="right">Openstaand</th>
+            <th>{{ $t('Dossier') }}</th>
+            <th>{{ $t('Factuur') }}</th>
+            <th>{{ $t('Klant') }}</th>
+            <th>{{ $t('Overdracht') }}</th>
+            <th>{{ $t('Looptijd') }}</th>
+            <th>{{ $t('Fase') }}</th>
+            <th class="right">{{ $t('Openstaand') }}</th>
+            <!-- Windykacja (alleen Polen): formele aanmaning en factuur verkopen -->
+            <th v-if="isPl" class="right">{{ $t('Acties') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="c in cases" :key="c.id">
             <td class="mono cell-primary">{{ c.incasso_reference }}</td>
-            <td class="mono" data-label="Factuur"><Link :href="route('invoices.show', c.id)">{{ c.number }}</Link></td>
-            <td data-label="Klant">{{ c.customer_name }}</td>
-            <td data-label="Overdracht">{{ formatDate(c.incasso_sent_at) }}</td>
-            <td data-label="Looptijd">{{ c.days_at_armaere }} dagen</td>
-            <td data-label="Fase">
+            <td class="mono" :data-label="$t('Factuur')"><Link :href="route('invoices.show', c.id)">{{ c.number }}</Link></td>
+            <td :data-label="$t('Klant')">{{ c.customer_name }}</td>
+            <td :data-label="$t('Overdracht')">{{ formatDate(c.incasso_sent_at) }}</td>
+            <td :data-label="$t('Looptijd')">{{ $t(':n dagen', { n: c.days_at_armaere }) }}</td>
+            <td :data-label="$t('Fase')">
               <select class="phase-select" :value="c.incasso_phase" @change="changePhase(c, $event.target.value)">
                 <option v-for="(label, value) in phaseLabels" :key="value" :value="value">{{ label }}</option>
               </select>
             </td>
-            <td class="right num" data-label="Openstaand">{{ eur(c.remaining) }}</td>
+            <td class="right num" :data-label="$t('Openstaand')">{{ eur(c.remaining) }}</td>
+            <td v-if="isPl" class="right wd-actions" :data-label="$t('Acties')">
+              <a :href="route('windykacja.wezwanie', c.id)" target="_blank" class="link-btn">{{ $t('Formele aanmaning (PDF)') }}</a>
+              <span v-if="c.sale_requested_at" class="pill-incasso">{{ $t('Te koop aangeboden') }}</span>
+              <button v-else type="button" class="link-btn" @click="requestSale(c)">{{ $t('Factuur verkopen') }}</button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -147,6 +171,11 @@ const phaseLabels = {
 }
 .phase-select:hover { border-color: var(--border-strong); }
 .phase-select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+/* Windykacja-acties (Polen): aanmaning-PDF en factuur verkopen, naast elkaar. */
+.wd-actions { white-space: nowrap; }
+.wd-actions .link-btn { margin-left: 10px; }
+.wd-actions .pill-incasso { margin-left: 10px; }
+.link-btn { background: none; border: none; padding: 0; font: inherit; font-size: 12px; color: var(--brand); text-decoration: underline; cursor: pointer; }
 
 @media (max-width: 760px) {
   /* Icoon, naam en contactgegevens onder elkaar i.p.v. drie kolommen. */
@@ -155,5 +184,6 @@ const phaseLabels = {
   /* Lange e-mailadressen mogen afbreken, anders duwen ze de pagina breder. */
   .contacts { overflow-wrap: anywhere; }
   .stat-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .wd-actions { white-space: normal; }
 }
 </style>

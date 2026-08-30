@@ -150,23 +150,23 @@
           @if($line->details)<div class="details">{{ $line->details }}</div>@endif
         </td>
         <td class="right">{{ rtrim(rtrim(number_format($line->quantity, 3, ',', '.'), '0'), ',') }} {{ $line->unit }}</td>
-        <td class="right">€&nbsp;{{ number_format($line->unit_price, 2, ',', '.') }}</td>
+        <td class="right">{{ money($line->unit_price) }}</td>
         @if($hasDiscount)<td class="right">{{ (float) ($line->discount_pct ?? 0) > 0 ? rtrim(rtrim(number_format($line->discount_pct, 2, ',', '.'), '0'), ',') . '%' : '—' }}</td>@endif
         <td class="center">{{ (int) $line->vat_rate }}%</td>
-        <td class="right">€&nbsp;{{ number_format($line->line_subtotal, 2, ',', '.') }}</td>
+        <td class="right">{{ money($line->line_subtotal) }}</td>
       </tr>
     @endforeach
   </tbody>
 </table>
 
 <table class="totals">
-  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">€&nbsp;{{ number_format($quote->subtotal, 2, ',', '.') }}</td></tr>
+  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">{{ money($quote->subtotal) }}</td></tr>
   @if(is_array($quote->vat_breakdown))
     @foreach($quote->vat_breakdown as $rate => $amount)
-      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€&nbsp;{{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money((float) $amount) }}</td></tr>
     @endforeach
   @endif
-  <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value brand">€&nbsp;{{ number_format($quote->total, 2, ',', '.') }}</td></tr>
+  <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value brand">{{ money($quote->total) }}</td></tr>
 </table>
 
 <div style="clear:both;"></div>

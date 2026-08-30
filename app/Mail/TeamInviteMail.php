@@ -26,7 +26,7 @@ class TeamInviteMail extends Mailable
         $company = $this->invitation->company?->name ?? Brand::name();
 
         return new Envelope(
-            subject: "{$this->inviterName} nodigt je uit voor {$company} op " . Brand::name(),
+            subject: __(':inviter nodigt je uit voor :company op :brand', ['inviter' => $this->inviterName, 'company' => $company, 'brand' => Brand::name()]),
         );
     }
 
@@ -36,8 +36,8 @@ class TeamInviteMail extends Mailable
             view: 'emails.team-invite',
             with: [
                 'inviter' => $this->inviterName,
-                'company' => $this->invitation->company?->name ?? 'het bedrijf',
-                'roleLabel' => User::ROLE_LABELS[$this->invitation->role] ?? $this->invitation->role,
+                'company' => $this->invitation->company?->name ?? __('het bedrijf'),
+                'roleLabel' => isset(User::ROLE_LABELS[$this->invitation->role]) ? __(User::ROLE_LABELS[$this->invitation->role]) : $this->invitation->role,
                 'url' => route('invitation.show', $this->invitation->token),
                 'expires' => $this->invitation->expires_at->translatedFormat('j F Y'),
             ],

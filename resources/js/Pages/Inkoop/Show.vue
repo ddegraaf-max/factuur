@@ -1,6 +1,7 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 import { eur } from '@/format.js';
 import { computed, ref } from 'vue';
 
@@ -8,16 +9,20 @@ const props = defineProps({
   purchase: Object,
 });
 
+// Markt (nl/pl): de online betaalmethode heet per markt anders (iDEAL / BLIK).
+const market = usePage().props.market || {};
+const onlinePaymentLabel = market.online_payment_label || 'iDEAL';
+
 const methodLabels = {
-  bank_transfer: 'Bankoverschrijving',
-  ideal: 'iDEAL',
-  direct_debit: 'Automatische incasso',
-  card: 'Pinpas / creditcard',
-  cash: 'Contant',
-  other: 'Anders',
+  bank_transfer: t('Bankoverschrijving'),
+  ideal: onlinePaymentLabel,
+  direct_debit: t('Automatische incasso'),
+  card: t('Pinpas / creditcard'),
+  cash: t('Contant'),
+  other: t('Anders'),
 };
 
-const rateLabel = (r) => Number(r) === 0 ? '0% / vrijgesteld' : `${Number(r)}%`;
+const rateLabel = (r) => Number(r) === 0 ? t('0% / vrijgesteld') : `${Number(r)}%`;
 
 /* ---------- Betaald markeren ---------- */
 const showPaidForm = ref(false);
@@ -34,19 +39,19 @@ const markPaid = () => {
 };
 
 const reopen = () => {
-  if (confirm('Deze factuur weer op "open" zetten?')) {
+  if (confirm(t('Deze factuur weer op "open" zetten?'))) {
     router.post(route('purchases.reopen', props.purchase.id), {}, { preserveScroll: true });
   }
 };
 
 const destroy = () => {
-  if (confirm('Inkoopfactuur én bijbehorende bijlagen definitief verwijderen?')) {
+  if (confirm(t('Inkoopfactuur én bijbehorende bijlagen definitief verwijderen?'))) {
     router.delete(route('purchases.destroy', props.purchase.id));
   }
 };
 
 const makeRecurring = () => {
-  if (confirm(`"${props.purchase.supplier_name}" voortaan automatisch maandelijks inboeken als vaste last?\n\nDe frequentie kun je daarna nog aanpassen.`)) {
+  if (confirm(t('":supplier" voortaan automatisch maandelijks inboeken als vaste last?\n\nDe frequentie kun je daarna nog aanpassen.', { supplier: props.purchase.supplier_name }))) {
     router.post(route('purchases.recurring.from', props.purchase.id));
   }
 };
@@ -70,7 +75,7 @@ const uploadFiles = (event) => {
 };
 
 const removeAttachment = (att) => {
-  if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
+  if (confirm(t('Bijlage ":filename" verwijderen?', { filename: att.filename }))) {
     router.delete(route('attachments.destroy', att.id), { preserveScroll: true });
   }
 };
@@ -84,11 +89,11 @@ const previewAttachment = computed(() =>
 </script>
 
 <template>
-  <Head :title="`Inkoop · ${purchase.supplier_name}`" />
+  <Head :title="`${$t('Inkoop')} · ${purchase.supplier_name}`" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Inkoop / <Link :href="route('purchases.index')" style="color:var(--text-3);">Inkoopfacturen</Link> /
+        {{ $t('Inkoop') }} / <Link :href="route('purchases.index')" style="color:var(--text-3);">{{ $t('Inkoopfacturen') }}</Link> /
         <span class="breadcrumb-current">{{ purchase.supplier_name }}</span>
       </div>
     </template>
@@ -97,29 +102,29 @@ const previewAttachment = computed(() =>
       <div>
         <Link :href="route('purchases.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Terug
+          {{ $t('Terug') }}
         </Link>
         <h1 class="page-title">{{ purchase.supplier_name }}</h1>
         <p class="page-subtitle">
-          Inkoopfactuur<template v-if="purchase.supplier_reference"> {{ purchase.supplier_reference }}</template>
+          {{ $t('Inkoopfactuur') }}<template v-if="purchase.supplier_reference"> {{ purchase.supplier_reference }}</template>
           · {{ purchase.invoice_date_label }}
         </p>
       </div>
       <div class="page-actions">
         <button v-if="purchase.status === 'open'" class="btn btn-primary btn-sm" @click="showPaidForm = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          Markeer als betaald
+          {{ $t('Markeer als betaald') }}
         </button>
-        <button v-else class="btn btn-secondary btn-sm" @click="reopen">Heropen</button>
+        <button v-else class="btn btn-secondary btn-sm" @click="reopen">{{ $t('Heropen') }}</button>
         <Link :href="route('purchases.edit', purchase.id)" class="btn btn-secondary btn-sm">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><polygon points="18.5 2.5 21.5 5.5 12 15 9 15 9 12 18.5 2.5"/></svg>
-          Bewerken
+          {{ $t('Bewerken') }}
         </Link>
-        <button class="btn btn-secondary btn-sm" title="Boek deze kosten voortaan automatisch periodiek in" @click="makeRecurring">
+        <button class="btn btn-secondary btn-sm" :title="$t('Boek deze kosten voortaan automatisch periodiek in')" @click="makeRecurring">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-          Maak terugkerend
+          {{ $t('Maak terugkerend') }}
         </button>
-        <button class="btn btn-danger btn-sm" @click="destroy">Verwijder</button>
+        <button class="btn btn-danger btn-sm" @click="destroy">{{ $t('Verwijder') }}</button>
       </div>
     </div>
 
@@ -129,18 +134,18 @@ const previewAttachment = computed(() =>
         <div class="card">
           <div class="pu-head">
             <div>
-              <span v-if="purchase.status === 'paid'" class="pill pill-paid">Betaald</span>
-              <span v-else-if="purchase.is_overdue" class="pill pill-overdue">{{ purchase.days_overdue }} d. over tijd</span>
-              <span v-else class="pill pill-sent">Open</span>
+              <span v-if="purchase.status === 'paid'" class="pill pill-paid">{{ $t('Betaald') }}</span>
+              <span v-else-if="purchase.is_overdue" class="pill pill-overdue">{{ $t(':n d. over tijd', { n: purchase.days_overdue }) }}</span>
+              <span v-else class="pill pill-sent">{{ $t('Open') }}</span>
             </div>
             <div class="pu-total">
               <template v-if="purchase.deductions?.length">
-                <div class="pu-total-label">Te betalen</div>
+                <div class="pu-total-label">{{ $t('Te betalen') }}</div>
                 <div class="pu-total-value">{{ eur(purchase.payable) }}</div>
-                <div class="pu-total-sub">Totaal incl. BTW {{ eur(purchase.total) }} − verrekend {{ eur(purchase.deductions_total) }}</div>
+                <div class="pu-total-sub">{{ $t('Totaal incl. BTW :total − verrekend :deducted', { total: eur(purchase.total), deducted: eur(purchase.deductions_total) }) }}</div>
               </template>
               <template v-else>
-                <div class="pu-total-label">Totaal incl. BTW</div>
+                <div class="pu-total-label">{{ $t('Totaal incl. BTW') }}</div>
                 <div class="pu-total-value">{{ eur(purchase.total) }}</div>
               </template>
             </div>
@@ -148,19 +153,19 @@ const previewAttachment = computed(() =>
 
           <div class="pu-meta">
             <div>
-              <div class="pu-meta-label">Factuurdatum</div>
+              <div class="pu-meta-label">{{ $t('Factuurdatum') }}</div>
               <div class="pu-meta-value">{{ purchase.invoice_date_label }}</div>
             </div>
             <div>
-              <div class="pu-meta-label">Vervaldatum</div>
+              <div class="pu-meta-label">{{ $t('Vervaldatum') }}</div>
               <div class="pu-meta-value">{{ purchase.due_date_label || '—' }}</div>
             </div>
             <div>
-              <div class="pu-meta-label">Categorie</div>
+              <div class="pu-meta-label">{{ $t('Categorie') }}</div>
               <div class="pu-meta-value">{{ purchase.category || '—' }}</div>
             </div>
             <div v-if="purchase.status === 'paid'">
-              <div class="pu-meta-label">Betaald op</div>
+              <div class="pu-meta-label">{{ $t('Betaald op') }}</div>
               <div class="pu-meta-value">
                 {{ purchase.paid_at_label }}
                 <span v-if="purchase.payment_method" class="muted"> · {{ methodLabels[purchase.payment_method] }}</span>
@@ -172,9 +177,9 @@ const previewAttachment = computed(() =>
             <table class="pu-table">
               <thead>
                 <tr>
-                  <th>BTW-tarief</th>
-                  <th class="right">Grondslag excl.</th>
-                  <th class="right">BTW</th>
+                  <th>{{ $t('BTW-tarief') }}</th>
+                  <th class="right">{{ $t('Grondslag excl.') }}</th>
+                  <th class="right">{{ $t('BTW') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,7 +189,7 @@ const previewAttachment = computed(() =>
                   <td class="right num">{{ eur(line.vat) }}</td>
                 </tr>
                 <tr class="total">
-                  <td>Totaal</td>
+                  <td>{{ $t('Totaal') }}</td>
                   <td class="right num">{{ eur(purchase.subtotal) }}</td>
                   <td class="right num">{{ eur(purchase.vat_total) }}</td>
                 </tr>
@@ -198,34 +203,34 @@ const previewAttachment = computed(() =>
                 <span class="num">- {{ eur(d.amount) }}</span>
               </div>
               <div class="pu-ded-row pu-ded-payable">
-                <span>Te betalen</span>
+                <span>{{ $t('Te betalen') }}</span>
                 <span class="num">{{ eur(purchase.payable) }}</span>
               </div>
             </div>
 
             <div class="pu-vat-note">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
-              {{ eur(purchase.vat_total) }} voorbelasting — telt automatisch mee in rubriek 5b van je
-              <Link :href="route('vat.index')" style="color:var(--brand);font-weight:500;">BTW-overzicht</Link>.
+              {{ $t(':amount voorbelasting — telt automatisch mee in rubriek 5b van je', { amount: eur(purchase.vat_total) }) }}
+              <Link :href="route('vat.index')" style="color:var(--brand);font-weight:500;">{{ $t('BTW-overzicht') }}</Link>.
             </div>
 
             <div v-if="purchase.notes" class="pu-notes">
-              <div class="pu-meta-label" style="margin-bottom:6px;">Notities</div>
+              <div class="pu-meta-label" style="margin-bottom:6px;">{{ $t('Notities') }}</div>
               {{ purchase.notes }}
             </div>
 
             <!-- Bijlagen -->
             <div class="sect-head" style="margin-top:22px;">
-              <div class="pu-meta-label" style="margin:0;font-size:12px;">Bijlagen</div>
+              <div class="pu-meta-label" style="margin:0;font-size:12px;">{{ $t('Bijlagen') }}</div>
               <div>
                 <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadFiles">
                 <button class="btn btn-secondary btn-sm" :disabled="uploadForm.processing" @click="fileInput?.click()">
-                  {{ uploadForm.processing ? 'Uploaden…' : 'Bijlage toevoegen' }}
+                  {{ uploadForm.processing ? $t('Uploaden…') : $t('Bijlage toevoegen') }}
                 </button>
               </div>
             </div>
             <div v-if="!purchase.attachments || purchase.attachments.length === 0" class="pu-att-empty">
-              Nog geen bon of factuur geüpload. Voeg een foto of PDF toe zodat je administratie compleet is.
+              {{ $t('Nog geen bon of factuur geüpload. Voeg een foto of PDF toe zodat je administratie compleet is.') }}
             </div>
             <div v-else class="pu-att-list">
               <div v-for="att in purchase.attachments" :key="att.id" class="pu-att-row">
@@ -236,8 +241,8 @@ const previewAttachment = computed(() =>
                   <a :href="route('attachments.show', att.id)" target="_blank" class="pu-att-name">{{ att.filename }}</a>
                   <div class="pu-att-meta">{{ att.size_formatted }} · {{ att.uploaded_at_label }}</div>
                 </div>
-                <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">Download</a>
-                <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">Verwijder</button>
+                <a :href="route('attachments.download', att.id)" class="btn btn-ghost btn-sm">{{ $t('Download') }}</a>
+                <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(att)">{{ $t('Verwijder') }}</button>
               </div>
             </div>
           </div>
@@ -248,19 +253,19 @@ const previewAttachment = computed(() =>
       <div v-if="previewAttachment" class="card pu-preview-card">
         <div class="pu-preview-head">
           <span>{{ previewAttachment.filename }}</span>
-          <a :href="route('attachments.show', previewAttachment.id)" target="_blank" class="link-btn">Open groot</a>
+          <a :href="route('attachments.show', previewAttachment.id)" target="_blank" class="link-btn">{{ $t('Open groot') }}</a>
         </div>
         <img
           v-if="previewAttachment.kind === 'image'"
           :src="route('attachments.show', previewAttachment.id)"
           class="pu-preview-img"
-          alt="Bon"
+          :alt="$t('Bon')"
         >
         <iframe
           v-else
           :src="route('attachments.show', previewAttachment.id)"
           class="pu-preview-pdf"
-          title="Factuur-PDF"
+          :title="$t('Factuur-PDF')"
         ></iframe>
       </div>
     </div>
@@ -269,7 +274,7 @@ const previewAttachment = computed(() =>
     <div v-if="showPaidForm" class="modal-overlay" @click.self="showPaidForm = false">
       <div class="modal">
         <div class="modal-header">
-          <div class="modal-title">Markeer als betaald</div>
+          <div class="modal-title">{{ $t('Markeer als betaald') }}</div>
           <button class="icon-btn" @click="showPaidForm = false">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -277,19 +282,19 @@ const previewAttachment = computed(() =>
         <div class="modal-body">
           <div class="form-row">
             <div class="form-group">
-              <label>Betaald op *</label>
+              <label>{{ $t('Betaald op') }} *</label>
               <input type="date" v-model="paidForm.paid_at">
               <div v-if="paidForm.errors.paid_at" class="field-error">{{ paidForm.errors.paid_at }}</div>
             </div>
             <div class="form-group">
-              <label>Betaalwijze</label>
+              <label>{{ $t('Betaalwijze') }}</label>
               <select v-model="paidForm.payment_method">
-                <option value="bank_transfer">Bankoverschrijving</option>
-                <option value="ideal">iDEAL</option>
-                <option value="direct_debit">Automatische incasso</option>
-                <option value="card">Pinpas / creditcard</option>
-                <option value="cash">Contant</option>
-                <option value="other">Anders</option>
+                <option value="bank_transfer">{{ $t('Bankoverschrijving') }}</option>
+                <option value="ideal">{{ onlinePaymentLabel }}</option>
+                <option value="direct_debit">{{ $t('Automatische incasso') }}</option>
+                <option value="card">{{ $t('Pinpas / creditcard') }}</option>
+                <option value="cash">{{ $t('Contant') }}</option>
+                <option value="other">{{ $t('Anders') }}</option>
               </select>
             </div>
           </div>
@@ -297,8 +302,8 @@ const previewAttachment = computed(() =>
         <div class="modal-footer">
           <div></div>
           <div style="display:flex;gap:8px;">
-            <button class="btn btn-secondary btn-sm" @click="showPaidForm = false">Annuleren</button>
-            <button class="btn btn-primary btn-sm" :disabled="paidForm.processing" @click="markPaid">Opslaan</button>
+            <button class="btn btn-secondary btn-sm" @click="showPaidForm = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" :disabled="paidForm.processing" @click="markPaid">{{ $t('Opslaan') }}</button>
           </div>
         </div>
       </div>

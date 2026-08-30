@@ -1,6 +1,6 @@
 @extends('layouts.public-brand', ['madeWith' => 'kaart'])
 @section('title', ($card->contact_name ? $card->contact_name . ' · ' : '') . $company->publicName())
-@section('description', $card->tagline ?: 'Contactgegevens van ' . $company->publicName())
+@section('description', $card->tagline ?: __('Contactgegevens van :name', ['name' => $company->publicName()]))
 @section('styles')
   .wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; background: linear-gradient(160deg, var(--brand) 0%, var(--accent) 100%); }
   .card { width: 100%; max-width: 440px; background: var(--surface); border-radius: 22px; box-shadow: 0 24px 60px rgba(0,0,0,.25); overflow: hidden; }
@@ -38,18 +38,18 @@
       @if($card->tagline)<div class="tag">{{ $card->tagline }}</div>@endif
     </div>
     <div class="actions">
-      <a class="btn btn-brand" href="{{ route('card.vcard', $company->public_slug) }}">Opslaan in contacten</a>
-      @if($phone_url)<a class="btn" href="{{ $phone_url }}">Bellen</a>@endif
-      @if($company->email)<a class="btn" href="mailto:{{ $company->email }}">E-mailen</a>@endif
+      <a class="btn btn-brand" href="{{ route('card.vcard', $company->public_slug) }}">{{ __('Opslaan in contacten') }}</a>
+      @if($phone_url)<a class="btn" href="{{ $phone_url }}">{{ __('Bellen') }}</a>@endif
+      @if($company->email)<a class="btn" href="mailto:{{ $company->email }}">{{ __('E-mailen') }}</a>@endif
       @if($whatsapp_url)<a class="btn" href="{{ $whatsapp_url }}" rel="noopener">WhatsApp</a>@endif
-      @if($site_url)<a class="btn" href="{{ $site_url }}">Website</a>
-      @elseif($website_url)<a class="btn" href="{{ $website_url }}" rel="noopener">Website</a>@endif
+      @if($site_url)<a class="btn" href="{{ $site_url }}">{{ __('Website') }}</a>
+      @elseif($website_url)<a class="btn" href="{{ $website_url }}" rel="noopener">{{ __('Website') }}</a>@endif
       @if($card->linkedin_url)<a class="btn" href="{{ $card->linkedin_url }}" rel="noopener">LinkedIn</a>@endif
     </div>
     <div class="details">
-      @if($card->show_address && $company->full_address)<div><span>Adres</span><b>{{ $company->full_address }}</b></div>@endif
-      @if($card->show_kvk && $company->kvk_number)<div><span>KvK</span><b>{{ $company->kvk_number }}</b></div>@endif
-      @if($card->show_vat && $company->vat_number)<div><span>Btw-nummer</span><b>{{ $company->vat_number }}</b></div>@endif
+      @if($card->show_address && $company->full_address)<div><span>{{ __('Adres') }}</span><b>{{ $company->full_address }}</b></div>@endif
+      @if($card->show_kvk && $company->kvk_number)<div><span>{{ __('KvK') }}</span><b>{{ $company->kvk_number }}</b></div>@endif
+      @if($card->show_vat && $company->vat_number)<div><span>{{ __('Btw-nummer') }}</span><b>{{ $company->vat_number }}</b></div>@endif
     </div>
   </div>
 </div>

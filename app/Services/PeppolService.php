@@ -63,7 +63,7 @@ class PeppolService
             'participant' => 'iso6523-actorid-upis::' . $participantId,
         ]);
         if ($response->failed()) {
-            throw new \DomainException('De Peppol Directory reageert niet. Probeer het later opnieuw.');
+            throw new \DomainException(__('De Peppol Directory reageert niet. Probeer het later opnieuw.'));
         }
 
         return ['registered' => (int) $response->json('total-result-count', 0) > 0, 'doctypes' => [], 'name' => null];
@@ -123,19 +123,19 @@ class PeppolService
     {
         $missing = [];
         if (strlen(preg_replace('/\D/', '', (string) $company->kvk_number)) !== 8) {
-            $missing[] = 'een geldig KvK-nummer (8 cijfers)';
+            $missing[] = __('een geldig KvK-nummer (8 cijfers)');
         }
         if (blank($company->address_line)) {
-            $missing[] = 'een adres';
+            $missing[] = __('een adres');
         }
         if (blank($company->postal_code)) {
-            $missing[] = 'een postcode';
+            $missing[] = __('een postcode');
         }
         if (blank($company->city)) {
-            $missing[] = 'een plaats';
+            $missing[] = __('een plaats');
         }
         if (blank($company->email)) {
-            $missing[] = 'een e-mailadres';
+            $missing[] = __('een e-mailadres');
         }
 
         return $missing;
@@ -145,10 +145,10 @@ class PeppolService
     public function register(Company $company): string
     {
         if (! $this->configured()) {
-            throw new \DomainException('Peppol is nog niet ingericht door de beheerder van ' . Brand::name() . '.');
+            throw new \DomainException(__('Peppol is nog niet ingericht door de beheerder van :brand.', ['brand' => Brand::name()]));
         }
         if ($missing = $this->registrationBlockers($company)) {
-            throw new \DomainException('Vul eerst ' . implode(', ', $missing) . ' in bij Instellingen → Bedrijfsgegevens.');
+            throw new \DomainException(__('Vul eerst :missing in bij Instellingen → Bedrijfsgegevens.', ['missing' => implode(', ', $missing)]));
         }
         if ($company->peppol_company_id) {
             return (string) $company->peppol_verification_url;
@@ -317,17 +317,17 @@ class PeppolService
         $company = $invoice->company;
         if (! $this->sendingEnabled($company)) {
             throw new \DomainException($this->configured()
-                ? 'Peppol is voor deze administratie nog niet geactiveerd of geverifieerd (Instellingen → Koppelingen).'
-                : 'Peppol is nog niet ingericht door de beheerder van ' . Brand::name() . '.');
+                ? __('Peppol is voor deze administratie nog niet geactiveerd of geverifieerd (Instellingen → Koppelingen).')
+                : __('Peppol is nog niet ingericht door de beheerder van :brand.', ['brand' => Brand::name()]));
         }
         if ($invoice->status === 'draft' || ! $invoice->number) {
-            throw new \DomainException('Verstuur de factuur eerst; concepten kunnen niet via Peppol.');
+            throw new \DomainException(__('Verstuur de factuur eerst; concepten kunnen niet via Peppol.'));
         }
 
         $customer = $invoice->customer;
         $participantId = $customer ? $this->participantId($customer) : null;
         if (! $participantId) {
-            throw new \DomainException('Geen Peppol-ID bekend voor deze klant (KvK-nummer of Peppol-ID invullen).');
+            throw new \DomainException(__('Geen Peppol-ID bekend voor deze klant (KvK-nummer of Peppol-ID invullen).'));
         }
 
         $invoice->load('lines');
@@ -399,7 +399,7 @@ class PeppolService
             'company_id' => $company->id,
             'peppol_document_id' => $documentId,
             'from_email' => null,
-            'subject' => trim('Peppol · ' . ($scan['supplier_name'] ?: 'e-factuur') . ($scan['supplier_reference'] ? " · {$scan['supplier_reference']}" : '')),
+            'subject' => trim('Peppol · ' . ($scan['supplier_name'] ?: __('e-factuur')) . ($scan['supplier_reference'] ? " · {$scan['supplier_reference']}" : '')),
             'filename' => $base . ($pdf ? '.pdf' : '.xml'),
             'mime_type' => $pdf ? 'application/pdf' : 'application/xml',
             'size_bytes' => strlen($binary),
@@ -452,8 +452,8 @@ class PeppolService
             'total_incl' => isset($p['totals']['taxInclusiveAmount']) ? $num($p['totals']['taxInclusiveAmount']) : round($sum, 2),
             'deductions' => [],
             'amount_due' => isset($p['totals']['payableAmount']) ? $num($p['totals']['payableAmount']) : null,
-            'notes' => mb_substr(trim((string) ($p['note'] ?? '')), 0, 300) ?: ($isCredit ? 'Creditnota ontvangen via Peppol' : 'Ontvangen via Peppol'),
-            'warning' => $isCredit ? 'Dit is een creditnota: de bedragen zijn negatief overgenomen.' : null,
+            'notes' => mb_substr(trim((string) ($p['note'] ?? '')), 0, 300) ?: ($isCredit ? __('Creditnota ontvangen via Peppol') : __('Ontvangen via Peppol')),
+            'warning' => $isCredit ? __('Dit is een creditnota: de bedragen zijn negatief overgenomen.') : null,
         ];
     }
 }

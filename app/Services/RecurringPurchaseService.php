@@ -57,7 +57,7 @@ class RecurringPurchaseService
         foreach ($profile->vat_lines ?? [] as $line) {
             $base = round((float) ($line['base'] ?? 0), 2);
             $vat = round((float) ($line['vat'] ?? 0), 2);
-            $lines[] = ['base' => $base, 'rate' => (float) ($line['rate'] ?? 21), 'vat' => $vat];
+            $lines[] = ['base' => $base, 'rate' => (float) ($line['rate'] ?? \App\Support\Market::defaultVatRate()), 'vat' => $vat];
             $subtotal += $base;
             $vatTotal += $vat;
         }
@@ -77,7 +77,7 @@ class RecurringPurchaseService
             'vat_total' => round($vatTotal, 2),
             'total' => round($subtotal + $vatTotal, 2),
             'vat_lines' => $lines,
-            'notes' => trim(($profile->notes ? $profile->notes . ' — ' : '') . 'Automatisch ingeboekt (vaste lasten).'),
+            'notes' => trim(($profile->notes ? $profile->notes . ' — ' : '') . __('Automatisch ingeboekt (vaste lasten).')),
         ]);
 
         $next = $profile->nextDateAfter($profile->next_run_on);

@@ -8,6 +8,7 @@ use App\Models\Invoice;
 use App\Services\InvoiceManager;
 use App\Services\QuoteManager;
 use App\Support\Brand;
+use App\Support\Market;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,7 +48,7 @@ class McpController extends Controller
 
         $company = Company::where('mcp_token', $token)->first();
         if (! $company) {
-            return $this->rpcError(null, -32000, 'Onbekende of ingetrokken koppeling. Maak in ' . Brand::name() . ' (Instellingen → Koppelingen) een nieuwe koppel-URL aan.');
+            return $this->rpcError(null, -32000, __('Onbekende of ingetrokken koppeling. Maak in :brand (Instellingen → Koppelingen) een nieuwe koppel-URL aan.', ['brand' => Brand::name()]));
         }
 
         $message = $request->json()->all();
@@ -65,7 +66,7 @@ class McpController extends Controller
             'ping' => $this->rpcResult($id, new \stdClass()),
             'tools/list' => $this->toolsList($id),
             'tools/call' => $this->toolsCall($id, $params, $company),
-            default => $this->rpcError($id, -32601, "Methode '{$method}' wordt niet ondersteund."),
+            default => $this->rpcError($id, -32601, __("Methode ':method' wordt niet ondersteund.", ['method' => $method])),
         };
     }
 
@@ -83,13 +84,21 @@ class McpController extends Controller
                 'name' => Brand::name(),
                 'version' => (string) config('app.version', '1.0'),
             ],
-            'instructions' => Brand::name() . ' is de facturatie-administratie van de gebruiker. '
-                . 'Gebruik klanten_zoeken om de juiste klant te vinden voordat je een offerte of factuur aanmaakt. '
-                . 'Alles wat je aanmaakt is een concept: de gebruiker controleert en verstuurt het zelf in ' . Brand::name() . '. '
-                . 'Prijzen geef je altijd exclusief btw op, met het btw-tarief (21, 9 of 0) per regel. '
-                . 'Heb je een uitgebreid offertedocument of plan van aanpak geschreven? Stuur het mee als bijlage '
-                . '(veld "bijlage" met "tekst" in markdown) — ' . Brand::name() . ' maakt er een nette PDF van die met de mail naar de klant meegaat.',
+            'instructions' => __(':brand is de facturatie-administratie van de gebruiker.', ['brand' => Brand::name()]) . ' '
+                . __('Gebruik klanten_zoeken om de juiste klant te vinden voordat je een offerte of factuur aanmaakt.') . ' '
+                . __('Alles wat je aanmaakt is een concept: de gebruiker controleert en verstuurt het zelf in :brand.', ['brand' => Brand::name()]) . ' '
+                . __('Prijzen geef je altijd exclusief btw op, met het btw-tarief (:rates of :last) per regel.', $this->rateList()) . ' '
+                . __('Heb je een uitgebreid offertedocument of plan van aanpak geschreven? Stuur het mee als bijlage (veld "bijlage" met "tekst" in markdown) — :brand maakt er een nette PDF van die met de mail naar de klant meegaat.', ['brand' => Brand::name()]),
         ]);
+    }
+
+    /** Btw-tarieven van de markt als tekst: nl "21, 9 of 0", pl "23, 8, 5 lub 0" (placeholders :rates en :last). */
+    protected function rateList(): array
+    {
+        $rates = Market::vatRates();
+        $last = array_pop($rates);
+
+        return ['rates' => implode(', ', $rates), 'last' => $last];
     }
 
     protected function toolsList(mixed $id): Response
@@ -97,13 +106,13 @@ class McpController extends Controller
         $lineSchema = [
             'type' => 'object',
             'properties' => [
-                'omschrijving' => ['type' => 'string', 'description' => 'Korte omschrijving van de regel.'],
-                'toelichting' => ['type' => 'string', 'description' => 'Optionele toelichting onder de regel.'],
-                'aantal' => ['type' => 'number', 'description' => 'Aantal (standaard 1).'],
-                'eenheid' => ['type' => 'string', 'description' => 'Eenheid, bijv. stuk, uur, dag, maand (standaard "stuk").'],
-                'prijs_excl_btw' => ['type' => 'number', 'description' => 'Stuksprijs EXCLUSIEF btw.'],
-                'btw_percentage' => ['type' => 'number', 'enum' => [21, 9, 0], 'description' => 'BTW-tarief in procenten.'],
-                'korting_pct' => ['type' => 'number', 'description' => 'Optionele korting op deze regel in procenten (0-100).'],
+                'omschrijving' => ['type' => 'string', 'description' => __('Korte omschrijving van de regel.')],
+                'toelichting' => ['type' => 'string', 'description' => __('Optionele toelichting onder de regel.')],
+                'aantal' => ['type' => 'number', 'description' => __('Aantal (standaard 1).')],
+                'eenheid' => ['type' => 'string', 'description' => __('Eenheid, bijv. stuk, uur, dag, maand (standaard "stuk").')],
+                'prijs_excl_btw' => ['type' => 'number', 'description' => __('Stuksprijs EXCLUSIEF btw.')],
+                'btw_percentage' => ['type' => 'number', 'enum' => Market::vatRates(), 'description' => __('BTW-tarief in procenten.')],
+                'korting_pct' => ['type' => 'number', 'description' => __('Optionele korting op deze regel in procenten (0-100).')],
             ],
             'required' => ['omschrijving', 'aantal', 'prijs_excl_btw', 'btw_percentage'],
             'additionalProperties' => false,
@@ -112,28 +121,28 @@ class McpController extends Controller
         return $this->rpcResult($id, ['tools' => [
             [
                 'name' => 'klanten_zoeken',
-                'description' => 'Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.',
+                'description' => __('Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.'),
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
-                        'zoekterm' => ['type' => 'string', 'description' => 'Deel van de klantnaam (optioneel).'],
+                        'zoekterm' => ['type' => 'string', 'description' => __('Deel van de klantnaam (optioneel).')],
                     ],
                     'additionalProperties' => false,
                 ],
             ],
             [
                 'name' => 'offerte_aanmaken',
-                'description' => 'Maak een CONCEPT-offerte aan voor een bestaande klant. Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. het volledige offertedocument of plan van aanpak): ' . Brand::name() . ' maakt er een PDF in de eigen huisstijl van die met de offertemail meegaat. Ook een handelsnaam kiezen kan. De gebruiker controleert en verstuurt alles zelf in ' . Brand::name() . '.',
+                'description' => __('Maak een CONCEPT-offerte aan voor een bestaande klant. Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. het volledige offertedocument of plan van aanpak): :brand maakt er een PDF in de eigen huisstijl van die met de offertemail meegaat. Ook een handelsnaam kiezen kan. De gebruiker controleert en verstuurt alles zelf in :brand.', ['brand' => Brand::name()]),
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
-                        'klant' => ['type' => 'string', 'description' => 'Naam van een bestaande klant (moet eenduidig matchen — gebruik eventueel eerst klanten_zoeken).'],
-                        'regels' => ['type' => 'array', 'items' => $lineSchema, 'description' => 'De offerteregels.'],
-                        'referentie' => ['type' => 'string', 'description' => 'Referentie of projectnaam (optioneel).'],
-                        'intro' => ['type' => 'string', 'description' => 'Inleidende tekst boven de offerte (optioneel).'],
-                        'opmerkingen' => ['type' => 'string', 'description' => 'Voorwaarden, planning of aannames onder de offerte (optioneel).'],
-                        'geldig_dagen' => ['type' => 'integer', 'description' => 'Geldigheid in dagen (optioneel; standaard van de administratie).'],
-                        'handelsnaam' => ['type' => 'string', 'description' => 'Optioneel: de handelsnaam (huisstijl) waaronder de offerte wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.'],
+                        'klant' => ['type' => 'string', 'description' => __('Naam van een bestaande klant (moet eenduidig matchen — gebruik eventueel eerst klanten_zoeken).')],
+                        'regels' => ['type' => 'array', 'items' => $lineSchema, 'description' => __('De offerteregels.')],
+                        'referentie' => ['type' => 'string', 'description' => __('Referentie of projectnaam (optioneel).')],
+                        'intro' => ['type' => 'string', 'description' => __('Inleidende tekst boven de offerte (optioneel).')],
+                        'opmerkingen' => ['type' => 'string', 'description' => __('Voorwaarden, planning of aannames onder de offerte (optioneel).')],
+                        'geldig_dagen' => ['type' => 'integer', 'description' => __('Geldigheid in dagen (optioneel; standaard van de administratie).')],
+                        'handelsnaam' => ['type' => 'string', 'description' => __('Optioneel: de handelsnaam (huisstijl) waaronder de offerte wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.')],
                         'bijlage' => $this->attachmentSchema('offerte'),
                     ],
                     'required' => ['klant', 'regels'],
@@ -142,16 +151,16 @@ class McpController extends Controller
             ],
             [
                 'name' => 'factuur_aanmaken',
-                'description' => 'Maak een CONCEPT-factuur aan voor een bestaande klant (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. een urenspecificatie): ' . Brand::name() . ' maakt er een PDF in de eigen huisstijl van die met de factuurmail meegaat. De gebruiker controleert en verstuurt alles zelf in ' . Brand::name() . '.',
+                'description' => __('Maak een CONCEPT-factuur aan voor een bestaande klant (het factuurnummer wordt pas bij versturen toegekend). Prijzen exclusief btw. Kan ook een geschreven document meesturen als bijlage (veld "bijlage" met "tekst" in markdown — bijv. een urenspecificatie): :brand maakt er een PDF in de eigen huisstijl van die met de factuurmail meegaat. De gebruiker controleert en verstuurt alles zelf in :brand.', ['brand' => Brand::name()]),
                 'inputSchema' => [
                     'type' => 'object',
                     'properties' => [
-                        'klant' => ['type' => 'string', 'description' => 'Naam van een bestaande klant (moet eenduidig matchen).'],
-                        'regels' => ['type' => 'array', 'items' => $lineSchema, 'description' => 'De factuurregels.'],
-                        'referentie' => ['type' => 'string', 'description' => 'Referentie (optioneel).'],
-                        'opmerkingen' => ['type' => 'string', 'description' => 'Opmerking voor de klant onderaan de factuur (optioneel).'],
-                        'betalingstermijn_dagen' => ['type' => 'integer', 'description' => 'Betalingstermijn in dagen (optioneel; standaard van de klant of administratie).'],
-                        'handelsnaam' => ['type' => 'string', 'description' => 'Optioneel: de handelsnaam (huisstijl) waaronder de factuur wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.'],
+                        'klant' => ['type' => 'string', 'description' => __('Naam van een bestaande klant (moet eenduidig matchen).')],
+                        'regels' => ['type' => 'array', 'items' => $lineSchema, 'description' => __('De factuurregels.')],
+                        'referentie' => ['type' => 'string', 'description' => __('Referentie (optioneel).')],
+                        'opmerkingen' => ['type' => 'string', 'description' => __('Opmerking voor de klant onderaan de factuur (optioneel).')],
+                        'betalingstermijn_dagen' => ['type' => 'integer', 'description' => __('Betalingstermijn in dagen (optioneel; standaard van de klant of administratie).')],
+                        'handelsnaam' => ['type' => 'string', 'description' => __('Optioneel: de handelsnaam (huisstijl) waaronder de factuur wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.')],
                         'bijlage' => $this->attachmentSchema('factuur'),
                     ],
                     'required' => ['klant', 'regels'],
@@ -160,7 +169,7 @@ class McpController extends Controller
             ],
             [
                 'name' => 'openstaande_facturen',
-                'description' => 'Overzicht van openstaande (en vervallen) verkoopfacturen: wie moet er nog betalen en hoeveel.',
+                'description' => __('Overzicht van openstaande (en vervallen) verkoopfacturen: wie moet er nog betalen en hoeveel.'),
                 'inputSchema' => ['type' => 'object', 'properties' => new \stdClass(), 'additionalProperties' => false],
             ],
         ]]);
@@ -173,12 +182,12 @@ class McpController extends Controller
 
         return [
             'type' => 'object',
-            'description' => "Optioneel: een bijlage die met de {$doc} wordt meegestuurd naar de klant. Geef ÓF \"tekst\" (bijv. het volledige offertedocument of een plan van aanpak in markdown — {$brand} maakt er een nette PDF van) ÓF \"base64\" met \"bestandsnaam\" voor een echt bestand (PDF/PNG/JPG/WEBP, max 10 MB).",
+            'description' => __('Optioneel: een bijlage die met de :doc wordt meegestuurd naar de klant. Geef ÓF "tekst" (bijv. het volledige offertedocument of een plan van aanpak in markdown — :brand maakt er een nette PDF van) ÓF "base64" met "bestandsnaam" voor een echt bestand (PDF/PNG/JPG/WEBP, max 10 MB).', ['doc' => __($doc), 'brand' => $brand]),
             'properties' => [
-                'titel' => ['type' => 'string', 'description' => 'Titel van het document (wordt ook de bestandsnaam), bijv. "Plan van aanpak".'],
-                'tekst' => ['type' => 'string', 'description' => 'De documenttekst in markdown of platte tekst — ' . $brand . ' zet dit om naar een verzorgde PDF.'],
-                'bestandsnaam' => ['type' => 'string', 'description' => 'Bestandsnaam inclusief extensie (alleen samen met base64).'],
-                'base64' => ['type' => 'string', 'description' => 'De base64-inhoud van het bestand (alleen voor echte bestanden; gebruik anders "tekst").'],
+                'titel' => ['type' => 'string', 'description' => __('Titel van het document (wordt ook de bestandsnaam), bijv. "Plan van aanpak".')],
+                'tekst' => ['type' => 'string', 'description' => __('De documenttekst in markdown of platte tekst — :brand zet dit om naar een verzorgde PDF.', ['brand' => $brand])],
+                'bestandsnaam' => ['type' => 'string', 'description' => __('Bestandsnaam inclusief extensie (alleen samen met base64).')],
+                'base64' => ['type' => 'string', 'description' => __('De base64-inhoud van het bestand (alleen voor echte bestanden; gebruik anders "tekst").')],
             ],
             'additionalProperties' => false,
         ];
@@ -196,7 +205,7 @@ class McpController extends Controller
         }
 
         if (filled($bijlage['tekst'] ?? null)) {
-            $title = mb_substr(trim((string) ($bijlage['titel'] ?? '')), 0, 120) ?: 'Bijlage';
+            $title = mb_substr(trim((string) ($bijlage['titel'] ?? '')), 0, 120) ?: __('Bijlage');
             $html = \Illuminate\Support\Str::markdown((string) $bijlage['tekst'], [
                 'html_input' => 'strip',
                 'allow_unsafe_links' => false,
@@ -217,14 +226,14 @@ class McpController extends Controller
         } elseif (filled($bijlage['base64'] ?? null)) {
             $binary = base64_decode(preg_replace('/\s+/', '', (string) $bijlage['base64']), true);
             if ($binary === false || strlen($binary) === 0) {
-                throw new \DomainException('De bijlage kon niet worden gelezen (ongeldige base64). Gebruik anders "tekst" — dan maakt ' . Brand::name() . ' er zelf een PDF van.');
+                throw new \DomainException(__('De bijlage kon niet worden gelezen (ongeldige base64). Gebruik anders "tekst" — dan maakt :brand er zelf een PDF van.', ['brand' => Brand::name()]));
             }
             if (strlen($binary) > 10 * 1024 * 1024) {
-                throw new \DomainException('De bijlage is groter dan 10 MB.');
+                throw new \DomainException(__('De bijlage is groter dan 10 MB.'));
             }
             $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($binary) ?: 'application/octet-stream';
             if (! in_array($mime, ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'], true)) {
-                throw new \DomainException('Alleen PDF-, PNG-, JPG- of WEBP-bijlagen zijn toegestaan. Gebruik anders "tekst" — dan maakt ' . Brand::name() . ' er zelf een PDF van.');
+                throw new \DomainException(__('Alleen PDF-, PNG-, JPG- of WEBP-bijlagen zijn toegestaan. Gebruik anders "tekst" — dan maakt :brand er zelf een PDF van.', ['brand' => Brand::name()]));
             }
             $filename = mb_substr(trim((string) ($bijlage['bestandsnaam'] ?? 'bijlage.pdf')), 0, 255) ?: 'bijlage.pdf';
         } else {
@@ -250,7 +259,7 @@ class McpController extends Controller
     {
         // De Claude-koppeling hoort bij de AI-functies (Slim-abonnement).
         if (! $company->hasAiAccess()) {
-            return $this->toolText($id, 'De Claude-koppeling zit in het Slim-abonnement van ' . Brand::name() . '. Upgrade via Instellingen → Abonnement.', true);
+            return $this->toolText($id, __('De Claude-koppeling zit in het Slim-abonnement van :brand. Upgrade via Instellingen → Abonnement.', ['brand' => Brand::name()]), true);
         }
 
         $name = $params['name'] ?? '';
@@ -262,7 +271,7 @@ class McpController extends Controller
                 'offerte_aanmaken' => $this->createQuote($company, $args),
                 'factuur_aanmaken' => $this->createInvoice($company, $args),
                 'openstaande_facturen' => $this->openInvoices($company),
-                default => throw new \DomainException("Onbekende tool '{$name}'."),
+                default => throw new \DomainException(__("Onbekende tool ':name'.", ['name' => $name])),
             };
 
             return $this->toolText($id, $text);
@@ -271,7 +280,7 @@ class McpController extends Controller
         } catch (\Throwable $e) {
             Log::error('MCP-tool mislukt', ['company' => $company->id, 'tool' => $name, 'error' => $e->getMessage()]);
 
-            return $this->toolText($id, 'Er ging iets mis in ' . Brand::name() . '. Probeer het opnieuw of maak het document handmatig aan.', true);
+            return $this->toolText($id, __('Er ging iets mis in :brand. Probeer het opnieuw of maak het document handmatig aan.', ['brand' => Brand::name()]), true);
         }
     }
 
@@ -290,15 +299,15 @@ class McpController extends Controller
 
         if ($customers->isEmpty()) {
             return $term === ''
-                ? 'Er staan nog geen klanten in deze administratie. Voeg eerst een klant toe in ' . Brand::name() . ' (Verkoop → Klanten).'
-                : "Geen klanten gevonden voor \"{$term}\". Controleer de spelling of voeg de klant eerst toe in " . Brand::name() . ' (Verkoop → Klanten).';
+                ? __('Er staan nog geen klanten in deze administratie. Voeg eerst een klant toe in :brand (Verkoop → Klanten).', ['brand' => Brand::name()])
+                : __('Geen klanten gevonden voor ":term". Controleer de spelling of voeg de klant eerst toe in :brand (Verkoop → Klanten).', ['term' => $term, 'brand' => Brand::name()]);
         }
 
         $lines = $customers->map(fn ($c) => '- ' . $c->name
             . ($c->city ? " ({$c->city})" : '')
             . ($c->email ? " · {$c->email}" : ''));
 
-        return "Gevonden klanten:\n" . $lines->implode("\n");
+        return __('Gevonden klanten:') . "\n" . $lines->implode("\n");
     }
 
     /** Eenduidige handelsnaam-match binnen de eigen administratie (of null). */
@@ -314,7 +323,7 @@ class McpController extends Controller
             ->get(['id', 'name']);
 
         if ($profiles->isEmpty()) {
-            throw new \DomainException('Deze administratie heeft geen handelsnamen ingericht — laat "handelsnaam" weg voor de standaard huisstijl.');
+            throw new \DomainException(__('Deze administratie heeft geen handelsnamen ingericht — laat "handelsnaam" weg voor de standaard huisstijl.'));
         }
 
         $needle = mb_strtolower($name);
@@ -324,10 +333,10 @@ class McpController extends Controller
         }
 
         throw new \DomainException(($matches->isEmpty()
-            ? "Handelsnaam \"{$name}\" bestaat niet."
-            : "Meerdere handelsnamen matchen op \"{$name}\".")
-            . ' Beschikbaar: ' . $profiles->pluck('name')->implode(', ')
-            . '. Of laat "handelsnaam" weg voor de standaard huisstijl.');
+            ? __('Handelsnaam ":name" bestaat niet.', ['name' => $name])
+            : __('Meerdere handelsnamen matchen op ":name".', ['name' => $name]))
+            . ' ' . __('Beschikbaar: :names.', ['names' => $profiles->pluck('name')->implode(', ')])
+            . ' ' . __('Of laat "handelsnaam" weg voor de standaard huisstijl.'));
     }
 
     /** Eenduidige klantmatch binnen de eigen administratie — anders een nette fout. */
@@ -335,7 +344,7 @@ class McpController extends Controller
     {
         $needle = mb_strtolower(trim($name));
         if ($needle === '') {
-            throw new \DomainException('Geef de naam van de klant op.');
+            throw new \DomainException(__('Geef de naam van de klant op.'));
         }
 
         $candidates = Customer::withoutGlobalScope('company')
@@ -352,12 +361,10 @@ class McpController extends Controller
             return Customer::withoutGlobalScope('company')->findOrFail($matches->first()->id);
         }
         if ($matches->isEmpty()) {
-            throw new \DomainException("Klant \"{$name}\" staat niet in de administratie. Gebruik klanten_zoeken om de juiste naam te vinden, of voeg de klant eerst toe in " . Brand::name() . '.');
+            throw new \DomainException(__('Klant ":name" staat niet in de administratie. Gebruik klanten_zoeken om de juiste naam te vinden, of voeg de klant eerst toe in :brand.', ['name' => $name, 'brand' => Brand::name()]));
         }
 
-        throw new \DomainException("Meerdere klanten matchen op \"{$name}\": "
-            . $matches->pluck('name')->implode(', ')
-            . '. Geef de volledige naam op.');
+        throw new \DomainException(__('Meerdere klanten matchen op ":name": :names. Geef de volledige naam op.', ['name' => $name, 'names' => $matches->pluck('name')->implode(', ')]));
     }
 
     /** Vertaal MCP-regels naar de regels die de managers verwachten (altijd excl. btw aangeleverd). */
@@ -369,15 +376,15 @@ class McpController extends Controller
         foreach ($rows as $row) {
             $description = trim((string) ($row['omschrijving'] ?? ''));
             if ($description === '') {
-                throw new \DomainException('Elke regel heeft een omschrijving nodig.');
+                throw new \DomainException(__('Elke regel heeft een omschrijving nodig.'));
             }
-            $rate = (float) ($row['btw_percentage'] ?? 21);
-            if (! in_array($rate, [0.0, 9.0, 21.0], true)) {
-                throw new \DomainException('Het btw-tarief moet 21, 9 of 0 zijn.');
+            $rate = (float) ($row['btw_percentage'] ?? Market::defaultVatRate());
+            if (! in_array($rate, array_map('floatval', Market::vatRates()), true)) {
+                throw new \DomainException(__('Het btw-tarief moet :rates of :last zijn.', $this->rateList()));
             }
             $price = round((float) ($row['prijs_excl_btw'] ?? 0), 2);
             if ($price < 0) {
-                throw new \DomainException('Prijzen kunnen niet negatief zijn; verwerk een korting via korting_pct.');
+                throw new \DomainException(__('Prijzen kunnen niet negatief zijn; verwerk een korting via korting_pct.'));
             }
             $quantity = (float) ($row['aantal'] ?? 1);
 
@@ -385,7 +392,7 @@ class McpController extends Controller
                 'description' => mb_substr($description, 0, 500),
                 'details' => filled($row['toelichting'] ?? null) ? mb_substr(trim($row['toelichting']), 0, 2000) : null,
                 'quantity' => $quantity > 0 ? $quantity : 1.0,
-                'unit' => filled($row['eenheid'] ?? null) ? mb_substr(trim($row['eenheid']), 0, 30) : 'stuk',
+                'unit' => filled($row['eenheid'] ?? null) ? mb_substr(trim($row['eenheid']), 0, 30) : __('stuk'),
                 // De managers interpreteren prijzen volgens de invoerstand van
                 // de administratie; de koppeling levert altijd excl. aan.
                 'unit_price' => $incl ? round($price * (1 + $rate / 100), 2) : $price,
@@ -395,7 +402,7 @@ class McpController extends Controller
         }
 
         if ($lines === []) {
-            throw new \DomainException('Geef minstens één regel op.');
+            throw new \DomainException(__('Geef minstens één regel op.'));
         }
 
         return $lines;
@@ -416,16 +423,16 @@ class McpController extends Controller
             'lines' => $lines,
         ]);
 
-        $attached = $this->attachDocument($quote, $company, $args, 'offerte ' . ($quote->number ?: '(concept)'));
+        $attached = $this->attachDocument($quote, $company, $args, __('offerte :number', ['number' => $quote->number ?: __('(concept)')]));
 
-        $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $eur = fn ($v) => money($v);
         $brand = $quote->brandProfile?->name;
 
-        return "Concept-offerte aangemaakt voor {$customer->name}" . ($brand ? " onder handelsnaam {$brand}" : '') . ".\n"
-            . 'Subtotaal ' . $eur($quote->subtotal) . ' · BTW ' . $eur($quote->vat_total) . ' · Totaal ' . $eur($quote->total) . "\n"
-            . 'Geldig tot ' . $quote->valid_until->translatedFormat('j F Y') . ".\n"
-            . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de offertemail naar de klant.\n" : '')
-            . 'Controleren en versturen: ' . route('quotes.show', $quote);
+        return __('Concept-offerte aangemaakt voor :customer', ['customer' => $customer->name]) . ($brand ? ' ' . __('onder handelsnaam :brand', ['brand' => $brand]) : '') . ".\n"
+            . __('Subtotaal :subtotal · BTW :vat · Totaal :total', ['subtotal' => $eur($quote->subtotal), 'vat' => $eur($quote->vat_total), 'total' => $eur($quote->total)]) . "\n"
+            . __('Geldig tot :date.', ['date' => $quote->valid_until->translatedFormat('j F Y')]) . "\n"
+            . ($attached ? __('Bijlage ":filename" toegevoegd — gaat mee met de offertemail naar de klant.', ['filename' => $attached]) . "\n" : '')
+            . __('Controleren en versturen: :url', ['url' => route('quotes.show', $quote)]);
     }
 
     protected function createInvoice(Company $company, array $args): string
@@ -446,16 +453,16 @@ class McpController extends Controller
 
         $invoice = $this->invoices->create($data);
 
-        $attached = $this->attachDocument($invoice, $company, $args, 'factuur (concept)');
+        $attached = $this->attachDocument($invoice, $company, $args, __('factuur (concept)'));
 
-        $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $eur = fn ($v) => money($v);
         $brand = $invoice->brandProfile?->name;
 
-        return "Concept-factuur aangemaakt voor {$customer->name}" . ($brand ? " onder handelsnaam {$brand}" : '') . ".\n"
-            . 'Subtotaal ' . $eur($invoice->subtotal) . ' · BTW ' . $eur($invoice->vat_total) . ' · Totaal ' . $eur($invoice->total) . "\n"
-            . "Het factuurnummer wordt toegekend bij het versturen.\n"
-            . ($attached ? "Bijlage \"{$attached}\" toegevoegd — gaat mee met de factuurmail naar de klant.\n" : '')
-            . 'Controleren en versturen: ' . route('invoices.show', $invoice);
+        return __('Concept-factuur aangemaakt voor :customer', ['customer' => $customer->name]) . ($brand ? ' ' . __('onder handelsnaam :brand', ['brand' => $brand]) : '') . ".\n"
+            . __('Subtotaal :subtotal · BTW :vat · Totaal :total', ['subtotal' => $eur($invoice->subtotal), 'vat' => $eur($invoice->vat_total), 'total' => $eur($invoice->total)]) . "\n"
+            . __('Het factuurnummer wordt toegekend bij het versturen.') . "\n"
+            . ($attached ? __('Bijlage ":filename" toegevoegd — gaat mee met de factuurmail naar de klant.', ['filename' => $attached]) . "\n" : '')
+            . __('Controleren en versturen: :url', ['url' => route('invoices.show', $invoice)]);
     }
 
     protected function openInvoices(Company $company): string
@@ -469,20 +476,23 @@ class McpController extends Controller
             ->get();
 
         if ($open->isEmpty()) {
-            return 'Er staan geen facturen open — alles is betaald.';
+            return __('Er staan geen facturen open — alles is betaald.');
         }
 
-        $eur = fn ($v) => '€ ' . number_format((float) $v, 2, ',', '.');
+        $eur = fn ($v) => money($v);
         $totalOpen = $open->sum(fn ($i) => $i->remaining_amount);
 
-        $lines = $open->map(function ($i) use ($eur) {
-            $late = $i->days_overdue > 0 ? " · {$i->days_overdue} dagen te laat" : '';
+        $dateFormat = (string) Market::get('date_format', 'd-m-Y');
+        $lines = $open->map(function ($i) use ($eur, $dateFormat) {
+            $late = $i->days_overdue > 0 ? ' · ' . __(':days dagen te laat', ['days' => $i->days_overdue]) : '';
 
-            return "- {$i->number} · {$i->customer_name} · open " . $eur($i->remaining_amount)
-                . ' · vervaldatum ' . ($i->due_date?->format('d-m-Y') ?? '-') . $late;
+            return '- ' . __(':number · :customer · open :amount · vervaldatum :date', [
+                'number' => $i->number, 'customer' => $i->customer_name,
+                'amount' => $eur($i->remaining_amount), 'date' => $i->due_date?->format($dateFormat) ?? '-',
+            ]) . $late;
         });
 
-        return "Openstaande facturen ({$open->count()} stuks, samen " . $eur($totalOpen) . " open):\n"
+        return __('Openstaande facturen (:count stuks, samen :total open):', ['count' => $open->count(), 'total' => $eur($totalOpen)]) . "\n"
             . $lines->implode("\n");
     }
 

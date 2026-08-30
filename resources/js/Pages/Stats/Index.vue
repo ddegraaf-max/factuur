@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import { router, Head } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { eur, marketLocale } from '@/format';
 
 const props = defineProps({
   year: Number,
@@ -10,22 +11,20 @@ const props = defineProps({
   totals: Object,
 });
 
-const eur = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
 const maxBar = computed(() => Math.max(1, ...props.list.map(c => Math.abs(c.ex_vat))));
 
 const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveState: false, preserveScroll: true });
 </script>
 
 <template>
-  <Head title="Klantomzet" />
+  <Head :title="$t('Klantomzet')" />
   <AppLayout>
-    <template #breadcrumb>Rapporten / <span class="breadcrumb-current">Klantomzet</span></template>
+    <template #breadcrumb>{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Klantomzet') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Klantomzet</h1>
-        <p class="page-subtitle">Omzet per klant per jaar · met bestede uren en het effectieve uurtarief</p>
+        <h1 class="page-title">{{ $t('Klantomzet') }}</h1>
+        <p class="page-subtitle">{{ $t('Omzet per klant per jaar · met bestede uren en het effectieve uurtarief') }}</p>
       </div>
       <div class="year-tabs">
         <div v-for="y in allYears" :key="y" class="tab" :class="{ active: year === y }" @click="setYear(y)">{{ y }}</div>
@@ -33,21 +32,21 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
     </div>
 
     <div v-if="list.length === 0" class="card empty">
-      <div style="font-size:18px;font-weight:600;margin-bottom:6px;">Geen omzet in {{ year }}</div>
-      <div style="color:var(--text-3);">Er zijn nog geen verstuurde facturen in dit jaar.</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:6px;">{{ $t('Geen omzet in :year', { year }) }}</div>
+      <div style="color:var(--text-3);">{{ $t('Er zijn nog geen verstuurde facturen in dit jaar.') }}</div>
     </div>
 
     <template v-else>
       <div class="kpi-grid">
-        <div class="kpi"><div class="lbl">Aantal klanten</div><div class="val">{{ totals.customers }}</div><div class="meta">{{ totals.invoice_count }} facturen<span v-if="totals.credit_count">· {{ totals.credit_count }} creditnota's</span></div></div>
-        <div class="kpi"><div class="lbl">Omzet excl. BTW</div><div class="val">{{ eur(totals.ex_vat) }}</div><div class="meta">Belastbaar bedrag</div></div>
-        <div class="kpi"><div class="lbl">BTW totaal</div><div class="val">{{ eur(totals.vat) }}</div><div class="meta">Af te dragen</div></div>
-        <div class="kpi tint"><div class="lbl">Omzet incl. BTW</div><div class="val brand">{{ eur(totals.inc_vat) }}</div><div class="meta">Totaal gefactureerd</div></div>
-        <div v-if="totals.hours > 0" class="kpi"><div class="lbl">Effectief uurtarief</div><div class="val">{{ eur(totals.effective_rate) }}</div><div class="meta">omzet excl. BTW ÷ {{ totals.hours.toLocaleString('nl-NL') }} geschreven uur</div></div>
+        <div class="kpi"><div class="lbl">{{ $t('Aantal klanten') }}</div><div class="val">{{ totals.customers }}</div><div class="meta">{{ $t(':n facturen', { n: totals.invoice_count }) }}<span v-if="totals.credit_count">· {{ $t(":n creditnota's", { n: totals.credit_count }) }}</span></div></div>
+        <div class="kpi"><div class="lbl">{{ $t('Omzet excl. BTW') }}</div><div class="val">{{ eur(totals.ex_vat) }}</div><div class="meta">{{ $t('Belastbaar bedrag') }}</div></div>
+        <div class="kpi"><div class="lbl">{{ $t('BTW totaal') }}</div><div class="val">{{ eur(totals.vat) }}</div><div class="meta">{{ $t('Af te dragen') }}</div></div>
+        <div class="kpi tint"><div class="lbl">{{ $t('Omzet incl. BTW') }}</div><div class="val brand">{{ eur(totals.inc_vat) }}</div><div class="meta">{{ $t('Totaal gefactureerd') }}</div></div>
+        <div v-if="totals.hours > 0" class="kpi"><div class="lbl">{{ $t('Effectief uurtarief') }}</div><div class="val">{{ eur(totals.effective_rate) }}</div><div class="meta">{{ $t('omzet excl. BTW ÷ :hours geschreven uur', { hours: totals.hours.toLocaleString(marketLocale) }) }}</div></div>
       </div>
 
       <div v-if="list.length >= 2" class="card">
-        <div class="card-header"><div class="card-title">Top {{ Math.min(list.length, 10) }} klanten <span class="muted">naar omzet excl. BTW</span></div></div>
+        <div class="card-header"><div class="card-title">{{ $t('Top :n klanten', { n: Math.min(list.length, 10) }) }} <span class="muted">{{ $t('naar omzet excl. BTW') }}</span></div></div>
         <div class="card-body">
           <div v-for="(c, i) in list.slice(0, 10)" :key="c.customer_id" class="bar-row">
             <div class="bar-label">
@@ -65,49 +64,49 @@ const setYear = (y) => router.get(route('stats.index'), { year: y }, { preserveS
       <div class="card" style="margin-top:14px;">
         <div class="card-header">
           <div>
-            <div class="card-title">Volledig overzicht</div>
-            <div class="card-subtitle">{{ list.length }} klanten met activiteit in {{ year }}</div>
+            <div class="card-title">{{ $t('Volledig overzicht') }}</div>
+            <div class="card-subtitle">{{ $t(':n klanten met activiteit in :year', { n: list.length, year }) }}</div>
           </div>
         </div>
         <table class="data-table">
           <thead>
             <tr>
               <th>#</th>
-              <th>Klant</th>
-              <th class="right">Facturen</th>
-              <th class="right">Uren</th>
-              <th class="right">Effectief/u</th>
-              <th class="right">Excl. BTW</th>
-              <th class="right">BTW</th>
-              <th class="right">Incl. BTW</th>
+              <th>{{ $t('Klant') }}</th>
+              <th class="right">{{ $t('Facturen') }}</th>
+              <th class="right">{{ $t('Uren') }}</th>
+              <th class="right">{{ $t('Effectief/u') }}</th>
+              <th class="right">{{ $t('Excl. BTW') }}</th>
+              <th class="right">{{ $t('BTW') }}</th>
+              <th class="right">{{ $t('Incl. BTW') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(c, i) in list" :key="c.customer_id">
               <td class="num rank-cell">#{{ i + 1 }}</td>
               <td class="cell-primary">{{ c.customer_name }}<span v-if="c.customer_city" class="city"> · {{ c.customer_city }}</span></td>
-              <td class="right num" data-label="Facturen">{{ c.invoice_count }}<span v-if="c.credit_count" class="muted-red">−{{ c.credit_count }}</span></td>
-              <td class="right num" data-label="Uren">
-                <template v-if="c.hours > 0">{{ c.hours.toLocaleString('nl-NL') }}<span v-if="c.km > 0" class="city"> · {{ c.km.toLocaleString('nl-NL') }} km</span></template>
+              <td class="right num" :data-label="$t('Facturen')">{{ c.invoice_count }}<span v-if="c.credit_count" class="muted-red">−{{ c.credit_count }}</span></td>
+              <td class="right num" :data-label="$t('Uren')">
+                <template v-if="c.hours > 0">{{ c.hours.toLocaleString(marketLocale) }}<span v-if="c.km > 0" class="city"> · {{ c.km.toLocaleString(marketLocale) }} km</span></template>
                 <span v-else class="city">—</span>
               </td>
-              <td class="right num" data-label="Effectief/u">
+              <td class="right num" :data-label="$t('Effectief/u')">
                 <template v-if="c.effective_rate !== null">{{ eur(c.effective_rate) }}</template>
                 <span v-else class="city">—</span>
               </td>
-              <td class="right num" data-label="Excl. BTW" :class="{ neg: c.ex_vat < 0 }">{{ c.ex_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.ex_vat)) }}</td>
-              <td class="right num" data-label="BTW" :class="{ neg: c.vat < 0 }">{{ c.vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.vat)) }}</td>
-              <td class="right num bold" data-label="Incl. BTW" :class="{ neg: c.inc_vat < 0 }">{{ c.inc_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.inc_vat)) }}</td>
+              <td class="right num" :data-label="$t('Excl. BTW')" :class="{ neg: c.ex_vat < 0 }">{{ c.ex_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.ex_vat)) }}</td>
+              <td class="right num" :data-label="$t('BTW')" :class="{ neg: c.vat < 0 }">{{ c.vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.vat)) }}</td>
+              <td class="right num bold" :data-label="$t('Incl. BTW')" :class="{ neg: c.inc_vat < 0 }">{{ c.inc_vat < 0 ? '−' : '' }}{{ eur(Math.abs(c.inc_vat)) }}</td>
             </tr>
             <tr class="total-row">
               <td class="rank-cell"></td>
-              <td class="cell-primary">Totaal</td>
-              <td class="right num" data-label="Facturen">{{ totals.invoice_count + totals.credit_count }}</td>
-              <td class="right num" data-label="Uren">{{ totals.hours > 0 ? totals.hours.toLocaleString('nl-NL') : '—' }}</td>
-              <td class="right num" data-label="Effectief/u">{{ totals.effective_rate !== null ? eur(totals.effective_rate) : '—' }}</td>
-              <td class="right num" data-label="Excl. BTW">{{ eur(totals.ex_vat) }}</td>
-              <td class="right num" data-label="BTW">{{ eur(totals.vat) }}</td>
-              <td class="right num bold" data-label="Incl. BTW">{{ eur(totals.inc_vat) }}</td>
+              <td class="cell-primary">{{ $t('Totaal') }}</td>
+              <td class="right num" :data-label="$t('Facturen')">{{ totals.invoice_count + totals.credit_count }}</td>
+              <td class="right num" :data-label="$t('Uren')">{{ totals.hours > 0 ? totals.hours.toLocaleString(marketLocale) : '—' }}</td>
+              <td class="right num" :data-label="$t('Effectief/u')">{{ totals.effective_rate !== null ? eur(totals.effective_rate) : '—' }}</td>
+              <td class="right num" :data-label="$t('Excl. BTW')">{{ eur(totals.ex_vat) }}</td>
+              <td class="right num" :data-label="$t('BTW')">{{ eur(totals.vat) }}</td>
+              <td class="right num bold" :data-label="$t('Incl. BTW')">{{ eur(totals.inc_vat) }}</td>
             </tr>
           </tbody>
         </table>

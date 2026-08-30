@@ -133,7 +133,7 @@ class YearReportController extends Controller
 
         return PurchaseInvoice::whereBetween('invoice_date', [$from, $to])
             ->get(['category', 'subtotal'])
-            ->groupBy(fn ($p) => $p->category ?: 'Overig')
+            ->groupBy(fn ($p) => $p->category ?: __('Overig'))
             ->map(fn ($group, $name) => [
                 'name' => $name,
                 'amount' => round((float) $group->sum('subtotal'), 2),

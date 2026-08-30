@@ -42,11 +42,11 @@ class OwnerAdministrationsController extends Controller
     {
         $target = Company::withoutGlobalScope('company')->findOrFail($company);
 
-        abort_if($target->is_exempt || $target->id === $request->user()->company_id, 403, 'Deze administratie kan niet worden verwijderd.');
+        abort_if($target->is_exempt || $target->id === $request->user()->company_id, 403, __('Deze administratie kan niet worden verwijderd.'));
 
         $request->validate(['confirm' => ['required', 'string']]);
         if (mb_strtolower(trim($request->input('confirm'))) !== mb_strtolower($target->name)) {
-            return back()->with('error', 'De naam komt niet overeen — er is niets verwijderd.');
+            return back()->with('error', __('De naam komt niet overeen — er is niets verwijderd.'));
         }
 
         $name = $target->name;
@@ -54,8 +54,8 @@ class OwnerAdministrationsController extends Controller
 
         \Illuminate\Support\Facades\Log::warning('Administratie verwijderd door eigenaar', ['company' => $company, 'name' => $name, 'by' => $request->user()->id]);
 
-        \App\Support\Audit::log('purged', null, "Administratie \"{$name}\" (#{$company}) volledig verwijderd door de eigenaar", [], $request->user()->company_id);
+        \App\Support\Audit::log('purged', null, __('Administratie ":name" (#:id) volledig verwijderd door de eigenaar', ['name' => $name, 'id' => $company]), [], $request->user()->company_id);
 
-        return back()->with('flash', "Administratie \"{$name}\" is volledig verwijderd.");
+        return back()->with('flash', __('Administratie ":name" is volledig verwijderd.', ['name' => $name]));
     }
 }

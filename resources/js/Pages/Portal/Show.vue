@@ -11,7 +11,13 @@ const props = defineProps({
   payment: { type: Object, default: () => ({ enabled: false, just_returned: false }) },
 });
 
-const email = computed(() => usePage().props.portal_email || null);
+const page = usePage();
+const email = computed(() => page.props.portal_email || null);
+
+// Markt (nl/pl): naam van de online betaalmethode (iDEAL / BLIK) en de
+// korte labels voor KvK/REGON en btw-nummer/NIP in de afzenderregel.
+const market = computed(() => page.props.market || {});
+const paymentLabel = computed(() => market.value.online_payment_label || 'iDEAL');
 
 const brand = computed(() => props.company.brand_color || '#E8231F');
 
@@ -19,7 +25,7 @@ const isOpen = computed(() =>
   !props.invoice.is_credit && ['sent', 'partial', 'overdue', 'incasso'].includes(props.invoice.status)
 );
 
-/* ---------- Online betalen (iDEAL via Mollie) ---------- */
+/* ---------- Online betalen (iDEAL / BLIK via Mollie) ---------- */
 const paying = ref(false);
 const startPayment = () => {
   if (paying.value) return;
@@ -38,11 +44,11 @@ const returnedUnpaid = computed(() =>
 </script>
 
 <template>
-  <Head :title="`Factuur ${invoice.number} · Klantenportaal`" />
+  <Head :title="$t('Factuur :number · Klantenportaal', { number: invoice.number })" />
   <PortalLayout :email="email">
     <Link :href="route('portal.index')" class="portal-back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Alle facturen
+      {{ $t('Alle facturen') }}
     </Link>
 
     <div class="portal-card portal-invoice">
@@ -52,35 +58,35 @@ const returnedUnpaid = computed(() =>
           <img v-if="company.logo_data" :src="company.logo_data" :alt="company.name" class="pi-logo">
           <div v-else class="pi-company-name" :style="{ color: brand }">{{ company.name }}</div>
           <div class="pi-doc-label">
-            {{ invoice.is_credit ? 'Creditnota' : 'Factuur' }} <strong>{{ invoice.number }}</strong>
+            {{ invoice.is_credit ? $t('Creditnota') : $t('Factuur') }} <strong>{{ invoice.number }}</strong>
           </div>
         </div>
         <div class="pi-head-right">
           <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
           <div class="pi-total">{{ eur(invoice.total) }}</div>
           <div v-if="invoice.paid_total > 0 && invoice.remaining > 0" class="pi-remaining">
-            {{ eur(invoice.paid_total) }} betaald · nog {{ eur(invoice.remaining) }} open
+            {{ $t(':paid betaald · nog :remaining open', { paid: eur(invoice.paid_total), remaining: eur(invoice.remaining) }) }}
           </div>
-          <div v-else-if="invoice.status === 'paid'" class="pi-paid-note">Volledig betaald — dank!</div>
+          <div v-else-if="invoice.status === 'paid'" class="pi-paid-note">{{ $t('Volledig betaald — dank!') }}</div>
         </div>
       </div>
 
       <!-- Meta -->
       <div class="pi-meta">
         <div>
-          <div class="pi-meta-label">Factuurdatum</div>
+          <div class="pi-meta-label">{{ $t('Factuurdatum') }}</div>
           <div class="pi-meta-value">{{ invoice.invoice_date_label }}</div>
         </div>
         <div v-if="invoice.due_date_label">
-          <div class="pi-meta-label">Vervaldatum</div>
+          <div class="pi-meta-label">{{ $t('Vervaldatum') }}</div>
           <div class="pi-meta-value">{{ invoice.due_date_label }}</div>
         </div>
         <div v-if="invoice.reference">
-          <div class="pi-meta-label">Referentie</div>
+          <div class="pi-meta-label">{{ $t('Referentie') }}</div>
           <div class="pi-meta-value mono">{{ invoice.reference }}</div>
         </div>
         <div>
-          <div class="pi-meta-label">Voor</div>
+          <div class="pi-meta-label">{{ $t('Voor') }}</div>
           <div class="pi-meta-value">{{ invoice.customer_name }}</div>
         </div>
       </div>
@@ -89,10 +95,10 @@ const returnedUnpaid = computed(() =>
       <table class="pi-lines">
         <thead>
           <tr>
-            <th>Omschrijving</th>
-            <th class="right">Aantal</th>
-            <th class="right">Prijs</th>
-            <th class="right">Bedrag</th>
+            <th>{{ $t('Omschrijving') }}</th>
+            <th class="right">{{ $t('Aantal') }}</th>
+            <th class="right">{{ $t('Prijs') }}</th>
+            <th class="right">{{ $t('Bedrag') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -111,15 +117,15 @@ const returnedUnpaid = computed(() =>
       <!-- Totalen -->
       <div class="pi-totals">
         <div class="pi-total-row">
-          <span>Subtotaal</span>
+          <span>{{ $t('Subtotaal') }}</span>
           <span class="mono">{{ eur(invoice.subtotal) }}</span>
         </div>
         <div v-for="(amount, rate) in invoice.vat_breakdown" :key="rate" class="pi-total-row">
-          <span>BTW {{ Number(rate) }}%</span>
+          <span>{{ $t('BTW') }} {{ Number(rate) }}%</span>
           <span class="mono">{{ eur(amount) }}</span>
         </div>
         <div class="pi-total-row grand">
-          <span>Totaal</span>
+          <span>{{ $t('Totaal') }}</span>
           <span class="mono">{{ eur(invoice.total) }}</span>
         </div>
       </div>
@@ -130,25 +136,24 @@ const returnedUnpaid = computed(() =>
       <div v-if="isOpen && company.iban" class="pi-pay" :style="{ borderColor: brand }">
         <div class="pi-pay-title">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-          Zo betaal je deze factuur
+          {{ $t('Zo betaal je deze factuur') }}
         </div>
 
-        <!-- Direct online betalen (iDEAL) -->
+        <!-- Direct online betalen (iDEAL / BLIK) -->
         <div v-if="payment.enabled" class="pi-ideal">
           <button type="button" class="pi-ideal-btn" :style="{ background: brand }" :disabled="paying" @click="startPayment">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            {{ paying ? 'Bezig…' : `Betaal ${eur(invoice.remaining)} met iDEAL` }}
+            {{ paying ? $t('Bezig…') : $t('Betaal :amount met :method', { amount: eur(invoice.remaining), method: paymentLabel }) }}
           </button>
-          <div class="pi-ideal-hint">Veilig betalen via je eigen bank — de betaling wordt direct op de factuur verwerkt.</div>
+          <div class="pi-ideal-hint">{{ $t('Veilig betalen via je eigen bank — de betaling wordt direct op de factuur verwerkt.') }}</div>
           <div v-if="returnedUnpaid" class="pi-ideal-note">
-            De betaling is nog niet afgerond. Nog niet gelukt of geannuleerd? Probeer het gerust opnieuw,
-            of maak het bedrag handmatig over met de gegevens hieronder.
+            {{ $t('De betaling is nog niet afgerond. Nog niet gelukt of geannuleerd? Probeer het gerust opnieuw, of maak het bedrag handmatig over met de gegevens hieronder.') }}
           </div>
         </div>
 
         <div class="pi-pay-grid">
           <div>
-            <div class="pi-meta-label">Te betalen</div>
+            <div class="pi-meta-label">{{ $t('Te betalen') }}</div>
             <div class="pi-pay-amount">{{ eur(invoice.remaining) }}</div>
           </div>
           <div>
@@ -156,22 +161,22 @@ const returnedUnpaid = computed(() =>
             <div class="pi-meta-value mono">{{ company.iban }}</div>
           </div>
           <div>
-            <div class="pi-meta-label">Ten name van</div>
+            <div class="pi-meta-label">{{ $t('Ten name van') }}</div>
             <div class="pi-meta-value">{{ company.name }}</div>
           </div>
           <div>
-            <div class="pi-meta-label">Onder vermelding van</div>
+            <div class="pi-meta-label">{{ $t('Onder vermelding van') }}</div>
             <div class="pi-meta-value mono">{{ invoice.number }}</div>
           </div>
         </div>
         <div v-if="invoice.due_date_label" class="pi-pay-due">
-          Graag betalen vóór <strong>{{ invoice.due_date_label }}</strong>.
+          {{ $t('Graag betalen vóór') }} <strong>{{ invoice.due_date_label }}</strong>.
         </div>
       </div>
 
       <!-- Bijlagen van de afzender -->
       <div v-if="invoice.attachments && invoice.attachments.length" class="pi-payments">
-        <div class="pi-sect-title">Bijlagen bij deze factuur</div>
+        <div class="pi-sect-title">{{ $t('Bijlagen bij deze factuur') }}</div>
         <div v-for="att in invoice.attachments" :key="att.id" class="pi-att-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           <div class="pi-att-info">
@@ -179,14 +184,14 @@ const returnedUnpaid = computed(() =>
             <div class="pi-att-meta">{{ att.size_formatted }}</div>
           </div>
           <a :href="route('portal.invoice.attachment', [invoice.token, att.id])" class="btn btn-secondary" style="height:34px;padding:0 14px;font-size:13px;">
-            Download
+            {{ $t('Download') }}
           </a>
         </div>
       </div>
 
       <!-- Betalingen -->
       <div v-if="invoice.payments && invoice.payments.length" class="pi-payments">
-        <div class="pi-sect-title">Ontvangen betalingen</div>
+        <div class="pi-sect-title">{{ $t('Ontvangen betalingen') }}</div>
         <div v-for="p in invoice.payments" :key="p.id" class="pi-payment-row">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           <span>{{ p.paid_on_label }} · {{ p.label }}</span>
@@ -198,10 +203,10 @@ const returnedUnpaid = computed(() =>
       <div class="pi-actions">
         <a :href="route('portal.invoice.pdf', invoice.token)" class="btn btn-primary">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
+          {{ $t('Download PDF') }}
         </a>
-        <a v-if="company.email" :href="`mailto:${company.email}?subject=Vraag over factuur ${invoice.number}`" class="btn btn-secondary">
-          Vraag stellen over deze factuur
+        <a v-if="company.email" :href="`mailto:${company.email}?subject=${$t('Vraag over factuur :number', { number: invoice.number })}`" class="btn btn-secondary">
+          {{ $t('Vraag stellen over deze factuur') }}
         </a>
       </div>
 
@@ -216,9 +221,9 @@ const returnedUnpaid = computed(() =>
         {{ company.postal_code }} {{ company.city }}
       </div>
       <div class="pi-sender-line">
-        <span v-if="company.kvk_number">KVK {{ company.kvk_number }}</span>
+        <span v-if="company.kvk_number">{{ market.registry?.short || 'KVK' }} {{ company.kvk_number }}</span>
         <span v-if="company.kvk_number && company.vat_number"> · </span>
-        <span v-if="company.vat_number">BTW {{ company.vat_number }}</span>
+        <span v-if="company.vat_number">{{ market.tax_id?.short || 'BTW' }} {{ company.vat_number }}</span>
         <span v-if="company.phone"> · {{ company.phone }}</span>
       </div>
     </div>

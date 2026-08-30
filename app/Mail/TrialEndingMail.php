@@ -23,8 +23,8 @@ class TrialEndingMail extends Mailable
     public function envelope(): Envelope
     {
         $subject = $this->daysLeft === 1
-            ? 'Je proefperiode eindigt morgen'
-            : "Nog {$this->daysLeft} dagen in je " . Brand::name() . '-proefperiode';
+            ? __('Je proefperiode eindigt morgen')
+            : __('Nog :days dagen in je :brand-proefperiode', ['days' => $this->daysLeft, 'brand' => Brand::name()]);
 
         return new Envelope(subject: $subject);
     }

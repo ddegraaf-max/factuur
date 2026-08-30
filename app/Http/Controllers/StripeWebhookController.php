@@ -152,11 +152,11 @@ class StripeWebhookController extends Controller
 
         $firstName = $user && trim($user->name) !== ''
             ? explode(' ', trim($user->name))[0]
-            : 'daar';
+            : __('daar');
 
         $accessUntil = $ended
             ? null
-            : optional($company->subscription_ends_at)->format('d-m-Y');
+            : optional($company->subscription_ends_at)->format((string) \App\Support\Market::get('date_format', 'd-m-Y'));
 
         try {
             Mail::to($to)->send(new SubscriptionCanceledMail($company, $firstName, $accessUntil, $ended));

@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Bericht aan de ondernemer zodra zijn klant de offerte in het portaal heeft
- * ondertekend of afgewezen. Altijd Nederlands: dit is interne post.
+ * ondertekend of afgewezen. In de taal van de markt: dit is interne post.
  */
 class QuoteDecisionMail extends Mailable
 {
@@ -26,8 +26,8 @@ class QuoteDecisionMail extends Mailable
     {
         return new Envelope(
             subject: $this->accepted
-                ? "Offerte {$this->quote->number} is digitaal ondertekend 🎉"
-                : "Offerte {$this->quote->number} is afgewezen",
+                ? __('Offerte :number is digitaal ondertekend 🎉', ['number' => $this->quote->number])
+                : __('Offerte :number is afgewezen', ['number' => $this->quote->number]),
         );
     }
 

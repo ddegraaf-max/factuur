@@ -60,15 +60,15 @@ class FreeInvoiceController extends Controller
             'regels.*.omschrijving' => ['required', 'string', 'max:200'],
             'regels.*.aantal' => ['required', 'numeric', 'gt:0', 'max:1000000'],
             'regels.*.prijs' => ['required', 'numeric', 'gte:-1000000', 'max:1000000'],
-            'regels.*.btw' => ['required', 'in:21,9,0'],
+            'regels.*.btw' => ['required', 'in:' . implode(',', \App\Support\Market::vatRates())],
         ], [], [
-            'van_bedrijf' => 'jouw bedrijfsnaam',
-            'aan_bedrijf' => 'naam van de klant',
-            'factuurnummer' => 'factuurnummer',
-            'factuurdatum' => 'factuurdatum',
-            'regels.*.omschrijving' => 'omschrijving',
-            'regels.*.aantal' => 'aantal',
-            'regels.*.prijs' => 'prijs',
+            'van_bedrijf' => __('jouw bedrijfsnaam'),
+            'aan_bedrijf' => __('naam van de klant'),
+            'factuurnummer' => __('factuurnummer'),
+            'factuurdatum' => __('factuurdatum'),
+            'regels.*.omschrijving' => __('omschrijving'),
+            'regels.*.aantal' => __('aantal'),
+            'regels.*.prijs' => __('prijs'),
         ]);
 
         // Totalen altijd server-side berekenen; bij verlegd/vrijgesteld telt

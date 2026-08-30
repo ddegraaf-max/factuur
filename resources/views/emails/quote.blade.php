@@ -1,5 +1,5 @@
 @php
-    $eur = fn ($n) => '€ ' . number_format((float) $n, 2, ',', '.');
+    $eur = fn ($n) => money($n);
     $logo = $company->logoBinary();
 @endphp
 <!DOCTYPE html>

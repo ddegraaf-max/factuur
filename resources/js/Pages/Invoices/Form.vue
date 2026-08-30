@@ -1,7 +1,8 @@
 <script setup>
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur, parseDutchNumber } from '@/format.js';
+import { t } from '@/i18n';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
@@ -18,11 +19,14 @@ const props = defineProps({
 
 const isEdit = computed(() => !!props.invoice);
 
+// Markt (nl/pl): standaard btw-tarief voor nieuwe regels.
+const market = usePage().props.market;
+
 // 'incl' = de ondernemer typt de prijs die de klant betaalt (bruto).
 // De opslag blijft altijd netto; de server rekent dat terug. De schakelaar op
 // het formulier (form.price_mode) wint van de bedrijfsinstelling.
 const inclMode = computed(() => form.price_mode === 'incl');
-const priceLabel = computed(() => inclMode.value ? 'Prijs incl. btw' : 'Prijs');
+const priceLabel = computed(() => inclMode.value ? t('Prijs incl. btw') : t('Prijs'));
 
 /** Toon de prijs zoals de gebruiker hem invoert: bruto in incl-modus. */
 const displayPrice = (line) => {
@@ -72,7 +76,7 @@ const form = useForm({
         quantity: 1,
         unit: 'stuk',
         unit_price: 0,
-        vat_rate: 21,
+        vat_rate: market.default_vat,
         discount_pct: 0,
       }],
   action: 'draft',
@@ -159,7 +163,7 @@ const addLine = () => {
     quantity: 1,
     unit: 'stuk',
     unit_price: 0,
-    vat_rate: 21,
+    vat_rate: market.default_vat,
     discount_pct: 0,
   });
 };
@@ -195,7 +199,7 @@ watch(() => form.customer_id, (id) => {
 
 /* ---------- Verrekeningen (reeds doorgestort) ---------- */
 const addAdvance = () => {
-  form.advances.push({ description: 'Reeds doorgestort', date: today, amount: null });
+  form.advances.push({ description: t('Reeds doorgestort'), date: today, amount: null });
 };
 const removeAdvance = (i) => form.advances.splice(i, 1);
 
@@ -271,12 +275,12 @@ const submit = (action) => {
 </script>
 
 <template>
-  <Head :title="isEdit ? 'Factuur bewerken' : 'Nieuwe factuur'" />
+  <Head :title="isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur')" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Verkoop / <Link :href="route('invoices.index')" style="color:var(--text-3);">Facturen</Link> /
-        <span class="breadcrumb-current">{{ isEdit ? 'Bewerken' : 'Nieuw' }}</span>
+        {{ $t('Verkoop') }} / <Link :href="route('invoices.index')" style="color:var(--text-3);">{{ $t('Facturen') }}</Link> /
+        <span class="breadcrumb-current">{{ isEdit ? $t('Bewerken') : $t('Nieuw') }}</span>
       </div>
     </template>
 
@@ -284,64 +288,64 @@ const submit = (action) => {
       <div>
         <Link :href="route('invoices.index')" class="btn btn-ghost btn-sm" style="padding-left:0;margin-bottom:6px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          Terug
+          {{ $t('Terug') }}
         </Link>
-        <h1 class="page-title">{{ isEdit ? 'Factuur bewerken' : 'Nieuwe factuur' }}</h1>
+        <h1 class="page-title">{{ isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur') }}</h1>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" :disabled="form.processing" @click="submit('draft')">
-          Opslaan als concept
+          {{ $t('Opslaan als concept') }}
         </button>
         <button class="btn btn-primary btn-sm" :disabled="form.processing" @click="submit('send')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Versturen
+          {{ $t('Versturen') }}
         </button>
       </div>
     </div>
 
     <div v-if="hasErrors" class="form-error-banner">
-      Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.
+      {{ $t('Opslaan is niet gelukt — controleer de gemarkeerde velden hieronder.') }}
     </div>
 
     <div class="form-layout">
       <div class="form-main">
         <div class="card">
-          <div class="card-header"><div class="card-title">Klant &amp; details</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Klant & details') }}</div></div>
           <div class="card-body">
             <div class="form-row">
               <div class="form-group">
-                <label>Klant *</label>
+                <label>{{ $t('Klant') }} *</label>
                 <select v-model="form.customer_id" required>
-                  <option v-if="customers.length === 0" value="">Geen klanten — eerst toevoegen</option>
+                  <option v-if="customers.length === 0" value="">{{ $t('Geen klanten — eerst toevoegen') }}</option>
                   <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
                 </select>
                 <div v-if="form.errors.customer_id" class="field-error">{{ form.errors.customer_id }}</div>
                 <Link v-if="customers.length === 0" :href="route('customers.create')" style="color:var(--brand);font-size:13px;font-weight:500;display:inline-block;margin-top:6px;">
-                  + Nieuwe klant aanmaken
+                  + {{ $t('Nieuwe klant aanmaken') }}
                 </Link>
               </div>
               <div class="form-group">
-                <label>Referentie<span class="label-hint">(optioneel)</span></label>
+                <label>{{ $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
                 <input type="text" v-model="form.reference" placeholder="PROJ-2026-001" maxlength="255">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Factuurdatum *</label>
+                <label>{{ $t('Factuurdatum') }} *</label>
                 <input type="date" v-model="form.invoice_date" required>
                 <div v-if="form.errors.invoice_date" class="field-error">{{ form.errors.invoice_date }}</div>
               </div>
               <div class="form-group">
-                <label>Betalingstermijn (dagen) *</label>
+                <label>{{ $t('Betalingstermijn (dagen)') }} *</label>
                 <input type="number" v-model="form.payment_terms" min="0" max="365" required>
                 <div v-if="form.errors.payment_terms" class="field-error">{{ form.errors.payment_terms }}</div>
               </div>
             </div>
             <div v-if="brand_profiles.length" class="form-row">
               <div class="form-group">
-                <label>Factureren als<span class="label-hint">(handelsnaam op de factuur)</span></label>
+                <label>{{ $t('Factureren als') }}<span class="label-hint">{{ $t('(handelsnaam op de factuur)') }}</span></label>
                 <select v-model="form.brand_profile_id">
-                  <option :value="null">Standaard huisstijl</option>
+                  <option :value="null">{{ $t('Standaard huisstijl') }}</option>
                   <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
                 </select>
               </div>
@@ -354,26 +358,26 @@ const submit = (action) => {
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Factuurregels</div>
+              <div class="card-title">{{ $t('Factuurregels') }}</div>
               <div class="card-subtitle">
-                {{ inclMode ? 'Je typt de prijs die de klant betaalt — de btw wordt automatisch teruggerekend' : 'Je typt prijzen exclusief btw' }}
-                · standaard in te stellen bij Instellingen → Bedrijfsgegevens
+                {{ inclMode ? $t('Je typt de prijs die de klant betaalt — de btw wordt automatisch teruggerekend') : $t('Je typt prijzen exclusief btw') }}
+                · {{ $t('standaard in te stellen bij Instellingen → Bedrijfsgegevens') }}
               </div>
             </div>
-            <div class="price-mode-toggle" role="group" aria-label="Prijzen invoeren exclusief of inclusief btw">
-              <button type="button" :class="{ active: !inclMode }" @click="setPriceMode('excl')">excl. btw</button>
-              <button type="button" :class="{ active: inclMode }" @click="setPriceMode('incl')">incl. btw</button>
+            <div class="price-mode-toggle" role="group" :aria-label="$t('Prijzen invoeren exclusief of inclusief btw')">
+              <button type="button" :class="{ active: !inclMode }" @click="setPriceMode('excl')">{{ $t('excl. btw') }}</button>
+              <button type="button" :class="{ active: inclMode }" @click="setPriceMode('incl')">{{ $t('incl. btw') }}</button>
             </div>
           </div>
           <div class="card-body">
             <div class="lines-grid">
               <div class="lines-header">
-                <div>Omschrijving</div>
-                <div style="text-align:right;">Aantal</div>
+                <div>{{ $t('Omschrijving') }}</div>
+                <div style="text-align:right;">{{ $t('Aantal') }}</div>
                 <div style="text-align:right;">{{ priceLabel }}</div>
-                <div style="text-align:right;">Korting</div>
-                <div>BTW</div>
-                <div style="text-align:right;">Totaal</div>
+                <div style="text-align:right;">{{ $t('Korting') }}</div>
+                <div>{{ $t('BTW') }}</div>
+                <div style="text-align:right;">{{ $t('Totaal') }}</div>
                 <div></div>
               </div>
 
@@ -383,29 +387,29 @@ const submit = (action) => {
               <div v-for="(line, i) in form.lines" :key="i" class="line-row">
                 <div class="line-desc">
                   <div class="line-desc-row">
-                    <select v-if="products.length > 0" v-model="line.product_id" @change="applyProduct(line, $event.target.value)" class="product-select" title="Kies product">
-                      <option :value="null">— Eigen regel —</option>
+                    <select v-if="products.length > 0" v-model="line.product_id" @change="applyProduct(line, $event.target.value)" class="product-select" :title="$t('Kies product')">
+                      <option :value="null">{{ $t('— Eigen regel —') }}</option>
                       <option v-for="p in products" :key="p.id" :value="p.id">{{ p.name }}</option>
                     </select>
-                    <input type="text" v-model="line.description" placeholder="Omschrijving" required>
+                    <input type="text" v-model="line.description" :placeholder="$t('Omschrijving')" required>
                   </div>
-                  <textarea v-model="line.details" placeholder="Toelichting (optioneel)" rows="1" class="line-details"></textarea>
+                  <textarea v-model="line.details" :placeholder="$t('Toelichting (optioneel)')" rows="1" class="line-details"></textarea>
                 </div>
-                <div class="line-field" data-label="Aantal">
+                <div class="line-field" :data-label="$t('Aantal')">
                   <input type="number" v-model.number="line.quantity" min="0" step="0.001" class="num right">
                 </div>
                 <div class="line-field" :data-label="priceLabel">
-                  <input type="number" v-model.number="line.unit_price" step="0.01" class="num right" title="Negatief mag ook — bijv. voor een korting of verrekende aanbetaling">
+                  <input type="number" v-model.number="line.unit_price" step="0.01" class="num right" :title="$t('Negatief mag ook — bijv. voor een korting of verrekende aanbetaling')">
                 </div>
-                <div class="line-field" data-label="Korting %">
-                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" title="Korting in procenten op deze regel">
+                <div class="line-field" :data-label="$t('Korting %')">
+                  <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" :title="$t('Korting in procenten op deze regel')">
                 </div>
-                <div class="line-field" data-label="BTW">
+                <div class="line-field" :data-label="$t('BTW')">
                   <select v-model.number="line.vat_rate">
                     <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
                   </select>
                 </div>
-                <div class="line-field line-total-field" data-label="Totaal">
+                <div class="line-field line-total-field" :data-label="$t('Totaal')">
                   <div class="num line-total">{{ eur(lineTotal(line)) }}</div>
                 </div>
                 <button class="li-remove" @click="removeLine(i)" :disabled="form.lines.length === 1" type="button">
@@ -416,24 +420,24 @@ const submit = (action) => {
 
             <div v-if="form.errors.lines" class="field-error" style="margin-top:10px;">{{ form.errors.lines }}</div>
             <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
-              Regel {{ e.line }}: {{ e.msgs.join(' ') }}
+              {{ $t('Regel :n', { n: e.line }) }}: {{ e.msgs.join(' ') }}
             </div>
             <div v-if="totals.total < -0.004" class="field-error" style="margin-top:10px;">
-              Het factuurtotaal is negatief — daarvoor maak je een creditnota. Een negatieve regel (korting of verrekende aanbetaling) mag wél, zolang het totaal op nul of hoger uitkomt.
+              {{ $t('Het factuurtotaal is negatief — daarvoor maak je een creditnota. Een negatieve regel (korting of verrekende aanbetaling) mag wél, zolang het totaal op nul of hoger uitkomt.') }}
             </div>
 
             <button class="add-line-btn" @click="addLine" type="button">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Regel toevoegen
+              {{ $t('Regel toevoegen') }}
             </button>
           </div>
         </div>
 
         <div class="card" style="margin-top:16px;">
-          <div class="card-header"><div class="card-title">Opmerking voor klant</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Opmerking voor klant') }}</div></div>
           <div class="card-body">
             <div class="form-group" style="margin:0;">
-              <textarea v-model="form.notes" placeholder="Optioneel — verschijnt onderaan de factuur" rows="3"></textarea>
+              <textarea v-model="form.notes" :placeholder="$t('Optioneel — verschijnt onderaan de factuur')" rows="3"></textarea>
             </div>
           </div>
         </div>
@@ -442,18 +446,18 @@ const submit = (action) => {
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Verrekening · reeds doorgestort</div>
-              <div class="card-subtitle">Al doorgestorte deelbetalingen komen op de factuur in mindering op "Te betalen" — je totaal en BTW veranderen niet</div>
+              <div class="card-title">{{ $t('Verrekening · reeds doorgestort') }}</div>
+              <div class="card-subtitle">{{ $t('Al doorgestorte deelbetalingen komen op de factuur in mindering op "Te betalen" — je totaal en BTW veranderen niet') }}</div>
             </div>
             <button type="button" class="btn btn-secondary btn-sm" @click="addAdvance">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Verrekening toevoegen
+              {{ $t('Verrekening toevoegen') }}
             </button>
           </div>
           <div v-if="form.advances.length > 0 || advanceError" class="card-body">
             <div v-if="advanceError" class="field-error" style="margin-bottom:10px;">{{ advanceError }}</div>
             <div v-for="(adv, i) in form.advances" :key="i" class="adv-row">
-              <input type="text" v-model="adv.description" placeholder="Bijv. Reeds doorgestort" maxlength="190">
+              <input type="text" v-model="adv.description" :placeholder="$t('Bijv. Reeds doorgestort')" maxlength="190">
               <input type="date" v-model="adv.date">
               <input type="number" v-model="adv.amount" step="0.01" min="0.01" placeholder="0,00">
               <button type="button" class="li-remove" @click="removeAdvance(i)">
@@ -461,7 +465,7 @@ const submit = (action) => {
               </button>
             </div>
             <div v-if="advancesTotal > totals.total + 0.009" class="field-error" style="margin-top:4px;">
-              De verrekeningen (€ {{ advancesTotal.toFixed(2) }}) zijn samen hoger dan het factuurtotaal.
+              {{ $t('De verrekeningen (:amount) zijn samen hoger dan het factuurtotaal.', { amount: eur(advancesTotal) }) }}
             </div>
           </div>
         </div>
@@ -470,12 +474,12 @@ const submit = (action) => {
         <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
-              <div class="card-title">Bijlagen</div>
-              <div class="card-subtitle">Bijv. een urenoverzicht of specificatie — gaat mee met de factuurmail en staat in het klantenportaal</div>
+              <div class="card-title">{{ $t('Bijlagen') }}</div>
+              <div class="card-subtitle">{{ $t('Bijv. een urenoverzicht of specificatie — gaat mee met de factuurmail en staat in het klantenportaal') }}</div>
             </div>
             <button type="button" class="btn btn-secondary btn-sm" @click="fileInput?.click()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Bestand toevoegen
+              {{ $t('Bestand toevoegen') }}
             </button>
           </div>
           <div class="card-body">
@@ -484,7 +488,7 @@ const submit = (action) => {
             <div v-if="fileError" class="field-error" style="margin-bottom:10px;">{{ fileError }}</div>
 
             <div v-if="files.length === 0" class="fa-empty">
-              Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand, 10 bestanden per factuur.
+              {{ $t('Nog geen bijlagen. PDF, PNG, JPG of WEBP · max. 10 MB per bestand, 10 bestanden per factuur.') }}
             </div>
 
             <div v-for="(f, i) in files" :key="i" class="fa-row">
@@ -495,16 +499,16 @@ const submit = (action) => {
                 <div class="fa-name">{{ f.name }}</div>
                 <div class="fa-meta">{{ formatSize(f.size) }}</div>
               </div>
-              <label class="fa-check" :title="f.forCustomer ? 'Gaat mee met de factuurmail en is zichtbaar in het portaal' : 'Alleen intern — de klant ziet dit bestand niet'">
+              <label class="fa-check" :title="f.forCustomer ? $t('Gaat mee met de factuurmail en is zichtbaar in het portaal') : $t('Alleen intern — de klant ziet dit bestand niet')">
                 <input type="checkbox" v-model="f.forCustomer">
-                Meesturen naar klant
+                {{ $t('Meesturen naar klant') }}
               </label>
               <button type="button" class="li-remove" @click="removeFile(i)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
 
-            <p v-if="isEdit" class="fa-note">Eerder toegevoegde bijlagen bekijk en beheer je op de factuurpagina.</p>
+            <p v-if="isEdit" class="fa-note">{{ $t('Eerder toegevoegde bijlagen bekijk en beheer je op de factuurpagina.') }}</p>
           </div>
         </div>
       </div>
@@ -512,25 +516,25 @@ const submit = (action) => {
       <!-- Sidebar with totals -->
       <aside class="form-sidebar">
         <div class="card totals-card">
-          <div class="card-header"><div class="card-title">Overzicht</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Overzicht') }}</div></div>
           <div class="card-body">
             <div class="total-row" v-for="b in totals.breakdown" :key="b.rate">
-              <span>Excl. BTW ({{ b.rate }}%)</span>
+              <span>{{ $t('Excl. BTW (:rate%)', { rate: b.rate }) }}</span>
               <span class="mono">{{ eur(b.subtotal) }}</span>
             </div>
-            <div class="total-row sep"><span>Subtotaal</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
+            <div class="total-row sep"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
             <div class="total-row" v-for="b in totals.breakdown" :key="'vat-' + b.rate">
-              <span>BTW {{ b.rate }}%</span>
+              <span>{{ $t('BTW') }} {{ b.rate }}%</span>
               <span class="mono">{{ eur(b.vat) }}</span>
             </div>
-            <div class="total-row grand"><span>Totaal</span><span class="mono">{{ eur(totals.total) }}</span></div>
+            <div class="total-row grand"><span>{{ $t('Totaal') }}</span><span class="mono">{{ eur(totals.total) }}</span></div>
             <template v-if="advancesTotal > 0">
               <div class="total-row" style="color:var(--warning);">
-                <span>Verrekend / doorgestort</span>
+                <span>{{ $t('Verrekend / doorgestort') }}</span>
                 <span class="mono">− {{ eur(advancesTotal) }}</span>
               </div>
               <div class="total-row grand" style="border-top-width:1px;">
-                <span>Te betalen</span>
+                <span>{{ $t('Te betalen') }}</span>
                 <span class="mono">{{ eur(payable) }}</span>
               </div>
             </template>
@@ -538,15 +542,15 @@ const submit = (action) => {
         </div>
 
         <div v-if="selectedCustomer" class="card" style="margin-top:12px;">
-          <div class="card-header"><div class="card-title">Klantgegevens</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Klantgegevens') }}</div></div>
           <div class="card-body" style="font-size:13px;line-height:1.7;">
             <div style="font-weight:600;">{{ selectedCustomer.name }}</div>
             <div v-if="selectedCustomer.address_line" style="color:var(--text-3);">{{ selectedCustomer.address_line }}</div>
             <div v-if="selectedCustomer.postal_code || selectedCustomer.city" style="color:var(--text-3);">
               {{ selectedCustomer.postal_code }} {{ selectedCustomer.city }}
             </div>
-            <div v-if="selectedCustomer.kvk_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;margin-top:4px;">KVK {{ selectedCustomer.kvk_number }}</div>
-            <div v-if="selectedCustomer.vat_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;">BTW {{ selectedCustomer.vat_number }}</div>
+            <div v-if="selectedCustomer.kvk_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;margin-top:4px;">{{ $page.props.market.registry.short }} {{ selectedCustomer.kvk_number }}</div>
+            <div v-if="selectedCustomer.vat_number" style="color:var(--text-3);font-family:var(--font-mono);font-size:12px;">{{ $page.props.market.tax_id.short }} {{ selectedCustomer.vat_number }}</div>
           </div>
         </div>
       </aside>

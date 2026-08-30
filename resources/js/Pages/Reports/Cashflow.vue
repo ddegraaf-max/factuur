@@ -23,61 +23,61 @@ const bar = (value) => Math.max(value / maxFlow.value * 100, value > 0 ? 2 : 0) 
 </script>
 
 <template>
-  <Head title="Cashflow" />
+  <Head :title="$t('Cashflow')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Rapporten / <span class="breadcrumb-current">Cashflow</span></div>
+      <div class="breadcrumb">{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Cashflow') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Cashflow-prognose</h1>
-        <p class="page-subtitle">Wat er de komende maanden naar verwachting binnenkomt en uitgaat — op basis van openstaande facturen, terugkerende facturen en vaste lasten.</p>
+        <h1 class="page-title">{{ $t('Cashflow-prognose') }}</h1>
+        <p class="page-subtitle">{{ $t('Wat er de komende maanden naar verwachting binnenkomt en uitgaat — op basis van openstaande facturen, terugkerende facturen en vaste lasten.') }}</p>
       </div>
     </div>
 
     <!-- KPI's -->
     <div class="kpi-grid">
       <div class="kpi">
-        <div class="lbl">Te ontvangen</div>
+        <div class="lbl">{{ $t('Te ontvangen') }}</div>
         <div class="val">{{ eur(totals.in) }}</div>
-        <div class="meta">waarvan {{ eur(overdue.in) }} al vervallen</div>
+        <div class="meta">{{ $t('waarvan :amount al vervallen', { amount: eur(overdue.in) }) }}</div>
       </div>
       <div class="kpi">
-        <div class="lbl">Te betalen</div>
+        <div class="lbl">{{ $t('Te betalen') }}</div>
         <div class="val">{{ eur(totals.out) }}</div>
-        <div class="meta">waarvan {{ eur(overdue.out) }} al vervallen</div>
+        <div class="meta">{{ $t('waarvan :amount al vervallen', { amount: eur(overdue.out) }) }}</div>
       </div>
       <div class="kpi" :class="totals.net >= 0 ? 'good' : 'alert'">
-        <div class="lbl">Verwacht netto ({{ months.length }} mnd)</div>
+        <div class="lbl">{{ $t('Verwacht netto (:n mnd)', { n: months.length }) }}</div>
         <div class="val">{{ eur(totals.net) }}</div>
-        <div class="meta">ontvangsten − uitgaven</div>
+        <div class="meta">{{ $t('ontvangsten − uitgaven') }}</div>
       </div>
       <div class="kpi" :class="months.length && months[months.length - 1].cumulative < 0 ? 'alert' : ''">
-        <div class="lbl">Verloop eind {{ months.length ? months[months.length - 1].label.split(' ')[0] : '' }}</div>
+        <div class="lbl">{{ $t('Verloop eind :month', { month: months.length ? months[months.length - 1].label.split(' ')[0] : '' }) }}</div>
         <div class="val">{{ eur(months.length ? months[months.length - 1].cumulative : 0) }}</div>
-        <div class="meta">cumulatief vanaf vandaag</div>
+        <div class="meta">{{ $t('cumulatief vanaf vandaag') }}</div>
       </div>
     </div>
 
     <!-- Maandtabel met balkjes -->
     <div class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="cf-title">Per maand</div>
+        <div class="cf-title">{{ $t('Per maand') }}</div>
         <table class="data-table cf-table">
           <thead>
             <tr>
-              <th>Periode</th>
+              <th>{{ $t('Periode') }}</th>
               <th style="width:26%;"></th>
-              <th class="right">Ontvangsten</th>
-              <th class="right">Uitgaven</th>
-              <th class="right">Netto</th>
-              <th class="right">Cumulatief</th>
+              <th class="right">{{ $t('Ontvangsten') }}</th>
+              <th class="right">{{ $t('Uitgaven') }}</th>
+              <th class="right">{{ $t('Netto') }}</th>
+              <th class="right">{{ $t('Cumulatief') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="overdue.in > 0 || overdue.out > 0" class="cf-overdue">
-              <td><strong>Al vervallen</strong><div class="cf-sub">direct opeisbaar</div></td>
+              <td><strong>{{ $t('Al vervallen') }}</strong><div class="cf-sub">{{ $t('direct opeisbaar') }}</div></td>
               <td>
                 <div class="cf-track"><div class="cf-fill in" :style="{ width: bar(overdue.in) }"></div></div>
                 <div class="cf-track"><div class="cf-fill out" :style="{ width: bar(overdue.out) }"></div></div>
@@ -91,9 +91,9 @@ const bar = (value) => Math.max(value / maxFlow.value * 100, value > 0 ? 2 : 0) 
               <td>
                 {{ m.label }}
                 <div class="cf-sub">
-                  <template v-if="m.in_recurring > 0.009">terugkerend {{ eur(m.in_recurring) }}</template>
+                  <template v-if="m.in_recurring > 0.009">{{ $t('terugkerend :amount', { amount: eur(m.in_recurring) }) }}</template>
                   <template v-if="m.in_recurring > 0.009 && m.out_recurring > 0.009"> · </template>
-                  <template v-if="m.out_recurring > 0.009">vaste lasten {{ eur(m.out_recurring) }}</template>
+                  <template v-if="m.out_recurring > 0.009">{{ $t('vaste lasten :amount', { amount: eur(m.out_recurring) }) }}</template>
                 </div>
               </td>
               <td>
@@ -108,7 +108,7 @@ const bar = (value) => Math.max(value / maxFlow.value * 100, value > 0 ? 2 : 0) 
           </tbody>
         </table>
         <div v-if="later.in > 0.009 || later.out > 0.009" class="cf-later">
-          Ná dit venster: nog {{ eur(later.in) }} te ontvangen en {{ eur(later.out) }} te betalen (vervaldatum verder weg).
+          {{ $t('Ná dit venster: nog :incoming te ontvangen en :outgoing te betalen (vervaldatum verder weg).', { incoming: eur(later.in), outgoing: eur(later.out) }) }}
         </div>
       </div>
     </div>
@@ -117,12 +117,10 @@ const bar = (value) => Math.max(value / maxFlow.value * 100, value > 0 ? 2 : 0) 
     <div class="cf-disclaimer">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div>
-        <strong>Dit is een prognose, geen banksaldo.</strong>
-        Ontvangsten staan op de vervaldatum van je facturen (terugkerende facturen: factuurdatum + betaaltermijn) en
-        uitgaven op de vervaldatum van je inkoop en de boekingsdatum van je vaste lasten. In werkelijkheid betalen
-        klanten soms later — de regel "al vervallen" laat zien wat er nu al opeisbaar is.
-        <template v-if="incasso_total > 0.009">Facturen in het incassotraject ({{ eur(incasso_total) }}) tellen niet mee: die ontvangst is onzeker.</template>
-        Privé-opnames, belastingen en loonkosten staan niet in {{ brand.name }} en zitten dus niet in dit beeld.
+        <strong>{{ $t('Dit is een prognose, geen banksaldo.') }}</strong>
+        {{ $t('Ontvangsten staan op de vervaldatum van je facturen (terugkerende facturen: factuurdatum + betaaltermijn) en uitgaven op de vervaldatum van je inkoop en de boekingsdatum van je vaste lasten. In werkelijkheid betalen klanten soms later — de regel "al vervallen" laat zien wat er nu al opeisbaar is.') }}
+        <template v-if="incasso_total > 0.009">{{ $t('Facturen in het incassotraject (:amount) tellen niet mee: die ontvangst is onzeker.', { amount: eur(incasso_total) }) }}</template>
+        {{ $t('Privé-opnames, belastingen en loonkosten staan niet in :brand en zitten dus niet in dit beeld.', { brand: brand.name }) }}
       </div>
     </div>
   </AppLayout>

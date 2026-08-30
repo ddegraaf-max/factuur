@@ -22,7 +22,7 @@ class VerificationCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Je ' . Brand::name() . ' verificatiecode: ' . $this->code,
+            subject: __('Je :brand verificatiecode: :code', ['brand' => Brand::name(), 'code' => $this->code]),
         );
     }
 

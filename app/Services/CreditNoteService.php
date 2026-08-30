@@ -14,7 +14,7 @@ class CreditNoteService
     public function createFromInvoice(Invoice $original, string $kind = 'full'): Invoice
     {
         if ($original->is_credit) {
-            throw new \DomainException('Kan geen creditnota maken voor een creditnota.');
+            throw new \DomainException(__('Kan geen creditnota maken voor een creditnota.'));
         }
 
         return DB::transaction(function () use ($original, $kind) {
@@ -31,11 +31,9 @@ class CreditNoteService
             $credit->invoice_date = now();
             $credit->due_date = now();
             $credit->payment_terms = 0;
-            $credit->notes = sprintf(
-                'Deze creditnota crediteert factuur %s %s.',
-                $original->number,
-                $kind === 'full' ? 'volledig' : 'gedeeltelijk'
-            );
+            $credit->notes = $kind === 'full'
+                ? __('Deze creditnota crediteert factuur :number volledig.', ['number' => $original->number])
+                : __('Deze creditnota crediteert factuur :number gedeeltelijk.', ['number' => $original->number]);
             $credit->save();
 
             // Copy invoice lines

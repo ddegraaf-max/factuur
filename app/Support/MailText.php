@@ -28,8 +28,8 @@ class MailText
             '{factuurnummer}' => (string) ($invoice->number ?? ''),
             '{factuurdatum}' => optional($invoice->invoice_date)->translatedFormat('j F Y') ?? '',
             '{vervaldatum}' => optional($invoice->due_date)->translatedFormat('j F Y') ?? '',
-            '{bedrag}' => '€ ' . number_format((float) $invoice->total, 2, ',', '.'),
-            '{openstaand}' => '€ ' . number_format(max((float) $invoice->total - (float) $invoice->paid_total, 0), 2, ',', '.'),
+            '{bedrag}' => money($invoice->total),
+            '{openstaand}' => money(max((float) $invoice->total - (float) $invoice->paid_total, 0)),
             '{iban}' => (string) ($company->iban ?? ''),
         ];
     }
@@ -49,7 +49,7 @@ class MailText
             '{bedrijf}' => (string) ($company->name ?? ''),
             '{factuurnummer}' => (string) ($invoice->number ?? ''),
             '{factuurdatum}' => optional($invoice->invoice_date)->translatedFormat('j F Y') ?? '',
-            '{bedrag}' => '€ ' . number_format((float) $invoice->total, 2, ',', '.'),
+            '{bedrag}' => money($invoice->total),
             '{betaaldatum}' => $paidOn ? $paidOn->translatedFormat('j F Y') : '',
             '{betaalwijze}' => $payment?->method ? self::paymentMethodLabel($payment->method) : '',
         ];
@@ -88,7 +88,7 @@ class MailText
             '{offertenummer}' => (string) ($quote->number ?? ''),
             '{offertedatum}' => optional($quote->quote_date)->translatedFormat('j F Y') ?? '',
             '{geldigtot}' => optional($quote->valid_until)->translatedFormat('j F Y') ?? '',
-            '{bedrag}' => '€ ' . number_format((float) $quote->total, 2, ',', '.'),
+            '{bedrag}' => money($quote->total),
         ];
     }
 }

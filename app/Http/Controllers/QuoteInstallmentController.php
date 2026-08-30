@@ -24,13 +24,13 @@ class QuoteInstallmentController extends Controller
     public function store(Request $request, Quote $quote): RedirectResponse
     {
         if (! in_array($quote->status, ['sent', 'accepted'], true)) {
-            return back()->withErrors(['installments' => 'Alleen een verstuurde of geaccepteerde offerte kan in termijnen worden gefactureerd.']);
+            return back()->withErrors(['installments' => __('Alleen een verstuurde of geaccepteerde offerte kan in termijnen worden gefactureerd.')]);
         }
         if ($quote->converted_invoice_id) {
-            return back()->withErrors(['installments' => 'Deze offerte is al volledig omgezet naar een factuur.']);
+            return back()->withErrors(['installments' => __('Deze offerte is al volledig omgezet naar een factuur.')]);
         }
         if ($quote->installments()->whereNotNull('invoice_id')->exists()) {
-            return back()->withErrors(['installments' => 'Er is al een termijn gefactureerd — het plan ligt vast.']);
+            return back()->withErrors(['installments' => __('Er is al een termijn gefactureerd — het plan ligt vast.')]);
         }
 
         $data = $request->validate([
@@ -38,12 +38,12 @@ class QuoteInstallmentController extends Controller
             'installments.*.description' => ['required', 'string', 'max:200'],
             'installments.*.percentage' => ['required', 'numeric', 'min:0.01', 'max:100'],
         ], [
-            'installments.min' => 'Een termijnplan bestaat uit minstens twee termijnen.',
+            'installments.min' => __('Een termijnplan bestaat uit minstens twee termijnen.'),
         ]);
 
         $sum = round(collect($data['installments'])->sum(fn ($i) => (float) $i['percentage']), 2);
         if (abs($sum - 100) > 0.01) {
-            return back()->withErrors(['installments' => "De percentages moeten samen 100% zijn (nu {$sum}%)."]);
+            return back()->withErrors(['installments' => __('De percentages moeten samen 100% zijn (nu :sum%).', ['sum' => $sum])]);
         }
 
         DB::transaction(function () use ($quote, $data) {
@@ -69,19 +69,19 @@ class QuoteInstallmentController extends Controller
             }
         });
 
-        return back()->with('flash', 'Termijnplan opgeslagen.');
+        return back()->with('flash', __('Termijnplan opgeslagen.'));
     }
 
     /** Plan verwijderen — kan alleen zolang er geen termijn is gefactureerd. */
     public function destroy(Quote $quote): RedirectResponse
     {
         if ($quote->installments()->whereNotNull('invoice_id')->exists()) {
-            return back()->withErrors(['installments' => 'Er is al een termijn gefactureerd — het plan kan niet meer worden verwijderd.']);
+            return back()->withErrors(['installments' => __('Er is al een termijn gefactureerd — het plan kan niet meer worden verwijderd.')]);
         }
 
         $quote->installments()->delete();
 
-        return back()->with('flash', 'Termijnplan verwijderd.');
+        return back()->with('flash', __('Termijnplan verwijderd.'));
     }
 
     /**
@@ -93,13 +93,13 @@ class QuoteInstallmentController extends Controller
         abort_unless($installment->quote_id === $quote->id, 404);
 
         if ($installment->invoice_id) {
-            return back()->withErrors(['installments' => 'Deze termijn is al gefactureerd.']);
+            return back()->withErrors(['installments' => __('Deze termijn is al gefactureerd.')]);
         }
 
         $plan = $quote->installments()->get();
         $next = $plan->firstWhere('invoice_id', null);
         if (! $next || $next->id !== $installment->id) {
-            return back()->withErrors(['installments' => 'Factureer de termijnen op volgorde — de eerstvolgende open termijn eerst.']);
+            return back()->withErrors(['installments' => __('Factureer de termijnen op volgorde — de eerstvolgende open termijn eerst.')]);
         }
 
         $quote->loadMissing('lines');
@@ -129,21 +129,21 @@ class QuoteInstallmentController extends Controller
         }
         $shares = array_filter($shares, fn ($v) => abs($v) > 0.005);
         if ($shares === []) {
-            return back()->withErrors(['installments' => 'Deze termijn heeft geen bedrag (meer) om te factureren.']);
+            return back()->withErrors(['installments' => __('Deze termijn heeft geen bedrag (meer) om te factureren.')]);
         }
 
         $mode = ($quote->company?->price_mode === 'incl') ? 'incl' : 'excl';
         $count = count($shares);
         $pctLabel = rtrim(rtrim(number_format((float) $installment->percentage, 2, ',', '.'), '0'), ',');
-        $quoteLabel = $quote->number ? 'offerte ' . $quote->number : 'offerte';
+        $quoteLabel = $quote->number ? __('offerte :number', ['number' => $quote->number]) : __('offerte');
 
         $lines = [];
         foreach ($shares as $rate => $amount) {
             $lines[] = [
                 'description' => $installment->description . ' — ' . $quoteLabel . ' (' . $pctLabel . '%)',
-                'details' => $count > 1 ? 'Deel tegen ' . rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') . '% btw' : null,
+                'details' => $count > 1 ? __('Deel tegen :rate% btw', ['rate' => rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',')]) : null,
                 'quantity' => 1,
-                'unit' => 'stuk',
+                'unit' => __('stuk'),
                 'unit_price' => $mode === 'incl'
                     ? round($amount * (1 + (float) $rate / 100), 2)
                     : $amount,
@@ -157,7 +157,7 @@ class QuoteInstallmentController extends Controller
                 'brand_profile_id' => $quote->brand_profile_id,
                 'language' => $quote->language,
                 'invoice_date' => now()->toDateString(),
-                'reference' => $quote->reference ?: ('Offerte ' . $quote->number),
+                'reference' => $quote->reference ?: __('Offerte :number', ['number' => $quote->number]),
                 'lines' => $lines,
             ]);
 
@@ -172,6 +172,6 @@ class QuoteInstallmentController extends Controller
         });
 
         return redirect()->route('invoices.edit', $invoice)
-            ->with('flash', 'Conceptfactuur voor deze termijn aangemaakt — controleer en verstuur.');
+            ->with('flash', __('Conceptfactuur voor deze termijn aangemaakt — controleer en verstuur.'));
     }
 }

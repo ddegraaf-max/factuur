@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ResendScheduler;
 use App\Services\StripeService;
+use App\Support\Market;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -62,11 +63,16 @@ class BillingController extends Controller
             $platformAi = [
                 'months' => $months,
                 'top' => $top->map(fn ($r) => [
-                    'name' => $names[$r->company_id] ?? ('Administratie #' . $r->company_id),
+                    'name' => $names[$r->company_id] ?? __('Administratie #:id', ['id' => $r->company_id]),
                     'total' => (int) $r->c,
                 ])->values(),
             ];
         }
+
+        // Naam, prijs en btw-noot per markt: Nederland (EUR, 21%) of Polen (PLN, 23% VAT).
+        // De taglines en kenmerken zijn vertaalsleutels.
+        $pl = Market::isPl();
+        $aiLimit = (int) config('services.anthropic.monthly_limit', 250);
 
         return Inertia::render('Billing/Index', [
             'subscription' => $company->subscriptionSummary(),
@@ -75,37 +81,35 @@ class BillingController extends Controller
             'plans' => [
                 [
                     'key' => 'basis',
-                    'name' => 'Basis',
-                    'amount' => '10',
-                    'vat_note' => 'Excl. 21% btw · € 12,10 incl. btw',
-                    'tagline' => 'Alles om te factureren en je administratie bij te houden.',
+                    'name' => $pl ? 'Podstawowy' : __('Basis'),
+                    'amount' => $pl ? '49' : '10',
+                    'vat_note' => $pl ? 'netto · 60,27 zł brutto (23% VAT)' : __('Excl. 21% btw · € 12,10 incl. btw'),
+                    'tagline' => __('Alles om te factureren en je administratie bij te houden.'),
                     'features' => [
-                        'Onbeperkt facturen, offertes, klanten en producten',
-                        'BTW-overzicht, herinneringen, incasso en klantenportaal',
-                        'Inkoop, uren, ritten en jaaroverzicht',
-                        'Digitaal visitekaartje en eigen website in je huisstijl',
-                        'Maandelijks opzegbaar',
-                        'Optioneel: automatische bankkoppeling voor € ' . number_format((float) config('services.ponto.account_price', 5), 2, ',', '.') . ' per rekening per maand',
+                        __('Onbeperkt facturen, offertes, klanten en producten'),
+                        __('BTW-overzicht, herinneringen, incasso en klantenportaal'),
+                        __('Inkoop, uren, ritten en jaaroverzicht'),
+                        __('Digitaal visitekaartje en eigen website in je huisstijl'),
+                        __('Maandelijks opzegbaar'),
+                        __('Optioneel: automatische bankkoppeling voor :price per rekening per maand', ['price' => money((float) config('services.ponto.account_price', 5))]),
                     ],
                     'available' => $this->stripe->configured(),
                 ],
                 [
                     'key' => 'slim',
-                    'name' => 'Slim',
-                    'amount' => '17,50',
-                    'vat_note' => 'Excl. 21% btw · € 21,18 incl. btw',
-                    'tagline' => 'Alles uit Basis, plus de AI-assistent die werk uit handen neemt.',
+                    'name' => $pl ? 'Smart' : __('Slim'),
+                    'amount' => $pl ? '79' : '17,50',
+                    'vat_note' => $pl ? 'netto · 97,17 zł brutto (23% VAT)' : __('Excl. 21% btw · € 21,18 incl. btw'),
+                    'tagline' => __('Alles uit Basis, plus de AI-assistent die werk uit handen neemt.'),
                     'features' => array_values(array_filter([
-                        'Alles uit Basis (bankkoppeling optioneel, per rekening)',
-                        'Scan & herken: bonnen en inkoopfacturen automatisch ingevuld',
-                        'Postvak IN met automatische boekingsvoorstellen',
-                        'Offerte uit tekst: plak je conceptofferte, het formulier vult zich in',
-                        'Claude-koppeling: maak offertes en facturen rechtstreeks vanuit je Claude-gesprek',
-                        'Huisstijl herkennen met AI: upload je huisstijlgids en alles staat goed',
-                        'Huisstijl en websitetekst laten ontwerpen door AI — ideaal als starter',
-                        ((int) config('services.anthropic.monthly_limit', 250)) > 0
-                            ? sprintf('Ruime fair-use: %d AI-acties per maand', (int) config('services.anthropic.monthly_limit', 250))
-                            : null,
+                        __('Alles uit Basis (bankkoppeling optioneel, per rekening)'),
+                        __('Scan & herken: bonnen en inkoopfacturen automatisch ingevuld'),
+                        __('Postvak IN met automatische boekingsvoorstellen'),
+                        __('Offerte uit tekst: plak je conceptofferte, het formulier vult zich in'),
+                        __('Claude-koppeling: maak offertes en facturen rechtstreeks vanuit je Claude-gesprek'),
+                        __('Huisstijl herkennen met AI: upload je huisstijlgids en alles staat goed'),
+                        __('Huisstijl en websitetekst laten ontwerpen door AI — ideaal als starter'),
+                        $aiLimit > 0 ? __('Ruime fair-use: :count AI-acties per maand', ['count' => $aiLimit]) : null,
                     ])),
                     'available' => $this->stripe->slimConfigured(),
                 ],
@@ -121,11 +125,11 @@ class BillingController extends Controller
         $plan = $request->input('plan') === 'slim' ? 'slim' : 'basis';
 
         if (! $this->stripe->configured() || ($plan === 'slim' && ! $this->stripe->slimConfigured())) {
-            return back()->with('error', 'Betalen is nog niet beschikbaar. Probeer het later opnieuw.');
+            return back()->with('error', __('Betalen is nog niet beschikbaar. Probeer het later opnieuw.'));
         }
 
         if ($company->is_exempt) {
-            return back()->with('flash', 'Dit account is vrijgesteld — je hoeft geen abonnement af te sluiten.');
+            return back()->with('flash', __('Dit account is vrijgesteld — je hoeft geen abonnement af te sluiten.'));
         }
 
         // Wordt er tijdens de proefperiode afgesloten, laat Stripe dan pas
@@ -146,7 +150,7 @@ class BillingController extends Controller
         } catch (\Throwable $e) {
             Log::error('Stripe checkout aanmaken mislukt', ['error' => $e->getMessage(), 'company' => $company->id]);
 
-            return back()->with('error', 'Er ging iets mis bij het starten van de betaling. Probeer het opnieuw.');
+            return back()->with('error', __('Er ging iets mis bij het starten van de betaling. Probeer het opnieuw.'));
         }
 
         // Externe redirect naar de Stripe-checkout (werkt ook met Inertia).
@@ -182,7 +186,7 @@ class BillingController extends Controller
         }
 
         return redirect()->route('billing.show')
-            ->with('flash', 'Bedankt! Je abonnement is actief. Je hebt weer volledig toegang.');
+            ->with('flash', __('Bedankt! Je abonnement is actief. Je hebt weer volledig toegang.'));
     }
 
     public function portal(Request $request)
@@ -190,7 +194,7 @@ class BillingController extends Controller
         $company = $request->user()->company;
 
         if (! $company->stripe_customer_id || ! $this->stripe->configured()) {
-            return back()->with('error', 'Er is nog geen abonnement om te beheren.');
+            return back()->with('error', __('Er is nog geen abonnement om te beheren.'));
         }
 
         try {
@@ -198,7 +202,7 @@ class BillingController extends Controller
         } catch (\Throwable $e) {
             Log::error('Stripe portaal aanmaken mislukt', ['error' => $e->getMessage(), 'company' => $company->id]);
 
-            return back()->with('error', 'Het beheerportaal is even niet bereikbaar. Probeer het later opnieuw.');
+            return back()->with('error', __('Het beheerportaal is even niet bereikbaar. Probeer het later opnieuw.'));
         }
 
         return Inertia::location($url);

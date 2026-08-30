@@ -1,11 +1,16 @@
 <script setup>
-import { Head, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref } from 'vue';
+import { t } from '@/i18n';
 
 defineProps({
   administrations: Array, // { id, name, kvk_number, role, role_label, is_active, subscription }
 });
+
+// Markt (nl/pl): KvK/REGON- en btw/NIP-labels, placeholders en lengtes.
+const market = usePage().props.market;
+const registryMax = Math.max(...(market.registry.digits || [8]), 8);
 
 const showForm = ref(false);
 
@@ -29,63 +34,61 @@ const switchTo = (a) => {
 
 const subscriptionLabel = (s) => {
   if (!s) return '';
-  if (s.status === 'active') return 'Abonnement actief';
-  if (s.status === 'trialing') return `Proefperiode — nog ${s.days_left} ${s.days_left === 1 ? 'dag' : 'dagen'}`;
-  return 'Proefperiode verlopen';
+  if (s.status === 'active') return t('Abonnement actief');
+  if (s.status === 'trialing') return s.days_left === 1 ? t('Proefperiode — nog 1 dag') : t('Proefperiode — nog :n dagen', { n: s.days_left });
+  return t('Proefperiode verlopen');
 };
 </script>
 
 <template>
-  <Head title="Administraties" />
+  <Head :title="$t('Administraties')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Account / <span class="breadcrumb-current">Administraties</span></div>
+      <div class="breadcrumb">{{ $t('Account') }} / <span class="breadcrumb-current">{{ $t('Administraties') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Administraties</h1>
+        <h1 class="page-title">{{ $t('Administraties') }}</h1>
         <p class="page-subtitle">
-          Beheer meerdere bedrijven onder één inlog — elk met een eigen KvK, klanten, facturen,
-          nummering en abonnement. Wisselen kan altijd via het menu linksonder.
+          {{ $t('Beheer meerdere bedrijven onder één inlog — elk met een eigen :registry, klanten, facturen, nummering en abonnement. Wisselen kan altijd via het menu linksonder.', { registry: market.registry.short }) }}
         </p>
       </div>
       <button v-if="!showForm" type="button" class="btn btn-primary" @click="showForm = true">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nieuwe administratie
+        {{ $t('Nieuwe administratie') }}
       </button>
     </div>
 
     <!-- Nieuwe administratie -->
     <div v-if="showForm" class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="adm-form-title">Nieuwe administratie starten</div>
+        <div class="adm-form-title">{{ $t('Nieuwe administratie starten') }}</div>
         <p class="adm-hint">
-          De nieuwe administratie begint met een eigen gratis proefperiode van 14 dagen en een eigen
-          abonnement. Jij wordt automatisch beheerder; collega's nodig je daarna uit via Instellingen → Team.
+          {{ $t("De nieuwe administratie begint met een eigen gratis proefperiode van 14 dagen en een eigen abonnement. Jij wordt automatisch beheerder; collega's nodig je daarna uit via Instellingen → Team.") }}
         </p>
         <form @submit.prevent="submit">
           <div class="form-row">
             <div class="form-group">
-              <label>Bedrijfsnaam *</label>
-              <input type="text" v-model="form.name" maxlength="255" placeholder="Bijv. Vries Fotografie">
+              <label>{{ $t('Bedrijfsnaam') }} *</label>
+              <input type="text" v-model="form.name" maxlength="255" :placeholder="$t('Bijv. Vries Fotografie')">
               <div v-if="form.errors.name" class="field-error">{{ form.errors.name }}</div>
             </div>
             <div class="form-group">
-              <label>KvK-nummer *</label>
-              <input type="text" v-model="form.kvk_number" maxlength="8" inputmode="numeric" placeholder="8 cijfers">
+              <label>{{ market.registry.label }}<template v-if="market.registry.required"> *</template><span v-else class="label-hint">{{ $t('(optioneel)') }}</span></label>
+              <input type="text" v-model="form.kvk_number" :maxlength="registryMax" inputmode="numeric" :placeholder="market.registry.placeholder">
               <div v-if="form.errors.kvk_number" class="field-error">{{ form.errors.kvk_number }}</div>
             </div>
           </div>
           <div class="form-group">
-            <label>BTW-nummer<span class="label-hint">(optioneel)</span></label>
-            <input type="text" v-model="form.vat_number" maxlength="20" placeholder="NL123456789B01" style="max-width:260px;">
+            <label>{{ market.tax_id.label }}<template v-if="market.tax_id.required"> *</template><span v-else class="label-hint">{{ $t('(optioneel)') }}</span></label>
+            <input type="text" v-model="form.vat_number" maxlength="20" :placeholder="market.tax_id.placeholder" style="max-width:260px;">
             <div v-if="form.errors.vat_number" class="field-error">{{ form.errors.vat_number }}</div>
           </div>
           <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button type="button" class="btn btn-secondary" @click="showForm = false">Annuleren</button>
+            <button type="button" class="btn btn-secondary" @click="showForm = false">{{ $t('Annuleren') }}</button>
             <button type="submit" class="btn btn-primary" :disabled="form.processing">
-              {{ form.processing ? 'Bezig…' : 'Administratie aanmaken' }}
+              {{ form.processing ? $t('Bezig…') : $t('Administratie aanmaken') }}
             </button>
           </div>
         </form>
@@ -98,15 +101,15 @@ const subscriptionLabel = (s) => {
         <div class="card-body">
           <div class="adm-head">
             <div class="adm-name">{{ a.name }}</div>
-            <span v-if="a.is_active" class="pill pill-paid">Actief</span>
+            <span v-if="a.is_active" class="pill pill-paid">{{ $t('Actief') }}</span>
           </div>
           <div class="adm-meta">
-            <span v-if="a.kvk_number">KvK {{ a.kvk_number }} · </span>{{ a.role_label }}
+            <span v-if="a.kvk_number">{{ market.registry.short }} {{ a.kvk_number }} · </span>{{ a.role_label }}
           </div>
           <div class="adm-meta" style="margin-top:2px;">{{ subscriptionLabel(a.subscription) }}</div>
           <button v-if="!a.is_active" type="button" class="btn btn-secondary btn-sm" style="margin-top:12px;" @click="switchTo(a)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-            Wisselen naar deze administratie
+            {{ $t('Wisselen naar deze administratie') }}
           </button>
         </div>
       </div>

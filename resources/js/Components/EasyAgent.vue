@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
+import { eur } from '@/format';
+import { t } from '@/i18n';
 
 const page = usePage();
 // Naam van de assistent per merk (EASY bij EasyInvoice, Lo bij Lopra) — zie config/brand.php.
@@ -14,8 +16,6 @@ const inputRef = ref(null);
 const insights = computed(() => page.props.easy_insights || []);
 const urgent = computed(() => insights.value.filter(i => ['danger', 'warning'].includes(i.severity)).length);
 
-const eur = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
 /**
  * Berichten markeren nadruk met **sterretjes** in plaats van HTML.
  * Hier splitsen we die op: de oneven stukken worden vet. Vue schrijft elk stuk
@@ -28,10 +28,10 @@ const toggle = () => {
   open.value = !open.value;
   if (open.value && !initialized.value) {
     initialized.value = true;
-    const userName = (page.props.auth?.user?.name || '').split(' ')[0] || 'daar';
+    const userName = (page.props.auth?.user?.name || '').split(' ')[0] || t('daar');
     messages.value.push({
       from: 'bot',
-      text: `Hoi **${userName}**! Ik ben **${assistant.value}**, je administratie-assistent. Vraag bijvoorbeeld naar **openstaand**, **achterstallig** of je **topklanten**.`,
+      text: t('Hoi **:name**! Ik ben **:assistant**, je administratie-assistent. Vraag bijvoorbeeld naar **openstaand**, **achterstallig** of je **topklanten**.', { name: userName, assistant: assistant.value }),
     });
   }
 };
@@ -42,41 +42,41 @@ const respond = (input) => {
   const q = input.toLowerCase().trim();
   const data = page.props.easy_data || {};
 
-  if (/^(hoi|hallo|hai|hey|hi|goedem)/.test(q)) {
-    return 'Hoi! Waar kan ik je mee helpen?';
+  if (/^(hoi|hallo|hai|hey|hi|goedem|cześć|czesc|dzień|dzien|witam|siema)/.test(q)) {
+    return t('Hoi! Waar kan ik je mee helpen?');
   }
-  if (q.includes('openstaand') || q.includes('open ') || q.endsWith('open')) {
+  if (q.includes('openstaand') || q.includes('open ') || q.endsWith('open') || q.includes('do zapłaty') || q.includes('do zaplaty') || q.includes('nieopłac') || q.includes('nieoplac') || q.includes('otwart')) {
     return data.outstanding
-      ? `Er staat in totaal **${eur(data.outstanding.total)}** open, verdeeld over **${data.outstanding.count}** facturen.`
-      : 'Geen openstaande facturen.';
+      ? t('Er staat in totaal **:total** open, verdeeld over **:count** facturen.', { total: eur(data.outstanding.total), count: data.outstanding.count })
+      : t('Geen openstaande facturen.');
   }
-  if (q.includes('achterstall') || q.includes('te laat')) {
+  if (q.includes('achterstall') || q.includes('te laat') || q.includes('przetermin') || q.includes('po terminie') || q.includes('zaległ') || q.includes('zalegl')) {
     return data.overdue
-      ? `Er zijn **${data.overdue.count}** achterstallige facturen voor **${eur(data.overdue.total)}**.`
-      : 'Geen achterstallige facturen op dit moment. 👌';
+      ? t('Er zijn **:count** achterstallige facturen voor **:total**.', { count: data.overdue.count, total: eur(data.overdue.total) })
+      : t('Geen achterstallige facturen op dit moment. 👌');
   }
-  if (q.includes('incasso') || q.includes('armaere')) {
+  if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline')) {
     return data.incasso
-      ? `Bij Armaere liggen **${data.incasso.count}** dossiers voor **${eur(data.incasso.total)}**.`
-      : 'Geen actieve incasso-dossiers.';
+      ? t('Bij :partner liggen **:count** dossiers voor **:total**.', { partner: page.props.market?.incasso_partner || 'Armaere', count: data.incasso.count, total: eur(data.incasso.total) })
+      : t('Geen actieve incasso-dossiers.');
   }
-  if (q.includes('btw') || q.includes('aangifte')) {
+  if (q.includes('btw') || q.includes('aangifte') || q.includes('vat') || q.includes('deklarac') || q.includes('jpk')) {
     return data.vat
-      ? `Te dragen BTW voor Q${data.vat.quarter}: **${eur(data.vat.amount)}**.\nDeadline: ${data.vat.deadline}.`
-      : 'BTW-gegevens niet beschikbaar.';
+      ? t('Te dragen BTW voor Q:quarter: **:amount**.\nDeadline: :deadline.', { quarter: data.vat.quarter, amount: eur(data.vat.amount), deadline: data.vat.deadline })
+      : t('BTW-gegevens niet beschikbaar.');
   }
-  if (q.includes('top') || q.includes('beste klant')) {
+  if (q.includes('top') || q.includes('beste klant') || q.includes('najlep') || q.includes('klienc')) {
     if (data.top_customers?.length) {
       // Regels gescheiden door een newline; de bubbel toont die dankzij pre-wrap.
-      return 'Top klanten dit jaar (excl. BTW):\n' + data.top_customers.slice(0, 3)
+      return t('Top klanten dit jaar (excl. BTW):') + '\n' + data.top_customers.slice(0, 3)
         .map(c => `· ${c.name} — **${eur(c.total)}**`).join('\n');
     }
-    return 'Nog geen omzetgegevens.';
+    return t('Nog geen omzetgegevens.');
   }
-  if (q.includes('help') || q === '?') {
-    return 'Ik kan je informeren over: openstaand, achterstallig, incasso, BTW-aangifte, topklanten en omzet. Vraag het me in normale taal.';
+  if (q.includes('help') || q.includes('pomoc') || q === '?') {
+    return t('Ik kan je informeren over: openstaand, achterstallig, incasso, BTW-aangifte, topklanten en omzet. Vraag het me in normale taal.');
   }
-  return 'Daar weet ik nog niet veel over. Probeer een vraag over **openstaand**, **achterstallig**, **incasso**, **BTW** of **topklanten**.';
+  return t('Daar weet ik nog niet veel over. Probeer een vraag over **openstaand**, **achterstallig**, **incasso**, **BTW** of **topklanten**.');
 };
 
 const send = (text) => {
@@ -91,7 +91,7 @@ const quick = (q) => send(q);
 </script>
 
 <template>
-  <button class="easy-fab" @click="toggle" :title="'Vraag ' + assistant + ' iets'">
+  <button class="easy-fab" @click="toggle" :title="$t('Vraag :assistant iets', { assistant })">
     {{ initial }}
     <span v-if="urgent > 0 && !open" class="pulse">{{ urgent }}</span>
   </button>
@@ -104,7 +104,7 @@ const quick = (q) => send(q);
         <div class="avatar">{{ initial }}</div>
         <div>
           <div class="name">{{ assistant }}</div>
-          <div class="tagline">Je administratie-assistent</div>
+          <div class="tagline">{{ $t('Je administratie-assistent') }}</div>
         </div>
       </div>
       <button class="close" @click="close">×</button>
@@ -112,7 +112,7 @@ const quick = (q) => send(q);
 
     <div class="body">
       <div v-if="insights.length" class="insights">
-        <div class="section-label">Wat ik vandaag voor je zie</div>
+        <div class="section-label">{{ $t('Wat ik vandaag voor je zie') }}</div>
         <div v-for="ins in insights" :key="ins.title" class="insight" :class="ins.severity">
           <div class="ins-title">{{ ins.title }}</div>
           <div class="ins-detail" style="white-space: pre-wrap;">
@@ -136,14 +136,14 @@ const quick = (q) => send(q);
     </div>
 
     <div class="quick">
-      <button class="chip" @click="quick('Hoeveel staat er open?')">Openstaand</button>
-      <button class="chip" @click="quick('Welke facturen zijn achterstallig?')">Achterstallig</button>
-      <button class="chip" @click="quick('BTW deze kwartaal?')">BTW</button>
-      <button class="chip" @click="quick('Topklanten?')">Topklanten</button>
+      <button class="chip" @click="quick($t('Hoeveel staat er open?'))">{{ $t('Openstaand') }}</button>
+      <button class="chip" @click="quick($t('Welke facturen zijn achterstallig?'))">{{ $t('Achterstallig') }}</button>
+      <button class="chip" @click="quick($t('BTW deze kwartaal?'))">{{ $t('BTW') }}</button>
+      <button class="chip" @click="quick($t('Topklanten?'))">{{ $t('Topklanten') }}</button>
     </div>
 
     <div class="input-row">
-      <input ref="inputRef" type="text" :placeholder="'Stel een vraag aan ' + assistant + '...'"
+      <input ref="inputRef" type="text" :placeholder="$t('Stel een vraag aan :assistant...', { assistant })"
         @keydown.enter="send($event.target.value)" />
       <button class="send-btn" @click="send(inputRef.value)">→</button>
     </div>

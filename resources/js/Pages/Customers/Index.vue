@@ -27,33 +27,33 @@ const setType = (v) => {
 </script>
 
 <template>
-  <Head title="Klanten" />
+  <Head :title="$t('Klanten')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Verkoop / <span class="breadcrumb-current">Klanten</span></div>
+      <div class="breadcrumb">{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Klanten') }}</span></div>
     </template>
     <template #topbar-actions>
       <Link :href="route('customers.create')" class="btn btn-primary btn-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Nieuwe klant
+        {{ $t('Nieuwe klant') }}
       </Link>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Klanten</h1>
-        <p class="page-subtitle">{{ customers.total }} klanten</p>
+        <h1 class="page-title">{{ $t('Klanten') }}</h1>
+        <p class="page-subtitle">{{ $t(':n klanten', { n: customers.total }) }}</p>
       </div>
     </div>
 
     <div class="filter-bar">
       <div class="filter-search">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input v-model="search" type="text" placeholder="Zoek op naam, e-mail, plaats, KVK...">
+        <input v-model="search" type="text" :placeholder="$t('Zoek op naam, e-mail, plaats, :registry...', { registry: $page.props.market?.registry?.short || 'KVK' })">
       </div>
-      <button :class="['filter-chip', { active: type === 'all' }]" @click="setType('all')">Alle</button>
-      <button :class="['filter-chip', { active: type === 'business' }]" @click="setType('business')">Zakelijk</button>
-      <button :class="['filter-chip', { active: type === 'consumer' }]" @click="setType('consumer')">Particulier</button>
+      <button :class="['filter-chip', { active: type === 'all' }]" @click="setType('all')">{{ $t('Alle') }}</button>
+      <button :class="['filter-chip', { active: type === 'business' }]" @click="setType('business')">{{ $t('Zakelijk') }}</button>
+      <button :class="['filter-chip', { active: type === 'consumer' }]" @click="setType('consumer')">{{ $t('Particulier') }}</button>
     </div>
 
     <div v-if="customers.data.length > 0" class="customer-grid">
@@ -63,22 +63,22 @@ const setType = (v) => {
           <div class="customer-name">{{ c.name }}</div>
           <div class="customer-meta">
             <span v-if="c.city">{{ c.city }}</span>
-            <span v-if="c.kvk_number" class="mono">KVK {{ c.kvk_number }}</span>
-            <span v-if="c.type === 'consumer'" style="color:var(--info)">Particulier</span>
+            <span v-if="c.kvk_number" class="mono">{{ $page.props.market?.registry?.short || 'KVK' }} {{ c.kvk_number }}</span>
+            <span v-if="c.type === 'consumer'" style="color:var(--info)">{{ $t('Particulier') }}</span>
           </div>
           <div class="customer-stats">
             <div class="cs-item">
-              <div class="cs-label">Facturen</div>
+              <div class="cs-label">{{ $t('Facturen') }}</div>
               <div class="cs-value mono">{{ c.invoices_count }}</div>
             </div>
             <div class="cs-item">
-              <div class="cs-label">Offertes</div>
+              <div class="cs-label">{{ $t('Offertes') }}</div>
               <div class="cs-value mono">
-                {{ c.quotes_count }}<span v-if="c.open_quotes_count > 0" class="cs-open" :title="`${c.open_quotes_count} offerte(s) wachten op reactie`">· {{ c.open_quotes_count }} open</span>
+                {{ c.quotes_count }}<span v-if="c.open_quotes_count > 0" class="cs-open" :title="$t(':n offerte(s) wachten op reactie', { n: c.open_quotes_count })">· {{ $t(':n open', { n: c.open_quotes_count }) }}</span>
               </div>
             </div>
             <div class="cs-item" v-if="c.outstanding > 0">
-              <div class="cs-label">Openstaand</div>
+              <div class="cs-label">{{ $t('Openstaand') }}</div>
               <div class="cs-value mono" style="color:var(--brand)">{{ eur(c.outstanding) }}</div>
             </div>
           </div>
@@ -86,9 +86,9 @@ const setType = (v) => {
       </Link>
     </div>
     <div v-else class="card card-empty">
-      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Geen klanten gevonden</div>
-      <div style="margin-bottom:20px;">Voeg je eerste klant toe om facturen te maken.</div>
-      <Link :href="route('customers.create')" class="btn btn-primary btn-sm" style="display:inline-flex;">+ Nieuwe klant</Link>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">{{ $t('Geen klanten gevonden') }}</div>
+      <div style="margin-bottom:20px;">{{ $t('Voeg je eerste klant toe om facturen te maken.') }}</div>
+      <Link :href="route('customers.create')" class="btn btn-primary btn-sm" style="display:inline-flex;">+ {{ $t('Nieuwe klant') }}</Link>
     </div>
 
     <div class="pagination" v-if="customers.last_page > 1">

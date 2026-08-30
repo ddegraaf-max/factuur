@@ -53,7 +53,7 @@ class KvkService
                     return [];
                 }
                 Log::warning('KvK Zoeken API-fout', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 300)]);
-                throw new \DomainException('Het KvK-register reageert niet. Probeer het zo opnieuw.');
+                throw new \DomainException(__('Het KvK-register reageert niet. Probeer het zo opnieuw.'));
             }
 
             $results = [];

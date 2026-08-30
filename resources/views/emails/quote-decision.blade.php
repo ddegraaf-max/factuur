@@ -1,14 +1,14 @@
 @php
     $appUrl = rtrim(config('app.url'), '/');
-    $eur = fn ($n) => '€ ' . number_format((float) $n, 2, ',', '.');
+    $eur = fn ($n) => money($n);
     $confirmationSent = $accepted && (bool) ($quote->company?->quote_accept_mail_enabled ?? false) && filled($quote->customer_email);
 @endphp
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $accepted ? 'Offerte ondertekend' : 'Offerte afgewezen' }}</title>
+    <title>{{ $accepted ? __('Offerte ondertekend') : __('Offerte afgewezen') }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -41,46 +41,50 @@
                     <img src="{{ \App\Support\Brand::asset('icon') }}" class="logo-mark" alt="{{ brand('name') }}">
                     <span>{{ brand('name') }}</span>
                 </div>
-                <div class="header-sub">Offerte {{ $quote->number }} · {{ $quote->customer_name }}</div>
+                <div class="header-sub">{{ __('Offerte :number', ['number' => $quote->number]) }} · {{ $quote->customer_name }}</div>
             </div>
             <div class="body">
+                @php
+                    // "5 september 2026 om 14:30" — datum en tijd in de taal van de markt.
+                    $stamp = fn (?\Carbon\CarbonInterface $at) => $at ? __(':date om :time', ['date' => $at->translatedFormat('j F Y'), 'time' => $at->format('H:i')]) : '';
+                @endphp
                 @if($accepted)
-                    <h1>🎉 Offerte {{ $quote->number }} is ondertekend</h1>
-                    <p><strong>{{ $quote->signed_name ?: $quote->customer_name }}</strong> heeft de offerte digitaal ondertekend. Het akkoord staat zwart-op-wit — met handtekening en bewijsdossier bij de offerte in {{ brand('name') }}.</p>
+                    <h1>🎉 {{ __('Offerte :number is ondertekend', ['number' => $quote->number]) }}</h1>
+                    <p>{!! __('<strong>:name</strong> heeft de offerte digitaal ondertekend. Het akkoord staat zwart-op-wit — met handtekening en bewijsdossier bij de offerte in :brand.', ['name' => e($quote->signed_name ?: $quote->customer_name), 'brand' => e(brand('name'))]) !!}</p>
                     <table class="facts" role="presentation">
-                        <tr><td class="k">Klant</td><td class="v">{{ $quote->customer_name }}</td></tr>
-                        <tr><td class="k">Ondertekend door</td><td class="v">{{ $quote->signed_name ?: '—' }}@if($quote->signed_email) <span style="font-weight:400;color:#78716C;">({{ $quote->signed_email }})</span>@endif</td></tr>
-                        <tr><td class="k">Op</td><td class="v">{{ ($quote->signed_at ?? $quote->accepted_at)?->translatedFormat('j F Y \o\m H:i') }}</td></tr>
-                        <tr><td class="k">Totaal incl. btw</td><td class="v">{{ $eur($quote->total) }}</td></tr>
+                        <tr><td class="k">{{ __('Klant') }}</td><td class="v">{{ $quote->customer_name }}</td></tr>
+                        <tr><td class="k">{{ __('Ondertekend door') }}</td><td class="v">{{ $quote->signed_name ?: '—' }}@if($quote->signed_email) <span style="font-weight:400;color:#78716C;">({{ $quote->signed_email }})</span>@endif</td></tr>
+                        <tr><td class="k">{{ __('Op') }}</td><td class="v">{{ $stamp($quote->signed_at ?? $quote->accepted_at) }}</td></tr>
+                        <tr><td class="k">{{ __('Totaal incl. btw') }}</td><td class="v">{{ $eur($quote->total) }}</td></tr>
                     </table>
                     <div class="tip">
-                        <strong>Volgende stap:</strong> zet de offerte met één klik om naar een conceptfactuur — of factureer in termijnen — via de offertepagina.
-                        @if($confirmationSent) Je klant heeft automatisch een bevestiging ontvangen met de ondertekende offerte als PDF.@endif
+                        {!! __('<strong>Volgende stap:</strong> zet de offerte met één klik om naar een conceptfactuur — of factureer in termijnen — via de offertepagina.') !!}
+                        @if($confirmationSent) {{ __('Je klant heeft automatisch een bevestiging ontvangen met de ondertekende offerte als PDF.') }}@endif
                     </div>
                 @else
-                    <h1>Offerte {{ $quote->number }} is afgewezen</h1>
-                    <p><strong>{{ $quote->customer_name }}</strong>@if($quote->signed_email) ({{ $quote->signed_email }})@endif heeft de offerte in het klantenportaal afgewezen.</p>
+                    <h1>{{ __('Offerte :number is afgewezen', ['number' => $quote->number]) }}</h1>
+                    <p>{!! __(':who heeft de offerte in het klantenportaal afgewezen.', ['who' => '<strong>' . e($quote->customer_name) . '</strong>' . ($quote->signed_email ? ' (' . e($quote->signed_email) . ')' : '')]) !!}</p>
                     @if($quote->decline_reason)
-                        <div class="reason"><strong>Toelichting van de klant:</strong><br>{{ $quote->decline_reason }}</div>
+                        <div class="reason"><strong>{{ __('Toelichting van de klant:') }}</strong><br>{{ $quote->decline_reason }}</div>
                     @endif
                     <table class="facts" role="presentation">
-                        <tr><td class="k">Klant</td><td class="v">{{ $quote->customer_name }}</td></tr>
-                        <tr><td class="k">Afgewezen op</td><td class="v">{{ $quote->rejected_at?->translatedFormat('j F Y \o\m H:i') ?? now()->translatedFormat('j F Y \o\m H:i') }}</td></tr>
-                        <tr><td class="k">Totaal incl. btw</td><td class="v">{{ $eur($quote->total) }}</td></tr>
+                        <tr><td class="k">{{ __('Klant') }}</td><td class="v">{{ $quote->customer_name }}</td></tr>
+                        <tr><td class="k">{{ __('Afgewezen op') }}</td><td class="v">{{ $stamp($quote->rejected_at ?? now()) }}</td></tr>
+                        <tr><td class="k">{{ __('Totaal incl. btw') }}</td><td class="v">{{ $eur($quote->total) }}</td></tr>
                     </table>
-                    <p>Wellicht is een aangepast voorstel op zijn plaats — je kunt de offerte bewerken en opnieuw versturen.</p>
+                    <p>{{ __('Wellicht is een aangepast voorstel op zijn plaats — je kunt de offerte bewerken en opnieuw versturen.') }}</p>
                 @endif
 
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 8px 0 4px;">
                     <tr>
                         <td class="btn-td">
-                            <a href="{{ route('quotes.show', $quote->id) }}" class="btn">Open de offerte in {{ brand('name') }}&nbsp;&nbsp;→</a>
+                            <a href="{{ route('quotes.show', $quote->id) }}" class="btn">{{ __('Open de offerte in :brand', ['brand' => brand('name')]) }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
 
                 <div class="meta">
-                    Je ontvangt dit bericht omdat een klant in het klantenportaal een beslissing heeft genomen over een offerte van {{ $quote->company?->name ?? 'je administratie' }}.
+                    {{ __('Je ontvangt dit bericht omdat een klant in het klantenportaal een beslissing heeft genomen over een offerte van :company.', ['company' => $quote->company?->name ?? __('je administratie')]) }}
                 </div>
             </div>
             <div class="footer">

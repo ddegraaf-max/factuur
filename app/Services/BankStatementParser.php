@@ -23,7 +23,7 @@ class BankStatementParser
         $contents = trim($contents);
 
         if ($contents === '') {
-            throw new \DomainException('Het bestand is leeg.');
+            throw new \DomainException(__('Het bestand is leeg.'));
         }
 
         if (str_starts_with(ltrim($contents), '<')) {
@@ -34,7 +34,7 @@ class BankStatementParser
             return $this->parseMt940($contents);
         }
 
-        throw new \DomainException('Onbekend formaat. Ondersteund: CAMT.053 (XML) of MT940 (structured).');
+        throw new \DomainException(__('Onbekend formaat. Ondersteund: CAMT.053 (XML) of MT940 (structured).'));
     }
 
     /* ===================== CAMT.053 ===================== */
@@ -51,14 +51,14 @@ class BankStatementParser
 
         if (! $loaded) {
             throw new \DomainException(
-                'Het XML-bestand kon niet worden gelezen. Is dit een geldig CAMT.053-bestand?'
+                __('Het XML-bestand kon niet worden gelezen. Is dit een geldig CAMT.053-bestand?')
                 . ($xmlError ? ' (' . trim($xmlError) . ')' : '')
             );
         }
 
         $entries = $doc->getElementsByTagNameNS('*', 'Ntry');
         if ($entries->length === 0) {
-            throw new \DomainException('Geen transacties gevonden in dit CAMT.053-bestand.');
+            throw new \DomainException(__('Geen transacties gevonden in dit CAMT.053-bestand.'));
         }
 
         $first = fn (\DOMElement $scope, string $name) => $scope->getElementsByTagNameNS('*', $name)->item(0);
@@ -72,7 +72,7 @@ class BankStatementParser
             }
 
             $amount = (float) str_replace(',', '.', $amountNode->textContent);
-            $currency = $amountNode->getAttribute('Ccy') ?: 'EUR';
+            $currency = $amountNode->getAttribute('Ccy') ?: \App\Support\Market::currency();
 
             $indicator = $first($entry, 'CdtDbtInd')?->textContent ?? 'CRDT';
             if (strtoupper(trim($indicator)) === 'DBIT') {
@@ -168,7 +168,7 @@ class BankStatementParser
                 $current = [
                     'booking_date' => $date->format('Y-m-d'),
                     'amount' => round($amount, 2),
-                    'currency' => 'EUR',
+                    'currency' => \App\Support\Market::currency(),
                     'counterparty_name' => null,
                     'counterparty_iban' => null,
                     'description' => '',
@@ -190,7 +190,7 @@ class BankStatementParser
         }
 
         if ($rows === []) {
-            throw new \DomainException('Geen transacties gevonden in dit MT940-bestand.');
+            throw new \DomainException(__('Geen transacties gevonden in dit MT940-bestand.'));
         }
 
         return $rows;

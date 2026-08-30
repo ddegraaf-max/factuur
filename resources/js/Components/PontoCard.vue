@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { router } from '@inertiajs/vue3';
 import { eur } from '@/format.js';
+import { t } from '@/i18n';
 
 defineProps({ ponto: Object });
 
@@ -11,7 +12,7 @@ const syncNow = () => {
   router.post(route('bank.ponto.sync'), {}, { preserveScroll: true, onFinish: () => { syncing.value = false; } });
 };
 const disconnect = () => {
-  if (confirm('Bankkoppeling verbreken? Al opgehaalde transacties blijven staan.')) {
+  if (confirm(t('Bankkoppeling verbreken? Al opgehaalde transacties blijven staan.'))) {
     router.post(route('bank.ponto.disconnect'), {}, { preserveScroll: true });
   }
 };
@@ -24,37 +25,37 @@ const toggleAccount = (account) => router.post(route('bank.ponto.account', accou
     <div class="ponto-head">
       <div class="ponto-text">
         <div class="ponto-title">
-          Automatische bankkoppeling
-          <span v-if="ponto.sandbox" class="ponto-pill">testomgeving</span>
-          <span v-else-if="ponto.connected && ponto.status === 'active'" class="ponto-pill ok">actief</span>
+          {{ $t('Automatische bankkoppeling') }}
+          <span v-if="ponto.sandbox" class="ponto-pill">{{ $t('testomgeving') }}</span>
+          <span v-else-if="ponto.connected && ponto.status === 'active'" class="ponto-pill ok">{{ $t('actief') }}</span>
         </div>
         <div v-if="!ponto.connected" class="ponto-sub">
-          Koppel je zakelijke rekening via Ponto: nieuwe transacties komen dan drie keer per dag vanzelf binnen — geen afschriften meer uploaden. Werkt met alle Nederlandse en Belgische banken.
+          {{ $t('Koppel je zakelijke rekening via Ponto: nieuwe transacties komen dan drie keer per dag vanzelf binnen — geen afschriften meer uploaden. Werkt met alle Nederlandse en Belgische banken.') }}
         </div>
-        <div v-if="!ponto.connected && ponto.price_label" class="ponto-price">{{ ponto.price_label }} — alleen voor rekeningen die je laat synchroniseren, bovenop je abonnement.</div>
+        <div v-if="!ponto.connected && ponto.price_label" class="ponto-price">{{ ponto.price_label }} — {{ $t('alleen voor rekeningen die je laat synchroniseren, bovenop je abonnement.') }}</div>
         <div v-else class="ponto-sub">
-          {{ ponto.last_synced_label ? `Laatst bijgewerkt ${ponto.last_synced_label}` : 'Nog niet bijgewerkt' }} · automatisch drie keer per dag.<span v-if="ponto.monthly_cost_label"> · {{ ponto.monthly_cost_label }}</span>
+          {{ ponto.last_synced_label ? $t('Laatst bijgewerkt :when', { when: ponto.last_synced_label }) : $t('Nog niet bijgewerkt') }} · {{ $t('automatisch drie keer per dag.') }}<span v-if="ponto.monthly_cost_label"> · {{ ponto.monthly_cost_label }}</span>
         </div>
       </div>
       <div class="ponto-actions">
         <template v-if="!ponto.connected">
-          <a v-if="ponto.can_manage && ponto.can_connect" class="btn btn-primary" :href="route('bank.ponto.connect')">Bank koppelen</a>
+          <a v-if="ponto.can_manage && ponto.can_connect" class="btn btn-primary" :href="route('bank.ponto.connect')">{{ $t('Bank koppelen') }}</a>
           <template v-else-if="ponto.can_manage">
             <span class="ponto-muted">{{ ponto.connect_hint }}</span>
-            <a class="btn btn-secondary btn-sm" :href="ponto.billing_url">Naar abonnement</a>
+            <a class="btn btn-secondary btn-sm" :href="ponto.billing_url">{{ $t('Naar abonnement') }}</a>
           </template>
-          <span v-else class="ponto-muted">Alleen de eigenaar kan een bank koppelen.</span>
+          <span v-else class="ponto-muted">{{ $t('Alleen de eigenaar kan een bank koppelen.') }}</span>
         </template>
         <template v-else>
-          <a v-if="ponto.can_manage && ponto.status === 'needs_reauth'" class="btn btn-primary btn-sm" :href="route('bank.ponto.connect')">Opnieuw autoriseren</a>
-          <button class="btn btn-secondary btn-sm" :disabled="syncing" @click="syncNow">{{ syncing ? 'Bezig…' : 'Nu bijwerken' }}</button>
-          <button v-if="ponto.can_manage" class="btn btn-secondary btn-sm" @click="disconnect">Ontkoppelen</button>
+          <a v-if="ponto.can_manage && ponto.status === 'needs_reauth'" class="btn btn-primary btn-sm" :href="route('bank.ponto.connect')">{{ $t('Opnieuw autoriseren') }}</a>
+          <button class="btn btn-secondary btn-sm" :disabled="syncing" @click="syncNow">{{ syncing ? $t('Bezig…') : $t('Nu bijwerken') }}</button>
+          <button v-if="ponto.can_manage" class="btn btn-secondary btn-sm" @click="disconnect">{{ $t('Ontkoppelen') }}</button>
         </template>
       </div>
     </div>
 
     <div v-if="ponto.status === 'needs_reauth'" class="ponto-alert">
-      De bank vraagt om een nieuwe toestemming. Autoriseer de koppeling opnieuw om transacties te blijven ontvangen.
+      {{ $t('De bank vraagt om een nieuwe toestemming. Autoriseer de koppeling opnieuw om transacties te blijven ontvangen.') }}
     </div>
     <div v-else-if="ponto.last_error" class="ponto-alert">{{ ponto.last_error }}</div>
 
@@ -63,19 +64,19 @@ const toggleAccount = (account) => router.post(route('bank.ponto.account', accou
         <div class="ponto-account-main">
           <div class="ponto-iban">{{ a.label }}</div>
           <div class="ponto-meta">
-            {{ [a.bank_name, a.name].filter(Boolean).join(' · ') }}<span v-if="a.last_synced_label"> · bijgewerkt {{ a.last_synced_label }}</span>
+            {{ [a.bank_name, a.name].filter(Boolean).join(' · ') }}<span v-if="a.last_synced_label"> · {{ $t('bijgewerkt :when', { when: a.last_synced_label }) }}</span>
           </div>
-          <div v-if="a.reauth_soon" class="ponto-warn">Toestemming verloopt {{ a.reauth_label }} — autoriseer op tijd opnieuw.</div>
+          <div v-if="a.reauth_soon" class="ponto-warn">{{ $t('Toestemming verloopt :when — autoriseer op tijd opnieuw.', { when: a.reauth_label }) }}</div>
           <div v-if="a.last_error" class="ponto-warn">{{ a.last_error }}</div>
         </div>
         <div class="ponto-account-side">
           <div v-if="a.balance !== null" class="ponto-balance">{{ eur(a.balance) }}</div>
-          <label class="ponto-toggle"><input type="checkbox" :checked="a.sync_enabled" @change="toggleAccount(a)"> synchroniseren</label>
+          <label class="ponto-toggle"><input type="checkbox" :checked="a.sync_enabled" @change="toggleAccount(a)"> {{ $t('synchroniseren') }}</label>
         </div>
       </div>
     </div>
     <div v-else-if="ponto.connected" class="ponto-muted" style="margin-top:10px;">
-      Nog geen rekeningen gevonden. Klik op "Nu bijwerken", of autoriseer opnieuw en kies een rekening.
+      {{ $t('Nog geen rekeningen gevonden. Klik op "Nu bijwerken", of autoriseer opnieuw en kies een rekening.') }}
     </div>
   </div>
 </template>

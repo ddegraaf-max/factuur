@@ -129,6 +129,7 @@
   <tr>
     <td>
       <span class="meta-label">{{ __('doc.invoice_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}<br>
+      @if(\App\Support\Market::isPl())<span class="meta-label">{{ __('doc.sale_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}<br>@endif
       <span class="meta-label">{{ __('doc.due_date') }}:</span> {{ $invoice->due_date->translatedFormat('j F Y') }}<br>
       @if($invoice->reference)<span class="meta-label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}@endif
     </td>
@@ -173,20 +174,20 @@
           @if($line->details)<div class="details">{{ $line->details }}</div>@endif
         </td>
         <td class="right">{{ rtrim(rtrim(number_format($line->quantity, 3, ',', '.'), '0'), ',') }} {{ $line->unit }}</td>
-        <td class="right">€&nbsp;{{ number_format($line->unit_price, 2, ',', '.') }}</td>
+        <td class="right">{{ money($line->unit_price) }}</td>
         @if($hasDiscount)<td class="right">{{ (float) ($line->discount_pct ?? 0) > 0 ? rtrim(rtrim(number_format($line->discount_pct, 2, ',', '.'), '0'), ',') . '%' : '—' }}</td>@endif
         <td class="center">{{ (int) $line->vat_rate }}%</td>
-        <td class="right">€&nbsp;{{ number_format($line->line_subtotal, 2, ',', '.') }}</td>
+        <td class="right">{{ money($line->line_subtotal) }}</td>
       </tr>
     @endforeach
   </tbody>
 </table>
 
 <table class="totals">
-  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">€&nbsp;{{ number_format($invoice->subtotal, 2, ',', '.') }}</td></tr>
+  <tr><td class="label">{{ __('doc.subtotal') }}</td><td class="value">{{ money($invoice->subtotal) }}</td></tr>
   @if(is_array($invoice->vat_breakdown))
     @foreach($invoice->vat_breakdown as $rate => $amount)
-      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">€&nbsp;{{ number_format((float) $amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money((float) $amount) }}</td></tr>
     @endforeach
   @endif
   @php
@@ -194,15 +195,16 @@
     $pdfPayable = max((float) $invoice->total - (float) $pdfAdvances->sum('amount'), 0);
   @endphp
   @if($pdfAdvances->isNotEmpty())
-    <tr><td class="label">{{ __('doc.total_incl_vat') }}</td><td class="value">€&nbsp;{{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+    <tr><td class="label">{{ __('doc.total_incl_vat') }}</td><td class="value">{{ money($invoice->total) }}</td></tr>
     @foreach($pdfAdvances as $adv)
-      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format('d-m-Y') }})</td><td class="value">-&nbsp;€&nbsp;{{ number_format($adv->amount, 2, ',', '.') }}</td></tr>
+      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format(market('date_format')) }})</td><td class="value">-&nbsp;{{ money($adv->amount) }}</td></tr>
     @endforeach
-    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value">€&nbsp;{{ number_format($pdfPayable, 2, ',', '.') }}</td></tr>
+    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value">{{ money($pdfPayable) }}</td></tr>
   @else
-    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value">€&nbsp;{{ number_format($invoice->total, 2, ',', '.') }}</td></tr>
+    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value">{{ money($invoice->total) }}</td></tr>
   @endif
 </table>
+@include('pdf.partials.vat-summary')
 
 <div style="clear:both;"></div>
 

@@ -53,7 +53,7 @@ class DirectDebitController extends Controller
             'invoice_ids' => ['required', 'array', 'min:1'],
             'invoice_ids.*' => ['integer'],
             'collection_date' => ['required', 'date', 'after_or_equal:' . SepaDirectDebitService::earliestCollectionDate()->toDateString()],
-        ], ['collection_date.after_or_equal' => 'De incassodatum moet minimaal drie werkdagen vooruit liggen.']);
+        ], ['collection_date.after_or_equal' => __('De incassodatum moet minimaal drie werkdagen vooruit liggen.')]);
 
         try {
             $batch = $this->sepa->createBatch($request->user()->company, $data['invoice_ids'], Carbon::parse($data['collection_date']), $request->user()->id);
@@ -61,9 +61,9 @@ class DirectDebitController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        Audit::log('created', null, "Incassobatch {$batch->reference} aangemaakt: {$batch->count} facturen, € " . number_format((float) $batch->total, 2, ',', '.'));
+        Audit::log('created', null, __('Incassobatch :reference aangemaakt: :count facturen, :total', ['reference' => $batch->reference, 'count' => $batch->count, 'total' => money($batch->total)]));
 
-        return back()->with('flash', "Batch aangemaakt met {$batch->count} facturen. Download het bestand en dien het in bij je bank.");
+        return back()->with('flash', __('Batch aangemaakt met :count facturen. Download het bestand en dien het in bij je bank.', ['count' => $batch->count]));
     }
 
     public function download(DirectDebitBatch $batch)
@@ -80,8 +80,8 @@ class DirectDebitController extends Controller
     public function destroy(DirectDebitBatch $batch)
     {
         $this->sepa->cancel($batch);
-        Audit::log('deleted', null, "Incassobatch {$batch->reference} geannuleerd; facturen weer incasseerbaar");
+        Audit::log('deleted', null, __('Incassobatch :reference geannuleerd; facturen weer incasseerbaar', ['reference' => $batch->reference]));
 
-        return back()->with('flash', 'Batch geannuleerd. De facturen staan weer in de lijst.');
+        return back()->with('flash', __('Batch geannuleerd. De facturen staan weer in de lijst.'));
     }
 }

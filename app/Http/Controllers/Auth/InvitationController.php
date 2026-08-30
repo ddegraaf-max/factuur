@@ -31,7 +31,7 @@ class InvitationController extends Controller
             'token' => $token,
             'email' => $invitation?->email,
             'company' => $invitation?->company?->name,
-            'roleLabel' => $invitation ? (User::ROLE_LABELS[$invitation->role] ?? $invitation->role) : null,
+            'roleLabel' => $invitation ? __(User::ROLE_LABELS[$invitation->role] ?? $invitation->role) : null,
             'invitedBy' => $invitation?->invitedBy?->name,
             // Bestaat er al een account op dit adres? Dan geen naam/wachtwoord
             // vragen, maar de administratie aan die inlog koppelen.
@@ -45,7 +45,7 @@ class InvitationController extends Controller
 
         if (! $invitation || ! $invitation->isUsable()) {
             throw ValidationException::withMessages([
-                'name' => 'Deze uitnodiging is verlopen of al gebruikt. Vraag een nieuwe aan bij de beheerder.',
+                'name' => __('Deze uitnodiging is verlopen of al gebruikt. Vraag een nieuwe aan bij de beheerder.'),
             ]);
         }
 
@@ -64,14 +64,14 @@ class InvitationController extends Controller
             $request->session()->regenerate();
 
             return redirect()->route('dashboard')
-                ->with('flash', ($invitation->company?->name ?? 'De administratie') . ' is aan je account gekoppeld — je kunt altijd wisselen via het menu linksonder.');
+                ->with('flash', __(':company is aan je account gekoppeld — je kunt altijd wisselen via het menu linksonder.', ['company' => $invitation->company?->name ?? __('De administratie')]));
         }
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ], [
-            'name.required' => 'Vul je naam in.',
+            'name.required' => __('Vul je naam in.'),
         ]);
 
         $user = User::create([
@@ -90,7 +90,7 @@ class InvitationController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('dashboard')
-            ->with('flash', 'Welkom bij ' . ($invitation->company?->name ?? 'het team') . '!');
+            ->with('flash', __('Welkom bij :company!', ['company' => $invitation->company?->name ?? __('het team')]));
     }
 
     private function findByToken(string $token): ?Invitation

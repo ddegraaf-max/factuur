@@ -1,6 +1,7 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
 import { eur } from '@/format.js';
 import axios from 'axios';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
@@ -15,6 +16,11 @@ const props = defineProps({
 });
 
 const isEdit = computed(() => !!props.purchase);
+
+// Markt (nl/pl): btw-tarieven en standaardtarief komen van de server.
+const market = usePage().props.market || {};
+const vatRates = market.vat_rates || [21, 9, 0];
+const defaultVat = Number(market.default_vat ?? 21);
 
 /* ---------- Formulier ---------- */
 const today = new Date().toISOString().slice(0, 10);
@@ -31,7 +37,7 @@ const initialRows = () => {
       vat: Number(l.vat),
     }));
   }
-  return [{ amount: null, rate: 21, vat: 0 }];
+  return [{ amount: null, rate: defaultVat, vat: 0 }];
 };
 
 const form = useForm({
@@ -84,7 +90,7 @@ const switchMode = (mode) => {
   amountMode.value = mode;
 };
 
-const addRow = () => form.rows.push({ amount: null, rate: 21, vat: 0 });
+const addRow = () => form.rows.push({ amount: null, rate: defaultVat, vat: 0 });
 const removeRow = (idx) => form.rows.splice(idx, 1);
 
 const totals = computed(() => {
@@ -99,7 +105,7 @@ const totals = computed(() => {
 
 /* ---------- Verrekeningen (al ontvangen / ingehouden) ---------- */
 const addDeduction = () => {
-  form.deductions.push({ description: 'Reeds ontvangen', date: form.invoice_date || today, amount: null });
+  form.deductions.push({ description: t('Reeds ontvangen'), date: form.invoice_date || today, amount: null });
 };
 const removeDeduction = (idx) => form.deductions.splice(idx, 1);
 
@@ -143,7 +149,7 @@ onBeforeUnmount(() => {
 const formatSize = (b) => b < 1024 * 1024 ? (b / 1024).toFixed(0) + ' KB' : (b / 1024 / 1024).toFixed(1) + ' MB';
 
 const removeExistingAttachment = (att) => {
-  if (confirm(`Bijlage "${att.filename}" verwijderen?`)) {
+  if (confirm(t('Bijlage ":filename" verwijderen?', { filename: att.filename }))) {
     router.delete(route('attachments.destroy', att.id), { preserveScroll: true, preserveState: false });
   }
 };
@@ -206,7 +212,7 @@ const applyScan = (r) => {
 onMounted(() => {
   if (!isEdit.value && props.inbox_item?.scan?.vat_lines?.length) {
     applyScan(props.inbox_item.scan);
-    scanNotice.value = 'Automatisch herkend uit je Postvak IN — controleer de gegevens even voor je opslaat.';
+    scanNotice.value = t('Automatisch herkend uit je Postvak IN — controleer de gegevens even voor je opslaat.');
     scanWarning.value = [props.inbox_item.duplicate_warning, props.inbox_item.scan.warning]
       .filter(Boolean).join(' ');
   } else if (!isEdit.value && props.inbox_item?.duplicate_warning) {
@@ -231,11 +237,11 @@ const scanReceipt = async () => {
       ({ data } = await axios.post(route('purchases.scan'), { inbox_id: props.inbox_item.id }));
     }
     applyScan(data.result);
-    scanNotice.value = 'Gegevens van de bon overgenomen — controleer ze even voor je opslaat.';
+    scanNotice.value = t('Gegevens van de bon overgenomen — controleer ze even voor je opslaat.');
     scanWarning.value = data.result.warning || '';
   } catch (e) {
     scanError.value = e.response?.data?.message
-      || 'Scannen is niet gelukt. Probeer het opnieuw of vul de gegevens handmatig in.';
+      || t('Scannen is niet gelukt. Probeer het opnieuw of vul de gegevens handmatig in.');
   } finally {
     scanning.value = false;
   }
@@ -287,19 +293,19 @@ const fileError = computed(() => {
 </script>
 
 <template>
-  <Head :title="isEdit ? 'Inkoopfactuur bewerken' : 'Inkoopfactuur inboeken'" />
+  <Head :title="isEdit ? $t('Inkoopfactuur bewerken') : $t('Inkoopfactuur inboeken')" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
-        Inkoop / <Link :href="route('purchases.index')" style="color:var(--text-3);">Inkoopfacturen</Link> /
-        <span class="breadcrumb-current">{{ isEdit ? 'Bewerken' : 'Inboeken' }}</span>
+        {{ $t('Inkoop') }} / <Link :href="route('purchases.index')" style="color:var(--text-3);">{{ $t('Inkoopfacturen') }}</Link> /
+        <span class="breadcrumb-current">{{ isEdit ? $t('Bewerken') : $t('Inboeken') }}</span>
       </div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">{{ isEdit ? 'Inkoopfactuur bewerken' : 'Inkoopfactuur inboeken' }}</h1>
-        <p class="page-subtitle">Boek de factuur van je leverancier in — met een foto of PDF erbij blijft je administratie compleet.</p>
+        <h1 class="page-title">{{ isEdit ? $t('Inkoopfactuur bewerken') : $t('Inkoopfactuur inboeken') }}</h1>
+        <p class="page-subtitle">{{ $t('Boek de factuur van je leverancier in — met een foto of PDF erbij blijft je administratie compleet.') }}</p>
       </div>
     </div>
 
@@ -308,141 +314,138 @@ const fileError = computed(() => {
         <!-- Linkerkolom: gegevens -->
         <div class="card pf-main">
           <div class="card-body">
-            <div class="pf-section-title">Leverancier</div>
+            <div class="pf-section-title">{{ $t('Leverancier') }}</div>
             <div class="form-row">
               <div class="form-group">
-                <label>Leverancier *</label>
-                <input type="text" v-model="form.supplier_name" list="supplier-list" placeholder="Bijv. Coolblue B.V." maxlength="180">
+                <label>{{ $t('Leverancier') }} *</label>
+                <input type="text" v-model="form.supplier_name" list="supplier-list" :placeholder="$t('Bijv. Coolblue B.V.')" maxlength="180">
                 <datalist id="supplier-list">
                   <option v-for="s in suppliers" :key="s" :value="s" />
                 </datalist>
                 <div v-if="form.errors.supplier_name" class="field-error">{{ form.errors.supplier_name }}</div>
               </div>
               <div class="form-group">
-                <label>Factuurnummer leverancier<span class="label-hint">(van de bon)</span></label>
+                <label>{{ $t('Factuurnummer leverancier') }}<span class="label-hint">{{ $t('(van de bon)') }}</span></label>
                 <input type="text" v-model="form.supplier_reference" maxlength="100">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Categorie</label>
+                <label>{{ $t('Categorie') }}</label>
                 <select v-model="form.category">
-                  <option value="">— Kies een categorie —</option>
+                  <option value="">{{ $t('— Kies een categorie —') }}</option>
                   <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
                 </select>
               </div>
               <div class="form-group"></div>
             </div>
 
-            <div class="pf-section-title">Datums</div>
+            <div class="pf-section-title">{{ $t('Datums') }}</div>
             <div class="form-row">
               <div class="form-group">
-                <label>Factuurdatum *</label>
+                <label>{{ $t('Factuurdatum') }} *</label>
                 <input type="date" v-model="form.invoice_date">
                 <div v-if="form.errors.invoice_date" class="field-error">{{ form.errors.invoice_date }}</div>
               </div>
               <div class="form-group">
-                <label>Vervaldatum<span class="label-hint">(optioneel)</span></label>
+                <label>{{ $t('Vervaldatum') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
                 <input type="date" v-model="form.due_date">
               </div>
             </div>
 
             <div class="pf-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-              <span>Bedragen</span>
+              <span>{{ $t('Bedragen') }}</span>
               <div class="pf-mode">
-                <button type="button" :class="{ active: amountMode === 'excl' }" @click="switchMode('excl')">Excl. BTW invoeren</button>
-                <button type="button" :class="{ active: amountMode === 'incl' }" @click="switchMode('incl')">Incl. BTW invoeren</button>
+                <button type="button" :class="{ active: amountMode === 'excl' }" @click="switchMode('excl')">{{ $t('Excl. BTW invoeren') }}</button>
+                <button type="button" :class="{ active: amountMode === 'incl' }" @click="switchMode('incl')">{{ $t('Incl. BTW invoeren') }}</button>
               </div>
             </div>
 
             <div class="pf-rows">
               <div class="pf-row pf-row-head">
-                <span>{{ amountMode === 'incl' ? 'Bedrag incl. BTW' : 'Bedrag excl. BTW' }}</span>
-                <span>Tarief</span>
-                <span>BTW</span>
+                <span>{{ amountMode === 'incl' ? $t('Bedrag incl. BTW') : $t('Bedrag excl. BTW') }}</span>
+                <span>{{ $t('Tarief') }}</span>
+                <span>{{ $t('BTW') }}</span>
                 <span></span>
               </div>
               <div v-for="(row, idx) in form.rows" :key="idx" class="pf-row">
                 <input type="number" step="0.01" v-model="row.amount" placeholder="0,00" @input="recalcVat(row)">
                 <select v-model="row.rate" @change="recalcVat(row)">
-                  <option :value="21">21%</option>
-                  <option :value="9">9%</option>
-                  <option :value="0">0% / vrijgesteld</option>
+                  <option v-for="r in vatRates" :key="r" :value="r">{{ r === 0 ? $t('0% / vrijgesteld') : r + '%' }}</option>
                 </select>
-                <input v-if="amountMode === 'excl'" type="number" step="0.01" v-model="row.vat" title="BTW-bedrag — pas aan als de bon anders afrondt">
+                <input v-if="amountMode === 'excl'" type="number" step="0.01" v-model="row.vat" :title="$t('BTW-bedrag — pas aan als de bon anders afrondt')">
                 <input v-else type="text" :value="eur(lineCalc(row).vat)" disabled>
-                <button type="button" class="icon-btn" :disabled="form.rows.length === 1" title="Regel verwijderen" @click="removeRow(idx)">
+                <button type="button" class="icon-btn" :disabled="form.rows.length === 1" :title="$t('Regel verwijderen')" @click="removeRow(idx)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
             </div>
             <button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" @click="addRow">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Tarief toevoegen
+              {{ $t('Tarief toevoegen') }}
             </button>
             <div v-if="lineError" class="field-error" style="margin-top:6px;">{{ lineError }}</div>
 
             <div class="pf-totals">
-              <div><span>Subtotaal excl. BTW</span><span class="num">{{ eur(totals.base) }}</span></div>
-              <div><span>BTW (voorbelasting)</span><span class="num">{{ eur(totals.vat) }}</span></div>
-              <div class="grand"><span>Totaal incl. BTW</span><span class="num">{{ eur(totals.total) }}</span></div>
+              <div><span>{{ $t('Subtotaal excl. BTW') }}</span><span class="num">{{ eur(totals.base) }}</span></div>
+              <div><span>{{ $t('BTW (voorbelasting)') }}</span><span class="num">{{ eur(totals.vat) }}</span></div>
+              <div class="grand"><span>{{ $t('Totaal incl. BTW') }}</span><span class="num">{{ eur(totals.total) }}</span></div>
               <template v-if="deductionsTotal > 0">
-                <div style="color:var(--warning);"><span>Al ontvangen / verrekend</span><span class="num">- {{ eur(deductionsTotal) }}</span></div>
-                <div class="grand" style="border-top-width:1px;"><span>Te betalen</span><span class="num">{{ eur(payable) }}</span></div>
+                <div style="color:var(--warning);"><span>{{ $t('Al ontvangen / verrekend') }}</span><span class="num">- {{ eur(deductionsTotal) }}</span></div>
+                <div class="grand" style="border-top-width:1px;"><span>{{ $t('Te betalen') }}</span><span class="num">{{ eur(payable) }}</span></div>
               </template>
             </div>
 
             <div class="pf-section-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-              <span>Verrekening · al ontvangen</span>
+              <span>{{ $t('Verrekening · al ontvangen') }}</span>
               <button type="button" class="btn btn-secondary btn-sm" @click="addDeduction">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                Verrekening toevoegen
+                {{ $t('Verrekening toevoegen') }}
               </button>
             </div>
             <p class="pf-hint" style="margin-bottom:10px;">
-              Staat er op de factuur al een ontvangen of ingehouden bedrag (bijv. door een deurwaarder ontvangen gelden of een aanbetaling)?
-              Zet het hier — je kosten en voorbelasting blijven volledig staan, alleen "te betalen" gaat omlaag.
+              {{ $t('Staat er op de factuur al een ontvangen of ingehouden bedrag (bijv. door een deurwaarder ontvangen gelden of een aanbetaling)? Zet het hier — je kosten en voorbelasting blijven volledig staan, alleen "te betalen" gaat omlaag.') }}
             </p>
             <div v-if="deductionError" class="field-error" style="margin-bottom:8px;">{{ deductionError }}</div>
             <div v-for="(ded, idx) in form.deductions" :key="idx" class="pf-ded-row">
-              <input type="text" v-model="ded.description" placeholder="Bijv. Ontvangen door deurwaarder" maxlength="190">
+              <input type="text" v-model="ded.description" :placeholder="$t('Bijv. Ontvangen door deurwaarder')" maxlength="190">
               <input type="date" v-model="ded.date">
               <input type="number" v-model="ded.amount" step="0.01" min="0.01" placeholder="0,00">
-              <button type="button" class="icon-btn" title="Verwijderen" @click="removeDeduction(idx)">
+              <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeDeduction(idx)">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
             <div v-if="deductionsTotal > totals.total + 0.009" class="field-error" style="margin-top:4px;">
-              De verrekeningen (€ {{ deductionsTotal.toFixed(2) }}) zijn samen hoger dan het factuurtotaal.
+              {{ $t('De verrekeningen (:amount) zijn samen hoger dan het factuurtotaal.', { amount: eur(deductionsTotal) }) }}
             </div>
 
-            <div class="pf-section-title">Betaling</div>
+            <div class="pf-section-title">{{ $t('Betaling') }}</div>
             <label class="checkbox-row" style="margin-top:0;">
               <input type="checkbox" v-model="form.is_paid">
-              <span>Deze factuur is al betaald</span>
+              <span>{{ $t('Deze factuur is al betaald') }}</span>
             </label>
             <div v-if="form.is_paid" class="form-row">
               <div class="form-group">
-                <label>Betaald op *</label>
+                <label>{{ $t('Betaald op') }} *</label>
                 <input type="date" v-model="form.paid_at">
                 <div v-if="form.errors.paid_at" class="field-error">{{ form.errors.paid_at }}</div>
               </div>
               <div class="form-group">
-                <label>Betaalwijze</label>
+                <label>{{ $t('Betaalwijze') }}</label>
                 <select v-model="form.payment_method">
-                  <option value="bank_transfer">Bankoverschrijving</option>
-                  <option value="ideal">iDEAL</option>
-                  <option value="direct_debit">Automatische incasso</option>
-                  <option value="card">Pinpas / creditcard</option>
-                  <option value="cash">Contant</option>
-                  <option value="other">Anders</option>
+                  <option value="bank_transfer">{{ $t('Bankoverschrijving') }}</option>
+                  <option value="ideal">{{ $page.props.market?.online_payment_label || 'iDEAL' }}</option>
+                  <option value="direct_debit">{{ $t('Automatische incasso') }}</option>
+                  <option value="card">{{ $t('Pinpas / creditcard') }}</option>
+                  <option value="cash">{{ $t('Contant') }}</option>
+                  <option value="other">{{ $t('Anders') }}</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group" style="margin-top:14px;">
-              <label>Notities<span class="label-hint">(optioneel)</span></label>
-              <textarea v-model="form.notes" maxlength="2000" placeholder="Bijv. waar de aankoop voor was"></textarea>
+              <label>{{ $t('Notities') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+              <textarea v-model="form.notes" maxlength="2000" :placeholder="$t('Bijv. waar de aankoop voor was')"></textarea>
             </div>
           </div>
         </div>
@@ -451,10 +454,9 @@ const fileError = computed(() => {
         <div class="pf-side">
           <div class="card">
             <div class="card-body">
-              <div class="pf-section-title" style="margin-top:0;">Bon of factuur</div>
+              <div class="pf-section-title" style="margin-top:0;">{{ $t('Bon of factuur') }}</div>
               <p class="pf-hint">
-                Voeg een foto of PDF van de factuur toe, dan kun je overtypen terwijl je 'm ernaast ziet —
-                en is je administratie meteen compleet voor de boekhouder.
+                {{ $t("Voeg een foto of PDF van de factuur toe, dan kun je overtypen terwijl je 'm ernaast ziet — en is je administratie meteen compleet voor de boekhouder.") }}
               </p>
 
               <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="addFiles">
@@ -463,11 +465,11 @@ const fileError = computed(() => {
               <div class="pf-upload-buttons">
                 <button type="button" class="btn btn-secondary btn-sm" @click="fileInput?.click()">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  Bestand kiezen
+                  {{ $t('Bestand kiezen') }}
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" @click="cameraInput?.click()">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                  Foto maken
+                  {{ $t('Foto maken') }}
                 </button>
               </div>
               <div v-if="fileError" class="field-error" style="margin-top:8px;">{{ fileError }}</div>
@@ -481,8 +483,8 @@ const fileError = computed(() => {
                 <div class="pf-file-info">
                   <div class="pf-file-name">{{ inbox_item.filename }}</div>
                   <div class="pf-file-meta">
-                    uit je Postvak IN<template v-if="inbox_item.from_email"> · van {{ inbox_item.from_email }}</template>
-                    — wordt bij het inboeken als bijlage gekoppeld
+                    {{ $t('uit je Postvak IN') }}<template v-if="inbox_item.from_email"> · {{ $t('van :email', { email: inbox_item.from_email }) }}</template>
+                    — {{ $t('wordt bij het inboeken als bijlage gekoppeld') }}
                   </div>
                 </div>
               </div>
@@ -492,16 +494,15 @@ const fileError = computed(() => {
                 <button type="button" class="btn btn-primary btn-sm" :disabled="scanning" @click="scanReceipt">
                   <svg v-if="!scanning" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2L22 12l-7.6 2.8L12 22l-2.4-7.2L2 12l7.6-2.8z"/></svg>
                   <svg v-else class="pf-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.56"/></svg>
-                  {{ scanning ? 'Bon wordt gelezen…' : 'Scan & herken' }}
+                  {{ scanning ? $t('Bon wordt gelezen…') : $t('Scan & herken') }}
                 </button>
-                <span class="pf-scan-hint">De gegevens en bedragen worden automatisch ingevuld — jij controleert ze.</span>
+                <span class="pf-scan-hint">{{ $t('De gegevens en bedragen worden automatisch ingevuld — jij controleert ze.') }}</span>
               </div>
               <!-- Upgradehint: de scan zit in het Slim-abonnement -->
               <div v-if="scan_locked" class="pf-scan">
                 <span class="pf-scan-hint">
-                  <b>Scan &amp; herken</b> leest je bon of factuur en vult dit formulier automatisch in —
-                  onderdeel van het <b>Slim</b>-abonnement.
-                  <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+                  <span v-html="$t('<b>Scan & herken</b> leest je bon of factuur en vult dit formulier automatisch in — onderdeel van het <b>Slim</b>-abonnement.')"></span>
+                  <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">{{ $t('Bekijk de abonnementen') }}</Link>
                 </span>
               </div>
 
@@ -517,27 +518,27 @@ const fileError = computed(() => {
                 </span>
                 <div class="pf-file-info">
                   <div class="pf-file-name">{{ f.name }}</div>
-                  <div class="pf-file-meta">{{ formatSize(f.size) }} · nog niet opgeslagen</div>
+                  <div class="pf-file-meta">{{ formatSize(f.size) }} · {{ $t('nog niet opgeslagen') }}</div>
                 </div>
-                <button type="button" class="icon-btn" title="Verwijderen" @click="removeFile(idx)">
+                <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeFile(idx)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </div>
 
               <!-- Grote preview van de eerste foto: overtypen met de bon ernaast -->
               <div v-if="files.find(f => f.previewUrl)" class="pf-preview">
-                <img :src="files.find(f => f.previewUrl).previewUrl" alt="Voorbeeld van de bon">
+                <img :src="files.find(f => f.previewUrl).previewUrl" :alt="$t('Voorbeeld van de bon')">
               </div>
               <div v-else-if="inbox_item?.is_image" class="pf-preview">
-                <img :src="inbox_item.url" alt="Voorbeeld van de aangeleverde bon">
+                <img :src="inbox_item.url" :alt="$t('Voorbeeld van de aangeleverde bon')">
               </div>
               <div v-else-if="inbox_item" class="pf-preview" style="padding:14px;text-align:center;">
-                <a :href="inbox_item.url" target="_blank" class="btn btn-secondary btn-sm">Open de aangeleverde PDF in een nieuw tabblad</a>
+                <a :href="inbox_item.url" target="_blank" class="btn btn-secondary btn-sm">{{ $t('Open de aangeleverde PDF in een nieuw tabblad') }}</a>
               </div>
 
               <!-- Bestaande bijlagen (bewerken) -->
               <template v-if="isEdit && purchase.attachments?.length">
-                <div class="pf-section-title" style="font-size:13px;">Opgeslagen bijlagen</div>
+                <div class="pf-section-title" style="font-size:13px;">{{ $t('Opgeslagen bijlagen') }}</div>
                 <div v-for="att in purchase.attachments" :key="att.id" class="pf-file">
                   <img v-if="att.kind === 'image'" :src="route('attachments.show', att.id)" class="pf-thumb" alt="">
                   <span v-else class="pf-thumb pf-thumb-pdf">
@@ -547,7 +548,7 @@ const fileError = computed(() => {
                     <a :href="route('attachments.show', att.id)" target="_blank" class="pf-file-name" style="color:var(--text);">{{ att.filename }}</a>
                     <div class="pf-file-meta">{{ att.size_formatted }}</div>
                   </div>
-                  <button type="button" class="icon-btn" title="Verwijderen" @click="removeExistingAttachment(att)">
+                  <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeExistingAttachment(att)">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </button>
                 </div>
@@ -558,9 +559,9 @@ const fileError = computed(() => {
       </div>
 
       <div class="pf-actions">
-        <Link :href="isEdit ? route('purchases.show', purchase.id) : route('purchases.index')" class="btn btn-secondary">Annuleren</Link>
+        <Link :href="isEdit ? route('purchases.show', purchase.id) : route('purchases.index')" class="btn btn-secondary">{{ $t('Annuleren') }}</Link>
         <button type="submit" class="btn btn-primary" :disabled="form.processing">
-          {{ form.processing ? 'Bezig…' : (isEdit ? 'Wijzigingen opslaan' : 'Inboeken') }}
+          {{ form.processing ? $t('Bezig…') : (isEdit ? $t('Wijzigingen opslaan') : $t('Inboeken')) }}
         </button>
       </div>
     </form>

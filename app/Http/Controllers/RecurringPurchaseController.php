@@ -45,7 +45,7 @@ class RecurringPurchaseController extends Controller
             'profiles' => $profiles,
             'suppliers' => PurchaseInvoice::selectRaw('supplier_name, MAX(id) AS last_id')
                 ->groupBy('supplier_name')->orderByDesc('last_id')->limit(100)->pluck('supplier_name'),
-            'categories' => PurchaseInvoiceController::CATEGORIES,
+            'categories' => PurchaseInvoiceController::categories(),
         ]);
     }
 
@@ -56,7 +56,7 @@ class RecurringPurchaseController extends Controller
 
         RecurringPurchase::create($data);
 
-        return back()->with('flash', 'Vaste last aangemaakt — de eerste inboeking volgt op de gekozen datum.');
+        return back()->with('flash', __('Vaste last aangemaakt — de eerste inboeking volgt op de gekozen datum.'));
     }
 
     public function update(Request $request, RecurringPurchase $profile): RedirectResponse
@@ -65,12 +65,12 @@ class RecurringPurchaseController extends Controller
         if ($request->has('active') && count($request->all()) === 1) {
             $profile->update(['active' => $request->boolean('active')]);
 
-            return back()->with('flash', $profile->active ? 'Vaste last hervat.' : 'Vaste last gepauzeerd.');
+            return back()->with('flash', $profile->active ? __('Vaste last hervat.') : __('Vaste last gepauzeerd.'));
         }
 
         $profile->update($this->validated($request));
 
-        return back()->with('flash', 'Vaste last bijgewerkt.');
+        return back()->with('flash', __('Vaste last bijgewerkt.'));
     }
 
     public function destroy(RecurringPurchase $profile): RedirectResponse
@@ -78,7 +78,7 @@ class RecurringPurchaseController extends Controller
         // Al ingeboekte inkoopfacturen blijven gewoon staan.
         $profile->delete();
 
-        return back()->with('flash', 'Vaste last verwijderd — al ingeboekte inkoopfacturen blijven bewaard.');
+        return back()->with('flash', __('Vaste last verwijderd — al ingeboekte inkoopfacturen blijven bewaard.'));
     }
 
     /** Snelstart: maak van een bestaande inkoopfactuur een maandelijkse vaste last. */
@@ -97,7 +97,7 @@ class RecurringPurchaseController extends Controller
         ]);
 
         return redirect()->route('purchases.recurring.index')
-            ->with('flash', "\"{$profile->supplier_name}\" staat nu als maandelijkse vaste last — pas zo nodig de frequentie aan.");
+            ->with('flash', __('":supplier" staat nu als maandelijkse vaste last — pas zo nodig de frequentie aan.', ['supplier' => $profile->supplier_name]));
     }
 
     /* ===================== Helpers ===================== */
@@ -113,16 +113,16 @@ class RecurringPurchaseController extends Controller
             'active' => ['nullable', 'boolean'],
             'vat_lines' => ['required', 'array', 'min:1'],
             'vat_lines.*.base' => ['required', 'numeric', 'between:-9999999,9999999'],
-            'vat_lines.*.rate' => ['required', 'numeric', 'in:0,9,21'],
+            'vat_lines.*.rate' => ['required', 'numeric', 'in:' . implode(',', \App\Support\Market::vatRates())],
             'vat_lines.*.vat' => ['required', 'numeric', 'between:-9999999,9999999'],
             'auto_paid' => ['nullable', 'boolean'],
             'payment_method' => ['nullable', 'in:bank_transfer,ideal,cash,card,direct_debit,other'],
             'notes' => ['nullable', 'string', 'max:2000'],
         ], [
-            'supplier_name.required' => 'Vul de naam van de leverancier in.',
-            'next_run_on.required' => 'Kies de datum van de (eerst)volgende inboeking.',
-            'vat_lines.required' => 'Voeg minstens één bedragregel toe.',
-            'end_date.after' => 'De einddatum moet ná de volgende inboeking liggen.',
+            'supplier_name.required' => __('Vul de naam van de leverancier in.'),
+            'next_run_on.required' => __('Kies de datum van de (eerst)volgende inboeking.'),
+            'vat_lines.required' => __('Voeg minstens één bedragregel toe.'),
+            'end_date.after' => __('De einddatum moet ná de volgende inboeking liggen.'),
         ]);
 
         return [

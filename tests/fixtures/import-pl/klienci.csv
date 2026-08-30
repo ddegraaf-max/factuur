@@ -1,0 +1,5 @@
+Nazwa;Osoba kontaktowa;E-mail;Telefon;Ulica;Kod pocztowy;Miejscowość;Kraj;NIP;REGON;Termin płatności (dni);Uwagi
+Piekarnia Kowalski Sp. z o.o.;Jan Kowalski;jan@piekarnia-kowalski.pl;+48 22 123 45 67;ul. Długa 12/3;00-238;Warszawa;Polska;525-224-84-81;146830300;14;Stały klient — płaci przelewem
+Anna Wiśniewska;;anna.wisniewska@example.pl;+48 600 700 800;ul. Świętokrzyska 5;31-004;Kraków;PL;;;;Osoba prywatna
+"Zakład Usług Elektrycznych ""Błysk"" s.c.";Marek Nowak;biuro@blysk.pl;+48 61 800 90 10;ul. Półwiejska 44;61-888;Poznań;Polska;7792442093;;30 dni;
+Piekarnia Kowalski Sp. z o.o.;Jan Kowalski;jan@piekarnia-kowalski.pl;;;;;;;;;duplikat

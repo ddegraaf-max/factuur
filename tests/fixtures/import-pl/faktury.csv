@@ -1,0 +1,4 @@
+Numer;Data wystawienia;Data sprzedaży;Termin płatności;Nabywca;NIP nabywcy;E-mail nabywcy;Netto;VAT;Brutto;Stawka VAT;Zapłacono;Uwagi
+FV/2026/08/0012;12.08.2026;12.08.2026;26.08.2026;Piekarnia Kowalski Sp. z o.o.;5252248481;jan@piekarnia-kowalski.pl;1 000,00;230,00;1 230,00;23%;0,00;Abonament sierpień 2026
+FV/2026/09/0003;2026-09-12;2026-09-12;2026-09-26;Nowy Kontrahent S.A.;1234563218;;2 032,52;467,48;2 500,00;23 %;500,00;Projekt strony www
+FV/2026/09/0004;12-09-2026;12-09-2026;19-09-2026;Anna Wiśniewska;;anna.wisniewska@example.pl;350,00;0,00;350,00;zw;350,00;Szkolenie BHP

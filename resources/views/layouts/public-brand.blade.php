@@ -1,6 +1,6 @@
 {{-- Publieke pagina's in de huisstijl van een administratie (visitekaartje, website). --}}
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,6 +33,6 @@
 </head>
 <body>
 @yield('content')
-<div class="made">Gemaakt met <a href="{{ config('app.url') }}/?utm_source=publiek&utm_medium={{ $madeWith ?? 'kaart' }}" rel="noopener">{{ brand('name') }}</a> — factureren en je bedrijf presenteren, in één.</div>
+<div class="made">{{ __('Gemaakt met') }} <a href="{{ config('app.url') }}/?utm_source=publiek&utm_medium={{ $madeWith ?? 'kaart' }}" rel="noopener">{{ brand('name') }}</a> {{ __('— factureren en je bedrijf presenteren, in één.') }}</div>
 </body>
 </html>

@@ -44,7 +44,7 @@ class ReceiptScanService
     public function scan(string $bytes, string $mimeType): array
     {
         if (! $this->enabled()) {
-            throw new \DomainException('Bonherkenning is niet geconfigureerd.');
+            throw new \DomainException(__('Bonherkenning is niet geconfigureerd.'));
         }
 
         // De AI-call kan even duren; ruim voor de standaard PHP-limiet van 30s.
@@ -86,21 +86,21 @@ class ReceiptScanService
             $message = $client->beta->messages->create(...$params);
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error('Bonherkenning: ongeldige Anthropic API-key', ['error' => $e->getMessage()]);
-            throw new \DomainException('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).');
+            throw new \DomainException(__('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).'));
         } catch (\Anthropic\Core\Exceptions\RateLimitException) {
-            throw new \DomainException('De AI-dienst is even druk. Probeer het over een minuut opnieuw.');
+            throw new \DomainException(__('De AI-dienst is even druk. Probeer het over een minuut opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIStatusException $e) {
             Log::warning('Bonherkenning: API-fout', ['type' => $e->type?->value, 'error' => mb_substr($e->getMessage(), 0, 300)]);
-            throw new \DomainException('De bon kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.');
+            throw new \DomainException(__('De bon kon niet worden gelezen door een storing bij de AI-dienst. Probeer het zo opnieuw.'));
         } catch (\Anthropic\Core\Exceptions\APIConnectionException) {
-            throw new \DomainException('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.');
+            throw new \DomainException(__('Geen verbinding met de AI-dienst. Controleer de internetverbinding en probeer het opnieuw.'));
         }
 
         if ($message->stopReason === 'refusal') {
-            throw new \DomainException('De AI wilde dit document niet verwerken. Vul de gegevens handmatig in.');
+            throw new \DomainException(__('De AI wilde dit document niet verwerken. Vul de gegevens handmatig in.'));
         }
         if ($message->stopReason === 'max_tokens') {
-            throw new \DomainException('Het document is te complex om automatisch te herkennen. Vul de gegevens handmatig in.');
+            throw new \DomainException(__('Het document is te complex om automatisch te herkennen. Vul de gegevens handmatig in.'));
         }
 
         $json = null;
@@ -113,7 +113,7 @@ class ReceiptScanService
 
         if (! is_array($json)) {
             Log::warning('Bonherkenning: onleesbaar antwoord van het model');
-            throw new \DomainException('De bon kon niet worden gelezen. Probeer een scherpere foto.');
+            throw new \DomainException(__('De bon kon niet worden gelezen. Probeer een scherpere foto.'));
         }
 
         return $this->sanitize($json);
@@ -139,7 +139,7 @@ class ReceiptScanService
                     'supplier_reference' => $nullable(['type' => 'string', 'description' => 'Factuurnummer of bonnummer van de leverancier.']),
                     'invoice_date' => $nullable(['type' => 'string', 'format' => 'date', 'description' => 'Factuur- of bondatum (YYYY-MM-DD).']),
                     'due_date' => $nullable(['type' => 'string', 'format' => 'date', 'description' => 'Vervaldatum, alleen als die expliciet vermeld staat.']),
-                    'category' => $nullable(['type' => 'string', 'enum' => PurchaseInvoiceController::CATEGORIES, 'description' => 'Best passende kostencategorie.']),
+                    'category' => $nullable(['type' => 'string', 'enum' => PurchaseInvoiceController::categories(), 'description' => 'Best passende kostencategorie.']),
                     'vat_lines' => [
                         'type' => 'array',
                         'description' => 'Bedragen gegroepeerd per BTW-tarief: één regel per tarief dat op het document voorkomt.',
@@ -147,7 +147,7 @@ class ReceiptScanService
                             'type' => 'object',
                             'properties' => [
                                 'base' => ['type' => 'number', 'description' => 'Grondslag exclusief BTW voor dit tarief.'],
-                                'rate' => ['type' => 'number', 'enum' => [21, 9, 0], 'description' => 'BTW-tarief in procenten.'],
+                                'rate' => ['type' => 'number', 'enum' => \App\Support\Market::vatRates(), 'description' => 'BTW-tarief in procenten.'],
                                 'vat' => ['type' => 'number', 'description' => 'BTW-bedrag voor dit tarief zoals op het document.'],
                             ],
                             'required' => ['base', 'rate', 'vat'],
@@ -179,12 +179,15 @@ class ReceiptScanService
 
     protected function prompt(): string
     {
-        return <<<'PROMPT'
-        Dit is een bon, kassabon of inkoopfactuur van een Nederlandse ondernemer.
+        $country = \App\Support\Market::get('country_name', 'Nederland');
+        $rates = implode(', ', \App\Support\Market::vatRates());
+
+        return <<<PROMPT
+        Dit is een bon, kassabon of inkoopfactuur van een ondernemer in {$country}.
         Haal de gegevens eruit voor de inkoopadministratie (crediteuren).
 
         Regels:
-        - Groepeer de bedragen per BTW-tarief (21, 9 of 0): "base" is de grondslag
+        - Groepeer de bedragen per BTW-tarief ({$rates}): "base" is de grondslag
           exclusief BTW, "vat" het BTW-bedrag zoals het document het vermeldt.
           Staat er alleen een totaal inclusief BTW, reken dan terug met het tarief.
         - Gebruik tarief 0 ook voor vrijgestelde, verlegde of buitenlandse BTW.
@@ -196,8 +199,8 @@ class ReceiptScanService
           in de vat_lines: de kosten en BTW blijven daar volledig staan.
         - Staat er expliciet een nog te betalen bedrag ("door u te voldoen"),
           vul dan amount_due in.
-        - Datums als YYYY-MM-DD. Nederlandse notatie zoals "3 aug 2026" of
-          "03-08-2026" betekent 2026-08-03 (dag-maand-jaar).
+        - Datums als YYYY-MM-DD. Europese notatie zoals "3 aug 2026", "03-08-2026"
+          of "03.08.2026" betekent 2026-08-03 (dag-maand-jaar).
         - Wat niet op het document staat of onleesbaar is: null. Verzin niets.
         - Is het document geen bon of factuur, zet dan is_invoice op false.
         PROMPT;
@@ -207,7 +210,7 @@ class ReceiptScanService
     protected function sanitize(array $json): array
     {
         if (($json['is_invoice'] ?? false) !== true) {
-            throw new \DomainException('Dit lijkt geen bon of factuur te zijn. Probeer een andere foto of vul de gegevens handmatig in.');
+            throw new \DomainException(__('Dit lijkt geen bon of factuur te zijn. Probeer een andere foto of vul de gegevens handmatig in.'));
         }
 
         $text = function ($value, int $max): ?string {
@@ -229,18 +232,18 @@ class ReceiptScanService
             $base = round((float) ($line['base'] ?? 0), 2);
             $vat = round((float) ($line['vat'] ?? 0), 2);
             $rate = (float) ($line['rate'] ?? 0);
-            if (! in_array($rate, [0.0, 9.0, 21.0], true) || ($base === 0.0 && $vat === 0.0)) {
+            if (! in_array((int) $rate, \App\Support\Market::vatRates(), true) || ($base === 0.0 && $vat === 0.0)) {
                 continue;
             }
             $lines[] = ['base' => $base, 'rate' => $rate, 'vat' => $vat];
         }
 
         if ($lines === []) {
-            throw new \DomainException('Er zijn geen bedragen herkend op het document. Probeer een scherpere foto of vul ze handmatig in.');
+            throw new \DomainException(__('Er zijn geen bedragen herkend op het document. Probeer een scherpere foto of vul ze handmatig in.'));
         }
 
         $category = $text($json['category'] ?? null, 60);
-        if ($category !== null && ! in_array($category, PurchaseInvoiceController::CATEGORIES, true)) {
+        if ($category !== null && ! in_array($category, PurchaseInvoiceController::categories(), true)) {
             $category = null;
         }
 
@@ -250,7 +253,7 @@ class ReceiptScanService
             $amount = round((float) ($d['amount'] ?? 0), 2);
             $label = $text($d['description'] ?? null, 190);
             if ($amount > 0) {
-                $deductions[] = ['description' => $label ?? 'Reeds ontvangen/verrekend', 'amount' => $amount];
+                $deductions[] = ['description' => $label ?? __('Reeds ontvangen/verrekend'), 'amount' => $amount];
             }
         }
 
@@ -260,11 +263,10 @@ class ReceiptScanService
         if ($totalIncl !== null) {
             $sum = round(array_sum(array_map(fn ($l) => $l['base'] + $l['vat'], $lines)), 2);
             if (abs($sum - $totalIncl) > 0.05) {
-                $warning = sprintf(
-                    'De herkende regels tellen op tot € %s, maar de bon vermeldt € %s — controleer de bedragen.',
-                    number_format($sum, 2, ',', '.'),
-                    number_format($totalIncl, 2, ',', '.')
-                );
+                $warning = __('De herkende regels tellen op tot :sum, maar de bon vermeldt :total — controleer de bedragen.', [
+                    'sum' => money($sum),
+                    'total' => money($totalIncl),
+                ]);
             }
         }
 
@@ -274,11 +276,10 @@ class ReceiptScanService
             $sum = round(array_sum(array_map(fn ($l) => $l['base'] + $l['vat'], $lines)), 2);
             $payable = round($sum - array_sum(array_column($deductions, 'amount')), 2);
             if (abs($payable - $amountDue) > 0.05) {
-                $warning = sprintf(
-                    'Volgens de herkende bedragen is er € %s te betalen, maar het document vermeldt € %s — controleer de bedragen en verrekeningen.',
-                    number_format($payable, 2, ',', '.'),
-                    number_format($amountDue, 2, ',', '.')
-                );
+                $warning = __('Volgens de herkende bedragen is er :payable te betalen, maar het document vermeldt :due — controleer de bedragen en verrekeningen.', [
+                    'payable' => money($payable),
+                    'due' => money($amountDue),
+                ]);
             }
         }
 

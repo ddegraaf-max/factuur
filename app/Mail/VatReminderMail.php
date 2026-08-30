@@ -31,8 +31,8 @@ class VatReminderMail extends Mailable
         $days = (int) ($p['days_left'] ?? 0);
 
         $subject = $this->final
-            ? sprintf('Nog %d %s: btw-aangifte %s %d', $days, $days === 1 ? 'dag' : 'dagen', $p['label'], $p['year'])
-            : sprintf('Btw-aangifte %s %d — vóór %s', $p['label'], $p['year'], $p['deadline_label']);
+            ? trans_choice('Nog :days dag: btw-aangifte :label :year|Nog :days dagen: btw-aangifte :label :year', $days, ['days' => $days, 'label' => $p['label'], 'year' => $p['year']])
+            : __('Btw-aangifte :label :year — vóór :deadline', ['label' => $p['label'], 'year' => $p['year'], 'deadline' => $p['deadline_label']]);
 
         return new Envelope(subject: $subject);
     }

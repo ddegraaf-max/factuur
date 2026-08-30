@@ -84,7 +84,7 @@ class QuoteManager
     public function update(Quote $quote, array $data): Quote
     {
         if (! in_array($quote->status, ['draft', 'sent'], true)) {
-            throw new \DomainException('Een geaccepteerde of afgewezen offerte kun je niet meer wijzigen.');
+            throw new \DomainException(__('Een geaccepteerde of afgewezen offerte kun je niet meer wijzigen.'));
         }
 
         return DB::transaction(function () use ($quote, $data) {
@@ -162,7 +162,7 @@ class QuoteManager
     public function send(Quote $quote): Quote
     {
         if (! in_array($quote->status, ['draft', 'sent'], true)) {
-            throw new \DomainException('Deze offerte kan niet (opnieuw) worden verstuurd.');
+            throw new \DomainException(__('Deze offerte kan niet (opnieuw) worden verstuurd.'));
         }
 
         $quote = DB::transaction(function () use ($quote) {
@@ -188,11 +188,13 @@ class QuoteManager
     public function accept(Quote $quote): Quote
     {
         if (! in_array($quote->status, ['sent', 'expired'], true)) {
-            throw new \DomainException('Alleen een verstuurde offerte kan worden geaccepteerd.');
+            throw new \DomainException(__('Alleen een verstuurde offerte kan worden geaccepteerd.'));
         }
 
         $quote->update(['status' => 'accepted', 'accepted_at' => now(), 'rejected_at' => null]);
-        \App\Support\Audit::log('accepted', $quote, \App\Support\Audit::label($quote) . ' geaccepteerd' . (auth()->check() ? '' : ' door de klant via het portaal'), [], $quote->company_id);
+        \App\Support\Audit::log('accepted', $quote, auth()->check()
+            ? __(':label geaccepteerd', ['label' => \App\Support\Audit::label($quote)])
+            : __(':label geaccepteerd door de klant via het portaal', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
 
         return $quote->fresh();
     }
@@ -201,13 +203,13 @@ class QuoteManager
     public function acceptConfirmationBlocker(Quote $quote, bool $force = false): ?string
     {
         if ($quote->status !== 'accepted') {
-            return 'De offerte is (nog) niet geaccepteerd.';
+            return __('De offerte is (nog) niet geaccepteerd.');
         }
         if (! $quote->customer_email) {
-            return 'Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.';
+            return __('Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.');
         }
         if ($quote->accept_mail_sent_at && ! $force) {
-            return 'Er is al een bevestiging verstuurd op '.$quote->accept_mail_sent_at->translatedFormat('j F Y').'.';
+            return __('Er is al een bevestiging verstuurd op :date.', ['date' => $quote->accept_mail_sent_at->translatedFormat('j F Y')]);
         }
 
         return null;
@@ -254,11 +256,13 @@ class QuoteManager
     public function reject(Quote $quote): Quote
     {
         if (! in_array($quote->status, ['sent', 'expired'], true)) {
-            throw new \DomainException('Alleen een verstuurde offerte kan worden afgewezen.');
+            throw new \DomainException(__('Alleen een verstuurde offerte kan worden afgewezen.'));
         }
 
         $quote->update(['status' => 'rejected', 'rejected_at' => now(), 'accepted_at' => null]);
-        \App\Support\Audit::log('rejected', $quote, \App\Support\Audit::label($quote) . ' afgewezen' . (auth()->check() ? '' : ' door de klant via het portaal'), [], $quote->company_id);
+        \App\Support\Audit::log('rejected', $quote, auth()->check()
+            ? __(':label afgewezen', ['label' => \App\Support\Audit::label($quote)])
+            : __(':label afgewezen door de klant via het portaal', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
 
         return $quote->fresh();
     }
@@ -270,13 +274,13 @@ class QuoteManager
     public function convertToInvoice(Quote $quote): Invoice
     {
         if ($quote->converted_invoice_id) {
-            throw new \DomainException('Van deze offerte is al een factuur gemaakt.');
+            throw new \DomainException(__('Van deze offerte is al een factuur gemaakt.'));
         }
         if ($quote->status === 'rejected') {
-            throw new \DomainException('Een afgewezen offerte kun je niet omzetten.');
+            throw new \DomainException(__('Een afgewezen offerte kun je niet omzetten.'));
         }
         if ($quote->installments()->exists()) {
-            throw new \DomainException('Deze offerte wordt in termijnen gefactureerd — gebruik het termijnplan (of verwijder dat eerst).');
+            throw new \DomainException(__('Deze offerte wordt in termijnen gefactureerd — gebruik het termijnplan (of verwijder dat eerst).'));
         }
 
         $quote->loadMissing('lines');
@@ -306,7 +310,7 @@ class QuoteManager
                 'brand_profile_id' => $quote->brand_profile_id,
                 'language' => $quote->language,
                 'invoice_date' => now()->toDateString(),
-                'reference' => $quote->reference ?: ('Offerte '.$quote->number),
+                'reference' => $quote->reference ?: __('Offerte :number', ['number' => $quote->number]),
                 'notes' => $quote->notes,
                 'lines' => $lines,
             ]);
@@ -458,7 +462,7 @@ class QuoteManager
                 'description' => $line['description'] ?? '',
                 'details' => $line['details'] ?? null,
                 'quantity' => $qty,
-                'unit' => $line['unit'] ?? 'stuk',
+                'unit' => $line['unit'] ?? __('stuk'),
                 'unit_price' => $mode === 'incl' ? $this->vat->netUnitPrice($price, $rate) : $price,
                 'vat_rate' => $rate,
                 'discount_pct' => $discount > 0 ? $discount : null,

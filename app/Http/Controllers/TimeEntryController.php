@@ -73,7 +73,7 @@ class TimeEntryController extends Controller
 
                 return [
                     'customer_id' => $first->customer_id,
-                    'customer_name' => $first->customer?->name ?? 'Onbekend',
+                    'customer_name' => $first->customer?->name ?? __('Onbekend'),
                     'entries' => $group->count(),
                     'minutes' => $group->sum('minutes'),
                     'amount' => $amounts->contains(null) ? null : round($amounts->sum(), 2),
@@ -143,14 +143,14 @@ class TimeEntryController extends Controller
         \App\Models\TimeCard::apply($entry);
 
         return back()->with('flash', $entry->fresh()->time_card_id
-            ? 'Uren geschreven en afgeschreven van de strippenkaart.'
-            : 'Uren geschreven.');
+            ? __('Uren geschreven en afgeschreven van de strippenkaart.')
+            : __('Uren geschreven.'));
     }
 
     public function update(Request $request, TimeEntry $entry): RedirectResponse
     {
         if ($entry->invoice_id) {
-            return back()->with('error', 'Deze uren staan al op een factuur en kunnen niet meer worden gewijzigd.');
+            return back()->with('error', __('Deze uren staan al op een factuur en kunnen niet meer worden gewijzigd.'));
         }
 
         $entry->update($this->validated($request));
@@ -158,18 +158,18 @@ class TimeEntryController extends Controller
         // Dekking herbeoordelen: past de regel nog op de kaart (of juist nu wel)?
         \App\Models\TimeCard::apply($entry->fresh());
 
-        return back()->with('flash', 'Uren bijgewerkt.');
+        return back()->with('flash', __('Uren bijgewerkt.'));
     }
 
     public function destroy(TimeEntry $entry): RedirectResponse
     {
         if ($entry->invoice_id) {
-            return back()->with('error', 'Deze uren staan al op een factuur en kunnen niet worden verwijderd.');
+            return back()->with('error', __('Deze uren staan al op een factuur en kunnen niet worden verwijderd.'));
         }
 
         $entry->delete();
 
-        return back()->with('flash', 'Urenregel verwijderd.');
+        return back()->with('flash', __('Urenregel verwijderd.'));
     }
 
     /** Start de timer; een eventueel nog lopende timer wordt eerst netjes gestopt. */
@@ -186,13 +186,13 @@ class TimeEntryController extends Controller
         TimeEntry::create([
             'customer_id' => $data['customer_id'] ?? null,
             'project' => $data['project'] ?? null,
-            'description' => $data['description'] ?? 'Gewerkte uren',
+            'description' => $data['description'] ?? __('Gewerkte uren'),
             'work_date' => today(),
             'minutes' => 0,
             'timer_started_at' => now(),
         ]);
 
-        return back()->with('flash', 'Timer gestart.');
+        return back()->with('flash', __('Timer gestart.'));
     }
 
     public function timerStop(Request $request): RedirectResponse
@@ -200,8 +200,8 @@ class TimeEntryController extends Controller
         $stopped = $this->stopRunningTimer($request);
 
         return $stopped
-            ? back()->with('flash', 'Timer gestopt — de uren staan in de lijst.')
-            : back()->with('error', 'Er loopt geen timer.');
+            ? back()->with('flash', __('Timer gestopt — de uren staan in de lijst.'))
+            : back()->with('error', __('Er loopt geen timer.'));
     }
 
     /**
@@ -212,7 +212,7 @@ class TimeEntryController extends Controller
     {
         $data = $request->validate([
             'customer_id' => ['required', 'integer', Rule::exists('customers', 'id')->where('company_id', $request->user()->company_id)],
-            'vat_rate' => ['nullable', 'numeric', 'in:0,9,21'],
+            'vat_rate' => ['nullable', 'numeric', 'in:' . implode(',', \App\Support\Market::vatRates())],
         ]);
 
         $entries = TimeEntry::billable()
@@ -223,21 +223,21 @@ class TimeEntryController extends Controller
             ->get();
 
         if ($entries->isEmpty()) {
-            return back()->with('error', 'Er staan geen factureerbare uren open voor deze klant.');
+            return back()->with('error', __('Er staan geen factureerbare uren open voor deze klant.'));
         }
 
         $missingRate = $entries->first(fn ($e) => $e->effectiveRate() === null);
         if ($missingRate) {
-            return back()->with('error', 'Er is geen uurtarief bekend voor deze uren. Stel een tarief in bij de klant, bij Instellingen → Bedrijfsgegevens, of op de urenregel zelf.');
+            return back()->with('error', __('Er is geen uurtarief bekend voor deze uren. Stel een tarief in bij de klant, bij Instellingen → Bedrijfsgegevens, of op de urenregel zelf.'));
         }
 
         $lines = $entries->map(fn ($e) => [
             'description' => $e->description,
             'details' => trim($e->work_date->translatedFormat('j F Y') . ($e->project ? " · {$e->project}" : '')),
             'quantity' => round($e->minutes / 60, 2),
-            'unit' => 'uur',
+            'unit' => __('uur'),
             'unit_price' => $e->effectiveRate(),
-            'vat_rate' => (float) ($data['vat_rate'] ?? 21),
+            'vat_rate' => (float) ($data['vat_rate'] ?? \App\Support\Market::defaultVatRate()),
         ])->all();
 
         $invoice = $manager->create([
@@ -250,7 +250,7 @@ class TimeEntryController extends Controller
         $hours = round($entries->sum('minutes') / 60, 2);
 
         return redirect()->route('invoices.edit', $invoice)
-            ->with('flash', "Conceptfactuur aangemaakt met {$hours} uur — controleer en verstuur 'm.");
+            ->with('flash', __("Conceptfactuur aangemaakt met :hours uur — controleer en verstuur 'm.", ['hours' => $hours]));
     }
 
     /* ===================== Helpers ===================== */
@@ -266,10 +266,10 @@ class TimeEntryController extends Controller
             'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'billable' => ['nullable', 'boolean'],
         ], [
-            'description.required' => 'Vul een omschrijving in — die komt straks op de factuur.',
-            'minutes.required' => 'Vul de gewerkte tijd in.',
-            'minutes.min' => 'Vul de gewerkte tijd in.',
-            'minutes.max' => 'Eén urenregel kan maximaal 24 uur zijn.',
+            'description.required' => __('Vul een omschrijving in — die komt straks op de factuur.'),
+            'minutes.required' => __('Vul de gewerkte tijd in.'),
+            'minutes.min' => __('Vul de gewerkte tijd in.'),
+            'minutes.max' => __('Eén urenregel kan maximaal 24 uur zijn.'),
         ]);
 
         return [

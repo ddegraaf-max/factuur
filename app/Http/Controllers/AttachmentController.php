@@ -32,8 +32,8 @@ class AttachmentController extends Controller
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
             'for_customer' => ['nullable', 'boolean'],
         ], [
-            'files.*.mimetypes' => 'Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.',
-            'files.*.max' => 'Elk bestand mag maximaal 10 MB groot zijn.',
+            'files.*.mimetypes' => __('Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.'),
+            'files.*.max' => __('Elk bestand mag maximaal 10 MB groot zijn.'),
         ]);
 
         // Opslagmeter: boven de limiet geen nieuwe bijlagen (zie App\Support\StorageUsage).
@@ -41,7 +41,7 @@ class AttachmentController extends Controller
         if (! \App\Support\StorageUsage::hasRoomFor($request->user()->company, $incoming)) {
             $usage = \App\Support\StorageUsage::for($request->user()->company);
 
-            return back()->withErrors(['files' => "De opslag van je administratie is vol ({$usage['used_label']} van {$usage['limit_label']}). Verwijder oude bijlagen of stap over op Slim (10 GB)."]);
+            return back()->withErrors(['files' => __('De opslag van je administratie is vol (:used van :limit). Verwijder oude bijlagen of stap over op Slim (10 GB).', ['used' => $usage['used_label'], 'limit' => $usage['limit_label']])]);
         }
 
         $added = 0;
@@ -60,7 +60,7 @@ class AttachmentController extends Controller
             $added++;
         }
 
-        return back()->with('flash', "{$added} bijlage(n) toegevoegd.");
+        return back()->with('flash', __(':count bijlage(n) toegevoegd.', ['count' => $added]));
     }
 
     /** Zet een bijlage op "voor de klant" (meesturen + portaal) of weer intern. */
@@ -73,8 +73,8 @@ class AttachmentController extends Controller
         $attachment->update(['for_customer' => $data['for_customer']]);
 
         return back()->with('flash', $data['for_customer']
-            ? 'Bijlage is nu zichtbaar voor de klant (mail + portaal).'
-            : 'Bijlage is nu alleen intern zichtbaar.');
+            ? __('Bijlage is nu zichtbaar voor de klant (mail + portaal).')
+            : __('Bijlage is nu alleen intern zichtbaar.'));
     }
 
     public function show(Attachment $attachment): Response
@@ -123,6 +123,6 @@ class AttachmentController extends Controller
 
         $attachment->delete();
 
-        return back()->with('flash', 'Bijlage verwijderd.');
+        return back()->with('flash', __('Bijlage verwijderd.'));
     }
 }

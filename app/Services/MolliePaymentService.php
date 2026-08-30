@@ -6,11 +6,12 @@ use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\OnlinePayment;
 use App\Models\Payment;
+use App\Support\Market;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 /**
- * Betaallink op de factuur (iDEAL) via Mollie. Elke administratie koppelt
+ * Betaallink op de factuur (iDEAL, of BLIK / Przelewy24 in Polen) via Mollie. Elke administratie koppelt
  * zijn éigen Mollie-account (Instellingen → Bedrijfsgegevens): het geld gaat
  * dus rechtstreeks naar de rekening van de ondernemer, EasyInvoice zit er
  * niet tussen. Zonder key blijft de betaalknop overal verborgen.
@@ -45,7 +46,7 @@ class MolliePaymentService
     public function checkoutUrl(Invoice $invoice): string
     {
         if (! $this->payable($invoice)) {
-            throw new \DomainException('Deze factuur kan niet (meer) online worden betaald.');
+            throw new \DomainException(__('Deze factuur kan niet (meer) online worden betaald.'));
         }
 
         $amount = round((float) $invoice->remaining_amount, 2);
@@ -63,11 +64,20 @@ class MolliePaymentService
         }
 
         $payload = [
-            'amount' => ['currency' => 'EUR', 'value' => number_format($amount, 2, '.', '')],
-            'description' => trim('Factuur ' . ($invoice->number ?: $invoice->id) . ' — ' . $invoice->company->name),
+            'amount' => ['currency' => Market::currency(), 'value' => number_format($amount, 2, '.', '')],
+            'description' => trim(__('Factuur :number — :company', ['number' => $invoice->number ?: $invoice->id, 'company' => $invoice->company->name])),
             'redirectUrl' => route('portal.invoice', $invoice->portal_token) . '?betaald=1',
+            'locale' => Market::isPl() ? 'pl_PL' : 'nl_NL',
             'metadata' => ['invoice_id' => $invoice->id],
         ];
+
+        // Betaalmethode per markt (config/markets.php → payment.mollie_methods):
+        // staat er precies één, dan sturen we die mee (bijv. iDEAL); bij
+        // meerdere (BLIK / Przelewy24 / kaart) laten we Mollie kiezen.
+        $methods = array_values(array_filter((array) Market::get('payment.mollie_methods', [])));
+        if (count($methods) === 1) {
+            $payload['method'] = $methods[0];
+        }
 
         // Mollie accepteert alleen publiek bereikbare webhook-URL's; lokaal
         // laten we hem weg — de statuscheck bij terugkeer vangt het dan op.
@@ -82,17 +92,17 @@ class MolliePaymentService
 
         if ($response->status() === 401) {
             Log::warning('Mollie: ongeldige API-key', ['company' => $invoice->company_id]);
-            throw new \DomainException('De Mollie-koppeling is verkeerd geconfigureerd. Neem contact op met de afzender van de factuur.');
+            throw new \DomainException(__('De Mollie-koppeling is verkeerd geconfigureerd. Neem contact op met de afzender van de factuur.'));
         }
         if ($response->failed()) {
             Log::warning('Mollie: betaling aanmaken mislukt', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 300)]);
-            throw new \DomainException('De betaling kon niet worden gestart. Probeer het zo opnieuw.');
+            throw new \DomainException(__('De betaling kon niet worden gestart. Probeer het zo opnieuw.'));
         }
 
         $data = $response->json();
         $checkout = $data['_links']['checkout']['href'] ?? null;
         if (! $checkout) {
-            throw new \DomainException('De betaling kon niet worden gestart. Probeer het zo opnieuw.');
+            throw new \DomainException(__('De betaling kon niet worden gestart. Probeer het zo opnieuw.'));
         }
 
         OnlinePayment::create([
@@ -167,7 +177,7 @@ class MolliePaymentService
             'amount' => $onlinePayment->amount,
             'paid_on' => ($onlinePayment->paid_at ?? now())->toDateString(),
             'method' => $this->mapMethod($onlinePayment->method),
-            'reference' => 'Online betaald via Mollie (' . $onlinePayment->mollie_id . ')',
+            'reference' => __('Online betaald via Mollie (:id)', ['id' => $onlinePayment->mollie_id]),
         ]);
 
         $onlinePayment->update(['payment_id' => $payment->id]);

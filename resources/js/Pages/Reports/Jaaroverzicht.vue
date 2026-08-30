@@ -1,10 +1,13 @@
 <script setup>
 import { Head, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur } from '@/format.js';
+import { eur, marketLocale } from '@/format.js';
 import { computed } from 'vue';
 
 const brand = usePage().props.brand;
+// Markt (nl/pl): de kilometervergoeding per markt (€ 0,23 / 1,15 zł).
+const market = usePage().props.market || {};
+const kmRate = eur(market.km_rate ?? 0.23);
 
 const props = defineProps({
   year: Number,
@@ -29,16 +32,16 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
 </script>
 
 <template>
-  <Head title="Jaaroverzicht" />
+  <Head :title="$t('Jaaroverzicht')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Rapporten / <span class="breadcrumb-current">Jaaroverzicht</span></div>
+      <div class="breadcrumb">{{ $t('Rapporten') }} / <span class="breadcrumb-current">{{ $t('Jaaroverzicht') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Jaaroverzicht {{ year }}</h1>
-        <p class="page-subtitle">Omzet, kosten en resultaat uit je facturatie — de basis voor je aangifte of voor je boekhouder.</p>
+        <h1 class="page-title">{{ $t('Jaaroverzicht :year', { year }) }}</h1>
+        <p class="page-subtitle">{{ $t('Omzet, kosten en resultaat uit je facturatie — de basis voor je aangifte of voor je boekhouder.') }}</p>
       </div>
       <div style="display:flex;gap:10px;align-items:center;">
         <select class="yr-select" :value="year" @change="setYear($event.target.value)">
@@ -46,7 +49,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
         </select>
         <a :href="route('yearreport.pdf', { year })" class="btn btn-secondary">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
+          {{ $t('Download PDF') }}
         </a>
       </div>
     </div>
@@ -54,29 +57,29 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
     <!-- Totalen -->
     <div class="kpi-grid">
       <div class="kpi">
-        <div class="lbl">Omzet (excl. btw)</div>
+        <div class="lbl">{{ $t('Omzet (excl. btw)') }}</div>
         <div class="val">{{ eur(totals.revenue) }}</div>
         <div class="meta">
-          {{ totals.invoice_count }} facturen
-          <template v-if="revenueDelta !== null"> · {{ revenueDelta >= 0 ? '+' : '' }}{{ revenueDelta }}% t.o.v. {{ year - 1 }}</template>
+          {{ $t(':n facturen', { n: totals.invoice_count }) }}
+          <template v-if="revenueDelta !== null"> · {{ $t(':delta% t.o.v. :year', { delta: (revenueDelta >= 0 ? '+' : '') + revenueDelta, year: year - 1 }) }}</template>
         </div>
       </div>
       <div class="kpi">
-        <div class="lbl">Kosten (excl. btw)</div>
+        <div class="lbl">{{ $t('Kosten (excl. btw)') }}</div>
         <div class="val">{{ eur(totals.costs) }}</div>
-        <div class="meta">{{ totals.purchase_count }} inkoopfacturen</div>
+        <div class="meta">{{ $t(':n inkoopfacturen', { n: totals.purchase_count }) }}</div>
       </div>
       <div class="kpi">
-        <div class="lbl">Kilometeraftrek</div>
+        <div class="lbl">{{ $t('Kilometeraftrek') }}</div>
         <div class="val">{{ eur(totals.km_amount) }}</div>
-        <div class="meta">{{ totals.km.toLocaleString('nl-NL') }} zakelijke km</div>
+        <div class="meta">{{ $t(':km zakelijke km', { km: totals.km.toLocaleString(marketLocale) }) }}</div>
       </div>
       <div class="kpi" :class="totals.result >= 0 ? 'good' : 'alert'">
-        <div class="lbl">Resultaat uit facturatie</div>
+        <div class="lbl">{{ $t('Resultaat uit facturatie') }}</div>
         <div class="val">{{ eur(totals.result) }}</div>
         <div class="meta">
-          <template v-if="resultDelta !== null">{{ resultDelta >= 0 ? '+' : '' }}{{ resultDelta }}% t.o.v. {{ year - 1 }}</template>
-          <template v-else>omzet − kosten − kilometers</template>
+          <template v-if="resultDelta !== null">{{ $t(':delta% t.o.v. :year', { delta: (resultDelta >= 0 ? '+' : '') + resultDelta, year: year - 1 }) }}</template>
+          <template v-else>{{ $t('omzet − kosten − kilometers') }}</template>
         </div>
       </div>
     </div>
@@ -85,12 +88,8 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
     <div class="yr-disclaimer">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div>
-        <strong>Dit is de basis, nog geen complete fiscale winst-en-verliesrekening.</strong>
-        Dit overzicht bevat alles wat je in {{ brand.name }} registreert: omzet (factuurdatum, excl. btw, creditnota's negatief),
-        ingeboekte kosten en de kilometeraftrek (€ 0,23/km voor privévervoermiddelen). Wat je boekhouder nog toevoegt vóór de
-        aangifte inkomstenbelasting: <b>afschrijvingen</b> (bijv. een bus of apparatuur), eventuele <b>loonkosten</b>,
-        <b>bijtelling</b> bij een zakelijke auto, en de <b>ondernemersaftrekken</b> (zelfstandigenaftrek, startersaftrek,
-        MKB-winstvrijstelling). Stuur de PDF mee — dan heeft je boekhouder alles uit je facturatie in één keer.
+        <strong>{{ $t('Dit is de basis, nog geen complete fiscale winst-en-verliesrekening.') }}</strong>
+        <span v-html="$t('Dit overzicht bevat alles wat je in :brand registreert: omzet (factuurdatum, excl. btw, creditnota\'s negatief), ingeboekte kosten en de kilometeraftrek (:rate/km voor privévervoermiddelen). Wat je boekhouder nog toevoegt vóór de aangifte inkomstenbelasting: <b>afschrijvingen</b> (bijv. een bus of apparatuur), eventuele <b>loonkosten</b>, <b>bijtelling</b> bij een zakelijke auto, en de <b>ondernemersaftrekken</b> (zelfstandigenaftrek, startersaftrek, MKB-winstvrijstelling). Stuur de PDF mee — dan heeft je boekhouder alles uit je facturatie in één keer.', { brand: brand.name, rate: kmRate })"></span>
       </div>
     </div>
 
@@ -98,10 +97,10 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
       <!-- Per kwartaal -->
       <div class="card">
         <div class="card-body">
-          <div class="yr-title">Per kwartaal</div>
+          <div class="yr-title">{{ $t('Per kwartaal') }}</div>
           <table class="data-table yr-table">
             <thead>
-              <tr><th>Kwartaal</th><th class="right">Omzet</th><th class="right">Kosten</th><th class="right">Kilometers</th><th class="right">Resultaat</th></tr>
+              <tr><th>{{ $t('Kwartaal') }}</th><th class="right">{{ $t('Omzet') }}</th><th class="right">{{ $t('Kosten') }}</th><th class="right">{{ $t('Kilometers') }}</th><th class="right">{{ $t('Resultaat') }}</th></tr>
             </thead>
             <tbody>
               <tr v-for="q in quarters" :key="q.label">
@@ -112,7 +111,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
                 <td class="num right" :style="{ color: q.result < 0 ? 'var(--brand-dark)' : 'inherit', fontWeight: 600 }">{{ eur(q.result) }}</td>
               </tr>
               <tr class="yr-total">
-                <td>Totaal {{ year }}</td>
+                <td>{{ $t('Totaal :year', { year }) }}</td>
                 <td class="num right">{{ eur(totals.revenue) }}</td>
                 <td class="num right">− {{ eur(totals.costs) }}</td>
                 <td class="num right">− {{ eur(totals.km_amount) }}</td>
@@ -121,8 +120,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
             </tbody>
           </table>
           <div v-if="previous.revenue || previous.costs" class="yr-prev">
-            Ter vergelijking {{ year - 1 }}: omzet {{ eur(previous.revenue) }}, kosten {{ eur(previous.costs) }},
-            resultaat {{ eur(previous.result) }}.
+            {{ $t('Ter vergelijking :year: omzet :revenue, kosten :costs, resultaat :result.', { year: year - 1, revenue: eur(previous.revenue), costs: eur(previous.costs), result: eur(previous.result) }) }}
           </div>
         </div>
       </div>
@@ -130,7 +128,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
       <!-- Kosten per categorie -->
       <div class="card">
         <div class="card-body">
-          <div class="yr-title">Kosten per categorie</div>
+          <div class="yr-title">{{ $t('Kosten per categorie') }}</div>
           <template v-if="categories.length">
             <div v-for="c in categories" :key="c.name" class="yr-cat">
               <div class="yr-cat-name">{{ c.name }} <span class="muted">· {{ c.count }}×</span></div>
@@ -138,7 +136,7 @@ const maxCategory = computed(() => Math.max(...props.categories.map(c => c.amoun
               <div class="yr-cat-amount num">{{ eur(c.amount) }}</div>
             </div>
           </template>
-          <div v-else class="muted" style="font-size:13px;">Nog geen inkoopfacturen in {{ year }}.</div>
+          <div v-else class="muted" style="font-size:13px;">{{ $t('Nog geen inkoopfacturen in :year.', { year }) }}</div>
         </div>
       </div>
     </div>

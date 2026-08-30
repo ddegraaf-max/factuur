@@ -45,14 +45,14 @@ class EmailVerificationController extends Controller
         $data = $request->validate([
             'code' => ['required', 'string', 'size:6', 'regex:/^[0-9]{6}$/'],
         ], [
-            'code.required' => 'Voer de 6-cijferige code in.',
-            'code.size' => 'De code bestaat uit precies 6 cijfers.',
-            'code.regex' => 'De code mag alleen cijfers bevatten.',
+            'code.required' => __('Voer de 6-cijferige code in.'),
+            'code.size' => __('De code bestaat uit precies 6 cijfers.'),
+            'code.regex' => __('De code mag alleen cijfers bevatten.'),
         ]);
 
         if ($user->verification_code_attempts >= self::MAX_ATTEMPTS) {
             throw ValidationException::withMessages([
-                'code' => 'Te veel pogingen. Vraag een nieuwe code aan.',
+                'code' => __('Te veel pogingen. Vraag een nieuwe code aan.'),
             ]);
         }
 
@@ -61,8 +61,8 @@ class EmailVerificationController extends Controller
 
             $remaining = self::MAX_ATTEMPTS - $user->verification_code_attempts;
             $msg = $remaining > 0
-                ? "De code is onjuist of verlopen. Nog {$remaining} poging(en) voordat je een nieuwe moet aanvragen."
-                : 'Te veel pogingen. Vraag een nieuwe code aan.';
+                ? __('De code is onjuist of verlopen. Nog :count poging(en) voordat je een nieuwe moet aanvragen.', ['count' => $remaining])
+                : __('Te veel pogingen. Vraag een nieuwe code aan.');
 
             throw ValidationException::withMessages(['code' => $msg]);
         }
@@ -73,7 +73,7 @@ class EmailVerificationController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard')->with('flash', 'Welkom! Je e-mailadres is bevestigd.');
+        return redirect()->route('dashboard')->with('flash', __('Welkom! Je e-mailadres is bevestigd.'));
     }
 
     public function resend(Request $request)
@@ -90,14 +90,14 @@ class EmailVerificationController extends Controller
         $cooldown = $this->resendCooldownSeconds($user);
         if ($cooldown > 0) {
             throw ValidationException::withMessages([
-                'code' => "Wacht nog {$cooldown} seconde(n) voordat je een nieuwe code aanvraagt.",
+                'code' => __('Wacht nog :seconds seconde(n) voordat je een nieuwe code aanvraagt.', ['seconds' => $cooldown]),
             ]);
         }
 
         $code = $user->generateVerificationCode();
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
 
-        return back()->with('flash', 'Nieuwe code verstuurd naar ' . $user->email);
+        return back()->with('flash', __('Nieuwe code verstuurd naar :email', ['email' => $user->email]));
     }
 
     private function resolveUser(Request $request): ?User

@@ -2,7 +2,7 @@
 
 /**
  * Engelstalige documentteksten — voor klanten met taalinstelling "Engels".
- * Bedragen houden bewust de Europese notatie (€ 1.234,56).
+ * Bedragen volgen de markt via money(): "€ 1.234,56" in Nederland, "1 234,50 zł" in Polen.
  */
 return [
     // Documenttitels
@@ -21,6 +21,7 @@ return [
     'coc' => 'CoC',
     'vat_no' => 'VAT',
     'invoice_date' => 'Invoice date',
+    'sale_date' => 'Date of supply',
     'due_date' => 'Due date',
     'quote_date' => 'Quotation date',
     'valid_until' => 'Valid until',
@@ -38,6 +39,9 @@ return [
     'already_settled' => 'Already settled',
     'amount_due' => 'Amount due',
     'note' => 'Note',
+    'vat_summary' => 'VAT summary',
+    'net' => 'Net',
+    'gross' => 'Gross',
 
     // Betaalinstructie op de factuur
     'pay_instruction' => 'Please transfer the amount within <strong>:days days</strong> to <strong>:iban</strong> in the name of <strong>:name</strong>',
@@ -55,8 +59,8 @@ return [
     // Factuurmail
     'mail_invoice_subject' => 'Invoice :number — :company',
     'mail_greeting' => 'Dear :name,',
-    'mail_invoice_intro' => 'Please find attached invoice <strong>:number</strong> dated :date for the amount of <strong>€ :total</strong>.',
-    'mail_settled_partial' => 'An amount of <strong>€ :settled</strong> has already been settled; the amount due is <strong>€ :open</strong>.',
+    'mail_invoice_intro' => 'Please find attached invoice <strong>:number</strong> dated :date for the amount of <strong>:total</strong>.',
+    'mail_settled_partial' => 'An amount of <strong>:settled</strong> has already been settled; the amount due is <strong>:open</strong>.',
     'mail_settled_full' => 'The full amount has already been settled — no further payment is required.',
     'mail_the_amount' => 'the amount',
     'mail_remaining_amount' => 'the remaining amount',

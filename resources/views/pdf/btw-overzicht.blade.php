@@ -1,6 +1,6 @@
 @php
-    $money = fn ($v) => ($v < 0 ? '- ' : '') . '€ ' . number_format(abs((float) $v), 2, ',', '.');
-    $whole = fn ($v) => ($v < 0 ? '- ' : '') . '€ ' . number_format(abs((float) $v), 0, ',', '.');
+    $money = fn ($v) => money($v);
+    $whole = fn ($v) => money($v, true, 0);
     $brand = $company->brand_color ?: brand('color');
     $typeLabel = ['quarter' => 'kwartaal', 'month' => 'maand', 'year' => 'jaar'][$period_type] ?? 'kwartaal';
     $statusLabel = function ($p) {

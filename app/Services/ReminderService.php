@@ -228,13 +228,13 @@ class ReminderService
 
     private function vars(Invoice $invoice, Company $company, int $termijn, float $remaining): array
     {
-        $eur = fn ($n) => '€ ' . number_format((float) $n, 2, ',', '.');
+        $eur = fn ($n) => money($n);
 
         return [
             '{klant}' => $invoice->customer_name ?? '',
             '{factuurnummer}' => $invoice->number ?? '',
-            '{factuurdatum}' => optional($invoice->invoice_date)->format('d-m-Y') ?? '',
-            '{vervaldatum}' => optional($invoice->due_date)->format('d-m-Y') ?? '',
+            '{factuurdatum}' => optional($invoice->invoice_date)->format(market('date_format')) ?? '',
+            '{vervaldatum}' => optional($invoice->due_date)->format(market('date_format')) ?? '',
             '{bedrag}' => $eur($invoice->total),
             '{openstaand}' => $eur($remaining),
             '{termijn}' => (string) $termijn,

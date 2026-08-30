@@ -52,17 +52,17 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Verificatie" />
+  <Head :title="$t('Verificatie')" />
   <AuthLayout>
     <template #hero>
-      <h2>Twee stappen veilig</h2>
-      <p>Je tweestapsverificatie is actief. Voer de code uit je authenticator app in om verder te gaan.</p>
+      <h2>{{ $t('Twee stappen veilig') }}</h2>
+      <p>{{ $t('Je tweestapsverificatie is actief. Voer de code uit je authenticator app in om verder te gaan.') }}</p>
     </template>
 
     <div class="login-form-card">
-      <div class="login-form-title">{{ useBackup ? 'Backup-code' : 'Verificatiecode' }}</div>
+      <div class="login-form-title">{{ useBackup ? $t('Backup-code') : $t('Verificatiecode') }}</div>
       <div class="login-form-sub">
-        {{ useBackup ? 'Voer een van je backup-codes in.' : 'Open je authenticator app en voer de 6-cijferige code in.' }}
+        {{ useBackup ? $t('Voer een van je backup-codes in.') : $t('Open je authenticator app en voer de 6-cijferige code in.') }}
       </div>
 
       <form @submit.prevent="submit">
@@ -77,7 +77,7 @@ const submit = () => {
             @keydown="onKeydown(i-1, $event)" />
         </div>
         <div v-else class="form-group">
-          <label>Backup-code</label>
+          <label>{{ $t('Backup-code') }}</label>
           <input v-model="form.recovery_code" type="text" placeholder="0000-0000" />
         </div>
 
@@ -85,12 +85,12 @@ const submit = () => {
         <div v-if="form.errors.recovery_code" class="field-error">{{ form.errors.recovery_code }}</div>
 
         <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
-          Verifiëren
+          {{ $t('Verifiëren') }}
         </button>
 
         <div class="login-bottom">
           <a @click.prevent="useBackup = !useBackup; form.reset();">
-            {{ useBackup ? '← Terug naar code' : 'Geen toegang? Gebruik backup-code' }}
+            {{ useBackup ? $t('← Terug naar code') : $t('Geen toegang? Gebruik backup-code') }}
           </a>
         </div>
       </form>

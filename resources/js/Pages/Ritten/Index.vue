@@ -1,8 +1,9 @@
 <script setup>
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur } from '@/format.js';
+import { eur, num, marketLocale } from '@/format.js';
 import { computed, ref } from 'vue';
+import { t } from '@/i18n';
 
 const props = defineProps({
   trips: Object,               // paginator
@@ -13,7 +14,13 @@ const props = defineProps({
   default_km_rate: Number,     // standaard kilometervergoeding van het bedrijf
 });
 
-const km = (n) => Number(n).toLocaleString('nl-NL', { maximumFractionDigits: 1 });
+// Markt (nl/pl): valutasymbool voor de tarief-hint en de wettelijke
+// kilometervergoeding als het bedrijf zelf geen standaardtarief heeft.
+const market = computed(() => usePage().props.market || {});
+const symbol = computed(() => market.value.symbol || '€');
+const defaultRate = computed(() => props.default_km_rate ?? market.value.km_rate ?? 0.23);
+
+const km = (n) => Number(n).toLocaleString(marketLocale, { maximumFractionDigits: 1 });
 
 /* ---------- Rit registreren / bewerken ---------- */
 const today = new Date().toISOString().slice(0, 10);
@@ -42,9 +49,7 @@ const totalKm = computed(() => {
   return Math.round(single * (form.round_trip ? 2 : 1) * 10) / 10;
 });
 
-const ratePlaceholder = computed(() =>
-  `${Number(props.default_km_rate).toFixed(2).replace('.', ',')} (standaard)`
-);
+const ratePlaceholder = computed(() => t(':rate (standaard)', { rate: num(defaultRate.value) }));
 
 const submit = () => {
   form
@@ -93,15 +98,15 @@ const cancelEdit = () => {
   form.trip_date = today;
 };
 
-const removeTrip = (t) => {
-  if (confirm('Deze rit verwijderen?')) {
-    router.delete(route('trips.destroy', t.id), { preserveScroll: true });
+const removeTrip = (trip) => {
+  if (confirm(t('Deze rit verwijderen?'))) {
+    router.delete(route('trips.destroy', trip.id), { preserveScroll: true });
   }
 };
 
 /* ---------- Factureren ---------- */
 const invoiceCustomer = (row) => {
-  if (confirm(`Conceptfactuur maken voor ${row.customer_name} met ${km(row.kilometers)} km (${eur(row.amount)})?`)) {
+  if (confirm(t('Conceptfactuur maken voor :customer met :km km (:amount)?', { customer: row.customer_name, km: km(row.kilometers), amount: eur(row.amount) }))) {
     router.post(route('trips.invoice'), { customer_id: row.customer_id });
   }
 };
@@ -118,27 +123,27 @@ const applyFilters = (overrides = {}) => {
 </script>
 
 <template>
-  <Head title="Ritten" />
+  <Head :title="$t('Ritten')" />
   <AppLayout>
     <template #breadcrumb>
-      <div class="breadcrumb">Verkoop / <span class="breadcrumb-current">Ritten</span></div>
+      <div class="breadcrumb">{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Ritten') }}</span></div>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Kilometerregistratie</h1>
-        <p class="page-subtitle">Houd zakelijke ritten bij — belast ze door aan je klant of bewaar ze als kilometeradministratie voor je aangifte.</p>
+        <h1 class="page-title">{{ $t('Kilometerregistratie') }}</h1>
+        <p class="page-subtitle">{{ $t('Houd zakelijke ritten bij — belast ze door aan je klant of bewaar ze als kilometeradministratie voor je aangifte.') }}</p>
       </div>
     </div>
 
     <!-- Statistieken -->
     <div class="kpi-grid">
-      <div class="kpi"><div class="lbl">Deze maand</div><div class="val">{{ km(stats.month_km) }} km</div><div class="meta">zakelijk gereden</div></div>
-      <div class="kpi"><div class="lbl">Dit jaar</div><div class="val">{{ km(stats.year_km) }} km</div><div class="meta">zakelijk gereden</div></div>
+      <div class="kpi"><div class="lbl">{{ $t('Deze maand') }}</div><div class="val">{{ km(stats.month_km) }} km</div><div class="meta">{{ $t('zakelijk gereden') }}</div></div>
+      <div class="kpi"><div class="lbl">{{ $t('Dit jaar') }}</div><div class="val">{{ km(stats.year_km) }} km</div><div class="meta">{{ $t('zakelijk gereden') }}</div></div>
       <div class="kpi" :class="{ alert: stats.open_amount > 0 }">
-        <div class="lbl">Nog te factureren</div>
+        <div class="lbl">{{ $t('Nog te factureren') }}</div>
         <div class="val">{{ eur(stats.open_amount) }}</div>
-        <div class="meta">aan open reiskosten</div>
+        <div class="meta">{{ $t('aan open reiskosten') }}</div>
       </div>
     </div>
 
@@ -146,57 +151,57 @@ const applyFilters = (overrides = {}) => {
     <div class="card" style="margin-bottom:16px;">
       <div class="card-body">
         <div class="trip-form-title">
-          {{ editingId ? 'Rit bewerken' : 'Rit registreren' }}
-          <button v-if="editingId" type="button" class="btn btn-secondary btn-sm" @click="cancelEdit">Annuleren</button>
+          {{ editingId ? $t('Rit bewerken') : $t('Rit registreren') }}
+          <button v-if="editingId" type="button" class="btn btn-secondary btn-sm" @click="cancelEdit">{{ $t('Annuleren') }}</button>
         </div>
         <form @submit.prevent="submit" class="trip-form">
           <div class="form-group">
-            <label>Datum *</label>
+            <label>{{ $t('Datum') }} *</label>
             <input type="date" v-model="form.trip_date">
             <div v-if="form.errors.trip_date" class="field-error">{{ form.errors.trip_date }}</div>
           </div>
           <div class="form-group">
-            <label>Klant<span class="label-hint">(voor doorbelasten)</span></label>
+            <label>{{ $t('Klant') }}<span class="label-hint">{{ $t('(voor doorbelasten)') }}</span></label>
             <select v-model="form.customer_id">
-              <option :value="null">— Geen klant —</option>
+              <option :value="null">{{ $t('— Geen klant —') }}</option>
               <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label>Van *</label>
-            <input type="text" v-model="form.from_location" maxlength="190" placeholder="Bijv. Bussum">
+            <label>{{ $t('Van') }} *</label>
+            <input type="text" v-model="form.from_location" maxlength="190" :placeholder="$t('Bijv. Bussum')">
             <div v-if="form.errors.from_location" class="field-error">{{ form.errors.from_location }}</div>
           </div>
           <div class="form-group">
-            <label>Naar *</label>
-            <input type="text" v-model="form.to_location" maxlength="190" placeholder="Bijv. Amsterdam">
+            <label>{{ $t('Naar') }} *</label>
+            <input type="text" v-model="form.to_location" maxlength="190" :placeholder="$t('Bijv. Amsterdam')">
             <div v-if="form.errors.to_location" class="field-error">{{ form.errors.to_location }}</div>
           </div>
           <div class="form-group narrow">
-            <label>Afstand (km) *</label>
-            <input type="text" v-model="form.distance" placeholder="Bijv. 42,5" inputmode="decimal">
+            <label>{{ $t('Afstand (km)') }} *</label>
+            <input type="text" v-model="form.distance" :placeholder="$t('Bijv. 42,5')" inputmode="decimal">
             <label class="checkbox-row" style="margin-top:7px;">
               <input type="checkbox" v-model="form.round_trip">
-              <span>Retour<template v-if="totalKm > 0"> — totaal {{ km(totalKm) }} km</template></span>
+              <span>{{ $t('Retour') }}<template v-if="totalKm > 0"> — {{ $t('totaal :km km', { km: km(totalKm) }) }}</template></span>
             </label>
             <div v-if="form.errors.kilometers" class="field-error">{{ form.errors.kilometers }}</div>
           </div>
           <div class="form-group narrow">
-            <label>Tarief per km<span class="label-hint">€</span></label>
+            <label>{{ $t('Tarief per km') }}<span class="label-hint">{{ symbol }}</span></label>
             <input type="text" v-model="form.rate" :placeholder="ratePlaceholder" inputmode="decimal">
             <div v-if="form.errors.rate" class="field-error">{{ form.errors.rate }}</div>
           </div>
           <div class="form-group grow">
-            <label>Doel van de rit<span class="label-hint">(optioneel, komt als detail op de factuur)</span></label>
-            <input type="text" v-model="form.description" maxlength="500" placeholder="Bijv. bespreking nieuwe huisstijl">
+            <label>{{ $t('Doel van de rit') }}<span class="label-hint">{{ $t('(optioneel, komt als detail op de factuur)') }}</span></label>
+            <input type="text" v-model="form.description" maxlength="500" :placeholder="$t('Bijv. bespreking nieuwe huisstijl')">
           </div>
           <div class="trip-form-actions">
             <label class="checkbox-row" style="margin:0;">
               <input type="checkbox" v-model="form.billable">
-              <span>Doorbelasten aan klant</span>
+              <span>{{ $t('Doorbelasten aan klant') }}</span>
             </label>
             <button type="submit" class="btn btn-primary" :disabled="form.processing">
-              {{ form.processing ? 'Bezig…' : (editingId ? 'Opslaan' : 'Rit registreren') }}
+              {{ form.processing ? $t('Bezig…') : (editingId ? $t('Opslaan') : $t('Rit registreren')) }}
             </button>
           </div>
         </form>
@@ -206,15 +211,15 @@ const applyFilters = (overrides = {}) => {
     <!-- Met één klik factureren -->
     <div v-if="billable_by_customer.length" class="card" style="margin-bottom:16px;">
       <div class="card-body">
-        <div class="trip-form-title" style="margin-bottom:4px;">Klaar om te factureren</div>
-        <p class="bill-hint">Alle openstaande ritten van een klant worden gebundeld op één conceptfactuur — per rit een reiskostenregel met datum en afstand.</p>
+        <div class="trip-form-title" style="margin-bottom:4px;">{{ $t('Klaar om te factureren') }}</div>
+        <p class="bill-hint">{{ $t('Alle openstaande ritten van een klant worden gebundeld op één conceptfactuur — per rit een reiskostenregel met datum en afstand.') }}</p>
         <div v-for="row in billable_by_customer" :key="row.customer_id" class="bill-row">
           <span class="bill-name">{{ row.customer_name }}</span>
-          <span class="bill-meta">{{ km(row.kilometers) }} km · {{ row.trips }} rit{{ row.trips === 1 ? '' : 'ten' }}</span>
+          <span class="bill-meta">{{ km(row.kilometers) }} km · {{ row.trips === 1 ? $t(':n rit', { n: row.trips }) : $t(':n ritten', { n: row.trips }) }}</span>
           <span class="bill-amount num">{{ eur(row.amount) }}</span>
           <button type="button" class="btn btn-primary btn-sm" @click="invoiceCustomer(row)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Maak factuur
+            {{ $t('Maak factuur') }}
           </button>
         </div>
       </div>
@@ -222,18 +227,18 @@ const applyFilters = (overrides = {}) => {
 
     <!-- Filters -->
     <div class="filter-bar">
-      <button :class="['filter-chip', { active: filters.status === 'open' }]" @click="applyFilters({ status: 'open' })">Open</button>
-      <button :class="['filter-chip', { active: filters.status === 'invoiced' }]" @click="applyFilters({ status: 'invoiced' })">Gefactureerd</button>
-      <button :class="['filter-chip', { active: filters.status === 'all' }]" @click="applyFilters({ status: 'all' })">Alles</button>
+      <button :class="['filter-chip', { active: filters.status === 'open' }]" @click="applyFilters({ status: 'open' })">{{ $t('Open') }}</button>
+      <button :class="['filter-chip', { active: filters.status === 'invoiced' }]" @click="applyFilters({ status: 'invoiced' })">{{ $t('Gefactureerd') }}</button>
+      <button :class="['filter-chip', { active: filters.status === 'all' }]" @click="applyFilters({ status: 'all' })">{{ $t('Alles') }}</button>
       <span class="filter-sep"></span>
       <select class="filter-select" :value="filters.period" @change="applyFilters({ period: $event.target.value })">
-        <option value="week">Deze week</option>
-        <option value="month">Deze maand</option>
-        <option value="year">Dit jaar</option>
-        <option value="all">Alle periodes</option>
+        <option value="week">{{ $t('Deze week') }}</option>
+        <option value="month">{{ $t('Deze maand') }}</option>
+        <option value="year">{{ $t('Dit jaar') }}</option>
+        <option value="all">{{ $t('Alle periodes') }}</option>
       </select>
       <select class="filter-select" :value="filters.customer_id ?? ''" @change="applyFilters({ customer_id: $event.target.value || undefined })">
-        <option value="">Alle klanten</option>
+        <option value="">{{ $t('Alle klanten') }}</option>
         <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
     </div>
@@ -243,40 +248,40 @@ const applyFilters = (overrides = {}) => {
       <table class="data-table">
         <thead>
           <tr>
-            <th>Datum</th>
-            <th>Rit</th>
-            <th>Klant</th>
-            <th class="right">Afstand</th>
-            <th class="right">Tarief</th>
-            <th class="right">Bedrag</th>
-            <th>Status</th>
+            <th>{{ $t('Datum') }}</th>
+            <th>{{ $t('Rit') }}</th>
+            <th>{{ $t('Klant') }}</th>
+            <th class="right">{{ $t('Afstand') }}</th>
+            <th class="right">{{ $t('Tarief') }}</th>
+            <th class="right">{{ $t('Bedrag') }}</th>
+            <th>{{ $t('Status') }}</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="t in trips.data" :key="t.id">
-            <td data-label="Datum">{{ t.trip_date_label }}</td>
-            <td class="cell-primary" data-label="Rit">
-              {{ t.from_location }} – {{ t.to_location }}<template v-if="t.round_trip"> <span class="muted">(retour)</span></template>
+            <td :data-label="$t('Datum')">{{ t.trip_date_label }}</td>
+            <td class="cell-primary" :data-label="$t('Rit')">
+              {{ t.from_location }} – {{ t.to_location }}<template v-if="t.round_trip"> <span class="muted">{{ $t('(retour)') }}</span></template>
               <div v-if="t.description" class="trip-desc">{{ t.description }}</div>
             </td>
-            <td data-label="Klant">{{ t.customer_name || '—' }}</td>
-            <td class="num right" data-label="Afstand">{{ km(t.kilometers) }} km</td>
-            <td class="num right" data-label="Tarief">{{ eur(t.effective_rate) }}</td>
-            <td class="num right" data-label="Bedrag">{{ t.amount != null ? eur(t.amount) : '—' }}</td>
-            <td data-label="Status">
+            <td :data-label="$t('Klant')">{{ t.customer_name || '—' }}</td>
+            <td class="num right" :data-label="$t('Afstand')">{{ km(t.kilometers) }} km</td>
+            <td class="num right" :data-label="$t('Tarief')">{{ eur(t.effective_rate) }}</td>
+            <td class="num right" :data-label="$t('Bedrag')">{{ t.amount != null ? eur(t.amount) : '—' }}</td>
+            <td :data-label="$t('Status')">
               <Link v-if="t.invoice_id" :href="route('invoices.show', t.invoice_id)" class="pill pill-paid" style="text-decoration:none;">
-                {{ t.invoice_number || 'Conceptfactuur' }}
+                {{ t.invoice_number || $t('Conceptfactuur') }}
               </Link>
-              <span v-else-if="!t.billable" class="pill pill-muted">Eigen administratie</span>
-              <span v-else class="pill pill-sent">Open</span>
+              <span v-else-if="!t.billable" class="pill pill-muted">{{ $t('Eigen administratie') }}</span>
+              <span v-else class="pill pill-sent">{{ $t('Open') }}</span>
             </td>
             <td class="row-actions">
               <template v-if="!t.invoice_id">
-                <button type="button" class="icon-btn" title="Bewerken" @click="startEdit(t)">
+                <button type="button" class="icon-btn" :title="$t('Bewerken')" @click="startEdit(t)">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
                 </button>
-                <button type="button" class="icon-btn" title="Verwijderen" @click="removeTrip(t)">
+                <button type="button" class="icon-btn" :title="$t('Verwijderen')" @click="removeTrip(t)">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </template>
@@ -295,8 +300,8 @@ const applyFilters = (overrides = {}) => {
       </div>
     </div>
     <div v-else class="card card-empty">
-      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">Nog geen ritten in deze periode</div>
-      <div>Registreer hierboven je eerste zakelijke rit — doorbelasten aan je klant of gewoon voor je eigen kilometeradministratie.</div>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:18px;color:var(--text);margin-bottom:6px;">{{ $t('Nog geen ritten in deze periode') }}</div>
+      <div>{{ $t('Registreer hierboven je eerste zakelijke rit — doorbelasten aan je klant of gewoon voor je eigen kilometeradministratie.') }}</div>
     </div>
   </AppLayout>
 </template>

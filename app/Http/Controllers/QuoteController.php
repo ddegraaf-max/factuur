@@ -6,7 +6,6 @@ use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quote;
 use App\Services\QuoteManager;
-use App\Services\VatCalculator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -85,21 +84,21 @@ class QuoteController extends Controller
 
         if (! $request->user()->company->hasAiAccess()) {
             return response()->json([
-                'message' => 'Offerte uit tekst zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.',
+                'message' => __('Offerte uit tekst zit in het Slim-abonnement. Upgrade via Instellingen → Abonnement.'),
             ], 403);
         }
 
         if ($request->user()->company->aiLimitReached()) {
             return response()->json([
-                'message' => 'Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.',
+                'message' => __('Het maandelijkse AI-tegoed is opgebruikt (fair use). Volgende maand staat de teller weer op nul.'),
             ], 429);
         }
 
         $data = $request->validate([
             'text' => ['required', 'string', 'max:20000'],
         ], [
-            'text.required' => 'Plak eerst de offertetekst.',
-            'text.max' => 'De tekst is te lang (maximaal 20.000 tekens).',
+            'text.required' => __('Plak eerst de offertetekst.'),
+            'text.max' => __('De tekst is te lang (maximaal 20.000 tekens).'),
         ]);
 
         try {
@@ -137,7 +136,7 @@ class QuoteController extends Controller
             return $this->dispatchSend($quote);
         }
 
-        return redirect()->route('quotes.show', $quote)->with('flash', 'Concept-offerte opgeslagen.');
+        return redirect()->route('quotes.show', $quote)->with('flash', __('Concept-offerte opgeslagen.'));
     }
 
     public function show(Quote $quote): Response
@@ -198,7 +197,7 @@ class QuoteController extends Controller
     {
         if (! in_array($quote->status, ['draft', 'sent'], true)) {
             return redirect()->route('quotes.show', $quote)
-                ->withErrors(['quote' => 'Een geaccepteerde of afgewezen offerte kun je niet meer wijzigen.']);
+                ->withErrors(['quote' => __('Een geaccepteerde of afgewezen offerte kun je niet meer wijzigen.')]);
         }
 
         $quote->load('lines');
@@ -222,18 +221,18 @@ class QuoteController extends Controller
             return $this->dispatchSend($quote->fresh());
         }
 
-        return redirect()->route('quotes.show', $quote)->with('flash', 'Offerte bijgewerkt.');
+        return redirect()->route('quotes.show', $quote)->with('flash', __('Offerte bijgewerkt.'));
     }
 
     public function destroy(Quote $quote): RedirectResponse
     {
         if ($quote->status !== 'draft') {
-            return back()->withErrors(['quote' => 'Alleen concepten kunnen worden verwijderd.']);
+            return back()->withErrors(['quote' => __('Alleen concepten kunnen worden verwijderd.')]);
         }
 
         $quote->delete();
 
-        return redirect()->route('quotes.index')->with('flash', 'Concept verwijderd.');
+        return redirect()->route('quotes.index')->with('flash', __('Concept verwijderd.'));
     }
 
     public function send(Quote $quote): RedirectResponse
@@ -249,18 +248,18 @@ class QuoteController extends Controller
             return back()->withErrors(['quote' => $e->getMessage()]);
         }
 
-        $flash = 'Offerte gemarkeerd als geaccepteerd.';
+        $flash = __('Offerte gemarkeerd als geaccepteerd.');
 
         // Vinkje "Bevestiging mailen naar de klant" (bijv. akkoord per telefoon).
         if ($request->boolean('send_confirmation')) {
             try {
                 $this->manager->sendAcceptConfirmation($quote->fresh());
-                $flash .= " Bevestiging gemaild naar {$quote->customer_email}.";
+                $flash .= ' ' . __('Bevestiging gemaild naar :email.', ['email' => $quote->customer_email]);
             } catch (\DomainException $e) {
-                $flash .= ' Geen bevestiging: '.$e->getMessage();
+                $flash .= ' ' . __('Geen bevestiging: :reason', ['reason' => $e->getMessage()]);
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::error('Bevestiging akkoord mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
-                $flash .= ' De bevestiging kon niet worden gemaild — probeer het straks via "Bevestiging mailen".';
+                $flash .= ' ' . __('De bevestiging kon niet worden gemaild — probeer het straks via "Bevestiging mailen".');
             }
         }
 
@@ -277,10 +276,10 @@ class QuoteController extends Controller
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Bevestiging akkoord (handmatig) mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
 
-            return back()->withErrors(['quote' => 'Versturen is niet gelukt. Probeer het later opnieuw.']);
+            return back()->withErrors(['quote' => __('Versturen is niet gelukt. Probeer het later opnieuw.')]);
         }
 
-        return back()->with('flash', "Bevestiging gemaild naar {$quote->customer_email}.");
+        return back()->with('flash', __('Bevestiging gemaild naar :email.', ['email' => $quote->customer_email]));
     }
 
     public function reject(Quote $quote): RedirectResponse
@@ -291,7 +290,7 @@ class QuoteController extends Controller
             return back()->withErrors(['quote' => $e->getMessage()]);
         }
 
-        return back()->with('flash', 'Offerte gemarkeerd als afgewezen.');
+        return back()->with('flash', __('Offerte gemarkeerd als afgewezen.'));
     }
 
     public function convert(Quote $quote): RedirectResponse
@@ -303,7 +302,7 @@ class QuoteController extends Controller
         }
 
         return redirect()->route('invoices.show', $invoice)
-            ->with('flash', 'Concept-factuur aangemaakt uit offerte '.$quote->number.'. Controleer en verstuur hem.');
+            ->with('flash', __('Concept-factuur aangemaakt uit offerte :number. Controleer en verstuur hem.', ['number' => $quote->number]));
     }
 
     public function pdf(Quote $quote): HttpResponse
@@ -328,8 +327,8 @@ class QuoteController extends Controller
 
         $fresh = $quote->fresh();
         $message = $fresh->customer_email
-            ? "Offerte {$fresh->number} verstuurd naar {$fresh->customer_email}."
-            : "Offerte {$fresh->number} vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.";
+            ? __('Offerte :number verstuurd naar :email.', ['number' => $fresh->number, 'email' => $fresh->customer_email])
+            : __('Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.', ['number' => $fresh->number]);
 
         return redirect()->route('quotes.show', $fresh)->with('flash', $message);
     }
@@ -341,7 +340,8 @@ class QuoteController extends Controller
         return [
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
-            'vat_rates' => VatCalculator::availableRates(),
+            'vat_rates' => \App\Support\Market::vatRateOptions(),
+            'default_vat_rate' => \App\Support\Market::defaultVatRate(),
             'price_mode' => $company?->price_mode ?? 'excl',
             'default_valid_days' => $company?->quote_valid_days ?? 30,
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
@@ -374,34 +374,34 @@ class QuoteController extends Controller
             // Negatief mag: een korting of verrekening als losse regel is
             // gangbaar. Alleen het offertetotaal mag niet onder nul (zie onder).
             'lines.*.unit_price' => ['required', 'numeric', 'min:-1000000', 'max:1000000'],
-            'lines.*.vat_rate' => ['required', 'numeric', 'in:0,9,21'],
+            'lines.*.vat_rate' => ['required', 'numeric', 'in:' . implode(',', \App\Support\Market::vatRates())],
             'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'action' => ['nullable', 'in:draft,send'],
         ], [
-            'customer_id.required' => 'Kies een klant voor deze offerte.',
-            'customer_id.exists' => 'Kies een klant voor deze offerte.',
-            'quote_date.required' => 'Vul een offertedatum in.',
-            'quote_date.date' => 'Vul een geldige offertedatum in.',
-            'valid_days.required' => 'Vul in hoeveel dagen de offerte geldig is.',
-            'valid_days.integer' => 'De geldigheid moet een heel aantal dagen zijn.',
-            'valid_days.min' => 'De offerte moet minstens 1 dag geldig zijn.',
-            'valid_days.max' => 'De geldigheid kan maximaal 365 dagen zijn.',
-            'lines.required' => 'Voeg minstens één offerteregel toe.',
-            'lines.min' => 'Voeg minstens één offerteregel toe.',
-            'lines.*.description.required' => 'Vul een omschrijving in.',
-            'lines.*.description.max' => 'De omschrijving mag maximaal 500 tekens lang zijn.',
-            'lines.*.quantity.required' => 'Vul een aantal in.',
-            'lines.*.quantity.numeric' => 'Het aantal moet een getal zijn.',
-            'lines.*.quantity.min' => 'Het aantal kan niet negatief zijn.',
-            'lines.*.unit_price.required' => 'Vul een prijs in.',
-            'lines.*.unit_price.numeric' => 'De prijs moet een getal zijn (gebruik een punt als decimaalteken).',
-            'lines.*.unit_price.min' => 'De prijs valt buiten het toegestane bereik.',
-            'lines.*.unit_price.max' => 'De prijs valt buiten het toegestane bereik.',
-            'lines.*.vat_rate.required' => 'Kies een btw-tarief.',
-            'lines.*.vat_rate.in' => 'Kies een geldig btw-tarief (0, 9 of 21%).',
-            'lines.*.discount_pct.numeric' => 'De korting moet een getal zijn.',
-            'lines.*.discount_pct.min' => 'De korting kan niet negatief zijn.',
-            'lines.*.discount_pct.max' => 'De korting kan maximaal 100% zijn.',
+            'customer_id.required' => __('Kies een klant voor deze offerte.'),
+            'customer_id.exists' => __('Kies een klant voor deze offerte.'),
+            'quote_date.required' => __('Vul een offertedatum in.'),
+            'quote_date.date' => __('Vul een geldige offertedatum in.'),
+            'valid_days.required' => __('Vul in hoeveel dagen de offerte geldig is.'),
+            'valid_days.integer' => __('De geldigheid moet een heel aantal dagen zijn.'),
+            'valid_days.min' => __('De offerte moet minstens 1 dag geldig zijn.'),
+            'valid_days.max' => __('De geldigheid kan maximaal 365 dagen zijn.'),
+            'lines.required' => __('Voeg minstens één offerteregel toe.'),
+            'lines.min' => __('Voeg minstens één offerteregel toe.'),
+            'lines.*.description.required' => __('Vul een omschrijving in.'),
+            'lines.*.description.max' => __('De omschrijving mag maximaal 500 tekens lang zijn.'),
+            'lines.*.quantity.required' => __('Vul een aantal in.'),
+            'lines.*.quantity.numeric' => __('Het aantal moet een getal zijn.'),
+            'lines.*.quantity.min' => __('Het aantal kan niet negatief zijn.'),
+            'lines.*.unit_price.required' => __('Vul een prijs in.'),
+            'lines.*.unit_price.numeric' => __('De prijs moet een getal zijn (gebruik een punt als decimaalteken).'),
+            'lines.*.unit_price.min' => __('De prijs valt buiten het toegestane bereik.'),
+            'lines.*.unit_price.max' => __('De prijs valt buiten het toegestane bereik.'),
+            'lines.*.vat_rate.required' => __('Kies een btw-tarief.'),
+            'lines.*.vat_rate.in' => __('Kies een geldig btw-tarief (:rates%).', ['rates' => implode(', ', \App\Support\Market::vatRates())]),
+            'lines.*.discount_pct.numeric' => __('De korting moet een getal zijn.'),
+            'lines.*.discount_pct.min' => __('De korting kan niet negatief zijn.'),
+            'lines.*.discount_pct.max' => __('De korting kan maximaal 100% zijn.'),
         ]);
 
         // Losse regels mogen negatief zijn, maar de optelsom niet. Het teken
@@ -414,7 +414,7 @@ class QuoteController extends Controller
 
         if ($sum < -0.005) {
             throw \Illuminate\Validation\ValidationException::withMessages([
-                'lines' => 'Het offertetotaal kan niet negatief zijn.',
+                'lines' => __('Het offertetotaal kan niet negatief zijn.'),
             ]);
         }
 

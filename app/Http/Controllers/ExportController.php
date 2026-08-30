@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Support\Brand;
+use App\Support\Market;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -36,7 +37,7 @@ class ExportController extends Controller
         $company = auth()->user()->company;
         $xml = $exporter->generate($company, (int) $data['year']);
 
-        \App\Support\Audit::log('exported', null, "Auditfile XAF {$data['year']} gedownload");
+        \App\Support\Audit::log('exported', null, __('Auditfile XAF :year gedownload', ['year' => $data['year']]));
 
         $slug = preg_replace('/[^A-Za-z0-9]+/', '-', trim($company->name)) ?: 'administratie';
 
@@ -73,39 +74,68 @@ class ExportController extends Controller
 
         $filename = sprintf('%s-export-%s-tm-%s.csv', Brand::key(), $from->format('Y-m-d'), $to->format('Y-m-d'));
 
-        return response()->streamDownload(function () use ($invoices) {
+        // Kolommen per btw-tarief van de markt (nl: 21/9/0, pl: 23/8/5/0); bij 0% alleen de grondslag.
+        $rates = Market::vatRates();
+        if (! in_array(0, $rates, true)) {
+            $rates[] = 0;
+        }
+        $dateFormat = (string) Market::get('date_format', 'd-m-Y');
+
+        return response()->streamDownload(function () use ($invoices, $rates, $dateFormat) {
             $out = fopen('php://output', 'w');
 
             // UTF-8 BOM zodat Excel diakrieten goed leest.
             fwrite($out, "\xEF\xBB\xBF");
 
             $statusLabels = [
-                'sent' => 'Verstuurd', 'partial' => 'Deels betaald', 'overdue' => 'Vervallen',
-                'incasso' => 'Incasso', 'paid' => 'Betaald',
+                'sent' => __('Verstuurd'), 'partial' => __('Deels betaald'), 'overdue' => __('Vervallen'),
+                'incasso' => __('Incasso'), 'paid' => __('Betaald'),
             ];
 
+            $rateColumns = [];
+            foreach ($rates as $rate) {
+                $rateColumns[] = __('Grondslag :rate%', ['rate' => $rate]);
+                if ($rate > 0) {
+                    $rateColumns[] = __('BTW :rate%', ['rate' => $rate]);
+                }
+            }
+            $emptyBuckets = array_fill_keys(array_map('strval', $rates), ['base' => 0.0, 'vat' => 0.0]);
+            $rateCells = function (array $buckets) use ($rates): array {
+                $cells = [];
+                foreach ($rates as $rate) {
+                    $cells[] = $buckets[(string) $rate]['base'];
+                    if ($rate > 0) {
+                        $cells[] = $buckets[(string) $rate]['vat'];
+                    }
+                }
+
+                return $cells;
+            };
+
             fputcsv($out, [
-                'Factuurnummer', 'Type', 'Status', 'Factuurdatum', 'Vervaldatum', 'Klant',
-                'KVK klant', 'BTW-nummer klant', 'Referentie',
-                'Bedrag excl. BTW', 'Grondslag 21%', 'BTW 21%', 'Grondslag 9%', 'BTW 9%', 'Grondslag 0%',
-                'BTW totaal', 'Bedrag incl. BTW', 'Betaald', 'Doorgestort/verrekend', 'Afgeboekt', 'Openstaand', 'Betaald op',
+                __('Factuurnummer'), __('Type'), __('Status'), __('Factuurdatum'), __('Vervaldatum'), __('Klant'),
+                __('KVK klant'), __('BTW-nummer klant'), __('Referentie'),
+                __('Bedrag excl. BTW'), ...$rateColumns,
+                __('BTW totaal'), __('Bedrag incl. BTW'), __('Betaald'), __('Doorgestort/verrekend'), __('Afgeboekt'), __('Openstaand'), __('Betaald op'),
             ], ';');
 
             $money = fn ($v) => number_format((float) $v, 2, ',', '');
             $sum = [
-                'subtotal' => 0.0, 'base21' => 0.0, 'vat21' => 0.0, 'base9' => 0.0,
-                'vat9' => 0.0, 'base0' => 0.0, 'vat_total' => 0.0, 'total' => 0.0,
+                'subtotal' => 0.0, 'vat_total' => 0.0, 'total' => 0.0,
                 'paid' => 0.0, 'advance' => 0.0, 'written_off' => 0.0, 'open' => 0.0,
             ];
+            $sumBuckets = $emptyBuckets;
 
             foreach ($invoices as $invoice) {
                 // Grondslag en BTW per tarief uit de factuurregels.
-                $buckets = ['21' => ['base' => 0.0, 'vat' => 0.0], '9' => ['base' => 0.0, 'vat' => 0.0], '0' => ['base' => 0.0, 'vat' => 0.0]];
+                $buckets = $emptyBuckets;
                 foreach ($invoice->lines as $line) {
                     $key = (string) (int) (float) $line->vat_rate;
                     if (! isset($buckets[$key])) $key = '0';
                     $buckets[$key]['base'] += (float) $line->line_subtotal;
                     $buckets[$key]['vat'] += (float) $line->line_vat;
+                    $sumBuckets[$key]['base'] += (float) $line->line_subtotal;
+                    $sumBuckets[$key]['vat'] += (float) $line->line_vat;
                 }
 
                 $open = (float) $invoice->total - (float) $invoice->paid_total;
@@ -117,35 +147,26 @@ class ExportController extends Controller
 
                 fputcsv($out, [
                     $invoice->number,
-                    $invoice->is_credit ? 'Creditnota' : 'Factuur',
+                    $invoice->is_credit ? __('Creditnota') : __('Factuur'),
                     $statusLabels[$invoice->status] ?? $invoice->status,
-                    $invoice->invoice_date->format('d-m-Y'),
-                    $invoice->due_date?->format('d-m-Y') ?? '',
+                    $invoice->invoice_date->format($dateFormat),
+                    $invoice->due_date?->format($dateFormat) ?? '',
                     $invoice->customer_name,
                     $invoice->customer_kvk_number ?? '',
                     $invoice->customer_vat_number ?? '',
                     $invoice->reference ?? '',
                     $money($invoice->subtotal),
-                    $money($buckets['21']['base']),
-                    $money($buckets['21']['vat']),
-                    $money($buckets['9']['base']),
-                    $money($buckets['9']['vat']),
-                    $money($buckets['0']['base']),
+                    ...array_map($money, $rateCells($buckets)),
                     $money($invoice->vat_total),
                     $money($invoice->total),
                     $money($realPaid),
                     $money($advancePaid),
                     $money($writtenOff),
                     $money($open),
-                    $invoice->paid_at?->format('d-m-Y') ?? '',
+                    $invoice->paid_at?->format($dateFormat) ?? '',
                 ], ';');
 
                 $sum['subtotal'] += (float) $invoice->subtotal;
-                $sum['base21'] += $buckets['21']['base'];
-                $sum['vat21'] += $buckets['21']['vat'];
-                $sum['base9'] += $buckets['9']['base'];
-                $sum['vat9'] += $buckets['9']['vat'];
-                $sum['base0'] += $buckets['0']['base'];
                 $sum['vat_total'] += (float) $invoice->vat_total;
                 $sum['total'] += (float) $invoice->total;
                 $sum['paid'] += $realPaid;
@@ -156,11 +177,9 @@ class ExportController extends Controller
 
             // Controletotaal voor de boekhouder.
             fputcsv($out, [
-                'TOTAAL', '', '', '', '', '', '', '', '',
+                __('TOTAAL'), '', '', '', '', '', '', '', '',
                 $money($sum['subtotal']),
-                $money($sum['base21']), $money($sum['vat21']),
-                $money($sum['base9']), $money($sum['vat9']),
-                $money($sum['base0']),
+                ...array_map($money, $rateCells($sumBuckets)),
                 $money($sum['vat_total']), $money($sum['total']),
                 $money($sum['paid']), $money($sum['advance']), $money($sum['written_off']), $money($sum['open']), '',
             ], ';');

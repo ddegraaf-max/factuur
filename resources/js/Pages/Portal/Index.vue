@@ -4,6 +4,7 @@ import { computed } from 'vue';
 import PortalLayout from '@/Layouts/PortalLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 import { eur } from '@/format.js';
+import { t } from '@/i18n';
 
 const props = defineProps({
   email: String,
@@ -21,7 +22,7 @@ const openQuote = (q) => router.get(route('portal.quote', q.token));
 const groups = computed(() => {
   const byCompany = new Map();
   for (const inv of props.invoices) {
-    const key = inv.company_name || 'Onbekende afzender';
+    const key = inv.company_name || t('Onbekende afzender');
     if (!byCompany.has(key)) byCompany.set(key, []);
     byCompany.get(key).push(inv);
   }
@@ -29,7 +30,7 @@ const groups = computed(() => {
 });
 
 const multiCompany = computed(() => {
-  const names = new Set([...props.invoices, ...props.quotes].map((d) => d.company_name || 'Onbekende afzender'));
+  const names = new Set([...props.invoices, ...props.quotes].map((d) => d.company_name || t('Onbekende afzender')));
   return names.size > 1;
 });
 
@@ -37,59 +38,59 @@ const open = (inv) => router.get(route('portal.invoice', inv.token));
 </script>
 
 <template>
-  <Head title="Jouw facturen en offertes · Klantenportaal" />
+  <Head :title="$t('Jouw facturen en offertes · Klantenportaal')" />
   <PortalLayout :email="email">
     <div class="portal-page-head">
-      <h1 class="portal-card-title" style="margin-bottom:4px;">Jouw facturen en offertes</h1>
-      <p class="portal-card-sub" style="margin-bottom:0;">Alles wat naar {{ email }} is verstuurd, op één plek.</p>
+      <h1 class="portal-card-title" style="margin-bottom:4px;">{{ $t('Jouw facturen en offertes') }}</h1>
+      <p class="portal-card-sub" style="margin-bottom:0;">{{ $t('Alles wat naar :email is verstuurd, op één plek.', { email }) }}</p>
     </div>
 
     <div class="portal-stats">
       <div class="portal-stat">
-        <div class="portal-stat-label">Openstaand bedrag</div>
+        <div class="portal-stat-label">{{ $t('Openstaand bedrag') }}</div>
         <div class="portal-stat-value">{{ eur(stats.open_amount) }}</div>
       </div>
       <div class="portal-stat">
-        <div class="portal-stat-label">Open facturen</div>
+        <div class="portal-stat-label">{{ $t('Open facturen') }}</div>
         <div class="portal-stat-value">{{ stats.open_count }}</div>
       </div>
       <div class="portal-stat" :class="{ 'portal-stat-alert': stats.overdue_count > 0 }">
-        <div class="portal-stat-label">Waarvan over de vervaldatum</div>
+        <div class="portal-stat-label">{{ $t('Waarvan over de vervaldatum') }}</div>
         <div class="portal-stat-value">{{ stats.overdue_count }}</div>
       </div>
       <div v-if="quotes.length" class="portal-stat" :class="{ 'portal-stat-attention': stats.quotes_open_count > 0 }">
-        <div class="portal-stat-label">Offertes die op u wachten</div>
+        <div class="portal-stat-label">{{ $t('Offertes die op u wachten') }}</div>
         <div class="portal-stat-value">{{ stats.quotes_open_count }}</div>
       </div>
     </div>
 
     <div v-if="invoices.length === 0 && quotes.length === 0" class="portal-card portal-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      <div class="portal-empty-title">Geen facturen of offertes gevonden</div>
-      <p>Er is (nog) niets verstuurd naar dit e-mailadres.</p>
+      <div class="portal-empty-title">{{ $t('Geen facturen of offertes gevonden') }}</div>
+      <p>{{ $t('Er is (nog) niets verstuurd naar dit e-mailadres.') }}</p>
     </div>
 
     <div class="portal-sections">
     <!-- Offertes: bovenaan als er een op reactie wacht, anders onder de facturen -->
     <div v-if="quotes.length" class="portal-group" :style="{ order: quotesFirst ? 0 : 2 }">
-      <div class="portal-group-title">Offertes</div>
+      <div class="portal-group-title">{{ $t('Offertes') }}</div>
       <div class="portal-list">
         <button v-for="q in quotes" :key="q.token" type="button" class="portal-row" :class="{ 'portal-row-attention': q.awaiting }" @click="openQuote(q)">
           <div class="portal-row-main">
             <div class="portal-row-number">
-              Offerte {{ q.number }}
+              {{ $t('Offerte') }} {{ q.number }}
               <span v-if="q.company_name" class="portal-row-company">· {{ q.company_name }}</span>
             </div>
             <div class="portal-row-meta">
               {{ q.quote_date_label }}
-              <template v-if="q.awaiting && q.valid_until_label">· geldig tot {{ q.valid_until_label }}<template v-if="q.days_left > 0"> (nog {{ q.days_left }} {{ q.days_left === 1 ? 'dag' : 'dagen' }})</template></template>
-              <template v-else-if="q.status === 'accepted' && q.accepted_at_label">· geaccepteerd op {{ q.accepted_at_label }}</template>
+              <template v-if="q.awaiting && q.valid_until_label">· {{ $t('geldig tot :date', { date: q.valid_until_label }) }}<template v-if="q.days_left > 0"> ({{ q.days_left === 1 ? $t('nog :n dag', { n: q.days_left }) : $t('nog :n dagen', { n: q.days_left }) }})</template></template>
+              <template v-else-if="q.status === 'accepted' && q.accepted_at_label">· {{ $t('geaccepteerd op :date', { date: q.accepted_at_label }) }}</template>
             </div>
           </div>
           <div class="portal-row-side">
             <div class="portal-row-amount">
               <div class="portal-row-total">{{ eur(q.total) }}</div>
-              <div v-if="q.awaiting" class="portal-row-cta">Bekijk en onderteken →</div>
+              <div v-if="q.awaiting" class="portal-row-cta">{{ $t('Bekijk en onderteken') }} →</div>
             </div>
             <span class="pill" :class="quotePill(q)">{{ q.status_label }}</span>
             <svg class="portal-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
@@ -99,8 +100,8 @@ const open = (inv) => router.get(route('portal.invoice', inv.token));
     </div>
 
     <div v-for="group in groups" :key="group.company" class="portal-group" style="order:1;">
-      <div v-if="!multiCompany && quotes.length" class="portal-group-title">Facturen</div>
-      <div v-if="multiCompany" class="portal-group-title">Facturen · {{ group.company }}</div>
+      <div v-if="!multiCompany && quotes.length" class="portal-group-title">{{ $t('Facturen') }}</div>
+      <div v-if="multiCompany" class="portal-group-title">{{ $t('Facturen') }} · {{ group.company }}</div>
       <div class="portal-list">
         <button
           v-for="inv in group.invoices"
@@ -111,20 +112,20 @@ const open = (inv) => router.get(route('portal.invoice', inv.token));
         >
           <div class="portal-row-main">
             <div class="portal-row-number">
-              {{ inv.is_credit ? 'Creditnota' : 'Factuur' }} {{ inv.number }}
+              {{ inv.is_credit ? $t('Creditnota') : $t('Factuur') }} {{ inv.number }}
               <span v-if="!multiCompany && inv.company_name" class="portal-row-company">· {{ inv.company_name }}</span>
             </div>
             <div class="portal-row-meta">
               {{ inv.invoice_date_label }}
               <template v-if="inv.due_date_label && ['sent','partial','overdue','incasso'].includes(inv.status)">
-                · te betalen vóór {{ inv.due_date_label }}
+                · {{ $t('te betalen vóór :date', { date: inv.due_date_label }) }}
               </template>
             </div>
           </div>
           <div class="portal-row-side">
             <div class="portal-row-amount">
               <div class="portal-row-total">{{ eur(inv.total) }}</div>
-              <div v-if="inv.paid_total > 0 && inv.remaining > 0" class="portal-row-remaining">nog {{ eur(inv.remaining) }} open</div>
+              <div v-if="inv.paid_total > 0 && inv.remaining > 0" class="portal-row-remaining">{{ $t('nog :amount open', { amount: eur(inv.remaining) }) }}</div>
             </div>
             <StatusPill :status="inv.status" :days-overdue="inv.days_overdue" />
             <svg class="portal-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>

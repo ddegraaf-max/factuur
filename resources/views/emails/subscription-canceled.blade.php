@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je {{ brand('name') }}-abonnement is opgezegd</title>
+    <title>{{ __('Je :brand-abonnement is opgezegd', ['brand' => brand('name')]) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -38,34 +38,34 @@
                 </div>
             </div>
             <div class="body">
-                <h1>Hi {{ $firstName }},</h1>
+                <h1>{{ __('Hi :name,', ['name' => $firstName]) }}</h1>
 
-                <p>Je hebt je {{ brand('name') }}-abonnement opgezegd. Jammer dat je gaat — bedankt dat je {{ brand('name') }} hebt gebruikt.</p>
+                <p>{{ __('Je hebt je :brand-abonnement opgezegd. Jammer dat je gaat — bedankt dat je :brand hebt gebruikt.', ['brand' => brand('name')]) }}</p>
 
                 @if ($ended)
-                    <p>Je toegang tot de app is nu beëindigd. <strong>Je account, facturen en gegevens blijven gewoon bewaard</strong> — je kunt op elk moment weer verdergaan waar je gebleven was.</p>
+                    <p>{!! __('Je toegang tot de app is nu beëindigd. <strong>Je account, facturen en gegevens blijven gewoon bewaard</strong> — je kunt op elk moment weer verdergaan waar je gebleven was.') !!}</p>
                 @else
                     <div class="info-box">
-                        <div class="label">Toegang tot en met</div>
+                        <div class="label">{{ __('Toegang tot en met') }}</div>
                         <div class="value">{{ $accessUntil }}</div>
                     </div>
-                    <p>Tot die datum houd je volledige toegang. Daarna stopt je abonnement automatisch. <strong>Je account, facturen en gegevens blijven bewaard</strong>.</p>
+                    <p>{!! __('Tot die datum houd je volledige toegang. Daarna stopt je abonnement automatisch. <strong>Je account, facturen en gegevens blijven bewaard</strong>.') !!}</p>
                 @endif
 
-                <p>Van gedachten veranderd? Je kunt met één klik weer verder — vanaf <strong>€ 12,10 per maand</strong> (incl. btw) heb je meteen weer alles:</p>
+                <p>{!! __('Van gedachten veranderd? Je kunt met één klik weer verder — :price heb je meteen weer alles:', ['price' => __('vanaf <strong>€ 12,10 per maand</strong> (incl. btw)')]) !!}</p>
                 <ul class="feats">
-                    <li>Onbeperkt facturen, klanten en producten</li>
-                    <li>BTW automatisch · herinneringen · incasso</li>
-                    <li>Maandelijks opzegbaar — geen verplichtingen</li>
+                    <li>{{ __('Onbeperkt facturen, klanten en producten') }}</li>
+                    <li>{{ __('BTW automatisch · herinneringen · incasso') }}</li>
+                    <li>{{ __('Maandelijks opzegbaar — geen verplichtingen') }}</li>
                 </ul>
 
                 <div class="btn-wrap">
-                    <a href="{{ $billingUrl }}" class="btn">{{ $ended ? 'Weer activeren' : 'Abonnement hervatten' }}</a>
+                    <a href="{{ $billingUrl }}" class="btn">{{ $ended ? __('Weer activeren') : __('Abonnement hervatten') }}</a>
                 </div>
-                <div class="price">Veilig betalen · maandelijks opzegbaar</div>
+                <div class="price">{{ __('Veilig betalen · maandelijks opzegbaar') }}</div>
 
                 <div class="meta">
-                    Ging er iets mis of missen we iets? We horen het graag — je feedback helpt ons echt verder. Mail ons op <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
+                    {{ __('Ging er iets mis of missen we iets? We horen het graag — je feedback helpt ons echt verder. Mail ons op') }} <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
                 </div>
             </div>
             <div class="footer">

@@ -2,10 +2,11 @@
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import { t } from '@/i18n';
+import { eur } from '@/format';
 
 const props = defineProps({ blockers: Array, creditor: Object, earliest_date: String, collectable: Array, batches: Array, mandates: Number });
 
-const eur = (v) => new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(v || 0);
 const selected = ref(props.collectable.map(i => i.id));
 const toggle = (id) => { selected.value = selected.value.includes(id) ? selected.value.filter(x => x !== id) : [...selected.value, id]; };
 const all = computed(() => selected.value.length === props.collectable.length && props.collectable.length > 0);
@@ -18,28 +19,28 @@ const create = () => {
   form.post(route('direct-debit.store'), { preserveScroll: true, onSuccess: () => { selected.value = []; } });
 };
 const cancelBatch = (b) => {
-  if (confirm(`Batch ${b.reference} annuleren? Alleen doen als je het bestand niet bij de bank hebt ingediend.`)) router.delete(route('direct-debit.destroy', b.id), { preserveScroll: true });
+  if (confirm(t('Batch :reference annuleren? Alleen doen als je het bestand niet bij de bank hebt ingediend.', { reference: b.reference }))) router.delete(route('direct-debit.destroy', b.id), { preserveScroll: true });
 };
 const open = ref(null);
 </script>
 
 <template>
-  <Head title="Automatische incasso" />
+  <Head :title="$t('Automatische incasso')" />
   <AppLayout>
-    <template #breadcrumb>Verkoop / <span class="breadcrumb-current">Automatische incasso</span></template>
+    <template #breadcrumb>{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Automatische incasso') }}</span></template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Automatische incasso</h1>
-        <p class="page-subtitle">Open facturen van klanten met een machtiging bundel je in één incassobestand (SEPA pain.008) dat je uploadt bij je bank — Rabobank, ING, ABN AMRO, bunq, Knab, Triodos en SNS lezen het direct in.</p>
+        <h1 class="page-title">{{ $t('Automatische incasso') }}</h1>
+        <p class="page-subtitle">{{ $t('Open facturen van klanten met een machtiging bundel je in één incassobestand (SEPA pain.008) dat je uploadt bij je bank — Rabobank, ING, ABN AMRO, bunq, Knab, Triodos en SNS lezen het direct in.') }}</p>
       </div>
     </div>
 
     <div v-if="blockers.length" class="card" style="margin-bottom:16px;">
       <div class="card-body dd-blocked">
-        <b>Nog even inrichten:</b> vul {{ blockers.join(' en ') }} in bij
-        <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">Bedrijfsgegevens</Link>.
-        Je Incassant-ID vraag je aan bij je bank (samen met een incassocontract); dat duurt meestal een paar werkdagen.
+        <b>{{ $t('Nog even inrichten:') }}</b> {{ $t('vul :fields in bij', { fields: blockers.map(b => $t(b)).join(' ' + $t('en') + ' ') }) }}
+        <Link :href="route('settings.company')" style="color:var(--brand);font-weight:600;">{{ $t('Bedrijfsgegevens') }}</Link>.
+        {{ $t('Je Incassant-ID vraag je aan bij je bank (samen met een incassocontract); dat duurt meestal een paar werkdagen.') }}
       </div>
     </div>
 
@@ -47,60 +48,58 @@ const open = ref(null);
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">Te incasseren</div>
-            <div class="card-subtitle">{{ collectable.length }} open {{ collectable.length === 1 ? 'factuur' : 'facturen' }} bij {{ mandates }} klant{{ mandates === 1 ? '' : 'en' }} met machtiging</div>
+            <div class="card-title">{{ $t('Te incasseren') }}</div>
+            <div class="card-subtitle">{{ collectable.length === 1 ? $t('1 open factuur') : $t(':n open facturen', { n: collectable.length }) }} {{ mandates === 1 ? $t('bij 1 klant met machtiging') : $t('bij :n klanten met machtiging', { n: mandates }) }}</div>
           </div>
         </div>
         <div class="card-body-flush" v-if="collectable.length">
           <table class="data-table">
-            <thead><tr><th style="width:32px;"><input type="checkbox" :checked="all" @change="toggleAll"></th><th>Factuur</th><th>Klant</th><th>IBAN</th><th>Soort</th><th>Vervalt</th><th class="right">Bedrag</th></tr></thead>
+            <thead><tr><th style="width:32px;"><input type="checkbox" :checked="all" @change="toggleAll"></th><th>{{ $t('Factuur') }}</th><th>{{ $t('Klant') }}</th><th>IBAN</th><th>{{ $t('Soort') }}</th><th>{{ $t('Vervalt') }}</th><th class="right">{{ $t('Bedrag') }}</th></tr></thead>
             <tbody>
               <tr v-for="i in collectable" :key="i.id" @click="toggle(i.id)" style="cursor:pointer;">
                 <td><input type="checkbox" :checked="selected.includes(i.id)" @click.stop="toggle(i.id)"></td>
                 <td><b>{{ i.number }}</b></td>
                 <td>{{ i.customer }}</td>
                 <td class="mono-sm">{{ i.iban }}</td>
-                <td><span class="pill pill-draft">{{ i.scheme }} · {{ i.sequence === 'FRST' ? 'eerste' : 'vervolg' }}</span></td>
+                <td><span class="pill pill-draft">{{ i.scheme }} · {{ i.sequence === 'FRST' ? $t('eerste') : $t('vervolg') }}</span></td>
                 <td class="muted-sm">{{ i.due_label }}</td>
                 <td class="right num">{{ eur(i.remaining) }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div v-else class="card-empty">
-          Niets te incasseren. Zet bij een klant (Klanten → bewerken → <b>Automatische incasso</b>) het IBAN van de machtiging; open facturen van die klant verschijnen dan hier.
-        </div>
+        <div v-else class="card-empty" v-html="$t('Niets te incasseren. Zet bij een klant (Klanten → bewerken → <b>Automatische incasso</b>) het IBAN van de machtiging; open facturen van die klant verschijnen dan hier.')"></div>
         <div v-if="collectable.length" class="dd-footer">
           <div>
-            <label class="dd-date">Incassodatum <input type="date" v-model="form.collection_date" :min="earliest_date"></label>
+            <label class="dd-date">{{ $t('Incassodatum') }} <input type="date" v-model="form.collection_date" :min="earliest_date"></label>
             <div v-if="form.errors.collection_date" class="field-error">{{ form.errors.collection_date }}</div>
-            <div class="muted-sm">Minimaal drie werkdagen vooruit; de bank verwerkt het bestand op die dag.</div>
+            <div class="muted-sm">{{ $t('Minimaal drie werkdagen vooruit; de bank verwerkt het bestand op die dag.') }}</div>
           </div>
           <div class="dd-total">
-            <div class="muted-sm">{{ selected.length }} geselecteerd</div>
+            <div class="muted-sm">{{ $t(':n geselecteerd', { n: selected.length }) }}</div>
             <div class="dd-sum">{{ eur(total) }}</div>
-            <button class="btn btn-primary" :disabled="!selected.length || blockers.length || form.processing" @click="create">{{ form.processing ? 'Bezig…' : 'Batch aanmaken' }}</button>
+            <button class="btn btn-primary" :disabled="!selected.length || blockers.length || form.processing" @click="create">{{ form.processing ? $t('Bezig…') : $t('Batch aanmaken') }}</button>
           </div>
         </div>
       </div>
 
       <div>
         <div class="card">
-          <div class="card-header"><div class="card-title">Incassobestanden</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Incassobestanden') }}</div></div>
           <div class="card-body-flush" v-if="batches.length">
             <table class="data-table">
-              <thead><tr><th>Batch</th><th>Incassodatum</th><th class="right">Facturen</th><th class="right">Totaal</th><th></th></tr></thead>
+              <thead><tr><th>{{ $t('Batch') }}</th><th>{{ $t('Incassodatum') }}</th><th class="right">{{ $t('Facturen') }}</th><th class="right">{{ $t('Totaal') }}</th><th></th></tr></thead>
               <tbody>
                 <template v-for="b in batches" :key="b.id">
                   <tr>
-                    <td><b>{{ b.reference }}</b><div class="muted-sm">{{ b.created_label }}<span v-if="b.downloaded"> · gedownload</span></div></td>
+                    <td><b>{{ b.reference }}</b><div class="muted-sm">{{ b.created_label }}<span v-if="b.downloaded"> · {{ $t('gedownload') }}</span></div></td>
                     <td>{{ b.collection_label }}</td>
                     <td class="right num">{{ b.count }}</td>
                     <td class="right num">{{ eur(b.total) }}</td>
                     <td class="right dd-actions">
-                      <a :href="route('direct-debit.download', b.id)" class="btn btn-secondary btn-sm">Download XML</a>
-                      <button type="button" class="link-btn" @click="open = open === b.id ? null : b.id">{{ open === b.id ? 'verberg' : 'details' }}</button>
-                      <button type="button" class="link-btn danger" @click="cancelBatch(b)">annuleer</button>
+                      <a :href="route('direct-debit.download', b.id)" class="btn btn-secondary btn-sm">{{ $t('Download XML') }}</a>
+                      <button type="button" class="link-btn" @click="open = open === b.id ? null : b.id">{{ open === b.id ? $t('verberg') : $t('details') }}</button>
+                      <button type="button" class="link-btn danger" @click="cancelBatch(b)">{{ $t('annuleer') }}</button>
                     </td>
                   </tr>
                   <tr v-if="open === b.id"><td colspan="5" class="dd-lines">
@@ -110,19 +109,19 @@ const open = ref(null);
               </tbody>
             </table>
           </div>
-          <div v-else class="card-empty">Nog geen batches. Na het aanmaken download je hier het bestand voor je bank.</div>
+          <div v-else class="card-empty">{{ $t('Nog geen batches. Na het aanmaken download je hier het bestand voor je bank.') }}</div>
         </div>
 
         <div class="card" style="margin-top:16px;">
-          <div class="card-header"><div class="card-title">Zo werkt het</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Zo werkt het') }}</div></div>
           <div class="card-body dd-help">
             <ol>
-              <li><b>Incassocontract</b> bij je bank afsluiten; je krijgt een Incassant-ID (bijv. NL12ZZZ123456780000). Zet dat bij Bedrijfsgegevens.</li>
-              <li><b>Machtiging</b> laten tekenen door je klant (doorlopende SEPA-machtiging) en het IBAN bij de klant invullen. Bewaar de getekende machtiging.</li>
-              <li><b>Batch aanmaken</b> van de open facturen en het XML-bestand uploaden in internetbankieren (Rabobank: Betalen → Bestand uploaden; ING: Zakelijk → Incasso-opdrachten; ABN: Batchverwerking).</li>
-              <li><b>Bijschrijving</b> koppel je daarna via Bank → Transacties aan de facturen, of boek je handmatig als betaald. Een CORE-incasso kan 8 weken worden gestorneerd; B2B niet.</li>
+              <li v-html="$t('<b>Incassocontract</b> bij je bank afsluiten; je krijgt een Incassant-ID (bijv. NL12ZZZ123456780000). Zet dat bij Bedrijfsgegevens.')"></li>
+              <li v-html="$t('<b>Machtiging</b> laten tekenen door je klant (doorlopende SEPA-machtiging) en het IBAN bij de klant invullen. Bewaar de getekende machtiging.')"></li>
+              <li v-html="$t('<b>Batch aanmaken</b> van de open facturen en het XML-bestand uploaden in internetbankieren (Rabobank: Betalen → Bestand uploaden; ING: Zakelijk → Incasso-opdrachten; ABN: Batchverwerking).')"></li>
+              <li v-html="$t('<b>Bijschrijving</b> koppel je daarna via Bank → Transacties aan de facturen, of boek je handmatig als betaald. Een CORE-incasso kan 8 weken worden gestorneerd; B2B niet.')"></li>
             </ol>
-            <div class="muted-sm">Incassant: {{ creditor.creditor_id || '— nog niet ingesteld' }} · IBAN {{ creditor.iban || '—' }}</div>
+            <div class="muted-sm">{{ $t('Incassant:') }} {{ creditor.creditor_id || $t('— nog niet ingesteld') }} · IBAN {{ creditor.iban || '—' }}</div>
           </div>
         </div>
       </div>

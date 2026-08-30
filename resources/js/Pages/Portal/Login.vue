@@ -16,29 +16,28 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Klantenportaal" />
+  <Head :title="$t('Klantenportaal')" />
   <PortalLayout>
     <div class="portal-center">
       <div class="portal-card portal-login-card">
         <div class="portal-lock-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
         </div>
-        <h1 class="portal-card-title">Bekijk je facturen en offertes</h1>
+        <h1 class="portal-card-title">{{ $t('Bekijk je facturen en offertes') }}</h1>
         <p class="portal-card-sub">
-          Vul het e-mailadres in waarop je de factuur of offerte hebt ontvangen.
-          We sturen je een eenmalige toegangscode — een wachtwoord is niet nodig.
+          {{ $t('Vul het e-mailadres in waarop je de factuur of offerte hebt ontvangen. We sturen je een eenmalige toegangscode — een wachtwoord is niet nodig.') }}
         </p>
 
         <form @submit.prevent="submit">
           <div class="form-group">
-            <label for="portal-email">E-mailadres</label>
+            <label for="portal-email">{{ $t('E-mailadres') }}</label>
             <input
               id="portal-email"
               v-model="form.email"
               type="email"
               inputmode="email"
               autocomplete="email"
-              placeholder="naam@bedrijf.nl"
+              :placeholder="$t('naam@bedrijf.nl')"
               required
               autofocus
             />
@@ -55,18 +54,18 @@ const submit = () => {
           </div>
 
           <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
-            {{ form.processing ? 'Bezig…' : 'Stuur toegangscode' }}
+            {{ form.processing ? $t('Bezig…') : $t('Stuur toegangscode') }}
           </button>
         </form>
 
         <div class="portal-trust">
           <div class="portal-trust-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            Toegang alleen met een code die naar jouw e-mailadres wordt gestuurd
+            {{ $t('Toegang alleen met een code die naar jouw e-mailadres wordt gestuurd') }}
           </div>
           <div class="portal-trust-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            De code is 10 minuten geldig en werkt maar één keer
+            {{ $t('De code is 10 minuten geldig en werkt maar één keer') }}
           </div>
         </div>
       </div>

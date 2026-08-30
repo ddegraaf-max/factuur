@@ -3,9 +3,13 @@ import { ref, computed, reactive } from 'vue';
 import { router, useForm, Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import axios from 'axios';
+import { t } from '@/i18n';
+import { eur, fmtDateLong } from '@/format';
 
 // Het platform-merk (EasyInvoice/Lopra) — niet te verwarren met de huisstijl van de gebruiker hieronder.
 const brand = usePage().props.brand;
+// Markt (nl/pl): valuta, btw-tarief en KvK/REGON- en btw/NIP-labels in het voorbeeld.
+const market = usePage().props.market;
 
 const props = defineProps({
   company: Object,
@@ -13,7 +17,7 @@ const props = defineProps({
   ai_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
 });
 
-const defaultFooter = 'Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.';
+const defaultFooter = t('Bedankt voor uw vertrouwen! Gelieve het factuurbedrag binnen de betaaltermijn te voldoen onder vermelding van het factuurnummer. Heeft u vragen over deze factuur? Neem gerust contact met ons op.');
 
 const form = useForm({
   brand_color: props.company.brand_color || '#E8231F',
@@ -43,10 +47,10 @@ const logoStyleClassic = computed(() => ({
 
 const colorPresets = ['#E8231F', '#0F172A', '#1E40AF', '#15803D', '#7C3AED', '#DB2777', '#EA580C', '#0891B2'];
 const templates = [
-  { value: 'modern', name: 'Modern', desc: 'Kleurband, sterk' },
-  { value: 'classic', name: 'Klassiek', desc: 'Formeel, gelijnd' },
-  { value: 'minimal', name: 'Minimaal', desc: 'Veel ruimte, rustig' },
-  { value: 'stationery', name: 'Briefpapier', desc: 'Je eigen ontwerp' },
+  { value: 'modern', name: t('Modern'), desc: t('Kleurband, sterk') },
+  { value: 'classic', name: t('Klassiek'), desc: t('Formeel, gelijnd') },
+  { value: 'minimal', name: t('Minimaal'), desc: t('Veel ruimte, rustig') },
+  { value: 'stationery', name: t('Briefpapier'), desc: t('Je eigen ontwerp') },
 ];
 
 const previewStationery = computed(() => props.company.stationery_data || null);
@@ -74,7 +78,7 @@ const onStationeryChange = (e) => {
   });
 };
 const removeStationery = () => {
-  if (!confirm('Briefpapier verwijderen? Het sjabloon valt dan terug op Modern.')) return;
+  if (!confirm(t('Briefpapier verwijderen? Het sjabloon valt dan terug op Modern.'))) return;
   router.delete(route('settings.brand.stationery.remove'), { preserveScroll: true });
 };
 
@@ -98,17 +102,19 @@ const onAiFile = async (e) => {
     form.invoice_font = r.font;
     if (form.invoice_template !== 'stationery') form.invoice_template = r.template;
     aiNotice.value = (r.motivation ? r.motivation + ' — ' : '')
-      + 'Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.';
+      + t('Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.');
   } catch (err) {
     aiError.value = err.response?.data?.message
       || err.response?.data?.errors?.file?.[0]
-      || 'Herkennen is niet gelukt. Probeer het opnieuw of stel de kleuren handmatig in.';
+      || t('Herkennen is niet gelukt. Probeer het opnieuw of stel de kleuren handmatig in.');
   } finally {
     aiBusy.value = false;
   }
 };
 
 /* ---------- Huisstijl ontwerpen met AI ---------- */
+// De uitstraling gaat als tekst naar de AI; de labels in de keuzelijst worden vertaald, de waarde blijft de brontekst.
+const tones = ['fris en modern', 'warm en ambachtelijk', 'strak en zakelijk', 'speels en creatief', 'luxe en rustig'];
 const design = reactive({ sector: '', audience: '', tone: 'fris en modern', colors: '' });
 const designBusy = ref(false);
 const designError = ref('');
@@ -127,7 +133,7 @@ const proposeDesign = async () => {
   } catch (err) {
     designError.value = err.response?.data?.message
       || err.response?.data?.errors?.sector?.[0]
-      || 'Ontwerpen is niet gelukt. Probeer het opnieuw.';
+      || t('Ontwerpen is niet gelukt. Probeer het opnieuw.');
   } finally {
     designBusy.value = false;
   }
@@ -156,26 +162,30 @@ const applyDirection = (d) => {
   form.logo_data_url = useLogo.value ? logoUrl(d) : null;
   chosen.value = d.name;
   aiError.value = '';
-  aiNotice.value = `${d.name} gekozen — ${d.motivation} Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.`;
+  aiNotice.value = t(':name gekozen — :motivation Bekijk het voorbeeld rechts en klik op Opslaan om te bevestigen.', { name: d.name, motivation: d.motivation });
 };
 
-const nf = (n) => '€ ' + Number(n).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+// Geld in de schrijfwijze van de markt (€ 1.234,50 / 1 234,50 zł).
+const nf = (n) => eur(n);
 const companyAddr = computed(() => [props.company.postal_code, props.company.city].filter(Boolean).join(' '));
 const footerText = computed(() => form.invoice_footer || defaultFooter);
 const _today = new Date();
-const _fmt = (d) => d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' });
+const _fmt = (d) => fmtDateLong(d);
 const _terms = props.company.default_payment_terms || 30;
+const _vat = Number(market.default_vat ?? 21);
+const _subtotal = 1430;
 const pv = {
-  number: '2026-0007',
+  number: market.key === 'pl' ? 'FV/2026/0007' : '2026-0007',
   date: _fmt(_today),
   due: _fmt(new Date(_today.getTime() + _terms * 86400000)),
   terms: _terms,
-  customer: { name: 'Voorbeeldklant B.V.', addr: 'Keizersgracht 123', city: '1015 CJ Amsterdam' },
+  customer: { name: t('Voorbeeldklant B.V.'), addr: t('Keizersgracht 123'), city: t('1015 CJ Amsterdam') },
   lines: [
-    { desc: 'Webdesign basispakket', qty: 1, price: 1250, vat: 21 },
-    { desc: 'Hosting jaarpakket', qty: 1, price: 180, vat: 21 },
+    { desc: t('Webdesign basispakket'), qty: 1, price: 1250, vat: _vat },
+    { desc: t('Hosting jaarpakket'), qty: 1, price: 180, vat: _vat },
   ],
-  subtotal: 1430, vat: 300.30, total: 1730.30,
+  vatRate: _vat,
+  subtotal: _subtotal, vat: Math.round(_subtotal * _vat) / 100, total: _subtotal + Math.round(_subtotal * _vat) / 100,
 };
 
 const onLogoChange = (e) => {
@@ -195,23 +205,23 @@ const submit = () => {
 };
 
 const removeLogo = () => {
-  if (!confirm('Logo verwijderen?')) return;
+  if (!confirm(t('Logo verwijderen?'))) return;
   router.delete(route('settings.brand.logo.remove'), { preserveScroll: true });
 };
 </script>
 
 <template>
-  <Head title="Huisstijl" />
+  <Head :title="$t('Huisstijl')" />
   <AppLayout>
-    <template #breadcrumb>Instellingen / <span class="breadcrumb-current">Huisstijl</span></template>
+    <template #breadcrumb>{{ $t('Instellingen') }} / <span class="breadcrumb-current">{{ $t('Huisstijl') }}</span></template>
     <template #topbar-actions>
-      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">Opslaan</button>
+      <button class="btn btn-primary btn-sm" @click="submit" :disabled="form.processing">{{ $t('Opslaan') }}</button>
     </template>
 
     <div class="page-header">
       <div>
-        <h1 class="page-title">Huisstijl</h1>
-        <p class="page-subtitle">Pas logo, kleuren en lay-out aan — alles wat je hier wijzigt verschijnt op je facturen</p>
+        <h1 class="page-title">{{ $t('Huisstijl') }}</h1>
+        <p class="page-subtitle">{{ $t('Pas logo, kleuren en lay-out aan — alles wat je hier wijzigt verschijnt op je facturen') }}</p>
       </div>
     </div>
 
@@ -221,13 +231,13 @@ const removeLogo = () => {
         <div v-if="ai_enabled" class="card" style="border-color:var(--brand-border);">
           <div class="card-header">
             <div>
-              <div class="card-title">✨ Huisstijl herkennen met AI</div>
-              <div class="card-subtitle">Upload je huisstijlgids, briefpapier of een oude factuur — de kleuren, het lettertype en het best passende sjabloon worden voor je ingevuld</div>
+              <div class="card-title">✨ {{ $t('Huisstijl herkennen met AI') }}</div>
+              <div class="card-subtitle">{{ $t('Upload je huisstijlgids, briefpapier of een oude factuur — de kleuren, het lettertype en het best passende sjabloon worden voor je ingevuld') }}</div>
             </div>
           </div>
           <div class="card-body">
             <label class="btn btn-primary btn-sm" style="cursor:pointer;">
-              {{ aiBusy ? 'Document wordt gelezen…' : 'Kies een bestand (PDF of afbeelding)' }}
+              {{ aiBusy ? $t('Document wordt gelezen…') : $t('Kies een bestand (PDF of afbeelding)') }}
               <input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none;" :disabled="aiBusy" @change="onAiFile" />
             </label>
             <div v-if="aiNotice" class="ai-msg ai-ok">{{ aiNotice }}</div>
@@ -236,8 +246,8 @@ const removeLogo = () => {
         </div>
         <div v-else-if="ai_locked" class="card">
           <div class="card-body" style="font-size:13px;color:var(--text-2);line-height:1.6;">
-            ✨ <b>Huisstijl herkennen met AI</b> — upload je huisstijlgids of briefpapier en de kleuren en stijl worden automatisch ingesteld. Onderdeel van het <b>Slim</b>-abonnement.
-            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">Bekijk de abonnementen</Link>
+            ✨ <b>{{ $t('Huisstijl herkennen met AI') }}</b> — {{ $t('upload je huisstijlgids of briefpapier en de kleuren en stijl worden automatisch ingesteld. Onderdeel van het') }} <b>Slim</b>{{ $t('-abonnement.') }}
+            <Link :href="route('billing.show')" style="color:var(--brand);font-weight:600;">{{ $t('Bekijk de abonnementen') }}</Link>
           </div>
         </div>
 
@@ -245,21 +255,21 @@ const removeLogo = () => {
         <div v-if="ai_enabled" class="card" style="border-color:var(--brand-border);">
           <div class="card-header">
             <div>
-              <div class="card-title">✨ Huisstijl ontwerpen met AI</div>
-              <div class="card-subtitle">Nog geen huisstijl? Vertel in een paar woorden wat je doet en kies uit drie voorstellen: kleuren, lettertype, sjabloon, slogan en een logo.</div>
+              <div class="card-title">✨ {{ $t('Huisstijl ontwerpen met AI') }}</div>
+              <div class="card-subtitle">{{ $t('Nog geen huisstijl? Vertel in een paar woorden wat je doet en kies uit drie voorstellen: kleuren, lettertype, sjabloon, slogan en een logo.') }}</div>
             </div>
           </div>
           <div class="card-body">
-            <div class="form-group"><label>Wat doet je bedrijf?</label><input v-model="design.sector" placeholder="Bijv. loodgieter voor particulieren in Utrecht" /></div>
+            <div class="form-group"><label>{{ $t('Wat doet je bedrijf?') }}</label><input v-model="design.sector" :placeholder="$t('Bijv. loodgieter voor particulieren in Utrecht')" /></div>
             <div class="form-row">
-              <div class="form-group"><label>Voor wie?</label><input v-model="design.audience" placeholder="Bijv. huiseigenaren en VvE's" /></div>
-              <div class="form-group"><label>Uitstraling</label>
-                <select v-model="design.tone"><option>fris en modern</option><option>warm en ambachtelijk</option><option>strak en zakelijk</option><option>speels en creatief</option><option>luxe en rustig</option></select>
+              <div class="form-group"><label>{{ $t('Voor wie?') }}</label><input v-model="design.audience" :placeholder="$t('Bijv. huiseigenaren en VvE\'s')" /></div>
+              <div class="form-group"><label>{{ $t('Uitstraling') }}</label>
+                <select v-model="design.tone"><option v-for="tone in tones" :key="tone" :value="tone">{{ $t(tone) }}</option></select>
               </div>
             </div>
-            <div class="form-group"><label>Kleurwens (optioneel)</label><input v-model="design.colors" placeholder="Bijv. graag blauw, geen rood" /></div>
+            <div class="form-group"><label>{{ $t('Kleurwens (optioneel)') }}</label><input v-model="design.colors" :placeholder="$t('Bijv. graag blauw, geen rood')" /></div>
             <button class="btn btn-primary btn-sm" :disabled="designBusy || design.sector.trim().length < 3" @click="proposeDesign">
-              {{ designBusy ? 'Ontwerpen… (± 20 seconden)' : (directions.length ? 'Nieuwe voorstellen' : 'Ontwerp mijn huisstijl') }}
+              {{ designBusy ? $t('Ontwerpen… (± 20 seconden)') : (directions.length ? $t('Nieuwe voorstellen') : $t('Ontwerp mijn huisstijl')) }}
             </button>
             <div v-if="designError" class="field-error" style="margin-top:8px;">{{ designError }}</div>
             <div v-if="directions.length" class="dir-grid">
@@ -267,35 +277,35 @@ const removeLogo = () => {
                 <div class="dir-swatches"><span :style="{ background: d.brand_color }"></span><span :style="{ background: d.accent_color }"></span></div>
                 <img :src="logoUrl(d)" class="dir-logo" alt="" />
                 <div class="dir-name">{{ d.name }}</div>
-                <div class="dir-meta">{{ d.font === 'serif' ? 'Schreefletter' : 'Schreefloos' }} · sjabloon {{ d.template }}</div>
+                <div class="dir-meta">{{ d.font === 'serif' ? $t('Schreefletter') : $t('Schreefloos') }} · {{ $t('sjabloon') }} {{ d.template }}</div>
                 <div class="dir-tag">"{{ d.tagline }}"</div>
                 <div class="dir-why">{{ d.motivation }}</div>
-                <button class="btn btn-secondary btn-sm" @click="applyDirection(d)">{{ chosen === d.name ? 'Gekozen ✓' : 'Gebruik deze' }}</button>
+                <button class="btn btn-secondary btn-sm" @click="applyDirection(d)">{{ chosen === d.name ? $t('Gekozen ✓') : $t('Gebruik deze') }}</button>
               </div>
             </div>
             <label v-if="directions.length" class="toggle-row" style="margin-top:12px;">
               <input type="checkbox" v-model="useLogo">
-              <div><div class="toggle-title">Ook het logo-voorstel gebruiken</div><div class="toggle-sub">Vervangt je huidige logo zodra je op Opslaan klikt. Later altijd te wijzigen.</div></div>
+              <div><div class="toggle-title">{{ $t('Ook het logo-voorstel gebruiken') }}</div><div class="toggle-sub">{{ $t('Vervangt je huidige logo zodra je op Opslaan klikt. Later altijd te wijzigen.') }}</div></div>
             </label>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Logo</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Logo') }}</div></div>
           <div class="card-body">
             <div v-if="previewLogo">
               <img :src="previewLogo" class="logo-preview" alt="Logo" />
               <div style="display:flex;gap:8px;margin-top:10px;">
                 <label class="btn btn-ghost btn-sm">
-                  {{ logoUploading ? 'Bezig…' : 'Vervangen' }}
+                  {{ logoUploading ? $t('Bezig…') : $t('Vervangen') }}
                   <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" @change="onLogoChange" :disabled="logoUploading" style="display:none;" />
                 </label>
-                <button class="btn btn-danger btn-sm" @click="removeLogo" :disabled="logoUploading">Verwijderen</button>
+                <button class="btn btn-danger btn-sm" @click="removeLogo" :disabled="logoUploading">{{ $t('Verwijderen') }}</button>
               </div>
 
               <div class="logo-scale-row">
                 <div class="logo-scale-label">
-                  <span>Grootte op factuur</span>
+                  <span>{{ $t('Grootte op factuur') }}</span>
                   <span class="logo-scale-value">{{ form.logo_scale }}%</span>
                 </div>
                 <input
@@ -315,18 +325,18 @@ const removeLogo = () => {
             </div>
             <label v-else class="logo-upload-zone">
               <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" @change="onLogoChange" :disabled="logoUploading" style="display:none;" />
-              <div class="upload-hint">PNG, JPG, SVG of WebP — max 2 MB</div>
-              <div class="upload-cta"><b>{{ logoUploading ? 'Uploaden…' : 'Klik om te uploaden' }}</b></div>
+              <div class="upload-hint">{{ $t('PNG, JPG, SVG of WebP — max 2 MB') }}</div>
+              <div class="upload-cta"><b>{{ logoUploading ? $t('Uploaden…') : $t('Klik om te uploaden') }}</b></div>
             </label>
             <div v-if="form.errors.logo" class="field-error" style="margin-top:8px;">{{ form.errors.logo }}</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Huiskleur</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Huiskleur') }}</div></div>
           <div class="card-body">
             <div class="form-group">
-              <label>Primaire kleur</label>
+              <label>{{ $t('Primaire kleur') }}</label>
               <div style="display:flex;gap:10px;">
                 <input type="color" v-model="form.brand_color" />
                 <input type="text" v-model="form.brand_color" class="mono" maxlength="7" />
@@ -345,8 +355,8 @@ const removeLogo = () => {
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Factuur-lay-out</div>
-              <div class="card-subtitle">Kies een sjabloon — het voorbeeld rechts past zich direct aan</div>
+              <div class="card-title">{{ $t('Factuur-lay-out') }}</div>
+              <div class="card-subtitle">{{ $t('Kies een sjabloon — het voorbeeld rechts past zich direct aan') }}</div>
             </div>
           </div>
           <div class="card-body">
@@ -384,14 +394,14 @@ const removeLogo = () => {
                   <!-- Briefpapier -->
                   <template v-else>
                     <img v-if="previewStationery" :src="previewStationery" class="tt-stationery-img" alt="" />
-                    <div v-else class="tt-stationery-empty">Upload<br>hieronder</div>
+                    <div v-else class="tt-stationery-empty">{{ $t('Upload') }}<br>{{ $t('hieronder') }}</div>
                   </template>
                 </div>
                 <div class="template-name">{{ t.name }}</div>
                 <div class="template-desc">{{ t.desc }}</div>
               </div>
             </div>
-            <div v-if="stationeryHint" class="field-error" style="margin-top:8px;">Upload eerst je briefpapier (hieronder) om dit sjabloon te kunnen kiezen.</div>
+            <div v-if="stationeryHint" class="field-error" style="margin-top:8px;">{{ $t('Upload eerst je briefpapier (hieronder) om dit sjabloon te kunnen kiezen.') }}</div>
           </div>
         </div>
 
@@ -399,69 +409,69 @@ const removeLogo = () => {
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Eigen briefpapier</div>
-              <div class="card-subtitle">Je volledige eigen ontwerp (bijv. door AI gemaakt) als ondergrond — {{ brand.name }} zet er alleen de factuurinhoud op</div>
+              <div class="card-title">{{ $t('Eigen briefpapier') }}</div>
+              <div class="card-subtitle">{{ $t('Je volledige eigen ontwerp (bijv. door AI gemaakt) als ondergrond — :brand zet er alleen de factuurinhoud op', { brand: brand.name }) }}</div>
             </div>
           </div>
           <div class="card-body">
             <div v-if="previewStationery">
-              <img :src="previewStationery" class="stationery-preview" alt="Briefpapier" />
+              <img :src="previewStationery" class="stationery-preview" :alt="$t('Briefpapier')" />
               <div style="display:flex;gap:8px;margin-top:10px;">
                 <label class="btn btn-ghost btn-sm">
-                  {{ stationeryUploading ? 'Bezig…' : 'Vervangen' }}
+                  {{ stationeryUploading ? $t('Bezig…') : $t('Vervangen') }}
                   <input type="file" accept="image/png,image/jpeg,image/webp" @change="onStationeryChange" :disabled="stationeryUploading" style="display:none;" />
                 </label>
-                <button class="btn btn-danger btn-sm" @click="removeStationery" :disabled="stationeryUploading">Verwijderen</button>
+                <button class="btn btn-danger btn-sm" @click="removeStationery" :disabled="stationeryUploading">{{ $t('Verwijderen') }}</button>
               </div>
               <div class="form-row" style="margin-top:14px;">
                 <div class="form-group">
-                  <label>Bovenmarge (mm)<span class="label-hint">waar de inhoud begint</span></label>
+                  <label>{{ $t('Bovenmarge (mm)') }}<span class="label-hint">{{ $t('waar de inhoud begint') }}</span></label>
                   <input type="number" v-model.number="form.stationery_margin_top" min="10" max="150" />
                 </div>
                 <div class="form-group">
-                  <label>Ondermarge (mm)</label>
+                  <label>{{ $t('Ondermarge (mm)') }}</label>
                   <input type="number" v-model.number="form.stationery_margin_bottom" min="5" max="100" />
                 </div>
               </div>
-              <p class="stationery-hint">Tip: staat je adres of logo bovenaan het papier? Zet de bovenmarge dan zo dat de factuurinhoud eronder begint. Het voorbeeld rechts beweegt live mee.</p>
+              <p class="stationery-hint">{{ $t('Tip: staat je adres of logo bovenaan het papier? Zet de bovenmarge dan zo dat de factuurinhoud eronder begint. Het voorbeeld rechts beweegt live mee.') }}</p>
             </div>
             <label v-else class="logo-upload-zone">
               <input type="file" accept="image/png,image/jpeg,image/webp" @change="onStationeryChange" :disabled="stationeryUploading" style="display:none;" />
-              <div class="upload-hint">PNG of JPG op A4-verhouding — max 4 MB. Heb je een PDF? Exporteer die eerst als afbeelding.</div>
-              <div class="upload-cta"><b>{{ stationeryUploading ? 'Uploaden…' : 'Klik om je briefpapier te uploaden' }}</b></div>
+              <div class="upload-hint">{{ $t('PNG of JPG op A4-verhouding — max 4 MB. Heb je een PDF? Exporteer die eerst als afbeelding.') }}</div>
+              <div class="upload-cta"><b>{{ stationeryUploading ? $t('Uploaden…') : $t('Klik om je briefpapier te uploaden') }}</b></div>
             </label>
             <div v-if="form.errors.stationery" class="field-error" style="margin-top:8px;">{{ form.errors.stationery }}</div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Lettertype</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Lettertype') }}</div></div>
           <div class="card-body">
             <div class="font-options">
               <label class="font-option" :class="{ active: form.invoice_font === 'sans' }">
                 <input type="radio" v-model="form.invoice_font" value="sans" hidden />
                 <div class="font-sample" style="font-family:'DM Sans',sans-serif;">Aa</div>
-                <div class="font-name">Sans-serif</div>
+                <div class="font-name">{{ $t('Sans-serif') }}</div>
               </label>
               <label class="font-option" :class="{ active: form.invoice_font === 'serif' }">
                 <input type="radio" v-model="form.invoice_font" value="serif" hidden />
                 <div class="font-sample" style="font-family:Georgia,serif;">Aa</div>
-                <div class="font-name">Serif</div>
+                <div class="font-name">{{ $t('Serif') }}</div>
               </label>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-header"><div class="card-title">Voetnoot op factuur</div></div>
+          <div class="card-header"><div class="card-title">{{ $t('Voetnoot op factuur') }}</div></div>
           <div class="card-body">
-            <textarea v-model="form.invoice_footer" rows="3" placeholder="Bedankt voor uw vertrouwen…"></textarea>
+            <textarea v-model="form.invoice_footer" rows="3" :placeholder="$t('Bedankt voor uw vertrouwen…')"></textarea>
           </div>
         </div>
       </div>
 
       <div class="preview-pane">
-        <div class="preview-label">Live voorbeeld — {{ templates.find(t => t.value === form.invoice_template)?.name }}</div>
+        <div class="preview-label">{{ $t('Live voorbeeld') }} — {{ templates.find(t => t.value === form.invoice_template)?.name }}</div>
         <div
           class="preview-frame"
           :class="`pv-${form.invoice_template} pv-font-${form.invoice_font}`"
@@ -480,31 +490,31 @@ const removeLogo = () => {
                 </div>
               </div>
               <div style="text-align:right;">
-                <div class="pv-doctype">FACTUUR</div>
+                <div class="pv-doctype">{{ $t('FACTUUR') }}</div>
                 <div class="pv-num">{{ pv.number }}</div>
               </div>
             </div>
             <div class="pv-body">
               <div class="pv-parties">
                 <div class="pv-party">
-                  <div class="pv-party-label">Van</div>
+                  <div class="pv-party-label">{{ $t('Afzender') }}</div>
                   <div class="pv-party-name">{{ company.name }}</div>
-                  <div v-if="company.kvk_number">KVK {{ company.kvk_number }}</div>
-                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                  <div v-if="company.kvk_number">{{ market.registry.short }} {{ company.kvk_number }}</div>
+                  <div v-if="company.vat_number">{{ market.tax_id.short }} {{ company.vat_number }}</div>
                 </div>
                 <div class="pv-party">
-                  <div class="pv-party-label">Factuur aan</div>
+                  <div class="pv-party-label">{{ $t('Factuur aan') }}</div>
                   <div class="pv-party-name">{{ pv.customer.name }}</div>
                   <div>{{ pv.customer.addr }}</div>
                   <div>{{ pv.customer.city }}</div>
                 </div>
               </div>
               <div class="pv-meta">
-                <div><span>Factuurdatum</span><strong>{{ pv.date }}</strong></div>
-                <div><span>Vervaldatum</span><strong>{{ pv.due }}</strong></div>
+                <div><span>{{ $t('Factuurdatum') }}</span><strong>{{ pv.date }}</strong></div>
+                <div><span>{{ $t('Vervaldatum') }}</span><strong>{{ pv.due }}</strong></div>
               </div>
               <table class="pv-lines">
-                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Stuksprijs</th><th class="c">BTW</th><th class="r">Bedrag</th></tr></thead>
+                <thead><tr><th>{{ $t('Omschrijving') }}</th><th class="r">{{ $t('Aantal') }}</th><th class="r">{{ $t('Stuksprijs') }}</th><th class="c">{{ $t('Btw') }}</th><th class="r">{{ $t('Bedrag') }}</th></tr></thead>
                 <tbody>
                   <tr v-for="(l, i) in pv.lines" :key="i">
                     <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="c">{{ l.vat }}%</td><td class="r">{{ nf(l.qty * l.price) }}</td>
@@ -512,12 +522,12 @@ const removeLogo = () => {
                 </tbody>
               </table>
               <div class="pv-totals">
-                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
-                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
-                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
+                <div><span>{{ $t('Subtotaal') }}</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>{{ $t('Btw') }} {{ pv.vatRate }}%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>{{ $t('Te betalen') }}</span><span>{{ nf(pv.total) }}</span></div>
               </div>
               <div v-if="company.iban" class="pv-pay-note">
-                Gelieve het bedrag binnen {{ pv.terms }} dagen te voldoen op {{ company.iban }} t.n.v. {{ company.name }} o.v.v. factuurnummer {{ pv.number }}.
+                {{ $t('Gelieve het bedrag binnen :days dagen te voldoen op :iban t.n.v. :name o.v.v. factuurnummer :number.', { days: pv.terms, iban: company.iban, name: company.name, number: pv.number }) }}
               </div>
               <div class="pv-footer">{{ footerText }}</div>
             </div>
@@ -528,33 +538,33 @@ const removeLogo = () => {
             <div class="pv-classic-header">
               <div style="text-align:center;">
                 <img v-if="previewLogo" :src="previewLogo" class="pv-logo-c" :style="logoStyleClassic" alt="" />
-                <div class="pv-classic-title">FACTUUR</div>
+                <div class="pv-classic-title">{{ $t('FACTUUR') }}</div>
                 <div class="pv-classic-sub">{{ company.name }} · {{ pv.number }}</div>
               </div>
             </div>
             <div class="pv-body">
               <div class="pv-parties">
                 <div class="pv-party">
-                  <div class="pv-party-label">Afzender</div>
+                  <div class="pv-party-label">{{ $t('Afzender') }}</div>
                   <div class="pv-party-name">{{ company.name }}</div>
                   <div v-if="company.address_line">{{ company.address_line }}</div>
                   <div v-if="companyAddr">{{ companyAddr }}</div>
-                  <div v-if="company.kvk_number">KVK {{ company.kvk_number }}</div>
-                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                  <div v-if="company.kvk_number">{{ market.registry.short }} {{ company.kvk_number }}</div>
+                  <div v-if="company.vat_number">{{ market.tax_id.short }} {{ company.vat_number }}</div>
                 </div>
                 <div class="pv-party" style="text-align:right;">
-                  <div class="pv-party-label">Aan</div>
+                  <div class="pv-party-label">{{ $t('Factuur aan') }}</div>
                   <div class="pv-party-name">{{ pv.customer.name }}</div>
                   <div>{{ pv.customer.addr }}</div>
                   <div>{{ pv.customer.city }}</div>
                 </div>
               </div>
               <div class="pv-classic-meta">
-                <div><strong>Factuurdatum:</strong> {{ pv.date }}</div>
-                <div><strong>Vervaldatum:</strong> {{ pv.due }}</div>
+                <div><strong>{{ $t('Factuurdatum') }}:</strong> {{ pv.date }}</div>
+                <div><strong>{{ $t('Vervaldatum') }}:</strong> {{ pv.due }}</div>
               </div>
               <table class="pv-lines pv-lines-classic">
-                <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs</th><th class="c">BTW</th><th class="r">Totaal</th></tr></thead>
+                <thead><tr><th>{{ $t('Omschrijving') }}</th><th class="r">{{ $t('Aantal') }}</th><th class="r">{{ $t('Prijs') }}</th><th class="c">{{ $t('Btw') }}</th><th class="r">{{ $t('Totaal') }}</th></tr></thead>
                 <tbody>
                   <tr v-for="(l, i) in pv.lines" :key="i">
                     <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="c">{{ l.vat }}%</td><td class="r">{{ nf(l.qty * l.price) }}</td>
@@ -562,12 +572,12 @@ const removeLogo = () => {
                 </tbody>
               </table>
               <div class="pv-totals pv-totals-classic">
-                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
-                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
-                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
+                <div><span>{{ $t('Subtotaal') }}</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>{{ $t('Btw') }} {{ pv.vatRate }}%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>{{ $t('Te betalen') }}</span><span>{{ nf(pv.total) }}</span></div>
               </div>
               <div v-if="company.iban" class="pv-pay-note">
-                Gelieve het bedrag binnen {{ pv.terms }} dagen te voldoen op {{ company.iban }} o.v.v. factuurnummer {{ pv.number }}.
+                {{ $t('Gelieve het bedrag binnen :days dagen te voldoen op :iban o.v.v. factuurnummer :number.', { days: pv.terms, iban: company.iban, number: pv.number }) }}
               </div>
               <div class="pv-footer pv-footer-classic">{{ footerText }}</div>
             </div>
@@ -583,21 +593,21 @@ const removeLogo = () => {
               >
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                   <div>
-                    <div style="font-weight:700;font-size:13px;">FACTUUR</div>
+                    <div style="font-weight:700;font-size:13px;">{{ $t('FACTUUR') }}</div>
                     <div style="font-size:9px;color:#78716c;">{{ pv.number }}</div>
                   </div>
                   <div style="text-align:right;font-size:9px;color:#44403c;">
-                    <div>Factuurdatum: <b>{{ pv.date }}</b></div>
-                    <div>Vervaldatum: <b>{{ pv.due }}</b></div>
+                    <div>{{ $t('Factuurdatum') }}: <b>{{ pv.date }}</b></div>
+                    <div>{{ $t('Vervaldatum') }}: <b>{{ pv.due }}</b></div>
                   </div>
                 </div>
                 <div style="margin-top:10px;font-size:9px;">
-                  <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.07em;color:#78716c;">Aan</div>
+                  <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.07em;color:#78716c;">{{ $t('Factuur aan') }}</div>
                   <div style="font-weight:700;font-size:10px;">{{ pv.customer.name }}</div>
                   <div>{{ pv.customer.addr }} · {{ pv.customer.city }}</div>
                 </div>
                 <table class="pv-lines" style="margin-top:10px;">
-                  <thead><tr><th>Omschrijving</th><th class="r">Aantal</th><th class="r">Prijs</th><th class="r">Bedrag</th></tr></thead>
+                  <thead><tr><th>{{ $t('Omschrijving') }}</th><th class="r">{{ $t('Aantal') }}</th><th class="r">{{ $t('Prijs') }}</th><th class="r">{{ $t('Bedrag') }}</th></tr></thead>
                   <tbody>
                     <tr v-for="(l, i) in pv.lines" :key="i">
                       <td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td class="r">{{ nf(l.price) }}</td><td class="r">{{ nf(l.qty * l.price) }}</td>
@@ -605,9 +615,9 @@ const removeLogo = () => {
                   </tbody>
                 </table>
                 <div class="pv-totals">
-                  <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
-                  <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
-                  <div class="pv-grand" style="border-top:2px solid #1c1917;"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
+                  <div><span>{{ $t('Subtotaal') }}</span><span>{{ nf(pv.subtotal) }}</span></div>
+                  <div><span>{{ $t('Btw') }} {{ pv.vatRate }}%</span><span>{{ nf(pv.vat) }}</span></div>
+                  <div class="pv-grand" style="border-top:2px solid #1c1917;"><span>{{ $t('Te betalen') }}</span><span>{{ nf(pv.total) }}</span></div>
                 </div>
               </div>
             </div>
@@ -617,25 +627,25 @@ const removeLogo = () => {
           <template v-else>
             <div class="pv-minimal-header">
               <img v-if="previewLogo" :src="previewLogo" class="pv-logo" :style="logoStyleModern" alt="" />
-              <div class="pv-minimal-title">Factuur</div>
+              <div class="pv-minimal-title">{{ $t('Factuur') }}</div>
               <div class="pv-minimal-num">{{ pv.number }} · {{ pv.date }}</div>
             </div>
             <div class="pv-body">
               <div class="pv-parties">
                 <div class="pv-party">
-                  <div class="pv-party-label">Van</div>
+                  <div class="pv-party-label">{{ $t('Afzender') }}</div>
                   <div class="pv-party-name">{{ company.name }}</div>
                   <div v-if="companyAddr">{{ companyAddr }}</div>
-                  <div v-if="company.vat_number">BTW {{ company.vat_number }}</div>
+                  <div v-if="company.vat_number">{{ market.tax_id.short }} {{ company.vat_number }}</div>
                 </div>
                 <div class="pv-party">
-                  <div class="pv-party-label">Aan</div>
+                  <div class="pv-party-label">{{ $t('Factuur aan') }}</div>
                   <div class="pv-party-name">{{ pv.customer.name }}</div>
                   <div>{{ pv.customer.city }}</div>
                 </div>
               </div>
               <div class="pv-meta">
-                <div><span>Vervaldatum</span><strong>{{ pv.due }}</strong></div>
+                <div><span>{{ $t('Vervaldatum') }}</span><strong>{{ pv.due }}</strong></div>
               </div>
               <table class="pv-lines pv-lines-minimal">
                 <tbody>
@@ -645,12 +655,12 @@ const removeLogo = () => {
                 </tbody>
               </table>
               <div class="pv-totals pv-totals-minimal">
-                <div><span>Subtotaal</span><span>{{ nf(pv.subtotal) }}</span></div>
-                <div><span>BTW 21%</span><span>{{ nf(pv.vat) }}</span></div>
-                <div class="pv-grand"><span>Te betalen</span><span>{{ nf(pv.total) }}</span></div>
+                <div><span>{{ $t('Subtotaal') }}</span><span>{{ nf(pv.subtotal) }}</span></div>
+                <div><span>{{ $t('Btw') }} {{ pv.vatRate }}%</span><span>{{ nf(pv.vat) }}</span></div>
+                <div class="pv-grand"><span>{{ $t('Te betalen') }}</span><span>{{ nf(pv.total) }}</span></div>
               </div>
               <div v-if="company.iban" class="pv-pay-note">
-                Betaling binnen {{ pv.terms }} dagen op {{ company.iban }} o.v.v. {{ pv.number }}.
+                {{ $t('Betaling binnen :days dagen op :iban o.v.v. :number.', { days: pv.terms, iban: company.iban, number: pv.number }) }}
               </div>
               <div class="pv-footer">{{ footerText }}</div>
             </div>

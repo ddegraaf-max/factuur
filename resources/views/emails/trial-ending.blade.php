@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Je {{ brand('name') }}-proefperiode</title>
+    <title>{{ __('Je :brand-proefperiode', ['brand' => brand('name')]) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -38,33 +38,33 @@
                 </div>
             </div>
             <div class="body">
-                <h1>Hi {{ $firstName }},</h1>
+                <h1>{{ __('Hi :name,', ['name' => $firstName]) }}</h1>
 
                 @if ($daysLeft === 1)
-                    <p>Je gratis proefperiode van {{ brand('name') }} eindigt <strong>morgen</strong>. Sluit nu een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
+                    <p>{!! __('Je gratis proefperiode van :brand eindigt <strong>morgen</strong>. Sluit nu een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.', ['brand' => e(brand('name'))]) !!}</p>
                 @else
-                    <p>Je gratis proefperiode van {{ brand('name') }} eindigt over <strong>{{ $daysLeft }} dagen</strong>. Sluit op tijd een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.</p>
+                    <p>{!! __('Je gratis proefperiode van :brand eindigt over <strong>:days dagen</strong>. Sluit op tijd een abonnement af zodat je zonder onderbreking verder kunt met je facturatie.', ['brand' => e(brand('name')), 'days' => $daysLeft]) !!}</p>
                 @endif
 
                 <div class="days-box">
                     <div class="days-num">{{ $daysLeft }}</div>
-                    <div class="days-label">{{ $daysLeft === 1 ? 'dag resterend' : 'dagen resterend' }}</div>
+                    <div class="days-label">{{ $daysLeft === 1 ? __('dag resterend') : __('dagen resterend') }}</div>
                 </div>
 
-                <p>Vanaf <strong>€ 12,10 per maand</strong> (incl. btw) houd je volledige toegang tot alles:</p>
+                <p>{!! __(':price houd je volledige toegang tot alles:', ['price' => ucfirst(__('vanaf <strong>€ 12,10 per maand</strong> (incl. btw)'))]) !!}</p>
                 <ul class="feats">
-                    <li>Onbeperkt facturen, klanten en producten</li>
-                    <li>BTW automatisch · herinneringen · incasso</li>
-                    <li>Maandelijks opzegbaar — geen verplichtingen</li>
+                    <li>{{ __('Onbeperkt facturen, klanten en producten') }}</li>
+                    <li>{{ __('BTW automatisch · herinneringen · incasso') }}</li>
+                    <li>{{ __('Maandelijks opzegbaar — geen verplichtingen') }}</li>
                 </ul>
 
                 <div class="btn-wrap">
-                    <a href="{{ $billingUrl }}" class="btn">Abonnement afsluiten</a>
+                    <a href="{{ $billingUrl }}" class="btn">{{ __('Abonnement afsluiten') }}</a>
                 </div>
-                <div class="price">Veilig betalen · maandelijks opzegbaar</div>
+                <div class="price">{{ __('Veilig betalen · maandelijks opzegbaar') }}</div>
 
                 <div class="meta">
-                    Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
+                    {{ __('Heb je al een abonnement afgesloten? Dan kun je deze e-mail negeren. Vragen? Mail ons gerust op') }} <a href="mailto:{{ brand('email') }}" style="color:{{ brand('color') }};">{{ brand('email') }}</a>.
                 </div>
             </div>
             <div class="footer">

@@ -25,12 +25,12 @@ const logout = () => {
           <img :src="brand.mark" class="portal-logo" :alt="brand.name">
           <div>
             <div class="portal-brand-name">{{ brand.name }}</div>
-            <div class="portal-brand-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Klantenportaal · beveiligde omgeving</div>
+            <div class="portal-brand-sub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{{ $t('Klantenportaal · beveiligde omgeving') }}</div>
           </div>
         </a>
         <div v-if="email" class="portal-user">
           <span class="portal-user-email">{{ email }}</span>
-          <button type="button" class="portal-logout" @click="logout">Uitloggen</button>
+          <button type="button" class="portal-logout" @click="logout">{{ $t('Uitloggen') }}</button>
         </div>
       </div>
     </header>
@@ -43,7 +43,7 @@ const logout = () => {
 
     <footer class="portal-footer">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      <span>Beveiligd portaal · mogelijk gemaakt door <a :href="brand.url" target="_blank" rel="noopener">{{ brand.name }}</a></span>
+      <span>{{ $t('Beveiligd portaal · mogelijk gemaakt door') }} <a :href="brand.url" target="_blank" rel="noopener">{{ brand.name }}</a></span>
     </footer>
   </div>
 </template>
