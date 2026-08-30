@@ -40,6 +40,41 @@ class Market
         return (string) self::get('locale', 'nl');
     }
 
+    /**
+     * Interfacetalen waaruit de gebruiker mag kiezen ('locales' in config/markets.php);
+     * de markttaal staat altijd vooraan. Nederland: alleen nl; Polen: pl en en.
+     *
+     * @return string[]
+     */
+    public static function uiLocales(): array
+    {
+        return array_values(array_unique(array_merge([self::locale()], (array) self::get('locales', []))));
+    }
+
+    public static function isUiLocale(?string $locale): bool
+    {
+        return $locale !== null && in_array($locale, self::uiLocales(), true);
+    }
+
+    /**
+     * Vertaalde tegenhanger van een Blade-view voor de actieve interfacetaal, als die
+     * bestaat: 'lopra-pl.landing' wordt 'lopra-pl.en.landing' zodra de bezoeker EN koos.
+     * Anders gewoon de view zelf.
+     */
+    public static function view(string $name): string
+    {
+        $locale = app()->getLocale();
+        if ($locale === self::locale()) {
+            return $name;
+        }
+
+        $parts = explode('.', $name);
+        $leaf = array_pop($parts);
+        $candidate = implode('.', array_merge($parts, [$locale, $leaf]));
+
+        return view()->exists($candidate) ? $candidate : $name;
+    }
+
     public static function country(): string
     {
         return (string) self::get('country', 'NL');
@@ -128,6 +163,7 @@ class Market
         return [
             'key' => self::key(),
             'locale' => self::locale(),
+            'locales' => self::uiLocales(),
             'country' => self::country(),
             'country_name' => (string) self::get('country_name', ''),
             'currency' => self::currency(),

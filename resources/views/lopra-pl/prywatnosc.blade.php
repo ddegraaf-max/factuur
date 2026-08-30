@@ -12,6 +12,13 @@
 @section('description', 'Jak ' . brand('name') . ' (Creditline B.V.) przetwarza dane osobowe: cele i podstawy prawne, kategorie danych, odbiorcy i podmioty przetwarzające, okres przechowywania, prawa osób, pliki cookie. Zgodnie z RODO, dane w Unii Europejskiej.')
 
 @section('content')
+@if(app()->getLocale() === 'en')
+<div class="container" style="padding-top:28px;">
+  <div style="background:#FEF3C7;border:1px solid #F59E0B;border-radius:12px;padding:14px 18px;font-size:14px;line-height:1.55;">
+    <b>In English:</b> this document is available in Polish only; the Polish text is the legally binding version. Need help understanding it? E-mail <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.
+  </div>
+</div>
+@endif
 <style>
   .legal{padding:60px 0 80px;}
   .legal .container{max-width:760px;}

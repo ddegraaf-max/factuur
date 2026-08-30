@@ -23,6 +23,8 @@ class HandleInertiaRequests extends Middleware
             'brand' => \App\Support\Brand::forClient(),
             // De markt (nl/pl): taal, valuta, btw-tarieven, NIP/KvK-labels — zie config/markets.php.
             'market' => \App\Support\Market::forClient(),
+            // Actieve interfacetaal (kan in Polen afwijken van de markttaal: PL/EN).
+            'locale' => app()->getLocale(),
             'auth' => [
                 'user' => $request->user(),
                 'company' => $request->user()?->company,

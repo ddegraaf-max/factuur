@@ -2,6 +2,8 @@
 import { usePage } from '@inertiajs/vue3';
 const version = usePage().props.version;
 const brand = usePage().props.brand;
+const market = usePage().props.market || {};
+const locale = usePage().props.locale;
 </script>
 
 <template>
@@ -26,6 +28,10 @@ const brand = usePage().props.brand;
       <div class="auth-footer-text">© {{ new Date().getFullYear() }} {{ brand.name }} · {{ version }}</div>
     </div>
     <div class="auth-form-pane">
+      <!-- Taalkeuze (alleen in markten met meer dan één interfacetaal, bv. Lopra Polska: PL/EN). Gewone <a>: volledige herlaad. -->
+      <div v-if="(market.locales || []).length > 1" class="auth-lang" aria-label="Language">
+        <a v-for="loc in market.locales" :key="loc" :href="route('lang', loc)" :class="{ 'is-active': loc === locale }">{{ loc.toUpperCase() }}</a>
+      </div>
       <slot />
     </div>
   </div>
@@ -97,6 +103,7 @@ const brand = usePage().props.brand;
   z-index: 1;
 }
 .auth-form-pane {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,4 +118,8 @@ const brand = usePage().props.brand;
   .auth-form-pane { padding: 24px 14px 40px; align-items: flex-start; }
   .auth-tagline h2 { font-size: 26px; }
 }
+.auth-lang { position: absolute; top: 18px; right: 22px; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--border); border-radius: 100px; background: var(--surface, #fff); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; z-index: 2; }
+.auth-lang a { padding: 4px 9px; border-radius: 100px; color: var(--text-3); text-decoration: none; line-height: 1.2; }
+.auth-lang a:hover { color: var(--text); }
+.auth-lang a.is-active { background: var(--brand); color: #fff; }
 </style>

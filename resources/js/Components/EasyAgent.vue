@@ -42,30 +42,30 @@ const respond = (input) => {
   const q = input.toLowerCase().trim();
   const data = page.props.easy_data || {};
 
-  if (/^(hoi|hallo|hai|hey|hi|goedem|cześć|czesc|dzień|dzien|witam|siema)/.test(q)) {
+  if (/^(hoi|hallo|hai|hey|hi|hello|good (morning|afternoon|evening)|goedem|cześć|czesc|dzień|dzien|witam|siema)/.test(q)) {
     return t('Hoi! Waar kan ik je mee helpen?');
   }
-  if (q.includes('openstaand') || q.includes('open ') || q.endsWith('open') || q.includes('do zapłaty') || q.includes('do zaplaty') || q.includes('nieopłac') || q.includes('nieoplac') || q.includes('otwart')) {
+  if (q.includes('openstaand') || q.includes('open ') || q.endsWith('open') || q.includes('do zapłaty') || q.includes('do zaplaty') || q.includes('nieopłac') || q.includes('nieoplac') || q.includes('otwart') || q.includes('outstanding') || q.includes('unpaid') || q.includes('receivable')) {
     return data.outstanding
       ? t('Er staat in totaal **:total** open, verdeeld over **:count** facturen.', { total: eur(data.outstanding.total), count: data.outstanding.count })
       : t('Geen openstaande facturen.');
   }
-  if (q.includes('achterstall') || q.includes('te laat') || q.includes('przetermin') || q.includes('po terminie') || q.includes('zaległ') || q.includes('zalegl')) {
+  if (q.includes('achterstall') || q.includes('te laat') || q.includes('przetermin') || q.includes('po terminie') || q.includes('zaległ') || q.includes('zalegl') || q.includes('overdue') || q.includes('late')) {
     return data.overdue
       ? t('Er zijn **:count** achterstallige facturen voor **:total**.', { count: data.overdue.count, total: eur(data.overdue.total) })
       : t('Geen achterstallige facturen op dit moment. 👌');
   }
-  if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline')) {
+  if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline') || q.includes('collection') || q.includes('debt')) {
     return data.incasso
       ? t('Bij :partner liggen **:count** dossiers voor **:total**.', { partner: page.props.market?.incasso_partner || 'Armaere', count: data.incasso.count, total: eur(data.incasso.total) })
       : t('Geen actieve incasso-dossiers.');
   }
-  if (q.includes('btw') || q.includes('aangifte') || q.includes('vat') || q.includes('deklarac') || q.includes('jpk')) {
+  if (q.includes('btw') || q.includes('aangifte') || q.includes('vat') || q.includes('deklarac') || q.includes('jpk') || q.includes('tax return')) {
     return data.vat
       ? t('Te dragen BTW voor Q:quarter: **:amount**.\nDeadline: :deadline.', { quarter: data.vat.quarter, amount: eur(data.vat.amount), deadline: data.vat.deadline })
       : t('BTW-gegevens niet beschikbaar.');
   }
-  if (q.includes('top') || q.includes('beste klant') || q.includes('najlep') || q.includes('klienc')) {
+  if (q.includes('top') || q.includes('beste klant') || q.includes('najlep') || q.includes('klienc') || q.includes('customer')) {
     if (data.top_customers?.length) {
       // Regels gescheiden door een newline; de bubbel toont die dankzij pre-wrap.
       return t('Top klanten dit jaar (excl. BTW):') + '\n' + data.top_customers.slice(0, 3)

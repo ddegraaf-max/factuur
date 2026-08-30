@@ -19,7 +19,7 @@ class DemoController extends Controller
         }
 
         // Demo-uitleg per markt: Poolse pagina onder Lopra Polska.
-        return view(\App\Support\Market::isPl() ? 'lopra-pl.demo' : 'marketing.demo');
+        return view(\App\Support\Market::view(\App\Support\Market::isPl() ? 'lopra-pl.demo' : 'marketing.demo'));
     }
 
     /** Bouw een verse demo-omgeving en log de bezoeker in. */

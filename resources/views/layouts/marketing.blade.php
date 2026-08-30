@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ market('locale') }}" data-brand="{{ \App\Support\Brand::key() }}" data-locale="{{ market('locale') }}" data-currency="{{ market('currency') }}">
+<html lang="{{ app()->getLocale() }}" data-brand="{{ \App\Support\Brand::key() }}" data-locale="{{ app()->getLocale() }}" data-market-locale="{{ market('locale') }}" data-currency="{{ market('currency') }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +11,7 @@
 <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ brand('name') }}">
-<meta property="og:locale" content="{{ market('locale') === 'pl' ? 'pl_PL' : 'nl_NL' }}">
+<meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_GB' : (market('locale') === 'pl' ? 'pl_PL' : 'nl_NL') }}">
 <meta property="og:url" content="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
 <meta property="og:title" content="@yield('title', brand('seo_title'))">
 <meta property="og:description" content="@yield('description', brand('og_description'))">
@@ -32,7 +32,7 @@
       "url": "{{ url('/') }}",
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
-      "inLanguage": "{{ market('locale') }}",
+      "inLanguage": "{{ app()->getLocale() }}",
       "description": "{{ brand('app_description') }}",
       "image": "{{ \App\Support\Brand::asset('og_image') }}",
       "offers": {!! json_encode(array_map(fn ($o) => ['@type' => 'Offer'] + $o, config('marketing.' . \App\Support\Brand::key() . '.offers', config('marketing.easyinvoice.offers', []))), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!},
@@ -479,6 +479,14 @@
 <body>
 
 <!-- NAVIGATION -->
+<style>
+  /* PL/EN-schakelaar (alleen in markten met meer dan één interfacetaal) */
+  .nav-lang { display: inline-flex; align-items: center; gap: 2px; margin-right: 6px; padding: 3px; border: 1px solid var(--border, #e5e7eb); border-radius: 100px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; background: #fff; }
+  .nav-lang-link { padding: 4px 9px; border-radius: 100px; color: var(--text-3, #6b7280); text-decoration: none; line-height: 1.2; }
+  .nav-lang-link:hover { color: var(--text, #111827); }
+  .nav-lang-link.is-active { background: var(--brand, #1C4E7A); color: #fff; }
+  .nav-lang-mobile { margin: 0 0 12px; align-self: flex-start; }
+</style>
 <header class="nav">
   <input type="checkbox" id="navToggle" class="nav-toggle-cb" aria-label="Menu openen of sluiten">
   <div class="container nav-inner">
@@ -488,7 +496,10 @@
     </a>
     @php
       // Navigatie en voettekst per merk (config/marketing.php); routes die hier niet bestaan worden overgeslagen.
-      $mk = config('marketing.' . \App\Support\Brand::key(), config('marketing.easyinvoice'));
+      // Engelse variant van de Poolse site (config 'lopra_pl_en') als de bezoeker EN koos.
+      $mk = config('marketing.' . \App\Support\Brand::key() . '_' . app()->getLocale())
+          ?: config('marketing.' . \App\Support\Brand::key(), config('marketing.easyinvoice'));
+      $mkLocales = \App\Support\Market::uiLocales();
       $mkUrl = function (array $l) {
           if (! empty($l['mailto'])) return 'mailto:' . brand('email');
           if (! empty($l['url'])) return $l['url'];
@@ -505,6 +516,13 @@
       @endforeach
     </nav>
     <div class="nav-actions">
+      @if(count($mkLocales) > 1)
+      <div class="nav-lang" aria-label="Language">
+        @foreach($mkLocales as $loc)
+        <a href="{{ route('lang', $loc) }}" class="nav-lang-link{{ app()->getLocale() === $loc ? ' is-active' : '' }}" hreflang="{{ $loc }}" rel="nofollow">{{ strtoupper($loc) }}</a>
+        @endforeach
+      </div>
+      @endif
       <a href="{{ route('login') }}" class="btn btn-ghost">{{ $mk['login'] }}</a>
       <a href="{{ route('register') }}" class="btn btn-primary">{{ $mk['cta'] }}</a>
     </div>
@@ -516,6 +534,13 @@
     @endif
       @endforeach
     <div class="nav-mobile-actions">
+      @if(count($mkLocales) > 1)
+      <div class="nav-lang nav-lang-mobile" aria-label="Language">
+        @foreach($mkLocales as $loc)
+        <a href="{{ route('lang', $loc) }}" class="nav-lang-link{{ app()->getLocale() === $loc ? ' is-active' : '' }}" hreflang="{{ $loc }}" rel="nofollow">{{ strtoupper($loc) }}</a>
+        @endforeach
+      </div>
+      @endif
       <a href="{{ route('login') }}" class="btn btn-secondary btn-block">{{ $mk['login'] }}</a>
       <a href="{{ route('register') }}" class="btn btn-primary btn-block">{{ $mk['cta'] }}</a>
     </div>

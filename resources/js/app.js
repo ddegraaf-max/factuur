@@ -40,8 +40,8 @@ createInertiaApp({
         import.meta.glob('./Pages/**/*.vue'),
     ),
     setup({ el, App, props, plugin }) {
-        // Taal van de markt (nl/pl): $t('Nederlandse tekst') vertaalt in de templates.
-        setLocale(props.initialPage?.props?.market?.locale || brandData.locale || 'nl');
+        // Interfacetaal (markttaal, of de PL/EN-keuze van de gebruiker): $t('Nederlandse tekst') vertaalt in de templates.
+        setLocale(props.initialPage?.props?.locale || props.initialPage?.props?.market?.locale || brandData.locale || 'nl');
         const app = createApp({ render: () => h(App, props) });
         app.config.globalProperties.$t = t;
         app.provide('t', t);

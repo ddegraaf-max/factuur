@@ -94,6 +94,8 @@ class RegisteredUserController extends Controller
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'company_id' => $company->id,
+                // Wie zich via de Engelse site aanmeldt, houdt Engels als interfacetaal (Lopra Polska).
+                'locale' => app()->getLocale() !== \App\Support\Market::locale() ? app()->getLocale() : null,
             ]);
 
             // Lidmaatschap vastleggen (meerdere administraties per gebruiker).

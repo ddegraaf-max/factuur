@@ -181,6 +181,26 @@ return [
             'register_seo_title' => 'Wypróbuj Lopra 14 dni za darmo — załóż konto',
             'register_seo_description' => 'Załóż konto w Lopra w minutę i przetestuj wszystko 14 dni za darmo — bez karty, potem od 49 zł netto miesięcznie.',
 
+            // Engelse interfacetaal (PL/EN-schakelaar): merkteksten per taal. Wat hier
+            // ontbreekt valt terug op het Pools. Gelezen door Brand::get().
+            'i18n' => [
+                'en' => [
+                    'tagline' => 'Your whole business in one place',
+                    'positioning' => 'Invoicing, brand and debt collection for businesses in Poland',
+                    'seo_title' => 'Lopra — invoices, brand and debt collection in one place, from 49 zł a month',
+                    'seo_description' => 'Lopra is the complete toolkit for businesses in Poland: KSeF-ready invoices and quotes, VAT return (JPK_V7), AI brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with Creditline Polska. In Polish and English. 14 days free.',
+                    'og_description' => 'Invoices, quotes, VAT, brand, website and debt collection — your whole business in one place.',
+                    'app_description' => 'Invoicing and business software for Poland: KSeF-ready VAT invoices, quotes with online signature, VAT return, AI brand identity, digital business card, website and debt collection with Creditline Polska.',
+                    'pwa_description' => 'Invoices, quotes, brand and debt collection — your whole business in one place.',
+                    'footer_description' => 'Your whole business in one place: invoices, quotes, VAT, brand, website and debt collection with Creditline Polska. From day one to a mature business.',
+                    'auth_title' => 'Your whole business in one place',
+                    'auth_subtitle' => 'Invoices, quotes, brand identity, website and debt collection — from the first day of your business.',
+                    'login_seo_title' => 'Log in to Lopra — your business in one place',
+                    'login_seo_description' => 'Log in to Lopra and get back to your invoices, quotes, VAT returns, brand and website.',
+                    'register_seo_title' => 'Try Lopra free for 14 days — create an account',
+                    'register_seo_description' => 'Create your Lopra account in a minute and test everything free for 14 days — no card needed, then from 49 zł net a month.',
+                ],
+            ],
             'registered' => false,
             'trademark' => null,
             'brand_watch' => false,

@@ -34,7 +34,21 @@ class Brand
             return $override;
         }
 
-        return config('brand.brands.' . static::key() . '.' . $key, $default);
+        $brandKey = static::key();
+
+        // Merkteksten per interfacetaal (Lopra Polska: Engels naast Pools) — zie 'i18n' in config/brand.php.
+        // 'market' zelf nooit via deze weg: Market::locale() leest die sleutel (anders recursie).
+        if ($key !== 'market') {
+            $locale = app()->getLocale();
+            if ($locale !== Market::locale()) {
+                $localized = config("brand.brands.{$brandKey}.i18n.{$locale}.{$key}");
+                if ($localized !== null) {
+                    return $localized;
+                }
+            }
+        }
+
+        return config('brand.brands.' . $brandKey . '.' . $key, $default);
     }
 
     public static function name(): string

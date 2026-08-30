@@ -6,7 +6,10 @@
 const root = typeof document !== 'undefined' ? document.documentElement.dataset : {};
 const LOCALE_TAGS = { nl: 'nl-NL', pl: 'pl-PL', en: 'en-GB' };
 
-export const marketLocale = LOCALE_TAGS[root.locale] || 'nl-NL';
+// Interfacetaal (data-locale: nl/pl/en) bepaalt maand- en dagnamen; de markttaal
+// (data-market-locale) bepaalt getallen, geld en cijferdatums — ook in de Engelse UI in Polen.
+export const uiLocale = LOCALE_TAGS[root.locale] || 'nl-NL';
+export const marketLocale = LOCALE_TAGS[root.marketLocale || root.locale] || 'nl-NL';
 export const marketCurrency = root.currency || 'EUR';
 
 /**
@@ -39,7 +42,9 @@ export function fmtDate(value, options) {
   if (!value) return '';
   const d = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(d.getTime())) return String(value);
-  return d.toLocaleDateString(marketLocale, options || { day: '2-digit', month: '2-digit', year: 'numeric' });
+  // Met maand- of dagnamen in de interfacetaal; kale cijferdatums in de markt-schrijfwijze.
+  const named = options && (['long', 'short', 'narrow'].includes(options.month) || options.weekday);
+  return d.toLocaleDateString(named ? uiLocale : marketLocale, options || { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
 /** Datum met maandnaam: nl "12 september 2026", pl "12 września 2026". */

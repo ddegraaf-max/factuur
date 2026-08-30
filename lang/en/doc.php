@@ -42,6 +42,9 @@ return [
     'vat_summary' => 'VAT summary',
     'net' => 'Net',
     'gross' => 'Gross',
+    'split_payment' => 'Split payment mechanism',
+    'payment_method' => 'Payment method',
+    'bank_transfer' => 'Bank transfer',
 
     // Betaalinstructie op de factuur
     'pay_instruction' => 'Please transfer the amount within <strong>:days days</strong> to <strong>:iban</strong> in the name of <strong>:name</strong>',

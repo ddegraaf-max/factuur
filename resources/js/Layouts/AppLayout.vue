@@ -224,6 +224,14 @@ const logout = () => {
             </button>
             <div class="user-menu-sep"></div>
           </template>
+          <template v-if="(page.props.market?.locales || []).length > 1">
+            <div class="user-menu-label">{{ $t('Taal') }}</div>
+            <!-- Gewone <a>: de woordenboeken wisselen pas bij een volledige herlaad. -->
+            <div class="user-menu-lang" @click.stop>
+              <a v-for="loc in page.props.market.locales" :key="loc" :href="route('lang', loc)" class="user-menu-lang-item" :class="{ 'is-active': loc === page.props.locale }">{{ loc.toUpperCase() }}</a>
+            </div>
+            <div class="user-menu-sep"></div>
+          </template>
           <Link :href="route('administrations.index')" class="user-menu-item">{{ $t('Administraties beheren') }}</Link>
           <Link :href="route('settings.security')" class="user-menu-item">{{ $t('Beveiliging') }}</Link>
           <button class="user-menu-item" @click.stop="logout">{{ $t('Uitloggen') }}</button>
@@ -511,6 +519,10 @@ table { border-collapse: collapse; width: 100%; }
   text-transform: uppercase; color: var(--text-4);
 }
 .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+.user-menu-lang { display: flex; gap: 6px; padding: 4px 10px 8px; }
+.user-menu-lang-item { flex: 1; text-align: center; padding: 6px 0; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-2); text-decoration: none; }
+.user-menu-lang-item:hover { background: var(--surface-2); }
+.user-menu-lang-item.is-active { background: var(--brand); color: #fff; border-color: var(--brand); }
 .user-menu-item.is-active-admin { font-weight: 600; color: var(--brand-darker); }
 .user-menu-item .admin-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .user-menu-item svg, .user-menu-item .admin-name { vertical-align: middle; }

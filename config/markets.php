@@ -11,6 +11,7 @@ return [
 
     'nl' => [
         'locale' => 'nl',
+        'locales' => ['nl'],
         'country' => 'NL',
         'country_name' => 'Nederland',
         'phone_prefix' => '+31',
@@ -53,6 +54,8 @@ return [
 
     'pl' => [
         'locale' => 'pl',
+        // Interfacetalen: Pools standaard, Engels voor buitenlandse ondernemers in Polen (PL/EN-schakelaar).
+        'locales' => ['pl', 'en'],
         'country' => 'PL',
         'country_name' => 'Polska',
         'phone_prefix' => '+48',

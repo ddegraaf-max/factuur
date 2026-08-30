@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [RedirectToCanonicalHost::class]);
 
         $middleware->web(append: [
+            // Interfacetaal (markttaal, of de PL/EN-keuze van de bezoeker/gebruiker).
+            \App\Http\Middleware\SetLocale::class,
             // Vóór Inertia: zet de demo-omgeving in veilige modus (geen echte
             // e-mail, geen betaalroutes) voordat er iets wordt afgehandeld.
             DemoMode::class,

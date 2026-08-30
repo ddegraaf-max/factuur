@@ -31,7 +31,19 @@ use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage per merk (config/brand.php): EasyInvoice en Lopra hebben elk een eigen landingspagina.
-Route::get('/', fn () => view((string) brand('home_view', 'landing')))->name('home');
+Route::get('/', fn () => view(\App\Support\Market::view((string) brand('home_view', 'landing'))))->name('home');
+
+// Interfacetaal wisselen (alleen waar de markt meer dan één taal biedt — Lopra Polska: PL/EN).
+// Onthouden in de sessie en bij de ingelogde gebruiker; terug naar de pagina van herkomst.
+Route::get('/lang/{locale}', function (\Illuminate\Http\Request $request, string $locale) {
+    abort_unless(count(\App\Support\Market::uiLocales()) > 1 && \App\Support\Market::isUiLocale($locale), 404);
+    \App\Http\Middleware\SetLocale::remember($request, $locale);
+
+    $back = url()->previous();
+    $sameHost = parse_url($back, PHP_URL_HOST) === $request->getHost();
+
+    return redirect()->to($sameHost ? $back : '/');
+})->name('lang');
 
 // PWA-manifest en robots.txt per merk — geen statische bestanden, want naam,
 // iconen, kleuren en de sitemap-URL verschillen per omgeving.
@@ -194,19 +206,20 @@ Route::middleware(['auth', 'owner'])->prefix('merkbewaking')->name('brand.')->gr
 
 // ---------- LOPRA POLSKA: Poolse marketingpagina's (alleen in markt pl) ----------
 Route::middleware('market:pl')->name('pl.')->group(function () {
-    Route::view('/faq', 'lopra-pl.faq')->name('faq');
-    Route::view('/kontakt', 'lopra-pl.kontakt')->name('kontakt');
-    Route::view('/o-nas', 'lopra-pl.o-nas')->name('o-nas');
-    Route::view('/regulamin', 'lopra-pl.regulamin')->name('regulamin');
-    Route::view('/polityka-prywatnosci', 'lopra-pl.prywatnosc')->name('prywatnosc');
+    // Market::view() kiest de Engelse tegenhanger (lopra-pl/en/…) als de bezoeker EN koos.
+    Route::get('/faq', fn () => view(\App\Support\Market::view('lopra-pl.faq')))->name('faq');
+    Route::get('/kontakt', fn () => view(\App\Support\Market::view('lopra-pl.kontakt')))->name('kontakt');
+    Route::get('/o-nas', fn () => view(\App\Support\Market::view('lopra-pl.o-nas')))->name('o-nas');
+    Route::get('/regulamin', fn () => view(\App\Support\Market::view('lopra-pl.regulamin')))->name('regulamin');
+    Route::get('/polityka-prywatnosci', fn () => view(\App\Support\Market::view('lopra-pl.prywatnosc')))->name('prywatnosc');
     // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én Creditline Polska.
-    Route::view('/kalkulator-odsetek', 'lopra-pl.kalkulator')->name('kalkulator');
+    Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
     // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
     Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
         $packages = config('przenies.packages', []);
         abort_unless(isset($packages[$pakiet]), 404);
 
-        return view('lopra-pl.przenies', ['slug' => $pakiet, 'pkg' => $packages[$pakiet], 'packages' => $packages]);
+        return view(\App\Support\Market::view('lopra-pl.przenies'), ['slug' => $pakiet, 'pkg' => $packages[$pakiet], 'packages' => $packages]);
     })->name('przenies');
 });
 

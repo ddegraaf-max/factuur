@@ -29,7 +29,8 @@ class IncassoController extends Controller
                 'total' => (float) $inv->total,
                 'paid_total' => (float) $inv->paid_total,
                 'remaining' => (float) ($inv->total - $inv->paid_total),
-                'days_at_armaere' => $inv->incasso_sent_at?->diffInDays(now()) ?? 0,
+                // Hele dagen: Carbon 3 geeft diffInDays als float terug.
+                'days_at_armaere' => (int) floor($inv->incasso_sent_at?->diffInDays(now()) ?? 0),
             ]);
 
         $total = $cases->sum('remaining');

@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 augustus 2026 · {{ brand('version_prefix') }} 1.45.0</div>
+        <h2>Onder de motorkap: de interface in meerdere talen</h2>
+        <ul class="tl-list">
+          <li><b>Taalkeuze per omgeving</b> — waar een omgeving meer dan één taal biedt, kies je die zelf: in het gebruikersmenu, op de inlogpagina en op de website. Je keuze wordt onthouden bij je account. In Nederland blijft alles Nederlands; de Poolse omgeving biedt Pools en Engels.</li>
+          <li><b>Documenten volgen de klant</b> — de taal van facturen, offertes en klantmails stel je per klant in (Nederlands, Engels, Pools) en staat los van de taal van je scherm.</li>
+          <li><b>Bedragen en datums blijven vertrouwd</b> — geld, getallen en datums houden de schrijfwijze van je land, ook als je scherm in een andere taal staat.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 augustus 2026 · {{ brand('version_prefix') }} 1.44.0</div>
         <h2>Onder de motorkap: één platform, meerdere merken</h2>
         <ul class="tl-list">
