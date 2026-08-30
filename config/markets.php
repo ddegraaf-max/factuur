@@ -92,7 +92,22 @@ return [
         // Windykacja: odsetki ustawowe za opóźnienie w transakcjach handlowych
         // (stopa referencyjna NBP + 10 p.p.) en de vaste rekompensata (art. 10
         // ustawy z 8 marca 2013 r.) van 40/70/100 EUR, omgerekend naar PLN.
-        'interest_rate' => 0.14,
+        'interest_rate' => 0.14, // vangnet als de tabel hieronder leeg is
+        // Odsetki ustawowe za opóźnienie w transakcjach handlowych (dłużnik niebędący podmiotem
+        // leczniczym): NBP-referentierente op 1 januari / 1 juli + 10 p.p., elk halfjaar in het
+        // Monitor Polski. ELK HALFJAAR AANVULLEN (obwieszczenie ± 20 juni / 11 december).
+        // 2025-H2 … 2026-H2 uit de obwieszczenia (M.P. 2025 poz. 602, 2025 poz. 1257, 2026 poz. 642);
+        // eerdere jaren afgeleid uit de referentierente van dat moment.
+        'interest_rates' => [
+            '2023-01-01' => 0.1675,
+            '2023-07-01' => 0.1675,
+            '2024-01-01' => 0.1575,
+            '2024-07-01' => 0.1575,
+            '2025-01-01' => 0.1575,
+            '2025-07-01' => 0.1525,
+            '2026-01-01' => 0.14,
+            '2026-07-01' => 0.1375,
+        ],
         'eur_pln' => 4.30,
         // Geen incassopartner in Polen: herinneringen en het wezwanie do zapłaty verstuurt
         // de ondernemer zelf vanuit Lopra. sprzedamfakture.pl koopt onbetaalde facturen

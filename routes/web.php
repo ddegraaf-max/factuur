@@ -214,6 +214,8 @@ Route::middleware('market:pl')->name('pl.')->group(function () {
     Route::get('/polityka-prywatnosci', fn () => view(\App\Support\Market::view('lopra-pl.prywatnosc')))->name('prywatnosc');
     // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én sprzedamfakture.pl.
     Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
+    // Wettelijke rente per periode + NBP-koers voor de vervaldatum (JSON voor de calculator).
+    Route::get('/kalkulator-odsetek/stawki', [\App\Http\Controllers\WindykacjaController::class, 'rates'])->middleware('throttle:60,1')->name('kalkulator.stawki');
     // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
     Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
         $packages = config('przenies.packages', []);

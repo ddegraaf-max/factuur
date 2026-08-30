@@ -23,6 +23,7 @@ class WykupTest extends TestCase
     {
         config(['brand.active' => 'lopra_pl']);
         Mail::fake();
+        \Illuminate\Support\Facades\Http::fake(); // NBP niet aanroepen in tests: vangnetkoers
 
         $this->assertFalse(Market::hasIncasso());
         $this->assertSame('sprzedamfakture.pl', Market::wykup('partner_name'));

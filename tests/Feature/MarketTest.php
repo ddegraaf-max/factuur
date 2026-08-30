@@ -94,11 +94,12 @@ class MarketTest extends TestCase
 
         config(['brand.active' => 'lopra_pl']);
         $w = app(WindykacjaService::class);
-        $this->assertSame(0.14, $w->interestRate());
-        $this->assertSame(383.56, $w->interest(10000, 100));          // 10 000 × 14% × 100/365
-        $this->assertSame(['eur' => 40, 'pln' => 172.0], $w->compensation(4000));
-        $this->assertSame(['eur' => 70, 'pln' => 301.0], $w->compensation(12400));
-        $this->assertSame(['eur' => 100, 'pln' => 430.0], $w->compensation(80000));
+        $this->assertSame(0.14, $w->interestRateOn(\Carbon\Carbon::parse('2026-03-01'))); // 2026-H1 uit de rentetabel
+        $this->assertSame(383.56, $w->interest(10000, 100, 0.14));          // 10 000 × 14% × 100/365
+        // Zonder vervaldatum: vaste vangnetkoers 4,30.
+        $this->assertSame([40, 172.0], [$w->compensation(4000)['eur'], $w->compensation(4000)['pln']]);
+        $this->assertSame([70, 301.0], [$w->compensation(12400)['eur'], $w->compensation(12400)['pln']]);
+        $this->assertSame([100, 430.0], [$w->compensation(80000)['eur'], $w->compensation(80000)['pln']]);
     }
 
     public function test_polish_registration_requires_a_valid_nip_and_sets_polish_defaults(): void

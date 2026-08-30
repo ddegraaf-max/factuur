@@ -622,6 +622,8 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
               <div class="pl-claim-row"><span class="label">{{ $t('Wettelijke rente') }} ({{ claimRatePct }}% {{ $t('per jaar') }})</span><span class="mono">{{ eur(claim.interest) }}</span></div>
               <div class="pl-claim-row"><span class="label">{{ $t('Vergoeding incassokosten') }} ({{ num(claim.compensation_eur, 0) }} EUR)</span><span class="mono">{{ eur(claim.compensation) }}</span></div>
               <div class="pl-claim-row grand"><span class="label">{{ $t('Totaal te vorderen') }}</span><span class="mono">{{ eur(claim.total) }}</span></div>
+              <div v-if="(claim.interest_periods || []).length > 1" class="pl-note">{{ $t('Rente per periode:') }} {{ claim.interest_periods.map(p => num(p.rate * 100, 2) + '% × ' + p.days + ' ' + $t('dagen')).join(' · ') }}</div>
+              <div v-if="claim.eur_pln" class="pl-note">{{ claim.eur_pln_source === 'nbp' ? $t('Vergoeding omgerekend tegen de NBP-koers van :date: :rate zł/EUR', { date: fmtDate(claim.eur_pln_date), rate: num(claim.eur_pln, 4) }) : $t('Vergoeding omgerekend tegen een indicatieve koers van :rate zł/EUR (NBP niet bereikbaar)', { rate: num(claim.eur_pln, 4) }) }}</div>
               <div class="pl-note">{{ $t('Uiterste betaaldatum in de aanmaning: :date', { date: fmtDate(claim.deadline) }) }}</div>
             </template>
           </div>

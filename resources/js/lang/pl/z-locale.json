@@ -22,5 +22,9 @@
   "Wacht op offerte": "Czeka na ofertę",
   "Aanmaning en verkoop van de vordering": "Wezwanie i sprzedaż wierzytelności",
   "Formele aanmaning met wettelijke rente en vergoeding van incassokosten — of verkoop de vordering aan :partner.": "Formalne wezwanie z odsetkami ustawowymi i rekompensatą — albo sprzedaj wierzytelność do :partner.",
-  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "Przypomnienia i wezwanie do zapłaty wysyłasz z :brand; nieopłaconą fakturę sprzedasz do :partner na stronie Sprzedaż faktur."
+  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "Przypomnienia i wezwanie do zapłaty wysyłasz z :brand; nieopłaconą fakturę sprzedasz do :partner na stronie Sprzedaż faktur.",
+  "Rente per periode:": "Odsetki wg okresów:",
+  "dagen": "dni",
+  "Vergoeding omgerekend tegen de NBP-koers van :date: :rate zł/EUR": "Rekompensata przeliczona po średnim kursie NBP z dnia :date: :rate zł/EUR",
+  "Vergoeding omgerekend tegen een indicatieve koers van :rate zł/EUR (NBP niet bereikbaar)": "Rekompensata przeliczona po kursie orientacyjnym :rate zł/EUR (brak połączenia z NBP)"
 }

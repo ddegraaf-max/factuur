@@ -6,8 +6,12 @@
 @section('description', 'Free calculator: count the days overdue, the statutory interest for late payment in commercial transactions and the 40/70/100 EUR recovery-cost compensation on an unpaid B2B invoice in Poland. Generate a ready-to-print payment demand (wezwanie do zapłaty).')
 
 @php
-  $rate = (float) market('interest_rate', 0.14);
-  $eurPln = (float) market('eur_pln', 4.30);
+  // Wettelijke rente per halfjaar ('interest_rates' in config/markets.php) en de vangnetkoers; de echte
+  // NBP-koers voor de gekozen vervaldatum haalt de pagina op via route('pl.kalkulator.stawki').
+  $windykacja = app(\App\Services\WindykacjaService::class);
+  $rate = $windykacja->interestRate();
+  $periods = collect($windykacja->ratePeriods())->map(fn ($r, $from) => ['from' => $from, 'rate' => $r])->values()->all();
+  $eurPln = $windykacja->eurPln();
   $ratePct = rtrim(rtrim(number_format($rate * 100, 2, '.', ''), '0'), '.');
 @endphp
 
@@ -111,8 +115,8 @@
           </div>
           <div class="m-field">
             <label for="stopa">Interest rate (% per year)</label>
-            <input type="text" id="stopa" inputmode="decimal" value="{{ $ratePct }}" autocomplete="off">
-            <div class="calc-hint">NBP reference rate + 10 percentage points, announced every six months by the Minister of Finance. Change it if a different rate applies.</div>
+            <input type="text" id="stopa" inputmode="decimal" value="" placeholder="{{ $ratePct }} (auto)" autocomplete="off">
+            <div class="calc-hint">Leave empty = the statutory rate for each period is applied automatically (NBP reference rate + 10 percentage points, announced every six months; currently {{ $ratePct }}%). Enter your own value to calculate differently.</div>
           </div>
         </div>
       </div>
@@ -124,12 +128,12 @@
           <table>
             <tr><td>Principal amount</td><td class="r" id="outKwota">0,00 zł</td></tr>
             <tr><td>Statutory interest for late payment<small><span id="outStopa">{{ $ratePct }}</span>% × <span id="outDni2">0</span> days / 365</small></td><td class="r" id="outOdsetki">0,00 zł</td></tr>
-            <tr><td>Recovery-cost compensation<small>Art. 10 of the Act · <span id="outEur">40</span> EUR × {{ number_format($eurPln, 2, ',', ' ') }} zł</small></td><td class="r" id="outRek">0,00 zł</td></tr>
+            <tr><td>Recovery-cost compensation<small>Art. 10 of the Act · <span id="outEur">40</span> EUR × <span id="outKurs">{{ number_format($eurPln, 4, ',', ' ') }}</span> zł · <span id="outKursNbp" hidden>NBP rate of <span id="outKursData"></span></span><span id="outKursEst">indicative rate</span></small></td><td class="r" id="outRek">0,00 zł</td></tr>
             <tr class="tot"><td>Total payable</td><td class="r" id="outRazem">0,00 zł</td></tr>
           </table>
         </div>
         <div class="calc-warn" id="warnBrak">The payment deadline has not passed yet — interest and compensation only accrue from the day after the due date.</div>
-        <div class="calc-note">The calculator is an aid, not legal advice. Compensation is converted at the NBP average euro rate from the last working day of the month preceding the month in which the amount fell due; here we assume a rate of {{ number_format($eurPln, 2, ',', ' ') }} zł. Interest is rounded to the nearest grosz.</div>
+        <div class="calc-note">The calculator is an aid, not legal advice. Compensation is converted at the NBP average euro rate from the last working day of the month preceding the month in which the amount fell due — the calculator fetches that rate from the NBP for the due date you enter (if the NBP is unavailable, an indicative rate of {{ number_format($eurPln, 2, ',', ' ') }} zł is used). Interest is rounded to the nearest grosz.</div>
         <div class="calc-actions">
           <button type="button" class="btn btn-primary btn-lg" id="btnWezwanie">Generate a payment demand (wezwanie do zapłaty)</button>
         </div>
@@ -202,7 +206,7 @@
       <table class="wz-sum">
         <tr><td>Należność główna</td><td class="r" id="wzKwota">0,00 zł</td></tr>
         <tr><td>Odsetki ustawowe za opóźnienie w transakcjach handlowych (<span id="wzStopa">{{ $ratePct }}</span>% w stosunku rocznym, <span id="wzDni">0</span> dni)</td><td class="r" id="wzOdsetki">0,00 zł</td></tr>
-        <tr><td>Rekompensata za koszty odzyskiwania należności (art. 10 ust. 1 ustawy; równowartość <span id="wzEur">40</span> EUR)</td><td class="r" id="wzRek">0,00 zł</td></tr>
+        <tr><td>Rekompensata za koszty odzyskiwania należności (art. 10 ust. 1 ustawy; równowartość <span id="wzEur">40</span> EUR<span id="wzKursInfo"></span>)</td><td class="r" id="wzRek">0,00 zł</td></tr>
         <tr class="tot"><td>Razem do zapłaty</td><td class="r" id="wzRazem">0,00 zł</td></tr>
       </table>
 
@@ -256,8 +260,13 @@
 
 <script>
 (function () {
+  // Renteperiodes (wettelijke rente per halfjaar), vangnetkoers en de echte NBP-koers voor de
+  // gekozen vervaldatum (opgehaald via de stawki-route; bij falen blijft de vangnetkoers staan).
+  var PERIODS = {!! json_encode($periods, JSON_HEX_TAG) !!};
   var RATE_DEFAULT = {{ json_encode($rate) }};
   var EUR_PLN = {{ json_encode($eurPln) }};
+  var EUR_PLN_DATE = null;
+  var STAWKI_URL = {!! json_encode(route("pl.kalkulator.stawki"), JSON_HEX_TAG) !!};
   var NBSP = '\u00A0';
 
   function $(id) { return document.getElementById(id); }
@@ -279,40 +288,82 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function toIso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function fromIso(s) { if (!s) return null; var p = s.split('-'); if (p.length !== 3) return null; var d = new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); return isNaN(d.getTime()) ? null : d; }
+  function isoUtc(d) { return d.toISOString().slice(0, 10); }
   function fmtDate(s) { var d = fromIso(s); return d ? pad(d.getUTCDate()) + '.' + pad(d.getUTCMonth() + 1) + '.' + d.getUTCFullYear() : '—'; }
+  function fmtPct(p) { return String(Math.round(p * 100) / 100).replace('.', ','); }
+  function fmtRate(r) { return Number(r).toFixed(4).replace('.', ','); }
 
   function rekEur(kwota) { if (kwota <= 5000) return 40; if (kwota <= 50000) return 70; return 100; }
+
+  // Rente die op een dag geldt: de laatste periode met ingangsdatum <= dag.
+  function rateOn(iso) {
+    var rate = null;
+    for (var i = 0; i < PERIODS.length; i++) { if (PERIODS[i].from <= iso) rate = PERIODS[i].rate; else break; }
+    return rate === null ? (PERIODS.length ? PERIODS[0].rate : RATE_DEFAULT) : rate;
+  }
+
+  // Rente dag voor dag, van de dag ná de termijn t/m de betaaldag, tegen de rente van die dag.
+  function segmentedInterest(kwota, termin, data) {
+    var segs = [], cur = null, day = new Date(termin.getTime() + 86400000);
+    while (day <= data) {
+      var r = rateOn(isoUtc(day));
+      if (!cur || cur.rate !== r) { cur = { rate: r, days: 0, amount: 0 }; segs.push(cur); }
+      cur.days++;
+      day = new Date(day.getTime() + 86400000);
+    }
+    var total = 0;
+    segs.forEach(function (s) { s.amount = Math.round(kwota * s.rate * s.days / 365 * 100) / 100; total += s.amount; });
+    return { total: Math.round(total * 100) / 100, segments: segs };
+  }
 
   function calc() {
     var kwota = Math.max(0, parseNum($('kwota').value));
     var stopaPct = parseNum($('stopa').value);
-    var rate = stopaPct > 0 ? stopaPct / 100 : RATE_DEFAULT;
     var termin = fromIso($('termin').value);
     var data = fromIso($('data').value);
     var dni = (termin && data) ? Math.floor((data - termin) / 86400000) : 0;
     if (dni < 0) dni = 0;
     var late = dni > 0;
-    var odsetki = late ? Math.round(kwota * rate * dni / 365 * 100) / 100 : 0;
+    var odsetki = 0, segs = [];
+    if (late && kwota > 0) {
+      if (stopaPct > 0) {
+        odsetki = Math.round(kwota * stopaPct / 100 * dni / 365 * 100) / 100;
+        segs = [{ rate: stopaPct / 100, days: dni, amount: odsetki }];
+      } else {
+        var si = segmentedInterest(kwota, termin, data);
+        odsetki = si.total; segs = si.segments;
+      }
+    }
+    var stopaText = stopaPct > 0
+      ? fmtPct(stopaPct)
+      : (segs.length ? segs.map(function (s) { return fmtPct(s.rate * 100); }).join(' / ') : fmtPct(rateOn(data ? isoUtc(data) : isoUtc(new Date())) * 100));
     var eur = rekEur(kwota);
     var rek = late && kwota > 0 ? Math.round(eur * EUR_PLN * 100) / 100 : 0;
     var razem = kwota + odsetki + rek;
-    return { kwota: kwota, rate: rate, stopaPct: stopaPct > 0 ? stopaPct : RATE_DEFAULT * 100, dni: dni, late: late, odsetki: odsetki, eur: eur, rek: rek, razem: razem };
+    return { kwota: kwota, stopaText: stopaText, segs: segs, dni: dni, late: late, odsetki: odsetki, eur: eur, rek: rek, razem: razem };
   }
 
-  function fmtPct(p) { return String(Math.round(p * 100) / 100).replace('.', ','); }
+  function renderKurs() {
+    $('outKurs').textContent = fmtRate(EUR_PLN);
+    var nbp = !!EUR_PLN_DATE;
+    if (nbp) $('outKursData').textContent = fmtDate(EUR_PLN_DATE);
+    $('outKursNbp').hidden = !nbp;
+    $('outKursEst').hidden = nbp;
+  }
 
   function render() {
     var r = calc();
     $('outData').textContent = fmtDate($('data').value);
     $('outDni').textContent = r.dni;
     $('outDni2').textContent = r.dni;
-    $('outStopa').textContent = fmtPct(r.stopaPct);
+    $('outStopa').textContent = r.stopaText;
     $('outKwota').textContent = fmt(r.kwota);
     $('outOdsetki').textContent = fmt(r.odsetki);
     $('outEur').textContent = r.eur;
     $('outRek').textContent = fmt(r.rek);
     $('outRazem').textContent = fmt(r.razem);
     $('warnBrak').classList.toggle('show', !r.late && !!$('termin').value);
+    renderKurs();
     return r;
   }
 
@@ -322,15 +373,36 @@
     $('wzDataStan').textContent = fmtDate($('data').value);
     $('wzTermin').textContent = fmtDate($('termin').value);
     $('wzKwota').textContent = fmt(r.kwota);
-    $('wzStopa').textContent = fmtPct(r.stopaPct);
+    $('wzStopa').textContent = r.stopaText;
     $('wzDni').textContent = r.dni;
     $('wzOdsetki').textContent = fmt(r.odsetki);
     $('wzEur').textContent = r.eur;
     $('wzRek').textContent = fmt(r.rek);
     $('wzRazem').textContent = fmt(r.razem);
+    // Het wezwanie is Pools (aan een Poolse debiteur): koersvermelding volgens de wet.
+    $('wzKursInfo').textContent = EUR_PLN_DATE ? ' × ' + fmtRate(EUR_PLN) + ' zł, średni kurs NBP z dnia ' + fmtDate(EUR_PLN_DATE) : '';
   }
 
-  // Starting values: today, and a due date 44 days ago (the example from the home page).
+  // NBP-koers (en actuele renteperiodes) voor de gekozen termijn ophalen; stil falen = vangnet.
+  var stawkiTimer = null;
+  function loadStawki() {
+    var termin = $('termin').value;
+    if (!termin || !window.fetch) return;
+    clearTimeout(stawkiTimer);
+    stawkiTimer = setTimeout(function () {
+      fetch(STAWKI_URL + '?termin=' + encodeURIComponent(termin) + '&data=' + encodeURIComponent($('data').value || ''), { headers: { 'Accept': 'application/json' } })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (j) {
+          if (!j) return;
+          if (j.periods && j.periods.length) PERIODS = j.periods;
+          if (j.eur_pln) { EUR_PLN = j.eur_pln; EUR_PLN_DATE = j.source === 'nbp' ? j.eur_pln_date : null; }
+          render();
+        })
+        .catch(function () {});
+    }, 250);
+  }
+
+  // Startwaarden: vandaag en een termijn van 44 dagen geleden (het voorbeeld van de homepage).
   var today = new Date();
   var due = new Date(today.getTime() - 44 * 86400000);
   $('data').value = toIso(today);
@@ -340,6 +412,7 @@
     $(id).addEventListener('input', render);
     $(id).addEventListener('change', render);
   });
+  $('termin').addEventListener('change', loadStawki);
   $('kwota').addEventListener('blur', function () { var v = parseNum(this.value); if (v > 0) this.value = fmt(v).replace(NBSP + 'zł', ''); });
 
   $('btnWezwanie').addEventListener('click', function () {
@@ -352,6 +425,7 @@
   $('btnZamknij').addEventListener('click', function () { $('wezwanie').hidden = true; $('btnWezwanie').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
 
   render();
+  loadStawki();
 })();
 </script>
 @endsection

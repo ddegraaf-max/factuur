@@ -22,7 +22,7 @@
       <tr><td style="padding:7px 0;color:#8A8681;border-top:1px solid #E4E0D9;">Termin płatności</td><td style="padding:7px 0;border-top:1px solid #E4E0D9;text-align:right;">{{ $invoice->due_date?->format('d.m.Y') }} ({{ $claim['days'] }} dni po terminie)</td></tr>
       <tr><td style="padding:7px 0;color:#8A8681;border-top:1px solid #E4E0D9;">Należność główna</td><td style="padding:7px 0;border-top:1px solid #E4E0D9;text-align:right;"><strong>{{ money($claim['principal']) }}</strong></td></tr>
       <tr><td style="padding:7px 0;color:#8A8681;border-top:1px solid #E4E0D9;">Odsetki ustawowe ({{ rtrim(rtrim(number_format($claim['rate'] * 100, 2, ',', ''), '0'), ',') }}% rocznie)</td><td style="padding:7px 0;border-top:1px solid #E4E0D9;text-align:right;">{{ money($claim['interest']) }}</td></tr>
-      <tr><td style="padding:7px 0;color:#8A8681;border-top:1px solid #E4E0D9;">Rekompensata (art. 10)</td><td style="padding:7px 0;border-top:1px solid #E4E0D9;text-align:right;">{{ money($claim['compensation']) }} ({{ $claim['compensation_eur'] }} EUR)</td></tr>
+      <tr><td style="padding:7px 0;color:#8A8681;border-top:1px solid #E4E0D9;">Rekompensata (art. 10 — {{ $claim['compensation_eur'] }} EUR{{ ! empty($claim['eur_pln_date']) ? ', kurs NBP z ' . \Carbon\Carbon::parse($claim['eur_pln_date'])->format('d.m.Y') : '' }})</td><td style="padding:7px 0;border-top:1px solid #E4E0D9;text-align:right;">{{ money($claim['compensation']) }} ({{ $claim['compensation_eur'] }} EUR)</td></tr>
       <tr><td style="padding:9px 0;border-top:2px solid #132F49;font-weight:700;">Razem</td><td style="padding:9px 0;border-top:2px solid #132F49;text-align:right;font-weight:700;">{{ money($claim['total']) }}</td></tr>
     </table>
 

@@ -28,18 +28,104 @@ class WindykacjaService
 {
     public const DEADLINE_DAYS = 7;
 
-    public function interestRate(): float
-    {
-        $env = env('WINDYKACJA_INTEREST_RATE');
+    public function __construct(private ?NbpService $nbp = null) {}
 
-        return $env !== null && $env !== '' ? (float) $env : (float) Market::get('interest_rate', 0.14);
+    private function nbp(): NbpService
+    {
+        return $this->nbp ??= app(NbpService::class);
     }
 
+    /**
+     * Wettelijke rente per periode (odsetki ustawowe za opóźnienie w transakcjach handlowych):
+     * NBP-referentierente + 10 procentpunt, per halfjaar vastgesteld — 'interest_rates' in
+     * config/markets.php. WINDYKACJA_INTEREST_RATE dwingt één vaste rente af.
+     *
+     * @return array<string, float> ingangsdatum (Y-m-d) => rente, oplopend gesorteerd
+     */
+    public function ratePeriods(): array
+    {
+        $env = env('WINDYKACJA_INTEREST_RATE');
+        if ($env !== null && $env !== '') {
+            return ['1970-01-01' => (float) $env];
+        }
+
+        $table = (array) Market::get('interest_rates', []);
+        if ($table === []) {
+            return ['1970-01-01' => (float) Market::get('interest_rate', 0.14)];
+        }
+        ksort($table);
+
+        return array_map('floatval', $table);
+    }
+
+    /** De rente die op een bepaalde dag geldt (vóór de eerste periode: de eerste rente). */
+    public function interestRateOn(Carbon $on): float
+    {
+        $periods = $this->ratePeriods();
+        $day = $on->toDateString();
+        $rate = null;
+        foreach ($periods as $from => $r) {
+            if ($from <= $day) {
+                $rate = $r;
+            } else {
+                break;
+            }
+        }
+
+        return $rate ?? (float) array_values($periods)[0];
+    }
+
+    /** Rente van vandaag (weergave, publieke calculator). */
+    public function interestRate(): float
+    {
+        return $this->interestRateOn(now());
+    }
+
+    /** Vaste vangnetkoers EUR/PLN (zonder NBP). */
     public function eurPln(): float
     {
-        $env = env('WINDYKACJA_EUR_PLN');
+        return $this->nbp()->fallback()['rate'];
+    }
 
-        return $env !== null && $env !== '' ? (float) $env : (float) Market::get('eur_pln', 4.30);
+    /**
+     * Rente vanaf de dag ná de vervaldatum tot en met $on, gesegmenteerd per renteperiode
+     * (een vordering die over 1 juli heen loopt, krijgt twee tarieven).
+     *
+     * @return array{total: float, periods: list<array{from: string, to: string, days: int, rate: float, amount: float}>}
+     */
+    public function interestBetween(float $amount, Carbon $due, Carbon $on): array
+    {
+        $start = $due->copy()->startOfDay()->addDay();
+        $end = $on->copy()->startOfDay();
+        if ($amount <= 0 || $end->lt($start)) {
+            return ['total' => 0.0, 'periods' => []];
+        }
+
+        $boundaries = array_keys($this->ratePeriods());
+        $segments = [];
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            $rate = $this->interestRateOn($cursor);
+            $next = null;
+            foreach ($boundaries as $b) {
+                if ($b > $cursor->toDateString()) {
+                    $next = Carbon::parse($b)->startOfDay();
+                    break;
+                }
+            }
+            $segEnd = ($next !== null && $next->copy()->subDay()->lt($end)) ? $next->copy()->subDay() : $end->copy();
+            $days = (int) $cursor->diffInDays($segEnd) + 1;
+            $segments[] = [
+                'from' => $cursor->toDateString(),
+                'to' => $segEnd->toDateString(),
+                'days' => $days,
+                'rate' => $rate,
+                'amount' => round($amount * $rate * $days / 365, 2),
+            ];
+            $cursor = $segEnd->copy()->addDay();
+        }
+
+        return ['total' => round(array_sum(array_column($segments, 'amount')), 2), 'periods' => $segments];
     }
 
     /** Enkelvoudige rente over $days dagen (ACT/365). */
@@ -52,12 +138,19 @@ class WindykacjaService
         return round($amount * ($rate ?? $this->interestRate()) * $days / 365, 2);
     }
 
-    /** @return array{eur:int, pln:float} vaste vergoeding naar hoogte van de hoofdsom (in PLN). */
-    public function compensation(float $principal): array
+    /**
+     * Vaste vergoeding (art. 10: 40/70/100 EUR naar hoogte van de hoofdsom), omgerekend tegen de
+     * gemiddelde NBP-koers van de laatste werkdag van de maand vóór de vervalmaand. Zonder
+     * vervaldatum (of zonder NBP) geldt de vaste vangnetkoers.
+     *
+     * @return array{eur: int, pln: float, rate: float, rate_date: ?string, source: string}
+     */
+    public function compensation(float $principal, ?Carbon $dueDate = null): array
     {
         $eur = $principal <= 5000 ? 40 : ($principal <= 50000 ? 70 : 100);
+        $fx = $dueDate ? $this->nbp()->eurRateForDueDate($dueDate) : $this->nbp()->fallback();
 
-        return ['eur' => $eur, 'pln' => round($eur * $this->eurPln(), 2)];
+        return ['eur' => $eur, 'pln' => round($eur * $fx['rate'], 2), 'rate' => $fx['rate'], 'rate_date' => $fx['date'], 'source' => $fx['source']];
     }
 
     public function daysOverdue(Invoice $invoice, ?Carbon $on = null): int
@@ -79,17 +172,25 @@ class WindykacjaService
         $on = $on ?? now();
         $principal = round(max(0, (float) ($invoice->amount_due ?? $invoice->open_amount ?? $invoice->total)), 2);
         $days = $this->daysOverdue($invoice, $on);
-        $interest = $this->interest($principal, $days);
-        $compensation = $this->compensation($principal);
+        $interest = $invoice->due_date
+            ? $this->interestBetween($principal, $invoice->due_date, $on)
+            : ['total' => 0.0, 'periods' => []];
+        $compensation = $this->compensation($principal, $invoice->due_date);
+        // De vergoeding ontstaat pas zodra er rente loopt (dag ná de vervaldatum).
+        $compensationPln = $days > 0 ? $compensation['pln'] : 0.0;
 
         return [
             'principal' => $principal,
             'days' => $days,
-            'rate' => $this->interestRate(),
-            'interest' => $interest,
+            'rate' => $this->interestRateOn($on),
+            'interest' => $interest['total'],
+            'interest_periods' => $interest['periods'],
             'compensation_eur' => $compensation['eur'],
-            'compensation' => $compensation['pln'],
-            'total' => round($principal + $interest + $compensation['pln'], 2),
+            'compensation' => $compensationPln,
+            'eur_pln' => $compensation['rate'],
+            'eur_pln_date' => $compensation['rate_date'],
+            'eur_pln_source' => $compensation['source'],
+            'total' => round($principal + $interest['total'] + $compensationPln, 2),
             'deadline' => $on->copy()->addDays(self::DEADLINE_DAYS),
             'on' => $on,
         ];

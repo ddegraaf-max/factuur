@@ -22,5 +22,9 @@
   "Wacht op offerte": "Awaiting offer",
   "Aanmaning en verkoop van de vordering": "Payment demand and invoice sale",
   "Formele aanmaning met wettelijke rente en vergoeding van incassokosten — of verkoop de vordering aan :partner.": "Formal payment demand with statutory interest and recovery-cost compensation — or sell the receivable to :partner.",
-  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "You send reminders and the payment demand from :brand yourself; an unpaid invoice can be sold to :partner on the Sell invoices page."
+  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "You send reminders and the payment demand from :brand yourself; an unpaid invoice can be sold to :partner on the Sell invoices page.",
+  "Rente per periode:": "Interest by period:",
+  "dagen": "days",
+  "Vergoeding omgerekend tegen de NBP-koers van :date: :rate zł/EUR": "Compensation converted at the NBP average rate of :date: :rate zł/EUR",
+  "Vergoeding omgerekend tegen een indicatieve koers van :rate zł/EUR (NBP niet bereikbaar)": "Compensation converted at an indicative rate of :rate zł/EUR (NBP unavailable)"
 }

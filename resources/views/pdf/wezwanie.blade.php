@@ -64,8 +64,19 @@
 
 <table class="claim">
   <tr><td>Należność główna (faktura {{ $invoice->number }})</td><td class="r">{{ money($claim['principal']) }}</td></tr>
-  <tr><td>Odsetki ustawowe za opóźnienie w transakcjach handlowych ({{ $ratePct }}% × {{ $claim['days'] }} dni)</td><td class="r">{{ money($claim['interest']) }}</td></tr>
-  <tr><td>Rekompensata za koszty odzyskiwania należności (art. 10 — {{ $claim['compensation_eur'] }} EUR)</td><td class="r">{{ money($claim['compensation']) }}</td></tr>
+@php
+  // Rente per periode (bv. 14% t/m 30 juni, 13,75% daarna) en de NBP-koers van de rekompensata.
+  $pct = fn ($r) => rtrim(rtrim(number_format($r * 100, 2, ',', ''), '0'), ',');
+  $segs = $claim['interest_periods'] ?? [];
+  $rateText = count($segs) > 1
+      ? implode(', ', array_map(fn ($s) => $pct($s['rate']) . '% × ' . $s['days'] . ' dni', $segs))
+      : $ratePct . '% × ' . $claim['days'] . ' dni';
+  $fxText = ! empty($claim['eur_pln_date'])
+      ? ' × ' . number_format($claim['eur_pln'], 4, ',', ' ') . ' zł — średni kurs NBP z dnia ' . \Carbon\Carbon::parse($claim['eur_pln_date'])->format('d.m.Y')
+      : '';
+@endphp
+  <tr><td>Odsetki ustawowe za opóźnienie w transakcjach handlowych ({{ $rateText }})</td><td class="r">{{ money($claim['interest']) }}</td></tr>
+  <tr><td>Rekompensata za koszty odzyskiwania należności (art. 10 — {{ $claim['compensation_eur'] }} EUR{{ $fxText }})</td><td class="r">{{ money($claim['compensation']) }}</td></tr>
   <tr class="tot"><td>Razem do zapłaty na dzień {{ $fmtDate($claim['on']) }}</td><td class="r">{{ money($claim['total']) }}</td></tr>
 </table>
 

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Invoice;
+use App\Services\NbpService;
 use App\Services\WindykacjaService;
+use Carbon\Carbon;
 use App\Support\Market;
 use Illuminate\Http\Request;
 
@@ -55,6 +57,28 @@ class WindykacjaController extends Controller
         }
 
         return back()->with('flash', __('Verzoek verstuurd naar :partner — zij nemen binnen één werkdag contact met je op.', ['partner' => Market::wykup('partner_name')]));
+    }
+
+    /**
+     * Publiek (kalkulator odsetek): de renteperiodes en de NBP-koers die bij een vervaldatum hoort,
+     * zodat de calculator op de site met dezelfde wettelijke waarden rekent als de app.
+     */
+    public function rates(Request $request, NbpService $nbp)
+    {
+        abort_unless(Market::isPl(), 404);
+        $data = $request->validate(['termin' => ['nullable', 'date'], 'data' => ['nullable', 'date']]);
+
+        $due = ! empty($data['termin']) ? Carbon::parse($data['termin']) : null;
+        $on = ! empty($data['data']) ? Carbon::parse($data['data']) : now();
+        $fx = $due ? $nbp->eurRateForDueDate($due) : $nbp->fallback();
+
+        return response()->json([
+            'periods' => collect($this->service->ratePeriods())->map(fn ($rate, $from) => ['from' => $from, 'rate' => $rate])->values(),
+            'rate' => $this->service->interestRateOn($on),
+            'eur_pln' => $fx['rate'],
+            'eur_pln_date' => $fx['date'],
+            'source' => $fx['source'],
+        ]);
     }
 
     private function authorizeInvoice(Invoice $invoice): void
