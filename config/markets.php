@@ -94,11 +94,14 @@ return [
         // ustawy z 8 marca 2013 r.) van 40/70/100 EUR, omgerekend naar PLN.
         'interest_rate' => 0.14,
         'eur_pln' => 4.30,
-        'incasso' => [
+        // Geen incassopartner in Polen: herinneringen en het wezwanie do zapłaty verstuurt
+        // de ondernemer zelf vanuit Lopra. sprzedamfakture.pl koopt onbetaalde facturen
+        // (wykup wierzytelności) — zie 'wykup'. Per omgeving: WYKUP_EMAIL (of INCASSO_CLAIMS_EMAIL).
+        'incasso' => null,
+        'wykup' => [
             'partner_name' => 'sprzedamfakture.pl',
-            'claims_email' => 'sprawy@sprzedamfakture.pl',
+            'email' => 'wykup@sprzedamfakture.pl',
             'cc' => 'info@creditline.nl',
-            'phone' => '+48 22 000 00 00',
             'website' => 'https://sprzedamfakture.pl',
         ],
     ],

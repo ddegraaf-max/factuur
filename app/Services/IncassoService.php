@@ -118,8 +118,8 @@ class IncassoService
                     ->update(['current_value' => $next, 'updated_at' => now()]);
             }
 
-            // Dossierprefix per markt: ARM (Armaere, NL) of SF (sprzedamfakture.pl).
-            return sprintf('%s-%d-%04d', \App\Support\Market::isPl() ? 'SF' : 'ARM', $year, $next);
+            // Dossierprefix van Armaere (NL); markten zonder incassopartner komen hier niet.
+            return sprintf('ARM-%d-%04d', $year, $next);
         });
     }
 }

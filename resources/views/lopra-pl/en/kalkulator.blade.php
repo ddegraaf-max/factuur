@@ -135,7 +135,7 @@
         </div>
         <div class="calc-actions" style="margin-top:10px;">
           <a href="{{ route('register') }}" class="btn btn-secondary">Create an account with {{ brand('name') }} — demand letters in one click</a>
-          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Hand the case to sprzedamfakture.pl</a>
+          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Sell the invoice on sprzedamfakture.pl</a>
         </div>
       </div>
     </div>
@@ -158,8 +158,8 @@
       <p>Interest and compensation are claims you do not need to announce in the contract or on the invoice. In practice many businesses never claim them — yet they are exactly what makes paying late stop being worthwhile for the debtor.</p>
 
       <h2>What if the demand letter doesn't work?</h2>
-      <p>A payment demand with a 7-day deadline is the standard pre-litigation step. If the debtor still does not pay, <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> can take over the case: amicable debt collection, an entry in a debtor register (KRD/BIG) and, if necessary, court proceedings and enforcement — with the costs charged to the debtor. Need the money right away? You can submit the invoice for purchase and receive an assignment offer within one working day.</p>
-      <p>In {{ brand('name') }} the whole process is built into invoicing: reminders go out automatically, the demand letter with interest and compensation is created in one click, and handing the case to sprzedamfakture.pl requires no retyping. <a href="{{ route('register') }}">Try it free for 14 days</a>.</p>
+      <p>A payment demand with a 7-day deadline is the standard pre-litigation step. If the debtor still does not pay, you can pursue the claim yourself — court proceedings and enforcement, with the costs charged to the debtor. Would you rather have the cash now than wait? Sell the invoice to <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>: you receive a purchase offer within one working day and, once you accept, the money is paid out and the buyer takes over the risk and any further recovery.</p>
+      <p>In {{ brand('name') }} the whole process is built into invoicing: reminders go out automatically, the demand letter with interest and compensation is created in one click, and selling the invoice to sprzedamfakture.pl requires no retyping. <a href="{{ route('register') }}">Try it free for 14 days</a>.</p>
     </div>
   </div>
 </section>
@@ -208,7 +208,7 @@
 
       <p>Wzywam do zapłaty powyższej kwoty w terminie <strong>7 dni</strong> od dnia otrzymania niniejszego wezwania, na rachunek bankowy nr <input type="text" class="inline" id="wzIban" placeholder="bank account number" style="min-width:260px;">, z podaniem numeru faktury w tytule przelewu. Odsetki naliczane są nadal, do dnia zapłaty.</p>
 
-      <p>W przypadku braku zapłaty w wyznaczonym terminie sprawa zostanie bez dalszych wezwań przekazana do windykacji oraz skierowana na drogę postępowania sądowego, co narazi Państwa na dodatkowe koszty — w tym koszty procesu, zastępstwa procesowego i egzekucji — a także może skutkować wpisem do rejestru dłużników.</p>
+      <p>W przypadku braku zapłaty w wyznaczonym terminie nastąpi, bez dalszych wezwań, skierowanie sprawy na drogę sądową oraz obciążenie kosztami odzyskiwania należności, co narazi Państwa na dodatkowe koszty — w tym koszty procesu, zastępstwa procesowego i egzekucji — a także może skutkować wpisem do rejestru dłużników.</p>
 
       <p>Jeżeli należność została uregulowana przed otrzymaniem niniejszego pisma, proszę uznać je za nieaktualne i przesłać potwierdzenie przelewu.</p>
 
@@ -222,10 +222,10 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Stop working this out by hand for every invoice</h2>
-    <p>In {{ brand('name') }} reminders go out on their own, the demand letter with interest and compensation is created in one click, and sprzedamfakture.pl is one step away — with no retyping.</p>
+    <p>In {{ brand('name') }} reminders go out on their own, the demand letter with interest and compensation is created in one click, and a purchase offer from sprzedamfakture.pl is one click away — with no retyping.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Try it free for 14 days →</a>
-      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Hand the case to sprzedamfakture.pl</a>
+      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Sell the invoice on sprzedamfakture.pl</a>
     </div>
   </div>
 </section>

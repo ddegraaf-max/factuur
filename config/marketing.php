@@ -79,7 +79,7 @@ $pl = [
         ['title' => 'Produkt', 'links' => [
             ['route' => 'home', 'fragment' => '#dlaczego', 'label' => 'Dlaczego Lopra'],
             ['route' => 'home', 'fragment' => '#funkcje', 'label' => 'Funkcje'],
-            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Windykacja ze sprzedamfakture.pl'],
+            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Windykacja i sprzedaż faktur'],
             ['route' => 'home', 'fragment' => '#cennik', 'label' => 'Cennik'],
             ['route' => 'demo', 'label' => 'Demo'],
         ]],
@@ -111,7 +111,7 @@ $pl = [
     'trademark_link' => '',
     'offers' => [
         ['name' => 'Podstawowy', 'price' => '60.27', 'priceCurrency' => 'PLN', 'description' => 'Pełne fakturowanie, wizytówka i strona www za 49 zł netto (60,27 zł brutto) miesięcznie, bez zobowiązań.'],
-        ['name' => 'Smart', 'price' => '97.17', 'priceCurrency' => 'PLN', 'description' => 'Wszystko z Podstawowego plus AI i windykacja premium za 79 zł netto (97,17 zł brutto) miesięcznie.'],
+        ['name' => 'Smart', 'price' => '97.17', 'priceCurrency' => 'PLN', 'description' => 'Wszystko z Podstawowego plus AI i priorytetowa wycena wykupu faktur za 79 zł netto (97,17 zł brutto) miesięcznie.'],
     ],
 ];
 
@@ -131,7 +131,7 @@ $plEn = [
         ['title' => 'Product', 'links' => [
             ['route' => 'home', 'fragment' => '#dlaczego', 'label' => 'Why Lopra'],
             ['route' => 'home', 'fragment' => '#funkcje', 'label' => 'Features'],
-            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Debt collection with sprzedamfakture.pl'],
+            ['route' => 'home', 'fragment' => '#windykacja', 'label' => 'Collection toolkit & invoice sale'],
             ['route' => 'home', 'fragment' => '#cennik', 'label' => 'Pricing'],
             ['route' => 'demo', 'label' => 'Demo'],
         ]],
@@ -163,7 +163,7 @@ $plEn = [
     'trademark_link' => '',
     'offers' => [
         ['name' => 'Podstawowy', 'price' => '60.27', 'priceCurrency' => 'PLN', 'description' => 'Full invoicing, business card and website for 49 zł net (60.27 zł gross) a month, no commitment.'],
-        ['name' => 'Smart', 'price' => '97.17', 'priceCurrency' => 'PLN', 'description' => 'Everything in Podstawowy plus AI and premium debt collection for 79 zł net (97.17 zł gross) a month.'],
+        ['name' => 'Smart', 'price' => '97.17', 'priceCurrency' => 'PLN', 'description' => 'Everything in Podstawowy plus AI and priority invoice-purchase quotes for 79 zł net (97.17 zł gross) a month.'],
     ],
 ];
 

@@ -56,7 +56,7 @@
       Torenlaan 5B · 1402 AT Bussum · Holandia<br>
       Rejestr handlowy (KvK) 59683198 · VAT NL853603108B01<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a><br>
-      Partner windykacyjny w Polsce: <strong>sprzedamfakture.pl</strong> — serwis windykacyjny Creditline B.V. (<a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>)
+      Partner wykupu wierzytelności w Polsce: <strong>sprzedamfakture.pl</strong> — serwis Creditline B.V. (<a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>)
     </div>
 
     <h2>§ 1. Definicje</h2>
@@ -85,12 +85,12 @@
       <li>weryfikację NIP kontrahenta w Wykazie podatników VAT oraz listę kontrahentów i produktów;</li>
       <li>zestawienie VAT należnego i naliczonego per stawka, w układzie pomocnym przy sporządzaniu JPK_V7, oraz eksport danych (CSV);</li>
       <li>przypomnienia o płatności, ponaglenia i generowanie wezwania do zapłaty z odsetkami ustawowymi za opóźnienie w transakcjach handlowych i rekompensatą;</li>
-      <li>przekazanie sprawy do partnera windykacyjnego sprzedamfakture.pl oraz zgłoszenie wierzytelności do wykupu — na wyraźne zlecenie Użytkownika;</li>
+      <li>zgłoszenie wierzytelności do wykupu przez sprzedamfakture.pl — na wyraźne zlecenie Użytkownika;</li>
       <li>identyfikację wizualną, wizytówkę cyfrową i stronę www Użytkownika, publikowane pod adresem w domenie Usługi;</li>
       <li>w pakiecie Smart — funkcje oparte na sztucznej inteligencji (m.in. propozycje identyfikacji wizualnej, tekst strony www, rozpoznawanie kosztów ze zdjęć, oferty z tekstu).</li>
     </ul>
     <p>2. Usługa jest narzędziem wspierającym Użytkownika. Usługodawca nie świadczy usług księgowych, doradztwa podatkowego ani prawnego. Za poprawność, kompletność i terminowość faktur, rozliczeń podatkowych, wysyłki do KSeF oraz treści wezwań do zapłaty odpowiada Użytkownik.</p>
-    <p>3. Windykacja należności i wykup wierzytelności są usługami sprzedamfakture.pl świadczonymi na podstawie odrębnej umowy lub zlecenia między Użytkownikiem a sprzedamfakture.pl. Wynagrodzenie za te usługi jest ustalane każdorazowo przed przyjęciem zlecenia; Usługa nie pobiera z tego tytułu opłat wstępnych.</p>
+    <p>3. Wykup wierzytelności jest usługą sprzedamfakture.pl świadczoną na podstawie odrębnej umowy cesji między Użytkownikiem a sprzedamfakture.pl. Cena wykupu jest ustalana każdorazowo w ofercie przed zawarciem umowy; Usługa nie pobiera z tego tytułu opłat.</p>
     <p>4. Treści generowane przez funkcje sztucznej inteligencji stanowią propozycje. Użytkownik sprawdza je przed użyciem i ponosi odpowiedzialność za ich wykorzystanie (w tym za prawa osób trzecich do nazw, sloganów lub znaków).</p>
 
     <h2>§ 4. Konto i okres próbny</h2>
@@ -139,7 +139,7 @@
 
     <h2>§ 10. Odpowiedzialność</h2>
     <p>1. Usługodawca odpowiada za szkody wyrządzone Użytkownikowi z winy umyślnej lub rażącego niedbalstwa. W pozostałym zakresie odpowiedzialność Usługodawcy jest ograniczona do szkody rzeczywistej i do wysokości wynagrodzenia zapłaconego przez Użytkownika za Usługę w okresie 12 miesięcy poprzedzających zdarzenie wywołujące szkodę.</p>
-    <p>2. Usługodawca nie odpowiada za utracone korzyści, za skutki nieprawidłowych danych wprowadzonych przez Użytkownika, za decyzje podjęte na podstawie zestawień i obliczeń generowanych przez Usługę (w tym wyliczeń odsetek i rekompensaty, które mają charakter pomocniczy), za przerwy wynikające z przyczyn leżących po stronie dostawców Internetu, operatorów płatności, KSeF lub innych systemów zewnętrznych ani za działania partnera windykacyjnego świadczone na podstawie odrębnej umowy.</p>
+    <p>2. Usługodawca nie odpowiada za utracone korzyści, za skutki nieprawidłowych danych wprowadzonych przez Użytkownika, za decyzje podjęte na podstawie zestawień i obliczeń generowanych przez Usługę (w tym wyliczeń odsetek i rekompensaty, które mają charakter pomocniczy), za przerwy wynikające z przyczyn leżących po stronie dostawców Internetu, operatorów płatności, KSeF lub innych systemów zewnętrznych ani za działania sprzedamfakture.pl w zakresie wykupu wierzytelności, świadczone na podstawie odrębnej umowy cesji.</p>
     <p>3. Ograniczenia odpowiedzialności nie dotyczą sytuacji, w których bezwzględnie obowiązujące przepisy prawa wyłączają możliwość ich zastosowania — w szczególności wobec Użytkowników objętych ochroną konsumencką (§ 12 ust. 2).</p>
 
     <h2>§ 11. Reklamacje</h2>

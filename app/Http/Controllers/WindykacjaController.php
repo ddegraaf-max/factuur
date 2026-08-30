@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 /**
  * Windykacja (Poolse markt): wezwanie do zapłaty als PDF en het verzoek om
- * een vordering te verkopen aan sprzedamfakture.pl. De overdracht van een
+ * een vordering te verkopen aan sprzedamfakture.pl (factuurkoper; geen incasso). De overdracht van een
  * dossier zelf loopt via IncassoController (partner per markt).
  */
 class WindykacjaController extends Controller
@@ -54,7 +54,7 @@ class WindykacjaController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('flash', __('Verzoek verstuurd naar :partner — zij nemen binnen één werkdag contact met je op.', ['partner' => Market::incasso('partner_name')]));
+        return back()->with('flash', __('Verzoek verstuurd naar :partner — zij nemen binnen één werkdag contact met je op.', ['partner' => Market::wykup('partner_name')]));
     }
 
     private function authorizeInvoice(Invoice $invoice): void

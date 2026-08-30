@@ -74,8 +74,8 @@
 w tytule przelewu podając numer faktury <strong>{{ $invoice->number }}</strong>. Odsetki naliczane są w dalszym ciągu, do dnia zapłaty.</p>
 
 <div class="box">
-  <strong>Brak zapłaty w wyznaczonym terminie</strong> skutkować będzie przekazaniem sprawy do windykacji przez <strong>{{ $partner['name'] }}</strong>@if($partner['website']) ({{ preg_replace('#^https?://#', '', $partner['website']) }})@endif,
-  zgłoszeniem dłużnika do biura informacji gospodarczej (KRD / BIG) oraz — w razie potrzeby — skierowaniem sprawy na drogę postępowania sądowego, którego koszty obciążą dłużnika.
+  <strong>Brak zapłaty w wyznaczonym terminie</strong> skutkować będzie skierowaniem sprawy na drogę postępowania sądowego oraz obciążeniem dłużnika kosztami odzyskiwania należności
+  (odsetki ustawowe za opóźnienie, rekompensata za koszty odzyskiwania należności, koszty postępowania), a także może skutkować zgłoszeniem dłużnika do biura informacji gospodarczej (KRD / BIG).
 </div>
 
 <p>Jeżeli należność została już uregulowana, prosimy o przesłanie potwierdzenia przelewu i pominięcie niniejszego wezwania.</p>
@@ -87,6 +87,6 @@ w tytule przelewu podając numer faktury <strong>{{ $invoice->number }}</strong>
   </tr>
 </table>
 
-<div class="foot">Wezwanie sporządzono w {{ brand('name') }} · {{ brand('domain') }} · Windykacja: {{ $partner['name'] }}</div>
+<div class="foot">Wezwanie sporządzono w {{ brand('name') }} · {{ brand('domain') }}</div>
 </body>
 </html>

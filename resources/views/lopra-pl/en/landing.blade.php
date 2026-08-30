@@ -1,14 +1,14 @@
 @extends('layouts.marketing')
 
-{{-- Lopra Polska home page, English version (APP_BRAND=lopra_pl): invoices, brand, website and debt collection with sprzedamfakture.pl — from day one to an established business. --}}
+{{-- Lopra Polska home page, English version (APP_BRAND=lopra_pl): invoices, brand, website and a collection toolkit with invoice sale to sprzedamfakture.pl — from day one to an established business. --}}
 
-@section('title', 'Lopra — invoices, brand and debt collection in one place, from 49 zł a month')
-@section('description', 'The complete tool for businesses in Poland: KSeF-ready invoices, quotes, VAT returns, AI-designed brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, and debt collection with sprzedamfakture.pl. 14 days free.')
+@section('title', 'Lopra — invoices, brand and unpaid-invoice recovery in one place, from 49 zł a month')
+@section('description', 'The complete tool for businesses in Poland: KSeF-ready invoices, quotes, VAT returns, AI-designed brand identity, digital business card and website, import from Fakturownia, iFirma, wFirma and inFakt, automatic reminders and payment demands, and the option to sell unpaid invoices to sprzedamfakture.pl. 14 days free.')
 
 @push('styles')
 @include('lopra.partials.landing-styles')
 <style>
-  /* Windykacja: ciemna sekcja z czterema krokami */
+  /* Windykacja: ciemna sekcja z trzema krokami */
   .wd { background: linear-gradient(160deg, #1C4E7A 0%, #163E62 55%, #132F49 100%); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
   .wd::before { content: ''; position: absolute; width: 700px; height: 700px; border-radius: 50%; right: -260px; top: -320px; background: radial-gradient(circle, rgba(224,165,92,0.22) 0%, rgba(224,165,92,0) 62%); }
   .wd .eyebrow { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: #E0A55C; }
@@ -59,7 +59,7 @@
     <div class="eyebrow">For businesses in Poland — from start-up to established company</div>
     <h1>Your whole business <span class="accent">in one place.</span></h1>
     <p class="hero-sub">
-      Invoices ready for KSeF (the national e-invoicing system), quotes, VAT returns, brand identity, your own website — and debt collection with sprzedamfakture.pl when a client won't pay. One tool, one subscription, zero accounting jargon.
+      Invoices ready for KSeF (the national e-invoicing system), quotes, VAT returns, brand identity, your own website — and, when a client won't pay, automatic reminders, a formal payment demand and the option to sell the invoice to sprzedamfakture.pl. One tool, one subscription, zero accounting jargon.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -187,7 +187,7 @@
             <section class="d-screen" data-screen="windykacja">
               <div class="d-shead d-anim" style="--d:.04s">
                 <div><div class="d-h1">Debt collection</div><div class="d-sub">FV/2026/0004 · TransLog Polska Sp. z o.o. · 44 days overdue</div></div>
-                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Hand over to sprzedamfakture.pl</div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Sell the invoice</div>
               </div>
               <div class="d-two even">
                 <div class="d-card d-anim" style="--d:.1s" style="margin:0;">
@@ -210,8 +210,8 @@
               </div>
               <div class="d-tiles">
                 <div class="d-tile d-anim" style="--d:.3s"><div class="ic copper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><b>Payment demand</b><span>ready to send, 7-day deadline</span></div></div>
-                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>sprzedamfakture.pl</b><span>amicable and court collection, KRD/BIG</span></div></div>
-                <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><b>Sell the invoice</b><span>purchase offer within 1 working day</span></div></div>
+                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>Interest calculator</b><span>14% p.a. + 40/70/100 EUR compensation</span></div></div>
+                <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><b>Sell the invoice</b><span>sprzedamfakture.pl · offer within 1 working day</span></div></div>
               </div>
             </section>
 
@@ -353,7 +353,7 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Why Lopra</div>
       <h2>One tool instead of four.</h2>
-      <p>Invoicing software, a logo designer, a website builder and a debt collection agency — normally four subscriptions and four logins. In Lopra it is one place, and everything works together.</p>
+      <p>Invoicing software, a logo designer, a website builder and a tool for chasing unpaid invoices — normally four subscriptions and four logins. In Lopra it is one place, and everything works together.</p>
     </div>
 
     <div class="lp-vcards">
@@ -401,28 +401,27 @@
           <span class="lp-mini-badge" style="border-color:#F5B5AC;color:#B42318;">⏱ 7 days to pay</span>
         </div>
         <div class="lp-vcard-body">
-          <span class="lp-vcard-tag">Debt collection</span>
-          <h3>Not paying? sprzedamfakture.pl recovers it.</h3>
-          <p>Reminders go out automatically. When that does not work, one click creates a wezwanie do zapłaty (formal payment demand) with statutory interest and compensation — and then you hand the case to sprzedamfakture.pl: amicable and court collection, a KRD/BIG debtor-register listing, or selling the invoice. All from your invoice, with no retyping.</p>
+          <span class="lp-vcard-tag">Collection toolkit</span>
+          <h3>Not paying? Chase it — or sell it.</h3>
+          <p>Reminders go out automatically. When that does not work, one click creates a wezwanie do zapłaty (formal payment demand) with statutory interest and compensation. Still nothing? Sell the invoice to sprzedamfakture.pl with one click: a purchase offer within one working day, the money paid out, the risk taken off your hands. All from your invoice, with no retyping.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- DEBT COLLECTION WITH CREDITLINE -->
+<!-- COLLECTION TOOLKIT AND INVOICE SALE TO SPRZEDAMFAKTURE.PL -->
 <section class="wd" id="windykacja">
   <div class="container">
-    <div class="eyebrow">Debt collection built into your invoicing</div>
-    <h2>From reminder to recovered payment — without switching tools.</h2>
-    <p class="lead">In Poland, one in three B2B invoices is paid late. Lopra keeps an eye on due dates for you, and when it comes to it, sprzedamfakture.pl takes over the case — with all the data from your invoice.</p>
+    <div class="eyebrow">Collection toolkit built into your invoicing</div>
+    <h2>From reminder to money in the bank — without switching tools.</h2>
+    <p class="lead">In Poland, one in three B2B invoices is paid late. Lopra keeps an eye on due dates, chases for you and prepares the formal demand — and if you would rather not wait or go to court yourself, you sell the invoice to sprzedamfakture.pl straight from Lopra.</p>
 
     <div class="wd-grid">
       <div class="wd-steps">
-        <div class="wd-step"><div class="nr">1</div><div><b>Reminders and follow-ups — automatically</b><p>Before the due date, after it and after 14 days: e-mail and SMS in your tone of voice, with a link to pay by BLIK or Przelewy24.</p><span class="tag">included in your subscription</span></div></div>
-        <div class="wd-step"><div class="nr">2</div><div><b>Payment demand with interest and compensation</b><p>One click: a formal pre-court demand (PDF) with statutory late-payment interest and the 40/70/100 EUR compensation under Art. 10 of the Late Payment Act — ready to send.</p><span class="tag">included in your subscription</span></div></div>
-        <div class="wd-step"><div class="nr">3</div><div><b>Hand-over to sprzedamfakture.pl</b><p>The complete file (invoice, contact history, demand) goes to the collection team. Amicable collection, a KRD/BIG listing and, if needed, court proceedings — at the debtor's expense.</p><span class="tag">quote before you commit · no upfront fees</span></div></div>
-        <div class="wd-step"><div class="nr">4</div><div><b>Sell the invoice</b><p>Need the cash now? Submit the receivable for purchase — sprzedamfakture.pl prepares an assignment offer within one working day.</p><span class="tag">receivables purchase</span></div></div>
+        <div class="wd-step"><div class="nr">1</div><div><b>Reminders and dunning notices — automatically</b><p>Before the due date, after it and after 14 days: e-mail and SMS in your tone of voice, with a link to pay by BLIK or Przelewy24.</p><span class="tag">included in your subscription</span></div></div>
+        <div class="wd-step"><div class="nr">2</div><div><b>Payment demand with interest and compensation</b><p>One click: a formal pre-court demand (PDF) with statutory late-payment interest (14%) and the 40/70/100 EUR compensation under Art. 10 of the Late Payment Act — ready to send.</p><span class="tag">included in your subscription</span></div></div>
+        <div class="wd-step"><div class="nr">3</div><div><b>Sell the invoice</b><p>Rather not wait or go to court yourself? Submit the invoice straight from Lopra — sprzedamfakture.pl sends a purchase offer within one working day. Accept, and the money is paid out; the buyer takes over the risk and any further recovery.</p><span class="tag">offer before you decide · no fees, no upfront costs</span></div></div>
       </div>
 
       <div>
@@ -434,11 +433,11 @@
             <tr><td>Art. 10 compensation (40 EUR)</td><td class="r">172,00 zł</td></tr>
             <tr class="tot"><td>Total due</td><td class="r">2 632,84 zł</td></tr>
           </table>
-          <div class="acts"><span class="main">Download demand (PDF)</span><span>Hand over to sprzedamfakture.pl</span><span>Sell the invoice</span></div>
+          <div class="acts"><span class="main">Download demand (PDF)</span><span>Sell the invoice</span></div>
         </div>
         <div class="wd-partner">
           <div class="lg">SF</div>
-          <div><b>sprzedamfakture.pl</b>Lopra's debt collection partner — AI-assisted receivables collection, invoice purchase, interest calculator. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a></div>
+          <div><b>sprzedamfakture.pl</b>Lopra's invoice-purchase partner: buys unpaid B2B invoices, assignment offer within one working day, no fees or upfront costs. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a></div>
         </div>
       </div>
     </div>
@@ -467,7 +466,7 @@
   <div class="container">
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Features</div>
-      <h2>Everything you need. From your first invoice to debt collection.</h2>
+      <h2>Everything you need. From your first invoice to the one that isn't paid.</h2>
       <p>No accounting package with a hundred buttons. Just everything you need to issue a professional invoice today — and what comes in handy once the business grows.</p>
     </div>
 
@@ -489,8 +488,8 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg></div>
-        <div class="feature-title">Debt collection with sprzedamfakture.pl</div>
-        <div class="feature-desc">Reminders, a payment demand with interest and compensation, case hand-over and invoice sale — straight from the invoice.</div>
+        <div class="feature-title">Collection toolkit &amp; invoice sale</div>
+        <div class="feature-desc">Reminders and dunning notices, a payment demand with interest and compensation, and — if you would rather have the cash now — selling the invoice to sprzedamfakture.pl. Straight from the invoice.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></div>
@@ -533,7 +532,7 @@
     <div class="pricing-wrap">
       <div class="pricing-lead">
         <h2>Everything a business needs is in Podstawowy (Basic).</h2>
-        <p>Invoices, quotes, VAT, business card, website and debt collection steps 1–2 — for what others charge for invoicing software alone. Want AI to design your brand, write your website and book your expenses from photos? Choose Smart.</p>
+        <p>Invoices, quotes, VAT, business card, website and the full collection toolkit — for what others charge for invoicing software alone. Want AI to design your brand, write your website and book your expenses from photos? Choose Smart.</p>
         <ul class="pricing-lead-points">
           <li>Digital business card and website included</li>
           <li>Unlimited invoices, ready for KSeF</li>
@@ -546,7 +545,7 @@
       <div class="pricing-cards">
         <div class="pricing-card basic">
           <div class="pricing-title">Podstawowy</div>
-          <div class="pricing-desc">Invoices, VAT, business card, website and debt collection steps 1–2</div>
+          <div class="pricing-desc">Invoices, VAT, business card, website and the collection toolkit</div>
           <div class="pricing-price-row">
             <div class="pricing-price">49<span class="euro" style="font-size:22px;margin-left:4px;">zł</span></div>
             <div class="pricing-period">/ month</div>
@@ -558,7 +557,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>VAT return per rate, every month</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Digital business card with QR code and a website</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Your own logo, colours and templates</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Reminders, payment demand, hand-over to sprzedamfakture.pl</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Reminders, payment demand, invoice sale to sprzedamfakture.pl</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>BLIK / Przelewy24 payment link on the invoice</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Hours, mileage, recurring invoices</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Extra users and your accountant free of charge</li>
@@ -583,7 +582,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Expenses from a photo: receipts and purchase invoices recognised automatically</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Quote from text: paste a description, the form fills itself in</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Claude integration: invoices and quotes straight from a conversation</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority handling of your collection cases at sprzedamfakture.pl</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priority purchase quotes from sprzedamfakture.pl</li>
           </ul>
           <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Try 14 days free</a>
           <div class="pricing-fineprint">No card needed · cancel at any time</div>
@@ -612,8 +611,8 @@
         <div class="faq-content">Your NIP (tax ID) and a business bank account. Lopra pulls your company name, address and REGON from the VAT taxpayer register (the "white list") and sets up invoice numbering and VAT. Your brand, business card and website take fifteen minutes. VAT-exempt? Tick the box — the correct note appears on your invoices.</div>
       </details>
       <details class="faq-item">
-        <summary>How much does debt collection with sprzedamfakture.pl cost?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Reminders and the payment demand are included in your subscription. Handing a case to sprzedamfakture.pl is quoted before you commit — no upfront fees; as a rule, collection costs and interest are charged to the debtor (under the Polish act on counteracting excessive delays in commercial transactions). You receive an invoice purchase offer within one working day.</div>
+        <summary>What does chasing an unpaid invoice cost?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Reminders, dunning notices and the payment demand are included in your subscription. Selling an invoice to sprzedamfakture.pl carries no fees and no upfront costs: you submit the invoice from Lopra, receive a purchase offer with the price within one working day and only then decide. Accept, and the money is paid out — the buyer takes over the risk and any further recovery.</div>
       </details>
       <details class="faq-item">
         <summary>My invoices are in Fakturownia / iFirma / wFirma / inFakt. Is switching difficult?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -621,7 +620,7 @@
       </details>
       <details class="faq-item">
         <summary>How much does it cost after the trial?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content"><b>Podstawowy</b> 49 zł net (60,27 zł gross) a month, <b>Smart</b> 79 zł net (97,17 zł gross) with AI features and priority debt collection. No fixed-term contract; pay by BLIK, card or bank transfer, with a VAT invoice every month.</div>
+        <div class="faq-content"><b>Podstawowy</b> 49 zł net (60,27 zł gross) a month, <b>Smart</b> 79 zł net (97,17 zł gross) with AI features and priority purchase quotes from sprzedamfakture.pl. No fixed-term contract; pay by BLIK, card or bank transfer, with a VAT invoice every month.</div>
       </details>
       <details class="faq-item">
         <summary>Is my data safe and GDPR-compliant?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -638,7 +637,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Start today. Professional from your very first invoice — and calm when someone doesn't pay.</h2>
-    <p>Account, brand, business card, website and your first invoice — all before dinner. And if a client does not pay, sprzedamfakture.pl is one click away.</p>
+    <p>Account, brand, business card, website and your first invoice — all before dinner. And if a client does not pay, the demand is ready in one click — and so is a purchase offer from sprzedamfakture.pl.</p>
     <a href="{{ route('register') }}" class="btn btn-white btn-lg">
       Try 14 days free
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

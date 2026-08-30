@@ -40,7 +40,10 @@ class MarketTest extends TestCase
         $this->assertSame(8, Market::nearestVatRate(9));
         $this->assertSame("1\u{00A0}234,50\u{00A0}zł", Market::money(1234.5));
         $this->assertSame('NIP', market('tax_id.label'));
-        $this->assertSame('sprzedamfakture.pl', Market::incasso('partner_name'));
+        $this->assertFalse(Market::hasIncasso());                 // geen incassopartner in Polen
+        $this->assertSame('', Market::incasso('partner_name'));
+        $this->assertSame('sprzedamfakture.pl', Market::wykup('partner_name'));
+        $this->assertSame('sprzedamfakture.pl', Market::forClient()['wykup_partner']);
         $this->assertSame('BLIK / Przelewy24', Market::forClient()['online_payment_label']);
         $this->assertSame('Lopra', brand('name'));
         $this->assertSame('lopra.pl', brand('domain'));

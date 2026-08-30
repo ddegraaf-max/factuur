@@ -1,14 +1,14 @@
 @extends('layouts.marketing')
 
-{{-- Strona główna Lopra Polska (APP_BRAND=lopra_pl): faktury, marka, strona www i windykacja ze sprzedamfakture.pl — od startu po dojrzały biznes. --}}
+{{-- Strona główna Lopra Polska (APP_BRAND=lopra_pl): faktury, marka, strona www, windykacja własna i sprzedaż faktur do sprzedamfakture.pl — od startu po dojrzały biznes. --}}
 
 @section('title', 'Lopra — faktury, marka i windykacja w jednym miejscu, od 49 zł miesięcznie')
-@section('description', 'Kompletne narzędzie dla polskich firm: faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna z AI, wizytówka i strona www, import z Fakturowni, iFirmy, wFirmy i inFaktu oraz windykacja należności ze sprzedamfakture.pl. 14 dni za darmo.')
+@section('description', 'Kompletne narzędzie dla polskich firm: faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna z AI, wizytówka i strona www, import z Fakturowni, iFirmy, wFirmy i inFaktu oraz windykacja własna: przypomnienia, wezwanie do zapłaty z odsetkami i sprzedaż nieopłaconej faktury do sprzedamfakture.pl. 14 dni za darmo.')
 
 @push('styles')
 @include('lopra.partials.landing-styles')
 <style>
-  /* Windykacja: ciemna sekcja z czterema krokami */
+  /* Windykacja: ciemna sekcja z trzema krokami */
   .wd { background: linear-gradient(160deg, #1C4E7A 0%, #163E62 55%, #132F49 100%); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
   .wd::before { content: ''; position: absolute; width: 700px; height: 700px; border-radius: 50%; right: -260px; top: -320px; background: radial-gradient(circle, rgba(224,165,92,0.22) 0%, rgba(224,165,92,0) 62%); }
   .wd .eyebrow { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: #E0A55C; }
@@ -59,7 +59,7 @@
     <div class="eyebrow">Dla firm w Polsce — od startu po dojrzały biznes</div>
     <h1>Cała Twoja firma <span class="accent">w jednym miejscu.</span></h1>
     <p class="hero-sub">
-      Faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna, strona www — i windykacja należności ze sprzedamfakture.pl, gdy klient nie płaci. Jedno narzędzie, jeden abonament, zero księgowego żargonu.
+      Faktury gotowe do KSeF, oferty, rozliczenie VAT, identyfikacja wizualna, strona www — a gdy klient nie płaci: przypomnienia, wezwanie do zapłaty i sprzedaż faktury do sprzedamfakture.pl jednym kliknięciem. Jedno narzędzie, jeden abonament, zero księgowego żargonu.
     </p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
@@ -187,7 +187,7 @@
             <section class="d-screen" data-screen="windykacja">
               <div class="d-shead d-anim" style="--d:.04s">
                 <div><div class="d-h1">Windykacja</div><div class="d-sub">FV/2026/0004 · TransLog Polska Sp. z o.o. · 44 dni po terminie</div></div>
-                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Przekaż do sprzedamfakture.pl</div>
+                <div class="d-newbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>Sprzedaj fakturę</div>
               </div>
               <div class="d-two even">
                 <div class="d-card d-anim" style="--d:.1s" style="margin:0;">
@@ -210,8 +210,8 @@
               </div>
               <div class="d-tiles">
                 <div class="d-tile d-anim" style="--d:.3s"><div class="ic copper"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><b>Wezwanie do zapłaty</b><span>gotowe do wysyłki, 7 dni terminu</span></div></div>
-                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>sprzedamfakture.pl</b><span>windykacja polubowna i sądowa, KRD/BIG</span></div></div>
-                <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><b>Sprzedaj fakturę</b><span>oferta wykupu w 1 dzień roboczy</span></div></div>
+                <div class="d-tile d-anim" style="--d:.36s"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><b>Kalkulator odsetek</b><span>ustawowe 14% i rekompensata 40/70/100 EUR</span></div></div>
+                <div class="d-tile d-anim" style="--d:.42s"><div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div><div><b>Sprzedaj fakturę</b><span>oferta wykupu ze sprzedamfakture.pl w 1 dzień roboczy</span></div></div>
               </div>
             </section>
 
@@ -353,7 +353,7 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Dlaczego Lopra</div>
       <h2>Jedno narzędzie zamiast czterech.</h2>
-      <p>Program do faktur, projektant logo, kreator stron i firma windykacyjna — zwykle cztery abonamenty i cztery loginy. W Lopra to jedno miejsce, a wszystko ze sobą współpracuje.</p>
+      <p>Program do faktur, projektant logo, kreator stron i osobne narzędzie do ponagleń i wezwań — zwykle cztery abonamenty i cztery loginy. W Lopra to jedno miejsce, a wszystko ze sobą współpracuje.</p>
     </div>
 
     <div class="lp-vcards">
@@ -402,27 +402,26 @@
         </div>
         <div class="lp-vcard-body">
           <span class="lp-vcard-tag">Windykacja</span>
-          <h3>Nie płacą? sprzedamfakture.pl odzyska.</h3>
-          <p>Przypomnienia idą automatycznie. Gdy to nie działa, jednym kliknięciem tworzysz wezwanie do zapłaty z odsetkami ustawowymi i rekompensatą — a potem przekazujesz sprawę do sprzedamfakture.pl: windykacja polubowna i sądowa, wpis do KRD/BIG, albo sprzedaż faktury. Wszystko z Twojej faktury, bez przepisywania danych.</p>
+          <h3>Nie płacą? Wezwij — albo sprzedaj fakturę.</h3>
+          <p>Przypomnienia idą automatycznie. Gdy to nie działa, jednym kliknięciem tworzysz wezwanie do zapłaty z odsetkami ustawowymi i rekompensatą. A jeśli nie chcesz czekać ani iść do sądu — sprzedajesz fakturę do sprzedamfakture.pl: oferta wykupu w jeden dzień roboczy, pieniądze na koncie, ryzyko po stronie kupującego. Wszystko z Twojej faktury, bez przepisywania danych.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- WINDYKACJA Z CREDITLINE -->
+<!-- WINDYKACJA WŁASNA + SPRZEDAŻ FAKTUR DO SPRZEDAMFAKTURE.PL -->
 <section class="wd" id="windykacja">
   <div class="container">
     <div class="eyebrow">Windykacja wbudowana w fakturowanie</div>
-    <h2>Od przypomnienia do odzyskanej należności — bez zmiany narzędzia.</h2>
-    <p class="lead">W Polsce co trzecia faktura B2B jest płacona po terminie. Lopra pilnuje terminów za Ciebie, a gdy trzeba, sprzedamfakture.pl przejmuje sprawę — ze wszystkimi danymi z Twojej faktury.</p>
+    <h2>Od przypomnienia do pieniędzy na koncie — bez zmiany narzędzia.</h2>
+    <p class="lead">W Polsce co trzecia faktura B2B jest płacona po terminie. Lopra pilnuje terminów i daje Ci gotowe narzędzia windykacji własnej, a gdy nie chcesz czekać — sprzedajesz fakturę do sprzedamfakture.pl, ze wszystkimi danymi prosto z Lopra.</p>
 
     <div class="wd-grid">
       <div class="wd-steps">
         <div class="wd-step"><div class="nr">1</div><div><b>Przypomnienia i ponaglenia — automatycznie</b><p>Przed terminem, po terminie i po 14 dniach: e-mail i SMS w Twoim tonie, z linkiem do zapłaty BLIK-iem lub Przelewy24.</p><span class="tag">w cenie abonamentu</span></div></div>
         <div class="wd-step"><div class="nr">2</div><div><b>Wezwanie do zapłaty z odsetkami i rekompensatą</b><p>Jedno kliknięcie: formalne, przedsądowe wezwanie (PDF) z odsetkami ustawowymi za opóźnienie i rekompensatą 40/70/100 EUR z art. 10 ustawy — gotowe do wysyłki.</p><span class="tag">w cenie abonamentu</span></div></div>
-        <div class="wd-step"><div class="nr">3</div><div><b>Przekazanie do sprzedamfakture.pl</b><p>Kompletne dossier (faktura, historia kontaktu, wezwanie) trafia do zespołu windykacyjnego. Windykacja polubowna, wpis do KRD/BIG, a w razie potrzeby droga sądowa — na koszt dłużnika.</p><span class="tag">wycena przed zleceniem · bez opłat wstępnych</span></div></div>
-        <div class="wd-step"><div class="nr">4</div><div><b>Sprzedaj fakturę</b><p>Potrzebujesz gotówki teraz? Zgłoś wierzytelność do wykupu — sprzedamfakture.pl przygotuje ofertę cesji w jeden dzień roboczy.</p><span class="tag">wykup wierzytelności</span></div></div>
+        <div class="wd-step"><div class="nr">3</div><div><b>Sprzedaj fakturę</b><p>Nie chcesz czekać ani iść do sądu? Zgłoś fakturę do wykupu jednym kliknięciem — sprzedamfakture.pl przygotuje ofertę cesji w jeden dzień roboczy. Po akceptacji pieniądze trafiają na Twoje konto, a ryzyko i dalsze odzyskiwanie należności bierze na siebie kupujący.</p><span class="tag">cena wykupu w ofercie · bez opłat</span></div></div>
       </div>
 
       <div>
@@ -434,11 +433,11 @@
             <tr><td>Rekompensata art. 10 (40 EUR)</td><td class="r">172,00 zł</td></tr>
             <tr class="tot"><td>Razem do zapłaty</td><td class="r">2 632,84 zł</td></tr>
           </table>
-          <div class="acts"><span class="main">Pobierz wezwanie (PDF)</span><span>Przekaż do sprzedamfakture.pl</span><span>Sprzedaj fakturę</span></div>
+          <div class="acts"><span class="main">Pobierz wezwanie (PDF)</span><span>Sprzedaj fakturę</span></div>
         </div>
         <div class="wd-partner">
           <div class="lg">SF</div>
-          <div><b>sprzedamfakture.pl</b>Partner windykacyjny Lopra — AI-wspomagana windykacja należności, wykup wierzytelności, kalkulator odsetek. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Policz odsetki i rekompensatę →</a></div>
+          <div><b>sprzedamfakture.pl</b>Partner wykupu faktur Lopra — kupuje nieopłacone faktury B2B, oferta cesji w jeden dzień roboczy, bez opłat wstępnych. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Policz odsetki i rekompensatę →</a></div>
         </div>
       </div>
     </div>
@@ -489,8 +488,8 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg></div>
-        <div class="feature-title">Windykacja ze sprzedamfakture.pl</div>
-        <div class="feature-desc">Przypomnienia, wezwanie do zapłaty z odsetkami i rekompensatą, przekazanie sprawy i sprzedaż faktury — prosto z faktury.</div>
+        <div class="feature-title">Windykacja i sprzedaż faktur</div>
+        <div class="feature-desc">Przypomnienia, wezwanie do zapłaty z odsetkami i rekompensatą, kalkulator odsetek — i sprzedaż faktury do sprzedamfakture.pl jednym kliknięciem.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg></div>
@@ -533,7 +532,7 @@
     <div class="pricing-wrap">
       <div class="pricing-lead">
         <h2>Wszystko, czego potrzebuje firma, jest w Podstawowym.</h2>
-        <p>Faktury, oferty, VAT, wizytówka, strona www i windykacja krok 1–2 — za cenę, jaką inni biorą za sam program do faktur. Chcesz, żeby AI zaprojektowała markę, napisała stronę i księgowała koszty ze zdjęć? Wybierz Smart.</p>
+        <p>Faktury, oferty, VAT, wizytówka, strona www i windykacja własna ze sprzedażą faktur — za cenę, jaką inni biorą za sam program do faktur. Chcesz, żeby AI zaprojektowała markę, napisała stronę i księgowała koszty ze zdjęć? Wybierz Smart.</p>
         <ul class="pricing-lead-points">
           <li>Wizytówka cyfrowa i strona www w cenie</li>
           <li>Faktury bez limitu, gotowe do KSeF</li>
@@ -546,7 +545,7 @@
       <div class="pricing-cards">
         <div class="pricing-card basic">
           <div class="pricing-title">Podstawowy</div>
-          <div class="pricing-desc">Faktury, VAT, wizytówka, strona www i windykacja krok 1–2</div>
+          <div class="pricing-desc">Faktury, VAT, wizytówka, strona www i windykacja własna</div>
           <div class="pricing-price-row">
             <div class="pricing-price">49<span class="euro" style="font-size:22px;margin-left:4px;">zł</span></div>
             <div class="pricing-period">/ mies.</div>
@@ -558,7 +557,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Rozliczenie VAT per stawka, co miesiąc</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Wizytówka cyfrowa z QR i strona www</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Własne logo, kolory i szablony</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Przypomnienia, wezwanie do zapłaty, przekazanie do sprzedamfakture.pl</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Przypomnienia, wezwanie do zapłaty, sprzedaż faktury do sprzedamfakture.pl</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Link do zapłaty BLIK / Przelewy24 na fakturze</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Godziny, przejazdy, faktury cykliczne</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Bezpłatni dodatkowi użytkownicy i księgowa</li>
@@ -583,7 +582,7 @@
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Koszty ze zdjęcia: paragony i faktury kosztowe rozpoznane automatycznie</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Oferta z tekstu: wklej opis, formularz wypełni się sam</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Integracja z Claude: faktury i oferty prosto z rozmowy</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priorytetowa obsługa spraw windykacyjnych w sprzedamfakture.pl</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Priorytetowa wycena wykupu faktur w sprzedamfakture.pl</li>
           </ul>
           <a href="{{ route('register') }}" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">Wypróbuj 14 dni za darmo</a>
           <div class="pricing-fineprint">Bez karty · rezygnacja w każdej chwili</div>
@@ -612,8 +611,8 @@
         <div class="faq-content">NIP i konto firmowe. Lopra pobierze nazwę, adres i REGON z Wykazu podatników VAT (białej listy), ustawi numerację faktur i VAT. Markę, wizytówkę i stronę www zrobisz w kwadrans. Zwolniony z VAT? Zaznacz to — na fakturach pojawi się właściwa adnotacja.</div>
       </details>
       <details class="faq-item">
-        <summary>Ile kosztuje windykacja ze sprzedamfakture.pl?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Przypomnienia i wezwanie do zapłaty są w cenie abonamentu. Przekazanie sprawy do sprzedamfakture.pl jest wyceniane przed zleceniem — bez opłat wstępnych; koszty windykacji i odsetki co do zasady obciążają dłużnika (ustawa o przeciwdziałaniu nadmiernym opóźnieniom w transakcjach handlowych). Ofertę wykupu faktury dostajesz w jeden dzień roboczy.</div>
+        <summary>Ile kosztuje windykacja i sprzedaż faktury?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Przypomnienia, ponaglenia i wezwanie do zapłaty są w cenie abonamentu. Sprzedaż faktury nic nie kosztuje z góry: sprzedamfakture.pl przedstawia ofertę z ceną wykupu w jeden dzień roboczy, a Ty decydujesz, czy ją przyjąć — bez prowizji i opłat wstępnych. Odsetki i rekompensata 40/70/100 EUR, które naliczasz w wezwaniu, obciążają dłużnika (ustawa o przeciwdziałaniu nadmiernym opóźnieniom w transakcjach handlowych).</div>
       </details>
       <details class="faq-item">
         <summary>Mam faktury w Fakturowni / iFirmie / wFirmie / inFakcie. Czy przeniesienie jest trudne?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -621,7 +620,7 @@
       </details>
       <details class="faq-item">
         <summary>Ile kosztuje po okresie próbnym?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content"><b>Podstawowy</b> 49 zł netto (60,27 zł brutto) miesięcznie, <b>Smart</b> 79 zł netto (97,17 zł brutto) z funkcjami AI i priorytetową windykacją. Bez umowy na czas określony, płatność BLIK-iem, kartą lub przelewem, faktura VAT co miesiąc.</div>
+        <div class="faq-content"><b>Podstawowy</b> 49 zł netto (60,27 zł brutto) miesięcznie, <b>Smart</b> 79 zł netto (97,17 zł brutto) z funkcjami AI i priorytetową wyceną wykupu faktur. Bez umowy na czas określony, płatność BLIK-iem, kartą lub przelewem, faktura VAT co miesiąc.</div>
       </details>
       <details class="faq-item">
         <summary>Czy moje dane są bezpieczne i zgodne z RODO?<svg class="faq-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -638,7 +637,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Zacznij dziś. Profesjonalnie od pierwszej faktury — i spokojnie, gdy ktoś nie płaci.</h2>
-    <p>Konto, marka, wizytówka, strona www i pierwsza faktura — wszystko przed kolacją. A jeśli klient nie zapłaci, sprzedamfakture.pl jest o jedno kliknięcie.</p>
+    <p>Konto, marka, wizytówka, strona www i pierwsza faktura — wszystko przed kolacją. A jeśli klient nie zapłaci, wezwanie do zapłaty i sprzedaż faktury do sprzedamfakture.pl są o jedno kliknięcie.</p>
     <a href="{{ route('register') }}" class="btn btn-white btn-lg">
       Wypróbuj 14 dni za darmo
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

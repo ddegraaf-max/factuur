@@ -1,3 +1,26 @@
 {
-  "Taal": "Język"
+  "Taal": "Język",
+  "Facturen verkopen": "Sprzedaż faktur",
+  "Verkoop een onbetaalde factuur aan :partner en heb je geld snel op je rekening — zonder incassotraject.": "Sprzedaj nieopłaconą fakturę do :partner i szybko miej pieniądze na koncie — bez windykacji.",
+  "Factuurkoper": "Kupujący faktury",
+  "Koopt onbetaalde B2B-facturen · offerte binnen één werkdag": "Kupuje nieopłacone faktury B2B · oferta w jeden dzień roboczy",
+  "Vragen over een aanbod of de voorwaarden? Mail :partner rechtstreeks.": "Pytania o ofertę lub warunki? Napisz bezpośrednio do :partner.",
+  "Bied de factuur aan": "Zgłoś fakturę",
+  "Eén klik: het dossier (factuur, vervaldatum, rente en vergoeding) gaat per e-mail naar :partner.": "Jedno kliknięcie: komplet danych (faktura, termin, odsetki i rekompensata) trafia e-mailem do :partner.",
+  "Offerte binnen één werkdag": "Oferta w jeden dzień roboczy",
+  ":partner doet een koopvoorstel — jij beslist.": ":partner przedstawia ofertę wykupu — Ty decydujesz.",
+  "Cessie en uitbetaling": "Cesja i wypłata",
+  "Na akkoord teken je de cessie en staat het geld snel op je rekening; het risico gaat over naar de koper.": "Po akceptacji podpisujesz cesję, a pieniądze szybko trafiają na Twoje konto; ryzyko przechodzi na kupującego.",
+  "Aangeboden": "Zgłoszone",
+  "Verkoopbaar nu": "Do sprzedania teraz",
+  "Verkoopbare facturen": "Faktury do sprzedania",
+  "Vervallen, onbetaalde facturen die je met één klik kunt aanbieden.": "Przeterminowane, nieopłacone faktury, które zgłosisz jednym kliknięciem.",
+  "Geen vervallen facturen — alles is op tijd betaald.": "Brak przeterminowanych faktur — wszystko zapłacone na czas.",
+  "Aangeboden facturen": "Faktury zgłoszone do wykupu",
+  "Nog geen factuur aangeboden.": "Nie zgłoszono jeszcze żadnej faktury.",
+  "Aangeboden op": "Zgłoszono",
+  "Wacht op offerte": "Czeka na ofertę",
+  "Aanmaning en verkoop van de vordering": "Wezwanie i sprzedaż wierzytelności",
+  "Formele aanmaning met wettelijke rente en vergoeding van incassokosten — of verkoop de vordering aan :partner.": "Formalne wezwanie z odsetkami ustawowymi i rekompensatą — albo sprzedaj wierzytelność do :partner.",
+  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "Przypomnienia i wezwanie do zapłaty wysyłasz z :brand; nieopłaconą fakturę sprzedasz do :partner na stronie Sprzedaż faktur."
 }

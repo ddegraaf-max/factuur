@@ -3,7 +3,7 @@
 {{-- „Przenieś się z {pakiet}” — Lopra Polska. Dane pakietu ($pkg: name, intro, export[], notes) i lista pakietów ($packages) pochodzą z config/przenies.php; $slug to bieżący pakiet. --}}
 
 @section('title', 'Przenieś się z ' . $pkg['name'] . ' do ' . brand('name') . ' — w kwadrans')
-@section('description', 'Przenieś klientów, produkty i nieopłacone faktury z ' . $pkg['name'] . ' do ' . brand('name') . ': eksport CSV lub XLSX, import z automatycznym rozpoznaniem kolumn (NIP, nazwa, termin płatności, brutto), bez duplikatów. Faktury gotowe do KSeF, marka, strona www i windykacja ze sprzedamfakture.pl.')
+@section('description', 'Przenieś klientów, produkty i nieopłacone faktury z ' . $pkg['name'] . ' do ' . brand('name') . ': eksport CSV lub XLSX, import z automatycznym rozpoznaniem kolumn (NIP, nazwa, termin płatności, brutto), bez duplikatów. Faktury gotowe do KSeF, marka, strona www, wezwania do zapłaty i sprzedaż faktur do sprzedamfakture.pl.')
 
 @section('content')
 <style>

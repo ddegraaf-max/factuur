@@ -39,7 +39,8 @@ const rawNav = [
       { name: 'Klanten', route: 'customers.index', icon: 'users' },
       { name: 'Producten', route: 'products.index', icon: 'box' },
       { name: 'Automatische incasso', route: 'direct-debit.index', icon: 'bank', badge: 'Nieuw' },
-      { name: 'Incasso', route: 'incasso.index', icon: 'gavel' },
+      // Markt zonder incassopartner (Polen): dezelfde route toont "Facturen verkopen" (factuurkoper).
+      { name: page.props.market?.incasso_partner ? 'Incasso' : 'Facturen verkopen', route: 'incasso.index', icon: 'gavel' },
     ],
   },
   {

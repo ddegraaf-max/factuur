@@ -254,20 +254,28 @@ class DemoDataBuilder
                 'sent_at' => now()->subDays($daysAgo),
             ]);
         }
-        $incasso->forceFill([
-            'status' => 'incasso',
-            'incasso_sent_at' => now()->subDays(45),
-            'incasso_reference' => sprintf('%s-%d-0001', Market::isPl() ? 'SF' : 'ARM', $year),
-            'incasso_handler' => Market::incasso('partner_name'),
-            'incasso_phase' => 'minnelijk',
-        ])->save();
-        DB::table('incasso_sequences')->insert([
-            'company_id' => $company->id,
-            'year' => $year,
-            'current_value' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (Market::hasIncasso()) {
+            $incasso->forceFill([
+                'status' => 'incasso',
+                'incasso_sent_at' => now()->subDays(45),
+                'incasso_reference' => sprintf('ARM-%d-0001', $year),
+                'incasso_handler' => Market::incasso('partner_name'),
+                'incasso_phase' => 'minnelijk',
+            ])->save();
+            DB::table('incasso_sequences')->insert([
+                'company_id' => $company->id,
+                'year' => $year,
+                'current_value' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } else {
+            // Geen incassopartner (Polen): de factuur is vervallen en te koop aangeboden aan de factuurkoper.
+            $incasso->forceFill([
+                'status' => 'overdue',
+                'sale_requested_at' => now()->subDays(2),
+            ])->save();
+        }
         $made['incasso'] = $incasso;
 
         // Bijlage bij het incassodossier — laat zien hoe bewijsstukken meegaan.
@@ -839,7 +847,7 @@ class DemoDataBuilder
     /**
      * Polen (Lopra Polska): Studio Wnętrz Kowalska — Anna Kowalska, projektantka
      * wnętrz in Kraków. PLN, btw 23% (8% voor afwerking in woningbouw), NIP en
-     * REGON, nummers FV/2026/0031…, sprzedamfakture.pl voor de windykacja.
+     * REGON, nummers FV/2026/0031…, sprzedamfakture.pl als factuurkoper.
      * Bedragen zijn de Nederlandse × 4,3, afgerond op hele złoty.
      */
     protected function datasetPl(): array

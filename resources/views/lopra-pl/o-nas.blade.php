@@ -1,6 +1,6 @@
 @extends('layouts.marketing')
 
-{{-- O nas — Lopra Polska: Lopra jako usługa Creditline B.V. (Bussum, ponad 25 lat w zarządzaniu należnościami) ze sprzedamfakture.pl jako partnerem windykacyjnym. Bez zmyślonych liczb i osób. --}}
+{{-- O nas — Lopra Polska: Lopra jako usługa Creditline B.V. (Bussum, ponad 25 lat w zarządzaniu należnościami) ze sprzedamfakture.pl jako partnerem wykupu faktur. Bez zmyślonych liczb i osób. --}}
 
 @section('title', 'O nas — ' . brand('name') . ', usługa Creditline B.V.')
 @section('description', 'Kim jesteśmy: ' . brand('name') . ' to usługa Creditline B.V. z Bussum (Holandia), firmy z ponad 25-letnim doświadczeniem w zarządzaniu należnościami i windykacji, rozwijana w Polsce we współpracy ze sprzedamfakture.pl. Jedno narzędzie od pierwszej faktury do windykacji.')
@@ -19,15 +19,15 @@
     <div class="prose">
       <h2>Usługa Creditline B.V.</h2>
       <p>{{ brand('name') }} to usługa Creditline B.V. z Bussum w Holandii — firmy, która od ponad 25 lat zajmuje się zarządzaniem należnościami i windykacją. Znamy z codziennej praktyki, a nie z opowieści, co dzieje się z firmą, gdy klienci płacą po terminie albo wcale: napięta płynność, godziny spędzone na ponagleniach i niepewność, czy w ogóle warto walczyć o swoje pieniądze.</p>
-      <p>To doświadczenie jest wbudowane w produkt. Przypomnienia, wezwanie do zapłaty z odsetkami ustawowymi i rekompensatą, przekazanie sprawy do windykacji — nie jako dodatek za dopłatą, ale jako stały element każdego abonamentu.</p>
+      <p>To doświadczenie jest wbudowane w produkt. Przypomnienia, wezwanie do zapłaty z odsetkami ustawowymi i rekompensatą, kalkulator odsetek i sprzedaż faktury jednym kliknięciem — nie jako dodatek za dopłatą, ale jako stały element każdego abonamentu.</p>
 
       <h2>sprzedamfakture.pl</h2>
-      <p>W Polsce {{ brand('name') }} działa we współpracy z <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> — serwisem windykacyjnym Creditline B.V. dla polskich firm: windykacja należności i wykup wierzytelności. Gdy przypomnienia i wezwanie nie skutkują, jednym kliknięciem przekazujesz sprawę: kompletne dossier z faktury, historia kontaktu i wezwanie trafiają do zespołu windykacyjnego, który prowadzi windykację polubowną, wpis do rejestrów dłużników i — w razie potrzeby — drogę sądową. Potrzebujesz gotówki od razu? sprzedamfakture.pl przygotuje ofertę wykupu wierzytelności w jeden dzień roboczy.</p>
-      <p>Każde przekazanie sprawy jest wyceniane przed zleceniem, bez opłat wstępnych. Decyzja zawsze należy do Ciebie.</p>
+      <p>W Polsce {{ brand('name') }} działa we współpracy z <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a> — serwisem Creditline B.V., który kupuje nieopłacone faktury B2B polskich firm. Gdy przypomnienia i wezwanie nie skutkują, a Ty nie chcesz czekać ani iść do sądu, jednym kliknięciem zgłaszasz fakturę do wykupu: dane trafiają prosto z faktury, bez przepisywania, a sprzedamfakture.pl przygotowuje ofertę cesji w jeden dzień roboczy. Po jej akceptacji pieniądze trafiają na Twoje konto, a ryzyko i dalsze odzyskiwanie należności bierze na siebie kupujący.</p>
+      <p>Cenę wykupu poznajesz w ofercie, zanim podejmiesz decyzję — bez prowizji i opłat wstępnych. Decyzja zawsze należy do Ciebie.</p>
 
       <h2>Dlaczego jedno narzędzie?</h2>
       <p>Mała firma zwykle potrzebuje czterech rzeczy naraz: programu do faktur, logo i kolorów, prostej strony www oraz kogoś, kto pomoże, gdy klient nie płaci. Zazwyczaj oznacza to cztery abonamenty, cztery loginy i dane przepisywane z jednego miejsca do drugiego.</p>
-      <p>W {{ brand('name') }} wszystko jest w jednym miejscu i ze sobą współpracuje: faktura gotowa do KSeF ma Twoje logo z identyfikacji wizualnej, wizytówka i strona www wyglądają tak samo, zapytanie ze strony zamienia się w ofertę, a niezapłacona faktura — bez przepisywania danych — w wezwanie do zapłaty i sprawę windykacyjną. Jeden abonament, jedna cena, zero księgowego żargonu.</p>
+      <p>W {{ brand('name') }} wszystko jest w jednym miejscu i ze sobą współpracuje: faktura gotowa do KSeF ma Twoje logo z identyfikacji wizualnej, wizytówka i strona www wyglądają tak samo, zapytanie ze strony zamienia się w ofertę, a niezapłacona faktura — bez przepisywania danych — w wezwanie do zapłaty albo ofertę wykupu. Jeden abonament, jedna cena, zero księgowego żargonu.</p>
 
       <h2>Co obiecujemy</h2>
       <ul>

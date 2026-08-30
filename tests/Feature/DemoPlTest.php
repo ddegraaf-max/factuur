@@ -23,7 +23,7 @@ use Tests\TestCase;
 /**
  * De demo-sandbox volgt de markt: onder Lopra Polska bouwt DemoDataBuilder een
  * Poolse voorbeeldadministratie (Studio Wnętrz Kowalska — PLN, btw 23/8%, NIP,
- * FV-nummers, windykacja bij sprzedamfakture.pl), en de Nederlandse demo
+ * FV-nummers, factuur te koop bij sprzedamfakture.pl), en de Nederlandse demo
  * (Jansen Webdesign) blijft precies zoals hij was.
  */
 class DemoPlTest extends TestCase
@@ -81,7 +81,7 @@ class DemoPlTest extends TestCase
 
         // --- Facturen: dezelfde statusverdeling als de Nederlandse demo, nummers FV/… ---
         $invoices = Invoice::withoutGlobalScopes()->where('company_id', $company->id)->get();
-        foreach (['paid', 'partial', 'sent', 'overdue', 'incasso', 'draft'] as $status) {
+        foreach (['paid', 'partial', 'sent', 'overdue', 'draft'] as $status) {
             $this->assertTrue($invoices->contains('status', $status), "Geen factuur met status {$status}");
         }
         $this->assertSame(7, $invoices->where('status', 'paid')->count());
@@ -107,17 +107,19 @@ class DemoPlTest extends TestCase
         $this->assertTrue($lines->contains('description', 'Nadzór autorski'));
         $this->assertFalse($lines->contains('unit', 'stuk'));
 
-        // --- Windykacja: één factuur ruim over de termijn, één dossier bij sprzedamfakture.pl ---
+        // --- Windykacja: vervallen facturen, waarvan één te koop aangeboden aan sprzedamfakture.pl;
+        //     geen incassodossier (Polen heeft geen incassopartner) ---
         $overdue = $invoices->where('status', 'overdue');
         $this->assertTrue(
             $overdue->contains(fn ($i) => $i->due_date->lt(now()->subDays(30))),
             'Geen vervallen factuur die ≥ 30 dagen over de termijn is'
         );
-        $incasso = $invoices->where('status', 'incasso');
-        $this->assertCount(1, $incasso);
-        $this->assertSame('sprzedamfakture.pl', $incasso->first()->incasso_handler);
-        $this->assertSame('minnelijk', $incasso->first()->incasso_phase);
-        $trail = ReminderLog::withoutGlobalScopes()->where('invoice_id', $incasso->first()->id)->pluck('type');
+        $this->assertCount(0, $invoices->where('status', 'incasso'), 'Poolse demo mag geen incassodossier hebben');
+        $offered = $invoices->whereNotNull('sale_requested_at');
+        $this->assertCount(1, $offered);
+        $this->assertSame('overdue', $offered->first()->status);
+        $this->assertNull($offered->first()->incasso_handler);
+        $trail = ReminderLog::withoutGlobalScopes()->where('invoice_id', $offered->first()->id)->pluck('type');
         $this->assertContains('Pierwsze przypomnienie', $trail->all());
         $this->assertContains('Ostateczne wezwanie do zapłaty', $trail->all());
 

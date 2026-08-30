@@ -56,6 +56,10 @@ const respond = (input) => {
       : t('Geen achterstallige facturen op dit moment. 👌');
   }
   if (q.includes('incasso') || q.includes('armaere') || q.includes('windykac') || q.includes('creditline') || q.includes('sprzedam') || q.includes('wykup') || q.includes('collection') || q.includes('debt')) {
+    if (!page.props.market?.incasso_partner) {
+      // Geen incassopartner (Polen): zelf aanmanen, factuur verkopen aan de factuurkoper.
+      return t('Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.', { brand: page.props.brand?.name || 'Lopra', partner: page.props.market?.wykup_partner || 'sprzedamfakture.pl' });
+    }
     return data.incasso
       ? t('Bij :partner liggen **:count** dossiers voor **:total**.', { partner: page.props.market?.incasso_partner || 'Armaere', count: data.incasso.count, total: eur(data.incasso.total) })
       : t('Geen actieve incasso-dossiers.');

@@ -29,7 +29,7 @@
     <h1>Look around first, then decide</h1>
     <p class="lead">
       This is not a video or a screenshot: you step into the <strong>real {{ brand('name') }}</strong>, filled with
-      sample data from a fictitious company. Issue invoices, record payments, look at a collection case —
+      sample data from a fictitious company. Issue invoices, record payments, open an overdue invoice with the demand ready —
       exactly the way you will use it yourself.
     </p>
   </div>
@@ -63,9 +63,9 @@
       <div class="demo-feat">
         <h2>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="2" y="9" width="20" height="12" rx="2"/></svg>
-          Debt collection<span class="demo-tag">sprzedamfakture.pl</span>
+          Debt collection<span class="demo-tag">Demand + sale</span>
         </h2>
-        <p>An overdue invoice with interest and compensation already calculated: download the wezwanie do zapłaty (payment demand), hand the case to sprzedamfakture.pl or submit the invoice for purchase.</p>
+        <p>An overdue invoice with interest and compensation already calculated: download the wezwanie do zapłaty (payment demand) or sell the invoice to sprzedamfakture.pl with one click — the purchase offer arrives within one working day.</p>
       </div>
       <div class="demo-feat">
         <h2>

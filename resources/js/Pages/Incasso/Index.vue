@@ -13,7 +13,6 @@ const props = defineProps({
 
 // Markt (nl/pl): de incassopartner komt van de server, met de marktinstelling als vangnet.
 const market = usePage().props.market || {};
-const isPl = computed(() => market.key === 'pl');
 const partnerName = computed(() => props.handler?.name || market.incasso_partner || '');
 
 // De fase bepaalt hoe ver het traject is: eerst minnelijk (schikken), dan via
@@ -31,15 +30,6 @@ const phaseLabels = {
   executie: t('Executie'),
 };
 
-// Alleen in Polen (windykacja): de factuur te koop aanbieden aan de incassopartner.
-const requestSale = (invoice) => {
-  const msg = t('Factuur :number te koop aanbieden aan :partner? Zij nemen daarna contact met je op over de voorwaarden.', {
-    number: invoice.number,
-    partner: partnerName.value,
-  });
-  if (!confirm(msg)) return;
-  router.post(route('windykacja.wykup', invoice.id), {}, { preserveScroll: true });
-};
 </script>
 
 <template>
@@ -113,8 +103,6 @@ const requestSale = (invoice) => {
             <th>{{ $t('Looptijd') }}</th>
             <th>{{ $t('Fase') }}</th>
             <th class="right">{{ $t('Openstaand') }}</th>
-            <!-- Windykacja (alleen Polen): formele aanmaning en factuur verkopen -->
-            <th v-if="isPl" class="right">{{ $t('Acties') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -130,11 +118,6 @@ const requestSale = (invoice) => {
               </select>
             </td>
             <td class="right num" :data-label="$t('Openstaand')">{{ eur(c.remaining) }}</td>
-            <td v-if="isPl" class="right wd-actions" :data-label="$t('Acties')">
-              <a :href="route('windykacja.wezwanie', c.id)" target="_blank" class="link-btn">{{ $t('Formele aanmaning (PDF)') }}</a>
-              <span v-if="c.sale_requested_at" class="pill-incasso">{{ $t('Te koop aangeboden') }}</span>
-              <button v-else type="button" class="link-btn" @click="requestSale(c)">{{ $t('Factuur verkopen') }}</button>
-            </td>
           </tr>
         </tbody>
       </table>
@@ -171,11 +154,6 @@ const requestSale = (invoice) => {
 }
 .phase-select:hover { border-color: var(--border-strong); }
 .phase-select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
-/* Windykacja-acties (Polen): aanmaning-PDF en factuur verkopen, naast elkaar. */
-.wd-actions { white-space: nowrap; }
-.wd-actions .link-btn { margin-left: 10px; }
-.wd-actions .pill-incasso { margin-left: 10px; }
-.link-btn { background: none; border: none; padding: 0; font: inherit; font-size: 12px; color: var(--brand); text-decoration: underline; cursor: pointer; }
 
 @media (max-width: 760px) {
   /* Icoon, naam en contactgegevens onder elkaar i.p.v. drie kolommen. */
@@ -184,6 +162,5 @@ const requestSale = (invoice) => {
   /* Lange e-mailadressen mogen afbreken, anders duwen ze de pagina breder. */
   .contacts { overflow-wrap: anywhere; }
   .stat-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-  .wd-actions { white-space: normal; }
 }
 </style>

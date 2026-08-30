@@ -157,6 +157,33 @@ class Market
         return (string) ($env ?: self::get('incasso.' . $key, ''));
     }
 
+    /** Heeft deze markt een incassopartner (dossier overdragen)? Polen niet: daar verkoop je de factuur. */
+    public static function hasIncasso(): bool
+    {
+        return self::incasso('partner_name') !== '';
+    }
+
+    /**
+     * Factuurkoper van deze markt (Polen: sprzedamfakture.pl — wykup wierzytelności, geen incasso).
+     * Per omgeving te overschrijven met WYKUP_PARTNER_NAME / WYKUP_EMAIL (of INCASSO_CLAIMS_EMAIL) / WYKUP_CC.
+     */
+    public static function wykup(string $key): string
+    {
+        $env = match ($key) {
+            'partner_name' => env('WYKUP_PARTNER_NAME'),
+            'email' => env('WYKUP_EMAIL') ?: env('INCASSO_CLAIMS_EMAIL'),
+            'cc' => env('WYKUP_CC'),
+            default => null,
+        };
+
+        return (string) ($env ?: self::get('wykup.' . $key, ''));
+    }
+
+    public static function hasWykup(): bool
+    {
+        return self::wykup('partner_name') !== '';
+    }
+
     /** Wat de Vue-kant nodig heeft (gedeeld via Inertia als $page.props.market). */
     public static function forClient(): array
     {
@@ -180,6 +207,8 @@ class Market
             'online_payment_label' => (string) self::get('payment.online_label', 'iDEAL'),
             'km_rate' => (float) self::get('km_rate', 0.23),
             'incasso_partner' => self::incasso('partner_name'),
+            'wykup_partner' => self::wykup('partner_name'),
+            'wykup_website' => self::wykup('website'),
             'interest_rate' => (float) self::get('interest_rate', 0),
         ];
     }

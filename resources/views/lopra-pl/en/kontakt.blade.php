@@ -3,7 +3,7 @@
 {{-- Contact — Lopra Polska, English edition. The form POSTs to route('contact.send') (shared handler); success/error messages are shown in English regardless of the session content. --}}
 
 @section('title', 'Contact ' . brand('name') . ' — we reply within one working day')
-@section('description', 'Have a question about invoices, KSeF, your subscription or debt collection? Write to the ' . brand('name') . ' team via the form or at ' . brand('email') . ' — we reply within one working day, also during your trial.')
+@section('description', 'Have a question about invoices, KSeF, your subscription or selling an unpaid invoice? Write to the ' . brand('name') . ' team via the form or at ' . brand('email') . ' — we reply within one working day, also during your trial.')
 
 @push('styles')
 <style>
@@ -90,9 +90,9 @@
       <div class="contact-card" style="margin-top:16px;">
         <div class="contact-partner" style="margin-bottom:10px;">
           <div class="lg">C</div>
-          <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Debt collection partner of {{ brand('name') }}</div></div>
+          <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Invoice-purchase partner of {{ brand('name') }}</div></div>
         </div>
-        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Collection cases, receivables purchase and questions about cases already handed over are handled directly by sprzedamfakture.pl.</p>
+        <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">sprzedamfakture.pl buys unpaid B2B invoices submitted from {{ brand('name') }}. Questions about selling an invoice, purchase offers and payouts go directly to sprzedamfakture.pl.</p>
         <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">sprzedamfakture.pl →</a>
       </div>
 
@@ -117,7 +117,7 @@
         <strong>Your subscription or an invoice from us</strong> — questions about the Podstawowy and Smart plans, changing plan or cancelling. Switching from Fakturownia, iFirma, wFirma or inFakt? We will help you move your clients, products and open invoices free of charge.
       </p>
       <p style="color:var(--text-2);font-size:14px;line-height:1.7;margin:0;">
-        <strong>Debt collection</strong> — for cases already handed over, quotes and receivables purchase, ask <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">sprzedamfakture.pl</a> directly.
+        <strong>Selling invoices</strong> — for purchase offers, payouts and invoices you have already sold, ask <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">sprzedamfakture.pl</a> directly.
         Something not working? Check the <a href="{{ route('status') }}" style="color:var(--brand);font-weight:500;">system status</a> first.
       </p>
     </div>

@@ -1,3 +1,26 @@
 {
-  "Taal": "Language"
+  "Taal": "Language",
+  "Facturen verkopen": "Sell invoices",
+  "Verkoop een onbetaalde factuur aan :partner en heb je geld snel op je rekening — zonder incassotraject.": "Sell an unpaid invoice to :partner and have the money in your account fast — no collection process.",
+  "Factuurkoper": "Invoice buyer",
+  "Koopt onbetaalde B2B-facturen · offerte binnen één werkdag": "Buys unpaid B2B invoices · offer within one working day",
+  "Vragen over een aanbod of de voorwaarden? Mail :partner rechtstreeks.": "Questions about an offer or the terms? E-mail :partner directly.",
+  "Bied de factuur aan": "Submit the invoice",
+  "Eén klik: het dossier (factuur, vervaldatum, rente en vergoeding) gaat per e-mail naar :partner.": "One click: the file (invoice, due date, interest and compensation) goes by e-mail to :partner.",
+  "Offerte binnen één werkdag": "Offer within one working day",
+  ":partner doet een koopvoorstel — jij beslist.": ":partner makes a purchase offer — you decide.",
+  "Cessie en uitbetaling": "Assignment and payout",
+  "Na akkoord teken je de cessie en staat het geld snel op je rekening; het risico gaat over naar de koper.": "Once you accept, you sign the assignment and the money lands in your account quickly; the risk passes to the buyer.",
+  "Aangeboden": "Submitted",
+  "Verkoopbaar nu": "Sellable now",
+  "Verkoopbare facturen": "Invoices you can sell",
+  "Vervallen, onbetaalde facturen die je met één klik kunt aanbieden.": "Overdue, unpaid invoices you can submit with one click.",
+  "Geen vervallen facturen — alles is op tijd betaald.": "No overdue invoices — everything was paid on time.",
+  "Aangeboden facturen": "Invoices submitted for purchase",
+  "Nog geen factuur aangeboden.": "No invoice submitted yet.",
+  "Aangeboden op": "Submitted on",
+  "Wacht op offerte": "Awaiting offer",
+  "Aanmaning en verkoop van de vordering": "Payment demand and invoice sale",
+  "Formele aanmaning met wettelijke rente en vergoeding van incassokosten — of verkoop de vordering aan :partner.": "Formal payment demand with statutory interest and recovery-cost compensation — or sell the receivable to :partner.",
+  "Herinneringen en de formele aanmaning verstuur je zelf vanuit :brand; een onbetaalde factuur verkoop je aan :partner via de pagina Facturen verkopen.": "You send reminders and the payment demand from :brand yourself; an unpaid invoice can be sold to :partner on the Sell invoices page."
 }

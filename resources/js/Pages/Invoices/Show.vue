@@ -63,8 +63,9 @@ const phaseLabels = {
   executie: t('Executie'),
 };
 
+// Alleen in markten met een incassopartner (Polen niet: daar verkoop je de factuur).
 const canIncasso = computed(() =>
-  !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
+  !!market.incasso_partner && !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
 );
 
 /* ---------- Handmatige herinnering ---------- */
@@ -312,7 +313,7 @@ const claimRatePct = computed(() => {
 });
 
 const requestSale = () => {
-  if (confirm(t('Deze factuur ter verkoop aanbieden aan :partner? De partner neemt contact met je op over de voorwaarden.', { partner: market.incasso_partner }))) {
+  if (confirm(t('Deze factuur ter verkoop aanbieden aan :partner? De partner neemt contact met je op over de voorwaarden.', { partner: market.wykup_partner }))) {
     router.post(route('windykacja.wykup', props.invoice.id), { note: saleNote.value }, {
       preserveScroll: true,
       onSuccess: () => { saleNote.value = ''; },
@@ -592,8 +593,8 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
         <div v-if="canWindykacja" class="pl-panel">
           <div class="pl-head">
             <div>
-              <div class="pl-title">{{ $t('Incasso') }}</div>
-              <div class="pl-sub">{{ $t('Formele aanmaning, wettelijke rente en vergoeding van incassokosten — of draag de vordering over aan :partner.', { partner: $page.props.market.incasso_partner }) }}</div>
+              <div class="pl-title">{{ $t('Aanmaning en verkoop van de vordering') }}</div>
+              <div class="pl-sub">{{ $t('Formele aanmaning met wettelijke rente en vergoeding van incassokosten — of verkoop de vordering aan :partner.', { partner: $page.props.market.wykup_partner }) }}</div>
             </div>
             <button type="button" class="btn btn-secondary btn-sm" @click="toggleWindykacja">
               {{ windykacjaOpen ? $t('Berekening verbergen') : $t('Berekening tonen') }}
@@ -607,7 +608,6 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             </a>
             <span v-if="invoice.sale_requested_at" class="pl-chip" :title="invoice.sale_requested_at_label || fmtDate(invoice.sale_requested_at)">✓ {{ $t('Aangemeld voor verkoop') }}</span>
             <button v-else type="button" class="btn btn-secondary btn-sm" @click="requestSale">{{ $t('Factuur verkopen') }}</button>
-            <button v-if="canIncasso" type="button" class="btn btn-secondary btn-sm" @click="sendToIncasso">{{ $t('Overdragen aan :partner', { partner: $page.props.market.incasso_partner }) }}</button>
           </div>
           <div v-if="!invoice.sale_requested_at" class="pl-sale">
             <input type="text" v-model="saleNote" maxlength="1000" :placeholder="$t('Toelichting bij de verkoop (optioneel)')">

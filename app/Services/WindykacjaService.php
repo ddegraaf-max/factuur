@@ -104,10 +104,6 @@ class WindykacjaService
             'invoice' => $invoice,
             'company' => $invoice->company,
             'claim' => $this->claim($invoice),
-            'partner' => [
-                'name' => Market::incasso('partner_name'),
-                'website' => (string) Market::get('incasso.website', ''),
-            ],
         ])->setPaper('a4');
     }
 
@@ -121,14 +117,14 @@ class WindykacjaService
         $invoice->forceFill(['sale_requested_at' => now()])->save();
 
         try {
-            Mail::to(Market::incasso('claims_email'))
-                ->cc(array_filter([Market::incasso('cc')]))
+            Mail::to(Market::wykup('email'))
+                ->cc(array_filter([Market::wykup('cc')]))
                 ->send(new WykupRequestMail($invoice->fresh(), $user, $this->claim($invoice), $note));
         } catch (\Throwable $e) {
             Log::error('Wykup-verzoek mailen mislukt', ['invoice' => $invoice->id, 'error' => $e->getMessage()]);
         }
 
-        Audit::log('invoice.sale_requested', $invoice, __('Factuur :number te koop aangeboden aan :partner', ['number' => $invoice->number, 'partner' => Market::incasso('partner_name')]), [], $invoice->company_id);
+        Audit::log('invoice.sale_requested', $invoice, __('Factuur :number te koop aangeboden aan :partner', ['number' => $invoice->number, 'partner' => Market::wykup('partner_name')]), [], $invoice->company_id);
 
         return $invoice->fresh();
     }

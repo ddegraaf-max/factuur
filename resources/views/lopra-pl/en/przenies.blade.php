@@ -3,7 +3,7 @@
 {{-- "Switch from {package}" — Lopra Polska, English version. Package data ($pkg: name, intro, export[], notes) and the package list ($packages) come from config/przenies.php (texts currently in Polish); $slug is the current package. --}}
 
 @section('title', 'Switch from ' . $pkg['name'] . ' to ' . brand('name') . ' — in fifteen minutes')
-@section('description', 'Move your clients, products and unpaid invoices from ' . $pkg['name'] . ' to ' . brand('name') . ': CSV or XLSX export, import with automatic column detection (NIP, name, due date, gross amount), no duplicates. Invoices ready for KSeF, your brand, a website and debt collection with sprzedamfakture.pl.')
+@section('description', 'Move your clients, products and unpaid invoices from ' . $pkg['name'] . ' to ' . brand('name') . ': CSV or XLSX export, import with automatic column detection (NIP, name, due date, gross amount), no duplicates. Invoices ready for KSeF, your brand, a website, automatic reminders and the option to sell unpaid invoices to sprzedamfakture.pl.')
 
 @section('content')
 <style>

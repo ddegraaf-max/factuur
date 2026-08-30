@@ -83,7 +83,7 @@
         <tr><td>Bezpieczeństwo usługi: logi, wykrywanie nadużyć, zapobieganie spamowi (w tym weryfikacja Cloudflare Turnstile w formularzu), kopie zapasowe</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (ochrona systemów i danych)</td></tr>
         <tr><td>Wiadomości o usłudze: zmiany regulaminu, ważne informacje techniczne, koniec okresu próbnego</td><td>art. 6 ust. 1 lit. b oraz lit. f</td></tr>
         <tr><td>Wskazówki i informacje o nowych funkcjach w okresie próbnym i w trakcie abonamentu</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (marketing własnych usług wobec obecnych klientów); możesz się wypisać w każdej chwili</td></tr>
-        <tr><td>Przekazanie sprawy windykacyjnej lub wierzytelności do sprzedamfakture.pl</td><td>art. 6 ust. 1 lit. b — na wyraźne zlecenie Użytkownika</td></tr>
+        <tr><td>Zgłoszenie wierzytelności do wykupu przez sprzedamfakture.pl</td><td>art. 6 ust. 1 lit. b — na wyraźne zlecenie Użytkownika</td></tr>
         <tr><td>Funkcje oparte na sztucznej inteligencji (propozycje identyfikacji wizualnej, tekst strony www, rozpoznawanie kosztów ze zdjęć, oferty z tekstu)</td><td>art. 6 ust. 1 lit. b — wykonanie umowy, wyłącznie gdy Użytkownik korzysta z danej funkcji</td></tr>
         <tr><td>Dochodzenie i obrona roszczeń</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes</td></tr>
       </tbody>
@@ -113,7 +113,7 @@
         <tr><td>Mollie</td><td>Linki do zapłaty na fakturach Użytkownika (BLIK, Przelewy24)</td><td>Unia Europejska</td></tr>
         <tr><td>Anthropic</td><td>Funkcje oparte na sztucznej inteligencji — przetwarza wyłącznie treści przesłane przez Użytkownika do analizy (np. zdjęcie paragonu, odpowiedzi na pytania o markę); dane nie są wykorzystywane do trenowania modeli</td><td>USA — standardowe klauzule umowne</td></tr>
         <tr><td>Cloudflare</td><td>Ochrona formularzy przed spamem (Turnstile)</td><td>UE / USA — standardowe klauzule umowne</td></tr>
-        <tr><td>sprzedamfakture.pl (serwis windykacyjny Creditline B.V.)</td><td>Windykacja należności i wykup wierzytelności — wyłącznie na zlecenie Użytkownika; po przekazaniu sprawy sprzedamfakture.pl jest odrębnym administratorem danych dłużnika</td><td>Polska</td></tr>
+        <tr><td>sprzedamfakture.pl (serwis wykupu wierzytelności Creditline B.V.)</td><td>Wykup wierzytelności — wyłącznie na zlecenie Użytkownika; po zawarciu umowy cesji sprzedamfakture.pl jest odrębnym administratorem danych dłużnika</td><td>Polska</td></tr>
       </tbody>
     </table>
     </div>
@@ -138,7 +138,7 @@
     <p>Podanie danych jest dobrowolne, ale niezbędne do założenia konta i korzystania z usługi. Nie podejmujemy wobec Ciebie decyzji opartych wyłącznie na zautomatyzowanym przetwarzaniu, które wywoływałyby skutki prawne.</p>
 
     <h2>8. Dane Twoich kontrahentów — powierzenie przetwarzania</h2>
-    <p>Wprowadzając do {{ brand('name') }} dane swoich klientów, dostawców lub pracowników, jesteś ich administratorem, a Creditline B.V. przetwarza je w Twoim imieniu jako podmiot przetwarzający (art. 28 RODO). Przetwarzamy te dane wyłącznie w celu świadczenia usługi i zgodnie z Twoimi poleceniami wydawanymi przez funkcje aplikacji (np. wysłanie faktury, przypomnienia lub wezwania, przekazanie sprawy do sprzedamfakture.pl). Stosujemy środki techniczne i organizacyjne opisane w pkt 10, korzystamy tylko z podmiotów wymienionych w pkt 4 i pomagamy Ci w realizacji praw osób, których dane dotyczą. Na żądanie udostępniamy umowę powierzenia przetwarzania danych.</p>
+    <p>Wprowadzając do {{ brand('name') }} dane swoich klientów, dostawców lub pracowników, jesteś ich administratorem, a Creditline B.V. przetwarza je w Twoim imieniu jako podmiot przetwarzający (art. 28 RODO). Przetwarzamy te dane wyłącznie w celu świadczenia usługi i zgodnie z Twoimi poleceniami wydawanymi przez funkcje aplikacji (np. wysłanie faktury, przypomnienia lub wezwania, zgłoszenie wierzytelności do wykupu przez sprzedamfakture.pl). Stosujemy środki techniczne i organizacyjne opisane w pkt 10, korzystamy tylko z podmiotów wymienionych w pkt 4 i pomagamy Ci w realizacji praw osób, których dane dotyczą. Na żądanie udostępniamy umowę powierzenia przetwarzania danych.</p>
 
     <h2>9. Pliki cookie</h2>
     <p>Strona {{ brand('domain') }} i aplikacja używają wyłącznie <strong>niezbędnych, funkcjonalnych plików cookie</strong>: do utrzymania sesji logowania, zabezpieczenia formularzy (token CSRF), zapamiętania ustawień oraz — w formularzu kontaktowym — do weryfikacji antyspamowej Cloudflare Turnstile. Nie używamy cookie reklamowych, śledzących ani narzędzi analitycznych osób trzecich, dlatego nie prosimy o zgodę na cookie. Możesz zablokować cookie w ustawieniach przeglądarki, ale wtedy logowanie do aplikacji nie będzie możliwe.</p>

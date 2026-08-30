@@ -135,7 +135,7 @@
         </div>
         <div class="calc-actions" style="margin-top:10px;">
           <a href="{{ route('register') }}" class="btn btn-secondary">Załóż konto w {{ brand('name') }} — wezwania jednym kliknięciem</a>
-          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Przekaż sprawę do sprzedamfakture.pl</a>
+          <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-secondary">Sprzedaj fakturę na sprzedamfakture.pl</a>
         </div>
       </div>
     </div>
@@ -158,8 +158,8 @@
       <p>Odsetki i rekompensata są roszczeniami, których nie musisz zapowiadać w umowie ani na fakturze. W praktyce wielu przedsiębiorców z nich nie korzysta — a to właśnie one sprawiają, że opóźnianie płatności przestaje się dłużnikowi opłacać.</p>
 
       <h2>Co dalej, gdy wezwanie nie działa?</h2>
-      <p>Wezwanie do zapłaty z terminem 7 dni to standardowy krok przedsądowy. Jeśli dłużnik nadal nie płaci, sprawę może przejąć <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>: windykacja polubowna, wpis do rejestru dłużników (KRD/BIG), a w razie potrzeby postępowanie sądowe i egzekucja — z kosztami obciążającymi dłużnika. Potrzebujesz pieniędzy od razu? Możesz zgłosić fakturę do wykupu i otrzymać ofertę cesji w jeden dzień roboczy.</p>
-      <p>W {{ brand('name') }} cały ten proces jest wbudowany w fakturowanie: przypomnienia idą automatycznie, wezwanie z odsetkami i rekompensatą tworzysz jednym kliknięciem, a przekazanie do sprzedamfakture.pl nie wymaga przepisywania danych. <a href="{{ route('register') }}">Wypróbuj 14 dni za darmo</a>.</p>
+      <p>Wezwanie do zapłaty z terminem 7 dni to standardowy krok przedsądowy — wysyłasz je sam, a jeśli dłużnik nadal nie płaci, możesz dochodzić należności na drodze sądowej, z kosztami obciążającymi dłużnika. Wolisz pieniądze teraz zamiast czekania i procesu? Sprzedaj fakturę na <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener">sprzedamfakture.pl</a>: ofertę cesji dostaniesz w jeden dzień roboczy, a po jej akceptacji ryzyko i dalsze odzyskiwanie należności bierze na siebie kupujący.</p>
+      <p>W {{ brand('name') }} cały ten proces jest wbudowany w fakturowanie: przypomnienia idą automatycznie, wezwanie z odsetkami i rekompensatą tworzysz jednym kliknięciem, a fakturę sprzedajesz do sprzedamfakture.pl bez przepisywania danych. <a href="{{ route('register') }}">Wypróbuj 14 dni za darmo</a>.</p>
     </div>
   </div>
 </section>
@@ -208,7 +208,7 @@
 
       <p>Wzywam do zapłaty powyższej kwoty w terminie <strong>7 dni</strong> od dnia otrzymania niniejszego wezwania, na rachunek bankowy nr <input type="text" class="inline" id="wzIban" placeholder="numer rachunku" style="min-width:260px;">, z podaniem numeru faktury w tytule przelewu. Odsetki naliczane są nadal, do dnia zapłaty.</p>
 
-      <p>W przypadku braku zapłaty w wyznaczonym terminie sprawa zostanie bez dalszych wezwań przekazana do windykacji oraz skierowana na drogę postępowania sądowego, co narazi Państwa na dodatkowe koszty — w tym koszty procesu, zastępstwa procesowego i egzekucji — a także może skutkować wpisem do rejestru dłużników.</p>
+      <p>W przypadku braku zapłaty w wyznaczonym terminie sprawa zostanie bez dalszych wezwań skierowana na drogę postępowania sądowego, co będzie skutkować obciążeniem Państwa kosztami odzyskiwania należności — w tym kosztami procesu, zastępstwa procesowego i egzekucji — a także może skutkować wpisem do rejestru dłużników.</p>
 
       <p>Jeżeli należność została uregulowana przed otrzymaniem niniejszego pisma, proszę uznać je za nieaktualne i przesłać potwierdzenie przelewu.</p>
 
@@ -222,10 +222,10 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Nie licz tego ręcznie przy każdej fakturze</h2>
-    <p>W {{ brand('name') }} przypomnienia idą same, wezwanie z odsetkami i rekompensatą powstaje jednym kliknięciem, a sprzedamfakture.pl jest o jeden krok — bez przepisywania danych.</p>
+    <p>W {{ brand('name') }} przypomnienia idą same, wezwanie z odsetkami i rekompensatą powstaje jednym kliknięciem, a fakturę sprzedajesz do sprzedamfakture.pl prosto z aplikacji — bez przepisywania danych.</p>
     <div class="hero-ctas">
       <a href="{{ route('register') }}" class="btn btn-white btn-lg">Wypróbuj 14 dni za darmo →</a>
-      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Przekaż sprawę do sprzedamfakture.pl</a>
+      <a href="https://sprzedamfakture.pl" target="_blank" rel="noopener" class="btn btn-lg" style="background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3);">Sprzedaj fakturę na sprzedamfakture.pl</a>
     </div>
   </div>
 </section>
