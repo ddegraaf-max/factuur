@@ -118,7 +118,8 @@ class IncassoService
                     ->update(['current_value' => $next, 'updated_at' => now()]);
             }
 
-            return sprintf('ARM-%d-%04d', $year, $next);
+            // Dossierprefix per markt: ARM (Armaere, NL) of CLP (Creditline Polska).
+            return sprintf('%s-%d-%04d', \App\Support\Market::isPl() ? 'CLP' : 'ARM', $year, $next);
         });
     }
 }

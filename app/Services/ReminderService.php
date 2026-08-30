@@ -172,7 +172,8 @@ class ReminderService
     {
         $ord = [1 => 'Eerste', 2 => 'Tweede', 3 => 'Derde', 4 => 'Vierde', 5 => 'Vijfde'][$i] ?? "{$i}e";
 
-        return "{$ord} {$noun}";
+        // Rangtelwoord en zelfstandig naamwoord apart vertaalbaar (Pools: "Pierwsze przypomnienie").
+        return trim(__($ord) . ' ' . __($noun));
     }
 
     private function sendStep(Invoice $invoice, Company $company, string $kind, string $label, int $termijn, float $remaining): bool
