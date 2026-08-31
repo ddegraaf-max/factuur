@@ -85,6 +85,7 @@ $pl = [
         ]],
         ['title' => 'Narzędzia', 'links' => [
             ['route' => 'pl.kalkulator', 'label' => 'Kalkulator odsetek'],
+            ['route' => 'pl.skup-wyrokow', 'label' => 'Skup starych wyroków'],
             ['route' => 'pl.przenies', 'params' => ['fakturownia'], 'label' => 'Przenieś się z Fakturowni'],
             ['route' => 'pl.przenies', 'params' => ['ifirma'], 'label' => 'Przenieś się z iFirmy'],
             ['route' => 'pl.przenies', 'params' => ['wfirma'], 'label' => 'Przenieś się z wFirmy'],
@@ -137,6 +138,7 @@ $plEn = [
         ]],
         ['title' => 'Tools', 'links' => [
             ['route' => 'pl.kalkulator', 'label' => 'Interest calculator'],
+            ['route' => 'pl.skup-wyrokow', 'label' => 'We buy old judgments'],
             ['route' => 'pl.przenies', 'params' => ['fakturownia'], 'label' => 'Switch from Fakturownia'],
             ['route' => 'pl.przenies', 'params' => ['ifirma'], 'label' => 'Switch from iFirma'],
             ['route' => 'pl.przenies', 'params' => ['wfirma'], 'label' => 'Switch from wFirma'],

@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 31 augustus 2026 · {{ brand('version_prefix') }} 1.46.0</div>
+        <h2>Onder de motorkap: vorderingen te gelde maken (Poolse omgeving)</h2>
+        <ul class="tl-list">
+          <li><b>Factuur verkopen</b> — in de Poolse omgeving bied je een onbetaalde factuur met één klik te koop aan bij de factuurkoper; offerte binnen één werkdag.</li>
+          <li><b>Oude vonnissen</b> — ook vorderingen met een executoriale titel (wyrok, nakaz zapłaty) kun je aanbieden, per dossier beoordeeld; met een publieke informatiepagina en aanmeldformulier.</li>
+          <li><b>Wettelijke rente exact</b> — rente per halfjaarperiode en de vaste vergoeding tegen de officiële NBP-koers van de wettelijk juiste dag.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 augustus 2026 · {{ brand('version_prefix') }} 1.45.0</div>
         <h2>Onder de motorkap: de interface in meerdere talen</h2>
         <ul class="tl-list">

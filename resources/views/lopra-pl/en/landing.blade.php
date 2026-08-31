@@ -437,7 +437,7 @@
         </div>
         <div class="wd-partner">
           <div class="lg">SF</div>
-          <div><b>sprzedamfakture.pl</b>Lopra's invoice-purchase partner: buys unpaid B2B invoices, assignment offer within one working day, no fees or upfront costs. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a></div>
+          <div><b>sprzedamfakture.pl</b>Lopra's invoice-purchase partner: buys unpaid B2B invoices, assignment offer within one working day, no fees or upfront costs. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Calculate interest and compensation →</a> · <a href="{{ route('pl.skup-wyrokow') }}" style="color:#E0A55C;text-decoration:underline;">We buy old judgments →</a></div>
         </div>
       </div>
     </div>

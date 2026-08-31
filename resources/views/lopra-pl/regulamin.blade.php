@@ -90,7 +90,7 @@
       <li>w pakiecie Smart — funkcje oparte na sztucznej inteligencji (m.in. propozycje identyfikacji wizualnej, tekst strony www, rozpoznawanie kosztów ze zdjęć, oferty z tekstu).</li>
     </ul>
     <p>2. Usługa jest narzędziem wspierającym Użytkownika. Usługodawca nie świadczy usług księgowych, doradztwa podatkowego ani prawnego. Za poprawność, kompletność i terminowość faktur, rozliczeń podatkowych, wysyłki do KSeF oraz treści wezwań do zapłaty odpowiada Użytkownik.</p>
-    <p>3. Wykup wierzytelności jest usługą sprzedamfakture.pl świadczoną na podstawie odrębnej umowy cesji między Użytkownikiem a sprzedamfakture.pl. Cena wykupu jest ustalana każdorazowo w ofercie przed zawarciem umowy; Usługa nie pobiera z tego tytułu opłat.</p>
+    <p>3. Wykup wierzytelności — w tym wierzytelności stwierdzonych tytułem wykonawczym (wyrok, nakaz zapłaty) — jest usługą sprzedamfakture.pl świadczoną na podstawie odrębnej umowy cesji między Użytkownikiem a sprzedamfakture.pl. Cena wykupu jest ustalana każdorazowo w ofercie przed zawarciem umowy; Usługa nie pobiera z tego tytułu opłat.</p>
     <p>4. Treści generowane przez funkcje sztucznej inteligencji stanowią propozycje. Użytkownik sprawdza je przed użyciem i ponosi odpowiedzialność za ich wykorzystanie (w tym za prawa osób trzecich do nazw, sloganów lub znaków).</p>
 
     <h2>§ 4. Konto i okres próbny</h2>

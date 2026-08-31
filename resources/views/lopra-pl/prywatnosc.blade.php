@@ -84,6 +84,7 @@
         <tr><td>Wiadomości o usłudze: zmiany regulaminu, ważne informacje techniczne, koniec okresu próbnego</td><td>art. 6 ust. 1 lit. b oraz lit. f</td></tr>
         <tr><td>Wskazówki i informacje o nowych funkcjach w okresie próbnym i w trakcie abonamentu</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (marketing własnych usług wobec obecnych klientów); możesz się wypisać w każdej chwili</td></tr>
         <tr><td>Zgłoszenie wierzytelności do wykupu przez sprzedamfakture.pl</td><td>art. 6 ust. 1 lit. b — na wyraźne zlecenie Użytkownika</td></tr>
+        <tr><td>Zgłoszenie wierzytelności lub tytułu wykonawczego do wykupu (formularz skupu wyroków) — zgłoszenie zawiera także dane dłużnika</td><td>art. 6 ust. 1 lit. b — na wyraźne zlecenie zgłaszającego</td></tr>
         <tr><td>Funkcje oparte na sztucznej inteligencji (propozycje identyfikacji wizualnej, tekst strony www, rozpoznawanie kosztów ze zdjęć, oferty z tekstu)</td><td>art. 6 ust. 1 lit. b — wykonanie umowy, wyłącznie gdy Użytkownik korzysta z danej funkcji</td></tr>
         <tr><td>Dochodzenie i obrona roszczeń</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes</td></tr>
       </tbody>

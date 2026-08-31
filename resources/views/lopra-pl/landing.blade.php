@@ -437,7 +437,7 @@
         </div>
         <div class="wd-partner">
           <div class="lg">SF</div>
-          <div><b>sprzedamfakture.pl</b>Partner wykupu faktur Lopra — kupuje nieopłacone faktury B2B, oferta cesji w jeden dzień roboczy, bez opłat wstępnych. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Policz odsetki i rekompensatę →</a></div>
+          <div><b>sprzedamfakture.pl</b>Partner wykupu faktur Lopra — kupuje nieopłacone faktury B2B, oferta cesji w jeden dzień roboczy, bez opłat wstępnych. <a href="{{ route('pl.kalkulator') }}" style="color:#E0A55C;text-decoration:underline;">Policz odsetki i rekompensatę →</a> · <a href="{{ route('pl.skup-wyrokow') }}" style="color:#E0A55C;text-decoration:underline;">Skup starych wyroków →</a></div>
         </div>
       </div>
     </div>

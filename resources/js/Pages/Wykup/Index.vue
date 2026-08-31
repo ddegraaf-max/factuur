@@ -1,5 +1,6 @@
 <script setup>
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { t } from '@/i18n';
 import { eur, fmtDate } from '@/format';
@@ -24,6 +25,19 @@ const sell = (invoice) => {
   });
   if (!confirm(msg)) return;
   router.post(route('windykacja.wykup', invoice.id), {}, { preserveScroll: true });
+};
+
+// Skup starych wyroków: ook een oud vonnis (tytuł wykonawczy) kan te koop worden aangeboden.
+const wyrokOpen = ref(false);
+const wyrokForm = useForm({
+  sygnatura: '', sad: '', data_wyroku: '', kwota: '', dluznik: '', dluznik_nip: '',
+  forma: '', egzekucja: '', egzekucja_rok: '', uwagi: '',
+});
+const submitWyrok = () => {
+  wyrokForm.post(route('wykup.wyrok'), {
+    preserveScroll: true,
+    onSuccess: () => { wyrokForm.reset(); wyrokOpen.value = false; },
+  });
 };
 </script>
 
@@ -136,6 +150,79 @@ const sell = (invoice) => {
         </tbody>
       </table>
     </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">{{ $t('Oude vonnissen en betalingsbevelen') }}</div>
+          <div class="card-subtitle">{{ $t('Ook een oud vonnis of nakaz zapłaty (executoriale titel) is geld waard — vaak 10–40% van de nominale waarde, na beoordeling per dossier.') }}</div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" @click="wyrokOpen = !wyrokOpen">{{ wyrokOpen ? $t('Formulier verbergen') : $t('Vonnis aanbieden') }}</button>
+      </div>
+      <form v-if="wyrokOpen" class="wyrok-form" @submit.prevent="submitWyrok">
+        <div class="wyrok-grid">
+          <label>
+            <span>{{ $t('Zaaknummer (sygnatura akt)') }} *</span>
+            <input type="text" v-model="wyrokForm.sygnatura" maxlength="60" required>
+            <em v-if="wyrokForm.errors.sygnatura" class="field-error">{{ wyrokForm.errors.sygnatura }}</em>
+          </label>
+          <label>
+            <span>{{ $t('Rechtbank') }}</span>
+            <input type="text" v-model="wyrokForm.sad" maxlength="120">
+          </label>
+          <label>
+            <span>{{ $t('Datum vonnis') }}</span>
+            <input type="date" v-model="wyrokForm.data_wyroku">
+            <em v-if="wyrokForm.errors.data_wyroku" class="field-error">{{ wyrokForm.errors.data_wyroku }}</em>
+          </label>
+          <label>
+            <span>{{ $t('Nominale waarde (zł)') }} *</span>
+            <input type="text" v-model="wyrokForm.kwota" maxlength="40" required inputmode="decimal">
+            <em v-if="wyrokForm.errors.kwota" class="field-error">{{ wyrokForm.errors.kwota }}</em>
+          </label>
+          <label>
+            <span>{{ $t('Schuldenaar') }} *</span>
+            <input type="text" v-model="wyrokForm.dluznik" maxlength="160" required>
+            <em v-if="wyrokForm.errors.dluznik" class="field-error">{{ wyrokForm.errors.dluznik }}</em>
+          </label>
+          <label>
+            <span>{{ $t('NIP van de schuldenaar') }}</span>
+            <input type="text" v-model="wyrokForm.dluznik_nip" maxlength="20">
+          </label>
+          <label>
+            <span>{{ $t('Rechtsvorm van de schuldenaar') }}</span>
+            <select v-model="wyrokForm.forma">
+              <option value=""></option>
+              <option value="sp_zoo">Sp. z o.o.</option>
+              <option value="sa">S.A.</option>
+              <option value="jdg">{{ $t('Eenmanszaak (JDG)') }}</option>
+              <option value="inna">{{ $t('Anders / onbekend') }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ $t('Eerdere executie') }}</span>
+            <select v-model="wyrokForm.egzekucja">
+              <option value=""></option>
+              <option value="none">{{ $t('Nog nooit uitgevoerd') }}</option>
+              <option value="bezskutecznosc">{{ $t('Gestaakt — bezskuteczność (geen verhaal)') }}</option>
+              <option value="inna">{{ $t('Gestaakt — andere reden') }}</option>
+              <option value="nie_wiem">{{ $t('Weet ik niet') }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ $t('Jaar laatste executie') }}</span>
+            <input type="number" v-model="wyrokForm.egzekucja_rok" min="1990" max="2100">
+            <em v-if="wyrokForm.errors.egzekucja_rok" class="field-error">{{ wyrokForm.errors.egzekucja_rok }}</em>
+          </label>
+          <label class="wyrok-wide">
+            <span>{{ $t('Toelichting') }}</span>
+            <textarea v-model="wyrokForm.uwagi" rows="3" maxlength="2000"></textarea>
+          </label>
+        </div>
+        <p class="wyrok-hint">{{ $t('Waarom de vorige executie is gestaakt, bepaalt de waarde: na bezskuteczność begint de verjaring van zes jaar opnieuw; na staking wegens stilzitten van de schuldeiser vervalt de stuiting.') }}</p>
+        <button type="submit" class="btn btn-primary" :disabled="wyrokForm.processing">{{ wyrokForm.processing ? $t('Bezig…') : $t('Vonnis te koop aanbieden') }}</button>
+      </form>
+    </div>
   </AppLayout>
 </template>
 
@@ -163,6 +250,15 @@ const sell = (invoice) => {
 .actions { white-space: nowrap; }
 .actions .link-btn { margin-right: 12px; }
 .link-btn { background: none; border: none; padding: 0; font: inherit; font-size: 12px; color: var(--brand); text-decoration: underline; cursor: pointer; }
+.wyrok-form { padding: 4px 20px 20px; }
+.wyrok-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.wyrok-grid label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+.wyrok-grid input, .wyrok-grid select, .wyrok-grid textarea { height: 38px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: inherit; font-weight: 400; color: var(--text); }
+.wyrok-grid textarea { height: auto; padding: 8px 10px; resize: vertical; }
+.wyrok-grid input:focus, .wyrok-grid select:focus, .wyrok-grid textarea:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+.wyrok-wide { grid-column: 1 / -1; }
+.wyrok-hint { font-size: 12px; color: var(--text-3); line-height: 1.55; margin: 12px 0 14px; }
+.field-error { font-style: normal; font-weight: 400; font-size: 12px; color: #B91C1C; }
 
 @media (max-width: 760px) {
   .partner-card { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 20px; }

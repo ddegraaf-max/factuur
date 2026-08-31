@@ -81,6 +81,67 @@ class WindykacjaController extends Controller
         ]);
     }
 
+    /** Publiek (skup wyroków): aanmelding van een oud vonnis — lead voor de factuurkoper. */
+    public function wyrokLead(Request $request)
+    {
+        abort_unless(Market::isPl(), 404);
+
+        $data = $request->validate(array_merge([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:180'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'firm' => ['nullable', 'string', 'max:160'],
+        ], $this->wyrokRules()));
+
+        $this->mailWyrok($data);
+
+        // De pagina toont zijn eigen Poolse/Engelse bevestiging zodra 'flash' gezet is.
+        return back()->with('flash', 'wyrok-verzonden');
+    }
+
+    /** Ingelogd: oud vonnis aanbieden vanuit de app (met bedrijfscontext). */
+    public function wyrokSale(Request $request)
+    {
+        abort_unless(Market::isPl(), 404);
+
+        $data = $request->validate($this->wyrokRules());
+        $user = $request->user();
+        $this->mailWyrok($data, $user, $user->company);
+
+        return back()->with('flash', __('Vonnis aangemeld bij :partner — zij nemen binnen enkele werkdagen contact met je op.', ['partner' => Market::wykup('partner_name')]));
+    }
+
+    /** @return array<string, array<int, string>> */
+    private function wyrokRules(): array
+    {
+        return [
+            'sygnatura' => ['required', 'string', 'max:60'],
+            'sad' => ['nullable', 'string', 'max:120'],
+            'data_wyroku' => ['nullable', 'date'],
+            'kwota' => ['required', 'string', 'max:40'],
+            'dluznik' => ['required', 'string', 'max:160'],
+            'dluznik_nip' => ['nullable', 'string', 'max:20'],
+            'forma' => ['nullable', 'in:sp_zoo,sa,jdg,inna'],
+            'egzekucja' => ['nullable', 'in:none,bezskutecznosc,inna,nie_wiem'],
+            'egzekucja_rok' => ['nullable', 'integer', 'between:1990,2100'],
+            'uwagi' => ['nullable', 'string', 'max:2000'],
+        ];
+    }
+
+    /** @param array<string, mixed> $data */
+    private function mailWyrok(array $data, ?\App\Models\User $user = null, ?\App\Models\Company $company = null): void
+    {
+        try {
+            // Demo-administraties mailen de koper nooit echt.
+            \Illuminate\Support\Facades\Mail::mailer($company?->is_demo ? 'log' : null)
+                ->to(Market::wykup('email'))
+                ->cc(array_filter([Market::wykup('cc')]))
+                ->send(new \App\Mail\WyrokSaleRequestMail($data, $user, $company));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Wyrok-aanmelding mailen mislukt', ['error' => $e->getMessage()]);
+        }
+    }
+
     private function authorizeInvoice(Invoice $invoice): void
     {
         abort_unless((int) $invoice->company_id === (int) auth()->user()->company_id, 404);

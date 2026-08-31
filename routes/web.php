@@ -216,6 +216,9 @@ Route::middleware('market:pl')->name('pl.')->group(function () {
     Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
     // Wettelijke rente per periode + NBP-koers voor de vervaldatum (JSON voor de calculator).
     Route::get('/kalkulator-odsetek/stawki', [\App\Http\Controllers\WindykacjaController::class, 'rates'])->middleware('throttle:60,1')->name('kalkulator.stawki');
+    // Skup starych wyroków (tytuły wykonawcze): pagina + aanmeldformulier — leads voor de factuurkoper.
+    Route::get('/skup-wyrokow', fn () => view(\App\Support\Market::view('lopra-pl.skup-wyrokow')))->name('skup-wyrokow');
+    Route::post('/skup-wyrokow', [\App\Http\Controllers\WindykacjaController::class, 'wyrokLead'])->middleware('throttle:10,1')->name('skup-wyrokow.send');
     // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
     Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
         $packages = config('przenies.packages', []);
@@ -231,7 +234,7 @@ Route::get('/sitemap.xml', function () {
     if (\App\Support\Market::isPl()) {
         // Lopra Polska: alleen de Poolse pagina's.
         $paths = [
-            '/', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/kalkulator-odsetek',
+            '/', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/kalkulator-odsetek', '/skup-wyrokow',
             '/status', '/login', '/register',
             '/przenies-sie-z/fakturownia', '/przenies-sie-z/ifirma', '/przenies-sie-z/wfirma', '/przenies-sie-z/infakt',
         ];
@@ -644,6 +647,8 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('invoices/{invoice}/windykacja', [\App\Http\Controllers\WindykacjaController::class, 'claim'])->name('windykacja.claim');
     Route::get('invoices/{invoice}/wezwanie', [\App\Http\Controllers\WindykacjaController::class, 'wezwanie'])->name('windykacja.wezwanie');
     Route::post('invoices/{invoice}/wykup', [\App\Http\Controllers\WindykacjaController::class, 'sale'])->name('windykacja.wykup');
+    // Oud vonnis (tytuł wykonawczy) te koop aanbieden vanuit de app — met bedrijfscontext in de mail.
+    Route::post('wykup/wyrok', [\App\Http\Controllers\WindykacjaController::class, 'wyrokSale'])->name('wykup.wyrok');
     Route::get('invoices/{invoice}/ksef.xml', [\App\Http\Controllers\KsefController::class, 'xml'])->name('ksef.xml');
     Route::patch('invoices/{invoice}/ksef', [\App\Http\Controllers\KsefController::class, 'number'])->name('ksef.number');
 
