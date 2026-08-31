@@ -69,7 +69,7 @@ class NbpService
     /** @return array{rate: float, date: null, source: 'fallback'} */
     public function fallback(): array
     {
-        $env = env('WINDYKACJA_EUR_PLN');
+        $env = config('markets.overrides.eur_pln');
         $rate = $env !== null && $env !== '' ? (float) $env : (float) Market::get('eur_pln', 4.30);
 
         return ['rate' => $rate, 'date' => null, 'source' => 'fallback'];

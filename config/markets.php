@@ -9,6 +9,23 @@
  */
 return [
 
+    // Omgevingsoverschrijvingen — env() mag alleen hier (config wordt in productie gecachet).
+    // Gelezen door App\Support\Market::incasso()/wykup(), WindykacjaService en NbpService.
+    'overrides' => [
+        'incasso' => [
+            'partner_name' => env('INCASSO_PARTNER_NAME'),
+            'claims_email' => env('INCASSO_CLAIMS_EMAIL'),
+            'cc' => env('INCASSO_CC'),
+        ],
+        'wykup' => [
+            'partner_name' => env('WYKUP_PARTNER_NAME'),
+            'email' => env('WYKUP_EMAIL') ?: env('INCASSO_CLAIMS_EMAIL'),
+            'cc' => env('WYKUP_CC'),
+        ],
+        'interest_rate' => env('WINDYKACJA_INTEREST_RATE'),
+        'eur_pln' => env('WINDYKACJA_EUR_PLN'),
+    ],
+
     'nl' => [
         'locale' => 'nl',
         'locales' => ['nl'],

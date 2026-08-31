@@ -44,7 +44,7 @@ class WindykacjaService
      */
     public function ratePeriods(): array
     {
-        $env = env('WINDYKACJA_INTEREST_RATE');
+        $env = config('markets.overrides.interest_rate');
         if ($env !== null && $env !== '') {
             return ['1970-01-01' => (float) $env];
         }

@@ -147,12 +147,7 @@ class Market
     /** Incassopartner van deze markt; per omgeving te overschrijven met INCASSO_PARTNER_NAME / INCASSO_CLAIMS_EMAIL / INCASSO_CC. */
     public static function incasso(string $key): string
     {
-        $env = match ($key) {
-            'partner_name' => env('INCASSO_PARTNER_NAME'),
-            'claims_email' => env('INCASSO_CLAIMS_EMAIL'),
-            'cc' => env('INCASSO_CC'),
-            default => null,
-        };
+        $env = config('markets.overrides.incasso.' . $key);
 
         return (string) ($env ?: self::get('incasso.' . $key, ''));
     }
@@ -169,12 +164,7 @@ class Market
      */
     public static function wykup(string $key): string
     {
-        $env = match ($key) {
-            'partner_name' => env('WYKUP_PARTNER_NAME'),
-            'email' => env('WYKUP_EMAIL') ?: env('INCASSO_CLAIMS_EMAIL'),
-            'cc' => env('WYKUP_CC'),
-            default => null,
-        };
+        $env = config('markets.overrides.wykup.' . $key);
 
         return (string) ($env ?: self::get('wykup.' . $key, ''));
     }
