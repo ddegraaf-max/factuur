@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 1 september 2026 · {{ brand('version_prefix') }} 1.46.1</div>
+        <h2>Kleine verbeteringen</h2>
+        <ul class="tl-list">
+          <li><b>Adres /logout</b> — wie dat adres rechtstreeks intikt, komt nu netjes op het dashboard of de inlogpagina in plaats van op een kale foutmelding. Uitloggen zelf doe je nog steeds via het gebruikersmenu.</li>
+          <li><b>Foutpagina in huisstijl</b> — een adres dat alleen via een knop of formulier werkt, toont voortaan een nette pagina met de weg terug.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 31 augustus 2026 · {{ brand('version_prefix') }} 1.46.0</div>
         <h2>Onder de motorkap: vorderingen te gelde maken (Poolse omgeving)</h2>
         <ul class="tl-list">

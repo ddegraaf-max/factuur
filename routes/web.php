@@ -371,6 +371,7 @@ Route::prefix('portaal')->name('portal.')->group(function () {
         ->middleware('throttle:10,1')->name('verify');
 
     Route::post('/uitloggen', [PortalAuthController::class, 'logout'])->name('logout');
+    Route::get('/uitloggen', fn () => redirect()->route('portal.login')); // ingetikt adres: geen 405
 
     Route::get('/overzicht', [PortalController::class, 'index'])
         ->middleware('portal.verified')->name('index');
@@ -452,6 +453,12 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->middleware('throttle:5,1')->name('password.store');
 });
+
+// Rechtstreeks naar /logout surfen (adresbalk, bladwijzer) gaf een kale
+// 405-pagina. Uitloggen blijft een POST — anders kan een vreemde site je met
+// een simpele link uitloggen — maar een GET wijst de weg: ingelogd naar het
+// dashboard, anders naar de inlogpagina.
+Route::get('logout', fn () => redirect()->route(auth()->check() ? 'dashboard' : 'login'));
 
 // ---------- AUTHENTICATED ----------
 // 'readonly': de boekhouder-rol mag alles inzien maar niets wijzigen.
