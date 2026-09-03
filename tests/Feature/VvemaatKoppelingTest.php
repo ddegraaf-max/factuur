@@ -50,6 +50,7 @@ class VvemaatKoppelingTest extends TestCase
         return Invoice::withoutGlobalScope('company')->create([
             'company_id' => $user->company_id,
             'customer_id' => $klant->id,
+            'customer_name' => $klant->name, // momentopname, verplicht (not null)
             'number' => '2026-0451',
             'status' => 'sent',
             'invoice_date' => '2026-09-01',
@@ -153,15 +154,16 @@ class VvemaatKoppelingTest extends TestCase
 
     public function test_de_planner_stuurt_een_gemiste_melding_alsnog(): void
     {
-        Http::fake(['vvemaat.test/*' => Http::response('kapot', 500)]);
+        // Eerst een storing aan de andere kant, daarna is het weer in de lucht.
+        // Eén reeks, want een tweede Http::fake() overschrijft de eerste niet:
+        // de eerste passende stub wint.
+        Http::fake(['vvemaat.test/*' => Http::sequence()->push('kapot', 500)->push(['ok' => true], 200)]);
 
         $factuur = $this->factuur('keizersgracht214');
         $this->betaal($factuur);
         $this->assertNull($factuur->fresh()->vvemaat_notified_at);
-
-        // Aan de andere kant is het weer in de lucht.
-        Http::fake(['vvemaat.test/*' => Http::response(['ok' => true], 200)]);
-        $factuur->fresh()->forceFill(['paid_at' => now()])->saveQuietly();
+        // refreshStatus() zet paid_at; daar zoekt de planner op.
+        $this->assertNotNull($factuur->fresh()->paid_at);
 
         $this->artisan('vvemaat:meld-betalingen')->assertSuccessful();
 
