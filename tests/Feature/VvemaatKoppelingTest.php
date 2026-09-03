@@ -222,7 +222,7 @@ class VvemaatKoppelingTest extends TestCase
             ->assertOk()
             ->assertInertia(fn ($page) => $page
                 ->where('invoice.vvemaat.period_label', null)
-                ->whereContains('invoice.vvemaat.waarschuwing', 'terugkerend profiel'));
+                ->where('invoice.vvemaat.waarschuwing', fn ($tekst) => str_contains((string) $tekst, 'terugkerend profiel')));
     }
 
     public function test_een_gewone_klant_krijgt_geen_vvemaat_blok(): void
