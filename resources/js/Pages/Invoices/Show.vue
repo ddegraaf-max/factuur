@@ -589,6 +589,43 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           </div>
         </div>
 
+        <!--
+          De koppeling met VvEMaat. Staat er alleen bij een klant die een
+          VvE-omgeving afneemt, en dan altijd — ook als alles goed gaat.
+
+          Aan deze melding hangt of het bestuur van die vereniging zijn
+          administratie kan blijven bijwerken. Gaat er iets mis, dan hoor je dat
+          hier te zien in plaats van pas als er gebeld wordt.
+        -->
+        <div v-if="invoice.vvemaat" class="inc-panel">
+          <div class="inc-head">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h.01M15 9h.01M9 13h.01M15 13h.01M11 21v-4h2v4"/></svg>
+            <div>
+              <div class="inc-title">VvEMaat</div>
+              <div class="inc-sub">
+                <a :href="invoice.vvemaat.url" target="_blank" rel="noopener noreferrer">{{ invoice.vvemaat.slug }}.vvemaat.nl</a>
+              </div>
+            </div>
+          </div>
+          <div class="inc-meta">
+            <div>
+              <span class="inv-meta-label">{{ $t('Periode') }}</span>
+              <span>{{ invoice.vvemaat.period_label || $t('geen — er wordt niets doorgegeven') }}</span>
+            </div>
+            <div>
+              <span class="inv-meta-label">{{ $t('Geeft toegang tot en met') }}</span>
+              <span class="mono">{{ invoice.vvemaat.paid_through || '—' }}</span>
+            </div>
+            <div>
+              <span class="inv-meta-label">{{ $t('Doorgegeven op') }}</span>
+              <span>{{ invoice.vvemaat.notified_at_label || $t('nog niet') }}</span>
+            </div>
+          </div>
+          <p v-if="invoice.vvemaat.waarschuwing" class="vv-warn">
+            {{ invoice.vvemaat.waarschuwing }}
+          </p>
+        </div>
+
         <!-- Windykacja (alleen markt pl): aanmaning, rente + rekompensata, verkoop van de vordering -->
         <div v-if="canWindykacja" class="pl-panel">
           <div class="pl-head">
@@ -1155,6 +1192,10 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 .inc-meta > div { display: flex; flex-direction: column; gap: 3px; }
 .inc-meta .inv-meta-label { color: #9CA3AF; }
 .inc-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+.inc-panel a { color: #93C5FD; text-decoration: underline; text-underline-offset: 2px; }
+/* Een waarschuwing binnen het donkere paneel: dezelfde accentkleur als het
+   pictogram, zodat het opvalt zonder een tweede stijltaal te introduceren. */
+.vv-warn { margin: 14px 0 0; font-size: 13px; line-height: 1.55; color: #FCD34D; }
 
 /* Windykacja & KSeF (markt pl) */
 .pl-panel { margin-top: 28px; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }

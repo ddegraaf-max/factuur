@@ -35,10 +35,19 @@ class VvemaatKoppelingTest extends TestCase
         config()->set('vvemaat.sleutel', 'test-sleutel');
     }
 
+    /**
+     * De gebruiker van de administratie waarin de factuur is gemaakt.
+     *
+     * `demoUser()` bouwt elke aanroep een nieuw bedrijf op. Wie hem twee keer
+     * roept en dan de factuur van de eerste opvraagt, krijgt een 404 door de
+     * bedrijfsscope — en zoekt die fout in de verkeerde hoek.
+     */
+    private ?\App\Models\User $eigenaar = null;
+
     /** Een openstaande factuur voor een klant, met of zonder VvE-omgeving. */
     private function factuur(?string $slug, bool $metPeriode = true): Invoice
     {
-        $user = $this->demoUser();
+        $user = $this->eigenaar = $this->demoUser();
 
         $klant = Customer::withoutGlobalScope('company')->create([
             'company_id' => $user->company_id,
@@ -179,6 +188,51 @@ class VvemaatKoppelingTest extends TestCase
 
         Http::assertNothingSent();
         $this->assertFalse(app(VvemaatService::class)->actief());
+    }
+
+    public function test_de_factuurpagina_toont_de_koppeling_bij_een_vve_klant(): void
+    {
+        Http::fake(['vvemaat.test/*' => Http::response(['ok' => true], 200)]);
+
+        $factuur = $this->factuur('keizersgracht214');
+        $this->betaal($factuur);
+
+        $this->actingAs($this->eigenaar)
+            ->get(route('invoices.show', $factuur))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('invoice.vvemaat.slug', 'keizersgracht214')
+                ->where('invoice.vvemaat.paid_through', '2027-08-31')
+                // Alles klopt, dus er hoort geen waarschuwing te staan.
+                ->where('invoice.vvemaat.waarschuwing', null));
+    }
+
+    public function test_de_factuurpagina_waarschuwt_als_er_geen_periode_op_staat(): void
+    {
+        /*
+         * Dit is de reden dat dit blok er is. Een factuur die met de hand is
+         * gemaakt draagt geen periode, en dan geeft EasyInvoice bewust niets
+         * door. Zonder deze melding zou de vereniging op slot gaan zonder dat
+         * iemand begrijpt waarom.
+         */
+        $factuur = $this->factuur('keizersgracht214', metPeriode: false);
+
+        $this->actingAs($this->eigenaar)
+            ->get(route('invoices.show', $factuur))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('invoice.vvemaat.period_label', null)
+                ->whereContains('invoice.vvemaat.waarschuwing', 'terugkerend profiel'));
+    }
+
+    public function test_een_gewone_klant_krijgt_geen_vvemaat_blok(): void
+    {
+        $factuur = $this->factuur(null);
+
+        $this->actingAs($this->eigenaar)
+            ->get(route('invoices.show', $factuur))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('invoice.vvemaat', null));
     }
 
     public function test_de_omgeving_is_via_het_klantformulier_in_te_stellen(): void

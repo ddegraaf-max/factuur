@@ -167,6 +167,14 @@ class InvoiceController extends Controller
                 'incasso_sent_at_label' => $invoice->incasso_sent_at?->translatedFormat('j M Y'),
                 'days_overdue' => $invoice->days_overdue,
                 'remaining' => $invoice->remaining_amount,
+                /*
+                 * De koppeling met VvEMaat, zichtbaar in plaats van alleen in
+                 * de logs. Aan die melding hangt of het bestuur van een
+                 * vereniging zijn administratie kan blijven bijwerken; gaat er
+                 * iets mis, dan hoor je dat hier te zien en niet pas als er
+                 * gebeld wordt.
+                 */
+                'vvemaat' => $this->vvemaatStand($invoice),
                 'attachments' => $invoice->attachments->map(fn ($a) => [
                     'id' => $a->id,
                     'filename' => $a->filename,
@@ -453,6 +461,65 @@ class InvoiceController extends Controller
         }
 
         return back()->with('flash', $flash);
+    }
+
+    /**
+     * De stand van de koppeling met VvEMaat voor deze factuur.
+     *
+     * Geeft `null` terug bij een gewone klant — dan is er niets te melden en
+     * hoort er ook niets op het scherm te staan.
+     *
+     * Voor een VvE-klant staat er wél iets, ook als alles goed gaat. Aan deze
+     * melding hangt of het bestuur van die vereniging zijn administratie kan
+     * blijven bijwerken, en dat is te belangrijk om alleen in een logbestand
+     * terug te vinden.
+     *
+     * De waarschuwing zonder periode is de reden dat dit er is. Alleen
+     * facturen uit een terugkerend profiel dragen een periode; een factuur die
+     * met de hand is gemaakt niet. Dan stuurt EasyInvoice bewust niets — liever
+     * geen melding dan een gegokte datum — en zou de vereniging op slot gaan
+     * zonder dat iemand begrijpt waarom.
+     */
+    protected function vvemaatStand(Invoice $invoice): ?array
+    {
+        $slug = $invoice->customer?->vvemaat_slug;
+        if (! filled($slug)) {
+            return null;
+        }
+
+        $heeftPeriode = (bool) $invoice->period_end;
+
+        return [
+            'slug' => $slug,
+            'url' => "https://{$slug}.vvemaat.nl",
+            'period_label' => $heeftPeriode
+                ? $invoice->period_start?->translatedFormat('j M Y')
+                    .' t/m '.$invoice->period_end->translatedFormat('j M Y')
+                : null,
+            'paid_through' => $heeftPeriode ? $invoice->period_end->toDateString() : null,
+            'notified_at_label' => $invoice->vvemaat_notified_at?->translatedFormat('j M Y, H:i'),
+            'koppeling_aan' => app(\App\Services\VvemaatService::class)->actief(),
+            'waarschuwing' => $this->vvemaatWaarschuwing($invoice, $heeftPeriode),
+        ];
+    }
+
+    /** Wat er mis is, in gewone taal, of niets. */
+    protected function vvemaatWaarschuwing(Invoice $invoice, bool $heeftPeriode): ?string
+    {
+        if (! app(\App\Services\VvemaatService::class)->actief()) {
+            return __('De koppeling met VvEMaat staat uit; er wordt niets doorgegeven.');
+        }
+        if (! $heeftPeriode) {
+            return __('Deze factuur dekt geen periode, dus er wordt niets doorgegeven aan '
+                .'VvEMaat. Facturen uit een terugkerend profiel krijgen die periode '
+                .'automatisch; een losse factuur niet.');
+        }
+        if ($invoice->status === 'paid' && ! $invoice->vvemaat_notified_at) {
+            return __('De factuur is voldaan maar de melding is nog niet aangekomen. '
+                .'De planner probeert het elk kwartier opnieuw.');
+        }
+
+        return null;
     }
 
     /**
