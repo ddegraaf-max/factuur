@@ -74,6 +74,10 @@ class RecurringInvoiceService
             return null;
         }
 
+        // De volgende beurt bepaalt ook waar deze periode ophoudt, dus die
+        // rekenen we uit vóórdat de factuur wordt gemaakt.
+        $next = $profile->nextDateAfter($profile->next_run_on);
+
         $invoice = $this->manager->create([
             'company_id' => $profile->company_id,
             'customer_id' => $profile->customer_id,
@@ -85,11 +89,24 @@ class RecurringInvoiceService
             'lines' => $profile->lines ?? [],
         ]);
 
+        /*
+         * Welke periode deze factuur dekt: van deze beurt tot de dag vóór de
+         * volgende. Hier is dat exact bekend; overal daarna zou het gokwerk
+         * zijn uit de factuurdatum en de frequentie.
+         *
+         * Dat is niet alleen netjes. VvEMaat leidt hier de datum uit af tot
+         * wanneer een vereniging toegang houdt, en een gok betekent daar dat
+         * iemand te vroeg wordt buitengesloten of te lang doorwerkt zonder te
+         * betalen.
+         */
+        $invoice->forceFill([
+            'period_start' => $profile->next_run_on->toDateString(),
+            'period_end' => $next->copy()->subDay()->toDateString(),
+        ])->save();
+
         if ($profile->auto_send) {
             $invoice = $this->manager->send($invoice);
         }
-
-        $next = $profile->nextDateAfter($profile->next_run_on);
 
         $profile->forceFill([
             'last_run_on' => $profile->next_run_on,

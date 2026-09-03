@@ -43,6 +43,19 @@ Schedule::command('summaries:send')
     ->dailyAt('08:30')
     ->timezone('Europe/Amsterdam');
 
+/*
+ * Elk kwartier: betaalmeldingen aan VvEMaat die niet aankwamen alsnog sturen.
+ *
+ * De melding gaat mee zodra een betaling wordt vastgelegd; dit is het vangnet
+ * voor een storing of een netwerk dat er even uit lag. Vaker dan dagelijks,
+ * want aan die melding hangt of een vereniging haar administratie kan
+ * bijwerken — die hoort niet een nacht op slot te staan omdat wij een verzoek
+ * zijn kwijtgeraakt.
+ */
+Schedule::command('vvemaat:meld-betalingen')
+    ->everyFifteenMinutes()
+    ->withoutOverlapping();
+
 // Elke vijf minuten: herken nieuwe Postvak IN-items automatisch (scan & herken),
 // zodat er een kant-en-klaar boekingsvoorstel klaarligt.
 Schedule::command('purchases:scan-inbox')

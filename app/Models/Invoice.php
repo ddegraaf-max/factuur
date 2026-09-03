@@ -26,6 +26,10 @@ class Invoice extends Model
         'sent_at', 'scheduled_send_on', 'first_viewed_at', 'paid_at',
         'thanks_sent_at', 'thanks_sent_to',
         'incasso_sent_at', 'incasso_reference', 'incasso_handler', 'incasso_phase',
+        // Welke periode deze factuur dekt. Gevuld door de terugkerende
+        // facturatie, die hem exact kent. VvEMaat leidt daaruit af tot wanneer
+        // een vereniging toegang heeft, dus raden is hier geen optie.
+        'period_start', 'period_end',
     ];
 
     protected $casts = [
@@ -44,6 +48,9 @@ class Invoice extends Model
         'total' => 'decimal:2',
         'paid_total' => 'decimal:2',
         'vat_breakdown' => 'array',
+        'period_start' => 'date',
+        'period_end' => 'date',
+        'vvemaat_notified_at' => 'datetime',
     ];
 
     protected static function booted(): void
