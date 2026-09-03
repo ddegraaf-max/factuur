@@ -138,6 +138,7 @@ const form = useForm({
   mandate_type: props.customer?.mandate_type ?? 'CORE',
   mandate_status: props.customer?.mandate_status ?? 'active',
   mandate_reference: props.customer?.mandate_reference ?? '',
+  vvemaat_slug: props.customer?.vvemaat_slug ?? '',
 });
 
 const submit = () => {
@@ -321,6 +322,27 @@ const remove = () => {
               <button type="button" class="btn btn-secondary" style="width:100%;" @click="router.post(route('customers.peppol.check', customer.id), {}, { preserveScroll: true })">
                 ⚡ {{ $t('Check Peppol-bereikbaarheid') }}
               </button>
+            </div>
+          </div>
+
+          <!--
+            Alleen voor klanten die een VvEMaat-omgeving afnemen. Aan dit veld
+            hangt of een betaalde factuur wordt doorgegeven: staat het leeg, dan
+            gebeurt er niets en blijft die vereniging op slot staan zodra haar
+            proefperiode afloopt. Blijft leeg bij elke gewone klant.
+          -->
+          <div class="form-row" v-if="!isPolish">
+            <div class="form-group">
+              <label>{{ $t('VvEMaat-omgeving') }}<span class="muted" style="margin-left:6px;">{{ $t('(alleen voor VvE-klanten)') }}</span></label>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <input type="text" v-model="form.vvemaat_slug" maxlength="63"
+                       placeholder="keizersgracht214" style="flex:1;">
+                <span class="muted" style="white-space:nowrap;">.vvemaat.nl</span>
+              </div>
+              <div v-if="form.errors.vvemaat_slug" class="field-error">{{ form.errors.vvemaat_slug }}</div>
+              <div class="muted" style="font-size:12px;margin-top:4px;">
+                {{ $t('Zodra een factuur van deze klant is voldaan, krijgt deze omgeving door tot wanneer er is betaald.') }}
+              </div>
             </div>
           </div>
         </div>

@@ -205,6 +205,18 @@ class CustomerController extends Controller
 
     protected function validatedRules(Request $request): array
     {
+        /*
+         * Het subdomein eerst gelijktrekken, dan pas toetsen. Wie
+         * "Keizersgracht214" of " keizersgracht214 " intypt bedoelt hetzelfde;
+         * daar een foutmelding voor teruggeven is streng zonder dat het iets
+         * oplevert. Wat er daarna nog fout aan is, is echt fout.
+         */
+        if ($request->has('vvemaat_slug')) {
+            $request->merge([
+                'vvemaat_slug' => strtolower(trim((string) $request->input('vvemaat_slug'))) ?: null,
+            ]);
+        }
+
         return $request->validate([
             'mandate_reference' => ['nullable', 'string', 'max:35', 'regex:/^[A-Za-z0-9+?\/\-:().,\' ]+$/'],
             'mandate_iban' => ['nullable', 'string', 'max:40', function ($attr, $value, $fail) {
@@ -230,6 +242,19 @@ class CustomerController extends Controller
             'payment_terms' => ['nullable', 'integer', 'min:0', 'max:365'],
             'hourly_rate' => ['nullable', 'numeric', 'min:0', 'max:99999'],
             'notes' => ['nullable', 'string'],
+            /*
+             * Het subdomein van de VvE-omgeving die bij deze klant hoort.
+             *
+             * Aan dit veld hangt of een betaalde factuur wordt doorgegeven aan
+             * VvEMaat, en dus of het bestuur van die vereniging zijn
+             * administratie kan blijven bijwerken. Een typefout betekent dat de
+             * melding naar een omgeving gaat die niet bestaat en de juiste op
+             * slot blijft — vandaar dezelfde vorm als VvEMaat zelf toestaat:
+             * kleine letters, cijfers en koppeltekens, en niet beginnen of
+             * eindigen met een koppelteken.
+             */
+            'vvemaat_slug' => ['nullable', 'string', 'max:63',
+                'regex:/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/'],
         ]);
     }
 }

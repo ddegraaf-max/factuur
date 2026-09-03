@@ -211,6 +211,18 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
               <template v-if="customer.kvk_number"><dt>{{ market.registry?.short || 'KVK' }}</dt><dd class="mono">{{ customer.kvk_number }}</dd></template>
               <template v-if="customer.vat_number"><dt>{{ market.tax_id?.label || $t('Btw-nummer') }}</dt><dd class="mono">{{ customer.vat_number }}</dd></template>
               <template v-if="customer.peppol_id"><dt>Peppol</dt><dd class="mono">{{ customer.peppol_id }}<span v-if="customer.peppol_available" class="tag ok">{{ $t('bereikbaar') }}</span></dd></template>
+              <!--
+                Staat hier een omgeving, dan krijgt die bij elke voldane
+                factuur door tot wanneer er is betaald. Zichtbaar maken is het
+                halve werk: staat het er niet, dan is dat te zien in plaats van
+                dat je je afvraagt waarom een vereniging op slot ging.
+              -->
+              <template v-if="customer.vvemaat_slug">
+                <dt>VvEMaat</dt>
+                <dd class="mono">
+                  <a :href="`https://${customer.vvemaat_slug}.vvemaat.nl`" target="_blank" rel="noopener noreferrer">{{ customer.vvemaat_slug }}.vvemaat.nl</a>
+                </dd>
+              </template>
               <dt>{{ $t('Taal') }}</dt><dd>{{ languageLabel }}</dd>
               <dt>{{ $t('Betaaltermijn') }}</dt><dd>{{ customer.payment_terms ? $t(':n dagen', { n: customer.payment_terms }) : $t('Standaard van je bedrijf') }}</dd>
               <template v-if="customer.hourly_rate"><dt>{{ $t('Uurtarief') }}</dt><dd>{{ eur(customer.hourly_rate) }}</dd></template>

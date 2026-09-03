@@ -181,6 +181,59 @@ class VvemaatKoppelingTest extends TestCase
         $this->assertFalse(app(VvemaatService::class)->actief());
     }
 
+    public function test_de_omgeving_is_via_het_klantformulier_in_te_stellen(): void
+    {
+        /*
+         * Zonder dit veld in het formulier bestaat de koppeling wel in de
+         * database maar kan niemand hem aanzetten. Dat is precies het soort gat
+         * waardoor iets "af" lijkt en niets doet.
+         */
+        $user = $this->demoUser();
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $user->company_id,
+            'name' => 'VvE Keizersgracht 214',
+            'country' => 'NL',
+            'type' => 'business',
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('customers.update', $klant), [
+                'name' => $klant->name,
+                'type' => 'business',
+                'country' => 'NL',
+                // Met hoofdletters en spaties eromheen: dat hoort gewoon goed
+                // te komen in plaats van een foutmelding op te leveren.
+                'vvemaat_slug' => '  Keizersgracht214  ',
+            ])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('keizersgracht214', $klant->fresh()->vvemaat_slug);
+    }
+
+    public function test_een_onmogelijk_subdomein_wordt_geweigerd(): void
+    {
+        $user = $this->demoUser();
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $user->company_id,
+            'name' => 'VvE Keizersgracht 214',
+            'country' => 'NL',
+            'type' => 'business',
+        ]);
+
+        // Een typefout hier stuurt de melding naar een omgeving die niet
+        // bestaat, terwijl de juiste op slot blijft staan.
+        $this->actingAs($user)
+            ->put(route('customers.update', $klant), [
+                'name' => $klant->name,
+                'type' => 'business',
+                'country' => 'NL',
+                'vvemaat_slug' => 'niet dit_mag',
+            ])
+            ->assertSessionHasErrors('vvemaat_slug');
+
+        $this->assertNull($klant->fresh()->vvemaat_slug);
+    }
+
     public function test_een_al_gemelde_factuur_wordt_niet_opnieuw_gemeld(): void
     {
         Http::fake(['vvemaat.test/*' => Http::response(['ok' => true], 200)]);
