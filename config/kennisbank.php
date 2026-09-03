@@ -11,6 +11,7 @@
 |   'category' => groepsnaam (voor navigatie/labels)
 |   'title'    => titel van het artikel
 |   'intro'    => korte inleiding (ook de meta-description)
+|   'updated'  => datum laatste inhoudelijke wijziging (Y-m-d); wordt lastmod in de sitemap
 |   'sections' => lijst van [kop, [alinea's...]]
 |
 | Let op: fiscale bedragen en regels veranderen — check bij twijfel de
@@ -23,6 +24,7 @@ return [
         // ---------- FACTUREREN ----------
         'factuureisen' => [
             'category' => 'Factureren',
+            'updated' => '2026-08-22',
             'title' => 'Wat moet er verplicht op een factuur staan?',
             'intro' => 'De Belastingdienst stelt duidelijke eisen aan een factuur. Dit is de complete checklist — plus de veelgemaakte fouten die je btw-aftrek bij je klant in gevaar brengen.',
             'sections' => [
@@ -51,6 +53,7 @@ return [
 
         'factuurnummering' => [
             'category' => 'Factureren',
+            'updated' => '2026-08-22',
             'title' => 'Factuurnummers: de regels en een goed systeem',
             'intro' => 'Factuurnummers moeten opeenvolgend en uniek zijn — maar hoe richt je dat handig in? De regels, de valkuilen en drie bewezen nummeringssystemen.',
             'sections' => [
@@ -77,6 +80,7 @@ return [
 
         'eerste-factuur-als-zzper' => [
             'category' => 'Factureren',
+            'updated' => '2026-08-22',
             'title' => 'Je eerste factuur sturen als zzp\'er: stappenplan',
             'intro' => 'Eerste opdracht binnen? Zo stuur je een factuur die klopt — van de verplichte gegevens tot de betalingstermijn, in zes stappen.',
             'sections' => [
@@ -104,6 +108,7 @@ return [
         // ---------- BTW & BELASTINGDIENST ----------
         'btw-tarieven' => [
             'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-08-22',
             'title' => 'Btw-tarieven: wanneer reken je 21%, 9% of 0%?',
             'intro' => 'Nederland kent drie btw-tarieven en een handvol vrijstellingen. Zo weet je welk tarief jij op je factuur zet — en wat het verschil is tussen 0% en vrijgesteld.',
             'sections' => [
@@ -130,6 +135,7 @@ return [
 
         'kleineondernemersregeling-kor' => [
             'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-08-22',
             'title' => 'De KOR: factureren zonder btw — slim of niet?',
             'intro' => 'Blijft je omzet onder de € 20.000 per jaar, dan kun je met de kleineondernemersregeling (KOR) zonder btw factureren. Zo werkt het — en zo bepaal je of het voor jou gunstig is.',
             'sections' => [
@@ -157,6 +163,7 @@ return [
         // ---------- BETAALD KRIJGEN ----------
         'betalingstermijn-aanmanen' => [
             'category' => 'Betaald krijgen',
+            'updated' => '2026-08-22',
             'title' => 'Betalingstermijnen, herinneren en aanmanen: zo krijg je betaald',
             'intro' => 'Van de wettelijke betalingstermijn tot incassokosten: dit zijn de regels als een klant niet betaalt — en de aanpak die facturen daadwerkelijk betaald krijgt.',
             'sections' => [
@@ -184,6 +191,7 @@ return [
         // ---------- MEER ARTIKELEN (3 september 2026) ----------
         'eindfactuur' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Eindfactuur: wat het is en hoe je hem opstelt na deelfacturen",
             'intro' => "Heb je een opdracht in termijnen gefactureerd, dan sluit je af met een eindfactuur. Wat erop moet staan, hoe je eerdere termijnen verrekent en welke fouten je klant en je boekhouder gek maken.",
             'sections' => [
@@ -213,6 +221,7 @@ return [
 
         'deelfactuur-termijnfactuur' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Deelfactuur en termijnfactuur: in delen factureren zonder gedoe",
             'intro' => "Bij een grote opdracht wil je niet maanden op je geld wachten. Met deelfacturen of termijnen factureer je tussentijds. Zo spreek je het af, zo zet je het op de factuur en zo blijft de btw kloppen.",
             'sections' => [
@@ -242,6 +251,7 @@ return [
 
         'voorschotfactuur-aanbetaling' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Voorschotfactuur en aanbetaling: regels, btw en een voorbeeld",
             'intro' => "Een aanbetaling vragen is normaal bij grotere opdrachten of nieuwe klanten. Maar hoe factureer je een voorschot, wanneer draag je de btw af en hoe verreken je het later?",
             'sections' => [
@@ -270,6 +280,7 @@ return [
 
         'proforma-factuur' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Proforma factuur: wat is het en wanneer gebruik je hem?",
             'intro' => "Een proforma factuur ziet eruit als een factuur, maar is er geen. Wanneer hij nuttig is, wat het verschil met een offerte is, en waarom je hem nooit in je factuurreeks mag opnemen.",
             'sections' => [
@@ -295,6 +306,7 @@ return [
 
         'creditnota-maken' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Creditnota maken: wanneer, hoe en met welk nummer",
             'intro' => "Een verstuurde factuur kun je niet weggooien of aanpassen. Fout gemaakt, korting achteraf of retour? Dan maak je een creditnota. Zo doe je dat goed, ook voor de btw.",
             'sections' => [
@@ -323,6 +335,7 @@ return [
 
         'factuur-zonder-kvk' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Factureren zonder KVK-inschrijving: mag dat?",
             'intro' => "Je hebt een klus gedaan en wilt een factuur sturen, maar je staat (nog) niet bij de KVK ingeschreven. Wat mag, wat moet, en wanneer je je wél moet inschrijven.",
             'sections' => [
@@ -350,6 +363,7 @@ return [
 
         'factuur-app-kiezen' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Een factuur-app kiezen als zzp'er: waar let je op?",
             'intro' => "Er zijn tientallen factuur-apps. De verschillen zitten niet in het maken van de factuur, maar in wat eromheen gebeurt: herinneringen, btw, bonnen, je boekhouder en wat het je écht kost. Een checklist.",
             'sections' => [
@@ -377,6 +391,7 @@ return [
 
         'terugkerende-facturen-abonnementen' => [
             'category' => 'Factureren',
+            'updated' => '2026-09-03',
             'title' => "Terugkerende facturen: maandelijks factureren en abonnementen",
             'intro' => "Vaste klanten, onderhoudscontracten, abonnementen: elke maand dezelfde factuur maken is zonde van je tijd en foutgevoelig. Zo richt je terugkerende facturatie in, van afspraak tot automatische incasso.",
             'sections' => [
@@ -404,6 +419,7 @@ return [
 
         'btw-aangifte-kwartaal-stappenplan' => [
             'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-09-03',
             'title' => "Btw-aangifte per kwartaal: stap voor stap (2026)",
             'intro' => "Elk kwartaal dezelfde vraag: welke rubriek, welk bedrag, wanneer betalen? Dit stappenplan loopt de aangifte omzetbelasting van begin tot eind door, inclusief de deadlines en de fouten die een boete opleveren.",
             'sections' => [
@@ -434,6 +450,7 @@ return [
 
         'factureren-buitenland-btw-verlegd' => [
             'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-09-03',
             'title' => "Factureren naar het buitenland: btw verlegd, ICP en 0%",
             'intro' => "Een klant in Duitsland, een opdrachtgever in de VS: wat zet je op de factuur, reken je btw en waar geef je het aan? De regels voor zakelijke klanten binnen en buiten de EU, zonder juridisch jargon.",
             'sections' => [
@@ -461,6 +478,7 @@ return [
 
         'btw-terugvragen-voorbelasting' => [
             'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-09-03',
             'title' => "Btw terugvragen: welke kosten wel en niet (voorbelasting)",
             'intro' => "De btw op je zakelijke kosten krijg je terug via de aangifte. Maar niet op alles, en niet zonder de juiste bon. Wat je mag aftrekken, waar de Belastingdienst streng op is, en hoe je het administratief simpel houdt.",
             'sections' => [
@@ -490,6 +508,7 @@ return [
 
         'zelfstandigenaftrek-urencriterium-2026' => [
             'category' => "Ondernemen als zzp'er",
+            'updated' => '2026-09-03',
             'title' => "Zelfstandigenaftrek en urencriterium 2026: bedragen en regels",
             'intro' => "De zelfstandigenaftrek wordt elk jaar kleiner, maar samen met de startersaftrek en de mkb-winstvrijstelling scheelt hij nog steeds honderden tot duizenden euro's belasting. Voorwaarde: het urencriterium. De cijfers voor 2026.",
             'sections' => [
@@ -518,6 +537,7 @@ return [
 
         'kilometervergoeding-zzp-2026' => [
             'category' => "Ondernemen als zzp'er",
+            'updated' => '2026-09-03',
             'title' => "Kilometers als zzp'er: 0,23 euro per km, registratie en regels (2026)",
             'intro' => "Rijd je met je privéauto naar klanten, dan mag je per zakelijke kilometer een vast bedrag aftrekken. Hoeveel dat is, wat je moet bijhouden en wanneer een auto op de zaak beter uitpakt.",
             'sections' => [
@@ -545,6 +565,7 @@ return [
 
         'bewaarplicht-administratie' => [
             'category' => "Ondernemen als zzp'er",
+            'updated' => '2026-09-03',
             'title' => "Bewaarplicht: hoe lang bewaar je facturen en administratie?",
             'intro' => "Zeven jaar, meestal. Maar wat valt er precies onder, wanneer begint de termijn, mag het digitaal en wat gebeurt er als je het niet doet? De bewaarplicht voor zzp'ers en mkb in gewone taal.",
             'sections' => [
@@ -573,6 +594,7 @@ return [
 
         'incassokosten-wettelijke-rente-berekenen' => [
             'category' => 'Betaald krijgen',
+            'updated' => '2026-09-03',
             'title' => "Incassokosten en wettelijke rente berekenen: de staffel (2026)",
             'intro' => "Betaalt een klant te laat, dan mag je incassokosten en rente rekenen. Hoeveel precies ligt vast in de wet. De staffel, het verschil tussen zakelijke klanten en consumenten, en hoe je het op de aanmaning zet.",
             'sections' => [

@@ -90,3 +90,6 @@ Schedule::command('ponto:sync')
     ->cron('40 6,12,18 * * *')
     ->timezone('Europe/Amsterdam')
     ->withoutOverlapping();
+
+// Zoekmachines (Bing en partners) de sitemap laten weten na een nieuwe versie.
+Schedule::command('seo:indexnow')->dailyAt('06:40');

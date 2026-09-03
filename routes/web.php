@@ -53,6 +53,12 @@ Route::get('/manifest.webmanifest', fn () => response()->json(
 Route::get('/robots.txt', fn () => response(
     "User-agent: *\nDisallow: /lang/\n\nSitemap: " . \App\Support\Brand::url('sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']
 ))->name('robots');
+// IndexNow-sleutelbestand (bewijst aan Bing en partners dat wij deze site zijn); sleutel afgeleid van APP_KEY.
+Route::get('/{key}.txt', function (string $key) {
+    abort_unless(hash_equals(\App\Support\IndexNow::key(), $key), 404);
+
+    return response($key, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
+})->where('key', '[a-f0-9]{32}')->name('indexnow.key');
 
 // Poolse markt: NIP-opzoeken (biała lista) ook vóór het inloggen, voor het registratieformulier.
 Route::get('/api/nip/{nip}', [\App\Http\Controllers\NipController::class, 'lookup'])

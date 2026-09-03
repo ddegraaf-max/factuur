@@ -76,4 +76,11 @@ class SitemapTest extends TestCase
         $this->actingAs($this->demoUser());
         $this->get('/dashboard')->assertOk()->assertSee('name="robots" content="noindex"', false);
     }
+
+    public function test_articles_carry_their_updated_date_as_lastmod(): void
+    {
+        $xml = (string) $this->get('/sitemap-kennisbank.xml')->assertOk()->getContent();
+        $this->assertStringContainsString('<loc>' . url('/kennisbank/eindfactuur') . '</loc><lastmod>2026-09-03</lastmod>', $xml);
+        $this->assertStringContainsString('<loc>' . url('/kennisbank/factuureisen') . '</loc><lastmod>2026-08-22</lastmod>', $xml);
+    }
 }

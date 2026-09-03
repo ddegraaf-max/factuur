@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.50.0</div>
+        <h2>Zoekmachines automatisch op de hoogte</h2>
+        <ul class="tl-list">
+          <li><b>IndexNow</b> — na elke nieuwe versie melden we alle pagina's uit de sitemap direct aan bij Bing en partnerzoekmachines, ook je gepubliceerde website en visitekaartje. Geen handwerk meer.</li>
+          <li><b>Wijzigingsdatums in de sitemap</b> — elk kennisbankartikel draagt zijn laatste wijzigingsdatum, zodat Google weet wat er nieuw is.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.49.0</div>
         <h2>Kennisbank: vijftien nieuwe artikelen</h2>
         <ul class="tl-list">
