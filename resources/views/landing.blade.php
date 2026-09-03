@@ -634,6 +634,36 @@
   </div>
 </section>
 
+<!-- Kennisbank: interne links vanaf de homepage, zodat zoekmachines de artikelen vinden -->
+<section class="section" id="kennisbank">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow" style="margin-bottom:16px;">Kennisbank</div>
+      <h2>Factureren, btw en betaald krijgen: zo zit het.</h2>
+      <p>Praktische antwoorden voor zzp'ers en mkb, geschreven door mensen die dagelijks facturen en incasso's zien.</p>
+    </div>
+
+    @php
+      $kbSlugs = ['factuureisen', 'eindfactuur', 'btw-aangifte-kwartaal-stappenplan', 'zelfstandigenaftrek-urencriterium-2026', 'incassokosten-wettelijke-rente-berekenen', 'factuur-zonder-kvk'];
+      $kbArticles = collect(config('kennisbank.articles'))->only($kbSlugs);
+    @endphp
+    <div class="features-grid">
+      @foreach ($kbArticles as $slug => $article)
+      <a class="feature-card" href="{{ url('/kennisbank/' . $slug) }}" style="display:block;color:inherit;text-decoration:none;">
+        <div class="feature-title">{{ $article['title'] }}</div>
+        <div class="feature-desc">{{ Str::limit($article['intro'], 120) }}</div>
+      </a>
+      @endforeach
+    </div>
+
+    <p style="text-align:center;margin-top:28px;">
+      <a href="{{ route('kennisbank') }}" style="color:var(--brand);font-weight:600;">Alle artikelen in de kennisbank →</a>
+      &nbsp;·&nbsp; <a href="{{ route('gratis-factuur') }}" style="color:var(--brand);font-weight:600;">Gratis factuur maken</a>
+      &nbsp;·&nbsp; <a href="{{ route('btw-calculator') }}" style="color:var(--brand);font-weight:600;">Btw-calculator</a>
+    </p>
+  </div>
+</section>
+
 <!-- FAQ -->
 <section class="section section-alt" id="faq">
   <div class="container">

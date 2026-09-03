@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.49.0</div>
+        <h2>Kennisbank: vijftien nieuwe artikelen</h2>
+        <ul class="tl-list">
+          <li><b>Factureren</b> — eindfactuur, deelfactuur en termijnen, voorschotfactuur, proforma, creditnota, factureren zonder KVK, een factuur-app kiezen en terugkerende facturen.</li>
+          <li><b>Btw</b> — de btw-aangifte per kwartaal stap voor stap, factureren naar het buitenland (btw verlegd, ICP, 0%) en btw terugvragen over je kosten.</li>
+          <li><b>Ondernemen</b> — zelfstandigenaftrek en urencriterium 2026, kilometers als zzp'er, de bewaarplicht, en incassokosten en wettelijke rente berekenen.</li>
+          <li><b>Op de homepage</b> — een selectie uit de kennisbank, met directe links naar de gratis tools.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.48.0</div>
         <h2>Beter vindbaar in zoekmachines</h2>
         <ul class="tl-list">
