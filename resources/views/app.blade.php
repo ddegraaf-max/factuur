@@ -21,6 +21,10 @@
         $seo = $seoPages[request()->path()] ?? null;
     @endphp
     <title inertia>{{ $seo['title'] ?? brand('name') }}</title>
+    @unless($seo)
+        {{-- De app zelf en de tokenpagina's (factuur/offerte voor de klant) horen niet in zoekmachines. --}}
+        <meta name="robots" content="noindex">
+    @endunless
     @if($seo)
         <meta name="description" content="{{ $seo['description'] }}">
         <link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">

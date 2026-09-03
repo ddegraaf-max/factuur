@@ -68,7 +68,7 @@ class MarketTest extends TestCase
             $this->get($path)->assertNotFound();
         }
 
-        $sitemap = (string) $this->get('/sitemap.xml')->assertOk()->getContent();
+        $sitemap = implode(' ', $this->sitemapUrls());
         $this->assertStringContainsString('/kalkulator-odsetek', $sitemap);
         $this->assertStringNotContainsString('/kennisbank', $sitemap);
 

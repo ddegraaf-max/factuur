@@ -51,7 +51,7 @@ Route::get('/manifest.webmanifest', fn () => response()->json(
     \App\Support\Brand::manifest(), 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
 ))->name('manifest');
 Route::get('/robots.txt', fn () => response(
-    "User-agent: *\nDisallow:\n\nSitemap: " . \App\Support\Brand::url('sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']
+    "User-agent: *\nDisallow: /lang/\n\nSitemap: " . \App\Support\Brand::url('sitemap.xml') . "\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']
 ))->name('robots');
 
 // Poolse markt: NIP-opzoeken (biała lista) ook vóór het inloggen, voor het registratieformulier.
@@ -228,43 +228,12 @@ Route::middleware('market:pl')->name('pl.')->group(function () {
     })->name('przenies');
 });
 
-// ---------- SITEMAP (voor zoekmachines) ----------
-// Dynamisch: nieuwe helpartikelen in config/help.php lopen automatisch mee.
-Route::get('/sitemap.xml', function () {
-    if (\App\Support\Market::isPl()) {
-        // Lopra Polska: alleen de Poolse pagina's.
-        $paths = [
-            '/', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/kalkulator-odsetek', '/skup-wyrokow',
-            '/status', '/login', '/register',
-            '/przenies-sie-z/fakturownia', '/przenies-sie-z/ifirma', '/przenies-sie-z/wfirma', '/przenies-sie-z/infakt',
-        ];
-    } else {
-        $paths = [
-            '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum',
-            '/roadmap', '/wat-is-nieuw', '/status', '/privacy', '/voorwaarden', '/cookies',
-            '/login', '/register',
-            '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
-            '/facturatie-met-ai', '/boekhouders', '/kennisbank', '/verwerkersovereenkomst',
-            '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
-        ];
-        foreach (array_keys(config('help.articles', [])) as $slug) {
-            $paths[] = '/helpcentrum/' . $slug;
-        }
-        foreach (array_keys(config('kennisbank.articles', [])) as $slug) {
-            $paths[] = '/kennisbank/' . $slug;
-        }
-
-    }
-
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-        . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-    foreach ($paths as $path) {
-        $xml .= '  <url><loc>' . e(url($path)) . '</loc></url>' . "\n";
-    }
-    $xml .= '</urlset>';
-
-    return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
-})->name('sitemap');
+// ---------- SITEMAPS (voor zoekmachines) ----------
+// Index met deelsitemaps per onderwerp; nieuwe help- en kennisbankartikelen en
+// gepubliceerde websites/visitekaartjes van administraties lopen automatisch mee.
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap-{name}.xml', [\App\Http\Controllers\SitemapController::class, 'show'])
+    ->where('name', '[a-z]+')->name('sitemap.section');
 Route::view('/voorwaarden', 'marketing.voorwaarden')->name('voorwaarden')->middleware('market:nl');
 Route::view('/privacy', 'marketing.privacy')->name('privacy')->middleware('market:nl');
 Route::view('/cookies', 'marketing.cookies')->name('cookies')->middleware('market:nl');

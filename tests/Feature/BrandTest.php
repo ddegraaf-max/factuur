@@ -130,7 +130,7 @@ class BrandTest extends TestCase
         }
 
         // De sitemap mag geen pagina's noemen die onder Lopra niet bestaan.
-        $this->get('/sitemap.xml')->assertOk()->assertDontSee('zocht-u-een-ander');
+        $this->assertStringNotContainsString('zocht-u-een-ander', implode(' ', $this->sitemapUrls()));
     }
 
     /**

@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.48.0</div>
+        <h2>Beter vindbaar in zoekmachines</h2>
+        <ul class="tl-list">
+          <li><b>Je website en visitekaartje worden aangemeld</b> — publiceer je website of digitale visitekaartje in {{ brand('name') }}, dan staat de pagina automatisch in onze sitemap voor Google en Bing. Zo wordt je bedrijf sneller gevonden.</li>
+          <li><b>Sitemaps per onderwerp</b> — helpcentrum, kennisbank, gratis tools en overstappagina's hebben elk een eigen sitemap, zodat nieuwe artikelen snel worden opgepikt.</li>
+          <li><b>Privé blijft privé</b> — de app zelf en de factuur- en offertelinks voor je klanten blijven buiten zoekmachines.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 1 september 2026 · {{ brand('version_prefix') }} 1.46.1</div>
         <h2>Kleine verbeteringen</h2>
         <ul class="tl-list">
