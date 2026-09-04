@@ -268,6 +268,44 @@ class QuoteManager
     }
 
     /**
+     * Een afgewezen of verlopen offerte opnieuw aanbieden: terug naar concept
+     * met een nieuwe offertedatum en geldigheidsdatum, zodat je hem kunt
+     * aanpassen en opnieuw versturen. Nummer en portaallink blijven; de eerdere
+     * beslissing van de klant (afwijzing, reden, ondertekening) wordt gewist,
+     * want die ging over het vorige voorstel. Het logboek bewaart de historie.
+     */
+    public function reopen(Quote $quote): Quote
+    {
+        if (! in_array($quote->status, ['rejected', 'expired'], true)) {
+            throw new \DomainException(__('Alleen een afgewezen of verlopen offerte kun je opnieuw aanbieden.'));
+        }
+        if ($quote->converted_invoice_id) {
+            throw new \DomainException(__('Deze offerte is al omgezet in een factuur.'));
+        }
+
+        $validDays = max(1, (int) ($quote->company?->quote_valid_days ?? 30));
+        $quote->forceFill([
+            'status' => 'draft',
+            'quote_date' => now(),
+            'valid_until' => now()->addDays($validDays),
+            'sent_at' => null,
+            'accepted_at' => null,
+            'rejected_at' => null,
+            'decline_reason' => null,
+            'signed_name' => null,
+            'signature_data' => null,
+            'signed_at' => null,
+            'signed_ip' => null,
+            'signed_email' => null,
+            'accept_mail_sent_at' => null,
+            'accept_mail_sent_to' => null,
+        ])->save();
+        \App\Support\Audit::log('reopened', $quote, __(':label opnieuw aangeboden (terug naar concept)', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
+
+        return $quote->fresh();
+    }
+
+    /**
      * Zet de offerte om in een concept-factuur met dezelfde regels.
      * De offerte blijft bestaan als vastlegging van de afspraak.
      */

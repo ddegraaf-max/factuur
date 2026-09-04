@@ -18,6 +18,8 @@ const pageError = computed(() => (page.props.errors || {}).quote ?? null);
 
 const isOpen = computed(() => ['sent', 'expired'].includes(props.quote.status));
 const canEdit = computed(() => ['draft', 'sent'].includes(props.quote.status));
+// Afgewezen of verlopen: opnieuw aanbieden (terug naar concept), tenzij er al een factuur uit is gemaakt.
+const canReopen = computed(() => ['rejected', 'expired'].includes(props.quote.status) && !props.quote.invoice);
 
 const pillClass = computed(() => ({
   draft: 'pill-draft',
@@ -56,6 +58,11 @@ const reject = () => {
   if (confirm(t('Offerte markeren als afgewezen?'))) {
     router.post(route('quotes.reject', props.quote.id), {}, { preserveScroll: true });
   }
+};
+
+const reopen = () => {
+  if (!confirm(t('Offerte opnieuw aanbieden? Hij gaat terug naar concept met een nieuwe geldigheidsdatum; daarna kun je hem aanpassen en opnieuw versturen.'))) return;
+  router.post(route('quotes.reopen', props.quote.id), {}, { preserveScroll: true });
 };
 
 const convert = () => {
@@ -176,7 +183,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <p class="page-subtitle">
           <template v-if="quote.status === 'draft'">{{ $t('Concept · nog niet verstuurd') }}</template>
           <template v-else-if="quote.status === 'accepted'">{{ $t('Geaccepteerd op :date', { date: quote.accepted_at_label }) }}<template v-if="quote.accept_mail_sent_at_label"> · {{ $t('bevestiging gemaild :date', { date: quote.accept_mail_sent_at_label }) }}</template></template>
-          <template v-else-if="quote.status === 'rejected'">{{ $t('Afgewezen op :date', { date: quote.rejected_at_label }) }}</template>
+          <template v-else-if="quote.status === 'rejected'">{{ $t('Afgewezen op :date', { date: quote.rejected_at_label }) }}<template v-if="quote.decline_reason"> · {{ $t('Reden van de klant: :reason', { reason: quote.decline_reason }) }}</template></template>
           <template v-else-if="quote.sent_at_label">{{ $t('Verstuurd op :date', { date: quote.sent_at_label }) }}</template>
           <template v-if="quote.brand_profile_name"> · {{ $t('als') }} <b>{{ quote.brand_profile_name }}</b></template>
           <template v-if="quote.language === 'en'"> · {{ $t('Engelstalig') }}</template>
@@ -196,6 +203,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           {{ quote.accept_mail_sent_at_label ? $t('Bevestiging opnieuw mailen') : $t('Bevestiging mailen') }}
         </button>
         <Link v-if="canEdit" :href="route('quotes.edit', quote.id)" class="btn btn-secondary btn-sm">{{ $t('Bewerken') }}</Link>
+        <button v-if="canReopen" class="btn btn-primary btn-sm" @click="reopen">{{ $t('Opnieuw aanbieden') }}</button>
         <button v-if="quote.status === 'draft'" class="btn btn-danger btn-sm" @click="destroy">{{ $t('Verwijder') }}</button>
         <button v-if="canEdit" class="btn btn-primary btn-sm" @click="send">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>

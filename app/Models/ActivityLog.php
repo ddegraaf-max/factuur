@@ -28,6 +28,7 @@ class ActivityLog extends Model
         'reminded' => 'Herinnering',
         'accepted' => 'Geaccepteerd',
         'rejected' => 'Afgewezen',
+        'reopened' => 'Opnieuw aangeboden',
         'paid' => 'Betaald',
         'login' => 'Ingelogd',
         'logout' => 'Uitgelogd',

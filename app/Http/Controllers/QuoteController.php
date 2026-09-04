@@ -293,6 +293,18 @@ class QuoteController extends Controller
         return back()->with('flash', __('Offerte gemarkeerd als afgewezen.'));
     }
 
+    /** Afgewezen of verlopen offerte opnieuw aanbieden: terug naar concept, daarna aanpassen en versturen. */
+    public function reopen(Quote $quote): RedirectResponse
+    {
+        try {
+            $this->manager->reopen($quote);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Offerte teruggezet naar concept met een nieuwe geldigheidsdatum. Pas hem aan als je wilt en verstuur hem opnieuw.'));
+    }
+
     public function convert(Quote $quote): RedirectResponse
     {
         try {

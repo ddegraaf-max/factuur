@@ -9,7 +9,6 @@
   "Nog geen facturen": "Brak faktur",
   "Begin met je eerste factuur.": "Zacznij od swojej pierwszej faktury.",
   "Maak je eerste factuur": "Utwórz pierwszą fakturę",
-
   "Factuur :number": "Faktura :number",
   "Factuur bewerken": "Edytuj fakturę",
   "Opslaan als concept": "Zapisz jako szkic",
@@ -55,7 +54,6 @@
   "Excl. BTW (:rate%)": "Netto (:rate%)",
   "Verrekend / doorgestort": "Rozliczono / wpłacono wcześniej",
   "Klantgegevens": "Dane klienta",
-
   "Factuur via het Peppol-netwerk afleveren in het boekhoudpakket van de klant?": "Dostarczyć fakturę przez sieć Peppol do systemu księgowego klienta?",
   "Creditnota definitief maken? Er wordt een definitief creditnotanummer toegekend.": "Zatwierdzić fakturę korygującą? Zostanie nadany ostateczny numer.",
   "Minnelijk traject": "Postępowanie polubowne",
@@ -121,7 +119,6 @@
   "Dossiernummer": "Numer sprawy",
   "Overgedragen op": "Przekazano dnia",
   "Fase": "Etap",
-
   "Formele aanmaning, wettelijke rente en vergoeding van incassokosten — of draag de vordering over aan :partner.": "Wezwanie do zapłaty, odsetki ustawowe i rekompensata za koszty odzyskiwania — lub przekaż wierzytelność do :partner.",
   "Berekening verbergen": "Ukryj wyliczenie",
   "Berekening tonen": "Pokaż wyliczenie",
@@ -145,7 +142,6 @@
   "KSeF-nummer": "Numer KSeF",
   "Toegekend KSeF-nummer": "Nadany numer KSeF",
   "KSeF-nummer opslaan": "Zapisz numer KSeF",
-
   "Creditnota's op deze factuur": "Faktury korygujące do tej faktury",
   "Hoort bij factuur": "Dotyczy faktury",
   ":number bekijken": "Zobacz :number",
@@ -183,7 +179,6 @@
   "Methode": "Metoda",
   "Afboeking": "Odpis",
   "Doorgestort": "Wpłacono wcześniej",
-
   "Betaling ontvangen": "Otrzymano płatność",
   "Er is echt geld binnengekomen (bank, contant, pin…).": "Pieniądze faktycznie wpłynęły (przelew, gotówka, karta…).",
   "Een al doorgestort bedrag dat op de factuur in mindering komt op \"Te betalen\". Verschijnt op de PDF; totaal en BTW blijven gelijk.": "Kwota wpłacona wcześniej, która pomniejsza na fakturze \"Do zapłaty\". Pojawi się na PDF; suma i VAT pozostają bez zmian.",
@@ -202,19 +197,16 @@
   "Registreren": "Zarejestruj",
   "Verrekenen": "Rozlicz",
   "Afboeken": "Odpisz",
-
   "Creditnota maken": "Wystaw fakturę korygującą",
   "Een creditnota corrigeert factuur <b>:number</b> van :customer. De oorspronkelijke factuur blijft ongewijzigd bestaan — zo blijft je administratie kloppen.": "Faktura korygująca koryguje fakturę <b>:number</b> dla :customer. Pierwotna faktura pozostaje bez zmian — dzięki temu Twoja księgowość się zgadza.",
   "Volledig crediteren": "Skoryguj w całości",
   "Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer.": "Cała kwota :amount zostanie zwrócona. Faktura korygująca od razu otrzyma ostateczny numer.",
   "Gedeeltelijk crediteren": "Skoryguj częściowo",
   "Je opent een concept waarin je zelf de regels en bedragen aanpast. Pas daarna maak je hem definitief.": "Otworzysz szkic, w którym samodzielnie dostosujesz pozycje i kwoty. Dopiero potem go zatwierdzisz.",
-
   "Factuur inplannen": "Zaplanuj wysyłkę faktury",
   "Op de gekozen datum wordt deze factuur 's ochtends automatisch definitief gemaakt en per e-mail verstuurd naar <b>:email</b>. Tot die tijd blijft het een concept dat je kunt aanpassen of annuleren.": "W wybranym dniu rano faktura zostanie automatycznie zatwierdzona i wysłana e-mailem do <b>:email</b>. Do tego czasu pozostaje szkicem, który możesz edytować lub anulować.",
   "de klant": "klienta",
   "Versturen op": "Wyślij dnia",
-
   "De regels van deze factuur worden elke periode automatisch opnieuw gefactureerd aan <b>:customer</b>. Beheren doe je via <b>Verkoop → Terugkerend</b>.": "Pozycje tej faktury będą co okres automatycznie fakturowane ponownie dla <b>:customer</b>. Zarządzasz tym w <b>Sprzedaż → Cykliczne</b>.",
   "Frequentie": "Częstotliwość",
   "Wekelijks": "Co tydzień",
@@ -228,7 +220,6 @@
   "Als concept klaarzetten (zelf controleren en versturen)": "Przygotuj jako szkic (sam sprawdzasz i wysyłasz)",
   "Direct versturen naar de klant": "Wyślij od razu do klienta",
   "Profiel aanmaken": "Utwórz profil",
-
   "Geaccepteerd": "Zaakceptowana",
   "Afgewezen": "Odrzucona",
   "Stuur een voorstel en zet het met één klik om in een factuur": "Wyślij propozycję i jednym kliknięciem zamień ją w fakturę",
@@ -237,7 +228,6 @@
   "Maak een voorstel voor je klant. Gaat hij akkoord, dan wordt het met één klik een factuur.": "Przygotuj propozycję dla klienta. Gdy ją zaakceptuje, jednym kliknięciem zamienisz ją w fakturę.",
   "Eerste offerte maken": "Utwórz pierwszą ofertę",
   "nog :n d.": "jeszcze :n dni",
-
   "1 regel ingevuld": "uzupełniono 1 pozycję",
   ":n regels ingevuld": "uzupełniono pozycji: :n",
   "klant herkend": "rozpoznano klienta",
@@ -267,7 +257,6 @@
   "Het offertetotaal is negatief. Een negatieve regel (korting) mag wél, zolang het totaal op nul of hoger uitkomt.": "Suma oferty jest ujemna. Ujemna pozycja (rabat) jest dozwolona, o ile suma wynosi zero lub więcej.",
   "Bijv. voorwaarden, planning of aannames bij dit voorstel": "Np. warunki, harmonogram lub założenia tej propozycji",
   "De offerte krijgt pas een definitief nummer zodra je hem verstuurt.": "Oferta otrzyma ostateczny numer dopiero po wysłaniu.",
-
   "Offerte opnieuw versturen?": "Wysłać ofertę ponownie?",
   "Offerte versturen naar de klant?": "Wysłać ofertę do klienta?",
   "Er is al een bevestiging gemaild op :date.": "Potwierdzenie zostało już wysłane :date.",
@@ -334,7 +323,6 @@
   "Alleen intern — klik om mee te sturen naar de klant": "Tylko wewnętrznie — kliknij, aby wysłać do klienta",
   "Voor de klant ✓": "Dla klienta ✓",
   "Alleen intern": "Tylko wewnętrznie",
-
   "Terugkerend profiel voor :name verwijderen? Al gegenereerde facturen blijven bestaan.": "Usunąć profil cykliczny dla :name? Wygenerowane już faktury pozostaną.",
   "Terugkerende facturen": "Faktury cykliczne",
   "Automatisch periodiek factureren — ideaal voor abonnementen en vaste diensten": "Automatyczne fakturowanie okresowe — idealne dla abonamentów i stałych usług",
@@ -355,5 +343,8 @@
   "Pauzeren": "Wstrzymaj",
   "Hervatten": "Wznów",
   "Profiel bewerken": "Edytuj profil",
-  "Volgende factuurdatum": "Data następnej faktury"
+  "Volgende factuurdatum": "Data następnej faktury",
+  "Opnieuw aanbieden": "Zaoferuj ponownie",
+  "Offerte opnieuw aanbieden? Hij gaat terug naar concept met een nieuwe geldigheidsdatum; daarna kun je hem aanpassen en opnieuw versturen.": "Zaoferować ofertę ponownie? Wróci do szkicu z nową datą ważności; potem możesz ją poprawić i wysłać ponownie.",
+  "Reden van de klant: :reason": "Powód klienta: :reason"
 }

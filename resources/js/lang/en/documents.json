@@ -343,5 +343,8 @@
   "Pauzeren": "Pause",
   "Hervatten": "Resume",
   "Profiel bewerken": "Edit profile",
-  "Volgende factuurdatum": "Next invoice date"
+  "Volgende factuurdatum": "Next invoice date",
+  "Opnieuw aanbieden": "Offer again",
+  "Offerte opnieuw aanbieden? Hij gaat terug naar concept met een nieuwe geldigheidsdatum; daarna kun je hem aanpassen en opnieuw versturen.": "Offer this quote again? It goes back to draft with a new validity date; you can then adjust it and send it again.",
+  "Reden van de klant: :reason": "Customer's reason: :reason"
 }

@@ -524,6 +524,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('offertes/{quote}/accepteren', [QuoteController::class, 'accept'])->name('quotes.accept');
     Route::post('offertes/{quote}/bevestiging', [QuoteController::class, 'confirm'])->name('quotes.confirm');
     Route::post('offertes/{quote}/afwijzen', [QuoteController::class, 'reject'])->name('quotes.reject');
+    Route::post('offertes/{quote}/opnieuw-aanbieden', [QuoteController::class, 'reopen'])->name('quotes.reopen');
     Route::post('offertes/{quote}/naar-factuur', [QuoteController::class, 'convert'])->name('quotes.convert');
 
     // Termijnfacturen: een offerte in delen factureren (30% vooraf, 70% bij oplevering)

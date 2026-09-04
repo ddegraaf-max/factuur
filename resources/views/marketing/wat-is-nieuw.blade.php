@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 september 2026 · {{ brand('version_prefix') }} 1.51.0</div>
+        <h2>Afgewezen offerte opnieuw aanbieden</h2>
+        <ul class="tl-list">
+          <li><b>Opnieuw aanbieden</b> — een afgewezen of verlopen offerte zet je met één knop terug naar concept, met een nieuwe offertedatum en geldigheidsdatum. Pas de prijs of de regels aan en verstuur hem opnieuw; nummer en klantlink blijven hetzelfde.</li>
+          <li><b>Reden van de klant</b> — wees een klant de offerte in het portaal af met een toelichting, dan zie je die nu direct bij de status.</li>
+          <li><b>Logboek</b> — het opnieuw aanbieden staat in het logboek, zodat de geschiedenis van het voorstel te volgen blijft.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 3 september 2026 · {{ brand('version_prefix') }} 1.50.0</div>
         <h2>Zoekmachines automatisch op de hoogte</h2>
         <ul class="tl-list">
