@@ -6,7 +6,7 @@
 <style>
   @page { margin: 16mm 15mm 16mm 15mm; }
   body {
-    font-family: {{ $company->invoice_font === 'serif' ? 'serif' : "'DejaVu Sans', sans-serif" }};
+    font-family: {!! \App\Support\DocumentLocale::font($company->invoice_font === 'serif' ? 'serif' : 'sans') !!};
     font-size: 10pt;
     color: #1C1917;
     line-height: 1.5;
@@ -31,8 +31,8 @@
   }
   .company-name { font-weight: 700; font-size: 12pt; }
   .company-line { color: #78716C; font-size: 9pt; }
-  .doc-title { font-size: 30pt; font-weight: 800; letter-spacing: -1px; margin: 0 0 4px 0; color: {{ $company->brand_color }}; }
-  .doc-number { font-size: 10pt; color: #78716C; font-family: 'Courier', monospace; }
+  .doc-title { font-size: 30pt; font-weight: 700; letter-spacing: -1px; margin: 0 0 4px 0; color: {{ $company->brand_color }}; }
+  .doc-number { font-size: 10pt; color: #78716C; font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; }
 
   .parties { width: 100%; margin-bottom: 20px; }
   .parties td { vertical-align: top; padding-right: 16px; width: 50%; }
@@ -44,7 +44,7 @@
   .meta-table td { padding: 8px 14px; font-size: 9pt; background: #FAFAF9; border-top: 1px solid #EFEEEC; border-bottom: 1px solid #EFEEEC; }
   .meta-table tr td:first-child { border-left: 1px solid #EFEEEC; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
   .meta-table tr td:last-child { border-right: 1px solid #EFEEEC; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
-  .meta-label { color: #A8A29E; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.05em; }
+  .meta-label { color: #A8A29E; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.05em; white-space: nowrap; }
   .meta-value { font-weight: 600; font-size: 9.5pt; }
 
   .lines { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
@@ -52,14 +52,14 @@
   .lines th.right { text-align: right; }
   .lines th.center { text-align: center; }
   .lines td { padding: 10px 10px; border-bottom: 1px solid #EFEEEC; font-size: 9.5pt; vertical-align: top; }
-  .lines td.right { text-align: right; font-family: 'Courier', monospace; }
+  .lines td.right { text-align: right; font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; }
   .lines td.center { text-align: center; }
   .lines .details { font-size: 8.5pt; color: #A8A29E; margin-top: 2px; }
 
   .totals { width: 290px; float: right; margin-top: 14px; }
   .totals tr td { padding: 5px 12px; font-size: 10pt; }
   .totals .label { color: #57534E; }
-  .totals .value { text-align: right; font-family: 'Courier', monospace; font-weight: 500; }
+  .totals .value { text-align: right; font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; font-weight: 500; }
   .totals .grand-row td { background: {{ $company->brand_color }}; color: #fff; font-weight: 700; font-size: 12.5pt; border-radius: 6px; padding: 10px 12px; }
   .totals .grand-row .value { color: #fff; }
 
@@ -112,7 +112,7 @@
       @if($invoice->customer_postal_code || $invoice->customer_city)
         <div class="party-line">{{ $invoice->customer_postal_code }} {{ $invoice->customer_city }}</div>
       @endif
-      @if($invoice->customer_kvk_number)<div class="party-line">{{ __('doc.coc') }} {{ $invoice->customer_kvk_number }}</div>@endif
+      @if($invoice->customer_kvk_number)<div class="party-line">{{ \App\Support\DocumentLocale::registryLabel($invoice->customer_country) }} {{ $invoice->customer_kvk_number }}</div>@endif
       @if($invoice->customer_vat_number)<div class="party-line">{{ __('doc.vat_no') }} {{ $invoice->customer_vat_number }}</div>@endif
     </td>
     <td>
@@ -121,7 +121,7 @@
         @if(\App\Support\Market::isPl())<tr><td class="meta-label">{{ __('doc.sale_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>@endif
         <tr><td class="meta-label">{{ __('doc.due_date') }}</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>
         @if($invoice->reference)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
-        @if($company->kvk_number)<tr><td class="meta-label">{{ __('doc.coc') }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
+        @if($company->kvk_number)<tr><td class="meta-label">{{ \App\Support\DocumentLocale::registryLabel($company->country) }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
         @if($company->vat_number)<tr><td class="meta-label">{{ __('doc.vat_no') }}</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
       </table>
     </td>
@@ -204,7 +204,7 @@
   </tr></table>
 </div>
 @endif
-@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
+@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->documentFooter(null, app()->getLocale()))<div class="footer">{!! nl2br(e($company->documentFooter(null, app()->getLocale()))) !!}</div>@endif
 
 </body>
 </html>

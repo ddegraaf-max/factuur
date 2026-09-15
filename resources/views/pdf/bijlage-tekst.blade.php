@@ -6,7 +6,7 @@
   @page { margin: 16mm 15mm 18mm 15mm; }
   /* DejaVu Sans: ingebouwd in DomPDF en met volledige unicode (€, accenten). */
   body {
-    font-family: {{ $company->invoice_font === 'serif' ? 'serif' : "'DejaVu Sans', sans-serif" }};
+    font-family: {!! \App\Support\DocumentLocale::font($company->invoice_font === 'serif' ? 'serif' : 'sans') !!};
     font-size: 9.5pt; color: #1c1917; line-height: 1.6; margin: 0;
   }
   .header { width: 100%; margin-bottom: 20px; border-bottom: 3px solid {{ $company->brand_color }}; padding-bottom: 14px; }
@@ -16,7 +16,7 @@
     display: inline-block; text-align: center; color: white; font-weight: bold;
     font-size: 19px; line-height: 40px;
   }
-  .doc-title { font-size: 19pt; font-weight: 800; letter-spacing: -0.5px; margin: 0; color: {{ $company->brand_color }}; }
+  .doc-title { font-size: 19pt; font-weight: 700; letter-spacing: -0.5px; margin: 0; color: {{ $company->brand_color }}; }
   .doc-meta { font-size: 8pt; color: #78716c; margin-top: 3px; }
 
   h1 { font-size: 14pt; margin: 14pt 0 5pt; color: {{ $company->brand_color }}; }
@@ -30,7 +30,7 @@
   table { border-collapse: collapse; width: 100%; margin: 8pt 0; }
   th, td { border: 1px solid #e7e5e4; padding: 4pt 7pt; font-size: 8.5pt; text-align: left; }
   th { background: #fafaf9; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.05em; color: #78716c; border-bottom: 2px solid {{ $company->brand_color }}; }
-  code { font-family: 'Courier', monospace; font-size: 8.5pt; background: #f5f5f4; padding: 1pt 3pt; }
+  code { font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; font-size: 8.5pt; background: #f5f5f4; padding: 1pt 3pt; }
   hr { border: none; border-top: 1px solid #e7e5e4; margin: 12pt 0; }
   .footer { margin-top: 26pt; padding-top: 10pt; border-top: 1px solid #e7e5e4; font-size: 8pt; color: #a8a29e; text-align: center; }
 </style>

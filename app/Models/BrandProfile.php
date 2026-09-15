@@ -18,16 +18,25 @@ class BrandProfile extends Model
 {
     protected $fillable = [
         'company_id', 'name', 'logo_data', 'logo_scale',
-        'brand_color', 'invoice_template', 'invoice_footer',
+        'brand_color', 'invoice_template', 'invoice_footer', 'invoice_footers',
     ];
 
     protected $casts = [
         'logo_scale' => 'integer',
+        'invoice_footers' => 'array',
     ];
 
     // Zelfde afweging als bij Company: het logo (base64) is te zwaar om
     // standaard in elke response mee te sturen. makeVisible() waar nodig.
     protected $hidden = ['logo_data'];
+
+    /** Vertaalde voetnoot van deze handelsnaam voor een documenttaal, of null. */
+    public function translatedFooter(?string $language): ?string
+    {
+        $value = trim((string) (($this->invoice_footers ?? [])[$language ?? ''] ?? ''));
+
+        return $value !== '' ? $value : null;
+    }
 
     protected static function booted(): void
     {

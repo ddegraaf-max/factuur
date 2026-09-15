@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 september 2026 · {{ brand('version_prefix') }} 1.53.0</div>
+        <h2>Poolse facturen: letters, voetnoot en KVK</h2>
+        <ul class="tl-list">
+          <li><b>Poolse letters in het PDF</b> — ł, ś, ą, ę en ż kwamen als vraagtekens uit de printer. Poolse facturen en offertes gebruiken nu een lettertype dat ze wél kent, ook in de schreefvariant en in de bedragenkolom.</li>
+          <li><b>Schreefloos is nu echt schreefloos</b> — koos je in de huisstijl het schreefloze lettertype, dan stond het PDF door een fout tóch in een schreefletter. Dat is hersteld; je facturen zien er nu uit zoals het voorbeeld in de instellingen.</li>
+          <li><b>Voetnoot per taal</b> — bij Bedrijfsgegevens (en per handelsnaam) vul je een Engelse en een Poolse voetnoot in. Facturen en offertes in die taal gebruiken hem; zonder vertaling blijft de standaard voetnoot staan.</li>
+          <li><b>KVK blijft KVK</b> — het registratienummer draagt het label van het land van het bedrijf: KVK voor Nederland en REGON voor Polen, ook op een Poolse of Engelse factuur.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 september 2026 · {{ brand('version_prefix') }} 1.52.0</div>
         <h2>Taal per factuur en offerte</h2>
         <ul class="tl-list">

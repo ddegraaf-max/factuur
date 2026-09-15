@@ -6,7 +6,7 @@
 <style>
   @page { margin: 24mm 22mm 24mm 22mm; }
   body {
-    font-family: {{ $company->invoice_font === 'serif' ? 'Georgia, serif' : "'DejaVu Sans', sans-serif" }};
+    font-family: {!! \App\Support\DocumentLocale::font($company->invoice_font === 'serif' ? 'serif' : 'sans') !!};
     font-size: 10pt;
     color: #1C1917;
     line-height: 1.6;
@@ -116,7 +116,7 @@
       @if($company->address_line)<div class="party-line">{{ $company->address_line }}</div>@endif
       @if($company->postal_code || $company->city)<div class="party-line">{{ $company->postal_code }} {{ $company->city }}</div>@endif
       @if($company->email)<div class="party-line" style="margin-top:8px;color:#999;">{{ $company->email }}</div>@endif
-      @if($company->kvk_number)<div class="party-line" style="color:#999;">{{ __('doc.coc') }} {{ $company->kvk_number }}</div>@endif
+      @if($company->kvk_number)<div class="party-line" style="color:#999;">{{ \App\Support\DocumentLocale::registryLabel($company->country) }} {{ $company->kvk_number }}</div>@endif
       @if($company->vat_number)<div class="party-line" style="color:#999;">{{ __('doc.vat_no') }} {{ $company->vat_number }}</div>@endif
     </td>
     <td>
@@ -207,7 +207,7 @@
   </tr></table>
 </div>
 @endif
-@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
+@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->documentFooter(null, app()->getLocale()))<div class="footer">{!! nl2br(e($company->documentFooter(null, app()->getLocale()))) !!}</div>@endif
 
 </body>
 </html>

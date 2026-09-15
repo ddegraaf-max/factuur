@@ -91,7 +91,7 @@
 
         <div class="footer">
             {{ $company->name }}
-            @if ($company->kvk_number) · {{ __('doc.coc') }} {{ $company->kvk_number }} @endif
+            @if ($company->kvk_number) · {{ \App\Support\DocumentLocale::registryLabel($company->country) }} {{ $company->kvk_number }} @endif
             @if ($company->email) · {{ $company->email }} @endif
         </div>
     </div>

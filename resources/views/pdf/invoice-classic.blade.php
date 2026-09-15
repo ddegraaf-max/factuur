@@ -6,7 +6,7 @@
 <style>
   @page { margin: 20mm 18mm 20mm 18mm; }
   body {
-    font-family: {{ $company->invoice_font === 'sans' ? "'DejaVu Sans', sans-serif" : 'Georgia, serif' }};
+    font-family: {!! \App\Support\DocumentLocale::font($company->invoice_font === 'sans' ? 'sans' : 'serif') !!};
     font-size: 10pt;
     color: #1C1917;
     line-height: 1.5;
@@ -134,7 +134,7 @@
       @if($invoice->reference)<span class="meta-label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}@endif
     </td>
     <td>
-      @if($company->kvk_number)<span class="meta-label">{{ __('doc.coc') }}:</span> {{ $company->kvk_number }}<br>@endif
+      @if($company->kvk_number)<span class="meta-label">{{ \App\Support\DocumentLocale::registryLabel($company->country) }}:</span> {{ $company->kvk_number }}<br>@endif
       @if($company->vat_number)<span class="meta-label">{{ __('doc.vat_no') }}:</span> {{ $company->vat_number }}<br>@endif
       @if($company->iban)<span class="meta-label">IBAN:</span> {{ $company->iban }}@endif
     </td>
@@ -148,7 +148,7 @@
   @if($invoice->customer_postal_code || $invoice->customer_city)
     <div class="party-line">{{ $invoice->customer_postal_code }} {{ $invoice->customer_city }}</div>
   @endif
-  @if($invoice->customer_kvk_number)<div class="party-line">{{ __('doc.coc') }} {{ $invoice->customer_kvk_number }}</div>@endif
+  @if($invoice->customer_kvk_number)<div class="party-line">{{ \App\Support\DocumentLocale::registryLabel($invoice->customer_country) }} {{ $invoice->customer_kvk_number }}</div>@endif
   @if($invoice->customer_vat_number)<div class="party-line">{{ __('doc.vat_no') }} {{ $invoice->customer_vat_number }}</div>@endif
 </div>
 
@@ -226,7 +226,7 @@
   </tr></table>
 </div>
 @endif
-@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
+@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->documentFooter(null, app()->getLocale()))<div class="footer">{!! nl2br(e($company->documentFooter(null, app()->getLocale()))) !!}</div>@endif
 
 </body>
 </html>

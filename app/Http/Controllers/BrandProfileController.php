@@ -78,6 +78,8 @@ class BrandProfileController extends Controller
             'brand_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'invoice_template' => ['nullable', 'in:modern,classic,minimal'],
             'invoice_footer' => ['nullable', 'string', 'max:1000'],
+            'invoice_footers' => ['nullable', 'array'],
+            'invoice_footers.*' => ['nullable', 'string', 'max:1000'],
             'logo_scale' => ['nullable', 'integer', 'min:50', 'max:200'],
         ], [
             'name.required' => __('Vul de handelsnaam in.'),
@@ -94,6 +96,7 @@ class BrandProfileController extends Controller
 
         $data['name'] = trim($data['name']);
         $data['logo_scale'] = $data['logo_scale'] ?? 100;
+        $data['invoice_footers'] = \App\Support\DocumentLocale::cleanFooters($data['invoice_footers'] ?? null);
 
         return $data;
     }

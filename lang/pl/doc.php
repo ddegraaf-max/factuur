@@ -18,7 +18,7 @@ return [
     'from' => 'Sprzedawca',
     'for' => 'Dla',
     'addressee' => 'Adresat',
-    'coc' => 'REGON',
+    'coc' => 'Nr rej.',
     'vat_no' => 'NIP',
     'invoice_date' => 'Data wystawienia',
     'sale_date' => 'Data sprzedaży',

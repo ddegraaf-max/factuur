@@ -6,6 +6,10 @@ import { eur, num } from '@/format';
 
 // Markt (nl/pl): KvK/REGON, btw/NIP, land, kilometertarief, betaalmethode.
 const market = usePage().props.market;
+
+// Voetnoot per documenttaal: de talen náást de standaardtaal van de markt.
+const footerLanguages = ['nl', 'en', 'pl'].filter(l => l !== (market?.locale || 'nl'));
+const languageNames = { nl: t('Nederlands'), en: t('Engels'), pl: t('Pools') };
 const formatExample = market.key === 'pl' ? 'FV/{year}/{sequence:4}' : '{year}-{sequence:4}';
 
 // Landkeuze: het land van de markt bovenaan, daarna de buurlanden.
@@ -54,6 +58,7 @@ const form = useForm({
   mollie_api_key: '',
   mollie_disconnect: false,
   invoice_footer: props.company.invoice_footer ?? '',
+  invoice_footers: Object.fromEntries(['nl', 'en', 'pl'].map(l => [l, props.company.invoice_footers?.[l] ?? ''])),
   invoice_number_format: props.company.invoice_number_format ?? formatExample,
   price_mode: props.company.price_mode ?? 'excl',
   daily_notification_enabled: !!props.company.daily_notification_enabled,
@@ -261,6 +266,10 @@ const submit = () => form.patch(route('settings.company.update'));
           <div class="form-group" style="margin:0;">
             <label>{{ $t('Standaard voetnoot') }}<span class="label-hint">{{ $t('(onderaan elke factuur)') }}</span></label>
             <textarea v-model="form.invoice_footer" rows="3" :placeholder="$t('Bijv. betalingsvoorwaarden, BTW-mededelingen...')"></textarea>
+          </div>
+          <div v-for="lang in footerLanguages" :key="lang" class="form-group" style="margin:12px 0 0;">
+            <label>{{ $t('Voetnoot') }} · {{ languageNames[lang] }}<span class="label-hint">{{ $t('(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)') }}</span></label>
+            <textarea v-model="form.invoice_footers[lang]" rows="2" maxlength="1000"></textarea>
           </div>
         </div>
       </div>

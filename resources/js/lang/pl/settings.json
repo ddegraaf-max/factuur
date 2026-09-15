@@ -577,5 +577,7 @@
   "Vragen over je abonnement? Mail": "Pytania o abonament? Napisz na",
   "Open claude.ai → Instellingen → Connectors (of in de Claude-desktopapp).": "Otwórz claude.ai → Ustawienia → Connectors (lub w aplikacji Claude na komputer).",
   "Ingeschakeld": "Włączone",
-  "Uitgeschakeld": "Wyłączone"
+  "Uitgeschakeld": "Wyłączone",
+  "Voetnoot": "Stopka",
+  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(dla faktur i ofert w tym języku; puste = domyślna stopka)"
 }

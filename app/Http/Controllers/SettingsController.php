@@ -121,6 +121,9 @@ class SettingsController extends Controller
             'mollie_disconnect' => ['nullable', 'boolean'],
             // Legacy invoice fields still accepted from older Company form
             'invoice_footer' => ['nullable', 'string'],
+            // Voetnoot per documenttaal (Engels/Pools naast de standaard).
+            'invoice_footers' => ['nullable', 'array'],
+            'invoice_footers.*' => ['nullable', 'string', 'max:1000'],
             'invoice_number_format' => ['nullable', 'string', 'max:50'],
             'brand_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ], [
@@ -130,6 +133,12 @@ class SettingsController extends Controller
 
         // Drop nulls so we don't overwrite existing values with null
         $data = array_filter($data, fn ($v) => $v !== null);
+
+        // Vertaalde voetnoten: alleen ondersteunde talen, lege teksten weg;
+        // niets over = null, zodat de vertalingen ook te wissen zijn.
+        if ($request->has('invoice_footers')) {
+            $data['invoice_footers'] = \App\Support\DocumentLocale::cleanFooters($request->input('invoice_footers'));
+        }
 
         // Dit veld moet je juist wél kunnen leegmaken (dan valt de dagmail terug
         // op het bedrijfs-e-mailadres); een leeg veld komt als null binnen.

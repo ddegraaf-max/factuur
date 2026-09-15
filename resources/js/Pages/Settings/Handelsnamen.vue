@@ -27,7 +27,12 @@ const form = useForm({
   brand_color: '',
   invoice_template: '',
   invoice_footer: '',
+  invoice_footers: { nl: '', en: '', pl: '' },
 });
+
+// Voetnoot per documenttaal: de talen náást de standaardtaal van de markt.
+const footerLanguages = ['nl', 'en', 'pl'].filter(l => l !== (usePage().props.market?.locale || 'nl'));
+const languageNames = { nl: t('Nederlands'), en: t('Engels'), pl: t('Pools') };
 
 const startAdd = () => {
   editingId.value = null;
@@ -47,6 +52,7 @@ const startEdit = (p) => {
   form.brand_color = p.brand_color ?? '';
   form.invoice_template = p.invoice_template ?? '';
   form.invoice_footer = p.invoice_footer ?? '';
+  form.invoice_footers = { nl: p.invoice_footers?.nl ?? '', en: p.invoice_footers?.en ?? '', pl: p.invoice_footers?.pl ?? '' };
   logoPreview.value = p.logo_data || null;
   showForm.value = true;
 };
@@ -175,6 +181,10 @@ const effectiveTemplate = (p) => TEMPLATES[p.invoice_template || props.company.i
           <div class="form-group">
             <label>{{ $t('Voetnoot op de factuur') }}<span class="label-hint">{{ $t('(leeg = standaard voetnoot)') }}</span></label>
             <textarea v-model="form.invoice_footer" rows="2" maxlength="1000" :placeholder="$t('Bijv. betalingsvoorwaarden voor deze handelsnaam')"></textarea>
+          </div>
+          <div v-for="lang in footerLanguages" :key="lang" class="form-group">
+            <label>{{ $t('Voetnoot') }} · {{ languageNames[lang] }}<span class="label-hint">{{ $t('(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)') }}</span></label>
+            <textarea v-model="form.invoice_footers[lang]" rows="2" maxlength="1000"></textarea>
           </div>
 
           <div style="display:flex;justify-content:flex-end;gap:10px;">

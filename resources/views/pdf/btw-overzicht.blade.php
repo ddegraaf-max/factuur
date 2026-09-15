@@ -20,7 +20,7 @@
 <style>
   @page { margin: 16mm 15mm 16mm 15mm; }
   body { font-family: 'DejaVu Sans', sans-serif; font-size: 9.5pt; color: #1C1917; line-height: 1.5; }
-  h1 { margin: 0; font-size: 20pt; font-weight: 800; letter-spacing: -0.5px; color: {{ $brand }}; }
+  h1 { margin: 0; font-size: 20pt; font-weight: 700; letter-spacing: -0.5px; color: {{ $brand }}; }
   .sub { color: #78716C; font-size: 9pt; margin-top: 2px; }
   .header { width: 100%; border-bottom: 3px solid {{ $brand }}; padding-bottom: 12px; margin-bottom: 18px; }
   .header td { vertical-align: bottom; }
@@ -37,13 +37,13 @@
   .p-title { font-size: 12pt; font-weight: 700; }
   .p-months { color: #78716C; font-size: 8.5pt; }
   .p-status { text-align: right; font-size: 8.5pt; color: #44403C; }
-  .p-vat { text-align: right; font-size: 13pt; font-weight: 800; }
+  .p-vat { text-align: right; font-size: 13pt; font-weight: 700; }
   table.lines { width: 100%; border-collapse: collapse; margin-top: 4px; }
   table.lines th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.05em; color: #78716C; padding: 5px 6px; border-bottom: 1px solid #D6D3D1; background: #FAFAF9; }
   table.lines td { padding: 5px 6px; border-bottom: 1px solid #E7E5E4; }
   table.lines .right { text-align: right; }
   table.lines .total td { font-weight: 700; }
-  table.lines .grand td { font-weight: 800; border-bottom: none; }
+  table.lines .grand td { font-weight: 700; border-bottom: none; }
   table.lines .whole { color: #78716C; font-size: 8.5pt; }
   .rubriek { display: inline-block; background: #EFEEEC; border-radius: 4px; padding: 0 4px; font-size: 7.5pt; font-weight: 700; margin-right: 5px; min-width: 14px; text-align: center; }
   .pay { margin-top: 8px; font-size: 8.5pt; color: #44403C; background: #FAFAF9; border: 1px solid #E7E5E4; border-radius: 6px; padding: 6px 10px; }

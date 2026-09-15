@@ -13,7 +13,7 @@
 <style>
   @page { margin: {{ $mt }}mm 18mm {{ $mb }}mm 18mm; }
   body {
-    font-family: {{ $company->invoice_font === 'serif' ? 'Georgia, serif' : "'DejaVu Sans', sans-serif" }};
+    font-family: {!! \App\Support\DocumentLocale::font($company->invoice_font === 'serif' ? 'serif' : 'sans') !!};
     font-size: 9.5pt;
     color: #1C1917;
     line-height: 1.55;
@@ -169,7 +169,7 @@
   </tr></table>
 </div>
 @endif
-@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->invoice_footer)<div class="footer">{!! nl2br(e($company->invoice_footer)) !!}</div>@endif
+@if($invoice->footer)<div class="footer">{!! nl2br(e($invoice->footer)) !!}</div>@elseif($company->documentFooter(null, app()->getLocale()))<div class="footer">{!! nl2br(e($company->documentFooter(null, app()->getLocale()))) !!}</div>@endif
 
 </body>
 </html>

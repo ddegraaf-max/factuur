@@ -71,9 +71,7 @@ class QuoteManager
 
                 'intro' => $data['intro'] ?? null,
                 'notes' => $data['notes'] ?? null,
-                'footer' => ($profile && filled($profile->invoice_footer))
-                    ? $profile->invoice_footer
-                    : $company->invoice_footer,
+                'footer' => $company->documentFooter($profile, $language),
             ]);
 
             $this->syncLines($quote, $lines, $mode);
@@ -99,18 +97,16 @@ class QuoteManager
             // Handelsnaam wijzigen; de voetnoot schuift mee naar die van het
             // nieuwe profiel (of terug naar de standaard van het bedrijf).
             $brandChanges = [];
+            $profile = $quote->brand_profile_id
+                ? \App\Models\BrandProfile::withoutGlobalScope('company')->find($quote->brand_profile_id)
+                : null;
             if (array_key_exists('brand_profile_id', $data)) {
                 $profile = ! empty($data['brand_profile_id'])
                     ? \App\Models\BrandProfile::withoutGlobalScope('company')
                         ->where('company_id', $quote->company_id)
                         ->find($data['brand_profile_id'])
                     : null;
-                $brandChanges = [
-                    'brand_profile_id' => $profile?->id,
-                    'footer' => ($profile && filled($profile->invoice_footer))
-                        ? $profile->invoice_footer
-                        : $quote->company->invoice_footer,
-                ];
+                $brandChanges = ['brand_profile_id' => $profile?->id];
             }
 
             // Klant: de offerte volgt de actuele klantgegevens zolang hij nog
@@ -142,6 +138,13 @@ class QuoteManager
             // Documenttaal: een keuze op het formulier wint van de klantinstelling.
             if (! empty($data['language']) && in_array($data['language'], \App\Support\DocumentLocale::SUPPORTED, true)) {
                 $customerChanges['language'] = $data['language'];
+            }
+
+            // Voettekst hoort bij handelsnaam én taal: opnieuw bepalen zodra een
+            // van beide gewijzigd kan zijn (vertaalde voetnoot uit Instellingen).
+            $language = $customerChanges['language'] ?? $quote->language;
+            if (array_key_exists('brand_profile_id', $data) || $language !== $quote->language) {
+                $brandChanges['footer'] = $quote->company->documentFooter($profile, $language);
             }
 
             $quote->update($brandChanges + $customerChanges + [

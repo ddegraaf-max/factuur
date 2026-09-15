@@ -577,5 +577,7 @@
   "Vragen over je abonnement? Mail": "Questions about your subscription? E-mail",
   "Open claude.ai → Instellingen → Connectors (of in de Claude-desktopapp).": "Open claude.ai → Settings → Connectors (or in the Claude desktop app).",
   "Ingeschakeld": "Enabled",
-  "Uitgeschakeld": "Disabled"
+  "Uitgeschakeld": "Disabled",
+  "Voetnoot": "Footer",
+  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(for invoices and quotes in this language; empty = the default footer)"
 }

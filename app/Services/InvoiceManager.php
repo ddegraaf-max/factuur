@@ -79,9 +79,7 @@ class InvoiceManager
                 'vat_breakdown' => $totals['vat_breakdown'],
 
                 'notes' => $data['notes'] ?? null,
-                'footer' => ($profile && filled($profile->invoice_footer))
-                    ? $profile->invoice_footer
-                    : $customer->company->invoice_footer,
+                'footer' => $customer->company->documentFooter($profile, $language),
             ]);
 
             $this->syncLines($invoice, $lines, $mode);
@@ -109,18 +107,16 @@ class InvoiceManager
             // Handelsnaam wijzigen mag zolang het een concept is; de voetnoot
             // schuift mee naar die van het nieuwe profiel (of het bedrijf).
             $brandChanges = [];
+            $profile = $invoice->brand_profile_id
+                ? \App\Models\BrandProfile::withoutGlobalScope('company')->find($invoice->brand_profile_id)
+                : null;
             if (array_key_exists('brand_profile_id', $data)) {
                 $profile = ! empty($data['brand_profile_id'])
                     ? \App\Models\BrandProfile::withoutGlobalScope('company')
                         ->where('company_id', $invoice->company_id)
                         ->find($data['brand_profile_id'])
                     : null;
-                $brandChanges = [
-                    'brand_profile_id' => $profile?->id,
-                    'footer' => ($profile && filled($profile->invoice_footer))
-                        ? $profile->invoice_footer
-                        : $invoice->company->invoice_footer,
-                ];
+                $brandChanges = ['brand_profile_id' => $profile?->id];
             }
 
             // Klant: een concept volgt de actuele klantgegevens tot het wordt
@@ -156,6 +152,13 @@ class InvoiceManager
             // (die is alleen de standaard, ook bij de klantwissel hierboven).
             if (! empty($data['language']) && in_array($data['language'], \App\Support\DocumentLocale::SUPPORTED, true)) {
                 $customerChanges['language'] = $data['language'];
+            }
+
+            // Voettekst hoort bij handelsnaam én taal: opnieuw bepalen zodra een
+            // van beide gewijzigd kan zijn (vertaalde voetnoot uit Instellingen).
+            $language = $customerChanges['language'] ?? $invoice->language;
+            if (array_key_exists('brand_profile_id', $data) || $language !== $invoice->language) {
+                $brandChanges['footer'] = $invoice->company->documentFooter($profile, $language);
             }
 
             // Leeggemaakte velden komen als null binnen (lege strings worden

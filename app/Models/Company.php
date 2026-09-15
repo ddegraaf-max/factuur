@@ -24,7 +24,7 @@ class Company extends Model
         'copy_email', 'accountant_email', 'daily_notification_enabled', 'daily_notification_email',
         'reminder_settings', 'email_texts', 'thanks_mail_enabled', 'review_url', 'quote_accept_mail_enabled',
         'peppol_company_id', 'peppol_verification_status', 'peppol_verification_url', 'peppol_registered_at', 'peppol_verified_at',
-        'default_payment_terms', 'default_hourly_rate', 'default_km_rate', 'invoice_footer', 'invoice_number_format',
+        'default_payment_terms', 'default_hourly_rate', 'default_km_rate', 'invoice_footer', 'invoice_footers', 'invoice_number_format',
         'quote_number_format', 'quote_valid_days',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
         'subscription_status', 'subscription_ends_at', 'subscription_cancel_emailed_at',
@@ -64,6 +64,7 @@ class Company extends Model
         'numbering_settings' => 'array',
         'reminder_settings' => 'array',
         'email_texts' => 'array',
+        'invoice_footers' => 'array',
         'thanks_mail_enabled' => 'boolean',
         'quote_accept_mail_enabled' => 'boolean',
         'peppol_registered_at' => 'datetime',
@@ -186,6 +187,30 @@ class Company extends Model
         $value = trim((string) (($this->email_texts ?? [])[$key] ?? ''));
 
         return $value !== '' ? $value : null;
+    }
+
+    /** Vertaalde voetnoot (Instellingen → Bedrijfsgegevens) voor een documenttaal, of null. */
+    public function translatedFooter(?string $language): ?string
+    {
+        $value = trim((string) (($this->invoice_footers ?? [])[$language ?? ''] ?? ''));
+
+        return $value !== '' ? $value : null;
+    }
+
+    /**
+     * Voettekst voor een document: eerst de vertaling in de documenttaal (van
+     * de handelsnaam, dan van het bedrijf), anders de standaard voetnoot van de
+     * handelsnaam of het bedrijf. Zo staat op een Poolse factuur geen
+     * Nederlandse tekst zodra er een Poolse voetnoot is ingevuld.
+     */
+    public function documentFooter(?BrandProfile $profile, ?string $language): ?string
+    {
+        $translated = $profile?->translatedFooter($language) ?? $this->translatedFooter($language);
+        if ($translated !== null) {
+            return $translated;
+        }
+
+        return filled($profile?->invoice_footer) ? $profile->invoice_footer : $this->invoice_footer;
     }
 
     /**
