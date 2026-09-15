@@ -84,12 +84,14 @@ class InvoiceController extends Controller
     {
         return Inertia::render('Invoices/Form', [
             'invoice' => null,
-            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
+            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms', 'language']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => Market::vatRateOptions(),
             'preselect_customer_id' => $request->input('customer_id'),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
+            // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
+            'default_language' => \App\Support\DocumentLocale::default(),
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -221,11 +223,13 @@ class InvoiceController extends Controller
                 'date' => $p->paid_on?->format('Y-m-d'),
                 'amount' => (float) $p->amount,
             ])->values(),
-            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms']),
+            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms', 'language']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => Market::vatRateOptions(),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
+            // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
+            'default_language' => \App\Support\DocumentLocale::default(),
             'brand_profiles' => \App\Models\BrandProfile::orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -586,6 +590,8 @@ class InvoiceController extends Controller
             'price_mode' => ['nullable', 'in:excl,incl'],
             // De manager controleert dat het profiel van het eigen bedrijf is.
             'brand_profile_id' => ['nullable', 'integer', 'exists:brand_profiles,id'],
+            // Taal van PDF en e-mail; leeg = de taal van de klant.
+            'language' => ['nullable', 'in:nl,en,pl'],
             'invoice_date' => ['required', 'date'],
             'payment_terms' => ['required', 'integer', 'min:0', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],

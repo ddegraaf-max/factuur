@@ -346,5 +346,9 @@
   "Volgende factuurdatum": "Data następnej faktury",
   "Opnieuw aanbieden": "Zaoferuj ponownie",
   "Offerte opnieuw aanbieden? Hij gaat terug naar concept met een nieuwe geldigheidsdatum; daarna kun je hem aanpassen en opnieuw versturen.": "Zaoferować ofertę ponownie? Wróci do szkicu z nową datą ważności; potem możesz ją poprawić i wysłać ponownie.",
-  "Reden van de klant: :reason": "Powód klienta: :reason"
+  "Reden van de klant: :reason": "Powód klienta: :reason",
+  "Taal van de factuur": "Język faktury",
+  "Taal van de offerte": "Język oferty",
+  "(PDF en e-mail — standaard de taal van de klant)": "(PDF i e-mail — domyślnie język klienta)",
+  "Poolstalig": "W języku polskim"
 }

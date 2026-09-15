@@ -4,7 +4,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur, fmtDateLong, parseDutchNumber } from '@/format.js';
 import { t } from '@/i18n';
 import axios from 'axios';
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   quote: Object,
@@ -13,6 +13,7 @@ const props = defineProps({
   vat_rates: Array,
   price_mode: { type: String, default: 'excl' },
   default_valid_days: { type: Number, default: 30 },
+  default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
   preselect_customer_id: { type: [String, Number], default: null },
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
   ai_enabled: Boolean, // "offerte uit tekst" (Slim-abonnement + API-key)
@@ -47,8 +48,14 @@ const daysBetween = (from, to) => {
   return Math.max(1, Math.round(ms / 86400000));
 };
 
+// Taal van PDF en e-mail: standaard die van de klant (Klanten → bewerken),
+// per offerte te wijzigen.
+const customerLanguage = (id) => props.customers.find(c => c.id === Number(id))?.language || props.default_language;
+const initialCustomerId = props.quote?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || '');
+
 const form = useForm({
-  customer_id: props.quote?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  customer_id: initialCustomerId,
+  language: props.quote?.language ?? customerLanguage(initialCustomerId),
   // Start in de bedrijfsinstelling; met de schakelaar op het formulier kies
   // je per offerte hoe je prijzen intypt (de server slaat altijd netto op).
   price_mode: props.price_mode === 'incl' ? 'incl' : 'excl',
@@ -169,6 +176,11 @@ const applyProduct = (line, productId) => {
       : Number(p.price);
   }
 };
+
+// Bij klantwissel: de taal van die klant (per offerte nog aan te passen).
+watch(() => form.customer_id, (id) => {
+  form.language = customerLanguage(id);
+});
 
 /* ---------- Offerte uit tekst (AI) ---------- */
 const aiText = ref('');
@@ -348,15 +360,24 @@ const submit = (action) => {
                 <div v-if="form.errors.valid_days" class="field-error">{{ form.errors.valid_days }}</div>
               </div>
             </div>
-            <div v-if="brand_profiles.length" class="form-row">
+            <div class="form-row">
               <div class="form-group">
+                <label>{{ $t('Taal van de offerte') }}<span class="label-hint">{{ $t('(PDF en e-mail — standaard de taal van de klant)') }}</span></label>
+                <select v-model="form.language">
+                  <option value="nl">{{ $t('Nederlands') }}</option>
+                  <option value="en">{{ $t('Engels') }}</option>
+                  <option value="pl">{{ $t('Pools') }}</option>
+                </select>
+                <div v-if="form.errors.language" class="field-error">{{ form.errors.language }}</div>
+              </div>
+              <div v-if="brand_profiles.length" class="form-group">
                 <label>{{ $t('Offerte als') }}<span class="label-hint">{{ $t('(handelsnaam op de offerte)') }}</span></label>
                 <select v-model="form.brand_profile_id">
                   <option :value="null">{{ $t('Standaard huisstijl') }}</option>
                   <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
                 </select>
               </div>
-              <div class="form-group"></div>
+              <div v-else class="form-group"></div>
             </div>
             <div class="form-group" style="margin:0;">
               <label>{{ $t('Begeleidende tekst') }}<span class="label-hint">{{ $t('(bovenaan de offerte)') }}</span></label>

@@ -152,6 +152,12 @@ class InvoiceManager
                 }
             }
 
+            // Documenttaal: een keuze op het formulier wint van de klantinstelling
+            // (die is alleen de standaard, ook bij de klantwissel hierboven).
+            if (! empty($data['language']) && in_array($data['language'], \App\Support\DocumentLocale::SUPPORTED, true)) {
+                $customerChanges['language'] = $data['language'];
+            }
+
             // Leeggemaakte velden komen als null binnen (lege strings worden
             // door Laravel naar null omgezet). "Sleutel aanwezig" is dus het
             // criterium om te wijzigen — niet "waarde niet null", anders is

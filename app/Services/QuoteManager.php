@@ -40,8 +40,9 @@ class QuoteManager
             $lines = $data['lines'] ?? [];
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
-            // Documenttaal: momentopname van de klantinstelling.
-            $language = $customer->language ?? 'nl';
+            // Documenttaal: momentopname van de klantinstelling, tenzij op het
+            // formulier een andere taal is gekozen.
+            $language = $data['language'] ?? $customer->language ?? 'nl';
             $language = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
 
             $quote = Quote::create([
@@ -136,6 +137,11 @@ class QuoteManager
                         $customerChanges['language'] = in_array($language, \App\Support\DocumentLocale::SUPPORTED, true) ? $language : 'nl';
                     }
                 }
+            }
+
+            // Documenttaal: een keuze op het formulier wint van de klantinstelling.
+            if (! empty($data['language']) && in_array($data['language'], \App\Support\DocumentLocale::SUPPORTED, true)) {
+                $customerChanges['language'] = $data['language'];
             }
 
             $quote->update($brandChanges + $customerChanges + [

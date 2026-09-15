@@ -348,6 +348,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <template v-else-if="invoice.sent_at_label">{{ $t('Verstuurd op :date', { date: invoice.sent_at_label }) }}</template>
           <template v-if="invoice.brand_profile_name"> · {{ $t('als') }} <b>{{ invoice.brand_profile_name }}</b></template>
           <template v-if="invoice.language === 'en'"> · {{ $t('Engelstalig') }}</template>
+          <template v-else-if="invoice.language === 'pl'"> · {{ $t('Poolstalig') }}</template>
         </p>
       </div>
       <div class="page-actions">

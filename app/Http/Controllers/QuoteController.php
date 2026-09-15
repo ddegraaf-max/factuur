@@ -350,7 +350,9 @@ class QuoteController extends Controller
         $company = auth()->user()->company;
 
         return [
-            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email']),
+            'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'language']),
+            // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
+            'default_language' => \App\Support\DocumentLocale::default(),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => \App\Support\Market::vatRateOptions(),
             'default_vat_rate' => \App\Support\Market::defaultVatRate(),
@@ -372,6 +374,8 @@ class QuoteController extends Controller
             'price_mode' => ['nullable', 'in:excl,incl'],
             // De manager controleert dat het profiel van het eigen bedrijf is.
             'brand_profile_id' => ['nullable', 'integer', 'exists:brand_profiles,id'],
+            // Taal van PDF en e-mail; leeg = de taal van de klant.
+            'language' => ['nullable', 'in:nl,en,pl'],
             'quote_date' => ['required', 'date'],
             'valid_days' => ['required', 'integer', 'min:1', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],

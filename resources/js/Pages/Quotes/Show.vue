@@ -187,6 +187,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <template v-else-if="quote.sent_at_label">{{ $t('Verstuurd op :date', { date: quote.sent_at_label }) }}</template>
           <template v-if="quote.brand_profile_name"> · {{ $t('als') }} <b>{{ quote.brand_profile_name }}</b></template>
           <template v-if="quote.language === 'en'"> · {{ $t('Engelstalig') }}</template>
+          <template v-else-if="quote.language === 'pl'"> · {{ $t('Poolstalig') }}</template>
         </p>
       </div>
       <div class="page-actions">

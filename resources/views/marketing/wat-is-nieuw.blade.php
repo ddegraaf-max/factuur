@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 september 2026 · {{ brand('version_prefix') }} 1.52.0</div>
+        <h2>Taal per factuur en offerte</h2>
+        <ul class="tl-list">
+          <li><b>Taalkeuze op het formulier</b> — kies per factuur of offerte of de PDF en de e-mail in het Nederlands, Engels of Pools gaan. De taal van de klant blijft de standaard; je wijkt alleen af waar dat nodig is.</li>
+          <li><b>Ook voor bestaande concepten</b> — een concept dat in het Nederlands stond, zet je met één keuze om naar het Pools of Engels. Kies je een andere klant, dan volgt de taal weer die klant.</li>
+          <li><b>Zichtbaar op de pagina</b> — bij een Engelse of Poolse factuur of offerte zie je dat direct onder de titel.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 september 2026 · {{ brand('version_prefix') }} 1.51.0</div>
         <h2>Afgewezen offerte opnieuw aanbieden</h2>
         <ul class="tl-list">

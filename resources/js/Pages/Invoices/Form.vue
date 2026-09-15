@@ -14,6 +14,7 @@ const props = defineProps({
   preselect_customer_id: { type: [String, Number], default: null },
   price_mode: { type: String, default: 'excl' },
   default_payment_terms: { type: Number, default: 30 },
+  default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
 });
 
@@ -47,8 +48,14 @@ const displayPrice = (line) => {
 
 const today = new Date().toISOString().slice(0, 10);
 
+// Taal van PDF en e-mail: standaard die van de klant (Klanten → bewerken),
+// per factuur te wijzigen.
+const customerLanguage = (id) => props.customers.find(c => c.id === Number(id))?.language || props.default_language;
+const initialCustomerId = props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || '');
+
 const form = useForm({
-  customer_id: props.invoice?.customer_id ?? props.preselect_customer_id ?? (props.customers[0]?.id || ''),
+  customer_id: initialCustomerId,
+  language: props.invoice?.language ?? customerLanguage(initialCustomerId),
   // Start in de bedrijfsinstelling; met de schakelaar op het formulier kies
   // je per factuur hoe je prijzen intypt (de server slaat altijd netto op).
   price_mode: props.price_mode === 'incl' ? 'incl' : 'excl',
@@ -191,10 +198,11 @@ const selectedCustomer = computed(() => {
   return props.customers.find(c => c.id === Number(form.customer_id));
 });
 
-// Bij klantwissel: diens eigen betalingstermijn, anders je bedrijfsstandaard.
+// Bij klantwissel: diens eigen betalingstermijn en taal, anders je bedrijfsstandaard.
 watch(() => form.customer_id, (id) => {
   const c = props.customers.find(c => c.id === Number(id));
   form.payment_terms = c?.payment_terms ?? props.default_payment_terms ?? 30;
+  form.language = customerLanguage(id);
 });
 
 /* ---------- Verrekeningen (reeds doorgestort) ---------- */
@@ -341,15 +349,24 @@ const submit = (action) => {
                 <div v-if="form.errors.payment_terms" class="field-error">{{ form.errors.payment_terms }}</div>
               </div>
             </div>
-            <div v-if="brand_profiles.length" class="form-row">
+            <div class="form-row">
               <div class="form-group">
+                <label>{{ $t('Taal van de factuur') }}<span class="label-hint">{{ $t('(PDF en e-mail — standaard de taal van de klant)') }}</span></label>
+                <select v-model="form.language">
+                  <option value="nl">{{ $t('Nederlands') }}</option>
+                  <option value="en">{{ $t('Engels') }}</option>
+                  <option value="pl">{{ $t('Pools') }}</option>
+                </select>
+                <div v-if="form.errors.language" class="field-error">{{ form.errors.language }}</div>
+              </div>
+              <div v-if="brand_profiles.length" class="form-group">
                 <label>{{ $t('Factureren als') }}<span class="label-hint">{{ $t('(handelsnaam op de factuur)') }}</span></label>
                 <select v-model="form.brand_profile_id">
                   <option :value="null">{{ $t('Standaard huisstijl') }}</option>
                   <option v-for="bp in brand_profiles" :key="bp.id" :value="bp.id">{{ bp.name }}</option>
                 </select>
               </div>
-              <div class="form-group"></div>
+              <div v-else class="form-group"></div>
             </div>
           </div>
         </div>
