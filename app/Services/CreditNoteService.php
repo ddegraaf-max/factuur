@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\InvoiceLine;
+use App\Models\Payment;
+use App\Support\Audit;
 use Illuminate\Support\Facades\DB;
 
 class CreditNoteService
@@ -72,6 +74,61 @@ class CreditNoteService
 
             return $credit->fresh(['lines']);
         });
+    }
+
+    /**
+     * Verrekent een creditnota met de factuur die ze crediteert. Op allebei
+     * komt een boeking van soort 'credit' voor hetzelfde bedrag: de factuur is
+     * daarmee (deels) voldaan en de creditnota afgewikkeld, zonder dat er geld
+     * beweegt. Omzet en btw blijven wat de twee documenten al zeggen.
+     *
+     * Beide kanten mogen in willekeurige volgorde worden opgegeven. Geeft het
+     * verrekende bedrag terug.
+     */
+    public function settle(Invoice $one, Invoice $other, ?string $paidOn = null, ?string $reference = null): float
+    {
+        [$invoice, $credit] = $one->is_credit ? [$other, $one] : [$one, $other];
+
+        if (! $credit->is_credit || $invoice->is_credit || (int) $credit->credits_invoice_id !== (int) $invoice->id) {
+            throw new \DomainException(__('Deze creditnota hoort niet bij deze factuur.'));
+        }
+        if ($credit->status === 'draft') {
+            throw new \DomainException(__('Maak de creditnota eerst definitief; een concept kun je niet verrekenen.'));
+        }
+        if (! in_array($invoice->status, ['sent', 'partial', 'overdue'], true)) {
+            throw new \DomainException(__('Alleen een openstaande factuur kan worden verrekend.'));
+        }
+
+        $amount = round(min((float) $invoice->remaining_amount, (float) $credit->remaining_amount), 2);
+        if ($amount < 0.01) {
+            throw new \DomainException(__('Er valt niets te verrekenen: de factuur of de creditnota is al voldaan.'));
+        }
+
+        $paidOn = $paidOn ?: now()->toDateString();
+        $reference = trim((string) $reference);
+
+        DB::transaction(function () use ($invoice, $credit, $amount, $paidOn, $reference) {
+            foreach ([
+                [$invoice, __('Verrekend met creditnota :number', ['number' => $credit->number])],
+                [$credit, __('Verrekend met factuur :number', ['number' => $invoice->number])],
+            ] as [$document, $default]) {
+                // Het opslaan herrekent paid_total en de status van het document.
+                Payment::create([
+                    'company_id' => $document->company_id,
+                    'invoice_id' => $document->id,
+                    'kind' => 'credit',
+                    'amount' => $amount,
+                    'paid_on' => $paidOn,
+                    'method' => 'other',
+                    'reference' => $reference !== '' ? $reference : $default,
+                ]);
+            }
+        });
+
+        Audit::log('settled', $invoice, __(':label verrekend met creditnota :number (:amount)', ['label' => Audit::label($invoice), 'number' => $credit->number, 'amount' => money($amount)]));
+        Audit::log('settled', $credit, __(':label verrekend met factuur :number (:amount)', ['label' => Audit::label($credit), 'number' => $invoice->number, 'amount' => money($amount)]));
+
+        return $amount;
     }
 
     public function nextNumber(Company $company): string

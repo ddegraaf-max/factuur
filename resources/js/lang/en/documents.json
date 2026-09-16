@@ -350,5 +350,9 @@
   "Taal van de factuur": "Invoice language",
   "Taal van de offerte": "Quote language",
   "(PDF en e-mail — standaard de taal van de klant)": "(PDF and email — defaults to the customer's language)",
-  "Poolstalig": "In Polish"
+  "Poolstalig": "In Polish",
+  "Verrekenen met :number": "Settle against :number",
+  "Boekt de creditnota af tegen de factuur, zodat beide op nul uitkomen. Er komt geen geld binnen; omzet en btw veranderen niet.": "Books the credit note against the invoice so both end at zero. No money comes in; revenue and VAT stay the same.",
+  "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "The credit note already is your correction of revenue and VAT. This settlement only closes the two open items against each other; nothing changes on the invoice PDF.",
+  "(optioneel — standaard \"Verrekend met creditnota …\")": "(optional — defaults to \"Settled against credit note …\")"
 }

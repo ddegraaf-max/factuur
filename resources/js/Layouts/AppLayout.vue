@@ -844,6 +844,7 @@ table { border-collapse: collapse; width: 100%; }
   background: currentColor;
 }
 .pill-paid    { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
+.pill-settled { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
 .pill-sent    { color: var(--info); background: var(--info-bg); border-color: var(--info-border); }
 .pill-overdue { color: var(--brand-darker); background: var(--brand-tint-2); border-color: var(--brand-border); }
 .pill-draft   { color: var(--text-2); background: var(--surface-3); border-color: var(--border-strong); }

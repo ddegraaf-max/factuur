@@ -981,5 +981,15 @@
   "Zet het betalingskenmerk in het veld \"Betalingskenmerk\" van je bankoverschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.": "Wpisz ten tytuł w polu „Tytuł przelewu” — bez niego urząd skarbowy nie zaksięguje Twojej płatności.",
   "Zet je handtekening in het tekenveld.": "Złóż podpis w polu podpisu.",
   "Zo betaal je:": "Jak zapłacić:",
-  "Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.": "Wyszukaj klientów w firmie po nazwie. Użyj tego, aby znaleźć właściwego klienta (i poznać dokładną nazwę), zanim utworzysz ofertę lub fakturę. Bez frazy wyszukiwania otrzymasz pierwszych 25 klientów."
+  "Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.": "Wyszukaj klientów w firmie po nazwie. Użyj tego, aby znaleźć właściwego klienta (i poznać dokładną nazwę), zanim utworzysz ofertę lub fakturę. Bez frazy wyszukiwania otrzymasz pierwszych 25 klientów.",
+  "Deze creditnota hoort niet bij deze factuur.": "Ta faktura korygująca nie należy do tej faktury.",
+  "Maak de creditnota eerst definitief; een concept kun je niet verrekenen.": "Najpierw zatwierdź fakturę korygującą; szkicu nie można rozliczyć.",
+  "Alleen een openstaande factuur kan worden verrekend.": "Rozliczyć można tylko nieopłaconą fakturę.",
+  "Er valt niets te verrekenen: de factuur of de creditnota is al voldaan.": "Nie ma nic do rozliczenia: faktura lub faktura korygująca jest już rozliczona.",
+  "Verrekend met creditnota :number": "Rozliczono z fakturą korygującą :number",
+  "Verrekend met factuur :number": "Rozliczono z fakturą :number",
+  ":label verrekend met creditnota :number (:amount)": ":label rozliczono z fakturą korygującą :number (:amount)",
+  ":label verrekend met factuur :number (:amount)": ":label rozliczono z fakturą :number (:amount)",
+  "Creditnota :credit verrekend met factuur :invoice (:amount). Omzet en btw veranderen niet.": "Faktura korygująca :credit rozliczona z fakturą :invoice (:amount). Przychód i VAT się nie zmieniają.",
+  "Verrekend met creditnota": "Rozliczono z fakturą korygującą"
 }

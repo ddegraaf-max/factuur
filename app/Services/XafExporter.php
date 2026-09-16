@@ -166,6 +166,9 @@ class XafExporter
             foreach ($inv->payments as $p) {
                 $date = $p->paid_on ? Carbon::parse($p->paid_on) : $inv->invoice_date;
                 if ($date->year !== $year) continue;
+                // Verrekening factuur <-> creditnota: beide documenten staan al in het verkoopboek en
+                // vallen op 1300 tegen elkaar weg; deze boekingen zijn geen bankmutatie en geen afboeking.
+                if ($p->kind === 'credit') continue;
                 $amount = (float) $p->amount;
                 $bankAcc = $p->kind === 'payment' ? '1100' : '8100';   // verrekening/afboeking: geen bankmutatie
                 $journals['B']['transactions'][] = ['nr' => 'B' . $p->id, 'desc' => 'Betaling ' . $inv->number, 'date' => $date, 'lines' => [

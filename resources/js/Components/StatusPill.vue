@@ -11,6 +11,7 @@ const labels = {
   paid: 'Betaald',
   overdue: 'Achterstallig',
   incasso: 'Bij incasso',
+  settled: 'Verrekend',
   cancelled: 'Geannuleerd',
 };
 </script>

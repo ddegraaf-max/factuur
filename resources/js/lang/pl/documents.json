@@ -350,5 +350,9 @@
   "Taal van de factuur": "Język faktury",
   "Taal van de offerte": "Język oferty",
   "(PDF en e-mail — standaard de taal van de klant)": "(PDF i e-mail — domyślnie język klienta)",
-  "Poolstalig": "W języku polskim"
+  "Poolstalig": "W języku polskim",
+  "Verrekenen met :number": "Rozlicz z :number",
+  "Boekt de creditnota af tegen de factuur, zodat beide op nul uitkomen. Er komt geen geld binnen; omzet en btw veranderen niet.": "Rozlicza fakturę korygującą z fakturą, tak że obie wychodzą na zero. Pieniądze nie wpływają; przychód i VAT się nie zmieniają.",
+  "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "Faktura korygująca jest już Twoją korektą przychodu i VAT. To rozliczenie jedynie zamyka obie otwarte pozycje wzajemnie; na PDF faktury nic się nie zmienia.",
+  "(optioneel — standaard \"Verrekend met creditnota …\")": "(opcjonalnie — domyślnie \"Rozliczono z fakturą korygującą …\")"
 }

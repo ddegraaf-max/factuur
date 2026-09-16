@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 september 2026 · {{ brand('version_prefix') }} 1.55.0</div>
+        <h2>Creditnota direct verrekenen met de factuur</h2>
+        <ul class="tl-list">
+          <li><b>Verrekenen in één klik</b> — bij "Betaling registreren" staat nu bovenaan de optie <i>Verrekenen met creditnota</i> (en op de creditnota: <i>Verrekenen met factuur</i>). Factuur en creditnota komen allebei op nul uit zonder dat er geld beweegt; omzet en btw veranderen niet.</li>
+          <li><b>Status Verrekend</b> — een verrekende (of terugbetaalde) creditnota heet voortaan <i>Verrekend</i> in plaats van eeuwig <i>Verstuurd</i>. In de export telt de verrekening mee onder "Doorgestort/verrekend"; het auditfile boekt haar niet als ontvangst.</li>
+          <li><b>Openstaand klopt weer</b> — creditnota's telden op het dashboard mee als openstaand bedrag. Dat is voorbij: een creditnota is geen vordering.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 september 2026 · {{ brand('version_prefix') }} 1.54.0</div>
         <h2>Creditnota's, vette letters en plaats van uitgifte</h2>
         <ul class="tl-list">

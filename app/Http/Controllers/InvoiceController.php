@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\Product;
+use App\Services\CreditNoteService;
 use App\Services\InvoiceManager;
 use App\Services\PaymentThanksService;
 use App\Services\UblGenerator;
@@ -195,11 +196,48 @@ class InvoiceController extends Controller
                     'number' => $c->number,
                     'status' => $c->status,
                     'total' => (float) $c->total,
+                    'remaining' => (float) $c->remaining_amount,
                     'invoice_date_label' => $c->invoice_date->translatedFormat('j M Y'),
                 ]),
+                'settle_options' => $this->settleOptions($invoice),
             ]),
             'company' => $company,
         ]);
+    }
+
+    /**
+     * Waarmee dit document te verrekenen valt: op een factuur de openstaande
+     * creditnota's erop, op een creditnota de openstaande factuur eronder.
+     * Het bedrag is wat er hoogstens tegen elkaar wegvalt.
+     */
+    private function settleOptions(Invoice $invoice): array
+    {
+        $open = fn (Invoice $i) => round((float) $i->total - (float) $i->paid_total, 2);
+        $option = fn (Invoice $with) => ['id' => $with->id, 'number' => $with->number, 'amount' => min($open($invoice), $open($with))];
+        $receivable = ['sent', 'partial', 'overdue'];
+
+        if ($open($invoice) < 0.01) {
+            return [];
+        }
+
+        if ($invoice->is_credit) {
+            $original = $invoice->status === 'draft' ? null : $invoice->originalInvoice;
+            if (! $original || ! in_array($original->status, $receivable, true) || $open($original) < 0.01) {
+                return [];
+            }
+
+            return [$option($original)];
+        }
+
+        if (! in_array($invoice->status, $receivable, true)) {
+            return [];
+        }
+
+        return $invoice->creditNotes
+            ->filter(fn (Invoice $c) => $c->status !== 'draft' && $open($c) >= 0.01)
+            ->map($option)
+            ->values()
+            ->all();
     }
 
     public function edit(Invoice $invoice): Response
@@ -410,8 +448,30 @@ class InvoiceController extends Controller
 
     public function recordPayment(Request $request, Invoice $invoice, PaymentThanksService $thanks): RedirectResponse
     {
+        // Verrekenen met een creditnota: er komt geen geld binnen, maar de
+        // factuur én de creditnota krijgen dezelfde boeking, zodat allebei op
+        // nul uitkomen. Werkt vanaf beide kanten (factuur of creditnota).
+        if ($request->input('kind') === 'credit') {
+            $data = $request->validate([
+                'credit_note_id' => ['required', 'integer'],
+                'paid_on' => ['required', 'date'],
+                'reference' => ['nullable', 'string', 'max:255'],
+            ]);
+            $counterpart = Invoice::findOrFail($data['credit_note_id']);
+            try {
+                $amount = app(CreditNoteService::class)->settle($invoice, $counterpart, $data['paid_on'], $data['reference'] ?? null);
+            } catch (\DomainException $e) {
+                return back()->withErrors(['credit_note_id' => $e->getMessage()]);
+            }
+            [$regular, $credit] = $invoice->is_credit ? [$counterpart, $invoice] : [$invoice, $counterpart];
+
+            return back()->with('flash', __('Creditnota :credit verrekend met factuur :invoice (:amount). Omzet en btw veranderen niet.', [
+                'credit' => $credit->number, 'invoice' => $regular->number, 'amount' => money($amount),
+            ]));
+        }
+
         $data = $request->validate([
-            'kind' => ['nullable', 'in:payment,write_off,advance'],
+            'kind' => ['nullable', 'in:payment,write_off,advance,credit'],
             'amount' => ['required', 'numeric', 'min:0.01', 'max:' . ($invoice->remaining_amount + 0.01)],
             'paid_on' => ['required', 'date'],
             'method' => ['nullable', 'required_if:kind,payment', 'in:bank_transfer,ideal,cash,card,other'],
@@ -549,9 +609,10 @@ class InvoiceController extends Controller
             $label = match ($payment->kind) {
                 'write_off' => __('Afgeboekt: :amount', ['amount' => money($payment->amount)]),
                 'advance' => __('Verrekend / reeds doorgestort: :amount', ['amount' => money($payment->amount)]),
+                'credit' => ($payment->reference ?: __('Verrekend')) . ': ' . money($payment->amount),
                 default => __('Betaling ontvangen: :amount', ['amount' => money($payment->amount)]),
             };
-            $push($payment->paid_on, $payment->kind === 'write_off' ? 'credit' : 'euro', $label);
+            $push($payment->paid_on, in_array($payment->kind, ['write_off', 'credit'], true) ? 'credit' : 'euro', $label);
         }
 
         if ($invoice->status === 'paid') {

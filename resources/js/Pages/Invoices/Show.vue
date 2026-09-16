@@ -165,9 +165,14 @@ const createRecurring = () => {
     });
 };
 
+// Verrekenen met een creditnota (of, op een creditnota, met de factuur): de
+// server geeft alleen tegenposten waar nog iets open staat.
+const settleOptions = computed(() => props.invoice.settle_options || []);
+
 const paymentForm = useForm({
-  kind: 'payment',
-  amount: props.invoice.remaining,
+  kind: settleOptions.value.length ? 'credit' : 'payment',
+  credit_note_id: settleOptions.value[0]?.id ?? null,
+  amount: settleOptions.value.length ? settleOptions.value[0].amount : props.invoice.remaining,
   paid_on: new Date().toISOString().slice(0, 10),
   method: 'bank_transfer',
   reference: '',
@@ -176,10 +181,25 @@ const paymentForm = useForm({
   send_thanks: !!props.company?.thanks_mail_enabled && !!props.invoice.customer_email,
 });
 
-// Bij afboeken is het restbedrag vrijwel altijd wat je wilt wegboeken.
+const selectedSettle = computed(() => settleOptions.value.find(o => o.id === paymentForm.credit_note_id) || settleOptions.value[0] || null);
+const syncSettleAmount = () => { if (selectedSettle.value) paymentForm.amount = selectedSettle.value.amount; };
+
+// Bij afboeken is het restbedrag vrijwel altijd wat je wilt wegboeken; bij
+// verrekenen ligt het bedrag vast (wat er hoogstens tegen elkaar wegvalt).
 watch(() => paymentForm.kind, (kind) => {
   if (kind === 'write_off') paymentForm.amount = props.invoice.remaining;
+  if (kind === 'credit') syncSettleAmount();
 });
+watch(() => paymentForm.credit_note_id, syncSettleAmount);
+
+// Na een boeking zijn de props vernieuwd, maar de formulierdefaults niet:
+// bij het openen opnieuw kiezen wat het meest voor de hand ligt.
+const openPaymentModal = () => {
+  paymentForm.kind = settleOptions.value.length ? 'credit' : 'payment';
+  paymentForm.credit_note_id = settleOptions.value[0]?.id ?? null;
+  paymentForm.amount = settleOptions.value.length ? settleOptions.value[0].amount : props.invoice.remaining;
+  showPaymentModal.value = true;
+};
 
 // Een bedankje hoort pas bij een volledige betaling — niet bij een deelbetaling.
 const isFullPayment = computed(() =>
@@ -416,7 +436,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           {{ $t('Creditnota definitief maken') }}
         </button>
-        <button v-if="['sent','partial','overdue'].includes(invoice.status)" class="btn btn-primary btn-sm" @click="showPaymentModal = true">
+        <button v-if="['sent','partial','overdue'].includes(invoice.status)" class="btn btn-primary btn-sm" @click="openPaymentModal">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           {{ $t('Betaling registreren') }}
         </button>
@@ -889,6 +909,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
                 <td :data-label="$t('Methode')">
                   <span v-if="p.kind === 'write_off'" class="writeoff-chip">{{ $t('Afboeking') }}</span>
                   <span v-else-if="p.kind === 'advance'" class="advance-chip">{{ $t('Doorgestort') }}</span>
+                  <span v-else-if="p.kind === 'credit'" class="settled-chip">{{ $t('Verrekend') }}</span>
                   <template v-else>{{ payMethodLabels[p.method] || p.method }}</template>
                 </td>
                 <td :data-label="$t('Referentie')">{{ p.reference || '—' }}</td>
@@ -910,6 +931,13 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           </button>
         </div>
         <div class="modal-body">
+          <label v-if="settleOptions.length" class="credit-opt" :class="{ on: paymentForm.kind === 'credit' }">
+            <input type="radio" value="credit" v-model="paymentForm.kind">
+            <div>
+              <div class="credit-opt-title">{{ $t('Verrekenen met :number', { number: selectedSettle?.number }) }}</div>
+              <div class="credit-opt-sub">{{ $t('Boekt de creditnota af tegen de factuur, zodat beide op nul uitkomen. Er komt geen geld binnen; omzet en btw veranderen niet.') }}</div>
+            </div>
+          </label>
           <label class="credit-opt" :class="{ on: paymentForm.kind === 'payment' }">
             <input type="radio" value="payment" v-model="paymentForm.kind">
             <div>
@@ -936,10 +964,19 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 
           <div v-if="paymentForm.kind === 'write_off'" class="writeoff-note" v-html="$t('Een afboeking verandert <b>niets</b> aan je omzet of BTW-aangifte — de factuur telt gewoon mee zoals hij is verstuurd. Wil je de BTW juist terugvragen (bijv. bij een oninbare factuur)? Maak dan een <b>creditnota</b> in plaats van een afboeking.')"></div>
 
+          <div v-if="paymentForm.kind === 'credit'" class="writeoff-note" style="background:var(--success-bg);border-color:var(--success-border);color:var(--success);">{{ $t('De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.') }}</div>
+          <div v-if="paymentForm.kind === 'credit' && settleOptions.length > 1" class="form-group" style="margin-top:14px;">
+            <label>{{ $t('Creditnota') }}</label>
+            <select v-model="paymentForm.credit_note_id">
+              <option v-for="o in settleOptions" :key="o.id" :value="o.id">{{ o.number }} · {{ eur(o.amount) }}</option>
+            </select>
+          </div>
+          <div v-if="paymentForm.errors.credit_note_id" class="field-error" style="margin-top:8px;">{{ paymentForm.errors.credit_note_id }}</div>
+
           <div class="form-row" style="margin-top:14px;">
             <div class="form-group">
               <label>{{ $t('Bedrag') }} *</label>
-              <input type="number" v-model="paymentForm.amount" step="0.01" min="0.01" :max="invoice.remaining">
+              <input type="number" v-model="paymentForm.amount" step="0.01" min="0.01" :max="invoice.remaining" :disabled="paymentForm.kind === 'credit'">
               <div v-if="paymentForm.errors.amount" class="field-error">{{ paymentForm.errors.amount }}</div>
             </div>
             <div class="form-group">
@@ -961,7 +998,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div class="form-group">
             <label>
               {{ paymentForm.kind === 'payment' ? $t('Referentie') : $t('Omschrijving') }}
-              <span class="label-hint">{{ { payment: $t('(bijv. bankregel-omschrijving)'), advance: $t('(verschijnt op de PDF, bijv. "Reeds doorgestort 11-08")'), write_off: $t('(bijv. betalingsverschil, kwijtgescholden)') }[paymentForm.kind] }}</span>
+              <span class="label-hint">{{ { payment: $t('(bijv. bankregel-omschrijving)'), advance: $t('(verschijnt op de PDF, bijv. "Reeds doorgestort 11-08")'), write_off: $t('(bijv. betalingsverschil, kwijtgescholden)'), credit: $t('(optioneel — standaard "Verrekend met creditnota …")') }[paymentForm.kind] }}</span>
             </label>
             <input type="text" v-model="paymentForm.reference" maxlength="255">
           </div>
@@ -984,7 +1021,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showPaymentModal = false">{{ $t('Annuleren') }}</button>
             <button class="btn btn-primary btn-sm" @click="recordPayment" :disabled="paymentForm.processing">
-              {{ { payment: $t('Registreren'), advance: $t('Verrekenen'), write_off: $t('Afboeken') }[paymentForm.kind] }}
+              {{ { payment: $t('Registreren'), advance: $t('Verrekenen'), write_off: $t('Afboeken'), credit: $t('Verrekenen') }[paymentForm.kind] }}
             </button>
           </div>
         </div>
@@ -1164,6 +1201,12 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
   display: inline-flex; align-items: center;
   font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
   background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border);
+}
+
+.settled-chip {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px;
+  background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border);
 }
 
 /* Keuzeblokken in de creditnota-modal */

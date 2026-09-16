@@ -136,7 +136,8 @@ class Invoice extends Model
 
     public function scopeOpen(Builder $query): Builder
     {
-        return $query->whereIn('status', ['sent', 'partial', 'overdue', 'incasso']);
+        // Creditnota's zijn geen vordering: die tellen nooit als openstaand.
+        return $query->where('is_credit', false)->whereIn('status', ['sent', 'partial', 'overdue', 'incasso']);
     }
 
     public function scopeRegular(Builder $query): Builder
@@ -158,11 +159,17 @@ class Invoice extends Model
 
     public function refreshStatus(): void
     {
-        if ($this->is_credit) return;
         if (in_array($this->status, ['draft', 'cancelled', 'incasso'])) return;
 
         $paid = (float) $this->paid_total;
         $total = (float) $this->total;
+
+        // Een creditnota kent geen betaaltermijn: ze is verstuurd, of verrekend
+        // (met de factuur, of terugbetaald) zodra het hele bedrag is geboekt.
+        if ($this->is_credit) {
+            $this->status = ($total > 0 && $paid >= $total - 0.004) ? 'settled' : 'sent';
+            return;
+        }
 
         if ($paid >= $total && $total > 0) {
             $this->status = 'paid';

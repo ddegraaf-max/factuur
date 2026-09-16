@@ -62,7 +62,7 @@ class ExportController extends Controller
 
         $invoices = Invoice::with('lines')
             ->withSum(['payments as real_paid' => fn ($q) => $q->where('kind', 'payment')], 'amount')
-            ->withSum(['payments as advance_paid' => fn ($q) => $q->where('kind', 'advance')], 'amount')
+            ->withSum(['payments as advance_paid' => fn ($q) => $q->whereIn('kind', ['advance', 'credit'])], 'amount')
             ->whereNotIn('status', ['draft', 'cancelled'])
             ->whereBetween('invoice_date', [$from, $to])
             ->when(! $includeCredit, fn ($q) => $q->where('is_credit', false))
@@ -89,7 +89,7 @@ class ExportController extends Controller
 
             $statusLabels = [
                 'sent' => __('Verstuurd'), 'partial' => __('Deels betaald'), 'overdue' => __('Vervallen'),
-                'incasso' => __('Incasso'), 'paid' => __('Betaald'),
+                'incasso' => __('Incasso'), 'paid' => __('Betaald'), 'settled' => __('Verrekend'),
             ];
 
             $rateColumns = [];

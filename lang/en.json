@@ -981,5 +981,15 @@
   "Zet het betalingskenmerk in het veld \"Betalingskenmerk\" van je bankoverschrijving — zonder kenmerk kan de Belastingdienst je betaling niet verwerken.": "Enter the payment reference in the \"Payment reference\" field of your bank transfer — without it, the tax office cannot process your payment.",
   "Zet je handtekening in het tekenveld.": "Sign in the signature field.",
   "Zo betaal je:": "How to pay:",
-  "Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.": "Search the company's customers by name. Use this to find the right customer (and learn the exact name) before you create a quote or invoice. Without a search term you get the first 25 customers."
+  "Zoek klanten in de administratie op naam. Gebruik dit om de juiste klant te vinden (en de exacte naam te kennen) voordat je een offerte of factuur aanmaakt. Zonder zoekterm krijg je de eerste 25 klanten.": "Search the company's customers by name. Use this to find the right customer (and learn the exact name) before you create a quote or invoice. Without a search term you get the first 25 customers.",
+  "Deze creditnota hoort niet bij deze factuur.": "This credit note does not belong to this invoice.",
+  "Maak de creditnota eerst definitief; een concept kun je niet verrekenen.": "Finalise the credit note first; a draft cannot be settled.",
+  "Alleen een openstaande factuur kan worden verrekend.": "Only an outstanding invoice can be settled.",
+  "Er valt niets te verrekenen: de factuur of de creditnota is al voldaan.": "There is nothing to settle: the invoice or the credit note has already been paid.",
+  "Verrekend met creditnota :number": "Settled against credit note :number",
+  "Verrekend met factuur :number": "Settled against invoice :number",
+  ":label verrekend met creditnota :number (:amount)": ":label settled against credit note :number (:amount)",
+  ":label verrekend met factuur :number (:amount)": ":label settled against invoice :number (:amount)",
+  "Creditnota :credit verrekend met factuur :invoice (:amount). Omzet en btw veranderen niet.": "Credit note :credit settled against invoice :invoice (:amount). Revenue and VAT do not change.",
+  "Verrekend met creditnota": "Settled against credit note"
 }

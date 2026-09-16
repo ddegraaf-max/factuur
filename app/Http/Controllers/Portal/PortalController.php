@@ -166,13 +166,15 @@ class PortalController extends Controller
                 ]),
                 // Betalingen en verrekeningen ("reeds doorgestort") tonen —
                 // interne afboekingen niet.
-                'payments' => $invoice->payments->whereIn('kind', ['payment', 'advance'])->map(fn ($p) => [
+                'payments' => $invoice->payments->whereIn('kind', ['payment', 'advance', 'credit'])->map(fn ($p) => [
                     'id' => $p->id,
                     'paid_on_label' => $p->paid_on?->translatedFormat('j M Y'),
                     'amount' => (float) $p->amount,
-                    'label' => $p->kind === 'advance'
-                        ? ($p->reference ?: __('Verrekend / reeds doorgestort'))
-                        : __('Betaling ontvangen'),
+                    'label' => match ($p->kind) {
+                        'advance' => $p->reference ?: __('Verrekend / reeds doorgestort'),
+                        'credit' => $p->reference ?: __('Verrekend met creditnota'),
+                        default => __('Betaling ontvangen'),
+                    },
                 ])->values(),
                 'attachments' => $customerAttachments,
             ]),
