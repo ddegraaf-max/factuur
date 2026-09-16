@@ -11,7 +11,7 @@
     color: #1C1917;
     line-height: 1.5;
   }
-  h1, h2, h3 { margin: 0; font-weight: 600; }
+  h1, h2, h3 { margin: 0; font-weight: 700; }
   .brand { color: {{ $company->brand_color }}; }
 
   .header { width: 100%; margin-bottom: 26px; border-bottom: 3px solid {{ $company->brand_color }}; padding-bottom: 16px; }
@@ -45,7 +45,7 @@
   .meta-table tr td:first-child { border-left: 1px solid #EFEEEC; border-top-left-radius: 6px; border-bottom-left-radius: 6px; }
   .meta-table tr td:last-child { border-right: 1px solid #EFEEEC; border-top-right-radius: 6px; border-bottom-right-radius: 6px; }
   .meta-label { color: #A8A29E; text-transform: uppercase; font-size: 7.5pt; letter-spacing: 0.05em; white-space: nowrap; }
-  .meta-value { font-weight: 600; font-size: 9.5pt; }
+  .meta-value { font-weight: 700; font-size: 9.5pt; }
 
   .lines { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
   .lines th { text-align: left; padding: 0 10px 8px; font-size: 8pt; text-transform: uppercase; letter-spacing: 0.06em; color: #A8A29E; border-bottom: 2px solid {{ $company->brand_color }}; }
@@ -59,13 +59,13 @@
   .totals { width: 290px; float: right; margin-top: 14px; }
   .totals tr td { padding: 5px 12px; font-size: 10pt; }
   .totals .label { color: #57534E; }
-  .totals .value { text-align: right; font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; font-weight: 500; }
+  .totals .value { text-align: right; font-family: {!! \App\Support\DocumentLocale::font('mono') !!}; font-weight: 700; }
   .totals .grand-row td { background: {{ $company->brand_color }}; color: #fff; font-weight: 700; font-size: 12.5pt; border-radius: 6px; padding: 10px 12px; }
   .totals .grand-row .value { color: #fff; }
 
   .notes { clear: both; margin-top: 46px; padding: 12px 14px; background: #FAFAF9; border-left: 3px solid {{ $company->brand_color }}; border-radius: 4px; font-size: 9pt; color: #44403C; }
   .footer { margin-top: 22px; padding-top: 12px; border-top: 1px solid #E7E5E4; font-size: 8.5pt; color: #A8A29E; text-align: center; }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 8pt; font-weight: 600; background: #FEF3C7; color: #B45309; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 100px; font-size: 8pt; font-weight: 700; background: #FEF3C7; color: #B45309; }
 </style>
 </head>
 <body>
@@ -119,6 +119,7 @@
       <table class="meta-table">
         <tr><td class="meta-label">{{ __('doc.invoice_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>
         @if(\App\Support\Market::isPl())<tr><td class="meta-label">{{ __('doc.sale_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>@endif
+        @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city)<tr><td class="meta-label">{{ __('doc.issue_place') }}</td><td class="meta-value">{{ $company->city }}</td></tr>@endif
         <tr><td class="meta-label">{{ __('doc.due_date') }}</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>
         @if($invoice->reference)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
         @if($company->kvk_number)<tr><td class="meta-label">{{ \App\Support\DocumentLocale::registryLabel($company->country) }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
@@ -146,7 +147,7 @@
     @foreach($invoice->lines as $line)
       <tr>
         <td>
-          <div style="font-weight:500;">{{ $line->description }}</div>
+          <div style="font-weight: 700;">{{ $line->description }}</div>
           @if($line->details)<div class="details">{{ $line->details }}</div>@endif
         </td>
         <td class="right">{{ rtrim(rtrim(number_format($line->quantity, 3, ',', '.'), '0'), ',') }} {{ $line->unit }}</td>

@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 september 2026 · {{ brand('version_prefix') }} 1.54.0</div>
+        <h2>Creditnota's, vette letters en plaats van uitgifte</h2>
+        <ul class="tl-list">
+          <li><b>Een creditnota is nooit achterstallig</b> — het dashboard zette verstuurde creditnota's na de vervaldatum tóch op 'achterstallig'. Bij een creditnota valt niets te innen; bestaande gevallen zijn hersteld.</li>
+          <li><b>Vette tekst in het PDF</b> — kopjes, bedragen en de datums in het factuurblok vielen terug op een schreefletter zonder Poolse tekens (15 wrze?nia). Ze staan nu in hetzelfde lettertype als de rest van het document.</li>
+          <li><b>Plaats van uitgifte</b> — Poolse facturen (en facturen vanuit de Poolse markt) vermelden naast de datum ook de plaats van uitgifte (miejsce wystawienia), zoals de Poolse factuureisen vragen.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 september 2026 · {{ brand('version_prefix') }} 1.53.0</div>
         <h2>Poolse facturen: letters, voetnoot en KVK</h2>
         <ul class="tl-list">

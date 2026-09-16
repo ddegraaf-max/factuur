@@ -41,6 +41,16 @@ class DocumentLocale
     }
 
     /**
+     * Plaats van uitgifte in het kopblok. Een Poolse factuur vermeldt naast de
+     * datum ook waar hij is opgemaakt (miejsce wystawienia); dat geldt voor
+     * Poolstalige documenten én voor alles wat vanuit de Poolse markt vertrekt.
+     */
+    public static function showsIssuePlace(): bool
+    {
+        return app()->getLocale() === 'pl' || Market::isPl();
+    }
+
+    /**
      * Label bij het registratienummer van een bedrijf. Dat hoort bij het land
      * van dát bedrijf, niet bij de taal van het document: een Nederlands bedrijf
      * heeft ook op een Poolse factuur een KVK-nummer, geen REGON.

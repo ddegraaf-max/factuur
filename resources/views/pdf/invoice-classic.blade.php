@@ -47,7 +47,7 @@
     margin-bottom: 18px;
   }
   .party-label { font-weight: 700; text-transform: uppercase; font-size: 9pt; letter-spacing: 0.06em; margin-bottom: 4px; color: {{ $company->brand_color }}; }
-  .party-name { font-weight: 600; font-size: 11pt; }
+  .party-name { font-weight: 700; font-size: 11pt; }
   .party-line { font-size: 10pt; color: #333; }
 
   /* Lines table — gridded */
@@ -91,7 +91,7 @@
     border-bottom: 1px solid #E7E5E4;
   }
   .totals .label { color: #333; }
-  .totals .value { text-align: right; font-weight: 500; }
+  .totals .value { text-align: right; font-weight: 700; }
   .totals .grand-row td {
     border-top: 2px solid {{ $company->brand_color }};
     border-bottom: 3px double {{ $company->brand_color }};
@@ -102,7 +102,7 @@
 
   .notes { clear: both; margin-top: 36px; padding: 12px 14px; border: 1px solid #E7E5E4; background: #FAFAF9; font-size: 9.5pt; font-style: italic; }
   .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid #E7E5E4; font-size: 9pt; color: #78716C; text-align: center; font-style: italic; }
-  .badge { display: inline-block; padding: 2px 8px; border: 1px solid #B45309; font-size: 8pt; font-weight: 600; color: #B45309; }
+  .badge { display: inline-block; padding: 2px 8px; border: 1px solid #B45309; font-size: 8pt; font-weight: 700; color: #B45309; }
 </style>
 </head>
 <body>
@@ -130,6 +130,7 @@
     <td>
       <span class="meta-label">{{ __('doc.invoice_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}<br>
       @if(\App\Support\Market::isPl())<span class="meta-label">{{ __('doc.sale_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}<br>@endif
+      @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city)<span class="meta-label">{{ __('doc.issue_place') }}:</span> {{ $company->city }}<br>@endif
       <span class="meta-label">{{ __('doc.due_date') }}:</span> {{ $invoice->due_date->translatedFormat('j F Y') }}<br>
       @if($invoice->reference)<span class="meta-label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}@endif
     </td>

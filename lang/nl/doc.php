@@ -23,6 +23,7 @@ return [
     'vat_no' => 'BTW',
     'invoice_date' => 'Factuurdatum',
     'sale_date' => 'Leverdatum',
+    'issue_place' => 'Plaats',
     'due_date' => 'Vervaldatum',
     'quote_date' => 'Offertedatum',
     'valid_until' => 'Geldig tot',

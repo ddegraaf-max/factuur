@@ -119,6 +119,21 @@ class Invoice extends Model
         return (int) $this->due_date->diffInDays(now());
     }
 
+    /**
+     * Zet verstuurde facturen met een verstreken vervaldatum op 'overdue'.
+     * Creditnota's slaan we over: daar valt niets te innen, dus die kunnen
+     * nooit achterstallig zijn. (Het dashboard vergat die controle ooit,
+     * waardoor creditnota's tóch als achterstallig te boek stonden.)
+     */
+    public static function markOverdue(): int
+    {
+        return static::query()
+            ->where('status', 'sent')
+            ->where('is_credit', false)
+            ->whereDate('due_date', '<', now())
+            ->update(['status' => 'overdue']);
+    }
+
     public function scopeOpen(Builder $query): Builder
     {
         return $query->whereIn('status', ['sent', 'partial', 'overdue', 'incasso']);

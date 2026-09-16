@@ -23,11 +23,8 @@ class InvoiceController extends Controller
 
     public function index(Request $request): Response
     {
-        // Auto-refresh overdue status on listing (skip credit notes + incasso)
-        Invoice::where('status', 'sent')
-            ->where('is_credit', false)
-            ->whereDate('due_date', '<', now())
-            ->update(['status' => 'overdue']);
+        // Achterstallig markeren bij het openen van de lijst (creditnota's en incasso blijven buiten schot).
+        Invoice::markOverdue();
 
         $status = $request->input('status', 'all');
         $q = $request->input('q');

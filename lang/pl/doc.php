@@ -22,6 +22,7 @@ return [
     'vat_no' => 'NIP',
     'invoice_date' => 'Data wystawienia',
     'sale_date' => 'Data sprzedaży',
+    'issue_place' => 'Miejsce wystawienia',
     'due_date' => 'Termin płatności',
     'quote_date' => 'Data oferty',
     'valid_until' => 'Ważna do',

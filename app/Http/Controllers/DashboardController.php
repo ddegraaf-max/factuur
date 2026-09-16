@@ -16,10 +16,8 @@ class DashboardController extends Controller
 {
     public function index(VatService $vat): Response
     {
-        // First, mark overdue
-        Invoice::where('status', 'sent')
-            ->whereDate('due_date', '<', now())
-            ->update(['status' => 'overdue']);
+        // Eerst achterstallig markeren (creditnota's en incasso blijven buiten schot).
+        Invoice::markOverdue();
 
         $outstanding = Invoice::open()->sum(DB::raw('total - paid_total'));
         $outstandingCount = Invoice::open()->count();

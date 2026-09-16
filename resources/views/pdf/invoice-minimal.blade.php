@@ -10,7 +10,7 @@
     font-size: 10pt;
     color: #1C1917;
     line-height: 1.6;
-    font-weight: 300;
+    font-weight: 400;
   }
   h1, h2, h3 { margin: 0; font-weight: 400; }
   .brand { color: {{ $company->brand_color }}; }
@@ -20,7 +20,7 @@
   .logo-img { max-height: 44px; max-width: 180px; margin-bottom: 18px; }
   .doc-title {
     font-size: 30pt;
-    font-weight: 300;
+    font-weight: 400;
     letter-spacing: -1.5px;
     margin: 0;
     color: {{ $company->brand_color }};
@@ -42,7 +42,7 @@
     color: #999;
     margin-bottom: 8px;
   }
-  .party-name { font-weight: 500; font-size: 11pt; }
+  .party-name { font-weight: 700; font-size: 11pt; }
   .party-line { color: #555; font-size: 10pt; }
 
   /* Lines — very minimal */
@@ -55,7 +55,7 @@
     text-align: left;
     padding: 12px 0 8px;
     font-size: 8.5pt;
-    font-weight: 500;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: {{ $company->brand_color }};
@@ -78,7 +78,7 @@
   .totals .grand-row td {
     border-top: 2px solid {{ $company->brand_color }};
     padding-top: 12px;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 13pt;
     color: #1C1917;
   }
@@ -129,6 +129,7 @@
       @if($invoice->customer_vat_number)<div class="party-line" style="margin-top:8px;color:#999;">{{ __('doc.vat_no') }} {{ $invoice->customer_vat_number }}</div>@endif
       <div class="party-line" style="margin-top:14px;color:#999;font-size:9pt;">
         @if(\App\Support\Market::isPl()){{ __('doc.sale_date') }}: {{ $invoice->invoice_date->translatedFormat('j F Y') }}<br>@endif
+        @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city){{ __('doc.issue_place') }}: {{ $company->city }}<br>@endif
         {{ __('doc.due_date') }}: {{ $invoice->due_date->translatedFormat('j F Y') }}
       </div>
     </td>

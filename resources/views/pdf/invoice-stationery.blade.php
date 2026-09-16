@@ -18,7 +18,7 @@
     color: #1C1917;
     line-height: 1.55;
   }
-  h1, h2, h3 { margin: 0; font-weight: 600; }
+  h1, h2, h3 { margin: 0; font-weight: 700; }
 
   /* Het briefpapier: paginavullend, herhaald op elke pagina. De negatieve
      offsets tillen de afbeelding uit de paginamarges (DomPDF-patroon). */
@@ -36,7 +36,7 @@
   .doc-sub { font-size: 9pt; color: #57534E; margin-top: 2px; }
   .meta-block { text-align: right; font-size: 9pt; color: #44403C; }
   .meta-block .label { color: #78716C; }
-  .badge { display: inline-block; padding: 2px 8px; font-size: 8pt; color: #B45309; background: #FEF3C7; border-radius: 100px; font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 8px; font-size: 8pt; color: #B45309; background: #FEF3C7; border-radius: 100px; font-weight: 700; }
 
   .party { margin-bottom: 20px; font-size: 9.5pt; }
   .party-label { font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.08em; color: #78716C; margin-bottom: 3px; }
@@ -81,6 +81,7 @@
     <td class="meta-block">
       <div><span class="label">{{ __('doc.invoice_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}</div>
       @if(\App\Support\Market::isPl())<div><span class="label">{{ __('doc.sale_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}</div>@endif
+      @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city)<div><span class="label">{{ __('doc.issue_place') }}:</span> {{ $company->city }}</div>@endif
       <div><span class="label">{{ __('doc.due_date') }}:</span> {{ $invoice->due_date->translatedFormat('j F Y') }}</div>
       @if($invoice->reference)<div><span class="label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}</div>@endif
     </td>

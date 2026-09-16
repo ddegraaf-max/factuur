@@ -22,6 +22,7 @@ return [
     'vat_no' => 'VAT',
     'invoice_date' => 'Invoice date',
     'sale_date' => 'Date of supply',
+    'issue_place' => 'Place of issue',
     'due_date' => 'Due date',
     'quote_date' => 'Quotation date',
     'valid_until' => 'Valid until',
