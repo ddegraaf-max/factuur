@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.3</div>
+        <h2>Minteken ook in de app</h2>
+        <ul class="tl-list">
+          <li><b>Creditnota overal als tegoed</b> — de creditnotapagina, de factuurlijst, de klantpagina en het klantenportaal tonen de bedragen van een creditnota nu ook met een minteken, net als de PDF en de export. Vervaldatum en betalingstermijn staan niet meer op een creditnota; in plaats van "Referentie" zie je "Crediteert factuur".</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.2</div>
         <h2>Creditnota met minteken invullen</h2>
         <ul class="tl-list">

@@ -94,7 +94,7 @@ const setStatus = (s) => {
                 </svg>
               </span>
             </td>
-            <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.total) }}</td>
+            <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
             <td><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" color="var(--text-4)"><polyline points="9 18 15 12 9 6"/></svg></td>
           </tr>
         </tbody>

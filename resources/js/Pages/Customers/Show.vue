@@ -147,7 +147,7 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
                   <td :data-label="$t('Datum')">{{ inv.invoice_date_label }}</td>
                   <td :data-label="$t('Vervaldatum')">{{ inv.due_date_label || '—' }}</td>
                   <td :data-label="$t('Status')"><StatusPill :status="inv.status" :days-overdue="inv.days_overdue" /></td>
-                  <td class="right num" :data-label="$t('Bedrag')">{{ eur(inv.total) }}</td>
+                  <td class="right num" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
                   <td class="right num" :data-label="$t('Open')" :class="{ 'is-open': inv.remaining > 0.009 && ['sent','partial','overdue','incasso'].includes(inv.status) }">
                     {{ inv.remaining > 0.009 && ['sent','partial','overdue','incasso'].includes(inv.status) ? eur(inv.remaining) : '—' }}
                   </td>

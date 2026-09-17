@@ -13,6 +13,9 @@ const props = defineProps({
   peppol: { type: Object, default: null },
 });
 
+// Creditnota: bedragen als tegoed tonen (met minteken), net als op de PDF en in de export.
+const signed = (v) => props.invoice.is_credit ? -Math.abs(Number(v) || 0) : v;
+
 // Markt (nl/pl): betaalmethode-label, incassopartner en de Poolse windykacja/KSeF-blokken.
 const market = usePage().props.market;
 
@@ -476,7 +479,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           </div>
           <div style="text-align:right">
             <div class="inv-meta-label" style="margin-bottom:6px;">{{ $t('Totaal') }}</div>
-            <div style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.02em;">{{ eur(invoice.total) }}</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.02em;">{{ eur(signed(invoice.total)) }}</div>
             <div v-if="invoice.paid_total > 0" style="font-size:12px;color:var(--success);margin-top:4px;">
               {{ $t(':paid betaald · :open open', { paid: eur(invoice.paid_total), open: eur(invoice.remaining) }) }}
             </div>
@@ -487,15 +490,15 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div class="inv-meta-label">{{ $t('Factuurdatum') }}</div>
             <div class="inv-meta-value">{{ invoice.invoice_date_label }}</div>
           </div>
-          <div>
+          <div v-if="!invoice.is_credit">
             <div class="inv-meta-label">{{ $t('Vervaldatum') }}</div>
             <div class="inv-meta-value">{{ invoice.due_date_label }}</div>
           </div>
           <div v-if="invoice.reference">
-            <div class="inv-meta-label">{{ $t('Referentie') }}</div>
+            <div class="inv-meta-label">{{ invoice.is_credit ? $t('Crediteert factuur') : $t('Referentie') }}</div>
             <div class="inv-meta-value mono">{{ invoice.reference }}</div>
           </div>
-          <div>
+          <div v-if="!invoice.is_credit">
             <div class="inv-meta-label">{{ $t('Betalingstermijn') }}</div>
             <div class="inv-meta-value">{{ $t(':n dagen', { n: invoice.payment_terms }) }}</div>
           </div>
@@ -563,11 +566,11 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
               </td>
               <td class="mono" style="text-align:right" :data-label="$t('Aantal')">{{ Number(line.quantity) }}</td>
               <td class="mono" style="text-align:right" :data-label="$t('Prijs')">
-                {{ eur(line.unit_price) }}
+                {{ eur(signed(line.unit_price)) }}
                 <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% {{ $t('korting') }}</span>
               </td>
               <td style="text-align:center" :data-label="$t('BTW')">{{ Number(line.vat_rate) }}%</td>
-              <td class="mono" style="text-align:right" :data-label="$t('Totaal')">{{ eur(line.line_subtotal) }}</td>
+              <td class="mono" style="text-align:right" :data-label="$t('Totaal')">{{ eur(signed(line.line_subtotal)) }}</td>
             </tr>
           </tbody>
         </table>
@@ -575,15 +578,15 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
         <div class="inv-totals">
           <div class="inv-total-row">
             <span class="label">{{ $t('Subtotaal') }}</span>
-            <span class="value mono">{{ eur(invoice.subtotal) }}</span>
+            <span class="value mono">{{ eur(signed(invoice.subtotal)) }}</span>
           </div>
           <div v-for="(amount, rate) in invoice.vat_breakdown" :key="rate" class="inv-total-row">
             <span class="label">{{ $t('BTW') }} {{ Number(rate) }}%</span>
-            <span class="value mono">{{ eur(amount) }}</span>
+            <span class="value mono">{{ eur(signed(amount)) }}</span>
           </div>
           <div class="inv-total-row grand">
             <span class="label">{{ $t('Totaal') }}</span>
-            <span class="value mono">{{ eur(invoice.total) }}</span>
+            <span class="value mono">{{ eur(signed(invoice.total)) }}</span>
           </div>
         </div>
 

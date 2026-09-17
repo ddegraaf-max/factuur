@@ -11,6 +11,9 @@ const props = defineProps({
   payment: { type: Object, default: () => ({ enabled: false, just_returned: false }) },
 });
 
+// Creditnota: bedragen als tegoed tonen (met minteken), net als op de PDF.
+const signed = (v) => props.invoice.is_credit ? -Math.abs(Number(v) || 0) : v;
+
 const page = usePage();
 const email = computed(() => page.props.portal_email || null);
 
@@ -63,7 +66,7 @@ const returnedUnpaid = computed(() =>
         </div>
         <div class="pi-head-right">
           <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
-          <div class="pi-total">{{ eur(invoice.total) }}</div>
+          <div class="pi-total">{{ eur(signed(invoice.total)) }}</div>
           <div v-if="invoice.paid_total > 0 && invoice.remaining > 0" class="pi-remaining">
             {{ $t(':paid betaald · nog :remaining open', { paid: eur(invoice.paid_total), remaining: eur(invoice.remaining) }) }}
           </div>
@@ -108,8 +111,8 @@ const returnedUnpaid = computed(() =>
               <div v-if="line.details" class="pi-line-details">{{ line.details }}</div>
             </td>
             <td class="right mono">{{ Number(line.quantity) }}</td>
-            <td class="right mono">{{ eur(line.unit_price) }}</td>
-            <td class="right mono">{{ eur(line.line_subtotal) }}</td>
+            <td class="right mono">{{ eur(signed(line.unit_price)) }}</td>
+            <td class="right mono">{{ eur(signed(line.line_subtotal)) }}</td>
           </tr>
         </tbody>
       </table>
@@ -118,15 +121,15 @@ const returnedUnpaid = computed(() =>
       <div class="pi-totals">
         <div class="pi-total-row">
           <span>{{ $t('Subtotaal') }}</span>
-          <span class="mono">{{ eur(invoice.subtotal) }}</span>
+          <span class="mono">{{ eur(signed(invoice.subtotal)) }}</span>
         </div>
         <div v-for="(amount, rate) in invoice.vat_breakdown" :key="rate" class="pi-total-row">
           <span>{{ $t('BTW') }} {{ Number(rate) }}%</span>
-          <span class="mono">{{ eur(amount) }}</span>
+          <span class="mono">{{ eur(signed(amount)) }}</span>
         </div>
         <div class="pi-total-row grand">
           <span>{{ $t('Totaal') }}</span>
-          <span class="mono">{{ eur(invoice.total) }}</span>
+          <span class="mono">{{ eur(signed(invoice.total)) }}</span>
         </div>
       </div>
 
