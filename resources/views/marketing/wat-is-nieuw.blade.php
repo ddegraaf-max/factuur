@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.55.1</div>
+        <h2>Gecrediteerde factuur telt niet meer als openstaand</h2>
+        <ul class="tl-list">
+          <li><b>Creditnota verrekent zichzelf</b> — zodra een creditnota definitief is, wordt ze automatisch verrekend met de factuur die ze crediteert, voor zover die nog openstaat. De factuur staat daarmee op <i>Betaald</i> (of <i>Deels betaald</i>), de creditnota op <i>Verrekend</i>. Wat overblijft, verreken of betaal je terug via "Betaling registreren" zoals je gewend bent.</li>
+          <li><b>Openstaand en dagoverzicht kloppen weer</b> — een gecrediteerde factuur telde nog mee in het totaal openstaand en kon zelfs betalingsherinneringen krijgen. Bestaande creditnota's zijn alsnog verrekend; je ziet dat terug in de historie en het logboek.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 september 2026 · {{ brand('version_prefix') }} 1.55.0</div>
         <h2>Creditnota direct verrekenen met de factuur</h2>
         <ul class="tl-list">

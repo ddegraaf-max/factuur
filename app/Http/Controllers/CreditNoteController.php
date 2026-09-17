@@ -22,15 +22,14 @@ class CreditNoteController extends Controller
             return back()->withErrors(['credit' => $e->getMessage()]);
         }
 
-        // For full credit: also send immediately (so it has a number)
+        // Volledige creditnota: meteen definitief (nummer) én verrekend met de factuur.
         if ($kind === 'full') {
-            $credit->update([
-                'number' => $this->service->nextNumber($credit->company),
-                'status' => 'sent',
-                'sent_at' => now(),
-            ]);
+            $settled = $this->service->finalize($credit);
+
             return redirect()->route('invoices.show', $credit)
-                ->with('flash', __('Creditnota :number aangemaakt en verstuurd.', ['number' => $credit->number]));
+                ->with('flash', $settled > 0
+                    ? __('Creditnota :number aangemaakt en verrekend met factuur :invoice.', ['number' => $credit->number, 'invoice' => $invoice->number])
+                    : __('Creditnota :number aangemaakt en verstuurd.', ['number' => $credit->number]));
         }
 
         // Partial: open as draft to edit
@@ -40,17 +39,15 @@ class CreditNoteController extends Controller
 
     public function finalize(Invoice $invoice)
     {
-        if (! $invoice->is_credit || $invoice->status !== 'draft') {
-            abort(422, __('Niet een conceptcreditnota.'));
+        try {
+            $settled = $this->service->finalize($invoice);
+        } catch (\DomainException $e) {
+            abort(422, $e->getMessage());
         }
 
-        $invoice->update([
-            'number' => $this->service->nextNumber($invoice->company),
-            'status' => 'sent',
-            'sent_at' => now(),
-        ]);
-
         return redirect()->route('invoices.show', $invoice)
-            ->with('flash', __('Creditnota :number verstuurd.', ['number' => $invoice->number]));
+            ->with('flash', $settled > 0
+                ? __('Creditnota :number is definitief en verrekend met factuur :invoice.', ['number' => $invoice->number, 'invoice' => $invoice->originalInvoice?->number])
+                : __('Creditnota :number verstuurd.', ['number' => $invoice->number]));
     }
 }

@@ -77,6 +77,45 @@ class CreditNoteService
     }
 
     /**
+     * Maakt een conceptcreditnota definitief (nummer, status 'sent') en
+     * verrekent haar meteen met de factuur die ze crediteert, voor zover die
+     * nog openstaat. Een gecrediteerde factuur is geen vordering meer: zonder
+     * verrekening bleef ze meetellen als openstaand (dashboard, dagoverzicht,
+     * debiteuren) en kreeg de klant er zelfs betalingsherinneringen voor.
+     * Geeft het verrekende bedrag terug; 0 als er niets te verrekenen viel
+     * (factuur al betaald, in incasso, of niet meer gekoppeld).
+     */
+    public function finalize(Invoice $credit): float
+    {
+        if (! $credit->is_credit || $credit->status !== 'draft') {
+            throw new \DomainException(__('Niet een conceptcreditnota.'));
+        }
+
+        $credit->update([
+            'number' => $this->nextNumber($credit->company),
+            'status' => 'sent',
+            'sent_at' => now(),
+        ]);
+
+        return $this->settleWithOriginal($credit);
+    }
+
+    /** Verrekent een definitieve creditnota met haar factuur, als daar nog iets openstaat. */
+    public function settleWithOriginal(Invoice $credit): float
+    {
+        $invoice = $credit->originalInvoice()->first();
+        if (! $invoice || ! in_array($invoice->status, ['sent', 'partial', 'overdue'], true)) {
+            return 0.0;
+        }
+
+        try {
+            return $this->settle($invoice, $credit);
+        } catch (\DomainException) {
+            return 0.0;
+        }
+    }
+
+    /**
      * Verrekent een creditnota met de factuur die ze crediteert. Op allebei
      * komt een boeking van soort 'credit' voor hetzelfde bedrag: de factuur is
      * daarmee (deels) voldaan en de creditnota afgewikkeld, zonder dat er geld

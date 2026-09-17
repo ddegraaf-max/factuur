@@ -212,6 +212,8 @@
   "Creditnota": "Faktura korygująca",
   "Creditnota :number aangemaakt": "Utworzono fakturę korygującą :number",
   "Creditnota :number aangemaakt en verstuurd.": "Faktura korygująca :number została utworzona i wysłana.",
+  "Creditnota :number aangemaakt en verrekend met factuur :invoice.": "Faktura korygująca :number została utworzona i rozliczona z fakturą :invoice.",
+  "Creditnota :number is definitief en verrekend met factuur :invoice.": "Faktura korygująca :number jest ostateczna i rozliczona z fakturą :invoice.",
   "Creditnota :number verstuurd.": "Faktura korygująca :number została wysłana.",
   "Creditnota kan niet naar incasso.": "Faktury korygującej nie można przekazać do windykacji.",
   "Creditnota ontvangen via Peppol": "Faktura korygująca otrzymana przez Peppol",

@@ -212,6 +212,8 @@
   "Creditnota": "Credit note",
   "Creditnota :number aangemaakt": "Credit note :number created",
   "Creditnota :number aangemaakt en verstuurd.": "Credit note :number created and sent.",
+  "Creditnota :number aangemaakt en verrekend met factuur :invoice.": "Credit note :number created and settled against invoice :invoice.",
+  "Creditnota :number is definitief en verrekend met factuur :invoice.": "Credit note :number is final and settled against invoice :invoice.",
   "Creditnota :number verstuurd.": "Credit note :number sent.",
   "Creditnota kan niet naar incasso.": "A credit note cannot be sent for debt collection.",
   "Creditnota ontvangen via Peppol": "Credit note received via Peppol",
