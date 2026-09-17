@@ -82,6 +82,6 @@ class Customer extends Model
     /** Wat de klant nog moet betalen: open facturen (incl. incasso), zonder creditnota's. */
     public function getOutstandingTotalAttribute(): float
     {
-        return round((float) $this->invoices()->open()->sum(DB::raw('total - paid_total')), 2);
+        return round((float) Invoice::open()->where('customer_id', $this->id)->sum(DB::raw('total - paid_total')), 2);
     }
 }
