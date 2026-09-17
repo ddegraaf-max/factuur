@@ -114,12 +114,13 @@ class DocumentFooterLanguageTest extends TestCase
         foreach (['modern', 'classic', 'minimal', 'stationery'] as $template) {
             $render = fn (string $language) => DocumentLocale::using($language, fn () => view("pdf.invoice-{$template}", ['invoice' => $invoice, 'company' => $company])->render());
 
-            // Pools: plaats van uitgifte in het kopblok (naast de plaats in het adres van het bedrijf).
+            // Plaats van uitgifte in het kopblok, in de taal van het document (naast de plaats in het adres van het bedrijf).
             $pl = $render('pl');
             $this->assertStringContainsString('Miejsce wystawienia', $pl, "Sjabloon {$template} zonder plaats van uitgifte");
             $nl = $render('nl');
             $this->assertStringNotContainsString('Miejsce', $nl);
-            $this->assertSame(substr_count($nl, 'Hilversum') + 1, substr_count($pl, 'Hilversum'), "Sjabloon {$template}: plaats hoort alleen op de Poolse factuur extra te staan");
+            $this->assertStringContainsString('Plaats', $nl, "Sjabloon {$template} zonder plaatsregel");
+            $this->assertSame(substr_count($pl, 'Hilversum'), substr_count($nl, 'Hilversum'), "Sjabloon {$template}: plaats hoort op elke factuur in het kopblok te staan");
 
             if ($template === 'stationery') {
                 continue; // zonder briefpapier valt dit sjabloon terug op modern

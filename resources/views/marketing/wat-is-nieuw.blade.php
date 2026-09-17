@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.8</div>
+        <h2>Plaats in het kopblok</h2>
+        <ul class="tl-list">
+          <li><b>Plaats bij de datum</b> — het kopblok van de factuur-PDF toont naast factuurdatum en vervaldatum nu ook de plaats van je bedrijf, in alle vier de sjablonen. Dat stond al op Poolse documenten en hoort er in Nederland net zo goed bij.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.6</div>
         <h2>Versturen naar een klant die pas later een e-mailadres kreeg</h2>
         <ul class="tl-list">

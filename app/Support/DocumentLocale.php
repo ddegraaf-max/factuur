@@ -41,13 +41,14 @@ class DocumentLocale
     }
 
     /**
-     * Plaats van uitgifte in het kopblok. Een Poolse factuur vermeldt naast de
-     * datum ook waar hij is opgemaakt (miejsce wystawienia); dat geldt voor
-     * Poolstalige documenten én voor alles wat vanuit de Poolse markt vertrekt.
+     * Plaats van uitgifte in het kopblok. Stond eerst alleen op Poolse
+     * documenten (miejsce wystawienia is daar verplicht); sinds 1.56.8 op elke
+     * factuur en creditnota, want ook in Nederland hoort de plaats bij de datum.
+     * De sjablonen laten de regel weg als het bedrijf geen plaats heeft.
      */
     public static function showsIssuePlace(): bool
     {
-        return app()->getLocale() === 'pl' || Market::isPl();
+        return true;
     }
 
     /**
