@@ -277,7 +277,8 @@ class InvoiceController extends Controller
             return back()->withErrors(['status' => __('Verstuurde facturen kunnen niet worden gewijzigd.')]);
         }
 
-        $data = $this->validated($request);
+        // Wat in de database staat telt (creditnota of niet), niet wat het formulier beweert.
+        $data = $this->validated($request, (bool) $invoice->is_credit);
         $this->manager->update($invoice, $data);
 
         $this->saveAttachments($request, $invoice);
@@ -636,7 +637,7 @@ class InvoiceController extends Controller
         ])->all();
     }
 
-    protected function validated(Request $request): array
+    protected function validated(Request $request, ?bool $isCredit = null): array
     {
         // Btw-tarieven van de markt (nl: 21/9/0, pl: 23/8/5/0), oplopend voor de foutmelding.
         $rates = Market::vatRates();
@@ -718,6 +719,17 @@ class InvoiceController extends Controller
 
             return (float) ($line['quantity'] ?? 0) * (float) ($line['unit_price'] ?? 0) * $factor;
         });
+
+        // Creditnota: met of zonder minteken ingevuld maakt niet uit. Het tegoed
+        // bewaren we positief; de PDF, de mail en de export zetten het minteken erbij.
+        $isCredit ??= $request->boolean('is_credit');
+        if ($isCredit && $sum < -0.005) {
+            foreach ($data['lines'] as &$line) {
+                $line['unit_price'] = -(float) $line['unit_price'];
+            }
+            unset($line);
+            $sum = -$sum;
+        }
 
         if ($sum < -0.005) {
             throw \Illuminate\Validation\ValidationException::withMessages([

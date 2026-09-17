@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.2</div>
+        <h2>Creditnota met minteken invullen</h2>
+        <ul class="tl-list">
+          <li><b>Minteken mag</b> — vulde je op een nieuwe creditnota de prijs met een minteken in, dan weigerde de app op te slaan ("het factuurtotaal kan niet negatief zijn"). Nu maakt het niet uit hoe je het intypt: het formulier toont elk bedrag als tegoed, en PDF, mail en export zetten er het minteken bij.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.1</div>
         <h2>Creditnota met minteken</h2>
         <ul class="tl-list">

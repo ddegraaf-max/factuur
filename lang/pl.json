@@ -220,7 +220,7 @@
   "Crediteert factuur": "Dotyczy faktury",
   "Factuurnummer, ook uit een ander pakket": "Numer faktury, także z innego programu",
   "Nieuwe creditnota": "Nowa faktura korygująca",
-  "Vul de bedragen positief in: de creditnota trekt ze zelf af van je omzet en btw.": "Wpisz kwoty jako dodatnie: faktura korygująca sama odejmie je od przychodu i VAT.",
+  "Met of zonder minteken invullen maakt niet uit: de creditnota toont alles als tegoed en trekt het af van je omzet en btw.": "Ze znakiem minus czy bez — bez różnicy: faktura korygująca pokazuje wszystko jako należność do zwrotu i odejmuje ją od przychodu i VAT.",
   "Datum": "Data",
   "Creditnota :number verstuurd.": "Faktura korygująca :number została wysłana.",
   "Creditnota kan niet naar incasso.": "Faktury korygującej nie można przekazać do windykacji.",

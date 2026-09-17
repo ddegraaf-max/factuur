@@ -22,6 +22,9 @@ const props = defineProps({
 const isEdit = computed(() => !!props.invoice);
 // Creditnota: zelfde formulier, eigen nummerreeks, geen betaaltermijn of verrekeningen.
 const isCredit = computed(() => props.is_credit || !!props.invoice?.is_credit);
+// Op een creditnota tonen we elk bedrag als tegoed (met minteken), hoe je het ook intypt;
+// de server bewaart het positief en zet het minteken op PDF, mail en export.
+const signed = (v) => isCredit.value ? -Math.abs(v) : v;
 
 // Markt (nl/pl): standaard btw-tarief voor nieuwe regels.
 const market = usePage().props.market;
@@ -303,7 +306,7 @@ const submit = (action) => {
           {{ $t('Terug') }}
         </Link>
         <h1 class="page-title">{{ isCredit ? (isEdit ? $t('Creditnota bewerken') : $t('Nieuwe creditnota')) : (isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur')) }}</h1>
-        <p v-if="isCredit" style="margin:4px 0 0;font-size:13px;color:var(--text-3);">{{ $t('Vul de bedragen positief in: de creditnota trekt ze zelf af van je omzet en btw.') }}</p>
+        <p v-if="isCredit" style="margin:4px 0 0;font-size:13px;color:var(--text-3);">{{ $t('Met of zonder minteken invullen maakt niet uit: de creditnota toont alles als tegoed en trekt het af van je omzet en btw.') }}</p>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" :disabled="form.processing" @click="submit('draft')">
@@ -432,7 +435,7 @@ const submit = (action) => {
                   </select>
                 </div>
                 <div class="line-field line-total-field" :data-label="$t('Totaal')">
-                  <div class="num line-total">{{ eur(lineTotal(line)) }}</div>
+                  <div class="num line-total">{{ eur(signed(lineTotal(line))) }}</div>
                 </div>
                 <button class="li-remove" @click="removeLine(i)" :disabled="form.lines.length === 1" type="button">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -444,7 +447,7 @@ const submit = (action) => {
             <div v-for="e in lineErrorList" :key="'err-' + e.line" class="field-error" style="margin-top:6px;">
               {{ $t('Regel :n', { n: e.line }) }}: {{ e.msgs.join(' ') }}
             </div>
-            <div v-if="totals.total < -0.004" class="field-error" style="margin-top:10px;">
+            <div v-if="!isCredit && totals.total < -0.004" class="field-error" style="margin-top:10px;">
               {{ $t('Het factuurtotaal is negatief — daarvoor maak je een creditnota. Een negatieve regel (korting of verrekende aanbetaling) mag wél, zolang het totaal op nul of hoger uitkomt.') }}
             </div>
 
@@ -542,14 +545,14 @@ const submit = (action) => {
           <div class="card-body">
             <div class="total-row" v-for="b in totals.breakdown" :key="b.rate">
               <span>{{ $t('Excl. BTW (:rate%)', { rate: b.rate }) }}</span>
-              <span class="mono">{{ eur(b.subtotal) }}</span>
+              <span class="mono">{{ eur(signed(b.subtotal)) }}</span>
             </div>
-            <div class="total-row sep"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
+            <div class="total-row sep"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(signed(totals.subtotal)) }}</span></div>
             <div class="total-row" v-for="b in totals.breakdown" :key="'vat-' + b.rate">
               <span>{{ $t('BTW') }} {{ b.rate }}%</span>
-              <span class="mono">{{ eur(b.vat) }}</span>
+              <span class="mono">{{ eur(signed(b.vat)) }}</span>
             </div>
-            <div class="total-row grand"><span>{{ $t('Totaal') }}</span><span class="mono">{{ eur(totals.total) }}</span></div>
+            <div class="total-row grand"><span>{{ $t('Totaal') }}</span><span class="mono">{{ eur(signed(totals.total)) }}</span></div>
             <template v-if="advancesTotal > 0">
               <div class="total-row" style="color:var(--warning);">
                 <span>{{ $t('Verrekend / doorgestort') }}</span>

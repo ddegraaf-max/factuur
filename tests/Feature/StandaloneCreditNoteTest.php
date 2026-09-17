@@ -125,6 +125,33 @@ class StandaloneCreditNoteTest extends TestCase
         $this->assertStringNotContainsString('Wij verzoeken u', $body);
     }
 
+    /** 1.56.2: met minteken ingevuld? Dan bewaren we het tegoed toch positief — geen foutmelding. */
+    public function test_negative_amounts_on_a_credit_note_are_accepted_and_stored_as_a_credit(): void
+    {
+        $this->actingAs($this->demoUser());
+
+        $this->post(route('invoices.store'), $this->payload([
+            'lines' => [['description' => '1x depot', 'quantity' => 2, 'unit_price' => -375, 'vat_rate' => 21]],
+        ]))->assertRedirect()->assertSessionHasNoErrors();
+        $credit = Invoice::where('reference', '2025-0123')->latest('id')->firstOrFail();
+        $this->assertTrue($credit->is_credit);
+        $this->assertEquals(907.5, (float) $credit->total);
+        $this->assertEquals(375.0, (float) $credit->lines()->first()->unit_price, 'Opgeslagen als tegoed, zonder minteken');
+
+        // Bij bewerken telt wat in de database staat (creditnota), niet wat het formulier beweert.
+        $this->put(route('invoices.update', $credit), $this->payload([
+            'is_credit' => 0,
+            'lines' => [['description' => 'Correctie', 'quantity' => 1, 'unit_price' => -10, 'vat_rate' => 21]],
+        ]))->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertEquals(12.1, (float) $credit->fresh()->total);
+
+        // Een gewone factuur blijft een negatief totaal weigeren.
+        $this->post(route('invoices.store'), $this->payload([
+            'is_credit' => 0,
+            'lines' => [['description' => 'Terugbetaling', 'quantity' => 1, 'unit_price' => -10, 'vat_rate' => 21]],
+        ]))->assertSessionHasErrors('lines');
+    }
+
     /** 1.56.1: in de boekhouder-export staan creditnota's negatief, zodat de kolommen optellen. */
     public function test_the_export_lists_a_credit_note_with_negative_amounts(): void
     {
