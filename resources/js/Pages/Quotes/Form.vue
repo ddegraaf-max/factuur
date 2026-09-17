@@ -251,6 +251,11 @@ const lineErrorList = computed(() =>
 );
 
 const submit = (action) => {
+  // Versturen naar een klant zonder e-mailadres: wel definitief, geen mail — dat zeggen we vooraf.
+  if (action === 'send') {
+    const c = props.customers.find(x => x.id === Number(form.customer_id));
+    if (c && !c.email && !confirm(t('Let op: deze klant heeft geen e-mailadres. Het document wordt vastgelegd maar niet gemaild — download dan de PDF om het zelf te versturen. Doorgaan?'))) return;
+  }
   form.action = action;
   if (isEdit.value) {
     form.put(route('quotes.update', props.quote.id));

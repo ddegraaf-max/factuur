@@ -227,6 +227,7 @@ const payMethodLabels = {
 };
 
 const sendInvoice = () => {
+  if (!props.invoice.send_email && !confirm(t('Let op: deze klant heeft geen e-mailadres. De factuur wordt vastgelegd maar niet gemaild — download dan de PDF om hem zelf te versturen. Doorgaan?'))) return;
   router.post(route('invoices.send', props.invoice.id));
 };
 

@@ -178,6 +178,11 @@ class QuoteManager
             if (! $quote->number) {
                 $quote->number = $this->nextNumber($quote->company, $quote->quote_date->year);
             }
+            // Geen adres op de offerte, maar inmiddels wel bij de klant (bijv. later
+            // ingevuld)? Dan dat gebruiken — anders gaat er stilletjes niets uit.
+            if (! $quote->customer_email && $quote->customer?->email) {
+                $quote->customer_email = $quote->customer->email;
+            }
             $quote->status = 'sent';
             $quote->sent_at = now();
             // Geheime link voor het portaal: bekijken én digitaal ondertekenen.
@@ -190,6 +195,10 @@ class QuoteManager
         });
 
         $this->email($quote);
+
+        \App\Support\Audit::log('sent', $quote, $quote->customer_email
+            ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($quote), 'email' => $quote->customer_email])
+            : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($quote)]));
 
         return $quote;
     }

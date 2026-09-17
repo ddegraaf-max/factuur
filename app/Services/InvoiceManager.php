@@ -203,6 +203,10 @@ class InvoiceManager
                     ? app(CreditNoteService::class)->nextNumber($invoice->company)
                     : $this->numbers->generate($invoice->company, $invoice->invoice_date->year);
             }
+            // Geen adres op de factuur, maar inmiddels wel bij de klant? Dan dat gebruiken.
+            if (! $invoice->customer_email && $invoice->customer?->email) {
+                $invoice->customer_email = $invoice->customer->email;
+            }
             $invoice->status = 'sent';
             $invoice->sent_at = now();
             // Geheime link voor het klantenportaal ("Bekijk factuur online").

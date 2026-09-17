@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.6</div>
+        <h2>Versturen naar een klant die pas later een e-mailadres kreeg</h2>
+        <ul class="tl-list">
+          <li><b>Adres alsnog gebruikt</b> — maakte je een offerte of factuur voor een klant zónder e-mailadres en vulde je dat adres daarna bij de klant in, dan ging er bij "Versturen" tóch niets uit: het document hield het lege adres vast. Nu neemt de app bij het versturen het adres van de klant over.</li>
+          <li><b>Eerlijke melding</b> — na versturen zie je naar welk adres de mail is gegaan, of dat er niets gemaild is omdat de klant geen adres heeft. Vóór het versturen waarschuwt de app daar al voor. Ook offertes krijgen nu een regel "verstuurd naar …" in het logboek.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.5</div>
         <h2>Tegoed op een creditnota</h2>
         <ul class="tl-list">

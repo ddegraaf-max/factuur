@@ -159,6 +159,8 @@ class QuoteController extends Controller
                 'signed_at_label' => $quote->signed_at?->translatedFormat('j F Y, H:i'),
                 'accept_mail_sent_at_label' => $quote->accept_mail_sent_at?->translatedFormat('j M Y, H:i'),
                 'portal_url' => $quote->portalUrl(),
+                // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
+                'send_email' => $quote->customer_email ?: $quote->customer?->email,
                 'invoice' => $quote->invoice ? [
                     'id' => $quote->invoice->id,
                     'number' => $quote->invoice->number,

@@ -30,7 +30,9 @@ const pillClass = computed(() => ({
 }[props.quote.status] ?? 'pill-draft'));
 
 const send = () => {
-  const label = props.quote.status === 'sent' ? t('Offerte opnieuw versturen?') : t('Offerte versturen naar de klant?');
+  const label = !props.quote.send_email
+    ? t('Let op: deze klant heeft geen e-mailadres. De offerte wordt vastgelegd maar niet gemaild — download dan de PDF om hem zelf te versturen. Doorgaan?')
+    : (props.quote.status === 'sent' ? t('Offerte opnieuw versturen?') : t('Offerte versturen naar de klant?'));
   if (confirm(label)) {
     router.post(route('quotes.send', props.quote.id), {}, { preserveScroll: true });
   }

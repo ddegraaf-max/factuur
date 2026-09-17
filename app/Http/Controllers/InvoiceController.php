@@ -113,7 +113,7 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
+            return redirect()->route('invoices.show', $invoice)->with('flash', $this->sentFlash($invoice));
         }
 
         return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept opgeslagen.'));
@@ -160,6 +160,8 @@ class InvoiceController extends Controller
                 'thanks_sent_at_label' => $invoice->thanks_sent_at?->translatedFormat('j M Y, H:i'),
                 'history' => $this->history($invoice),
                 'portal_url' => $invoice->portalUrl(),
+                // Waar 'Versturen' naartoe mailt: het adres op de factuur, anders dat van de klant.
+                'send_email' => $invoice->customer_email ?: $invoice->customer?->email,
                 'views' => $invoice->views->map(fn ($v) => [
                     'id' => $v->id,
                     'event' => $v->event,
@@ -318,7 +320,7 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
+            return redirect()->route('invoices.show', $invoice)->with('flash', $this->sentFlash($invoice));
         }
 
         return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept bijgewerkt.'));
@@ -327,7 +329,17 @@ class InvoiceController extends Controller
     public function send(Invoice $invoice): RedirectResponse
     {
         $this->manager->send($invoice);
-        return back()->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
+        return back()->with('flash', $this->sentFlash($invoice));
+    }
+
+    /** Flash na versturen: naar welk adres — of eerlijk dat er niets gemaild is. */
+    private function sentFlash(Invoice $invoice): string
+    {
+        $label = $invoice->is_credit ? __('Creditnota') : __('Factuur');
+
+        return $invoice->customer_email
+            ? __(':label :number verstuurd naar :email.', ['label' => $label, 'number' => $invoice->number, 'email' => $invoice->customer_email])
+            : __(':label :number vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.', ['label' => $label, 'number' => $invoice->number]);
     }
 
     /** Maak een nieuw concept met dezelfde klant en regels. */
