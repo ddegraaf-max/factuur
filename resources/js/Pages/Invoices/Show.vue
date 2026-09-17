@@ -481,7 +481,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div class="inv-meta-label" style="margin-bottom:6px;">{{ $t('Totaal') }}</div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:28px;letter-spacing:-0.02em;">{{ eur(signed(invoice.total)) }}</div>
             <div v-if="invoice.paid_total > 0" style="font-size:12px;color:var(--success);margin-top:4px;">
-              {{ $t(':paid betaald · :open open', { paid: eur(invoice.paid_total), open: eur(invoice.remaining) }) }}
+              {{ invoice.is_credit ? $t(':settled verrekend · :open tegoed', { settled: eur(invoice.paid_total), open: eur(invoice.remaining) }) : $t(':paid betaald · :open open', { paid: eur(invoice.paid_total), open: eur(invoice.remaining) }) }}
             </div>
           </div>
         </div>

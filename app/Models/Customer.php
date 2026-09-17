@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Telkolommen uit withCount() in CustomerController::index.
@@ -78,11 +79,9 @@ class Customer extends Model
         return strtoupper($first . $last);
     }
 
+    /** Wat de klant nog moet betalen: open facturen (incl. incasso), zonder creditnota's. */
     public function getOutstandingTotalAttribute(): float
     {
-        return $this->invoices()
-            ->whereIn('status', ['sent', 'partial', 'overdue'])
-            ->get()
-            ->sum(fn ($i) => $i->total - $i->paid_total);
+        return round((float) $this->invoices()->open()->sum(DB::raw('total - paid_total')), 2);
     }
 }

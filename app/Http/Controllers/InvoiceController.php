@@ -223,7 +223,24 @@ class InvoiceController extends Controller
         }
 
         if ($invoice->is_credit) {
-            $original = $invoice->status === 'draft' ? null : $invoice->originalInvoice;
+            if ($invoice->status === 'draft') {
+                return [];
+            }
+
+            // Losse creditnota (zonder factuur in het pakket): elke open factuur van de klant.
+            if (! $invoice->credits_invoice_id) {
+                return Invoice::regular()
+                    ->where('customer_id', $invoice->customer_id)
+                    ->whereIn('status', $receivable)
+                    ->orderBy('invoice_date')->orderBy('id')
+                    ->get()
+                    ->filter(fn (Invoice $i) => $open($i) >= 0.01)
+                    ->map($option)
+                    ->values()
+                    ->all();
+            }
+
+            $original = $invoice->originalInvoice;
             if (! $original || ! in_array($original->status, $receivable, true) || $open($original) < 0.01) {
                 return [];
             }
@@ -235,8 +252,18 @@ class InvoiceController extends Controller
             return [];
         }
 
+        // Creditnota's op deze factuur, plus losse creditnota's van dezelfde klant.
+        $loose = Invoice::credit()
+            ->whereNull('credits_invoice_id')
+            ->where('customer_id', $invoice->customer_id)
+            ->where('status', 'sent')
+            ->orderBy('invoice_date')->orderBy('id')
+            ->get();
+
         return $invoice->creditNotes
-            ->filter(fn (Invoice $c) => $c->status !== 'draft' && $open($c) >= 0.01)
+            ->filter(fn (Invoice $c) => $c->status !== 'draft')
+            ->concat($loose)
+            ->filter(fn (Invoice $c) => $open($c) >= 0.01)
             ->map($option)
             ->values()
             ->all();

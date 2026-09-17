@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.5</div>
+        <h2>Tegoed op een creditnota</h2>
+        <ul class="tl-list">
+          <li><b>Klantenlijst</b> — het openstaande bedrag per klant telde een nog niet verrekende creditnota mee als vordering, en de teller "Facturen" telde creditnota's mee. Allebei hersteld.</li>
+          <li><b>Tegoed zichtbaar</b> — op de klantpagina en het dashboard zie je naast het openstaande bedrag nu het tegoed op creditnota's die nog niet verrekend of terugbetaald zijn, met het saldo. In de kolom Open staat dat tegoed met een minteken.</li>
+          <li><b>Losse creditnota verrekenen</b> — een creditnota zonder factuur in het pakket kun je nu via "Betaling registreren" verrekenen met elke open factuur van dezelfde klant (en andersom). De factuur gaat op Betaald of Deels betaald, de creditnota op Verrekend.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.4</div>
         <h2>Minteken op het dashboard</h2>
         <ul class="tl-list">

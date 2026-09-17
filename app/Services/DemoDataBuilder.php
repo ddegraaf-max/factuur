@@ -283,6 +283,7 @@ class DemoDataBuilder
         $this->attachSample($company, $incasso, $filename, $title, $body);
 
         // --- Creditnota op een betaalde factuur ---
+        // Bedragen positief, zoals alle creditnota's: het teken zit in de rapportage en op de PDF.
         $spec = $this->d['credit'];
         $original = $made['paid1'];
         $credit = $this->makeInvoice($company, $customers[$spec['customer']], $spec['lines'], [
@@ -798,7 +799,7 @@ class DemoDataBuilder
             'attachment_note' => '%s — voorbeelddocument uit de %s-demo.',
             'credit' => [
                 'customer' => 'stoepje',
-                'lines' => [['Correctie: te veel gefactureerde uren', 2, -75]],
+                'lines' => [['Correctie: te veel gefactureerde uren', 2, 75]],
                 'number' => 'C%d-%04d',
                 'reference' => 'Creditnota bij %s',
                 'notes' => 'Correctie op factuur %s: twee uur te veel gefactureerd.',
@@ -982,7 +983,7 @@ class DemoDataBuilder
             'attachment_note' => '%s — przykładowy dokument z wersji demo %s.',
             'credit' => [
                 'customer' => 'kawiarnia',
-                'lines' => [['Korekta: zawyżona liczba godzin nadzoru', 2, -323]],
+                'lines' => [['Korekta: zawyżona liczba godzin nadzoru', 2, 323]],
                 'number' => 'FV/%d/K/%04d',
                 'reference' => 'Faktura korygująca do %s',
                 'notes' => 'Korekta faktury %s: naliczono o dwie godziny za dużo.',

@@ -81,7 +81,7 @@ const greeting = () => {
           {{ $t('Openstaand') }}
         </div>
         <div class="kpi-value">{{ eur(kpis.outstanding) }}</div>
-        <div class="kpi-meta">{{ kpis.outstanding_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: kpis.outstanding_count }) }}</div>
+        <div class="kpi-meta">{{ kpis.outstanding_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: kpis.outstanding_count }) }}<span v-if="kpis.open_credit > 0"> · {{ $t("tegoed :amount op creditnota's", { amount: eur(kpis.open_credit) }) }}</span></div>
       </div>
 
       <div :class="['kpi-card', { alert: kpis.overdue > 0 }]">

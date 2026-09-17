@@ -22,6 +22,9 @@ class DashboardController extends Controller
         $outstanding = Invoice::open()->sum(DB::raw('total - paid_total'));
         $outstandingCount = Invoice::open()->count();
 
+        // Creditnota's die nog niet verrekend of terugbetaald zijn: tegoed van klanten.
+        $openCredit = Invoice::where('is_credit', true)->where('status', 'sent')->sum(DB::raw('total - paid_total'));
+
         $overdue = Invoice::where('status', 'overdue')->sum(DB::raw('total - paid_total'));
         $overdueCount = Invoice::where('status', 'overdue')->count();
 
@@ -145,6 +148,7 @@ class DashboardController extends Controller
             'kpis' => [
                 'outstanding' => (float) $outstanding,
                 'outstanding_count' => $outstandingCount,
+                'open_credit' => (float) $openCredit,
                 'overdue' => (float) $overdue,
                 'overdue_count' => $overdueCount,
                 'month_revenue' => (float) $monthRevenue,

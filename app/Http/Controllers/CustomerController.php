@@ -17,7 +17,8 @@ class CustomerController extends Controller
 
         $customers = Customer::query()
             ->withCount([
-                'invoices',
+                // Creditnota's zijn geen facturen (en tellen niet mee als openstaand).
+                'invoices as invoices_count' => fn ($qb) => $qb->where('is_credit', false),
                 'quotes',
                 // Offertes die nog bij de klant liggen (verstuurd, geen reactie).
                 'quotes as open_quotes_count' => fn ($qb) => $qb->where('status', 'sent'),
@@ -92,6 +93,8 @@ class CustomerController extends Controller
 
         $real = $invoices->whereNotIn('status', ['draft', 'cancelled']);
         $open = $real->filter(fn ($i) => ! $i->is_credit && in_array($i->status, ['sent', 'partial', 'overdue', 'incasso'], true));
+        // Creditnota's die nog niet verrekend of terugbetaald zijn: een tegoed van de klant.
+        $openCredit = $real->filter(fn ($i) => $i->is_credit && $i->status === 'sent' && (float) $i->total - (float) $i->paid_total > 0.009);
         $signed = fn ($i) => ($i->is_credit ? -1 : 1) * (float) $i->subtotal;
 
         // Betaalgedrag: hoeveel dagen na de factuurdatum wordt er gemiddeld betaald,
@@ -121,6 +124,8 @@ class CustomerController extends Controller
             'stats' => [
                 'open_total' => round($open->sum(fn ($i) => (float) $i->total - (float) $i->paid_total), 2),
                 'open_count' => $open->count(),
+                'open_credit_total' => round($openCredit->sum(fn ($i) => (float) $i->total - (float) $i->paid_total), 2),
+                'open_credit_count' => $openCredit->count(),
                 'overdue_count' => $open->filter(fn ($i) => $i->status === 'overdue' || $i->is_overdue)->count(),
                 'revenue_year' => round($real->filter(fn ($i) => $i->invoice_date->year === $year)->sum($signed), 2),
                 'revenue_total' => round($real->sum($signed), 2),

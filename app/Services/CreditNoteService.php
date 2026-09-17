@@ -128,7 +128,12 @@ class CreditNoteService
     {
         [$invoice, $credit] = $one->is_credit ? [$other, $one] : [$one, $other];
 
-        if (! $credit->is_credit || $invoice->is_credit || (int) $credit->credits_invoice_id !== (int) $invoice->id) {
+        // Een creditnota hoort bij de factuur die ze crediteert; een losse creditnota
+        // (zonder factuur in het pakket) bij elke factuur van dezelfde klant.
+        $belongs = $credit->credits_invoice_id
+            ? (int) $credit->credits_invoice_id === (int) $invoice->id
+            : ($credit->customer_id && (int) $credit->customer_id === (int) $invoice->customer_id && (int) $credit->company_id === (int) $invoice->company_id);
+        if (! $credit->is_credit || $invoice->is_credit || ! $belongs) {
             throw new \DomainException(__('Deze creditnota hoort niet bij deze factuur.'));
         }
         if ($credit->status === 'draft') {

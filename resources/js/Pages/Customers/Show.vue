@@ -17,6 +17,13 @@ const props = defineProps({
   hours_url: { type: String, default: null },
 });
 
+// Kolom Open: bij een factuur wat de klant nog moet betalen, bij een creditnota het tegoed (negatief).
+const openAmount = (inv) => {
+  if (!(inv.remaining > 0.009)) return null;
+  if (inv.is_credit) return inv.status === 'sent' ? -inv.remaining : null;
+  return ['sent', 'partial', 'overdue', 'incasso'].includes(inv.status) ? inv.remaining : null;
+};
+
 // Markt (nl/pl): korte labels voor KvK/REGON en btw-nummer/NIP.
 const market = computed(() => usePage().props.market || {});
 
@@ -88,6 +95,7 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
         <div class="meta">
           <template v-if="stats.open_count === 0">{{ $t('Niets open') }}</template>
           <template v-else>{{ stats.open_count === 1 ? $t(':n factuur', { n: stats.open_count }) : $t(':n facturen', { n: stats.open_count }) }}<span v-if="stats.overdue_count" class="warn"> · {{ $t(':n achterstallig', { n: stats.overdue_count }) }}</span></template>
+          <span v-if="stats.open_credit_total > 0" class="credit"> · {{ stats.open_credit_count > 1 ? $t("tegoed :amount op :n creditnota's, saldo :balance", { amount: eur(stats.open_credit_total), n: stats.open_credit_count, balance: eur(stats.open_total - stats.open_credit_total) }) : $t('tegoed :amount op creditnota, saldo :balance', { amount: eur(stats.open_credit_total), balance: eur(stats.open_total - stats.open_credit_total) }) }}</span>
         </div>
       </div>
       <div class="kpi">
@@ -148,8 +156,8 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
                   <td :data-label="$t('Vervaldatum')">{{ inv.due_date_label || '—' }}</td>
                   <td :data-label="$t('Status')"><StatusPill :status="inv.status" :days-overdue="inv.days_overdue" /></td>
                   <td class="right num" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
-                  <td class="right num" :data-label="$t('Open')" :class="{ 'is-open': inv.remaining > 0.009 && ['sent','partial','overdue','incasso'].includes(inv.status) }">
-                    {{ inv.remaining > 0.009 && ['sent','partial','overdue','incasso'].includes(inv.status) ? eur(inv.remaining) : '—' }}
+                  <td class="right num" :data-label="$t('Open')" :class="{ 'is-open': openAmount(inv) > 0, 'is-credit': openAmount(inv) < 0 }">
+                    {{ openAmount(inv) !== null ? eur(openAmount(inv)) : '—' }}
                   </td>
                 </tr>
               </tbody>
@@ -271,6 +279,8 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
 .tag { display: inline-block; margin-left: 6px; font-size: 10px; font-weight: 700; color: var(--text-4); background: var(--surface-3); border-radius: 4px; padding: 1px 5px; vertical-align: middle; }
 .tag.ok { color: var(--success); background: var(--success-bg); }
 .is-open { color: var(--brand); font-weight: 600; }
+.is-credit { color: var(--success); font-weight: 600; }
+.kpi .meta .credit { color: var(--success); font-weight: 600; }
 .more-note { padding: 10px 16px; font-size: 12.5px; color: var(--text-4); border-top: 1px solid var(--border); }
 .more-note a, .lnk { color: var(--brand); font-weight: 500; }
 

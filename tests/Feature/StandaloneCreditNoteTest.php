@@ -83,7 +83,7 @@ class StandaloneCreditNoteTest extends TestCase
 
         // Factuurpagina en logboek noemen het een creditnota.
         $this->get(route('invoices.show', $credit))->assertOk()
-            ->assertInertia(fn ($page) => $page->where('invoice.is_credit', true)->where('invoice.settle_options', []));
+            ->assertInertia(fn ($page) => $page->where('invoice.is_credit', true));
         $this->assertDatabaseHas('activity_logs', ['subject_id' => $credit->id, 'action' => 'sent', 'subject_label' => 'Creditnota ' . $credit->number]);
     }
 
@@ -150,6 +150,47 @@ class StandaloneCreditNoteTest extends TestCase
             'is_credit' => 0,
             'lines' => [['description' => 'Terugbetaling', 'quantity' => 1, 'unit_price' => -10, 'vat_rate' => 21]],
         ]))->assertSessionHasErrors('lines');
+    }
+
+    /** 1.56.5: een losse creditnota is een tegoed (geen vordering) en verreken je met elke open factuur van de klant. */
+    public function test_a_standalone_credit_note_is_a_credit_and_settles_with_any_open_invoice_of_the_customer(): void
+    {
+        Mail::fake();
+        $this->actingAs($this->demoUser());
+        $invoice = Invoice::regular()->whereIn('status', ['sent', 'overdue'])->has('lines')->orderBy('id')->firstOrFail();
+        $other = Invoice::regular()->whereIn('status', ['sent', 'overdue'])->where('customer_id', '!=', $invoice->customer_id)->orderBy('id')->firstOrFail();
+        $customer = Customer::findOrFail($invoice->customer_id);
+        $outstandingBefore = $customer->outstanding_total;
+
+        $this->post(route('invoices.store'), $this->payload(['customer_id' => $customer->id, 'action' => 'send']))->assertRedirect();
+        $credit = Invoice::where('reference', '2025-0123')->latest('id')->firstOrFail();
+        $this->assertSame('sent', $credit->status);
+
+        // Geen vordering: het openstaande bedrag van de klant verandert niet, het tegoed staat apart.
+        $this->assertEqualsWithDelta($outstandingBefore, $customer->fresh()->outstanding_total, 0.001);
+        $this->get(route('customers.show', $customer))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('stats.open_credit_total', fn ($v) => abs($v - 242) < 0.001)
+            ->where('stats.open_credit_count', 1));
+        $this->get(route('dashboard'))->assertOk()->assertInertia(fn ($page) => $page->where('kpis.open_credit', fn ($v) => $v >= 242.0));
+
+        // Aangeboden op de factuur van deze klant (niet op die van een ander), en andersom op de creditnota.
+        $has = fn ($id) => fn ($options) => collect($options)->contains('id', $id);
+        $this->get(route('invoices.show', $invoice))->assertInertia(fn ($page) => $page->where('invoice.settle_options', $has($credit->id)));
+        $this->get(route('invoices.show', $other))->assertInertia(fn ($page) => $page->where('invoice.settle_options', fn ($o) => ! collect($o)->contains('id', $credit->id)));
+        $this->get(route('invoices.show', $credit))->assertInertia(fn ($page) => $page->where('invoice.settle_options', $has($invoice->id)));
+
+        // Andere klant: geweigerd. Zelfde klant: verrekend voor wat aan beide kanten openstaat.
+        $settle = fn (Invoice $from) => $this->post(route('invoices.payments.store', $from), ['kind' => 'credit', 'credit_note_id' => $credit->id, 'paid_on' => now()->toDateString()]);
+        $settle($other)->assertSessionHasErrors('credit_note_id');
+        $settle($invoice)->assertRedirect()->assertSessionHasNoErrors();
+
+        $invoice->refresh();
+        $credit->refresh();
+        $expected = min(242.0, (float) $invoice->total);
+        $this->assertEqualsWithDelta($expected, (float) $credit->paid_total, 0.001);
+        $this->assertEqualsWithDelta($expected, (float) $invoice->paid_total, 0.001);
+        $this->assertSame($expected >= 241.999 ? 'settled' : 'sent', $credit->status);
+        $this->assertContains($invoice->status, ['paid', 'partial']);
     }
 
     /** 1.56.1: in de boekhouder-export staan creditnota's negatief, zodat de kolommen optellen. */
