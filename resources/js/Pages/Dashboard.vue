@@ -150,7 +150,7 @@ const greeting = () => {
                 <td :data-label="$t('Klant')">{{ inv.customer_name }}</td>
                 <td :data-label="$t('Datum')">{{ inv.invoice_date }}</td>
                 <td :data-label="$t('Status')"><StatusPill :status="inv.status" /></td>
-                <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.total) }}</td>
+                <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
               </tr>
             </tbody>
           </table>

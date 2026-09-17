@@ -28,7 +28,7 @@ class SearchController extends Controller
         if ($invoices->isNotEmpty()) {
             $groups[] = ['title' => __('Facturen'), 'items' => $invoices->map(fn ($i) => [
                 'title' => ($i->is_credit ? __('Creditnota') : __('Factuur')) . ' ' . ($i->number ?: __('concept')),
-                'subtitle' => $i->customer_name . ' · ' . $money($i->total) . ' · ' . $this->status($i->status),
+                'subtitle' => $i->customer_name . ' · ' . $money(($i->is_credit ? -1 : 1) * (float) $i->total) . ' · ' . $this->status($i->status),
                 'url' => route('invoices.show', $i), 'icon' => 'invoice',
             ])->all()];
         }

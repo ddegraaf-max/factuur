@@ -65,6 +65,7 @@ class DashboardController extends Controller
                 'customer_name' => $i->customer_name,
                 'invoice_date' => $i->invoice_date->format('d M Y'),
                 'status' => $i->status,
+                'is_credit' => (bool) $i->is_credit,
                 'total' => (float) $i->total,
             ]);
 

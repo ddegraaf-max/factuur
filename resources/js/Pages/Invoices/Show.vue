@@ -722,7 +722,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
                 <td class="cell-primary mono">{{ c.number || $t('Concept') }}</td>
                 <td :data-label="$t('Datum')">{{ c.invoice_date_label }}</td>
                 <td :data-label="$t('Status')"><StatusPill :status="c.status" /></td>
-                <td class="num right" :data-label="$t('Bedrag')">{{ eur(c.total) }}</td>
+                <td class="num right" :data-label="$t('Bedrag')">{{ eur(-Math.abs(c.total)) }}</td>
               </tr>
             </tbody>
           </table>

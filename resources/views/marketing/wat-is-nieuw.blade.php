@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.4</div>
+        <h2>Minteken op het dashboard</h2>
+        <ul class="tl-list">
+          <li><b>Creditnota's in "Recente facturen"</b> — ook op het dashboard, in de zoekresultaten en in de tabel "Creditnota's op deze factuur" staat het bedrag van een creditnota nu met een minteken. De btw-pagina's deden dit al.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.3</div>
         <h2>Minteken ook in de app</h2>
         <ul class="tl-list">
