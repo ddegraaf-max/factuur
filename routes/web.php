@@ -28,6 +28,9 @@ use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TenderController;
+use App\Http\Controllers\TenderPoolController;
+use App\Http\Controllers\TenderResponseController;
 use Illuminate\Support\Facades\Route;
 
 // Homepage per merk (config/brand.php): EasyInvoice en Lopra hebben elk een eigen landingspagina.
@@ -393,6 +396,14 @@ Route::match(['get', 'post', 'delete'], '/mcp/{token}', [\App\Http\Controllers\M
     ->middleware('throttle:120,1')->name('mcp');
 
 // ---------- GUEST AUTH ----------
+// Reactie van een onderaannemer op een prijsaanvraag: geheime tokenlink uit de
+// mail, zonder inlog (dus buiten de guest- én auth-groep).
+Route::get('uitvraag/{token}', [TenderResponseController::class, 'show'])->name('tender.respond.show');
+Route::post('uitvraag/{token}', [TenderResponseController::class, 'respond'])
+    ->middleware('throttle:20,1')->name('tender.respond');
+Route::post('uitvraag/{token}/afwijzen', [TenderResponseController::class, 'decline'])
+    ->middleware('throttle:20,1')->name('tender.decline');
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store'])
@@ -597,6 +608,25 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('inkoop-postvak/{item}/afwijzen', [\App\Http\Controllers\PurchaseInboxController::class, 'dismiss'])->name('purchases.inbox.dismiss');
     Route::delete('inkoop-postvak/{item}', [\App\Http\Controllers\PurchaseInboxController::class, 'destroy'])->name('purchases.inbox.destroy');
     Route::post('inkoop-postvak/adres', [\App\Http\Controllers\PurchaseInboxController::class, 'rotateAddress'])->name('purchases.inbox.rotate');
+
+    // Uitvragen bij onderaannemers: werkpakketten, pool, rondes met tokenlinks (1.57.0)
+    Route::get('uitvragen', [TenderController::class, 'index'])->name('tenders.index');
+    Route::post('uitvragen', [TenderController::class, 'store'])->name('tenders.store');
+    Route::post('offertes/{quote}/uitvraag', [TenderController::class, 'storeFromQuote'])->name('tenders.from_quote');
+    Route::get('uitvragen/{round}', [TenderController::class, 'show'])->name('tenders.show');
+    Route::post('uitvragen/{round}/gunnen/{tenderRequest}', [TenderController::class, 'award'])->name('tenders.award');
+    Route::post('uitvragen/{round}/herinneren/{tenderRequest}', [TenderController::class, 'remind'])->name('tenders.remind');
+    Route::post('uitvragen/{round}/sluiten', [TenderController::class, 'close'])->name('tenders.close');
+    Route::get('uitvragen/{round}/bijlage/{tenderRequest}', [TenderController::class, 'attachment'])->name('tenders.attachment');
+    Route::get('onderaannemers', [TenderPoolController::class, 'index'])->name('tenders.pool');
+    Route::post('onderaannemers/pakketten', [TenderPoolController::class, 'storePackage'])->name('tenders.packages.store');
+    Route::post('onderaannemers/pakketten/standaard', [TenderPoolController::class, 'seedPackages'])->name('tenders.packages.seed');
+    Route::patch('onderaannemers/pakketten/{package}', [TenderPoolController::class, 'updatePackage'])->name('tenders.packages.update');
+    Route::delete('onderaannemers/pakketten/{package}', [TenderPoolController::class, 'destroyPackage'])->name('tenders.packages.destroy');
+    Route::post('onderaannemers', [TenderPoolController::class, 'storeSubcontractor'])->name('tenders.subcontractors.store');
+    Route::post('onderaannemers/importeren', [TenderPoolController::class, 'import'])->name('tenders.subcontractors.import');
+    Route::patch('onderaannemers/{subcontractor}', [TenderPoolController::class, 'updateSubcontractor'])->name('tenders.subcontractors.update');
+    Route::delete('onderaannemers/{subcontractor}', [TenderPoolController::class, 'destroySubcontractor'])->name('tenders.subcontractors.destroy');
 
     // Vaste lasten: terugkerende inkoop automatisch inboeken
     Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');

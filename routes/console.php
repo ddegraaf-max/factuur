@@ -18,6 +18,11 @@ Schedule::command('invoices:remind')
     ->dailyAt('08:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: herinner onderaannemers die na drie dagen nog niet op een prijsaanvraag reageerden.
+Schedule::command('tenders:remind')
+    ->dailyAt('09:00')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: genereer facturen uit terugkerende profielen die aan de beurt zijn.
 Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')

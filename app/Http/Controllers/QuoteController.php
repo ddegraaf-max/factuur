@@ -161,6 +161,18 @@ class QuoteController extends Controller
                 'portal_url' => $quote->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
                 'send_email' => $quote->customer_email ?: $quote->customer?->email,
+                // Uitvragen bij onderaannemers voor dit project, en de pool voor een nieuwe ronde.
+                'tender_rounds' => \App\Models\TenderRound::with(['workPackage', 'requests'])->where('quote_id', $quote->id)->orderByDesc('id')->get()
+                    ->map(fn ($r) => [
+                        'id' => $r->id,
+                        'title' => $r->title,
+                        'status' => $r->status,
+                        'deadline_label' => $r->deadline->translatedFormat('j M Y'),
+                        'requested' => $r->requests->count(),
+                        'responded' => $r->requests->filter(fn ($x) => $x->hasPrice())->count(),
+                        'lowest' => $r->requests->filter(fn ($x) => $x->hasPrice())->min('price'),
+                    ])->values(),
+                'tender_packages' => $quote->status === 'accepted' ? app(\App\Services\TenderService::class)->packagesForPicker(auth()->user()->company) : [],
                 'invoice' => $quote->invoice ? [
                     'id' => $quote->invoice->id,
                     'number' => $quote->invoice->number,

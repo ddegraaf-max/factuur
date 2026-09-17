@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 september 2026 · {{ brand('version_prefix') }} 1.57.0</div>
+        <h2>Prijzen opvragen bij onderaannemers</h2>
+        <ul class="tl-list">
+          <li><b>Uitvragen per onderdeel</b> — is een offerte geaccepteerd, dan zet je per werkpakket (fundament, geveldoorbraak, houtskelet, metselwerk …) met één klik een prijsaanvraag uit bij een handvol bedrijven uit je pool. Kan ook los, zonder offerte. Je verkoopprijs en het klantadres gaan niet mee; alleen postcode en plaats.</li>
+          <li><b>Reageren via een link</b> — elk bedrijf krijgt een mail met een eigen link en geeft daar prijs, beschikbaarheid, geldigheid en opmerkingen door, eventueel met de eigen offerte als PDF. Of zegt af, met reden. Geen inlog nodig.</li>
+          <li><b>Vergelijken en gunnen</b> — één overzicht per uitvraag: bedrijf, prijs, verschil met je eigen calculatie, beschikbaarheid. Gunnen is één klik: opdracht naar de winnaar, nette afwijzing naar de rest. Wie na drie dagen stil blijft, krijgt automatisch een herinnering.</li>
+          <li><b>Pool die meegroeit</b> — onder Inkoop → Onderaannemers beheer je werkpakketten (twaalf standaardpakketten voor aan- en verbouw staan klaar) en bedrijven, ook door een lijst te plakken. Per bedrijf zie je reactietijd, prijsniveau ten opzichte van de andere aanbieders en gewonnen opdrachten.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.8</div>
         <h2>Plaats in het kopblok</h2>
         <ul class="tl-list">

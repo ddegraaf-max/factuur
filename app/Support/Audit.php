@@ -31,6 +31,7 @@ class Audit
         \App\Models\User::class => 'gebruiker',
         \App\Models\RecurringInvoice::class => 'terugkerend',
         \App\Models\BrandProfile::class => 'handelsnaam',
+        \App\Models\TenderRound::class => 'uitvraag',
     ];
 
     public static function log(string $action, ?Model $subject = null, ?string $description = null, array $changes = [], ?int $companyId = null): ?ActivityLog
@@ -75,6 +76,7 @@ class Audit
             $subject instanceof \App\Models\Payment => '€ ' . number_format((float) $subject->amount, 2, ',', '.') . ($subject->invoice?->number ? ' op ' . $subject->invoice->number : ''),
             $subject instanceof \App\Models\PurchaseInvoice => trim(($subject->supplier_name ?? '') . ' ' . ($subject->invoice_number ?? '')) ?: ('#' . $subject->id),
             $subject instanceof \App\Models\Company => 'bedrijfsgegevens',
+            $subject instanceof \App\Models\TenderRound => $subject->title,
             default => (string) ($subject->getAttribute('name') ?? $subject->getAttribute('description') ?? $subject->getAttribute('email') ?? ('#' . $subject->getKey())),
         };
 

@@ -49,6 +49,8 @@ const rawNav = [
       { name: 'Inkoopfacturen', route: 'purchases.index', icon: 'receipt' },
       { name: 'Postvak IN', route: 'purchases.inbox.index', icon: 'inbox', badge: 'Nieuw' },
       { name: 'Vaste lasten', route: 'purchases.recurring.index', icon: 'repeat' },
+      { name: 'Uitvragen', route: 'tenders.index', icon: 'quote', badge: 'Nieuw' },
+      { name: 'Onderaannemers', route: 'tenders.pool', icon: 'users' },
     ],
   },
   {

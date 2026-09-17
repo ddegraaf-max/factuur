@@ -1,6 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import TenderRoundModal from '@/Components/TenderRoundModal.vue';
 import { eur, marketLocale } from '@/format.js';
 import { t } from '@/i18n';
 import { computed, ref } from 'vue';
@@ -17,6 +18,10 @@ const page = usePage();
 const pageError = computed(() => (page.props.errors || {}).quote ?? null);
 
 const isOpen = computed(() => ['sent', 'expired'].includes(props.quote.status));
+// Prijzen opvragen bij onderaannemers (na akkoord van de klant).
+const showTender = ref(false);
+const tenderPill = { open: 'pill-sent', awarded: 'pill-paid', closed: 'pill-cancelled' };
+const tenderLabel = { open: 'Open', awarded: 'Gegund', closed: 'Gesloten' };
 const canEdit = computed(() => ['draft', 'sent'].includes(props.quote.status));
 // Afgewezen of verlopen: opnieuw aanbieden (terug naar concept), tenzij er al een factuur uit is gemaakt.
 const canReopen = computed(() => ['rejected', 'expired'].includes(props.quote.status) && !props.quote.invoice);
@@ -197,6 +202,9 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           PDF
         </a>
+        <button v-if="quote.status === 'accepted'" class="btn btn-secondary btn-sm" :title="$t('Vraag per onderdeel prijzen en beschikbaarheid op bij je onderaannemers')" @click="showTender = true">
+          {{ $t('Prijzen opvragen') }}
+        </button>
         <button
           v-if="quote.status === 'accepted' && quote.customer_email"
           class="btn btn-secondary btn-sm"
@@ -511,6 +519,27 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         </div>
       </div>
     </div>
+    <!-- Uitvragen bij onderaannemers voor dit project -->
+    <div v-if="quote.tender_rounds && quote.tender_rounds.length" class="card" style="margin-top:16px;">
+      <div class="card-header">
+        <div class="card-title">{{ $t('Uitvragen bij onderaannemers') }}</div>
+        <Link :href="route('tenders.index')" class="btn btn-secondary btn-sm">{{ $t('Alle uitvragen') }}</Link>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>{{ $t('Uitvraag') }}</th><th>{{ $t('Reageren vóór') }}</th><th class="right">{{ $t('Reacties') }}</th><th class="right">{{ $t('Laagste prijs') }}</th><th>{{ $t('Status') }}</th></tr></thead>
+        <tbody>
+          <tr v-for="r in quote.tender_rounds" :key="r.id" style="cursor:pointer;" @click="router.visit(route('tenders.show', r.id))">
+            <td class="cell-primary">{{ r.title }}</td>
+            <td>{{ r.deadline_label }}</td>
+            <td class="right num">{{ r.responded }} / {{ r.requested }}</td>
+            <td class="right num">{{ r.lowest !== null ? eur(r.lowest) : '—' }}</td>
+            <td><span :class="['pill', tenderPill[r.status]]">{{ $t(tenderLabel[r.status]) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <TenderRoundModal :show="showTender" :packages="quote.tender_packages || []" :quote="quote" @close="showTender = false" />
+
   </AppLayout>
 </template>
 
