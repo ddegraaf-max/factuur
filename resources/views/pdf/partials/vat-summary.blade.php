@@ -6,6 +6,7 @@
 @php
   $vsDoc = $document ?? $invoice;
   $vsRows = [];
+  $vsSign = ($vsDoc->is_credit ?? false) ? -1 : 1; // creditnota: bedragen negatief
   if (\App\Support\Market::isPl() && is_array($vsDoc->vat_breakdown) && $vsDoc->vat_breakdown !== []) {
       foreach ($vsDoc->vat_breakdown as $vsRate => $vsVat) {
           // Netto per tarief = som van de regelbedragen (excl. btw, na korting) met dat tarief;
@@ -13,7 +14,7 @@
           $vsNet = $vsDoc->lines->isEmpty() && count($vsDoc->vat_breakdown) === 1
               ? (float) $vsDoc->subtotal
               : (float) $vsDoc->lines->filter(fn ($l) => abs((float) $l->vat_rate - (float) $vsRate) < 0.005)->sum('line_subtotal');
-          $vsRows[] = ['rate' => (float) $vsRate, 'net' => $vsNet, 'vat' => (float) $vsVat, 'gross' => $vsNet + (float) $vsVat];
+          $vsRows[] = ['rate' => (float) $vsRate, 'net' => $vsSign * $vsNet, 'vat' => $vsSign * (float) $vsVat, 'gross' => $vsSign * ($vsNet + (float) $vsVat)];
       }
   }
   $vsTh = 'font-size:7.5pt; text-transform:uppercase; letter-spacing:0.05em; color:#78716C; font-weight:700; padding:2px 6px; border-bottom:1px solid #D6D3D1; text-align:right;';

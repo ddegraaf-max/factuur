@@ -101,20 +101,63 @@ class StandaloneCreditNoteTest extends TestCase
             $this->assertStringNotContainsString('Vervaldatum', $html, $template);
             $this->assertStringNotContainsString('Gelieve het bedrag', $html, $template);
             $this->assertStringContainsString('verrekend of aan u terugbetaald', $html, $template);
+            // 1.56.1: bedragen met minteken (prijs, regeltotaal, subtotaal, btw, totaal).
+            $this->assertStringContainsString('-€' . "\u{00A0}" . '100,00', $html, $template . ': prijs');
+            $this->assertStringContainsString('-€' . "\u{00A0}" . '200,00', $html, $template . ': subtotaal');
+            $this->assertStringContainsString('-€' . "\u{00A0}" . '42,00', $html, $template . ': btw');
+            $this->assertStringContainsString('-€' . "\u{00A0}" . '242,00', $html, $template . ': totaal');
         }
 
-        // Een gewone factuur blijft een factuur.
+        // Een gewone factuur blijft een factuur, met positief totaal.
         $invoice = Invoice::regular()->whereIn('status', ['sent', 'overdue'])->has('lines')->orderBy('id')->firstOrFail()->load('lines');
         $html = DocumentLocale::using('nl', fn () => view('pdf.invoice-modern', ['invoice' => $invoice, 'company' => $invoice->brandedCompany()])->render());
         $this->assertStringContainsString('FACTUUR', $html);
         $this->assertStringNotContainsString('CREDITNOTA', $html);
         $this->assertStringContainsString('Vervaldatum', $html);
+        $this->assertStringContainsString(money($invoice->total), $html);
+        $this->assertStringNotContainsString('-' . money($invoice->total), $html);
 
-        // De mail: eigen onderwerp en tekst, geen betaalverzoek.
+        // De mail: eigen onderwerp en tekst, bedrag met minteken, geen betaalverzoek.
         $mail = new InvoiceMail($credit, 'pdf');
         $body = DocumentLocale::using('nl', fn () => $mail->render());
         $this->assertStringContainsString('Hierbij ontvangt u creditnota', $body);
+        $this->assertStringContainsString('-€' . "\u{00A0}" . '242,00', $body);
         $this->assertStringNotContainsString('Wij verzoeken u', $body);
+    }
+
+    /** 1.56.1: in de boekhouder-export staan creditnota's negatief, zodat de kolommen optellen. */
+    public function test_the_export_lists_a_credit_note_with_negative_amounts(): void
+    {
+        $this->actingAs($this->demoUser());
+        $credit = $this->draftCredit();
+        $credit->forceFill(['number' => 'C-2026-0099', 'status' => 'sent', 'sent_at' => now()])->save();
+
+        $csv = $this->get(route('export.download', [
+            'from' => now()->subYear()->toDateString(),
+            'to' => now()->addDay()->toDateString(),
+            'status' => 'all',
+            'include_credit' => 1,
+        ]))->assertOk()->streamedContent();
+
+        $rows = array_map(fn ($line) => str_getcsv($line, ';'), array_filter(explode("\n", trim($csv))));
+        $documents = array_values(array_filter($rows, fn ($r) => in_array($r[1] ?? null, ['Factuur', 'Creditnota'], true)));
+        $row = collect($documents)->first(fn ($r) => $r[0] === 'C-2026-0099');
+        $this->assertNotNull($row, 'creditnota ontbreekt in de export');
+
+        // Kolommen: … [9] excl. btw, per tarief grondslag/btw, dan btw totaal, incl. btw, betaald, doorgestort, afgeboekt, openstaand, betaald op.
+        $tail = array_slice($row, -7);
+        $this->assertSame('-200,00', $row[9], 'Bedrag excl. BTW');
+        $this->assertSame('-42,00', $tail[0], 'BTW totaal');
+        $this->assertSame('-242,00', $tail[1], 'Bedrag incl. BTW');
+        $this->assertSame('-242,00', $tail[5], 'Openstaand');
+        $this->assertContains('-200,00', $row, 'grondslag 21% negatief');
+
+        // Het controletotaal is de optelsom van de regels — dus mét de creditnota als aftrekpost.
+        $totalRow = collect($rows)->first(fn ($r) => ($r[0] ?? null) === 'TOTAAL');
+        $number = fn ($cell) => (float) str_replace(',', '.', $cell);
+        $expected = array_sum(array_map(fn ($r) => $number(array_slice($r, -6, 1)[0]), $documents));
+        $this->assertEqualsWithDelta($expected, $number(array_slice($totalRow, -6, 1)[0]), 0.01);
+        $this->assertGreaterThan(1, count($documents), 'de demo levert ook gewone facturen in de export');
     }
 
     public function test_a_credit_draft_sent_from_the_form_gets_a_credit_number_and_settles(): void

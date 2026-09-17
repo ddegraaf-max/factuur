@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.1</div>
+        <h2>Creditnota met minteken</h2>
+        <ul class="tl-list">
+          <li><b>Minteken op de creditnota</b> — prijzen, regeltotalen, subtotaal, btw en het gecrediteerde bedrag staan op de PDF en in de e-mail nu met een minteken. Zo is voor je klant (en diens boekhouder) in één oogopslag duidelijk dat het om een tegoed gaat.</li>
+          <li><b>Export telt op</b> — in de export voor je boekhouder staan creditnota's nu negatief in alle bedragkolommen, inclusief grondslag en btw per tarief en het controletotaal. Optellen in Excel klopt daardoor meteen; de btw-aangifte en het auditfile deden dit al goed.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.0</div>
         <h2>Zelfstandige creditnota</h2>
         <ul class="tl-list">

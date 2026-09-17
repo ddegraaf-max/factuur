@@ -104,6 +104,8 @@
   @php
     // Welke factuur deze creditnota crediteert: de gekoppelde factuur, anders het opgegeven nummer (Nieuwe creditnota).
     $pdfCredits = $invoice->is_credit ? ($invoice->originalInvoice?->number ?: $invoice->reference) : null;
+    // Creditnota: alle bedragen met een minteken, zodat het document voor zich spreekt.
+    $pdfSign = $invoice->is_credit ? -1 : 1;
   @endphp
   <div class="doc-title">{{ __($invoice->is_credit ? 'doc.credit_note_tc' : 'doc.invoice_tc') }}</div>
   <div class="doc-meta">
@@ -161,19 +163,19 @@
           @if($line->details)<div class="details">{{ $line->details }}</div>@endif
         </td>
         <td class="right">{{ rtrim(rtrim(number_format($line->quantity, 3, ',', '.'), '0'), ',') }}</td>
-        <td class="right">{{ money($line->unit_price) }}</td>
+        <td class="right">{{ money($pdfSign * $line->unit_price) }}</td>
         @if($hasDiscount)<td class="right">{{ (float) ($line->discount_pct ?? 0) > 0 ? rtrim(rtrim(number_format($line->discount_pct, 2, ',', '.'), '0'), ',') . '%' : '—' }}</td>@endif
-        <td class="right">{{ money($line->line_subtotal) }}</td>
+        <td class="right">{{ money($pdfSign * $line->line_subtotal) }}</td>
       </tr>
     @endforeach
   </tbody>
 </table>
 
 <table class="totals">
-  <tr><td>{{ __('doc.subtotal') }}</td><td class="value">{{ money($invoice->subtotal) }}</td></tr>
+  <tr><td>{{ __('doc.subtotal') }}</td><td class="value">{{ money($pdfSign * $invoice->subtotal) }}</td></tr>
   @if(is_array($invoice->vat_breakdown))
     @foreach($invoice->vat_breakdown as $rate => $amount)
-      <tr><td>{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money((float) $amount) }}</td></tr>
+      <tr><td>{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money($pdfSign * (float) $amount) }}</td></tr>
     @endforeach
   @endif
   @php
@@ -181,13 +183,13 @@
     $pdfPayable = max((float) $invoice->total - (float) $pdfAdvances->sum('amount'), 0);
   @endphp
   @if($pdfAdvances->isNotEmpty())
-    <tr><td>{{ __('doc.total_incl_vat') }}</td><td class="value">{{ money($invoice->total) }}</td></tr>
+    <tr><td>{{ __('doc.total_incl_vat') }}</td><td class="value">{{ money($pdfSign * $invoice->total) }}</td></tr>
     @foreach($pdfAdvances as $adv)
       <tr><td>{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format(market('date_format')) }})</td><td class="value">-&nbsp;{{ money($adv->amount) }}</td></tr>
     @endforeach
-    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value">{{ money($pdfPayable) }}</td></tr>
+    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value">{{ money($pdfSign * $pdfPayable) }}</td></tr>
   @else
-    <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value">{{ money($invoice->total) }}</td></tr>
+    <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value">{{ money($pdfSign * $invoice->total) }}</td></tr>
   @endif
 </table>
 @include('pdf.partials.vat-summary')

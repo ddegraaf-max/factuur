@@ -127,23 +127,26 @@ class ExportController extends Controller
             $sumBuckets = $emptyBuckets;
 
             foreach ($invoices as $invoice) {
+                // Creditnota's negatief, zodat de kolommen in Excel gewoon optellen.
+                $sign = $invoice->is_credit ? -1 : 1;
+
                 // Grondslag en BTW per tarief uit de factuurregels.
                 $buckets = $emptyBuckets;
                 foreach ($invoice->lines as $line) {
                     $key = (string) (int) (float) $line->vat_rate;
                     if (! isset($buckets[$key])) $key = '0';
-                    $buckets[$key]['base'] += (float) $line->line_subtotal;
-                    $buckets[$key]['vat'] += (float) $line->line_vat;
-                    $sumBuckets[$key]['base'] += (float) $line->line_subtotal;
-                    $sumBuckets[$key]['vat'] += (float) $line->line_vat;
+                    $buckets[$key]['base'] += $sign * (float) $line->line_subtotal;
+                    $buckets[$key]['vat'] += $sign * (float) $line->line_vat;
+                    $sumBuckets[$key]['base'] += $sign * (float) $line->line_subtotal;
+                    $sumBuckets[$key]['vat'] += $sign * (float) $line->line_vat;
                 }
 
-                $open = (float) $invoice->total - (float) $invoice->paid_total;
+                $open = $sign * ((float) $invoice->total - (float) $invoice->paid_total);
                 // 'Betaald' = echt ontvangen geld; doorstortingen/verrekeningen
                 // en afboekingen staan apart zodat de boekhouder ze ziet.
-                $realPaid = (float) ($invoice->real_paid ?? 0);
-                $advancePaid = (float) ($invoice->advance_paid ?? 0);
-                $writtenOff = round((float) $invoice->paid_total - $realPaid - $advancePaid, 2);
+                $realPaid = $sign * (float) ($invoice->real_paid ?? 0);
+                $advancePaid = $sign * (float) ($invoice->advance_paid ?? 0);
+                $writtenOff = round($sign * (float) $invoice->paid_total - $realPaid - $advancePaid, 2);
 
                 fputcsv($out, [
                     $invoice->number,
@@ -155,10 +158,10 @@ class ExportController extends Controller
                     $invoice->customer_kvk_number ?? '',
                     $invoice->customer_vat_number ?? '',
                     $invoice->reference ?? '',
-                    $money($invoice->subtotal),
+                    $money($sign * $invoice->subtotal),
                     ...array_map($money, $rateCells($buckets)),
-                    $money($invoice->vat_total),
-                    $money($invoice->total),
+                    $money($sign * $invoice->vat_total),
+                    $money($sign * $invoice->total),
                     $money($realPaid),
                     $money($advancePaid),
                     $money($writtenOff),
@@ -166,9 +169,9 @@ class ExportController extends Controller
                     $invoice->paid_at?->format($dateFormat) ?? '',
                 ], ';');
 
-                $sum['subtotal'] += (float) $invoice->subtotal;
-                $sum['vat_total'] += (float) $invoice->vat_total;
-                $sum['total'] += (float) $invoice->total;
+                $sum['subtotal'] += $sign * (float) $invoice->subtotal;
+                $sum['vat_total'] += $sign * (float) $invoice->vat_total;
+                $sum['total'] += $sign * (float) $invoice->total;
                 $sum['paid'] += $realPaid;
                 $sum['advance'] += $advancePaid;
                 $sum['written_off'] += $writtenOff;

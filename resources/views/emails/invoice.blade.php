@@ -1,7 +1,7 @@
 @php
     $openRaw = (float) $invoice->total - (float) $invoice->paid_total;
     $open = money($openRaw);
-    $total = money($invoice->total);
+    $total = money(($invoice->is_credit ? -1 : 1) * $invoice->total); // creditnota: met minteken
     $settled = money($invoice->paid_total);
     $terms = (int) ($invoice->payment_terms ?? $company->default_payment_terms ?? 14);
     $logo = $company->logoBinary();
