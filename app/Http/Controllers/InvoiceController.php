@@ -82,6 +82,8 @@ class InvoiceController extends Controller
     {
         return Inertia::render('Invoices/Form', [
             'invoice' => null,
+            // ?credit=1: zelfstandige creditnota, zonder factuur in het pakket.
+            'is_credit' => $request->boolean('credit'),
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms', 'language']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => Market::vatRateOptions(),
@@ -111,7 +113,7 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
+            return redirect()->route('invoices.show', $invoice)->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
         }
 
         return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept opgeslagen.'));
@@ -288,7 +290,7 @@ class InvoiceController extends Controller
 
         if ($request->input('action') === 'send') {
             $this->manager->send($invoice);
-            return redirect()->route('invoices.show', $invoice)->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
+            return redirect()->route('invoices.show', $invoice)->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
         }
 
         return redirect()->route('invoices.show', $invoice)->with('flash', __('Concept bijgewerkt.'));
@@ -297,7 +299,7 @@ class InvoiceController extends Controller
     public function send(Invoice $invoice): RedirectResponse
     {
         $this->manager->send($invoice);
-        return back()->with('flash', __('Factuur :number verstuurd.', ['number' => $invoice->number]));
+        return back()->with('flash', __($invoice->is_credit ? 'Creditnota :number verstuurd.' : 'Factuur :number verstuurd.', ['number' => $invoice->number]));
     }
 
     /** Maak een nieuw concept met dezelfde klant en regels. */
@@ -643,6 +645,7 @@ class InvoiceController extends Controller
 
         $data = $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
+            'is_credit' => ['nullable', 'boolean'],
             // Hoe de prijzen in dít formulier zijn ingetypt (schakelaar op het
             // formulier); zonder waarde geldt de bedrijfsinstelling.
             'price_mode' => ['nullable', 'in:excl,incl'],

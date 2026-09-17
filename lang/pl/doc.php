@@ -8,6 +8,11 @@ return [
     // Documenttitels
     'invoice' => 'FAKTURA VAT',
     'invoice_tc' => 'Faktura',
+    'credit_note' => 'FAKTURA KORYGUJĄCA',
+    'credit_note_tc' => 'Faktura korygująca',
+    'credits_invoice' => 'Dotyczy faktury',
+    'amount_credited' => 'Kwota korekty',
+    'credit_note_hint' => 'Kwota zostanie rozliczona z otwartymi fakturami lub zwrócona.',
     'quote' => 'OFERTA',
     'quote_tc' => 'Oferta',
     'draft' => 'SZKIC',
@@ -62,6 +67,9 @@ return [
 
     // Factuurmail
     'mail_invoice_subject' => 'Faktura :number — :company',
+    'mail_credit_subject' => 'Faktura korygująca :number — :company',
+    'mail_credit_intro' => 'W załączeniu przesyłamy fakturę korygującą <strong>:number</strong> z dnia :date na kwotę <strong>:total</strong>. Kwota zostanie rozliczona z otwartymi fakturami lub zwrócona.',
+    'mail_view_credit' => 'Zobacz fakturę korygującą online',
     'mail_greeting' => 'Szanowni Państwo,',
     'mail_invoice_intro' => 'W załączeniu przesyłamy fakturę <strong>:number</strong> z dnia :date na kwotę <strong>:total</strong>. Faktura w formacie PDF znajduje się w załączniku.',
     'mail_settled_partial' => 'Z tej kwoty rozliczono już <strong>:settled</strong>; pozostało do zapłaty <strong>:open</strong>.',

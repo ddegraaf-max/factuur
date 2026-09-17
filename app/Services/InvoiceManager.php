@@ -31,6 +31,8 @@ class InvoiceManager
                 ? Carbon::parse($data['invoice_date'])
                 : now();
             $paymentTerms = (int) ($data['payment_terms'] ?? $customer->payment_terms ?? $customer->company->default_payment_terms ?? 30);
+            // Zelfstandige creditnota (Nieuwe creditnota): geen betaaltermijn.
+            $isCredit = ! empty($data['is_credit']);
 
             // Handelsnaam: alleen een profiel van hetzelfde bedrijf telt
             // (zonder global scope, want dit draait ook via de console).
@@ -57,10 +59,11 @@ class InvoiceManager
                 'brand_profile_id' => $profile?->id,
                 'language' => $language,
                 'status' => 'draft',
+                'is_credit' => $isCredit,
                 'reference' => $data['reference'] ?? null,
                 'invoice_date' => $invoiceDate,
-                'due_date' => $invoiceDate->copy()->addDays($paymentTerms),
-                'payment_terms' => $paymentTerms,
+                'due_date' => $isCredit ? $invoiceDate : $invoiceDate->copy()->addDays($paymentTerms),
+                'payment_terms' => $isCredit ? 0 : $paymentTerms,
 
                 // Snapshot
                 'customer_name' => $customer->name,
@@ -195,10 +198,10 @@ class InvoiceManager
 
         $invoice = DB::transaction(function () use ($invoice) {
             if (! $invoice->number) {
-                $invoice->number = $this->numbers->generate(
-                    $invoice->company,
-                    $invoice->invoice_date->year
-                );
+                // Creditnota's hebben hun eigen reeks (C-jaar-volgnummer).
+                $invoice->number = $invoice->is_credit
+                    ? app(CreditNoteService::class)->nextNumber($invoice->company)
+                    : $this->numbers->generate($invoice->company, $invoice->invoice_date->year);
             }
             $invoice->status = 'sent';
             $invoice->sent_at = now();
@@ -219,6 +222,12 @@ class InvoiceManager
         \App\Support\Audit::log('sent', $invoice, $invoice->customer_email
             ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($invoice), 'email' => $invoice->customer_email])
             : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($invoice)]));
+
+        // Een creditnota op een factuur uit het pakket: meteen verrekenen,
+        // voor zover die factuur nog openstaat.
+        if ($invoice->is_credit) {
+            app(CreditNoteService::class)->settleWithOriginal($invoice);
+        }
 
         return $invoice;
     }

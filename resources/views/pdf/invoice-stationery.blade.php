@@ -73,7 +73,11 @@
 <table class="doc-meta-row">
   <tr>
     <td>
-      <div class="doc-title">{{ __('doc.invoice_tc') }}</div>
+      @php
+        // Welke factuur deze creditnota crediteert: de gekoppelde factuur, anders het opgegeven nummer (Nieuwe creditnota).
+        $pdfCredits = $invoice->is_credit ? ($invoice->originalInvoice?->number ?: $invoice->reference) : null;
+      @endphp
+      <div class="doc-title">{{ __($invoice->is_credit ? 'doc.credit_note_tc' : 'doc.invoice_tc') }}</div>
       <div class="doc-sub">
         @if($invoice->number){{ $invoice->number }}@else<span class="badge">{{ __('doc.draft_tc') }}</span>@endif
       </div>
@@ -82,8 +86,8 @@
       <div><span class="label">{{ __('doc.invoice_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}</div>
       @if(\App\Support\Market::isPl())<div><span class="label">{{ __('doc.sale_date') }}:</span> {{ $invoice->invoice_date->translatedFormat('j F Y') }}</div>@endif
       @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city)<div><span class="label">{{ __('doc.issue_place') }}:</span> {{ $company->city }}</div>@endif
-      <div><span class="label">{{ __('doc.due_date') }}:</span> {{ $invoice->due_date->translatedFormat('j F Y') }}</div>
-      @if($invoice->reference)<div><span class="label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}</div>@endif
+      @if($pdfCredits)<div><span class="label">{{ __('doc.credits_invoice') }}:</span> {{ $pdfCredits }}</div>@else<div><span class="label">{{ __('doc.due_date') }}:</span> {{ $invoice->due_date->translatedFormat('j F Y') }}</div>@endif
+      @if($invoice->reference && $invoice->reference !== $pdfCredits)<div><span class="label">{{ __('doc.reference') }}:</span> {{ $invoice->reference }}</div>@endif
     </td>
   </tr>
 </table>
@@ -143,7 +147,7 @@
     @foreach($pdfAdvances as $adv)
       <tr><td>{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format(market('date_format')) }})</td><td class="value">-&nbsp;{{ money($adv->amount) }}</td></tr>
     @endforeach
-    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value">{{ money($pdfPayable) }}</td></tr>
+    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value">{{ money($pdfPayable) }}</td></tr>
   @else
     <tr class="grand-row"><td>{{ __('doc.total') }}</td><td class="value">{{ money($invoice->total) }}</td></tr>
   @endif
@@ -154,7 +158,9 @@
 
 @if($invoice->notes)<div class="notes">{!! nl2br(e($invoice->notes)) !!}</div>@endif
 @php($payQr = \App\Support\PaymentQr::forInvoice($invoice))
-@if($company->iban || $payQr)
+@if($invoice->is_credit)
+<div class="notes">{{ __('doc.credit_note_hint') }}</div>
+@elseif($company->iban || $payQr)
 <div class="notes">
   <table style="width:100%; border-collapse:collapse;"><tr>
     <td style="vertical-align:middle; padding-right:12px;">

@@ -66,6 +66,9 @@ class Audit
     public static function label(Model $subject): string
     {
         $type = self::TYPES[get_class($subject)] ?? mb_strtolower(class_basename($subject));
+        if ($subject instanceof \App\Models\Invoice && $subject->is_credit) {
+            $type = 'creditnota';
+        }
         $name = match (true) {
             $subject instanceof \App\Models\Invoice => $subject->number ?: ('concept #' . $subject->id),
             $subject instanceof \App\Models\Quote => $subject->number ?: ('concept #' . $subject->id),

@@ -33,14 +33,15 @@ class InvoiceMail extends Mailable
         // vanaf een vreemd domein belandt in de spamfilter.
         // Antwoorden gaan wél rechtstreeks naar de ondernemer.
         // Eigen onderwerp (Instellingen → E-mailteksten), anders de standaard.
-        $customSubject = $company->emailText('invoice_subject');
+        // Een creditnota gebruikt de eigen factuurteksten niet: die gaan over betalen.
+        $customSubject = $this->invoice->is_credit ? null : $company->emailText('invoice_subject');
 
         return new Envelope(
             from: \App\Support\Sender::address($company, $company->name ?: config('mail.from.name')),
             replyTo: array_filter([$this->companyReplyTo($company)]),
             subject: $customSubject
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::invoiceVars($this->invoice, $company))
-                : __('doc.mail_invoice_subject', [
+                : __($this->invoice->is_credit ? 'doc.mail_credit_subject' : 'doc.mail_invoice_subject', [
                     'number' => $this->invoice->number,
                     'company' => $company->name ?? Brand::name(),
                 ]),
@@ -61,7 +62,7 @@ class InvoiceMail extends Mailable
 
         // Eigen tekst vervangt aanhef, intro en betaalverzoek; verrekenings-
         // meldingen en de portaalknop blijven automatisch (gegevensgestuurd).
-        $customBody = $company->emailText('invoice_body');
+        $customBody = $this->invoice->is_credit ? null : $company->emailText('invoice_body');
 
         return new Content(
             view: 'emails.invoice',

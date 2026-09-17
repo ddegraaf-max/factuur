@@ -347,7 +347,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 </script>
 
 <template>
-  <Head :title="$t('Factuur :number', { number: invoice.number || $t('concept') })" />
+  <Head :title="$t(invoice.is_credit ? 'Creditnota :number' : 'Factuur :number', { number: invoice.number || $t('concept') })" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
@@ -362,7 +362,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           {{ $t('Terug') }}
         </Link>
-        <h1 class="page-title">{{ $t('Factuur') }} {{ invoice.number || $t('— concept —') }}</h1>
+        <h1 class="page-title">{{ invoice.is_credit ? $t('Creditnota') : $t('Factuur') }} {{ invoice.number || $t('— concept —') }}</h1>
         <p class="page-subtitle">
           <template v-if="invoice.status === 'draft'">{{ $t('Concept · nog niet verstuurd') }}</template>
           <template v-else-if="invoice.sent_at_label">{{ $t('Verstuurd op :date', { date: invoice.sent_at_label }) }}</template>

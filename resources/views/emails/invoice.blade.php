@@ -28,21 +28,21 @@
         @else
         <p style="margin:0 0 14px;">{{ __('doc.mail_greeting', ['name' => $invoice->customer_name]) }}</p>
         <p style="margin:0 0 14px;">
-          {!! __('doc.mail_invoice_intro', [
+          {!! __($invoice->is_credit ? 'doc.mail_credit_intro' : 'doc.mail_invoice_intro', [
               'number' => e($invoice->number),
               'date' => e(optional($invoice->invoice_date)->translatedFormat('j F Y')),
               'total' => e($total),
           ]) !!}
         </p>
         @endif
-        @if($invoice->paid_total > 0 && $openRaw > 0.009)
+        @if(! $invoice->is_credit && $invoice->paid_total > 0 && $openRaw > 0.009)
           <p style="margin:0 0 14px;">
             {!! __('doc.mail_settled_partial', ['settled' => e($settled), 'open' => e($open)]) !!}
           </p>
-        @elseif($invoice->paid_total > 0)
+        @elseif(! $invoice->is_credit && $invoice->paid_total > 0)
           <p style="margin:0 0 14px;">{{ __('doc.mail_settled_full') }}</p>
         @endif
-        @if(empty($customBody) && $openRaw > 0.009)
+        @if(! $invoice->is_credit && empty($customBody) && $openRaw > 0.009)
         <p style="margin:0 0 14px;">
           {!! __('doc.mail_pay_request', [
               'amount' => $invoice->paid_total > 0 ? __('doc.mail_remaining_amount') : __('doc.mail_the_amount'),
@@ -62,14 +62,16 @@
               <td style="border-radius:8px;background:{{ $company->brand_color ?: brand('color') }};">
                 <a href="{{ route('portal.invoice', $invoice->portal_token) }}"
                    style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:8px;">
-                  {{ (filled($company->mollie_api_key ?? null) && $openRaw > 0.009) ? __('doc.mail_view_pay_invoice') : __('doc.mail_view_invoice') }}&nbsp;&nbsp;→
+                  {{ $invoice->is_credit ? __('doc.mail_view_credit') : ((filled($company->mollie_api_key ?? null) && $openRaw > 0.009) ? __('doc.mail_view_pay_invoice') : __('doc.mail_view_invoice')) }}&nbsp;&nbsp;→
                 </a>
               </td>
             </tr>
           </table>
+          @unless($invoice->is_credit)
           <p style="margin:0 0 14px;color:#78716c;font-size:12.5px;line-height:1.6;">
             {{ __('doc.mail_portal_hint') }}
           </p>
+          @endunless
         @endif
         @if($company->invoice_footer)
           <p style="margin:16px 0 0;color:#78716c;font-size:13px;line-height:1.6;">{{ $company->invoice_footer }}</p>

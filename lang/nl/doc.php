@@ -9,6 +9,11 @@ return [
     // Documenttitels
     'invoice' => 'FACTUUR',
     'invoice_tc' => 'Factuur',
+    'credit_note' => 'CREDITNOTA',
+    'credit_note_tc' => 'Creditnota',
+    'credits_invoice' => 'Crediteert factuur',
+    'amount_credited' => 'Gecrediteerd bedrag',
+    'credit_note_hint' => 'Dit bedrag wordt met u verrekend of aan u terugbetaald.',
     'quote' => 'OFFERTE',
     'quote_tc' => 'Offerte',
     'draft' => 'CONCEPT',
@@ -60,6 +65,9 @@ return [
 
     // Factuurmail
     'mail_invoice_subject' => 'Factuur :number — :company',
+    'mail_credit_subject' => 'Creditnota :number — :company',
+    'mail_credit_intro' => 'Hierbij ontvangt u creditnota <strong>:number</strong> van :date voor een bedrag van <strong>:total</strong>. Dit bedrag wordt met u verrekend of aan u terugbetaald.',
+    'mail_view_credit' => 'Bekijk creditnota online',
     'mail_greeting' => 'Beste :name,',
     'mail_invoice_intro' => 'Hierbij ontvangt u factuur <strong>:number</strong> van :date voor een bedrag van <strong>:total</strong>. De factuur vindt u als PDF in de bijlage.',
     'mail_settled_partial' => 'Hierop is reeds <strong>:settled</strong> verrekend/doorgestort; het te betalen bedrag is <strong>:open</strong>.',

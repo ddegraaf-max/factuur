@@ -8,6 +8,11 @@ return [
     // Documenttitels
     'invoice' => 'INVOICE',
     'invoice_tc' => 'Invoice',
+    'credit_note' => 'CREDIT NOTE',
+    'credit_note_tc' => 'Credit note',
+    'credits_invoice' => 'Credits invoice',
+    'amount_credited' => 'Amount credited',
+    'credit_note_hint' => 'This amount will be settled against your open invoices or refunded to you.',
     'quote' => 'QUOTATION',
     'quote_tc' => 'Quotation',
     'draft' => 'DRAFT',
@@ -62,6 +67,9 @@ return [
 
     // Factuurmail
     'mail_invoice_subject' => 'Invoice :number — :company',
+    'mail_credit_subject' => 'Credit note :number — :company',
+    'mail_credit_intro' => 'Please find attached credit note <strong>:number</strong> dated :date for the amount of <strong>:total</strong>. This amount will be settled against your open invoices or refunded to you.',
+    'mail_view_credit' => 'View credit note online',
     'mail_greeting' => 'Dear :name,',
     'mail_invoice_intro' => 'Please find attached invoice <strong>:number</strong> dated :date for the amount of <strong>:total</strong>.',
     'mail_settled_partial' => 'An amount of <strong>:settled</strong> has already been settled; the amount due is <strong>:open</strong>.',

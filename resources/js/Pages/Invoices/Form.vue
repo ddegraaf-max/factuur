@@ -16,9 +16,12 @@ const props = defineProps({
   default_payment_terms: { type: Number, default: 30 },
   default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
+  is_credit: { type: Boolean, default: false }, // zelfstandige creditnota (Nieuwe creditnota)
 });
 
 const isEdit = computed(() => !!props.invoice);
+// Creditnota: zelfde formulier, eigen nummerreeks, geen betaaltermijn of verrekeningen.
+const isCredit = computed(() => props.is_credit || !!props.invoice?.is_credit);
 
 // Markt (nl/pl): standaard btw-tarief voor nieuwe regels.
 const market = usePage().props.market;
@@ -55,6 +58,7 @@ const initialCustomerId = props.invoice?.customer_id ?? props.preselect_customer
 
 const form = useForm({
   customer_id: initialCustomerId,
+  is_credit: (props.is_credit || !!props.invoice?.is_credit) ? 1 : 0,
   language: props.invoice?.language ?? customerLanguage(initialCustomerId),
   // Start in de bedrijfsinstelling; met de schakelaar op het formulier kies
   // je per factuur hoe je prijzen intypt (de server slaat altijd netto op).
@@ -283,7 +287,7 @@ const submit = (action) => {
 </script>
 
 <template>
-  <Head :title="isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur')" />
+  <Head :title="isCredit ? (isEdit ? $t('Creditnota bewerken') : $t('Nieuwe creditnota')) : (isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur'))" />
   <AppLayout>
     <template #breadcrumb>
       <div class="breadcrumb">
@@ -298,7 +302,8 @@ const submit = (action) => {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           {{ $t('Terug') }}
         </Link>
-        <h1 class="page-title">{{ isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur') }}</h1>
+        <h1 class="page-title">{{ isCredit ? (isEdit ? $t('Creditnota bewerken') : $t('Nieuwe creditnota')) : (isEdit ? $t('Factuur bewerken') : $t('Nieuwe factuur')) }}</h1>
+        <p v-if="isCredit" style="margin:4px 0 0;font-size:13px;color:var(--text-3);">{{ $t('Vul de bedragen positief in: de creditnota trekt ze zelf af van je omzet en btw.') }}</p>
       </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" :disabled="form.processing" @click="submit('draft')">
@@ -333,17 +338,17 @@ const submit = (action) => {
                 </Link>
               </div>
               <div class="form-group">
-                <label>{{ $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
-                <input type="text" v-model="form.reference" placeholder="PROJ-2026-001" maxlength="255">
+                <label>{{ isCredit ? $t('Crediteert factuur') : $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+                <input type="text" v-model="form.reference" :placeholder="isCredit ? $t('Factuurnummer, ook uit een ander pakket') : 'PROJ-2026-001'" maxlength="255">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>{{ $t('Factuurdatum') }} *</label>
+                <label>{{ isCredit ? $t('Datum') : $t('Factuurdatum') }} *</label>
                 <input type="date" v-model="form.invoice_date" required>
                 <div v-if="form.errors.invoice_date" class="field-error">{{ form.errors.invoice_date }}</div>
               </div>
-              <div class="form-group">
+              <div v-if="!isCredit" class="form-group">
                 <label>{{ $t('Betalingstermijn (dagen)') }} *</label>
                 <input type="number" v-model="form.payment_terms" min="0" max="365" required>
                 <div v-if="form.errors.payment_terms" class="field-error">{{ form.errors.payment_terms }}</div>
@@ -459,8 +464,8 @@ const submit = (action) => {
           </div>
         </div>
 
-        <!-- Verrekeningen / reeds doorgestort -->
-        <div class="card" style="margin-top:16px;">
+        <!-- Verrekeningen / reeds doorgestort (niet op een creditnota) -->
+        <div v-if="!isCredit" class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
               <div class="card-title">{{ $t('Verrekening · reeds doorgestort') }}</div>

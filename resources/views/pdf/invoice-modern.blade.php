@@ -95,7 +95,11 @@
       </div>
     </td>
     <td style="text-align:right;">
-      <div class="doc-title brand">{{ __('doc.invoice') }}</div>
+      @php
+        // Welke factuur deze creditnota crediteert: de gekoppelde factuur, anders het opgegeven nummer (Nieuwe creditnota).
+        $pdfCredits = $invoice->is_credit ? ($invoice->originalInvoice?->number ?: $invoice->reference) : null;
+      @endphp
+      <div class="doc-title brand">{{ __($invoice->is_credit ? 'doc.credit_note' : 'doc.invoice') }}</div>
       <div class="doc-number">
         @if($invoice->number){{ $invoice->number }}@else<span class="badge">{{ __('doc.draft') }}</span>@endif
       </div>
@@ -120,8 +124,8 @@
         <tr><td class="meta-label">{{ __('doc.invoice_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>
         @if(\App\Support\Market::isPl())<tr><td class="meta-label">{{ __('doc.sale_date') }}</td><td class="meta-value">{{ $invoice->invoice_date->translatedFormat('j F Y') }}</td></tr>@endif
         @if(\App\Support\DocumentLocale::showsIssuePlace() && $company->city)<tr><td class="meta-label">{{ __('doc.issue_place') }}</td><td class="meta-value">{{ $company->city }}</td></tr>@endif
-        <tr><td class="meta-label">{{ __('doc.due_date') }}</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>
-        @if($invoice->reference)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
+        @if($pdfCredits)<tr><td class="meta-label">{{ __('doc.credits_invoice') }}</td><td class="meta-value">{{ $pdfCredits }}</td></tr>@else<tr><td class="meta-label">{{ __('doc.due_date') }}</td><td class="meta-value">{{ $invoice->due_date->translatedFormat('j F Y') }}</td></tr>@endif
+        @if($invoice->reference && $invoice->reference !== $pdfCredits)<tr><td class="meta-label">{{ __('doc.reference') }}</td><td class="meta-value">{{ $invoice->reference }}</td></tr>@endif
         @if($company->kvk_number)<tr><td class="meta-label">{{ \App\Support\DocumentLocale::registryLabel($company->country) }}</td><td class="meta-value">{{ $company->kvk_number }}</td></tr>@endif
         @if($company->vat_number)<tr><td class="meta-label">{{ __('doc.vat_no') }}</td><td class="meta-value">{{ $company->vat_number }}</td></tr>@endif
       </table>
@@ -178,9 +182,9 @@
     @foreach($pdfAdvances as $adv)
       <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format(market('date_format')) }})</td><td class="value">-&nbsp;{{ money($adv->amount) }}</td></tr>
     @endforeach
-    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value brand">{{ money($pdfPayable) }}</td></tr>
+    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value brand">{{ money($pdfPayable) }}</td></tr>
   @else
-    <tr class="grand-row"><td>{{ __('doc.amount_due') }}</td><td class="value brand">{{ money($invoice->total) }}</td></tr>
+    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value brand">{{ money($invoice->total) }}</td></tr>
   @endif
 </table>
 @include('pdf.partials.vat-summary')
@@ -189,7 +193,9 @@
 
 @if($invoice->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($invoice->notes)) !!}</div>@endif
 @php($payQr = \App\Support\PaymentQr::forInvoice($invoice))
-@if($company->iban || $payQr)
+@if($invoice->is_credit)
+<div class="notes">{{ __('doc.credit_note_hint') }}</div>
+@elseif($company->iban || $payQr)
 <div class="notes">
   <table style="width:100%; border-collapse:collapse;"><tr>
     <td style="vertical-align:middle; padding-right:12px;">

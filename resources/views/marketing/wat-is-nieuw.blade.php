@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 17 september 2026 · {{ brand('version_prefix') }} 1.56.0</div>
+        <h2>Zelfstandige creditnota</h2>
+        <ul class="tl-list">
+          <li><b>Nieuwe creditnota zonder factuur in het pakket</b> — op de factuurlijst staat nu <i>Nieuwe creditnota</i>: hetzelfde formulier als een factuur, met bij "Crediteert factuur" het nummer van de factuur die je crediteert, ook als die uit je vorige pakket komt. Eigen nummerreeks (C-…), geen betaaltermijn, en vanzelf in mindering op omzet en btw.</li>
+          <li><b>PDF en e-mail heten nu ook creditnota</b> — de PDF droeg altijd de titel "Factuur", ook voor een creditnota. Nu staat er Creditnota, met de regel "Crediteert factuur", "Gecrediteerd bedrag" in plaats van "Te betalen" en geen betaalverzoek. De e-mail heeft een eigen onderwerp en tekst.</li>
+          <li><b>Versturen vanuit het formulier</b> — een creditnota-concept dat je via het formulier verstuurt, krijgt een creditnotanummer (kreeg tot nu toe een factuurnummer), wordt gemaild naar de klant en direct verrekend met de factuur die ze crediteert.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Fix</span> 17 september 2026 · {{ brand('version_prefix') }} 1.55.1</div>
         <h2>Gecrediteerde factuur telt niet meer als openstaand</h2>
         <ul class="tl-list">

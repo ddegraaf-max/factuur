@@ -35,6 +35,9 @@ const setStatus = (s) => {
       <div class="breadcrumb">{{ $t('Verkoop') }} / <span class="breadcrumb-current">{{ $t('Facturen') }}</span></div>
     </template>
     <template #topbar-actions>
+      <Link :href="route('invoices.create', { credit: 1 })" class="btn btn-secondary btn-sm" :title="$t('Creditnota op een factuur die niet in dit pakket staat')">
+        {{ $t('Nieuwe creditnota') }}
+      </Link>
       <Link :href="route('invoices.create')" class="btn btn-primary btn-sm">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         {{ $t('Nieuwe factuur') }}
