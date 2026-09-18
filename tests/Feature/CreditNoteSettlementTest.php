@@ -3,10 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\ActivityLog;
+use App\Mail\InvoiceMail;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Services\XafExporter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\Support\UsesDemoCompany;
 use Tests\TestCase;
 
@@ -134,13 +136,14 @@ class CreditNoteSettlementTest extends TestCase
     /** 1.55.1: een definitieve creditnota verrekent zichzelf met de nog openstaande factuur. */
     public function test_a_full_credit_note_settles_the_open_invoice_at_once(): void
     {
+        Mail::fake();
         $this->actingAs($this->demoUser());
         $invoice = $this->openInvoice();
         $openBefore = Invoice::open()->count();
 
         $this->post(route('invoices.credit.store', $invoice), ['kind' => 'full'])
             ->assertRedirect()
-            ->assertSessionHas('flash', fn ($flash) => str_contains($flash, 'verrekend met factuur ' . $invoice->number));
+            ->assertSessionHas('flash', fn ($flash) => str_contains($flash, 'Verrekend met factuur ' . $invoice->number));
         $credit = $invoice->creditNotes()->orderByDesc('id')->firstOrFail();
 
         $invoice->refresh();
@@ -152,12 +155,17 @@ class CreditNoteSettlementTest extends TestCase
         $this->assertSame($openBefore - 1, Invoice::open()->count(), 'De gecrediteerde factuur telt niet meer als openstaand');
         $this->assertSame(2, ActivityLog::where('action', 'settled')->count());
 
+        // 1.57.1: definitief maken ís versturen — de klant krijgt de creditnota gemaild.
+        Mail::assertSent(InvoiceMail::class, fn (InvoiceMail $mail) => $mail->invoice->is($credit) && str_starts_with($mail->envelope()->subject, 'Creditnota ' . $credit->number));
+        $this->assertDatabaseHas('activity_logs', ['subject_id' => $credit->id, 'action' => 'sent']);
+
         // Niets meer te verrekenen: de betalingsmodal biedt het niet meer aan.
         $this->get(route('invoices.show', $invoice))->assertOk()->assertInertia(fn ($page) => $page->where('invoice.settle_options', []));
     }
 
     public function test_finalizing_a_partial_credit_note_settles_only_its_amount(): void
     {
+        Mail::fake();
         $this->actingAs($this->demoUser());
         $invoice = $this->openInvoice();
         $part = round((float) $invoice->total / 4, 2);
@@ -168,7 +176,7 @@ class CreditNoteSettlementTest extends TestCase
         $this->assertSame(0, Payment::where('kind', 'credit')->count(), 'Een concept verrekent nog niets');
 
         $this->post(route('invoices.credit.finalize', $draft))->assertRedirect()
-            ->assertSessionHas('flash', fn ($flash) => str_contains($flash, 'verrekend met factuur ' . $invoice->number));
+            ->assertSessionHas('flash', fn ($flash) => str_contains($flash, 'Verrekend met factuur ' . $invoice->number));
 
         $invoice->refresh();
         $draft->refresh();
@@ -176,6 +184,7 @@ class CreditNoteSettlementTest extends TestCase
         $this->assertEqualsWithDelta((float) $invoice->total - $part, $invoice->remaining_amount, 0.001);
         $this->assertSame('settled', $draft->status);
         $this->assertNotNull($draft->number);
+        Mail::assertSent(InvoiceMail::class, fn (InvoiceMail $mail) => $mail->invoice->is($draft));
     }
 
     public function test_a_credit_note_on_a_paid_invoice_is_not_settled(): void
@@ -184,7 +193,7 @@ class CreditNoteSettlementTest extends TestCase
         $invoice = Invoice::regular()->where('status', 'paid')->has('lines')->orderBy('id')->firstOrFail();
 
         $this->post(route('invoices.credit.store', $invoice), ['kind' => 'full'])->assertRedirect()
-            ->assertSessionHas('flash', fn ($flash) => str_contains($flash, 'aangemaakt en verstuurd'));
+            ->assertSessionHas('flash', fn ($flash) => str_starts_with($flash, 'Creditnota C-') && str_contains($flash, 'verstuurd naar') && ! str_contains($flash, 'Verrekend'));
         $credit = $invoice->creditNotes()->orderByDesc('id')->firstOrFail();
 
         $this->assertSame('sent', $credit->status, 'Terug te betalen: blijft open');

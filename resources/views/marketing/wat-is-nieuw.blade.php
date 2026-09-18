@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 september 2026 · {{ brand('version_prefix') }} 1.57.1</div>
+        <h2>Creditnota gaat naar de klant</h2>
+        <ul class="tl-list">
+          <li><b>Creditnota mailen</b> — een creditnota die je definitief maakt (via "Creditnota maken" op de factuur, of met Versturen op het concept) gaat nu per e-mail naar de klant, met de PDF en de portaallink, net als een factuur. De melding zegt naar welk adres, of dat de klant geen adres heeft.</li>
+          <li><b>Eén knop</b> — de aparte knop "Creditnota definitief maken" is weg: Versturen doet alles in één keer, inclusief de verrekening met de factuur.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 september 2026 · {{ brand('version_prefix') }} 1.57.0</div>
         <h2>Prijzen opvragen bij onderaannemers</h2>
         <ul class="tl-list">

@@ -91,13 +91,12 @@ class CreditNoteService
             throw new \DomainException(__('Niet een conceptcreditnota.'));
         }
 
-        $credit->update([
-            'number' => $this->nextNumber($credit->company),
-            'status' => 'sent',
-            'sent_at' => now(),
-        ]);
+        // Definitief maken ís versturen (1.57.1): nummer uit de creditnotareeks,
+        // mail naar de klant, logboekregel en verrekening met de factuur — precies
+        // wat 'Versturen' vanuit het formulier doet.
+        app(InvoiceManager::class)->send($credit);
 
-        return $this->settleWithOriginal($credit);
+        return round((float) $credit->fresh()->paid_total, 2);
     }
 
     /** Verrekent een definitieve creditnota met haar factuur, als daar nog iets openstaat. */

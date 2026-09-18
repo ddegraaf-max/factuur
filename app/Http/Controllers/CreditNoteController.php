@@ -26,10 +26,7 @@ class CreditNoteController extends Controller
         if ($kind === 'full') {
             $settled = $this->service->finalize($credit);
 
-            return redirect()->route('invoices.show', $credit)
-                ->with('flash', $settled > 0
-                    ? __('Creditnota :number aangemaakt en verrekend met factuur :invoice.', ['number' => $credit->number, 'invoice' => $invoice->number])
-                    : __('Creditnota :number aangemaakt en verstuurd.', ['number' => $credit->number]));
+            return redirect()->route('invoices.show', $credit)->with('flash', $this->finalizedFlash($credit->fresh(), $settled, $invoice));
         }
 
         // Partial: open as draft to edit
@@ -45,9 +42,20 @@ class CreditNoteController extends Controller
             abort(422, $e->getMessage());
         }
 
-        return redirect()->route('invoices.show', $invoice)
-            ->with('flash', $settled > 0
-                ? __('Creditnota :number is definitief en verrekend met factuur :invoice.', ['number' => $invoice->number, 'invoice' => $invoice->originalInvoice?->number])
-                : __('Creditnota :number verstuurd.', ['number' => $invoice->number]));
+        return redirect()->route('invoices.show', $invoice)->with('flash', $this->finalizedFlash($invoice->fresh(), $settled, $invoice->originalInvoice));
+    }
+
+    /** Wat er is gebeurd: gemaild (naar wie) of niet (geen adres), en verrekend met welke factuur. */
+    private function finalizedFlash(Invoice $credit, float $settled, ?Invoice $invoice): string
+    {
+        $message = $credit->customer_email
+            ? __('Creditnota :number verstuurd naar :email.', ['number' => $credit->number, 'email' => $credit->customer_email])
+            : __('Creditnota :number vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.', ['number' => $credit->number]);
+
+        if ($settled > 0 && $invoice) {
+            $message .= ' ' . __('Verrekend met factuur :invoice.', ['invoice' => $invoice->number]);
+        }
+
+        return $message;
     }
 }

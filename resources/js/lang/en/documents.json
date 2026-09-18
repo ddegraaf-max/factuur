@@ -354,5 +354,7 @@
   "Verrekenen met :number": "Settle against :number",
   "Boekt de creditnota af tegen de factuur, zodat beide op nul uitkomen. Er komt geen geld binnen; omzet en btw veranderen niet.": "Books the credit note against the invoice so both end at zero. No money comes in; revenue and VAT stay the same.",
   "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "The credit note already is your correction of revenue and VAT. This settlement only closes the two open items against each other; nothing changes on the invoice PDF.",
-  "(optioneel — standaard \"Verrekend met creditnota …\")": "(optional — defaults to \"Settled against credit note …\")"
+  "(optioneel — standaard \"Verrekend met creditnota …\")": "(optional — defaults to \"Settled against credit note …\")",
+  "Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer, gaat per e-mail naar de klant en wordt verrekend met deze factuur.": "The full amount of :amount will be reversed. The credit note gets a final number right away, is e-mailed to the customer and is settled against this invoice.",
+  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "You open a draft in which you adjust the lines and amounts yourself. Then you send it, just like an invoice."
 }

@@ -53,11 +53,6 @@ const createCredit = () => {
   });
 };
 
-const finalizeCredit = () => {
-  if (confirm(t('Creditnota definitief maken? Er wordt een definitief creditnotanummer toegekend.'))) {
-    router.post(route('invoices.credit.finalize', props.invoice.id));
-  }
-};
 
 /* ---------- Incasso ---------- */
 const phaseLabels = {
@@ -435,10 +430,6 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
         <button v-if="canIncasso" class="btn btn-secondary btn-sm" :title="$t('Draag deze factuur over aan :partner', { partner: $page.props.market.incasso_partner })" @click="sendToIncasso">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
           {{ $t('Naar incasso') }}
-        </button>
-        <button v-if="invoice.is_credit && invoice.status === 'draft'" class="btn btn-primary btn-sm" @click="finalizeCredit">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-          {{ $t('Creditnota definitief maken') }}
         </button>
         <button v-if="['sent','partial','overdue'].includes(invoice.status)" class="btn btn-primary btn-sm" @click="openPaymentModal">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1048,7 +1039,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <input type="radio" value="full" v-model="creditForm.kind">
             <div>
               <div class="credit-opt-title">{{ $t('Volledig crediteren') }}</div>
-              <div class="credit-opt-sub">{{ $t('Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer.', { amount: eur(invoice.total) }) }}</div>
+              <div class="credit-opt-sub">{{ $t('Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer, gaat per e-mail naar de klant en wordt verrekend met deze factuur.', { amount: eur(invoice.total) }) }}</div>
             </div>
           </label>
 
@@ -1056,7 +1047,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <input type="radio" value="partial" v-model="creditForm.kind">
             <div>
               <div class="credit-opt-title">{{ $t('Gedeeltelijk crediteren') }}</div>
-              <div class="credit-opt-sub">{{ $t('Je opent een concept waarin je zelf de regels en bedragen aanpast. Pas daarna maak je hem definitief.') }}</div>
+              <div class="credit-opt-sub">{{ $t('Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.') }}</div>
             </div>
           </label>
         </div>

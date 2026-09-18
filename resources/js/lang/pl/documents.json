@@ -354,5 +354,7 @@
   "Verrekenen met :number": "Rozlicz z :number",
   "Boekt de creditnota af tegen de factuur, zodat beide op nul uitkomen. Er komt geen geld binnen; omzet en btw veranderen niet.": "Rozlicza fakturę korygującą z fakturą, tak że obie wychodzą na zero. Pieniądze nie wpływają; przychód i VAT się nie zmieniają.",
   "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "Faktura korygująca jest już Twoją korektą przychodu i VAT. To rozliczenie jedynie zamyka obie otwarte pozycje wzajemnie; na PDF faktury nic się nie zmienia.",
-  "(optioneel — standaard \"Verrekend met creditnota …\")": "(opcjonalnie — domyślnie \"Rozliczono z fakturą korygującą …\")"
+  "(optioneel — standaard \"Verrekend met creditnota …\")": "(opcjonalnie — domyślnie \"Rozliczono z fakturą korygującą …\")",
+  "Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer, gaat per e-mail naar de klant en wordt verrekend met deze factuur.": "Cała kwota :amount zostanie skorygowana. Faktura korygująca od razu otrzyma ostateczny numer, zostanie wysłana e-mailem do klienta i rozliczona z tą fakturą.",
+  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "Otworzysz szkic, w którym sam poprawisz pozycje i kwoty. Potem go wyślesz, tak jak fakturę."
 }
