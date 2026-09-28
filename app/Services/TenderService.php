@@ -256,6 +256,83 @@ class TenderService
         ])->save();
     }
 
+    /**
+     * De ondernemer legt zelf vast dat een bedrijf heeft afgezegd (telefonisch
+     * of per mail). Er gaat geen bericht uit, en ook geen herinnering meer.
+     */
+    public function markDeclined(TenderRequest $request, ?string $reason = null): void
+    {
+        if (! $request->round?->isOpen() || ! in_array($request->status, ['sent', 'responded'], true)) {
+            throw new \DomainException(__('Afzeggen kan alleen zolang de uitvraag open is en het bedrijf nog meedoet.'));
+        }
+
+        $request->forceFill([
+            'status' => 'declined',
+            'decline_reason' => filled($reason) ? trim($reason) : __('Afgezegd (door jou vastgelegd)'),
+            'responded_at' => now(),
+        ])->save();
+    }
+
+    /** Haalt een bedrijf uit de ronde, met alles wat het had ingestuurd. Er gaat geen bericht uit. */
+    public function removeRequest(TenderRequest $request): void
+    {
+        if (! $request->round?->isOpen()) {
+            throw new \DomainException(__('Deze uitvraag is al gegund of gesloten; verwijderen kan niet meer.'));
+        }
+
+        $round = $request->round;
+        $name = $request->subcontractor?->name;
+        if ($request->attachment_path) {
+            Storage::disk('local')->delete($request->attachment_path);
+        }
+        $request->attachments()->delete();
+        $request->delete();
+
+        Audit::log('updated', $round, __(':label: :name uit de uitvraag gehaald', [
+            'label' => Audit::label($round), 'name' => $name,
+        ]), [], $round->company_id);
+    }
+
+    /**
+     * Schrijft extra bedrijven aan in een lopende ronde: zelfde aanvraag,
+     * zelfde bijlagen. Wie al meedoet of geen e-mailadres heeft, slaat het over.
+     */
+    public function invite(TenderRound $round, array $subcontractorIds): int
+    {
+        if (! $round->isOpen()) {
+            throw new \DomainException(__('Deze uitvraag is al gegund of gesloten; bedrijven toevoegen kan niet meer.'));
+        }
+
+        $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $round->company_id)
+            ->whereIn('id', $subcontractorIds)
+            ->whereNotIn('id', $round->requests()->pluck('subcontractor_id'))
+            ->whereNotNull('email')
+            ->orderBy('name')
+            ->get();
+
+        if ($subcontractors->isEmpty()) {
+            throw new \DomainException(__('Kies minstens één bedrijf met een e-mailadres dat nog niet is aangeschreven.'));
+        }
+
+        foreach ($subcontractors as $subcontractor) {
+            $request = $round->requests()->create([
+                'subcontractor_id' => $subcontractor->id,
+                'token' => bin2hex(random_bytes(32)),
+                'status' => 'sent',
+            ]);
+            $request->setRelation('round', $round)->setRelation('subcontractor', $subcontractor);
+            if ($this->mail($request, 'request')) {
+                $request->forceFill(['sent_at' => now()])->save();
+            }
+        }
+
+        Audit::log('updated', $round, __(':label: :count bedrijven extra aangeschreven', [
+            'label' => Audit::label($round), 'count' => $subcontractors->count(),
+        ]), [], $round->company_id);
+
+        return $subcontractors->count();
+    }
+
     /** Gunt de ronde: opdracht naar de winnaar, nette afwijzing naar wie een prijs gaf. */
     public function award(TenderRound $round, TenderRequest $winner): void
     {

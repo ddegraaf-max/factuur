@@ -6,6 +6,7 @@ use App\Models\Attachment;
 use App\Models\TenderRequest;
 use App\Services\TenderService;
 use App\Support\IsoWeek;
+use App\Support\TenderText;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -47,7 +48,8 @@ class TenderResponseController extends Controller
             ],
             'round' => [
                 'title' => $round->title,
-                'description' => $round->description,
+                // Zonder een meegeplakte e-mailondertekening.
+                'description' => TenderText::body($round->description),
                 'location' => $round->location,
                 'start_week' => $round->start_week,
                 'start_week_label' => IsoWeek::label($round->start_week),

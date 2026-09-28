@@ -8,6 +8,7 @@ import { computed, ref } from 'vue';
 const props = defineProps({
   round: Object,
   requests: Array,
+  candidates: { type: Array, default: () => [] },
 });
 
 const page = usePage();
@@ -29,7 +30,37 @@ const award = (r) => {
     router.post(route('tenders.award', [props.round.id, r.id]), {}, { preserveScroll: true });
   }
 };
-const remind = (r) => router.post(route('tenders.remind', [props.round.id, r.id]), {}, { preserveScroll: true });
+// Een herinnering is een mail: altijd eerst vragen, zodat een misklik niets verstuurt.
+const remind = (r) => {
+  if (confirm(t('Herinnering mailen naar :name?', { name: r.name }))) {
+    router.post(route('tenders.remind', [props.round.id, r.id]), {}, { preserveScroll: true });
+  }
+};
+
+/* ---------- Afgezegd of per vergissing aangeschreven ---------- */
+const markDeclined = (r) => {
+  const reason = prompt(t(':name heeft afgezegd. Reden (mag leeg blijven):', { name: r.name }), t('Geen tijd'));
+  if (reason === null) return;
+  router.post(route('tenders.requests.decline', [props.round.id, r.id]), { reason }, { preserveScroll: true });
+};
+const removeRequest = (r) => {
+  if (confirm(t(':name uit deze uitvraag halen? Het bedrijf krijgt geen bericht; een ingestuurde prijs gaat verloren.', { name: r.name }))) {
+    router.delete(route('tenders.requests.destroy', [props.round.id, r.id]), { preserveScroll: true });
+  }
+};
+
+/* ---------- Extra bedrijven aanschrijven ---------- */
+const showInvite = ref(false);
+const inviteForm = useForm({ subcontractor_ids: [] });
+const openInvite = () => { inviteForm.clearErrors(); inviteForm.subcontractor_ids = []; showInvite.value = true; };
+const toggleInvite = (id) => {
+  const i = inviteForm.subcontractor_ids.indexOf(id);
+  if (i >= 0) inviteForm.subcontractor_ids.splice(i, 1); else inviteForm.subcontractor_ids.push(id);
+};
+const invite = () => inviteForm.post(route('tenders.requests.store', props.round.id), {
+  preserveScroll: true,
+  onSuccess: () => { showInvite.value = false; },
+});
 const close = () => {
   if (confirm(t('Uitvraag sluiten zonder te gunnen? De bedrijven krijgen geen bericht.'))) {
     router.post(route('tenders.close', props.round.id), {}, { preserveScroll: true });
@@ -102,7 +133,12 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
     </div>
 
     <div class="card">
-      <div class="card-header"><div class="card-title">{{ $t('Vergelijking') }}</div></div>
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="card-title">{{ $t('Vergelijking') }}</div>
+        <button v-if="round.status === 'open' && candidates.length" class="btn btn-secondary btn-sm" @click="openInvite">
+          {{ $t('Bedrijven toevoegen') }}
+        </button>
+      </div>
       <table class="data-table">
         <thead>
           <tr>
@@ -147,6 +183,8 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
             <td class="right actions">
               <button v-if="round.status === 'open' && r.status === 'responded'" class="btn btn-primary btn-sm" @click="award(r)">{{ $t('Gunnen') }}</button>
               <button v-if="round.status === 'open' && r.status === 'sent'" class="btn btn-secondary btn-sm" @click="remind(r)">{{ $t('Herinneren') }}</button>
+              <button v-if="round.status === 'open' && ['sent', 'responded'].includes(r.status)" class="btn btn-ghost btn-sm" :title="$t('Het bedrijf heeft afgezegd, bijvoorbeeld per telefoon of mail. Er gaat geen bericht uit.')" @click="markDeclined(r)">{{ $t('Afgezegd') }}</button>
+              <button v-if="round.status === 'open' && r.status !== 'awarded'" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" :title="$t('Bedrijf uit deze uitvraag halen. Er gaat geen bericht uit.')" @click="removeRequest(r)">{{ $t('Verwijder') }}</button>
               <button class="btn btn-ghost btn-sm" :title="$t('Link naar het reactieformulier kopiëren (voor als je zelf belt)')" @click="copy(r.response_url)">🔗</button>
             </td>
           </tr>
@@ -186,6 +224,39 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
     <div v-if="round.description" class="card" style="margin-top:16px;">
       <div class="card-header"><div class="card-title">{{ $t('Omschrijving in de mail') }}</div></div>
       <div class="card-body" style="white-space:pre-wrap;font-size:13.5px;line-height:1.6;color:var(--text-2);">{{ round.description }}</div>
+      <div v-if="round.signature" class="card-body sig-note">
+        {{ $t('De ondertekening die in je tekst stond, staat onderaan de mail en niet meer in de omschrijving. Dat hoeft niet: zonder eigen ondertekening sluit de mail af met je bedrijfsgegevens.') }}
+      </div>
+    </div>
+
+    <!-- Extra bedrijven aanschrijven -->
+    <div v-if="showInvite" class="modal-overlay" @click.self="showInvite = false">
+      <div class="modal" style="max-width:640px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Bedrijven toevoegen aan deze uitvraag') }}</div>
+          <button class="btn btn-ghost btn-sm" @click="showInvite = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin:0 0 14px;line-height:1.6;">
+            {{ $t('Deze bedrijven staan in de pool van :package en zijn nog niet aangeschreven. Ze krijgen dezelfde aanvraag met dezelfde bijlagen.', { package: round.package }) }}
+          </p>
+          <div v-if="pageError" class="field-error" style="margin-bottom:12px;">{{ pageError }}</div>
+          <div class="inv-list">
+            <label v-for="c in candidates" :key="c.id" class="inv-item" :class="{ off: !c.has_email }">
+              <input type="checkbox" :checked="inviteForm.subcontractor_ids.includes(c.id)" :disabled="!c.has_email" @change="toggleInvite(c.id)">
+              <span class="inv-name">{{ c.name }}</span>
+              <span class="sub">{{ c.city || '' }}<template v-if="!c.has_email"> · {{ $t('geen e-mailadres') }}</template></span>
+            </label>
+          </div>
+          <div v-if="inviteForm.errors.subcontractor_ids" class="field-error">{{ inviteForm.errors.subcontractor_ids }}</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="showInvite = false">{{ $t('Annuleren') }}</button>
+          <button class="btn btn-primary btn-sm" :disabled="inviteForm.processing || !inviteForm.subcontractor_ids.length" @click="invite">
+            {{ $t('Versturen naar :n bedrijven', { n: inviteForm.subcontractor_ids.length }) }}
+          </button>
+        </div>
+      </div>
     </div>
   </AppLayout>
 </template>
@@ -202,6 +273,13 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
 .remarks { max-width: 280px; font-size: 13px; white-space: pre-wrap; }
 .actions { white-space: nowrap; }
 .lnk { color: var(--brand); }
+.sig-note { font-size: 12.5px; color: var(--text-3); line-height: 1.6; border-top: 1px solid var(--border); }
+.inv-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+.inv-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 13.5px; }
+.inv-item input { width: 17px; height: 17px; padding: 0; flex: none; }
+.inv-item .sub { margin-left: auto; white-space: nowrap; }
+.inv-item.off { opacity: 0.55; cursor: not-allowed; }
+.inv-name { font-weight: 600; color: var(--text); }
 .att-line { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
 .att-line:last-of-type { border-bottom: none; }
 .att-actions { margin-left: auto; white-space: nowrap; }

@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.0</div>
+        <h2>Uitvragen: afzeggen, bedrijven toevoegen en een nettere mail</h2>
+        <ul class="tl-list">
+          <li><b>Afgezegd vastleggen</b> — belt of mailt een bedrijf dat het geen tijd heeft, dan zet je het in de uitvraag op "Afgezegd", met de reden erbij. Er gaat geen bericht uit en het bedrijf krijgt geen herinnering meer.</li>
+          <li><b>Bedrijf verwijderen</b> — per vergissing aangeschreven? Haal het bedrijf uit de uitvraag.</li>
+          <li><b>Bedrijven toevoegen</b> — schrijf in een lopende uitvraag extra bedrijven uit je pool aan. Ze krijgen dezelfde aanvraag met dezelfde bijlagen en komen in dezelfde vergelijking.</li>
+          <li><b>Herinneren vraagt om bevestiging</b> — een misklik verstuurt geen mail meer.</li>
+          <li><b>Nettere mail</b> — de prijsaanvraag toont de kerngegevens in een overzicht, de omschrijving met opsommingen en de bijlagen als aanklikbare regels. De mail sluit af met je bedrijfsgegevens; een ondertekening die je zelf in de tekst plakt, komt onderaan te staan.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.59.1</div>
         <h2>Werkpakket dakbedekking in bitumen</h2>
         <ul class="tl-list">

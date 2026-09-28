@@ -8,6 +8,7 @@ use App\Models\TenderRound;
 use App\Services\TenderService;
 use App\Support\IsoWeek;
 use App\Support\StorageUsage;
+use App\Support\TenderText;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -55,10 +56,24 @@ class TenderController extends Controller
         $round->load(['workPackage', 'quote', 'requests.subcontractor']);
         $budget = $round->budget !== null ? (float) $round->budget : null;
         $priced = $round->requests->filter(fn (TenderRequest $r) => $r->hasPrice());
+        $text = TenderText::split($round->description);
+
+        // Bedrijven uit de pool van dit werkpakket die nog niet zijn aangeschreven.
+        $invited = $round->requests->pluck('subcontractor_id');
+        $candidates = $round->isOpen() && $round->workPackage
+            ? $round->workPackage->subcontractors()->get()->reject(fn ($s) => $invited->contains($s->id))
+            : collect();
 
         return Inertia::render('Tenders/Show', [
+            'candidates' => $candidates->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->name,
+                'city' => $s->city,
+                'has_email' => filled($s->email),
+            ])->values(),
             'round' => $this->summary($round) + [
-                'description' => $round->description,
+                'description' => $text['body'],
+                'signature' => $text['signature'],
                 'created_at_label' => $round->created_at?->translatedFormat('j M Y'),
                 'awarded_at_label' => $round->awarded_at?->translatedFormat('j M Y'),
                 'average' => $priced->count() ? round((float) $priced->avg('price'), 2) : null,
@@ -166,6 +181,56 @@ class TenderController extends Controller
         return back()->with('flash', $sent
             ? __('Herinnering gemaild naar :name.', ['name' => $tenderRequest->subcontractor?->name])
             : __('Geen herinnering verstuurd: dit bedrijf heeft al gereageerd of de uitvraag is gesloten.'));
+    }
+
+    /** Het bedrijf heeft afgezegd (telefonisch of per mail): vastleggen, zonder bericht. */
+    public function declineRequest(Request $request, TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+        $data = $request->validate(['reason' => ['nullable', 'string', 'max:1000']]);
+
+        try {
+            $this->service->markDeclined($tenderRequest, $data['reason'] ?? null);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __(':name staat op afgezegd en krijgt geen herinnering meer.', ['name' => $tenderRequest->subcontractor?->name]));
+    }
+
+    /** Bedrijf uit de ronde halen, bijvoorbeeld als het per vergissing is aangeschreven. */
+    public function destroyRequest(TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+        $name = $tenderRequest->subcontractor?->name;
+
+        try {
+            $this->service->removeRequest($tenderRequest);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __(':name is uit de uitvraag gehaald.', ['name' => $name]));
+    }
+
+    /** Extra bedrijven aanschrijven in een lopende uitvraag. */
+    public function invite(Request $request, TenderRound $round): RedirectResponse
+    {
+        $data = $request->validate([
+            'subcontractor_ids' => ['required', 'array', 'min:1'],
+            'subcontractor_ids.*' => ['integer'],
+        ], [
+            'subcontractor_ids.required' => __('Kies minstens één bedrijf.'),
+            'subcontractor_ids.min' => __('Kies minstens één bedrijf.'),
+        ]);
+
+        try {
+            $count = $this->service->invite($round, $data['subcontractor_ids']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __(':count bedrijven extra aangeschreven.', ['count' => $count]));
     }
 
     public function close(TenderRound $round): RedirectResponse

@@ -184,7 +184,7 @@ const submit = () => {
           </div>
         </div>
         <div class="form-group">
-          <label>{{ $t('Omschrijving voor de bedrijven') }}</label>
+          <label>{{ $t('Omschrijving voor de bedrijven') }} <span class="label-hint">{{ $t('(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)') }}</span></label>
           <textarea v-model="form.description" rows="7" maxlength="5000"></textarea>
           <div v-if="form.errors.description" class="field-error">{{ form.errors.description }}</div>
         </div>

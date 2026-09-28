@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\TenderRequest;
 use App\Support\IsoWeek;
 use App\Support\Sender;
+use App\Support\TenderText;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -57,6 +58,14 @@ class TenderMail extends Mailable
     {
         $round = $this->tenderRequest->round;
         $files = $this->files();
+        $token = $this->tenderRequest->token;
+        $text = TenderText::split($round->description);
+        $row = fn ($file, bool $attached) => [
+            'name' => $file->filename,
+            'size' => $file->size_formatted,
+            'url' => route('tender.attachment', [$token, $file->id]),
+            'attached' => $attached,
+        ];
 
         return new Content(
             view: 'emails.tender',
@@ -68,8 +77,14 @@ class TenderMail extends Mailable
                 'subcontractor' => $this->tenderRequest->subcontractor,
                 'url' => $this->tenderRequest->responseUrl(),
                 'startWeek' => IsoWeek::label($round->start_week),
-                'attached' => array_map(fn ($file) => $file->filename, $files['attached']),
-                'online' => array_map(fn ($file) => $file->filename, $files['online']),
+                // Omschrijving in alinea's en opsommingen; een meegeplakte
+                // ondertekening komt onderaan de mail, niet in de aanvraag.
+                'blocks' => TenderText::blocks($round->description),
+                'signature' => $text['signature'],
+                'files' => array_merge(
+                    array_map(fn ($file) => $row($file, true), $files['attached']),
+                    array_map(fn ($file) => $row($file, false), $files['online']),
+                ),
             ],
         );
     }

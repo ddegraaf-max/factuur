@@ -148,5 +148,16 @@
   "Beschikbaar vanaf": "Dostępność od",
   "Bijlagen voor de bedrijven": "Załączniki dla firm",
   "Geen bijlagen. Voeg een tekening, bestek of foto’s toe zodat de bedrijven precies weten wat er gemaakt moet worden.": "Brak załączników. Dodaj rysunek, specyfikację lub zdjęcia, aby firmy dokładnie wiedziały, co trzeba wykonać.",
-  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "Załącznik dodany teraz od razu pojawi się na stronie odpowiedzi każdej firmy i będzie wysyłany z przypomnieniami. Nowy e-mail nie zostanie wysłany."
+  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "Załącznik dodany teraz od razu pojawi się na stronie odpowiedzi każdej firmy i będzie wysyłany z przypomnieniami. Nowy e-mail nie zostanie wysłany.",
+  "Herinnering mailen naar :name?": "Wysłać przypomnienie do :name?",
+  ":name heeft afgezegd. Reden (mag leeg blijven):": ":name zrezygnowała. Powód (może zostać pusty):",
+  "Geen tijd": "Brak czasu",
+  ":name uit deze uitvraag halen? Het bedrijf krijgt geen bericht; een ingestuurde prijs gaat verloren.": "Usunąć :name z tego zapytania? Firma nie dostanie wiadomości; przesłana cena zostanie utracona.",
+  "Bedrijven toevoegen": "Dodaj firmy",
+  "Het bedrijf heeft afgezegd, bijvoorbeeld per telefoon of mail. Er gaat geen bericht uit.": "Firma zrezygnowała, na przykład telefonicznie lub mailowo. Żadna wiadomość nie zostanie wysłana.",
+  "Bedrijf uit deze uitvraag halen. Er gaat geen bericht uit.": "Usuń firmę z tego zapytania. Żadna wiadomość nie zostanie wysłana.",
+  "De ondertekening die in je tekst stond, staat onderaan de mail en niet meer in de omschrijving. Dat hoeft niet: zonder eigen ondertekening sluit de mail af met je bedrijfsgegevens.": "Podpis, który był w Twoim tekście, znajduje się na dole wiadomości, a nie w opisie. Nie jest potrzebny: bez własnego podpisu wiadomość kończy się danymi Twojej firmy.",
+  "Bedrijven toevoegen aan deze uitvraag": "Dodaj firmy do tego zapytania",
+  "Deze bedrijven staan in de pool van :package en zijn nog niet aangeschreven. Ze krijgen dezelfde aanvraag met dezelfde bijlagen.": "Te firmy są w puli :package i nie zostały jeszcze zapytane. Otrzymają to samo zapytanie z tymi samymi załącznikami.",
+  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(bez podpisu: wiadomość kończy się danymi Twojej firmy)"
 }

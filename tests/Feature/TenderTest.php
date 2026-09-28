@@ -257,6 +257,82 @@ class TenderTest extends TestCase
         $this->get(route('tender.attachment', [$request->token, $other->id]))->assertNotFound();
     }
 
+    public function test_the_owner_records_a_decline_removes_a_company_and_invites_more(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a, $b] = $this->pool();
+        $c = Subcontractor::create(['name' => 'Klein Timmerwerk', 'email' => 'info@klein.test', 'city' => 'Alphen aan den Rijn']);
+        $c->workPackages()->sync([$package->id]);
+
+        $this->post(route('tenders.store'), ['work_package_id' => $package->id, 'subcontractor_ids' => [$a->id, $b->id], 'deadline' => now()->addDays(5)->toDateString()])->assertRedirect();
+        $round = TenderRound::firstOrFail();
+        $reqA = $round->requests()->where('subcontractor_id', $a->id)->firstOrFail();
+        $reqB = $round->requests()->where('subcontractor_id', $b->id)->firstOrFail();
+        Mail::assertSent(TenderMail::class, 2);
+
+        // Afgezegd per telefoon: vastleggen zonder mail, en daarna geen herinnering meer.
+        $this->post(route('tenders.requests.decline', [$round, $reqA]), ['reason' => 'Geen tijd'])->assertSessionHasNoErrors();
+        $this->assertSame('declined', $reqA->fresh()->status);
+        $this->assertSame('Geen tijd', $reqA->fresh()->decline_reason);
+        $this->travel(4)->days();
+        $this->assertSame(1, app(TenderService::class)->remindDue(), 'Alleen het bedrijf dat nog meedoet krijgt een herinnering');
+        Mail::assertNotSent(TenderMail::class, fn (TenderMail $mail) => $mail->kind === 'reminder' && $mail->hasTo('info@jansen.test'));
+
+        // Per vergissing aangeschreven: uit de ronde halen.
+        $this->delete(route('tenders.requests.destroy', [$round, $reqB]))->assertSessionHasNoErrors();
+        $this->assertSame(1, $round->requests()->count());
+
+        // De pagina biedt de bedrijven aan die nog niet meedoen; toevoegen mailt alleen de nieuwe.
+        $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page
+            ->has('candidates', 3)
+            ->where('requests.0.status', 'declined'));
+        $sent = Mail::sent(TenderMail::class)->count();
+        $this->post(route('tenders.requests.store', $round), ['subcontractor_ids' => [$c->id, $a->id]])->assertSessionHasNoErrors();
+        $this->assertSame(2, $round->requests()->count(), 'Wie al in de ronde zit, wordt niet nog eens aangeschreven');
+        $this->assertSame($sent + 1, Mail::sent(TenderMail::class)->count());
+        Mail::assertSent(TenderMail::class, fn (TenderMail $mail) => $mail->kind === 'request' && $mail->hasTo('info@klein.test'));
+
+        // Na sluiten kan er niets meer bij of af.
+        $this->post(route('tenders.close', $round))->assertRedirect();
+        $this->post(route('tenders.requests.store', $round), ['subcontractor_ids' => [$b->id]])->assertSessionHasErrors('tender');
+        $this->delete(route('tenders.requests.destroy', [$round, $reqA]))->assertSessionHasErrors('tender');
+    }
+
+    public function test_the_mail_keeps_a_pasted_signature_out_of_the_description(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a] = $this->pool();
+
+        $this->post(route('tenders.store'), [
+            'work_package_id' => $package->id,
+            'subcontractor_ids' => [$a->id],
+            'deadline' => now()->addDays(5)->toDateString(),
+            'description' => "Uitbouw 5,50 x 1,80 m.\n\nGevraagd:\n- HSB-wanden leveren\n- Balklaag plat dak\n\n-- \n\nMet vriendelijke groet,\nJan Jansen\nDe inhoud van dit bericht is vertrouwelijk.",
+        ])->assertRedirect()->assertSessionHasNoErrors();
+        $round = TenderRound::firstOrFail();
+        $request = $round->requests()->firstOrFail();
+
+        $text = \App\Support\TenderText::split($round->description);
+        $this->assertStringEndsWith('- Balklaag plat dak', $text['body']);
+        $this->assertStringStartsWith('Met vriendelijke groet,', $text['signature']);
+        $this->assertSame(['p', 'p', 'ul'], array_column(\App\Support\TenderText::blocks($round->description), 'type'));
+
+        $html = (new TenderMail($request, 'request'))->render();
+        $this->assertStringContainsString('HSB-wanden leveren', $html);
+        $this->assertLessThan(strpos($html, 'De inhoud van dit bericht is vertrouwelijk'), strpos($html, 'Prijs en beschikbaarheid doorgeven'), 'De ondertekening staat onder de knop, niet in de omschrijving');
+
+        // Het bedrijf en de eigenaar zien de omschrijving zonder ondertekening.
+        $this->get(route('tenders.show', $round))->assertInertia(fn ($page) => $page
+            ->where('round.description', $text['body'])
+            ->where('round.signature', $text['signature']));
+        $this->asGuest();
+        $this->get(route('tender.respond.show', $request->token))->assertInertia(fn ($page) => $page->where('round.description', $text['body']));
+    }
+
     public function test_closed_rounds_take_no_more_attachments(): void
     {
         Mail::fake();

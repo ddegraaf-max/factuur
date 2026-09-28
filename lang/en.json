@@ -1086,5 +1086,22 @@
   "Te groot voor de mail, te downloaden via de knop hieronder:": "Too large for the e-mail, available for download via the button below:",
   "Deze uitvraag is al gegund of gesloten; bijlagen toevoegen kan niet meer.": "This request has already been awarded or closed; attachments can no longer be added.",
   ":count bijlage(n) toegevoegd. Ze staan nu op de reactiepagina van elk bedrijf en gaan mee met herinneringen.": ":count attachment(s) added. They are now on each company’s response page and are sent with reminders.",
-  "Je kunt hoogstens 10 bijlagen per keer toevoegen.": "You can add at most 10 attachments at a time."
+  "Je kunt hoogstens 10 bijlagen per keer toevoegen.": "You can add at most 10 attachments at a time.",
+  "Afzeggen kan alleen zolang de uitvraag open is en het bedrijf nog meedoet.": "Declining is only possible while the request is open and the company is still taking part.",
+  "Afgezegd (door jou vastgelegd)": "Declined (recorded by you)",
+  "Deze uitvraag is al gegund of gesloten; verwijderen kan niet meer.": "This request has already been awarded or closed; removing is no longer possible.",
+  ":label: :name uit de uitvraag gehaald": ":label: :name removed from the request",
+  "Deze uitvraag is al gegund of gesloten; bedrijven toevoegen kan niet meer.": "This request has already been awarded or closed; companies can no longer be added.",
+  "Kies minstens één bedrijf met een e-mailadres dat nog niet is aangeschreven.": "Choose at least one company with an e-mail address that has not been contacted yet.",
+  ":label: :count bedrijven extra aangeschreven": ":label: :count more companies contacted",
+  ":name staat op afgezegd en krijgt geen herinnering meer.": ":name is marked as declined and gets no more reminders.",
+  ":name is uit de uitvraag gehaald.": ":name has been removed from the request.",
+  ":count bedrijven extra aangeschreven.": ":count more companies contacted.",
+  "Herinnering": "Reminder",
+  "Opdracht": "Order",
+  "Prijsaanvraag": "Price request",
+  "Omschrijving": "Description",
+  "ook als bijlage bij deze mail": "also attached to this e-mail",
+  "te groot voor de mail, klik om te openen": "too large for the e-mail, click to open",
+  "Geen tijd of past het niet? Laat het ons via dezelfde knop weten, dan sturen wij geen herinnering.": "No time, or not a fit? Let us know through the same button and we will not send a reminder."
 }

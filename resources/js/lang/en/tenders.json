@@ -148,5 +148,16 @@
   "Beschikbaar vanaf": "Available from",
   "Bijlagen voor de bedrijven": "Attachments for the companies",
   "Geen bijlagen. Voeg een tekening, bestek of foto’s toe zodat de bedrijven precies weten wat er gemaakt moet worden.": "No attachments. Add a drawing, specification or photos so the companies know exactly what has to be made.",
-  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "An attachment you add now appears on each company’s response page right away and is sent with reminders. No new e-mail is sent."
+  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "An attachment you add now appears on each company’s response page right away and is sent with reminders. No new e-mail is sent.",
+  "Herinnering mailen naar :name?": "E-mail a reminder to :name?",
+  ":name heeft afgezegd. Reden (mag leeg blijven):": ":name has declined. Reason (may be left empty):",
+  "Geen tijd": "No time",
+  ":name uit deze uitvraag halen? Het bedrijf krijgt geen bericht; een ingestuurde prijs gaat verloren.": "Remove :name from this request? The company gets no message; a submitted price is lost.",
+  "Bedrijven toevoegen": "Add companies",
+  "Het bedrijf heeft afgezegd, bijvoorbeeld per telefoon of mail. Er gaat geen bericht uit.": "The company has declined, for example by phone or e-mail. No message is sent.",
+  "Bedrijf uit deze uitvraag halen. Er gaat geen bericht uit.": "Remove the company from this request. No message is sent.",
+  "De ondertekening die in je tekst stond, staat onderaan de mail en niet meer in de omschrijving. Dat hoeft niet: zonder eigen ondertekening sluit de mail af met je bedrijfsgegevens.": "The signature that was in your text is placed at the bottom of the e-mail and no longer in the description. You can leave it out: without your own signature the e-mail closes with your company details.",
+  "Bedrijven toevoegen aan deze uitvraag": "Add companies to this request",
+  "Deze bedrijven staan in de pool van :package en zijn nog niet aangeschreven. Ze krijgen dezelfde aanvraag met dezelfde bijlagen.": "These companies are in the pool of :package and have not been contacted yet. They get the same request with the same attachments.",
+  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(without a signature: the e-mail closes with your company details)"
 }

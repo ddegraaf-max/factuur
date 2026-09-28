@@ -621,6 +621,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('uitvragen/{round}/gunnen/{tenderRequest}', [TenderController::class, 'award'])->name('tenders.award');
     Route::post('uitvragen/{round}/herinneren/{tenderRequest}', [TenderController::class, 'remind'])->name('tenders.remind');
     Route::post('uitvragen/{round}/sluiten', [TenderController::class, 'close'])->name('tenders.close');
+    Route::post('uitvragen/{round}/bedrijven', [TenderController::class, 'invite'])->name('tenders.requests.store');
+    Route::post('uitvragen/{round}/afzeggen/{tenderRequest}', [TenderController::class, 'declineRequest'])->name('tenders.requests.decline');
+    Route::delete('uitvragen/{round}/aanvragen/{tenderRequest}', [TenderController::class, 'destroyRequest'])->name('tenders.requests.destroy');
     Route::get('uitvragen/{round}/bijlage/{tenderRequest}', [TenderController::class, 'attachment'])->name('tenders.attachment');
     Route::post('uitvragen/{round}/bijlagen', [TenderController::class, 'storeAttachments'])->name('tenders.attachments.store');
     Route::get('onderaannemers', [TenderPoolController::class, 'index'])->name('tenders.pool');
