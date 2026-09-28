@@ -158,6 +158,7 @@ class QuoteInstallmentController extends Controller
                 'language' => $quote->language,
                 'invoice_date' => now()->toDateString(),
                 'reference' => $quote->reference ?: __('Offerte :number', ['number' => $quote->number]),
+                'vat_reversed' => (bool) $quote->vat_reversed,
                 'lines' => $lines,
             ]);
 

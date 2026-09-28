@@ -1109,5 +1109,19 @@
   "Demo bekijken": "Zobacz demo",
   "Kennisbank": "Baza wiedzy",
   "Helpcentrum": "Centrum pomocy",
-  "Veelgestelde vragen": "Najczęstsze pytania"
+  "Veelgestelde vragen": "Najczęstsze pytania",
+  "Vul een geldig btw-nummer in, met de landcode ervoor (bijvoorbeeld NL123456789B01).": "Podaj prawidłowy numer VAT z kodem kraju na początku (na przykład NL123456789B01).",
+  "Bij btw verlegd hoort het btw-nummer van de klant op het document. Vul het hier in.": "Przy odwrotnym obciążeniu na dokumencie musi być numer VAT klienta. Wpisz go tutaj.",
+  "Bij btw verlegd hoort het btw-nummer van de klant op het document. Vul dat eerst in bij :customer.": "Przy odwrotnym obciążeniu na dokumencie musi być numer VAT klienta. Najpierw uzupełnij go u klienta :customer.",
+  "Optioneel: true als de btw is verlegd naar de klant (bijvoorbeeld onderaanneming in de bouw). Alle regels komen dan op 0% en op het document staat \"btw verlegd\" met het btw-nummer van de klant. Dat nummer moet bij de klant zijn ingevuld.": "Opcjonalnie: true, gdy podatek rozlicza nabywca (na przykład podwykonawstwo w budownictwie). Wszystkie pozycje mają wtedy stawkę 0%, a na dokumencie jest adnotacja \"odwrotne obciążenie\" z numerem VAT klienta. Ten numer musi być uzupełniony u klienta.",
+  "Vul je bedrijfsgegevens in": "Uzupełnij dane firmy",
+  "Je adres en rekeningnummer komen op elke factuur.": "Adres i numer rachunku są na każdej fakturze.",
+  "Je adres, KvK-nummer en IBAN komen op elke factuur.": "Adres, numer KvK i IBAN są na każdej fakturze.",
+  "Voeg je eerste klant toe": "Dodaj pierwszego klienta",
+  "Naam en e-mailadres zijn genoeg om te beginnen.": "Na początek wystarczy nazwa i adres e-mail.",
+  "Verstuur je eerste factuur of offerte": "Wyślij pierwszą fakturę lub ofertę",
+  "Je klant krijgt een mail met de PDF en een link om online te bekijken.": "Klient dostanie e-mail z plikiem PDF i linkiem do podglądu online.",
+  "Btw verlegd. De btw is verlegd naar de afnemer (artikel 12 Wet OB).": "Odwrotne obciążenie. Podatek rozlicza nabywca (art. 12 holenderskiej ustawy o VAT).",
+  "Vrijgesteld van btw. Op deze factuur is geen btw van toepassing.": "Zwolnienie z VAT. Na tej fakturze nie nalicza się VAT.",
+  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Witaj! Faktura dla :customer czeka jako szkic. Sprawdź ją i wyślij."
 }

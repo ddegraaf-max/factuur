@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+import { todayLocal } from '@/format.js';
 import { Head, useForm, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
@@ -10,7 +11,7 @@ const props = defineProps({
   owner_emails: Array,
 });
 
-const today = new Date().toISOString().slice(0, 10);
+const today = todayLocal();
 const form = useForm({
   occurred_on: today,
   source: 'telefoon',

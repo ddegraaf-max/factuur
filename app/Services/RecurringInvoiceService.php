@@ -86,6 +86,7 @@ class RecurringInvoiceService
             'payment_terms' => $profile->payment_terms,
             'reference' => $profile->reference,
             'notes' => $profile->notes,
+            'vat_reversed' => (bool) $profile->vat_reversed,
             'lines' => $profile->lines ?? [],
         ]);
 

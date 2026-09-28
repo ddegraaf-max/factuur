@@ -123,10 +123,16 @@ const returnedUnpaid = computed(() =>
           <span>{{ $t('Subtotaal') }}</span>
           <span class="mono">{{ eur(signed(invoice.subtotal)) }}</span>
         </div>
-        <div v-for="(amount, rate) in invoice.vat_breakdown" :key="rate" class="pi-total-row">
-          <span>{{ $t('BTW') }} {{ Number(rate) }}%</span>
-          <span class="mono">{{ eur(signed(amount)) }}</span>
+        <div v-if="invoice.vat_reversed" class="pi-total-row">
+          <span>{{ $t('Btw verlegd') }}</span>
+          <span class="mono">{{ eur(0) }}</span>
         </div>
+        <template v-else>
+          <div v-for="(amount, rate) in invoice.vat_breakdown" :key="rate" class="pi-total-row">
+            <span>{{ $t('BTW') }} {{ Number(rate) }}%</span>
+            <span class="mono">{{ eur(signed(amount)) }}</span>
+          </div>
+        </template>
         <div class="pi-total-row grand">
           <span>{{ $t('Totaal') }}</span>
           <span class="mono">{{ eur(signed(invoice.total)) }}</span>

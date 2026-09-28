@@ -188,6 +188,8 @@ class Market
             'symbol_position' => (string) self::get('symbol_position', 'before'),
             'vat_rates' => self::vatRates(),
             'default_vat' => self::defaultVatRate(),
+            // Btw verlegd op facturen en offertes (niet in de Poolse markt).
+            'vat_reverse' => VatReverse::available(),
             'vat_return' => (string) self::get('vat_return', 'nl'),
             'e_invoicing' => (string) self::get('e_invoicing', 'peppol'),
             'tax_authority' => (string) self::get('tax_authority', ''),

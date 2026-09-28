@@ -373,5 +373,11 @@
   "(optioneel — alleen voor jezelf)": "(optional — for your own reference)",
   "Bijv. betalingsregeling afgesproken, klacht in behandeling": "E.g. payment arrangement agreed, complaint being handled",
   "Op pauze: geen herinneringen, aanmaningen of incasso": "On hold: no reminders, dunning letters or debt collection",
-  ":n op pauze": ":n on hold"
+  ":n op pauze": ":n on hold",
+  "Btw verlegd": "VAT reverse-charged",
+  "btw verlegd": "VAT reverse-charged",
+  "verlegd": "reversed",
+  "De klant draagt de btw af, bijvoorbeeld bij onderaanneming in de bouw. Op het document staat geen btw, wel \"btw verlegd\" en het btw-nummer van de klant.": "The customer accounts for the VAT, for example with subcontracting in construction. The document shows no VAT, but it does state \"VAT reverse-charged\" and the customer's VAT number.",
+  "Btw-nummer van de klant": "Customer VAT number",
+  "Dit nummer wordt bij de klant bewaard.": "This number is saved with the customer."
 }

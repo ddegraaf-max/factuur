@@ -80,6 +80,7 @@ class RecurringInvoiceController extends Controller
             'reference' => $invoice->reference,
             'notes' => $invoice->notes,
             'payment_terms' => $invoice->payment_terms ?? 30,
+            'vat_reversed' => (bool) $invoice->vat_reversed,
             'lines' => $invoice->lines->map(fn ($l) => [
                 'product_id' => $l->product_id,
                 'description' => $l->description,

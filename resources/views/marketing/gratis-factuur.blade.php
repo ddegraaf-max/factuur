@@ -20,6 +20,11 @@
   .totals-box .row { display: flex; justify-content: space-between; padding: 4px 0; color: var(--text-2); }
   .totals-box .grand { border-top: 2px solid var(--text); margin-top: 6px; padding-top: 10px; font-weight: 700; font-size: 17px; color: var(--text); }
   .privacy-note { font-size: 12.5px; color: var(--text-3); margin-top: 14px; }
+  .keep-card { margin-top: 22px; padding: 22px; border-radius: 14px; background: var(--brand-tint); border: 1px solid var(--brand-border); }
+  .keep-card[hidden] { display: none; }
+  .keep-title { font-family: var(--font-display); font-weight: 700; font-size: 19px; margin-bottom: 6px; }
+  .keep-card p { color: var(--text-2); font-size: 14.5px; margin: 0 0 14px; line-height: 1.6; }
+  .keep-note { font-size: 12.5px; color: var(--text-3); margin-top: 10px; }
   .check-list { list-style: none; padding: 0; margin: 0; }
   .check-list li { padding: 7px 0 7px 30px; position: relative; color: var(--text-2); }
   .check-list li::before {
@@ -182,6 +187,15 @@
 
       <button type="submit" class="btn btn-primary btn-lg btn-block">Download factuur (PDF) ↓</button>
       <div class="privacy-note">We slaan niets op: je gegevens worden alleen gebruikt om de PDF te maken. Alleen je eigen bedrijfsgegevens worden — voor de volgende keer — in je eigen browser bewaard.</div>
+
+      {{-- Na het downloaden: de factuur meenemen naar een account. Alleen op eigen verzoek;
+           pas bij een klik op deze knop gaan de gegevens mee. --}}
+      <div class="keep-card" id="keepCard" hidden>
+        <div class="keep-title">Je factuur is gedownload</div>
+        <p>Wil je hem ook versturen, laten betalen met iDEAL en je klant vanzelf laten herinneren? Neem deze factuur mee naar een account. Je bedrijfsgegevens, je klant en de factuur staan er dan al in.</p>
+        <button type="submit" class="btn btn-primary" formaction="{{ route('gratis-factuur.keep') }}">Neem mee naar een gratis proefaccount →</button>
+        <div class="keep-note">14 dagen gratis, geen betaalgegevens nodig. Pas als je op deze knop klikt, gaan je gegevens mee.</div>
+      </div>
     </form>
   </div>
 </section>
@@ -230,7 +244,7 @@
       </details>
       <details class="faq-item">
         <summary>Worden mijn gegevens opgeslagen? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Nee. De gegevens die je invult worden alleen gebruikt om de PDF te genereren en daarna direct vergeten. Alleen je eigen bedrijfsgegevens worden in je eigen browser bewaard, zodat je ze de volgende keer niet opnieuw hoeft in te typen.</div>
+        <div class="faq-content">Nee. De gegevens die je invult worden alleen gebruikt om de PDF te genereren en daarna direct vergeten. Alleen je eigen bedrijfsgegevens worden in je eigen browser bewaard, zodat je ze de volgende keer niet opnieuw hoeft in te typen. Kies je er na het downloaden zelf voor om de factuur mee te nemen naar een account, dan gaan de gegevens mee naar dat account.</div>
       </details>
       <details class="faq-item">
         <summary>Voldoet de factuur aan de eisen van de Belastingdienst? <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -268,7 +282,7 @@
     {
       "@@type": "Question",
       "name": "Worden mijn gegevens opgeslagen?",
-      "acceptedAnswer": { "@@type": "Answer", "text": "Nee. De ingevulde gegevens worden alleen gebruikt om de PDF te genereren en daarna direct vergeten." }
+      "acceptedAnswer": { "@@type": "Answer", "text": "Nee. De ingevulde gegevens worden alleen gebruikt om de PDF te genereren en daarna direct vergeten. Alleen als je er na het downloaden zelf voor kiest de factuur mee te nemen naar een account, gaan de gegevens mee." }
     },
     {
       "@@type": "Question",
@@ -354,6 +368,17 @@
       if (el && !el.value && saved[id]) el.value = saved[id];
     });
   } catch (e) {}
+
+  // Na het downloaden blijft de pagina staan; dan verschijnt het aanbod om de
+  // factuur mee te nemen. De knop daarin verstuurt hetzelfde formulier naar een ander adres.
+  document.getElementById('genForm').addEventListener('submit', function (e) {
+    if (e.submitter && e.submitter.hasAttribute('formaction')) return;
+    setTimeout(function () {
+      var card = document.getElementById('keepCard');
+      card.hidden = false;
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 1500);
+  });
 
   document.getElementById('genForm').addEventListener('submit', function () {
     try {

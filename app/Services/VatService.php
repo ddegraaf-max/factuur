@@ -161,7 +161,8 @@ class VatService
                 continue;
             }
             $sign = $invoice->is_credit ? -1 : 1;
-            $country = strtoupper(trim((string) $invoice->customer_country)) ?: 'NL';
+            // Geïmporteerde klanten hebben soms een landnaam in plaats van een code.
+            $country = \App\Support\CountryCode::of($invoice->customer_country);
             // 0%-regels: binnenland → 1e, EU → 3b (ICP), daarbuiten → 3a (uitvoer).
             $zeroKey = $country === 'NL' ? '1e' : (in_array($country, self::EU, true) ? '3b' : '3a');
 

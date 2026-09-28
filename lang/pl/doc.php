@@ -46,6 +46,10 @@ return [
     'amount_due' => 'Do zapłaty',
     'note' => 'Uwagi',
     'vat_summary' => 'Podsumowanie stawek VAT',
+    // Btw verlegd: vermelding op het document, kort in de regelkolom en voluit eronder.
+    'vat_reversed' => 'Odwrotne obciążenie',
+    'vat_reversed_short' => 'np.',
+    'vat_reversed_note' => 'Podatek rozlicza nabywca: :name, numer VAT :number.',
     'net' => 'Netto',
     'gross' => 'Brutto',
     'split_payment' => 'Mechanizm podzielonej płatności',

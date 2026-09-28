@@ -46,6 +46,10 @@ return [
     'amount_due' => 'Amount due',
     'note' => 'Note',
     'vat_summary' => 'VAT summary',
+    // Btw verlegd: vermelding op het document, kort in de regelkolom en voluit eronder.
+    'vat_reversed' => 'VAT reverse-charged',
+    'vat_reversed_short' => 'reversed',
+    'vat_reversed_note' => 'VAT is reverse-charged to :name, VAT number :number.',
     'net' => 'Net',
     'gross' => 'Gross',
     'split_payment' => 'Split payment mechanism',

@@ -2,7 +2,7 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { t } from '@/i18n';
-import { eur } from '@/format.js';
+import { eur, todayLocal } from '@/format.js';
 import axios from 'axios';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -23,7 +23,7 @@ const vatRates = market.vat_rates || [21, 9, 0];
 const defaultVat = Number(market.default_vat ?? 21);
 
 /* ---------- Formulier ---------- */
-const today = new Date().toISOString().slice(0, 10);
+const today = todayLocal();
 
 // Bedragregels: in 'excl'-modus vul je het bedrag exclusief in (BTW aanpasbaar),
 // in 'incl'-modus het totaalbedrag van de bon en rekenen wij terug.

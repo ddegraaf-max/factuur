@@ -21,7 +21,7 @@ class Invoice extends Model
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',
-        'subtotal', 'vat_total', 'total', 'paid_total', 'vat_breakdown',
+        'subtotal', 'vat_total', 'total', 'paid_total', 'vat_breakdown', 'vat_reversed',
         'notes', 'footer', 'internal_notes',
         'sent_at', 'scheduled_send_on', 'first_viewed_at', 'paid_at',
         'thanks_sent_at', 'thanks_sent_to',
@@ -34,8 +34,12 @@ class Invoice extends Model
 
     protected $casts = [
         'is_credit' => 'boolean',
-        'invoice_date' => 'date',
-        'due_date' => 'date',
+        'vat_reversed' => 'boolean',
+        // Als jjjj-mm-dd naar het scherm: de gewone notatie rekent om naar UTC
+        // en maakt van 28 september middernacht 27 september 22:00 uur, waarna
+        // een datumveld de verkeerde dag toont en bij opslaan ook bewaart.
+        'invoice_date' => 'date:Y-m-d',
+        'due_date' => 'date:Y-m-d',
         'sent_at' => 'datetime',
         'scheduled_send_on' => 'date',
         'first_viewed_at' => 'datetime',

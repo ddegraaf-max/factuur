@@ -759,6 +759,9 @@ class InvoiceController extends Controller
             'lines.*.unit_price' => ['required', 'numeric', 'min:-1000000', 'max:1000000'],
             'lines.*.vat_rate' => ['required', 'numeric', 'in:' . implode(',', Market::vatRates())],
             'lines.*.discount_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            // Btw verlegd: geen btw op de regels; het btw-nummer van de klant is dan nodig.
+            'vat_reversed' => ['nullable', 'boolean'],
+            'customer_vat_number' => ['nullable', 'string', 'max:20'],
             'action' => ['nullable', 'in:draft,send'],
             'files' => ['nullable', 'array', 'max:10'],
             'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
@@ -827,7 +830,7 @@ class InvoiceController extends Controller
             ]);
         }
 
-        return $data;
+        return \App\Support\VatReverse::prepare($data);
     }
 
     /**

@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur, num, marketLocale } from '@/format.js';
+import { eur, num, marketLocale, todayLocal } from '@/format.js';
 import { computed, ref } from 'vue';
 import { t } from '@/i18n';
 
@@ -23,7 +23,7 @@ const defaultRate = computed(() => props.default_km_rate ?? market.value.km_rate
 const km = (n) => Number(n).toLocaleString(marketLocale, { maximumFractionDigits: 1 });
 
 /* ---------- Rit registreren / bewerken ---------- */
-const today = new Date().toISOString().slice(0, 10);
+const today = todayLocal();
 const editingId = ref(null);
 
 const form = useForm({

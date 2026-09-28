@@ -7,6 +7,7 @@ use App\Mail\VerificationCodeMail;
 use App\Models\Company;
 use App\Models\PageView;
 use App\Models\User;
+use App\Services\FreeInvoiceImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,9 +18,19 @@ use Inertia\Inertia;
 
 class RegisteredUserController extends Controller
 {
-    public function create()
+    public function create(Request $request)
     {
-        return Inertia::render('Auth/Register');
+        // Komt de bezoeker van de gratis factuurtool en nam hij zijn factuur mee?
+        // Dan staan bedrijfsnaam en e-mailadres alvast ingevuld.
+        $free = $request->session()->get(FreeInvoiceImport::SESSION);
+
+        return Inertia::render('Auth/Register', [
+            'prefill' => is_array($free) ? [
+                'companyName' => (string) ($free['van_bedrijf'] ?? ''),
+                'email' => filter_var($free['van_email'] ?? '', FILTER_VALIDATE_EMAIL) ?: '',
+                'customer' => (string) ($free['aan_bedrijf'] ?? ''),
+            ] : null,
+        ]);
     }
 
     public function store(Request $request)
@@ -41,25 +52,38 @@ class RegisteredUserController extends Controller
             $request->merge(['vatNumber' => \App\Services\NipService::normalize($request->input('vatNumber'))]);
         }
 
+        // Het korte formulier (Nederland) vraagt één naamveld; de rest van de
+        // code rekent met voor- en achternaam.
+        if (filled($request->input('name')) && blank($request->input('firstName'))) {
+            [$first, $last] = array_pad(explode(' ', trim(preg_replace('/\s+/', ' ', (string) $request->input('name'))), 2), 2, '');
+            $request->merge(['firstName' => $first, 'lastName' => $last]);
+        }
+
         // Elke poging telt, ook een die op de controle strandt: zo zie je waar het formulier mensen verliest.
         PageView::milestone($request, PageView::EVENT_REGISTER_TRIED);
 
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:60'],
-            'lastName' => ['required', 'string', 'max:60'],
+            // In Nederland mag de achternaam ontbreken (één naamveld).
+            'lastName' => [$pl ? 'required' : 'nullable', 'string', 'max:60'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(8)],
+            // Het korte formulier heeft geen herhaalveld, wel een knop om het wachtwoord te tonen.
+            'password' => array_merge(['required'], $pl || $request->has('password_confirmation') ? ['confirmed'] : [], [Password::min(8)]),
             'companyName' => ['required', 'string', 'max:255'],
-            'companyType' => ['required', 'in:' . implode(',', array_keys(\App\Support\Market::companyTypes()))],
+            'companyType' => [$pl ? 'required' : 'nullable', 'in:' . implode(',', array_keys(\App\Support\Market::companyTypes()))],
+            // In Nederland niet verplicht bij het aanmelden: bedrijfsgegevens vul je
+            // daarna aan, via de startlijst op het dashboard.
             'kvkNumber' => $pl
                 ? ['nullable', 'regex:/^\d{9}(\d{5})?$/', 'unique:companies,kvk_number']
-                : ['required', 'digits:8', 'unique:companies,kvk_number'],
+                : ['nullable', 'digits:8', 'unique:companies,kvk_number'],
             'vatNumber' => $pl
                 ? ['required', 'digits:10', function ($attr, $value, $fail) { if (! \App\Services\NipService::valid($value)) { $fail(__('Nieprawidłowy numer NIP — sprawdź cyfry.')); } }, 'unique:companies,vat_number']
                 : ['nullable', 'regex:/^NL\d{9}B\d{2}$/i', 'unique:companies,vat_number'],
             'acceptTerms' => ['accepted'],
             'newsletter' => ['boolean'],
         ], [
+            'firstName.required' => __('Vul je naam in.'),
+            'kvkNumber.digits' => __('Een KvK-nummer bestaat uit 8 cijfers.'),
             'kvkNumber.unique' => __('Er bestaat al een account met dit KvK-nummer. Neem contact met ons op als dit onterecht is.'),
             'kvkNumber.regex' => __('Vul een geldig REGON-nummer in (9 of 14 cijfers).'),
             'vatNumber.regex' => __('Vul een geldig Nederlands BTW-nummer in, bijvoorbeeld NL123456789B01.'),
@@ -94,7 +118,7 @@ class RegisteredUserController extends Controller
             ]);
 
             $user = User::create([
-                'name' => $data['firstName'] . ' ' . $data['lastName'],
+                'name' => trim($data['firstName'] . ' ' . ($data['lastName'] ?? '')),
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
                 'company_id' => $company->id,
@@ -110,6 +134,20 @@ class RegisteredUserController extends Controller
 
         // Mijlpaal voor de marketing-inzichten, met de herkomst van het bezoek van vandaag.
         PageView::milestone($request, PageView::EVENT_REGISTERED);
+
+        // Factuur meegenomen uit de gratis tool: bedrijfsgegevens, klant en de
+        // factuur als concept. Mislukt dat, dan gaat het aanmelden gewoon door.
+        $free = $request->session()->pull(FreeInvoiceImport::SESSION);
+        if (is_array($free) && ! $pl) {
+            try {
+                $draft = app(FreeInvoiceImport::class)->apply($user->company, $free);
+                if ($draft) {
+                    Session::put('welcome_invoice_id', $draft->id);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Factuur uit de gratis tool niet meegenomen', ['company' => $user->company_id, 'error' => $e->getMessage()]);
+            }
+        }
 
         $code = $user->generateVerificationCode();
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));

@@ -37,7 +37,9 @@ class QuoteManager
                     ->find($data['brand_profile_id'])
                 : null;
 
-            $lines = $data['lines'] ?? [];
+            // Btw verlegd: geen btw op de regels, wel de vermelding op het document.
+            $reversed = \App\Support\VatReverse::requested($data);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             // Documenttaal: momentopname van de klantinstelling, tenzij op het
@@ -68,6 +70,7 @@ class QuoteManager
                 'vat_total' => $totals['vat_total'],
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
+                'vat_reversed' => $reversed,
 
                 'intro' => $data['intro'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -88,7 +91,11 @@ class QuoteManager
 
         return DB::transaction(function () use ($quote, $data) {
             $mode = $this->resolveMode($data, $quote->company);
-            $lines = $data['lines'] ?? [];
+            // Zonder keuze op het formulier blijft het document zoals het was.
+            $reversed = array_key_exists('vat_reversed', $data)
+                ? \App\Support\VatReverse::requested($data)
+                : (bool) $quote->vat_reversed;
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $quoteDate = isset($data['quote_date']) ? Carbon::parse($data['quote_date']) : $quote->quote_date;
@@ -156,6 +163,7 @@ class QuoteManager
                 'vat_total' => $totals['vat_total'],
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
+                'vat_reversed' => $reversed,
                 'intro' => array_key_exists('intro', $data) ? $data['intro'] : $quote->intro,
                 'notes' => array_key_exists('notes', $data) ? $data['notes'] : $quote->notes,
             ]);
@@ -368,6 +376,7 @@ class QuoteManager
                 'invoice_date' => now()->toDateString(),
                 'reference' => $quote->reference ?: __('Offerte :number', ['number' => $quote->number]),
                 'notes' => $quote->notes,
+                'vat_reversed' => (bool) $quote->vat_reversed,
                 'lines' => $lines,
             ]);
 

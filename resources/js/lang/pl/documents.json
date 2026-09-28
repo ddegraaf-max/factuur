@@ -373,5 +373,11 @@
   "(optioneel — alleen voor jezelf)": "(opcjonalnie — tylko dla Ciebie)",
   "Bijv. betalingsregeling afgesproken, klacht in behandeling": "Np. uzgodniono spłatę w ratach, reklamacja w toku",
   "Op pauze: geen herinneringen, aanmaningen of incasso": "Wstrzymana: bez przypomnień, wezwań i windykacji",
-  ":n op pauze": ":n wstrzymanych"
+  ":n op pauze": ":n wstrzymanych",
+  "Btw verlegd": "Odwrotne obciążenie",
+  "btw verlegd": "odwrotne obciążenie",
+  "verlegd": "np.",
+  "De klant draagt de btw af, bijvoorbeeld bij onderaanneming in de bouw. Op het document staat geen btw, wel \"btw verlegd\" en het btw-nummer van de klant.": "Podatek rozlicza klient, na przykład przy podwykonawstwie w budownictwie. Na dokumencie nie ma kwoty VAT, jest adnotacja \"odwrotne obciążenie\" i numer VAT klienta.",
+  "Btw-nummer van de klant": "Numer VAT klienta",
+  "Dit nummer wordt bij de klant bewaard.": "Numer zostanie zapisany przy kliencie."
 }

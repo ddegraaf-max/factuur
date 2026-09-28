@@ -19,7 +19,8 @@ class Payment extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
-        'paid_on' => 'date',
+        // Als jjjj-mm-dd naar het scherm; zie de toelichting bij Invoice.
+        'paid_on' => 'date:Y-m-d',
     ];
 
     protected static function booted(): void

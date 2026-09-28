@@ -12,6 +12,7 @@ const props = defineProps({
   result_chart: Object,
   vat_due: { type: Object, default: null },
   quotes: { type: Object, default: null },
+  onboarding: { type: Object, default: null }, // startlijst voor een nieuw account
 });
 
 // Offertestatus in dezelfde pil-kleuren als op de offertepagina.
@@ -56,6 +57,30 @@ const greeting = () => {
           {{ kpis.overdue_count - kpis.overdue_paused_count === 1 ? $t('Je hebt 1 factuur die aandacht nodig heeft.') : $t('Je hebt :n facturen die aandacht nodig hebben.', { n: kpis.overdue_count - kpis.overdue_paused_count }) }}
         </p>
         <p class="page-subtitle" v-else>{{ $t('Alles is up-to-date.') }}</p>
+      </div>
+    </div>
+
+    <!-- Startlijst: van nieuw account naar de eerste verstuurde factuur -->
+    <div v-if="onboarding" class="card start-card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">{{ $t('In drie stappen je eerste factuur') }}</div>
+          <div class="card-subtitle">{{ $t(':done van :total gedaan', { done: onboarding.done, total: onboarding.total }) }}</div>
+        </div>
+        <div class="start-bar" aria-hidden="true"><div :style="{ width: (onboarding.done / onboarding.total * 100) + '%' }"></div></div>
+      </div>
+      <div class="card-body start-steps">
+        <Link v-for="(step, i) in onboarding.steps" :key="step.key" :href="step.route" :class="['start-step', { done: step.done }]">
+          <span class="start-mark">
+            <svg v-if="step.done" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <template v-else>{{ i + 1 }}</template>
+          </span>
+          <span class="start-text">
+            <span class="start-title">{{ step.title }}</span>
+            <span class="start-sub">{{ step.text }}</span>
+          </span>
+          <span v-if="!step.done" class="start-go">→</span>
+        </Link>
       </div>
     </div>
 
@@ -275,6 +300,36 @@ const greeting = () => {
 </template>
 
 <style>
+/* Startlijst voor een nieuw account */
+.start-card { margin-bottom: 20px; border-color: var(--brand-border, var(--border)); }
+.start-card .card-header { align-items: center; gap: 16px; }
+.start-bar { flex: none; width: 140px; height: 8px; border-radius: 8px; background: var(--surface-2); overflow: hidden; }
+.start-bar div { height: 100%; background: var(--brand); border-radius: 8px; transition: width 0.3s; }
+.start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.start-step {
+  display: flex; align-items: flex-start; gap: 12px; padding: 14px;
+  border: 1px solid var(--border); border-radius: var(--r-md, 10px);
+  color: inherit; text-decoration: none; transition: border-color 0.15s, background 0.15s;
+}
+.start-step:hover { border-color: var(--brand); background: var(--surface-2); }
+.start-step.done { opacity: 0.65; }
+.start-mark {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--brand);
+  background: var(--brand-tint-2, var(--surface-2));
+}
+.start-step.done .start-mark { background: var(--success-bg); color: var(--success); }
+.start-text { flex: 1; min-width: 0; }
+.start-title { display: block; font-weight: 600; font-size: 14px; }
+.start-step.done .start-title { text-decoration: line-through; }
+.start-sub { display: block; font-size: 12.5px; color: var(--text-3); margin-top: 2px; line-height: 1.5; }
+.start-go { color: var(--brand); font-weight: 700; }
+@media (max-width: 900px) {
+  .start-steps { grid-template-columns: 1fr; }
+  .start-bar { width: 90px; }
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

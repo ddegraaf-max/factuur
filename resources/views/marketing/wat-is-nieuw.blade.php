@@ -31,6 +31,21 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.62.0</div>
+        <h2>Btw verlegd, sneller aanmelden en je gratis factuur meenemen</h2>
+        <ul class="tl-list">
+          <li><b>Btw verlegd</b> — één vinkje op de factuur of offerte. De regels komen op 0%, op het document staat de vermelding btw verlegd met het btw-nummer van je klant, en de omzet komt in rubriek 1e van je aangifte. Ook in de PDF, het klantenportaal en de e-factuur. Staat het btw-nummer nog niet bij de klant, dan vul je het op het formulier in. <a href="{{ route('help.article', 'btw-verlegd') }}">Zo werkt het</a>.</li>
+          <li><b>Aanmelden met vier velden</b> — je naam, je bedrijfsnaam, je e-mailadres en een wachtwoord. Je KvK-nummer en adres vul je daarna in.</li>
+          <li><b>Startlijst op het dashboard</b> — een nieuw account ziet drie stappen naar de eerste factuur: bedrijfsgegevens invullen, een klant toevoegen en versturen. De lijst verdwijnt zodra dat is gedaan.</li>
+          <li><b>Gratis factuur meenemen</b> — maak je een factuur met de <a href="{{ route('gratis-factuur') }}">gratis tool</a>, dan kun je hem na het downloaden meenemen naar een proefaccount. Je bedrijfsgegevens, je klant en de factuur staan er dan als concept in. Dit gebeurt alleen als je er zelf voor kiest.</li>
+          <li><b>Factuur en offerte op een laptop</b> — op een scherm tot ongeveer 1460 pixels breed was het veld voor de omschrijving erg smal. De omschrijving heeft nu een eigen rij.</li>
+          <li><b>Datum bij bewerken</b> — bij het bewerken van een offerte stond de datum een dag te vroeg en schoof hij bij opslaan een dag terug; bij een conceptfactuur was het datumveld leeg. Beide tonen nu de juiste dag.</li>
+          <li><b>Nieuws alleen op verzoek</b> — het vinkje voor tips en nieuws staat bij het aanmelden standaard uit.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.61.0</div>
         <h2>Incassokosten berekenen en een pagina voor de bouw</h2>
         <ul class="tl-list">

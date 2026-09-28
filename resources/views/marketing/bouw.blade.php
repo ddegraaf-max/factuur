@@ -8,6 +8,7 @@
       ['Kan ik een offerte in termijnen factureren?', 'Ja. Bij een verstuurde of getekende offerte leg je een termijnplan vast, bijvoorbeeld 30% bij opdracht, 40% als de ruwbouw staat en 30% bij oplevering. Elke termijn wordt met één klik een factuur. De laatste termijn is altijd de rest, zodat het totaal tot op de cent gelijk is aan de offerte.'],
       ['Moeten onderaannemers een account hebben om te reageren?', 'Nee. Een onderaannemer krijgt een mail met een knop. Daarmee opent hij de aanvraag met de bijlagen, vult zijn prijs en de week waarin hij kan beginnen in en stuurt zijn eigen offerte als bestand mee. Een account is niet nodig.'],
       ['Wat stuur ik mee met een prijsaanvraag?', 'Een omschrijving van het werk, de plaats, de gewenste startweek en bijlagen zoals een tekening, bestek of foto\'s (PDF, PNG, JPG of WEBP). De prijs die je zelf aan je klant hebt gegeven, gaat nooit mee.'],
+      ['Kan ik facturen met btw verlegd maken?', 'Ja. Vink bij de factuur of offerte btw verlegd aan. Alle regels komen op 0% en op het document staat de vermelding btw verlegd met het btw-nummer van je opdrachtgever. Staat dat nummer nog niet bij de klant, dan vul je het ter plekke in. In je btw-aangifte komt de omzet in rubriek 1e.'],
       ['Werkt het op de bouwplaats, op mijn telefoon?', 'Ja. ' . brand('name') . ' werkt in de browser van je telefoon en kun je als app op je beginscherm zetten. Een offerte maken, uren schrijven of een bon fotograferen kan ter plekke.'],
       ['Kan mijn boekhouder meekijken?', 'Ja, gratis. Je nodigt je boekhouder uit en die ziet je facturen, inkoop en btw-overzicht, zonder iets te kunnen wijzigen.'],
       ['Wat kost het?', 'Het pakket Basis kost € 12,10 per maand inclusief btw en is per maand opzegbaar. Offertes, termijnfacturen en prijsaanvragen zitten daarin. De eerste 14 dagen zijn gratis, zonder betaalgegevens.'],
@@ -64,13 +65,13 @@
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <div class="feature-title">Uren en kilometers</div>
-        <div class="feature-desc">Schrijf uren per klant en zet ze in één keer op de factuur. Ritten naar de bouwplaats houd je bij voor je kilometeradministratie.</div>
+        <div class="feature-title">Uren, kilometers en bonnen</div>
+        <div class="feature-desc">Schrijf uren per klant en zet ze in één keer op de factuur. Ritten houd je bij voor je kilometeradministratie. Een foto van een bon van de bouwmarkt staat meteen in je inkoop (pakket Slim).</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
-        <div class="feature-title">Bonnen van de bouwmarkt</div>
-        <div class="feature-desc">Maak een foto van de bon en het bedrag, de btw en de leverancier staan in je inkoop. Het inlezen van bonnen zit in het pakket Slim.</div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+        <div class="feature-title">Btw verlegd</div>
+        <div class="feature-desc">Werk je als onderaannemer? Eén vinkje en de factuur staat op 0%, met de vermelding btw verlegd en het btw-nummer van je opdrachtgever. De omzet komt in de juiste rubriek van je aangifte.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
@@ -116,7 +117,7 @@
       </ul>
 
       <h2>Meer lezen</h2>
-      <p>In de kennisbank staat uitleg over <a href="{{ route('kennisbank.artikel', 'deelfactuur-termijnfactuur') }}">deelfacturen en termijnfacturen</a>, de <a href="{{ route('kennisbank.artikel', 'voorschotfactuur-aanbetaling') }}">aanbetaling</a> en de <a href="{{ route('kennisbank.artikel', 'eindfactuur') }}">eindfactuur</a>. Betaalt een klant niet? Reken met de <a href="{{ route('incassokosten-calculator') }}">calculator voor incassokosten en rente</a> uit wat je mag vragen.</p>
+      <p>In de kennisbank staat uitleg over <a href="{{ route('kennisbank.artikel', 'btw-verlegd-bouw-onderaanneming') }}">btw verlegd in de bouw</a>, <a href="{{ route('kennisbank.artikel', 'deelfactuur-termijnfactuur') }}">deelfacturen en termijnfacturen</a>, de <a href="{{ route('kennisbank.artikel', 'voorschotfactuur-aanbetaling') }}">aanbetaling</a> en de <a href="{{ route('kennisbank.artikel', 'eindfactuur') }}">eindfactuur</a>. Betaalt een klant niet? Reken met de <a href="{{ route('incassokosten-calculator') }}">calculator voor incassokosten en rente</a> uit wat je mag vragen.</p>
     </div>
   </div>
 </section>

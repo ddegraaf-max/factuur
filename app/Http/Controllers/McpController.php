@@ -142,6 +142,7 @@ class McpController extends Controller
                         'intro' => ['type' => 'string', 'description' => __('Inleidende tekst boven de offerte (optioneel).')],
                         'opmerkingen' => ['type' => 'string', 'description' => __('Voorwaarden, planning of aannames onder de offerte (optioneel).')],
                         'geldig_dagen' => ['type' => 'integer', 'description' => __('Geldigheid in dagen (optioneel; standaard van de administratie).')],
+                        'btw_verlegd' => $this->reverseSchema(),
                         'handelsnaam' => ['type' => 'string', 'description' => __('Optioneel: de handelsnaam (huisstijl) waaronder de offerte wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.')],
                         'bijlage' => $this->attachmentSchema('offerte'),
                     ],
@@ -160,6 +161,7 @@ class McpController extends Controller
                         'referentie' => ['type' => 'string', 'description' => __('Referentie (optioneel).')],
                         'opmerkingen' => ['type' => 'string', 'description' => __('Opmerking voor de klant onderaan de factuur (optioneel).')],
                         'betalingstermijn_dagen' => ['type' => 'integer', 'description' => __('Betalingstermijn in dagen (optioneel; standaard van de klant of administratie).')],
+                        'btw_verlegd' => $this->reverseSchema(),
                         'handelsnaam' => ['type' => 'string', 'description' => __('Optioneel: de handelsnaam (huisstijl) waaronder de factuur wordt gemaakt, als de administratie meerdere handelsnamen heeft. Weglaten = standaard huisstijl.')],
                         'bijlage' => $this->attachmentSchema('factuur'),
                     ],
@@ -367,6 +369,24 @@ class McpController extends Controller
         throw new \DomainException(__('Meerdere klanten matchen op ":name": :names. Geef de volledige naam op.', ['name' => $name, 'names' => $matches->pluck('name')->implode(', ')]));
     }
 
+    protected function reverseSchema(): array
+    {
+        return ['type' => 'boolean', 'description' => __('Optioneel: true als de btw is verlegd naar de klant (bijvoorbeeld onderaanneming in de bouw). Alle regels komen dan op 0% en op het document staat "btw verlegd" met het btw-nummer van de klant. Dat nummer moet bij de klant zijn ingevuld.')];
+    }
+
+    /** Btw verlegd gevraagd? Dan moet het btw-nummer van de klant bekend zijn. */
+    protected function reversed(Customer $customer, array $args): bool
+    {
+        if (! \App\Support\VatReverse::requested(['vat_reversed' => filter_var($args['btw_verlegd'] ?? false, FILTER_VALIDATE_BOOLEAN)])) {
+            return false;
+        }
+        if (\App\Support\VatReverse::normalize((string) $customer->vat_number) === '') {
+            throw new \DomainException(__('Bij btw verlegd hoort het btw-nummer van de klant op het document. Vul dat eerst in bij :customer.', ['customer' => $customer->name]));
+        }
+
+        return true;
+    }
+
     /** Vertaal MCP-regels naar de regels die de managers verwachten (altijd excl. btw aangeleverd). */
     protected function mapLines(Company $company, array $rows): array
     {
@@ -420,6 +440,7 @@ class McpController extends Controller
             'reference' => filled($args['referentie'] ?? null) ? mb_substr(trim($args['referentie']), 0, 255) : null,
             'intro' => filled($args['intro'] ?? null) ? mb_substr(trim($args['intro']), 0, 2000) : null,
             'notes' => filled($args['opmerkingen'] ?? null) ? trim($args['opmerkingen']) : null,
+            'vat_reversed' => $this->reversed($customer, $args),
             'lines' => $lines,
         ]);
 
@@ -445,6 +466,7 @@ class McpController extends Controller
             'brand_profile_id' => $this->resolveBrandProfile($company, $args),
             'reference' => filled($args['referentie'] ?? null) ? mb_substr(trim($args['referentie']), 0, 255) : null,
             'notes' => filled($args['opmerkingen'] ?? null) ? trim($args['opmerkingen']) : null,
+            'vat_reversed' => $this->reversed($customer, $args),
             'lines' => $lines,
         ];
         if (isset($args['betalingstermijn_dagen'])) {

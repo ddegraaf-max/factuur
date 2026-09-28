@@ -95,5 +95,7 @@
   "Welke facturen zijn achterstallig?": "Which invoices are overdue?",
   "BTW deze kwartaal?": "VAT this quarter?",
   "Topklanten?": "Top customers?",
-  "Verrekend": "Settled"
+  "Verrekend": "Settled",
+  "In drie stappen je eerste factuur": "Your first invoice in three steps",
+  ":done van :total gedaan": ":done of :total done"
 }

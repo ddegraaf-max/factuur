@@ -108,6 +108,9 @@ Route::get('/health', \App\Http\Controllers\HealthController::class)->middleware
 Route::get('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'show'])->name('gratis-factuur')->middleware('market:nl');
 Route::post('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceController::class, 'download'])
     ->middleware(['throttle:15,1', 'turnstile'])->name('gratis-factuur.download')->middleware('market:nl');
+// Na het downloaden: de factuur meenemen naar een nieuw account (alleen op eigen verzoek).
+Route::post('/gratis-factuur-maken/meenemen', [\App\Http\Controllers\FreeInvoiceController::class, 'keep'])
+    ->middleware(['throttle:15,1', 'market:nl'])->name('gratis-factuur.keep');
 Route::view('/btw-calculator', 'marketing.btw-calculator')->name('btw-calculator')->middleware('market:nl');
 Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uurtarief-calculator')->middleware('market:nl');
 Route::get('/incassokosten-berekenen', [\App\Http\Controllers\CollectionCostsController::class, 'show'])

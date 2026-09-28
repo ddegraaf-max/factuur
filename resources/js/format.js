@@ -71,3 +71,9 @@ export function parseDutchNumber(input) {
 }
 
 export const parseNumber = parseDutchNumber;
+
+/** Vandaag als jjjj-mm-dd in de tijd van de gebruiker (toISOString rekent om naar UTC). */
+export function todayLocal() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}

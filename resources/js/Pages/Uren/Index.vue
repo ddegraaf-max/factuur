@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur, num } from '@/format.js';
+import { eur, num, todayLocal } from '@/format.js';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { t } from '@/i18n';
 
@@ -36,7 +36,7 @@ const parseDuration = (value) => {
 };
 
 /* ---------- Uren schrijven / bewerken ---------- */
-const today = new Date().toISOString().slice(0, 10);
+const today = todayLocal();
 const editingId = ref(null);
 
 const form = useForm({

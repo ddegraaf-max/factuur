@@ -97,6 +97,7 @@ class UblGenerator
         }
 
         // ---------- BTW-totalen per tarief ----------
+        $reversed = (bool) $invoice->vat_reversed;
         $buckets = []; // rate => ['base' => x, 'vat' => y]
         foreach ($invoice->lines as $line) {
             $rate = (string) (float) $line->vat_rate;
@@ -111,9 +112,13 @@ class UblGenerator
             $xml[] = '      <cbc:TaxableAmount currencyID="'.$this->e($currency).'">'.$this->amount($bucket['base']).'</cbc:TaxableAmount>';
             $xml[] = '      <cbc:TaxAmount currencyID="'.$this->e($currency).'">'.$this->amount($bucket['vat']).'</cbc:TaxAmount>';
             $xml[] = '      <cac:TaxCategory>';
-            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $rate).'</cbc:ID>';
+            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $rate, $reversed).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $rate).'</cbc:Percent>';
-            if ((float) $rate === 0.0) {
+            if ($reversed) {
+                // Btw verlegd: categorie AE met de Europese code voor verlegging.
+                $xml[] = '        <cbc:TaxExemptionReasonCode>VATEX-EU-AE</cbc:TaxExemptionReasonCode>';
+                $xml[] = '        <cbc:TaxExemptionReason>'.$this->e(__('doc.vat_reversed')).'</cbc:TaxExemptionReason>';
+            } elseif ((float) $rate === 0.0) {
                 $xml[] = '        <cbc:TaxExemptionReason>'.$this->e(__('Nultarief of vrijgesteld van BTW')).'</cbc:TaxExemptionReason>';
             }
             $xml[] = '        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>';
@@ -142,7 +147,7 @@ class UblGenerator
             }
             $xml[] = '      <cbc:Name>'.$this->e(mb_substr($line->description, 0, 100) ?: __('Regel :n', ['n' => $index + 1])).'</cbc:Name>';
             $xml[] = '      <cac:ClassifiedTaxCategory>';
-            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $line->vat_rate).'</cbc:ID>';
+            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $line->vat_rate, $reversed).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $line->vat_rate).'</cbc:Percent>';
             $xml[] = '        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>';
             $xml[] = '      </cac:ClassifiedTaxCategory>';
@@ -203,31 +208,20 @@ class UblGenerator
         return implode("\n", $p);
     }
 
-    /** UNCL5305-categorie: S = standaard/verlaagd tarief, Z = nultarief. */
-    protected function taxCategory(float $rate): string
+    /** UNCL5305-categorie: S = standaard/verlaagd tarief, Z = nultarief, AE = btw verlegd. */
+    protected function taxCategory(float $rate, bool $reversed = false): string
     {
+        if ($reversed) {
+            return 'AE';
+        }
+
         return $rate > 0 ? 'S' : 'Z';
     }
 
     /** Landnaam of -code → ISO 3166-1 alpha-2 (standaard: het land van de markt). */
     protected function countryCode(?string $country): string
     {
-        $c = trim((string) $country);
-        if ($c === '') return \App\Support\Market::country();
-        if (strlen($c) === 2) return strtoupper($c);
-
-        return match (mb_strtolower($c)) {
-            'nederland', 'the netherlands', 'netherlands', 'holland' => 'NL',
-            'belgië', 'belgie', 'belgium' => 'BE',
-            'duitsland', 'germany', 'deutschland', 'niemcy' => 'DE',
-            'frankrijk', 'france' => 'FR',
-            'luxemburg', 'luxembourg' => 'LU',
-            'verenigd koninkrijk', 'united kingdom' => 'GB',
-            'spanje', 'spain' => 'ES',
-            'italië', 'italie', 'italy' => 'IT',
-            'polen', 'poland', 'polska' => 'PL',
-            default => \App\Support\Market::country(),
-        };
+        return \App\Support\CountryCode::of($country);
     }
 
     protected function amount(float|string $value): string

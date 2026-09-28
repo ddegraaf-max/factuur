@@ -282,5 +282,16 @@
   "Nieuwe code over :n s": "New code in :n s",
   "Versturen…": "Sending…",
   "Stuur nieuwe code": "Send new code",
-  "Andere e-mail gebruiken": "Use a different email"
+  "Andere e-mail gebruiken": "Use a different email",
+  "(minstens 8 tekens)": "(at least 8 characters)",
+  "Tonen": "Show",
+  "Verbergen": "Hide",
+  "Ik ga akkoord met de": "I agree to the",
+  "algemene voorwaarden": "terms and conditions",
+  "en het": "and the",
+  "privacybeleid": "privacy policy",
+  "Geen betaalgegevens nodig. Je KvK-nummer en adres vul je daarna in.": "No payment details needed. You add your KvK number and address afterwards.",
+  "Vul hiernaast je naam, je bedrijfsnaam, je e-mailadres en een wachtwoord in en bevestig je e-mailadres met de code die je ontvangt. Daarna vul je je bedrijfsgegevens aan en kun je meteen een klant toevoegen en factureren. Alles wat je in de proefperiode aanmaakt, blijft gewoon staan als je doorgaat.": "Enter your name, your company name, your e-mail address and a password, and confirm your e-mail address with the code you receive. After that you complete your company details and you can add a customer and start invoicing right away. Everything you create during the trial stays in place if you continue.",
+  "Je factuur voor :customer gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.": "Your invoice for :customer comes along: it will be in your account as a draft, together with your company details.",
+  "Je factuur gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.": "Your invoice comes along: it will be in your account as a draft, together with your company details."
 }

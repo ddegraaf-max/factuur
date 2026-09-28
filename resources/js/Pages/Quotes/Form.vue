@@ -1,7 +1,8 @@
 <script setup>
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { eur, fmtDateLong, parseDutchNumber } from '@/format.js';
+import VatReverseField from '@/Components/VatReverseField.vue';
+import { eur, fmtDateLong, parseDutchNumber, todayLocal } from '@/format.js';
 import { t } from '@/i18n';
 import axios from 'axios';
 import { computed, ref, watch } from 'vue';
@@ -28,7 +29,7 @@ const market = usePage().props.market;
 const inclMode = computed(() => form.price_mode === 'incl');
 const priceLabel = computed(() => inclMode.value ? t('Prijs incl. btw') : t('Prijs'));
 
-const today = new Date().toISOString().slice(0, 10);
+const today = todayLocal();
 
 /** Toon de prijs zoals hij is ingevoerd: bruto in incl-modus, vóór korting. */
 const displayPrice = (line) => {
@@ -79,10 +80,31 @@ const form = useForm({
         discount_pct: Number(l.discount_pct) || 0,
       }))
     : [{ product_id: null, description: '', details: '', quantity: 1, unit: 'stuk', unit_price: 0, vat_rate: market.default_vat, discount_pct: 0 }],
+  // Btw verlegd: geen btw op de regels; het btw-nummer van de klant hoort er dan bij.
+  vat_reversed: !!props.quote?.vat_reversed,
+  customer_vat_number: '',
   action: 'draft',
 });
 
 const r2 = (n) => Math.round(n * 100) / 100;
+
+// Bij btw verlegd rekent elke regel met 0%; het gekozen tarief blijft bewaard
+// voor als je het vinkje weer uitzet.
+const rateOf = (line) => form.vat_reversed ? 0 : (Number(line.vat_rate) || 0);
+
+/** Btw verlegd aan of uit. In incl-modus rekenen de prijzen mee, zodat het nettobedrag gelijk blijft. */
+const setReversed = (on) => {
+  if (on === form.vat_reversed) return;
+  if (form.price_mode === 'incl') {
+    for (const line of form.lines) {
+      const price = parseDutchNumber(line.unit_price) || 0;
+      const rate = Number(line.vat_rate) || 0;
+      line.unit_price = on ? r2(price / (1 + rate / 100)) : r2(price * (1 + rate / 100));
+    }
+  }
+  form.vat_reversed = on;
+  if (!on) form.customer_vat_number = '';
+};
 
 /**
  * Wissel tussen prijzen incl. en excl. btw. De al ingetypte prijzen worden
@@ -92,7 +114,7 @@ const setPriceMode = (mode) => {
   if (mode === form.price_mode) return;
   for (const line of form.lines) {
     const price = parseDutchNumber(line.unit_price) || 0;
-    const rate = Number(line.vat_rate) || 0;
+    const rate = rateOf(line);
     line.unit_price = mode === 'incl'
       ? r2(price * (1 + rate / 100))
       : r2(price / (1 + rate / 100));
@@ -104,7 +126,7 @@ const setPriceMode = (mode) => {
 const calcLine = (line) => {
   const qty = parseDutchNumber(line.quantity);
   const price = parseDutchNumber(line.unit_price);
-  const rate = Number(line.vat_rate) || 0;
+  const rate = rateOf(line);
   const factor = 1 - Math.min(100, Math.max(0, Number(line.discount_pct) || 0)) / 100;
 
   if (inclMode.value) {
@@ -171,11 +193,13 @@ const applyProduct = (line, productId) => {
     line.details = p.description ?? '';
     line.unit = p.unit;
     line.vat_rate = Number(p.vat_rate);
-    line.unit_price = inclMode.value
+    line.unit_price = inclMode.value && !form.vat_reversed
       ? r2(Number(p.price) * (1 + Number(p.vat_rate) / 100))
       : Number(p.price);
   }
 };
+
+const selectedCustomer = computed(() => props.customers.find(c => c.id === Number(form.customer_id)));
 
 // Bij klantwissel: de taal van die klant (per offerte nog aan te passen).
 watch(() => form.customer_id, (id) => {
@@ -203,7 +227,7 @@ const applyParsed = (r) => {
       quantity: Number(l.quantity) || 1,
       unit: l.unit || 'stuk',
       // De AI levert prijzen exclusief btw; in incl-modus toont het formulier bruto.
-      unit_price: inclMode.value
+      unit_price: inclMode.value && !form.vat_reversed
         ? r2(Number(l.unit_price) * (1 + Number(l.vat_rate) / 100))
         : Number(l.unit_price),
       vat_rate: Number(l.vat_rate),
@@ -384,6 +408,15 @@ const submit = (action) => {
               </div>
               <div v-else class="form-group"></div>
             </div>
+            <VatReverseField
+              v-if="market.vat_reverse"
+              :model-value="form.vat_reversed"
+              v-model:vat-number="form.customer_vat_number"
+              :customer="selectedCustomer"
+              :error="form.errors.customer_vat_number || form.errors.vat_reversed"
+              style="margin-bottom:16px;"
+              @update:model-value="setReversed"
+            />
             <div class="form-group" style="margin:0;">
               <label>{{ $t('Begeleidende tekst') }}<span class="label-hint">{{ $t('(bovenaan de offerte)') }}</span></label>
               <textarea v-model="form.intro" rows="3" maxlength="2000" :placeholder="$t('Bijv. Naar aanleiding van ons gesprek doen wij je graag het volgende voorstel…')"></textarea>
@@ -436,7 +469,8 @@ const submit = (action) => {
                   <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" :title="$t('Korting in procenten op deze regel')">
                 </div>
                 <div class="line-field" :data-label="$t('BTW')">
-                  <select v-model.number="line.vat_rate">
+                  <div v-if="form.vat_reversed" class="vat-reversed-chip" :title="$t('Btw verlegd')">{{ $t('verlegd') }}</div>
+                  <select v-else v-model.number="line.vat_rate">
                     <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
                   </select>
                 </div>
@@ -479,10 +513,16 @@ const submit = (action) => {
           <div class="card-header"><div class="card-title">{{ $t('Totaal') }}</div></div>
           <div class="card-body">
             <div class="total-row"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
-            <div v-for="b in totals.breakdown" :key="b.rate" class="total-row">
-              <span>{{ $t('BTW') }} {{ b.rate }}%</span>
-              <span class="mono">{{ eur(b.vat) }}</span>
+            <div v-if="form.vat_reversed" class="total-row">
+              <span>{{ $t('Btw verlegd') }}</span>
+              <span class="mono">{{ eur(0) }}</span>
             </div>
+            <template v-else>
+              <div v-for="b in totals.breakdown" :key="b.rate" class="total-row">
+                <span>{{ $t('BTW') }} {{ b.rate }}%</span>
+                <span class="mono">{{ eur(b.vat) }}</span>
+              </div>
+            </template>
             <div class="total-row grand"><span>{{ $t('Totaal') }}</span><span class="mono">{{ eur(totals.total) }}</span></div>
 
             <div style="margin-top:18px;font-size:12px;color:var(--text-3);line-height:1.6;">

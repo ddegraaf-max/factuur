@@ -170,6 +170,8 @@ class DashboardController extends Controller
             ] : null,
             'recent_invoices' => $recentInvoices,
             'quotes' => $quotes,
+            // Startlijst voor een nieuw account: bedrijfsgegevens, eerste klant, eerste factuur.
+            'onboarding' => auth()->user()->isOwner() ? \App\Support\Onboarding::for(auth()->user()->company) : null,
             'result_chart' => [
                 'year' => $year,
                 'prev_year' => $year - 1,

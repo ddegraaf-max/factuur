@@ -2,7 +2,7 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { t } from '@/i18n';
-import { eur } from '@/format.js';
+import { eur, todayLocal } from '@/format.js';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -27,7 +27,7 @@ const rateLabel = (r) => Number(r) === 0 ? t('0% / vrijgesteld') : `${Number(r)}
 /* ---------- Betaald markeren ---------- */
 const showPaidForm = ref(false);
 const paidForm = useForm({
-  paid_at: new Date().toISOString().slice(0, 10),
+  paid_at: todayLocal(),
   payment_method: 'bank_transfer',
 });
 

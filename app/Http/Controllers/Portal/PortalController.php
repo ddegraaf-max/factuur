@@ -152,6 +152,7 @@ class PortalController extends Controller
                 'customer_postal_code' => $invoice->customer_postal_code,
                 'customer_city' => $invoice->customer_city,
                 'vat_breakdown' => $invoice->vat_breakdown,
+                'vat_reversed' => (bool) $invoice->vat_reversed,
                 'subtotal' => (float) $invoice->subtotal,
                 'vat_total' => (float) $invoice->vat_total,
                 'lines' => $invoice->lines->map(fn ($l) => [

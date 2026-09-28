@@ -482,6 +482,45 @@ return [
             ],
         ],
 
+        'btw-verlegd-bouw-onderaanneming' => [
+            'category' => 'Btw & Belastingdienst',
+            'updated' => '2026-09-28',
+            'tool' => [
+                'route' => 'bouw',
+                'title' => 'Factureren als onderaannemer?',
+                'text' => 'Vink bij de factuur btw verlegd aan. De regels komen op 0%, de vermelding en het btw-nummer van je opdrachtgever staan op de factuur en de omzet komt in de juiste rubriek van je aangifte.',
+                'label' => 'Bekijk het programma voor de bouw',
+            ],
+            'title' => "Btw verlegd in de bouw: zo factureer je als onderaannemer",
+            'intro' => "Werk je als onderaannemer voor een aannemer, dan zet je geen btw op je factuur: die is verlegd. Wanneer de regeling geldt, wat er op de factuur moet staan en waar het in je aangifte komt.",
+            'sections' => [
+                ["Wat betekent btw verlegd?", [
+                    "Normaal reken jij btw aan je klant en draag je die af aan de Belastingdienst. Bij verlegging draait dat om: jij factureert zonder btw en je opdrachtgever geeft de btw zelf aan in zijn aangifte. Hij trekt hem in dezelfde aangifte weer af, dus per saldo betaalt hij niets extra.",
+                    "De regeling bestaat om te voorkomen dat een onderaannemer btw ontvangt en die niet afdraagt. Ze is niet vrijwillig: voldoe je aan de voorwaarden, dan moet je verleggen.",
+                ]],
+                ["Wanneer geldt de verleggingsregeling?", [
+                    "De regeling geldt bij onderaanneming en bij het uitlenen van personeel, voor werk van stoffelijke aard aan een onroerende zaak of een schip. Denk aan bouwen, verbouwen, slopen, aanleggen, herstellen, onderhouden en schoonmaken. Ze komt voor in de bouw, de scheepsbouw, de metaalconstructie, de schoonmaak en het hoveniersvak.",
+                    "Het gaat om de verhouding tussen aannemer en onderaannemer. Jij bent de onderaannemer als je opdrachtgever het werk zelf weer heeft aangenomen van iemand anders. Voorbeeld: een aannemer bouwt een uitbouw voor een particulier en huurt jou in voor het metselwerk. Jij verlegt de btw naar de aannemer; de aannemer rekent zijn klant gewoon btw.",
+                ]],
+                ["Wanneer geldt ze niet?", [
+                    "Werk je rechtstreeks voor een particulier, dan reken je gewoon btw. Dat geldt ook als je opdrachtgever een bedrijf is dat het werk niet zelf heeft aangenomen, zoals een winkelier die zijn eigen pand laat verbouwen. Een uitzondering is de eigenbouwer: een bedrijf dat voor eigen rekening bouwt om te verkopen.",
+                    "Lever je alleen materiaal zonder het te verwerken, dan is er geen sprake van onderaanneming en reken je ook gewoon btw. Twijfel je? Vraag je opdrachtgever of hij het werk zelf heeft aangenomen, en leg het antwoord vast.",
+                ]],
+                ["Wat moet er op de factuur staan?", [
+                    "Alles wat op een gewone factuur hoort, met drie verschillen. Je vermeldt geen btw-tarief en geen btw-bedrag. Je zet de woorden btw verlegd op de factuur. En je vermeldt het btw-identificatienummer van je opdrachtgever, naast dat van jezelf.",
+                    "Vergeet je de vermelding of het nummer, dan kan de Belastingdienst de btw alsnog bij jou ophalen. Controleer het btw-nummer van een nieuwe opdrachtgever daarom vóór je eerste factuur.",
+                ]],
+                ["Waar komt het in je btw-aangifte?", [
+                    "Als onderaannemer geef je de omzet aan in rubriek 1e: leveringen en diensten belast met 0% of niet bij jou belast. Btw vul je daar niet in. De btw op je eigen inkopen, zoals materiaal en gereedschap, trek je gewoon af als voorbelasting.",
+                    "Je opdrachtgever geeft de verlegde btw aan in rubriek 2a en trekt hetzelfde bedrag af in rubriek 5b.",
+                ]],
+                ["Materiaal, meerwerk en termijnen", [
+                    "Verwerk je materiaal in het werk, dan valt het materiaal onder dezelfde verlegging als de arbeid. Meerwerk en termijnfacturen volgen de hoofdopdracht: is de opdracht verlegd, dan zijn de termijnen dat ook.",
+                    "De verleggingsregeling staat los van de ketenaansprakelijkheid en de g-rekening. Die gaan over loonheffingen, niet over btw.",
+                ]],
+            ],
+        ],
+
         'btw-terugvragen-voorbelasting' => [
             'category' => 'Btw & Belastingdienst',
             'updated' => '2026-09-03',

@@ -73,6 +73,16 @@ class EmailVerificationController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        // Factuur meegenomen uit de gratis tool? Dan begint het account daar.
+        $draft = \App\Models\Invoice::where('company_id', $user->company_id)
+            ->where('status', 'draft')
+            ->whereKey((int) Session::pull('welcome_invoice_id'))
+            ->first();
+        if ($draft) {
+            return redirect()->route('invoices.edit', $draft)
+                ->with('flash', __('Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.', ['customer' => $draft->customer_name]));
+        }
+
         return redirect()->route('dashboard')->with('flash', __('Welkom! Je e-mailadres is bevestigd.'));
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\FreeInvoiceImport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,7 +13,8 @@ use Illuminate\Support\Str;
  * onderaan de PDF staat een bescheiden verwijzing naar easyinvoice.nl.
  *
  * Er wordt niets opgeslagen: de ingevulde gegevens worden alleen gebruikt om
- * de PDF te renderen en daarna vergeten.
+ * de PDF te renderen en daarna vergeten. Alleen wie er na het downloaden zelf
+ * voor kiest, neemt zijn factuur mee naar een account (keep).
  */
 class FreeInvoiceController extends Controller
 {
@@ -22,6 +24,28 @@ class FreeInvoiceController extends Controller
     }
 
     public function download(Request $request)
+    {
+        $data = $this->validated($request);
+        // Een nieuwe factuur: wat eerder is klaargezet om mee te nemen, vervalt.
+        $request->session()->forget(FreeInvoiceImport::SESSION);
+
+        return $this->pdf($data);
+    }
+
+    /**
+     * De bezoeker kiest ervoor zijn factuur mee te nemen naar een account: de
+     * gegevens wachten in de sessie tot het account is aangemaakt
+     * (RegisteredUserController, FreeInvoiceImport).
+     */
+    public function keep(Request $request)
+    {
+        $request->session()->put(FreeInvoiceImport::SESSION, $this->validated($request));
+
+        return redirect()->route('register');
+    }
+
+    /** @return array<string, mixed> */
+    protected function validated(Request $request): array
     {
         // Nederlandse invoer gebruikt een decimale komma; normaliseer vóór
         // validatie zodat "12,50" gewoon werkt.
@@ -42,7 +66,7 @@ class FreeInvoiceController extends Controller
 
         $request->merge(['regels' => $lines]);
 
-        $data = $request->validate([
+        return $request->validate([
             'van_bedrijf' => ['required', 'string', 'max:120'],
             'van_adres' => ['nullable', 'string', 'max:300'],
             'van_kvk' => ['nullable', 'string', 'max:20'],
@@ -70,7 +94,11 @@ class FreeInvoiceController extends Controller
             'regels.*.aantal' => __('aantal'),
             'regels.*.prijs' => __('prijs'),
         ]);
+    }
 
+    /** @param  array<string, mixed>  $data */
+    protected function pdf(array $data)
+    {
         // Totalen altijd server-side berekenen; bij verlegd/vrijgesteld telt
         // geen enkele regel btw.
         $subtotal = 0.0;

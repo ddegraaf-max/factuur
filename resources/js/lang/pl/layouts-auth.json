@@ -282,5 +282,16 @@
   "Nieuwe code over :n s": "Nowy kod za :n s",
   "Versturen…": "Wysyłanie…",
   "Stuur nieuwe code": "Wyślij nowy kod",
-  "Andere e-mail gebruiken": "Użyj innego adresu e-mail"
+  "Andere e-mail gebruiken": "Użyj innego adresu e-mail",
+  "(minstens 8 tekens)": "(co najmniej 8 znaków)",
+  "Tonen": "Pokaż",
+  "Verbergen": "Ukryj",
+  "Ik ga akkoord met de": "Akceptuję",
+  "algemene voorwaarden": "regulamin",
+  "en het": "oraz",
+  "privacybeleid": "politykę prywatności",
+  "Geen betaalgegevens nodig. Je KvK-nummer en adres vul je daarna in.": "Bez danych płatniczych. Numer KvK i adres uzupełnisz później.",
+  "Vul hiernaast je naam, je bedrijfsnaam, je e-mailadres en een wachtwoord in en bevestig je e-mailadres met de code die je ontvangt. Daarna vul je je bedrijfsgegevens aan en kun je meteen een klant toevoegen en factureren. Alles wat je in de proefperiode aanmaakt, blijft gewoon staan als je doorgaat.": "Podaj imię i nazwisko, nazwę firmy, adres e-mail i hasło, a następnie potwierdź adres e-mail kodem, który otrzymasz. Potem uzupełnisz dane firmy i od razu możesz dodać klienta i wystawić fakturę. Wszystko, co utworzysz w okresie próbnym, zostaje, jeśli będziesz kontynuować.",
+  "Je factuur voor :customer gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.": "Faktura dla :customer zostanie przeniesiona: znajdziesz ją na koncie jako szkic, razem z danymi firmy.",
+  "Je factuur gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.": "Faktura zostanie przeniesiona: znajdziesz ją na koncie jako szkic, razem z danymi firmy."
 }

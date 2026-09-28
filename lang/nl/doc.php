@@ -47,6 +47,10 @@ return [
     'amount_due' => 'Te betalen',
     'note' => 'Opmerking',
     'vat_summary' => 'Btw-overzicht',
+    // Btw verlegd: vermelding op het document, kort in de regelkolom en voluit eronder.
+    'vat_reversed' => 'Btw verlegd',
+    'vat_reversed_short' => 'verlegd',
+    'vat_reversed_note' => 'De btw is verlegd naar :name, btw-nummer :number.',
     'net' => 'Netto',
     'gross' => 'Bruto',
 

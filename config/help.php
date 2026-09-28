@@ -24,13 +24,16 @@ return [
             'intro' => 'In een paar minuten heb je een {brand}-account en kun je je eerste factuur versturen.',
             'sections' => [
                 ['Account aanmaken', [
-                    'Klik rechtsboven op "Start gratis" en vul je naam, e-mailadres en een wachtwoord in. Je kunt direct aan de slag — een creditcard is niet nodig.',
+                    'Klik rechtsboven op "Start gratis" en vul je naam, je bedrijfsnaam, je e-mailadres en een wachtwoord in. Meer is niet nodig; je KvK-nummer en adres vul je daarna in. Een creditcard is niet nodig.',
                 ]],
                 ['E-mailadres bevestigen', [
                     'Na registratie ontvang je een e-mail met een verificatiecode. Vul deze code in om je account te activeren. Geen e-mail ontvangen? Controleer je spammap of vraag een nieuwe code aan.',
                 ]],
                 ['Volgende stap', [
-                    'Vul daarna je bedrijfsgegevens in, zodat ze automatisch op je facturen verschijnen.',
+                    'Op het dashboard staat een startlijst met drie stappen: je bedrijfsgegevens invullen, je eerste klant toevoegen en je eerste factuur of offerte versturen. De lijst verdwijnt zodra dat is gedaan.',
+                ]],
+                ['Al een factuur gemaakt met de gratis tool?', [
+                    'Kies na het downloaden voor "Neem mee naar een gratis proefaccount". Je bedrijfsgegevens, je klant en de factuur staan dan als concept in je nieuwe account.',
                 ]],
             ],
         ],
@@ -73,13 +76,36 @@ return [
             'intro' => '{brand} berekent de btw automatisch per factuurregel — 21%, 9% of 0%.',
             'sections' => [
                 ['Tarief kiezen', [
-                    'Kies bij elke factuurregel het juiste btw-tarief. Het hoge tarief is 21%, het lage 9%, en 0% gebruik je bijvoorbeeld bij btw-verlegd of export.',
+                    'Kies bij elke factuurregel het juiste btw-tarief. Het hoge tarief is 21%, het lage 9%, en 0% gebruik je bijvoorbeeld bij export. Voor btw verlegd is er een eigen vinkje op de factuur; zie het artikel Btw verlegd.',
                 ]],
                 ['KOR / geen btw', [
-                    'Val je onder de Kleine Ondernemersregeling (KOR)? Dan stel je 0% in en vermeldt {brand} automatisch de KOR-regeling op je factuur.',
+                    'Doe je mee aan de kleineondernemersregeling (KOR)? Zet dan elke regel op 0% en zet in je factuurvoettekst (Instellingen → Bedrijfsgegevens) dat je bent vrijgesteld van btw op grond van de kleineondernemersregeling. Die vermelding is verplicht.',
                 ]],
                 ['Btw-overzicht', [
                     'Per kwartaal vind je een overzicht van de berekende btw, dat je eenvoudig overneemt bij je aangifte.',
+                ]],
+            ],
+        ],
+
+        'btw-verlegd' => [
+            'category' => 'Facturen',
+            'title' => 'Btw verlegd op een factuur of offerte',
+            'intro' => 'Draagt je klant de btw af, zoals bij onderaanneming in de bouw? Dan zet je met één vinkje btw verlegd op het document.',
+            'sections' => [
+                ['Aanzetten', [
+                    'Vink bij het maken van de factuur of offerte, onder Klant & details, Btw verlegd aan. Alle regels rekenen dan met 0% en in het overzicht staat Btw verlegd in plaats van een btw-bedrag.',
+                ]],
+                ['Het btw-nummer van je klant', [
+                    'Bij btw verlegd hoort het btw-nummer van je klant op het document. Staat het al bij de klant, dan wordt het overgenomen. Staat het er nog niet, dan vul je het op het formulier in; het wordt bij de klant bewaard.',
+                ]],
+                ['Wat je klant ziet', [
+                    'Op de PDF en in het klantenportaal staat de vermelding btw verlegd, met de naam en het btw-nummer van je klant. De e-factuur (UBL en Peppol) krijgt de categorie voor verlegde btw.',
+                ]],
+                ['Termijnen, kopieën en terugkerende facturen', [
+                    'Een termijnfactuur of een factuur uit een offerte neemt de keuze van de offerte over. Een kopie en een terugkerende factuur nemen de keuze van de oorspronkelijke factuur over.',
+                ]],
+                ['In je btw-aangifte', [
+                    'De omzet van een verlegde factuur aan een Nederlandse klant komt in rubriek 1e. Bij een klant in een ander EU-land komt hij in rubriek 3b.',
                 ]],
             ],
         ],

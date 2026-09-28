@@ -2,7 +2,7 @@
 import { Head, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { t } from '@/i18n';
-import { eur } from '@/format.js';
+import { eur, todayLocal } from '@/format.js';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -31,7 +31,7 @@ const form = useForm({
   supplier_name: '',
   category: '',
   frequency: 'monthly',
-  next_run_on: new Date().toISOString().slice(0, 10),
+  next_run_on: todayLocal(),
   end_date: '',
   rows: [{ amount: null, rate: defaultVat, vat: 0 }],
   auto_paid: true,

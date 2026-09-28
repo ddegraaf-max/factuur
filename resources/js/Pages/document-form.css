@@ -139,6 +139,36 @@
 }
 .add-line-btn:hover { background: var(--brand-tint); }
 
+/* ===== Regels op een laptopscherm =====
+   Tot ongeveer 1460px breed bleef er naast de vaste kolommen (aantal, prijs,
+   korting, btw, totaal) nauwelijks ruimte voor de omschrijving over: op 1280px
+   was dat veld 40px breed. Daar krijgt de omschrijving een eigen rij en staan
+   de andere velden eronder, elk met zijn eigen label. */
+@media (min-width: 761px) and (max-width: 1460px) {
+  .lines-header { display: none; }
+  .line-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(0, 1.1fr) 32px;
+    gap: 10px 8px;
+    padding: 14px 0;
+  }
+  .line-desc { grid-column: 1 / -1; }
+  .line-desc-row select.product-select { flex: 0 1 190px; }
+  .line-field { display: block; min-width: 0; }
+  .line-field::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .line-field input, .line-field select, .line-field .vat-reversed-chip { width: 100%; }
+  .line-total-field::before { text-align: right; }
+  .li-remove { align-self: end; }
+}
+
 /* ===== Regels op mobiel: elke regel wordt een blok met labels ===== */
 @media (max-width: 760px) {
   .lines-header { display: none; }
@@ -234,4 +264,12 @@
 }
 @media (max-width: 560px) {
   .price-mode-toggle { margin-top: 8px; }
+}
+
+/* Btw verlegd: in de btw-kolom staat geen keuzelijst maar dit label. */
+.vat-reversed-chip {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 34px; padding: 0 10px; border-radius: 8px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  color: var(--text-2); font-size: 12.5px; font-weight: 600; white-space: nowrap;
 }

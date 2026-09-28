@@ -7,6 +7,11 @@ import Turnstile from '@/Components/Turnstile.vue';
 import LopraAuthHero from '@/Components/LopraAuthHero.vue';
 import { t } from '@/i18n';
 
+const props = defineProps({
+  // Gegevens uit de gratis factuurtool, als de bezoeker zijn factuur meenam.
+  prefill: { type: Object, default: null },
+});
+
 const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
 const brand = usePage().props.brand;
 
@@ -18,19 +23,26 @@ const taxId = market.tax_id || { label: 'Btw-nummer', placeholder: 'NL123456789B
 const companyTypes = Object.entries(market.company_types || { eenmanszaak: 'ZZP / Eenmanszaak' })
   .map(([value, label]) => ({ value, label }));
 const isPl = market.key === 'pl';
+// Nederland: een kort formulier met vier velden. Bedrijfsgegevens zoals het
+// KvK-nummer vul je daarna aan, via de startlijst op het dashboard. Polen houdt
+// het volledige formulier: het NIP is daar verplicht en vult de rest in.
+const simple = !isPl;
+const showPassword = ref(false);
 
 const form = useForm({
+  name: '',
   firstName: '',
   lastName: '',
-  email: '',
+  email: props.prefill?.email || '',
   password: '',
   password_confirmation: '',
-  companyName: '',
+  companyName: props.prefill?.companyName || '',
   companyType: companyTypes[0]?.value ?? 'eenmanszaak',
   kvkNumber: '',
   vatNumber: '',
   acceptTerms: false,
-  newsletter: true,
+  // Nieuws alleen voor wie er zelf voor kiest.
+  newsletter: false,
   'cf-turnstile-response': '',
 });
 
@@ -84,7 +96,17 @@ const lookupNip = async () => {
   }
 };
 
-const submit = () => form.post(route('register'));
+const submit = () => {
+  if (!simple) return form.post(route('register'));
+
+  // Het korte formulier stuurt alleen wat het vraagt.
+  form
+    .transform(({ name, email, password, companyName, acceptTerms, newsletter, ...rest }) => ({
+      name, email, password, companyName, acceptTerms, newsletter,
+      'cf-turnstile-response': rest['cf-turnstile-response'],
+    }))
+    .post(route('register'));
+};
 </script>
 
 <template>
@@ -105,7 +127,7 @@ const submit = () => form.post(route('register'));
           <li>{{ $t('Boekhouder gratis mee laten kijken') }}</li>
         </ul>
         <h2>{{ $t('Hoe werkt het?') }}</h2>
-        <p>{{ $t('Vul hiernaast je naam, e-mailadres en een wachtwoord in en bevestig je e-mailadres met de code die je ontvangt. Daarna vul je je bedrijfsgegevens in — met je KvK-nummer halen we die grotendeels automatisch op — en kun je meteen een klant toevoegen en factureren. Alles wat je in de proefperiode aanmaakt, blijft gewoon staan als je doorgaat.') }}</p>
+        <p>{{ $t('Vul hiernaast je naam, je bedrijfsnaam, je e-mailadres en een wachtwoord in en bevestig je e-mailadres met de code die je ontvangt. Daarna vul je je bedrijfsgegevens aan en kun je meteen een klant toevoegen en factureren. Alles wat je in de proefperiode aanmaakt, blijft gewoon staan als je doorgaat.') }}</p>
         <h2>{{ $t('Wat kost het?') }}</h2>
         <p>{{ $t('Het volledige facturatiepakket kost € 12,10 per maand (incl. 21% btw). Wil je ook de AI-functies, zoals bonnetjes scannen en een offerte maken uit een paar zinnen tekst? Dan kies je Slim voor € 21,18 per maand. Geen instapkosten, geen jaarcontract: je zegt op wanneer je wilt.') }}</p>
         <h2>{{ $t('Liever eerst kijken?') }}</h2>
@@ -127,7 +149,66 @@ const submit = () => form.post(route('register'));
         {{ $t('Heb je al een account?') }} <a :href="route('login')">{{ $t('Inloggen') }}</a>
       </div>
 
-      <form @submit.prevent="submit">
+      <div v-if="prefill" class="reg-carry">
+        {{ prefill.customer
+          ? $t('Je factuur voor :customer gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.', { customer: prefill.customer })
+          : $t('Je factuur gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.') }}
+      </div>
+
+      <!-- Nederland: vier velden -->
+      <form v-if="simple" @submit.prevent="submit">
+        <div class="form-group">
+          <label for="reg-name">{{ $t('Je naam') }} *</label>
+          <input id="reg-name" v-model="form.name" type="text" autocomplete="name" required />
+          <div v-if="form.errors.firstName || form.errors.lastName" class="field-error">{{ form.errors.firstName || form.errors.lastName }}</div>
+        </div>
+        <div class="form-group">
+          <label for="reg-company">{{ $t('Bedrijfsnaam') }} *</label>
+          <input id="reg-company" v-model="form.companyName" type="text" autocomplete="organization" required />
+          <div v-if="form.errors.companyName" class="field-error">{{ form.errors.companyName }}</div>
+        </div>
+        <div class="form-group">
+          <label for="reg-email">{{ $t('E-mailadres') }} *</label>
+          <input id="reg-email" v-model="form.email" type="email" autocomplete="email" required />
+          <div v-if="form.errors.email" class="field-error">{{ form.errors.email }}</div>
+        </div>
+        <div class="form-group">
+          <label for="reg-password">{{ $t('Wachtwoord') }} * <span class="muted">{{ $t('(minstens 8 tekens)') }}</span></label>
+          <div class="pw-field">
+            <input id="reg-password" v-model="form.password" :type="showPassword ? 'text' : 'password'" autocomplete="new-password" minlength="8" required />
+            <button type="button" class="pw-toggle" @click="showPassword = !showPassword">{{ showPassword ? $t('Verbergen') : $t('Tonen') }}</button>
+          </div>
+          <div v-if="form.password" class="password-strength">
+            <div class="bar"><div class="fill" :style="{ width: pwStrength.pct + '%', background: pwStrength.color }"></div></div>
+            <span class="label" :style="{ color: pwStrength.color }">{{ pwStrength.label }}</span>
+          </div>
+          <div v-if="form.errors.password" class="field-error">{{ form.errors.password }}</div>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" v-model="form.acceptTerms" />
+          <span>{{ $t('Ik ga akkoord met de') }} <a :href="route('voorwaarden')" target="_blank" rel="noopener">{{ $t('algemene voorwaarden') }}</a> {{ $t('en het') }} <a :href="route('privacy')" target="_blank" rel="noopener">{{ $t('privacybeleid') }}</a>. *</span>
+        </label>
+        <div v-if="form.errors.acceptTerms" class="field-error">{{ form.errors.acceptTerms }}</div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" v-model="form.newsletter" />
+          <span>{{ $t('Stuur me tips, productupdates en nieuws.') }}</span>
+        </label>
+
+        <Turnstile :sitekey="turnstileSitekey"
+                   @verified="t => form['cf-turnstile-response'] = t"
+                   @expired="() => form['cf-turnstile-response'] = ''" />
+        <div v-if="form.errors['cf-turnstile-response']" class="field-error">{{ form.errors['cf-turnstile-response'] }}</div>
+
+        <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
+          {{ form.processing ? $t('Bezig…') : $t('Start 14 dagen gratis') }}
+        </button>
+        <p class="reg-note">{{ $t('Geen betaalgegevens nodig. Je KvK-nummer en adres vul je daarna in.') }}</p>
+      </form>
+
+      <!-- Polen: volledig formulier met NIP -->
+      <form v-else @submit.prevent="submit">
         <div class="register-section">
           <div class="register-section-title"><span class="num">1</span> {{ $t('Jouw gegevens') }}</div>
           <div class="form-row">
@@ -221,3 +302,22 @@ const submit = () => form.post(route('register'));
     </div>
   </AuthLayout>
 </template>
+
+<style scoped>
+.pw-field { position: relative; }
+.pw-field input { padding-right: 96px; }
+/* Edge zet zelf een oogje in het veld; de knop Tonen doet hetzelfde. */
+.pw-field input::-ms-reveal, .pw-field input::-ms-clear { display: none; }
+.pw-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  border: none; background: none; padding: 6px 10px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 600; color: var(--text-3); cursor: pointer;
+}
+.pw-toggle:hover { color: var(--text); background: var(--surface-2); }
+.checkbox-row a { color: var(--brand); font-weight: 500; }
+.reg-note { margin: 12px 0 0; text-align: center; font-size: 12.5px; color: var(--text-3); }
+.reg-carry {
+  background: var(--success-bg); color: var(--success); border-radius: 10px;
+  padding: 11px 14px; margin-bottom: 16px; font-size: 13px; line-height: 1.5; font-weight: 500;
+}
+</style>

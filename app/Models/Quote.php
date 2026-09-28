@@ -27,7 +27,7 @@ class Quote extends Model
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',
-        'subtotal', 'vat_total', 'total', 'vat_breakdown',
+        'subtotal', 'vat_total', 'total', 'vat_breakdown', 'vat_reversed',
         'intro', 'notes', 'footer',
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
         'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
@@ -35,8 +35,9 @@ class Quote extends Model
     ];
 
     protected $casts = [
-        'quote_date' => 'date',
-        'valid_until' => 'date',
+        // Als jjjj-mm-dd naar het scherm; zie de toelichting bij Invoice.
+        'quote_date' => 'date:Y-m-d',
+        'valid_until' => 'date:Y-m-d',
         'sent_at' => 'datetime',
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
@@ -46,6 +47,7 @@ class Quote extends Model
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',
         'vat_breakdown' => 'array',
+        'vat_reversed' => 'boolean',
     ];
 
     protected static function booted(): void

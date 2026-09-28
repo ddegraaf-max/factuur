@@ -42,7 +42,9 @@ class InvoiceManager
                     ->find($data['brand_profile_id'])
                 : null;
 
-            $lines = $data['lines'] ?? [];
+            // Btw verlegd: geen btw op de regels, wel de vermelding op het document.
+            $reversed = \App\Support\VatReverse::requested($data);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
             $mode = $this->resolveMode($data, $customer->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
@@ -80,6 +82,7 @@ class InvoiceManager
                 'total' => $totals['total'],
                 'paid_total' => 0,
                 'vat_breakdown' => $totals['vat_breakdown'],
+                'vat_reversed' => $reversed,
 
                 'notes' => $data['notes'] ?? null,
                 'footer' => $customer->company->documentFooter($profile, $language),
@@ -98,7 +101,11 @@ class InvoiceManager
         }
 
         return DB::transaction(function () use ($invoice, $data) {
-            $lines = $data['lines'] ?? [];
+            // Zonder keuze op het formulier blijft het document zoals het was.
+            $reversed = array_key_exists('vat_reversed', $data)
+                ? \App\Support\VatReverse::requested($data)
+                : (bool) $invoice->vat_reversed;
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
             $mode = $this->resolveMode($data, $invoice->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
@@ -177,6 +184,7 @@ class InvoiceManager
                 'vat_total' => $totals['vat_total'],
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
+                'vat_reversed' => $reversed,
                 'notes' => array_key_exists('notes', $data) ? $data['notes'] : $invoice->notes,
             ]);
 

@@ -1109,5 +1109,19 @@
   "Demo bekijken": "View the demo",
   "Kennisbank": "Knowledge base",
   "Helpcentrum": "Help centre",
-  "Veelgestelde vragen": "Frequently asked questions"
+  "Veelgestelde vragen": "Frequently asked questions",
+  "Vul een geldig btw-nummer in, met de landcode ervoor (bijvoorbeeld NL123456789B01).": "Enter a valid VAT number, starting with the country code (for example NL123456789B01).",
+  "Bij btw verlegd hoort het btw-nummer van de klant op het document. Vul het hier in.": "With reverse-charged VAT the customer's VAT number must be on the document. Enter it here.",
+  "Bij btw verlegd hoort het btw-nummer van de klant op het document. Vul dat eerst in bij :customer.": "With reverse-charged VAT the customer's VAT number must be on the document. Add it to :customer first.",
+  "Optioneel: true als de btw is verlegd naar de klant (bijvoorbeeld onderaanneming in de bouw). Alle regels komen dan op 0% en op het document staat \"btw verlegd\" met het btw-nummer van de klant. Dat nummer moet bij de klant zijn ingevuld.": "Optional: true when VAT is reverse-charged to the customer (for example subcontracting in construction). All lines are then set to 0% and the document states \"VAT reverse-charged\" with the customer's VAT number. That number must be filled in for the customer.",
+  "Vul je bedrijfsgegevens in": "Fill in your company details",
+  "Je adres en rekeningnummer komen op elke factuur.": "Your address and bank account appear on every invoice.",
+  "Je adres, KvK-nummer en IBAN komen op elke factuur.": "Your address, KvK number and IBAN appear on every invoice.",
+  "Voeg je eerste klant toe": "Add your first customer",
+  "Naam en e-mailadres zijn genoeg om te beginnen.": "A name and e-mail address are enough to start.",
+  "Verstuur je eerste factuur of offerte": "Send your first invoice or quote",
+  "Je klant krijgt een mail met de PDF en een link om online te bekijken.": "Your customer receives an e-mail with the PDF and a link to view it online.",
+  "Btw verlegd. De btw is verlegd naar de afnemer (artikel 12 Wet OB).": "VAT reverse-charged. The VAT is reverse-charged to the customer (article 12 of the Dutch VAT Act).",
+  "Vrijgesteld van btw. Op deze factuur is geen btw van toepassing.": "Exempt from VAT. No VAT applies to this invoice.",
+  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Welcome! Your invoice for :customer is ready as a draft. Check it and send it."
 }
