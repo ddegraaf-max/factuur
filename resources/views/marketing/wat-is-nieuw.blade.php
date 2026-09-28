@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.2</div>
+        <h2>Snellere website</h2>
+        <ul class="tl-list">
+          <li><b>Sneller in beeld</b> — de lettertypen van de website komen nu van ons eigen domein in plaats van Google. Dat scheelt twee verbindingen; op een mobiele verbinding staat de pagina merkbaar eerder in beeld.</li>
+          <li><b>Geen verzoeken naar Google</b> — bij het bezoeken van de website gaat er geen verzoek meer naar Google Fonts.</li>
+          <li><b>Inloggen en registreren</b> — deze pagina's tonen hun kop, uitleg en links ook zonder JavaScript.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.1</div>
         <h2>Prijsaanvraag: logo en ondertekening</h2>
         <ul class="tl-list">

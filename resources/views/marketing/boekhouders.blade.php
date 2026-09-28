@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
 @section('title', 'Voor boekhouders en accountants — gratis meekijken — ' . brand('name'))
-@section('description', 'Werk je als boekhouder of accountant voor zzp\'ers en mkb? Kijk gratis mee in de administratie van je klanten in ' . brand('name') . ': btw-overzicht, jaaroverzicht en exports, met één inlog voor al je klanten.')
+@section('description', 'Boekhouder of accountant? Kijk gratis mee in de administratie van je klanten in ' . brand('name') . ': btw-overzicht, jaaroverzicht en exports, met één inlog.')
 
 @section('content')
 <section class="page-hero">

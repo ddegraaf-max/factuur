@@ -1,0 +1,9 @@
+Lettertypen voor de openbare pagina's, vanaf het eigen domein geserveerd.
+
+Bricolage Grotesque, DM Sans en JetBrains Mono zijn uitgegeven onder de
+SIL Open Font License 1.1 (https://openfontlicense.org). De bestanden zijn de
+ongewijzigde woff2-varianten (latin en latin-ext) zoals Google Fonts ze levert.
+
+- Bricolage Grotesque: https://fonts.google.com/specimen/Bricolage+Grotesque
+- DM Sans: https://fonts.google.com/specimen/DM+Sans
+- JetBrains Mono: https://fonts.google.com/specimen/JetBrains+Mono

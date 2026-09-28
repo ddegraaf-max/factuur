@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Factureren met AI — koppel je administratie aan Claude of ChatGPT — ' . brand('name'))
-@section('description', brand('name') . ' is het Nederlandse facturatieprogramma met AI: bonnetjes automatisch inboeken, offertes uit een omschrijving en een directe koppeling met Claude en ChatGPT. Vraag je AI-assistent een factuur te maken — hij staat als concept klaar.')
+@section('title', 'Factureren met AI: koppel Claude of ChatGPT — ' . brand('name'))
+@section('description', brand('name') . ' is facturatiesoftware met AI: bonnetjes automatisch inboeken, offertes uit een omschrijving en een koppeling met Claude en ChatGPT.')
 
 @push('styles')
 <style>
