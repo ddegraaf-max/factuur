@@ -221,7 +221,13 @@ return [
 
         'deelfactuur-termijnfactuur' => [
             'category' => 'Factureren',
-            'updated' => '2026-09-03',
+            'updated' => '2026-09-28',
+            'tool' => [
+                'route' => 'bouw',
+                'title' => 'Werk je in de bouw?',
+                'text' => 'Leg bij de offerte een termijnplan vast en maak van elke termijn met één klik een factuur. Met prijsaanvragen bij onderaannemers erbij.',
+                'label' => 'Bekijk het programma voor de bouw',
+            ],
             'title' => "Deelfactuur en termijnfactuur: in delen factureren zonder gedoe",
             'intro' => "Bij een grote opdracht wil je niet maanden op je geld wachten. Met deelfacturen of termijnen factureer je tussentijds. Zo spreek je het af, zo zet je het op de factuur en zo blijft de btw kloppen.",
             'sections' => [
@@ -594,7 +600,13 @@ return [
 
         'incassokosten-wettelijke-rente-berekenen' => [
             'category' => 'Betaald krijgen',
-            'updated' => '2026-09-03',
+            'updated' => '2026-09-28',
+            'tool' => [
+                'route' => 'incassokosten-calculator',
+                'title' => 'Direct uitrekenen?',
+                'text' => 'Vul het factuurbedrag en de vervaldatum in en je ziet de incassokosten, de rente per periode en een tekst voor je aanmaning.',
+                'label' => 'Naar de calculator',
+            ],
             'title' => "Incassokosten en wettelijke rente berekenen: de staffel (2026)",
             'intro' => "Betaalt een klant te laat, dan mag je incassokosten en rente rekenen. Hoeveel precies ligt vast in de wet. De staffel, het verschil tussen zakelijke klanten en consumenten, en hoe je het op de aanmaning zet.",
             'sections' => [
@@ -609,8 +621,8 @@ return [
                     "Bij zakelijke klanten mag je bij elke te late betaling minimaal 40 euro rekenen, ook bij een factuur van 25 euro. Hogere kosten mag je zakelijk afspreken in je voorwaarden; de wettelijke staffel geldt dan als ondergrens. Bij consumenten is de staffel juist het maximum.",
                 ]],
                 ["Wettelijke rente", [
-                    "Naast incassokosten mag je rente rekenen over de hoofdsom vanaf de dag na de vervaldatum. Voor zakelijke klanten geldt de wettelijke handelsrente: de ECB-rente plus acht procentpunt, elk half jaar opnieuw vastgesteld. In de eerste helft van 2026 was dat 10,15%. Voor consumenten geldt de gewone wettelijke rente, die een stuk lager ligt. Het actuele percentage staat op rijksoverheid.nl.",
-                    "Rekenvoorbeeld: 5.000 euro, 60 dagen te laat, 10,15% handelsrente: 5.000 maal 10,15% maal 60 gedeeld door 365 is ongeveer 83 euro.",
+                    "Naast incassokosten mag je rente rekenen over de hoofdsom vanaf de dag na de vervaldatum. Voor zakelijke klanten geldt de wettelijke handelsrente: de ECB-rente plus acht procentpunt, elk half jaar opnieuw vastgesteld. Sinds 1 juli 2026 is dat 10,4%; in de eerste helft van 2026 was het 10,15%. Voor consumenten geldt de gewone wettelijke rente, sinds 1 januari 2026 4%. Het actuele percentage staat op rijksoverheid.nl.",
+                    "Rekenvoorbeeld: 5.000 euro, 60 dagen te laat, 10,4% handelsrente: 5.000 maal 10,4% maal 60 gedeeld door 365 is ongeveer 85 euro.",
                 ]],
                 ["Zo zet je het op de aanmaning", [
                     "Vermeld de oorspronkelijke factuur met nummer, datum en bedrag, de vervaldatum, het bedrag aan incassokosten met een verwijzing naar de wettelijke staffel, de rente tot een genoemde datum en het totaal. Geef een korte, duidelijke termijn en zeg wat er daarna gebeurt: overdracht aan een incassobureau. Software die aanmaningen maakt, rekent de kosten en rente automatisch uit op basis van de vervaldatum.",

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PageView;
 use App\Services\DemoDataBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,6 +42,9 @@ class DemoController extends Controller
 
             return back()->with('error', __('De demo kon even niet worden gestart. Probeer het zo nog eens.'));
         }
+
+        // Mijlpaal voor de marketing-inzichten: de demo-omgeving zelf wordt later opgeruimd.
+        PageView::milestone($request, PageView::EVENT_DEMO);
 
         Auth::login($user);
         $request->session()->regenerate();

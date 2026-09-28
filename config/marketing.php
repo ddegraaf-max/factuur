@@ -30,6 +30,7 @@ $nl = [
             ['route' => 'gratis-factuur', 'label' => 'Gratis factuur maken'],
             ['route' => 'btw-calculator', 'label' => 'Btw-calculator'],
             ['route' => 'uurtarief-calculator', 'label' => 'Uurtarief-calculator'],
+            ['route' => 'incassokosten-calculator', 'label' => 'Incassokosten berekenen'],
             ['route' => 'kennisbank', 'label' => 'Kennisbank'],
             ['route' => 'overstappen.van', 'params' => ['wefact'], 'label' => 'Overstappen van WeFact'],
             ['route' => 'overstappen.van', 'params' => ['moneybird'], 'label' => 'Overstappen van Moneybird'],
@@ -38,6 +39,7 @@ $nl = [
         ['title' => 'Bedrijf', 'links' => [
             ['route' => 'over', 'label' => 'Over ons'],
             ['route' => 'boekhouders', 'label' => 'Voor boekhouders'],
+            ['route' => 'bouw', 'label' => 'Voor de bouw'],
             ['route' => 'contact', 'label' => 'Contact'],
         ]],
         ['title' => 'Hulp', 'links' => [

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Mail\VerificationCodeMail;
 use App\Models\Company;
+use App\Models\PageView;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,9 @@ class RegisteredUserController extends Controller
         if ($pl && filled($request->input('vatNumber'))) {
             $request->merge(['vatNumber' => \App\Services\NipService::normalize($request->input('vatNumber'))]);
         }
+
+        // Elke poging telt, ook een die op de controle strandt: zo zie je waar het formulier mensen verliest.
+        PageView::milestone($request, PageView::EVENT_REGISTER_TRIED);
 
         $data = $request->validate([
             'firstName' => ['required', 'string', 'max:60'],
@@ -103,6 +107,9 @@ class RegisteredUserController extends Controller
 
             return $user;
         });
+
+        // Mijlpaal voor de marketing-inzichten, met de herkomst van het bezoek van vandaag.
+        PageView::milestone($request, PageView::EVENT_REGISTERED);
 
         $code = $user->generateVerificationCode();
         Mail::to($user->email)->send(new VerificationCodeMail($user, $code));

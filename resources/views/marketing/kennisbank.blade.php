@@ -30,7 +30,7 @@
 
     <div style="max-width:760px;margin:56px auto 0;background:var(--brand-tint);border:1px solid var(--brand-border);border-radius:16px;padding:28px;text-align:center;">
       <h3 style="font-size:20px;margin-bottom:8px;">Liever meteen aan de slag?</h3>
-      <p style="color:var(--text-2);margin:0 0 18px;">Maak <a href="{{ route('gratis-factuur') }}" style="color:var(--brand);font-weight:600;">gratis een factuur</a> zonder account, of reken je <a href="{{ route('uurtarief-calculator') }}" style="color:var(--brand);font-weight:600;">uurtarief</a> en <a href="{{ route('btw-calculator') }}" style="color:var(--brand);font-weight:600;">btw</a> uit met onze gratis tools.</p>
+      <p style="color:var(--text-2);margin:0 0 18px;">Maak <a href="{{ route('gratis-factuur') }}" style="color:var(--brand);font-weight:600;">gratis een factuur</a> zonder account, of reken je <a href="{{ route('uurtarief-calculator') }}" style="color:var(--brand);font-weight:600;">uurtarief</a>, <a href="{{ route('btw-calculator') }}" style="color:var(--brand);font-weight:600;">btw</a> of <a href="{{ route('incassokosten-calculator') }}" style="color:var(--brand);font-weight:600;">incassokosten en rente</a> uit met onze gratis tools.</p>
     </div>
   </div>
 </section>

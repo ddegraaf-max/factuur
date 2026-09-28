@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
 @section('title', 'Gratis factuur maken (PDF) — zonder account — ' . brand('name'))
-@section('description', 'Maak gratis een professionele factuur als PDF. Zonder account, zonder watermerk, met correcte btw. Vul je gegevens in en download direct — gemaakt voor Nederlandse zzp\'ers en mkb.')
+@section('description', 'Maak gratis een factuur als PDF: zonder account, zonder watermerk en met de juiste btw. Invullen en direct downloaden, voor zzp\'ers en mkb.')
 
 @push('styles')
 <style>

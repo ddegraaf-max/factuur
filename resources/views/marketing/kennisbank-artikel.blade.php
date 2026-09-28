@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', $article['title'] . ' — Kennisbank — ' . brand('name'))
-@section('description', $article['intro'])
+@section('title', \App\Support\Seo::title($article['title'] . ' — Kennisbank — ' . brand('name'), $article['title'] . ' — ' . brand('name'), $article['title']))
+@section('description', \App\Support\Seo::description($article['intro']))
 
 @push('styles')
 <style>
@@ -47,9 +47,18 @@
       <a class="side-link" href="{{ route('gratis-factuur') }}">Gratis factuur maken</a>
       <a class="side-link" href="{{ route('btw-calculator') }}">Btw-calculator</a>
       <a class="side-link" href="{{ route('uurtarief-calculator') }}">Uurtarief-calculator</a>
+      <a class="side-link" href="{{ route('incassokosten-calculator') }}">Incassokosten berekenen</a>
     </aside>
 
     <article class="prose" style="margin:0;">
+      @if (! empty($article['tool']) && \Illuminate\Support\Facades\Route::has($article['tool']['route']))
+        {{-- Hoort er een rekenhulp of een eigen pagina bij het artikel, dan staat die bovenaan. --}}
+        <div class="article-cta" style="margin:0 0 28px;">
+          <h3>{{ $article['tool']['title'] }}</h3>
+          <p>{{ $article['tool']['text'] }}</p>
+          <a href="{{ route($article['tool']['route']) }}" class="btn btn-primary">{{ $article['tool']['label'] }} →</a>
+        </div>
+      @endif
       @foreach ($article['sections'] as $section)
         <h2>{{ $section[0] }}</h2>
         @foreach ($section[1] as $paragraph)

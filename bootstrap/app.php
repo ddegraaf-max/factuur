@@ -53,6 +53,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'webhooks/recommand',
             'webhooks/inbound-mail/*',
             'mcp/*',
+            // Seintje van de bezoekersteller (sendBeacon kan geen token meesturen).
+            'm/gezien',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

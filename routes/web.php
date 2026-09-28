@@ -110,10 +110,14 @@ Route::post('/gratis-factuur-maken', [\App\Http\Controllers\FreeInvoiceControlle
     ->middleware(['throttle:15,1', 'turnstile'])->name('gratis-factuur.download')->middleware('market:nl');
 Route::view('/btw-calculator', 'marketing.btw-calculator')->name('btw-calculator')->middleware('market:nl');
 Route::view('/uurtarief-calculator', 'marketing.uurtarief-calculator')->name('uurtarief-calculator')->middleware('market:nl');
+Route::get('/incassokosten-berekenen', [\App\Http\Controllers\CollectionCostsController::class, 'show'])
+    ->middleware(['market:nl', 'throttle:60,1'])->name('incassokosten-calculator');
 
 // ---------- EXTRA MARKETINGPAGINA'S ----------
 Route::view('/facturatie-met-ai', 'marketing.facturatie-met-ai')->name('ai')->middleware('market:nl');
 Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders')->middleware('market:nl');
+// Voor aannemers en bouwbedrijven: offertes, termijnfacturen en prijsaanvragen bij onderaannemers.
+Route::view('/factuurprogramma-bouw', 'marketing.bouw')->name('bouw')->middleware('market:nl');
 
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
@@ -195,6 +199,12 @@ Route::get('/kennisbank/{slug}', function (string $slug) {
 // (zie MarketingStatsController voor de toegangscheck).
 Route::get('/marketing-inzichten', [\App\Http\Controllers\MarketingStatsController::class, 'index'])
     ->middleware('auth')->name('marketing.inzichten');
+// Seintje uit de browser: de bezoeken van vandaag van deze bezoeker zijn van een mens.
+Route::post('/m/gezien', function (\Illuminate\Http\Request $request) {
+    \App\Models\PageView::confirm($request);
+
+    return response()->noContent();
+})->middleware('throttle:60,1')->name('pageview.confirm');
 
 // Eigenaar: alle administraties bekijken en (test)accounts definitief opruimen.
 Route::middleware(['auth', 'owner'])->prefix('eigenaar')->name('owner.')->group(function () {

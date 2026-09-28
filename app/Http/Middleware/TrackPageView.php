@@ -13,7 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
  * privacyvriendelijk (geen cookies, geen IP-opslag), dus zonder cookiebanner.
  *
  * - Alleen GET-verzoeken op de allowlist hieronder; ingelogde gebruikers en
- *   bots tellen niet mee.
+ *   bots die zich als bot melden tellen niet mee. Robots met een gewone
+ *   browsernaam komen wel binnen; een bezoek telt pas als mens na het seintje
+ *   uit de browser (PageView::confirm, layouts/pageview-signal.blade.php).
  * - Unieke bezoekers per dag via een hash van IP + user-agent + dag + app-key.
  *   De hash is elke dag anders en is niet terug te rekenen naar een persoon.
  * - Schrijft pas ná de response (terminate), zodat de bezoeker er niets van
@@ -27,11 +29,11 @@ class TrackPageView
         '/veelgestelde-vragen', '/wat-is-nieuw', '/roadmap', '/status',
         '/privacy', '/voorwaarden', '/cookies', '/helpcentrum', '/kennisbank',
         '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
-        '/facturatie-met-ai', '/boekhouders',
+        '/facturatie-met-ai', '/boekhouders', '/incassokosten-berekenen', '/factuurprogramma-bouw',
     ];
 
-    /** Padprefixen die we meten (artikelpagina's). */
-    private const PREFIXES = ['/helpcentrum/', '/kennisbank/'];
+    /** Padprefixen die we meten (artikel- en overstappagina's). */
+    private const PREFIXES = ['/helpcentrum/', '/kennisbank/', '/overstappen-van/'];
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -64,9 +66,7 @@ class TrackPageView
                 'utm_medium' => $this->utm($request, 'utm_medium'),
                 'utm_campaign' => $this->utm($request, 'utm_campaign'),
                 'device' => preg_match('/Mobile|Android|iPhone|iPad/i', $userAgent) ? 'mobile' : 'desktop',
-                'visitor_hash' => substr(hash('sha256', implode('|', [
-                    $request->ip(), $userAgent, now()->toDateString(), config('app.key'),
-                ])), 0, 32),
+                'visitor_hash' => PageView::visitorHash($request),
             ]);
         } catch (\Throwable $e) {
             Log::warning('Pageview niet geregistreerd', ['error' => $e->getMessage()]);

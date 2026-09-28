@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Verwerkersovereenkomst ' . brand('name') . ' — AVG-afspraken voor jouw administratie')
-@section('description', 'De verwerkersovereenkomst tussen jou (verwerkingsverantwoordelijke) en Creditline B.V. / ' . brand('name') . ' (verwerker): doel, subverwerkers, beveiliging, datalekken, bewaartermijn en verwijdering. Automatisch van kracht bij gebruik.')
+@section('title', 'Verwerkersovereenkomst (AVG) — ' . brand('name'))
+@section('description', 'De verwerkersovereenkomst van ' . brand('name') . ': doel, subverwerkers, beveiliging, datalekken, bewaartermijn en verwijdering. Geldt automatisch bij gebruik.')
 
 @section('content')
 <style>

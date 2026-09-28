@@ -468,7 +468,7 @@
   .footer-links a { font-size: 13.5px; color: rgba(255,255,255,0.55); transition: color 0.15s; }
   .footer-links a:hover { color: white; }
   .footer-bottom { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 12.5px; color: rgba(255,255,255,0.4); }
-  .footer-bottom-links { display: flex; gap: 18px; }
+  .footer-bottom-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
   .footer-bottom-links a { color: rgba(255,255,255,0.55); }
   .footer-bottom-links a:hover { color: rgba(255,255,255,0.8); }
   .footer-trademark { margin-top: 16px; font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.35); }
@@ -619,6 +619,7 @@
   });
 })();
 </script>
+@include('layouts.pageview-signal')
 
 </body>
 </html>

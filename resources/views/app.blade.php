@@ -102,6 +102,7 @@
                 </nav>
             </main>
         </div>
+        @include('layouts.pageview-signal')
     @else
         @inertia
     @endif

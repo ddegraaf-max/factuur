@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', $article['title'] . ' — Helpcentrum — ' . brand('name'))
-@section('description', $article['intro'])
+@section('title', \App\Support\Seo::title($article['title'] . ' — Helpcentrum — ' . brand('name'), $article['title'] . ' — ' . brand('name'), $article['title']))
+@section('description', \App\Support\Seo::description($article['intro'], 'Stap voor stap uitgelegd in het helpcentrum van ' . brand('name') . '.'))
 
 @push('styles')
 <style>

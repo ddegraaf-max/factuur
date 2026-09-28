@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-@section('title', 'Overstappen van ' . $from['name'] . ' naar ' . brand('name') . ' — in 10 minuten geregeld')
-@section('description', 'Stap over van ' . $from['name'] . ' naar ' . brand('name') . ': klanten, producten en openstaande facturen neem je met de overstapwizard in tien minuten over. Onbeperkt factureren, offertes met digitale ondertekening, iDEAL, Peppol en incasso — zonder verbruikslimieten.')
+@section('title', 'Overstappen van ' . $from['name'] . ' naar ' . brand('name'))
+@section('description', 'Stap over van ' . $from['name'] . ' naar ' . brand('name') . ': de overstapwizard neemt klanten, producten en openstaande facturen in tien minuten mee. Zonder verbruikslimieten.')
 
 @section('content')
 <style>

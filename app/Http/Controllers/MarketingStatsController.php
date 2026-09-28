@@ -5,10 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\PageView;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Intern marketingdashboard op /marketing-inzichten: bezoekers, herkomst,
- * populaire pagina's en de funnel (bezoek → demo → registratie).
+ * populaire pagina's en de trechter (bezoek → demo → registratie).
+ *
+ * Geteld worden mensen: bezoeken waarvan de browser een teken van leven gaf
+ * (PageView::confirm). Alles daarbuiten staat er als 'robots en kale verzoeken'
+ * naast, zodat het verschil zichtbaar blijft.
  *
  * Alleen zichtbaar voor de eigenaar: e-mailadressen uit MARKETING_STATS_EMAILS
  * of — zolang die variabele leeg is — de gebruiker met id 1.
@@ -22,10 +27,13 @@ class MarketingStatsController extends Controller
 
         $days = 30;
         $from = now()->subDays($days - 1)->toDateString();
+        $period = fn () => PageView::query()->where('viewed_on', '>=', $from);
+        // Een bezoeker is een hash op een dag; dezelfde persoon telt morgen opnieuw.
+        $key = $this->visitorKey();
+        $visitors = "COUNT(DISTINCT {$key})";
 
-        $perDay = PageView::query()
-            ->where('viewed_on', '>=', $from)
-            ->selectRaw('viewed_on, COUNT(*) AS views, COUNT(DISTINCT visitor_hash) AS visitors')
+        $perDay = $period()->views()
+            ->selectRaw("viewed_on, {$visitors} AS requests, COUNT(DISTINCT CASE WHEN confirmed_at IS NOT NULL THEN {$key} END) AS people")
             ->groupBy('viewed_on')
             ->get()
             ->keyBy(fn ($row) => $row->viewed_on->toDateString());
@@ -37,54 +45,76 @@ class MarketingStatsController extends Controller
 
             return [
                 'date' => $date,
-                'views' => (int) ($row->views ?? 0),
-                'visitors' => (int) ($row->visitors ?? 0),
+                'requests' => (int) ($row->requests ?? 0),
+                'people' => (int) ($row->people ?? 0),
             ];
         });
 
-        $topPages = PageView::query()
-            ->where('viewed_on', '>=', $from)
-            ->selectRaw('path, COUNT(*) AS views, COUNT(DISTINCT visitor_hash) AS visitors')
+        $topPages = $period()->views()->human()
+            ->selectRaw("path, {$visitors} AS visitors, COUNT(*) AS views")
             ->groupBy('path')
-            ->orderByDesc('views')
+            ->orderByDesc('visitors')
+            ->limit(15)
+            ->get();
+
+        $sources = $period()->views()->human()
+            ->selectRaw("COALESCE(utm_source, referrer_host) AS source, {$visitors} AS visitors")
+            ->where(fn ($q) => $q->whereNotNull('referrer_host')->orWhereNotNull('utm_source'))
+            ->groupByRaw('COALESCE(utm_source, referrer_host)')
+            ->orderByDesc('visitors')
             ->limit(12)
             ->get();
 
-        $topReferrers = PageView::query()
-            ->where('viewed_on', '>=', $from)
-            ->whereNotNull('referrer_host')
-            ->selectRaw('referrer_host, COUNT(*) AS views')
-            ->groupBy('referrer_host')
-            ->orderByDesc('views')
-            ->limit(10)
+        // Zoekmachines sturen hun naam mee; dat is ook zonder seintje een bruikbaar teken.
+        $searchPages = $period()->views()->fromSearch()
+            ->selectRaw("path, {$visitors} AS visitors")
+            ->groupBy('path')
+            ->orderByDesc('visitors')
+            ->limit(12)
             ->get();
 
-        $topSources = PageView::query()
-            ->where('viewed_on', '>=', $from)
-            ->whereNotNull('utm_source')
-            ->selectRaw('utm_source, COUNT(*) AS views')
-            ->groupBy('utm_source')
-            ->orderByDesc('views')
-            ->limit(10)
-            ->get();
+        $count = fn ($query) => (int) $query->selectRaw("{$visitors} AS n")->value('n');
+        $events = fn (string $event) => $count($period()->where('event', $event));
 
         $fromMoment = now()->subDays($days - 1)->startOfDay();
-        $registrations = Company::where('is_demo', false)->where('created_at', '>=', $fromMoment)->count();
-        $demoStarts = Company::where('is_demo', true)->where('created_at', '>=', $fromMoment)->count();
+        $people = $count($period()->views()->human());
+        $requests = $count($period()->views());
+
+        $signups = $period()->where('event', PageView::EVENT_REGISTERED)
+            ->orderByDesc('id')->limit(20)
+            ->get(['viewed_on', 'referrer_host', 'utm_source', 'utm_campaign', 'device']);
 
         return view('marketing.inzichten', [
             'series' => $series,
             'topPages' => $topPages,
-            'topReferrers' => $topReferrers,
-            'topSources' => $topSources,
+            'sources' => $sources,
+            'searchPages' => $searchPages,
+            'signups' => $signups,
             'totals' => [
-                'views' => $series->sum('views'),
-                'visitors' => $series->sum('visitors'),
-                'registrations' => $registrations,
-                'demo_starts' => $demoStarts,
+                'people' => $people,
+                'robots' => max(0, $requests - $people),
+                'search' => $count($period()->views()->fromSearch()),
+                'registrations' => Company::where('is_demo', false)->where('created_at', '>=', $fromMoment)->count(),
             ],
+            'funnel' => [
+                ['label' => 'Bezoekers', 'n' => $people],
+                ['label' => 'Demopagina bekeken', 'n' => $count($period()->views()->human()->where('path', '/demo'))],
+                ['label' => 'Demo gestart', 'n' => $events(PageView::EVENT_DEMO)],
+                ['label' => 'Registratiepagina bekeken', 'n' => $count($period()->views()->human()->where('path', '/register'))],
+                ['label' => 'Formulier verstuurd', 'n' => $events(PageView::EVENT_REGISTER_TRIED)],
+                ['label' => 'Geregistreerd', 'n' => $events(PageView::EVENT_REGISTERED)],
+            ],
+            'measuredSince' => PageView::query()->views()->human()->min('viewed_on'),
             'days' => $days,
         ]);
+    }
+
+    /** Hash en dag samen, in de schrijfwijze van de database. */
+    private function visitorKey(): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "visitor_hash || '-' || viewed_on"
+            : "visitor_hash || '-' || viewed_on::text";
     }
 
     private function mayView(?\App\Models\User $user): bool

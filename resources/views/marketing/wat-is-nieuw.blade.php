@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.61.0</div>
+        <h2>Incassokosten berekenen en een pagina voor de bouw</h2>
+        <ul class="tl-list">
+          <li><b>Incassokosten en rente berekenen</b> — een nieuwe gratis <a href="{{ route('incassokosten-calculator') }}">calculator</a>: vul het factuurbedrag en de vervaldatum in en je ziet de wettelijke incassokosten, de rente per periode en een tekst voor je aanmaning. Met de percentages van 2026, voor zakelijke klanten en consumenten.</li>
+          <li><b>Voor de bouw</b> — op <a href="{{ route('bouw') }}">één pagina</a> staat wat {{ brand('name') }} doet voor aannemers en bouwbedrijven: offertes met handtekening, termijnfacturen en prijsaanvragen bij onderaannemers.</li>
+          <li><b>Rentepercentages bijgewerkt</b> — het kennisbankartikel over incassokosten noemt de handelsrente van 10,4% die sinds 1 juli 2026 geldt.</li>
+          <li><b>Voettekst op de telefoon</b> — de links onderaan de website pasten niet op een smal scherm, waardoor de pagina zijwaarts kon schuiven. Ze lopen nu door op een volgende regel.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.2</div>
         <h2>Snellere website</h2>
         <ul class="tl-list">

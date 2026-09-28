@@ -112,7 +112,7 @@ class BrandEvidenceService
             ->whereBetween('sent_at', [$start, $end])->distinct('company_id')->count('company_id');
 
         $views = class_exists(PageView::class)
-            ? PageView::whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])
+            ? PageView::views()->whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])
             : null;
 
         return [
@@ -126,8 +126,8 @@ class BrandEvidenceService
             'offertes_verstuurd' => $quotesSent,
             'documentmails_met_merk' => $invoicesSent + $quotesSent,
             'bezoekers_website' => $views ? (int) $views->distinct('visitor_hash')->count('visitor_hash') : null,
-            'paginaweergaven_website' => $views ? (int) PageView::whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])->count() : null,
-            'homepage_weergaven' => $views ? (int) PageView::whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])->where('path', '/')->count() : null,
+            'paginaweergaven_website' => $views ? (int) PageView::views()->whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])->count() : null,
+            'homepage_weergaven' => $views ? (int) PageView::views()->whereBetween('viewed_on', [$start->toDateString(), $end->toDateString()])->where('path', '/')->count() : null,
         ];
     }
 

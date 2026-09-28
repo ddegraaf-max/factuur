@@ -17,7 +17,10 @@ class SeoMetaTest extends TestCase
     private const PAGES = [
         '/', '/facturatie-met-ai', '/kennisbank', '/boekhouders', '/over-ons', '/contact',
         '/veelgestelde-vragen', '/helpcentrum', '/roadmap', '/wat-is-nieuw', '/status',
-        '/privacy', '/voorwaarden', '/demo', '/login', '/register',
+        '/privacy', '/voorwaarden', '/demo', '/login', '/register', '/btw-calculator', '/uurtarief-calculator',
+        '/gratis-factuur-maken', '/incassokosten-berekenen', '/cookies', '/verwerkersovereenkomst',
+        '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
+        '/factuurprogramma-bouw',
     ];
 
     private function meta(string $html, string $pattern): string
@@ -43,6 +46,45 @@ class SeoMetaTest extends TestCase
         }
 
         $this->assertSame(count($titles), count(array_unique($titles)), 'Elke pagina heeft een eigen title');
+    }
+
+    public function test_articles_get_a_title_and_description_that_fit(): void
+    {
+        $paths = array_merge(
+            array_map(fn ($slug) => '/kennisbank/' . $slug, array_keys(config('kennisbank.articles'))),
+            array_map(fn ($slug) => '/helpcentrum/' . $slug, array_keys(config('help.articles'))),
+        );
+
+        $titles = [];
+        foreach ($paths as $path) {
+            $html = (string) $this->get($path)->assertOk()->getContent();
+            $title = $this->meta($html, '#<title[^>]*>(.*?)</title>#s');
+            $description = $this->meta($html, '#<meta name="description" content="([^"]*)"#');
+
+            $this->assertLessThanOrEqual(65, mb_strlen($title), "Title van {$path} is te lang: {$title}");
+            $this->assertGreaterThanOrEqual(70, mb_strlen($description), "Description van {$path} is te kort: {$description}");
+            $this->assertLessThanOrEqual(165, mb_strlen($description), "Description van {$path} is te lang: {$description}");
+            $titles[$path] = $title;
+        }
+
+        $this->assertSame(count($titles), count(array_unique($titles)), 'Elk artikel heeft een eigen title');
+    }
+
+    public function test_long_texts_are_cut_at_a_sentence_or_a_word(): void
+    {
+        $this->assertSame('Kort — Merk', \App\Support\Seo::title('Kort — Kennisbank met een heel lange toevoeging erachteraan die niet past — Merk', 'Kort — Merk'));
+
+        $long = 'Betaalt een klant te laat, dan mag je incassokosten en rente rekenen. Hoeveel precies ligt vast in de wet. '
+            . 'De staffel, het verschil tussen zakelijke klanten en consumenten, en hoe je het op de aanmaning zet.';
+        $this->assertSame(
+            'Betaalt een klant te laat, dan mag je incassokosten en rente rekenen. Hoeveel precies ligt vast in de wet.',
+            \App\Support\Seo::description($long)
+        );
+
+        $oneSentence = str_repeat('woord ', 40);
+        $cut = \App\Support\Seo::description($oneSentence);
+        $this->assertLessThanOrEqual(165, mb_strlen($cut));
+        $this->assertStringEndsWith('woord…', $cut);
     }
 
     public function test_login_and_register_are_readable_without_javascript(): void
