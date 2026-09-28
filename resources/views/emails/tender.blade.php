@@ -35,6 +35,9 @@
                     <h1>{{ __('Wij gunnen u de opdracht') }} 🎉</h1>
                     <p>{{ __('Beste :name,', ['name' => $name]) }}</p>
                     <p>{{ __('Bedankt voor uw prijsopgave voor :package. Wij gunnen u de opdracht en nemen binnenkort contact met u op over de planning en de opdrachtbevestiging.', ['package' => $round->title]) }}</p>
+                    @if($attached)
+                        <p style="font-size:14px;"><strong>{{ __('Bijlagen bij deze mail:') }}</strong> {{ implode(', ', $attached) }}</p>
+                    @endif
                 @elseif($kind === 'reject')
                     <h1>{{ __('Prijsaanvraag :package', ['package' => $round->title]) }}</h1>
                     <p>{{ __('Beste :name,', ['name' => $name]) }}</p>
@@ -54,13 +57,19 @@
                         <table>
                             <tr><td class="k">{{ __('Onderdeel') }}</td><td><strong>{{ $round->title }}</strong></td></tr>
                             @if($round->location)<tr><td class="k">{{ __('Locatie') }}</td><td>{{ $round->location }}</td></tr>@endif
-                            @if($round->start_week)<tr><td class="k">{{ __('Gewenste start') }}</td><td>{{ __('week :week', ['week' => $round->start_week]) }}</td></tr>@endif
+                            @if($startWeek)<tr><td class="k">{{ __('Gewenste start') }}</td><td>{{ __('week :week', ['week' => $startWeek]) }}</td></tr>@endif
                             <tr><td class="k">{{ __('Reageren vóór') }}</td><td><strong>{{ $deadline }}</strong></td></tr>
                         </table>
                         @if($round->description)
                             <p style="margin:12px 0 0;font-size:14px;line-height:1.6;color:#44403C;">{!! nl2br(e($round->description)) !!}</p>
                         @endif
                     </div>
+                    @if($attached)
+                        <p style="font-size:14px;"><strong>{{ __('Bijlagen bij deze mail:') }}</strong> {{ implode(', ', $attached) }}</p>
+                    @endif
+                    @if($online)
+                        <p style="font-size:14px;"><strong>{{ __('Te groot voor de mail, te downloaden via de knop hieronder:') }}</strong> {{ implode(', ', $online) }}</p>
+                    @endif
                     <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 20px 0 6px;">
                         <tr>
                             <td class="btn-td">

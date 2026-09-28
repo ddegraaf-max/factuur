@@ -90,9 +90,12 @@ class TenderService
 
     /**
      * Opent een ronde: één aanvraag per gekozen bedrijf (alleen bedrijven mét
-     * e-mailadres), elk met eigen tokenlink, en meteen de aanvraagmail.
+     * e-mailadres), elk met eigen tokenlink, en meteen de aanvraagmail — met
+     * de bijlagen (tekening, bestek) erbij.
+     *
+     * @param  array<int, UploadedFile>  $files
      */
-    public function open(Company $company, ?Quote $quote, array $data): TenderRound
+    public function open(Company $company, ?Quote $quote, array $data, array $files = []): TenderRound
     {
         $package = WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
             ->findOrFail($data['work_package_id']);
@@ -106,7 +109,7 @@ class TenderService
             throw new \DomainException(__('Kies minstens één bedrijf met een e-mailadres.'));
         }
 
-        $round = DB::transaction(function () use ($company, $quote, $package, $subcontractors, $data) {
+        $round = DB::transaction(function () use ($company, $quote, $package, $subcontractors, $data, $files) {
             $round = TenderRound::create([
                 'company_id' => $company->id,
                 'quote_id' => $quote?->id,
@@ -128,6 +131,9 @@ class TenderService
                 ]);
             }
 
+            // Vóór het mailen, zodat de bijlagen meteen meegaan.
+            $this->attach($round, $files);
+
             return $round;
         });
 
@@ -142,6 +148,28 @@ class TenderService
         ]), [], $company->id);
 
         return $round->fresh(['requests.subcontractor', 'workPackage']);
+    }
+
+    /**
+     * Bijlagen bij de uitvraag: gaan mee met de mail en staan op de
+     * reactiepagina van elk bedrijf. Geeft het aantal toegevoegde bestanden terug.
+     *
+     * @param  array<int, UploadedFile>  $files
+     */
+    public function attach(TenderRound $round, array $files): int
+    {
+        foreach ($files as $file) {
+            $round->attachments()->create([
+                'company_id' => $round->company_id,
+                'filename' => mb_substr($file->getClientOriginalName(), 0, 255),
+                'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
+                'size_bytes' => $file->getSize(),
+                'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                'for_customer' => true,
+            ]);
+        }
+
+        return count($files);
     }
 
     /** Herinnert iedereen die na drie dagen nog niets liet horen, zolang de ronde open is. */
@@ -187,10 +215,20 @@ class TenderService
         }
 
         if ($file) {
+            // Een nieuwe offerte vervangt de vorige. Oudere staan mogelijk nog op schijf.
             if ($request->attachment_path) {
                 Storage::disk('local')->delete($request->attachment_path);
             }
-            $request->attachment_path = $file->store('tenders/' . $request->tender_round_id, 'local');
+            $request->attachments()->delete();
+            $request->attachments()->create([
+                'company_id' => $request->round->company_id,
+                'filename' => mb_substr($file->getClientOriginalName(), 0, 255),
+                'mime_type' => $file->getMimeType() ?? 'application/octet-stream',
+                'size_bytes' => $file->getSize(),
+                'file_data' => base64_encode(file_get_contents($file->getRealPath())),
+                'for_customer' => false,
+            ]);
+            $request->attachment_path = null;
             $request->attachment_name = mb_substr($file->getClientOriginalName(), 0, 255);
         }
 

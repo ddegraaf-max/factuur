@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Uitvraagronde: één werkpakket van één project, uitgezet bij een handvol
@@ -64,6 +65,12 @@ class TenderRound extends Model
     public function awardedRequest(): BelongsTo
     {
         return $this->belongsTo(TenderRequest::class, 'awarded_request_id');
+    }
+
+    /** Tekening, bestek, foto's: wat de bedrijven nodig hebben om te kunnen prijzen. */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable')->withoutGlobalScope('company')->orderBy('id');
     }
 
     public function isOpen(): bool

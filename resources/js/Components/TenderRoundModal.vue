@@ -1,7 +1,8 @@
 <script setup>
 import { useForm, usePage } from '@inertiajs/vue3';
 import { t } from '@/i18n';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
+import { dayValue, isoWeek, parseDay, weekLabel } from '@/week.js';
 
 /**
  * Uitvraag openen: werkpakket kiezen, bedrijven aanvinken, omschrijving en
@@ -19,14 +20,6 @@ const emit = defineEmits(['close']);
 const page = usePage();
 const pageError = computed(() => (page.props.errors || {}).tender ?? null);
 
-const isoWeek = (date) => {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  const day = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - day);
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
-  return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
-};
 const plusDays = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d; };
 const iso = (d) => d.toISOString().slice(0, 10);
 
@@ -43,7 +36,33 @@ const form = useForm({
   start_week: isoWeek(plusDays(28)),
   deadline: iso(plusDays(7)),
   budget: '',
+  files: [],
 });
+
+// Startweek: je kiest een dag in de kalender, de week gaat mee in de aanvraag.
+const startDay = ref(dayValue(plusDays(28)));
+watch(startDay, (value) => {
+  const day = parseDay(value);
+  form.start_week = day ? isoWeek(day) : '';
+});
+
+/* ---------- Bijlagen (tekening, bestek, foto's) ---------- */
+const fileInput = ref(null);
+const MAX_FILES = 10;
+const fileSize = (bytes) => (bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} kB` : `${(bytes / 1024 / 1024).toFixed(1).replace('.', ',')} MB`);
+const addFiles = (event) => {
+  const known = new Set(form.files.map(f => f.name + ':' + f.size));
+  for (const file of Array.from(event.target.files || [])) {
+    if (form.files.length >= MAX_FILES) break;
+    if (!known.has(file.name + ':' + file.size)) form.files.push(file);
+  }
+  // Leegmaken, zodat hetzelfde bestand na verwijderen opnieuw te kiezen is.
+  event.target.value = '';
+};
+const removeFile = (index) => form.files.splice(index, 1);
+const fileErrors = computed(() => Object.entries(form.errors)
+  .filter(([key]) => key === 'files' || key.startsWith('files.'))
+  .map(([, message]) => message));
 
 const selectedPackage = computed(() => props.packages.find(p => p.id === Number(form.work_package_id)) || null);
 const candidates = computed(() => selectedPackage.value?.subcontractors || []);
@@ -88,7 +107,8 @@ const submit = () => {
     .transform((data) => ({ ...data, budget: data.budget === '' ? null : String(data.budget).replace(',', '.') }))
     .post(props.quote ? route('tenders.from_quote', props.quote.id) : route('tenders.store'), {
       preserveScroll: true,
-      onSuccess: () => { emit('close'); form.reset(); },
+      forceFormData: true,
+      onSuccess: () => { emit('close'); form.reset(); startDay.value = dayValue(plusDays(28)); },
     });
 };
 </script>
@@ -145,8 +165,10 @@ const submit = () => {
             <input type="text" v-model="form.location" maxlength="160" placeholder="1402 AT Bussum">
           </div>
           <div class="form-group">
-            <label>{{ $t('Gewenste startweek') }}</label>
-            <input type="text" v-model="form.start_week" maxlength="12" placeholder="2026-W42">
+            <label>{{ $t('Gewenste startweek') }} <span class="label-hint">{{ $t('(kies een dag in die week)') }}</span></label>
+            <input type="date" v-model="startDay">
+            <div v-if="form.start_week" class="tm-week">{{ $t('week :week', { week: weekLabel(form.start_week) }) }}</div>
+            <div v-if="form.errors.start_week" class="field-error">{{ form.errors.start_week }}</div>
           </div>
         </div>
         <div class="form-row">
@@ -166,6 +188,23 @@ const submit = () => {
           <textarea v-model="form.description" rows="7" maxlength="5000"></textarea>
           <div v-if="form.errors.description" class="field-error">{{ form.errors.description }}</div>
         </div>
+
+        <div class="form-group">
+          <label>{{ $t('Bijlagen') }} <span class="label-hint">{{ $t('(tekening, bestek of foto’s: wat er precies gemaakt moet worden)') }}</span></label>
+          <div v-if="form.files.length" class="tm-files">
+            <div v-for="(file, i) in form.files" :key="file.name + file.size" class="tm-file">
+              <span class="tm-file-name">📎 {{ file.name }}</span>
+              <span class="tm-meta">{{ fileSize(file.size) }}</span>
+              <button type="button" class="tm-file-remove" :title="$t('Bijlage weghalen')" @click="removeFile(i)">✕</button>
+            </div>
+          </div>
+          <input ref="fileInput" class="tm-file-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" @change="addFiles">
+          <button type="button" class="btn btn-secondary btn-sm" :disabled="form.files.length >= MAX_FILES" @click="fileInput?.click()">
+            {{ form.files.length ? $t('Nog een bestand toevoegen') : $t('Bestand toevoegen') }}
+          </button>
+          <div class="tm-hint">{{ $t('Gaat mee met de mail en staat op de reactiepagina van elk bedrijf. PDF, PNG, JPG of WEBP, max. 10 MB per bestand. Let op: stuur geen stukken mee waar je verkoopprijs of het adres van de klant op staat.') }}</div>
+          <div v-for="(message, i) in fileErrors" :key="i" class="field-error">{{ message }}</div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary btn-sm" @click="emit('close')">{{ $t('Annuleren') }}</button>
@@ -180,8 +219,18 @@ const submit = () => {
 <style scoped>
 .tm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
 .tm-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 13.5px; }
+/* De algemene regel voor invoervelden (100% breed, 42px hoog) geldt niet voor een vinkje. */
+.tm-item input { width: 17px; height: 17px; padding: 0; flex: none; }
 .tm-item.off { opacity: 0.55; cursor: not-allowed; }
 .tm-name { font-weight: 600; color: var(--text); }
 .tm-meta { color: var(--text-3); font-size: 12px; margin-left: auto; white-space: nowrap; }
+.tm-week { font-size: 12.5px; color: var(--text-2); margin-top: 6px; font-weight: 500; }
+.tm-files { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.tm-file { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+.tm-file-name { font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.tm-file-remove { color: var(--text-3); font-size: 13px; padding: 2px 6px; border-radius: 6px; flex: none; }
+.tm-file-remove:hover { background: var(--surface-2); color: var(--brand-dark); }
+.tm-file-input { display: none; }
+.tm-hint { font-size: 12px; color: var(--text-3); margin-top: 8px; line-height: 1.5; }
 .tm-empty { font-size: 13px; color: var(--text-3); padding: 10px 12px; border: 1px dashed var(--border); border-radius: 8px; }
 </style>

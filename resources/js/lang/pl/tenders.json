@@ -139,5 +139,14 @@
   "Creditnota op een factuur die niet in dit pakket staat": "Faktura korygująca do faktury spoza tego programu",
   "tegoed :amount op :n creditnota's, saldo :balance": "nadpłata :amount na :n fakturach korygujących, saldo :balance",
   "tegoed :amount op creditnota, saldo :balance": "nadpłata :amount na fakturze korygującej, saldo :balance",
-  "tegoed :amount op creditnota's": "nadpłaty :amount na fakturach korygujących"
+  "tegoed :amount op creditnota's": "nadpłaty :amount na fakturach korygujących",
+  "(kies een dag in die week)": "(wybierz dzień w tym tygodniu)",
+  "(tekening, bestek of foto’s: wat er precies gemaakt moet worden)": "(rysunek, specyfikacja lub zdjęcia: co dokładnie trzeba wykonać)",
+  "Bijlage weghalen": "Usuń załącznik",
+  "Nog een bestand toevoegen": "Dodaj kolejny plik",
+  "Gaat mee met de mail en staat op de reactiepagina van elk bedrijf. PDF, PNG, JPG of WEBP, max. 10 MB per bestand. Let op: stuur geen stukken mee waar je verkoopprijs of het adres van de klant op staat.": "Zostanie wysłany z e-mailem i będzie widoczny na stronie odpowiedzi każdej firmy. PDF, PNG, JPG lub WEBP, maks. 10 MB na plik. Uwaga: nie dołączaj dokumentów, na których widać Twoją cenę sprzedaży lub adres klienta.",
+  "Beschikbaar vanaf": "Dostępność od",
+  "Bijlagen voor de bedrijven": "Załączniki dla firm",
+  "Geen bijlagen. Voeg een tekening, bestek of foto’s toe zodat de bedrijven precies weten wat er gemaakt moet worden.": "Brak załączników. Dodaj rysunek, specyfikację lub zdjęcia, aby firmy dokładnie wiedziały, co trzeba wykonać.",
+  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "Załącznik dodany teraz od razu pojawi się na stronie odpowiedzi każdej firmy i będzie wysyłany z przypomnieniami. Nowy e-mail nie zostanie wysłany."
 }

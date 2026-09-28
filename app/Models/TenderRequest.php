@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * Eén prijsaanvraag aan één bedrijf binnen een uitvraagronde. De tokenlink in
@@ -40,6 +41,15 @@ class TenderRequest extends Model
     public function subcontractor(): BelongsTo
     {
         return $this->belongsTo(Subcontractor::class)->withoutGlobalScope('company');
+    }
+
+    /**
+     * De eigen offerte van het bedrijf. In de database, net als alle bijlagen:
+     * wat op schijf staat verdwijnt bij elke deploy.
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable')->withoutGlobalScope('company')->orderBy('id');
     }
 
     /** De geheime link uit de mail: hier geeft het bedrijf prijs en beschikbaarheid door. */

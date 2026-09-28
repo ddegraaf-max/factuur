@@ -1,9 +1,9 @@
 <script setup>
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { eur } from '@/format.js';
 import { t } from '@/i18n';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
   round: Object,
@@ -35,6 +35,31 @@ const close = () => {
     router.post(route('tenders.close', props.round.id), {}, { preserveScroll: true });
   }
 };
+/* ---------- Bijlagen bij de uitvraag ---------- */
+const fileInput = ref(null);
+const uploadForm = useForm({ files: [] });
+const uploadErrors = computed(() => Object.entries(uploadForm.errors)
+  .filter(([key]) => key === 'files' || key.startsWith('files.'))
+  .map(([, message]) => message));
+const uploadFiles = (event) => {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  uploadForm.files = files;
+  uploadForm.post(route('tenders.attachments.store', props.round.id), {
+    forceFormData: true,
+    preserveScroll: true,
+    onFinish: () => {
+      uploadForm.reset();
+      if (fileInput.value) fileInput.value.value = '';
+    },
+  });
+};
+const removeAttachment = (file) => {
+  if (confirm(t('Bijlage ":name" verwijderen?', { name: file.filename }))) {
+    router.delete(route('attachments.destroy', file.id), { preserveScroll: true });
+  }
+};
+
 const copy = async (url) => { try { await navigator.clipboard.writeText(url); } catch (e) { /* stil */ } };
 </script>
 
@@ -129,6 +154,35 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
       </table>
     </div>
 
+    <div class="card" style="margin-top:16px;">
+      <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="card-title">{{ $t('Bijlagen voor de bedrijven') }}</div>
+        <template v-if="round.status === 'open'">
+          <input ref="fileInput" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none" @change="uploadFiles">
+          <button class="btn btn-secondary btn-sm" :disabled="uploadForm.processing" @click="fileInput?.click()">
+            {{ uploadForm.processing ? $t('Bezig met uploaden…') : $t('Bestand toevoegen') }}
+          </button>
+        </template>
+      </div>
+      <div class="card-body">
+        <div v-for="(message, i) in uploadErrors" :key="i" class="field-error" style="margin-bottom:8px;">{{ message }}</div>
+        <div v-if="!round.attachments.length" class="att-none">
+          {{ $t('Geen bijlagen. Voeg een tekening, bestek of foto’s toe zodat de bedrijven precies weten wat er gemaakt moet worden.') }}
+        </div>
+        <div v-for="file in round.attachments" :key="file.id" class="att-line">
+          <a :href="route('attachments.show', file.id)" target="_blank" class="lnk">📎 {{ file.filename }}</a>
+          <span class="sub">{{ file.size_formatted }}</span>
+          <span class="att-actions">
+            <a :href="route('attachments.download', file.id)" class="btn btn-ghost btn-sm">{{ $t('Download') }}</a>
+            <button v-if="round.status === 'open'" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="removeAttachment(file)">{{ $t('Verwijder') }}</button>
+          </span>
+        </div>
+        <div v-if="round.status === 'open'" class="att-note">
+          {{ $t('Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.') }}
+        </div>
+      </div>
+    </div>
+
     <div v-if="round.description" class="card" style="margin-top:16px;">
       <div class="card-header"><div class="card-title">{{ $t('Omschrijving in de mail') }}</div></div>
       <div class="card-body" style="white-space:pre-wrap;font-size:13.5px;line-height:1.6;color:var(--text-2);">{{ round.description }}</div>
@@ -148,4 +202,9 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
 .remarks { max-width: 280px; font-size: 13px; white-space: pre-wrap; }
 .actions { white-space: nowrap; }
 .lnk { color: var(--brand); }
+.att-line { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+.att-line:last-of-type { border-bottom: none; }
+.att-actions { margin-left: auto; white-space: nowrap; }
+.att-none, .att-note { font-size: 13px; color: var(--text-3); line-height: 1.6; }
+.att-note { margin-top: 10px; }
 </style>

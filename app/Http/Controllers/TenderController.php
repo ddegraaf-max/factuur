@@ -6,11 +6,15 @@ use App\Models\Quote;
 use App\Models\TenderRequest;
 use App\Models\TenderRound;
 use App\Services\TenderService;
+use App\Support\IsoWeek;
+use App\Support\StorageUsage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -58,6 +62,13 @@ class TenderController extends Controller
                 'created_at_label' => $round->created_at?->translatedFormat('j M Y'),
                 'awarded_at_label' => $round->awarded_at?->translatedFormat('j M Y'),
                 'average' => $priced->count() ? round((float) $priced->avg('price'), 2) : null,
+                // Zonder de inhoud: alleen wat de lijst nodig heeft.
+                'attachments' => $round->attachments()->get(['id', 'filename', 'mime_type', 'size_bytes'])->map(fn ($a) => [
+                    'id' => $a->id,
+                    'filename' => $a->filename,
+                    'kind' => $a->kind,
+                    'size_formatted' => $a->size_formatted,
+                ])->values(),
             ],
             'requests' => $round->requests->map(fn (TenderRequest $r) => [
                 'id' => $r->id,
@@ -69,12 +80,12 @@ class TenderController extends Controller
                 'phone' => $r->subcontractor?->phone,
                 'price' => $r->hasPrice() ? (float) $r->price : null,
                 'delta' => $r->hasPrice() && $budget !== null ? round((float) $r->price - $budget, 2) : null,
-                'available_week' => $r->available_week,
+                'available_week' => IsoWeek::label($r->available_week),
                 'valid_until_label' => $r->valid_until?->translatedFormat('j M Y'),
                 'remarks' => $r->remarks,
                 'decline_reason' => $r->decline_reason,
                 'attachment_name' => $r->attachment_name,
-                'attachment_url' => $r->attachment_path ? route('tenders.attachment', [$round, $r]) : null,
+                'attachment_url' => $r->attachment_name ? route('tenders.attachment', [$round, $r]) : null,
                 'sent_at_label' => $r->sent_at?->translatedFormat('j M, H:i'),
                 'opened_at_label' => $r->opened_at?->translatedFormat('j M, H:i'),
                 'reminded_at_label' => $r->reminded_at?->translatedFormat('j M, H:i'),
@@ -108,15 +119,21 @@ class TenderController extends Controller
             'start_week' => ['nullable', 'string', 'max:12'],
             'deadline' => ['required', 'date', 'after_or_equal:today'],
             'budget' => ['nullable', 'numeric', 'min:0'],
-        ], [
+        ] + self::FILE_RULES, [
             'subcontractor_ids.required' => __('Kies minstens één bedrijf.'),
             'subcontractor_ids.min' => __('Kies minstens één bedrijf.'),
             'deadline.required' => __('Kies een datum waarvoor de bedrijven moeten reageren.'),
             'deadline.after_or_equal' => __('Kies een reactiedatum vanaf vandaag.'),
-        ]);
+        ] + $this->fileMessages());
+
+        $files = $request->file('files', []);
+        if ($error = $this->storageError($request, $files)) {
+            return back()->withErrors(['files' => $error]);
+        }
+        unset($data['files']);
 
         try {
-            $round = $this->service->open(auth()->user()->company, $quote, $data);
+            $round = $this->service->open(auth()->user()->company, $quote, $data, $files);
         } catch (\DomainException $e) {
             return back()->withErrors(['tender' => $e->getMessage()]);
         }
@@ -158,13 +175,78 @@ class TenderController extends Controller
         return back()->with('flash', __('Uitvraag gesloten zonder gunning.'));
     }
 
-    /** De offerte-PDF die het bedrijf meestuurde. */
-    public function attachment(TenderRound $round, TenderRequest $tenderRequest): StreamedResponse
+    /**
+     * Bijlage toevoegen aan een lopende uitvraag. Er gaat geen nieuwe mail uit:
+     * het bestand staat meteen op de reactiepagina en gaat mee met herinneringen.
+     */
+    public function storeAttachments(Request $request, TenderRound $round): RedirectResponse
     {
-        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id && $tenderRequest->attachment_path, 404);
-        abort_unless(Storage::disk('local')->exists($tenderRequest->attachment_path), 404);
+        if (! $round->isOpen()) {
+            return back()->withErrors(['files' => __('Deze uitvraag is al gegund of gesloten; bijlagen toevoegen kan niet meer.')]);
+        }
 
-        return Storage::disk('local')->download($tenderRequest->attachment_path, $tenderRequest->attachment_name ?: 'offerte.pdf');
+        $request->validate(['files' => ['required', 'array', 'max:10']] + self::FILE_RULES, $this->fileMessages());
+
+        $files = $request->file('files', []);
+        if ($error = $this->storageError($request, $files)) {
+            return back()->withErrors(['files' => $error]);
+        }
+
+        $added = $this->service->attach($round, $files);
+
+        return back()->with('flash', __(':count bijlage(n) toegevoegd. Ze staan nu op de reactiepagina van elk bedrijf en gaan mee met herinneringen.', ['count' => $added]));
+    }
+
+    /** De offerte-PDF die het bedrijf meestuurde. */
+    public function attachment(TenderRound $round, TenderRequest $tenderRequest): HttpResponse|StreamedResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+
+        $name = $tenderRequest->attachment_name ?: 'offerte.pdf';
+        if ($file = $tenderRequest->attachments()->latest('id')->first()) {
+            $contents = $file->contents();
+            abort_if($contents === null, 404);
+
+            return response($contents, 200, [
+                'Content-Type' => 'application/octet-stream',
+                'Content-Disposition' => HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, $name, 'offerte'),
+                'Content-Length' => (string) strlen($contents),
+                'X-Content-Type-Options' => 'nosniff',
+            ]);
+        }
+
+        // Offertes van vóór 1.59.0 stonden op schijf.
+        abort_unless($tenderRequest->attachment_path && Storage::disk('local')->exists($tenderRequest->attachment_path), 404);
+
+        return Storage::disk('local')->download($tenderRequest->attachment_path, $name);
+    }
+
+    /** Zelfde bestandstypen en grootte als de bijlagen bij facturen en offertes. */
+    private const FILE_RULES = [
+        'files' => ['nullable', 'array', 'max:10'],
+        'files.*' => ['file', 'max:10240', 'mimetypes:application/pdf,image/png,image/jpeg,image/webp'],
+    ];
+
+    private function fileMessages(): array
+    {
+        return [
+            'files.max' => __('Je kunt hoogstens 10 bijlagen per keer toevoegen.'),
+            'files.*.mimetypes' => __('Alleen PDF-, PNG-, JPG- of WEBP-bestanden zijn toegestaan.'),
+            'files.*.max' => __('Elk bestand mag maximaal 10 MB groot zijn.'),
+        ];
+    }
+
+    /** Opslagmeter: boven de limiet geen nieuwe bijlagen (zie App\Support\StorageUsage). */
+    private function storageError(Request $request, array $files): ?string
+    {
+        $incoming = array_sum(array_map(fn ($file) => (int) $file->getSize(), $files));
+        $company = $request->user()->company;
+        if ($incoming === 0 || StorageUsage::hasRoomFor($company, $incoming)) {
+            return null;
+        }
+        $usage = StorageUsage::for($company);
+
+        return __('De opslag van je administratie is vol (:used van :limit). Verwijder oude bijlagen of stap over op Slim (10 GB).', ['used' => $usage['used_label'], 'limit' => $usage['limit_label']]);
     }
 
     private function summary(TenderRound $round): array
@@ -181,7 +263,7 @@ class TenderController extends Controller
             'quote_number' => $round->quote?->number,
             'customer_name' => $round->quote?->customer_name,
             'location' => $round->location,
-            'start_week' => $round->start_week,
+            'start_week' => IsoWeek::label($round->start_week),
             'deadline' => $round->deadline->toDateString(),
             'deadline_label' => $round->deadline->translatedFormat('j M Y'),
             'deadline_passed' => $round->deadline->copy()->endOfDay()->isPast(),

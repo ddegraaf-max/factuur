@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attachment;
 use App\Models\TenderRequest;
 use App\Services\TenderService;
+use App\Support\IsoWeek;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\HeaderUtils;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * Het reactieformulier voor de onderaannemer: bereikbaar via de geheime
@@ -46,8 +50,16 @@ class TenderResponseController extends Controller
                 'description' => $round->description,
                 'location' => $round->location,
                 'start_week' => $round->start_week,
+                'start_week_label' => IsoWeek::label($round->start_week),
                 'deadline_label' => $round->deadline->translatedFormat('j F Y'),
                 'open' => $round->isOpen(),
+                // Tekening, bestek: te openen via dezelfde geheime link.
+                'attachments' => $round->attachments()->get(['id', 'filename', 'mime_type', 'size_bytes'])->map(fn (Attachment $a) => [
+                    'id' => $a->id,
+                    'filename' => $a->filename,
+                    'size_formatted' => $a->size_formatted,
+                    'url' => route('tender.attachment', [$token, $a->id]),
+                ])->values(),
             ],
             'request' => [
                 'status' => $request->status,
@@ -109,6 +121,27 @@ class TenderResponseController extends Controller
         }
 
         return back()->with('flash', __('Bedankt voor uw bericht.'));
+    }
+
+    /** Een bijlage van de uitvraag, alleen voor wie de link van die uitvraag heeft. */
+    public function attachment(string $token, int $attachment): HttpResponse
+    {
+        $request = $this->find($token) ?? abort(404);
+        $file = $request->round->attachments()->whereKey($attachment)->first() ?? abort(404);
+        $contents = $file->contents() ?? abort(404);
+
+        $inline = in_array($file->mime_type, ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'], true);
+
+        return response($contents, 200, [
+            'Content-Type' => $inline ? $file->mime_type : 'application/octet-stream',
+            'Content-Disposition' => HeaderUtils::makeDisposition(
+                $inline ? HeaderUtils::DISPOSITION_INLINE : HeaderUtils::DISPOSITION_ATTACHMENT,
+                $file->filename,
+                'bijlage'
+            ),
+            'Content-Length' => (string) strlen($contents),
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
     }
 
     private function find(string $token): ?TenderRequest

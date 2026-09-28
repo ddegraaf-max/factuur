@@ -1081,5 +1081,10 @@
   "Op pauze: er gaan geen herinneringen of aanmaningen uit tot je hervat.": "Wstrzymana: przypomnienia i wezwania nie będą wysyłane do czasu wznowienia.",
   "Pauze opgeheven: herinneringen lopen weer volgens schema.": "Wstrzymanie zakończone: przypomnienia znów są wysyłane zgodnie z harmonogramem.",
   "Op pauze gezet t/m :date": "Wstrzymano do :date",
-  "Op pauze gezet": "Wstrzymano"
+  "Op pauze gezet": "Wstrzymano",
+  "Bijlagen bij deze mail:": "Załączniki do tej wiadomości:",
+  "Te groot voor de mail, te downloaden via de knop hieronder:": "Za duże na e-mail, do pobrania za pomocą przycisku poniżej:",
+  "Deze uitvraag is al gegund of gesloten; bijlagen toevoegen kan niet meer.": "To zapytanie zostało już rozstrzygnięte lub zamknięte; nie można już dodawać załączników.",
+  ":count bijlage(n) toegevoegd. Ze staan nu op de reactiepagina van elk bedrijf en gaan mee met herinneringen.": "Dodano załączniki: :count. Są teraz na stronie odpowiedzi każdej firmy i będą wysyłane z przypomnieniami.",
+  "Je kunt hoogstens 10 bijlagen per keer toevoegen.": "Jednorazowo możesz dodać najwyżej 10 załączników."
 }

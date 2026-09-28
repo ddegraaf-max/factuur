@@ -1081,5 +1081,10 @@
   "Op pauze: er gaan geen herinneringen of aanmaningen uit tot je hervat.": "On hold: no reminders or dunning letters will be sent until you resume.",
   "Pauze opgeheven: herinneringen lopen weer volgens schema.": "Pause lifted: reminders run on schedule again.",
   "Op pauze gezet t/m :date": "Put on hold until :date",
-  "Op pauze gezet": "Put on hold"
+  "Op pauze gezet": "Put on hold",
+  "Bijlagen bij deze mail:": "Attachments to this e-mail:",
+  "Te groot voor de mail, te downloaden via de knop hieronder:": "Too large for the e-mail, available for download via the button below:",
+  "Deze uitvraag is al gegund of gesloten; bijlagen toevoegen kan niet meer.": "This request has already been awarded or closed; attachments can no longer be added.",
+  ":count bijlage(n) toegevoegd. Ze staan nu op de reactiepagina van elk bedrijf en gaan mee met herinneringen.": ":count attachment(s) added. They are now on each company’s response page and are sent with reminders.",
+  "Je kunt hoogstens 10 bijlagen per keer toevoegen.": "You can add at most 10 attachments at a time."
 }

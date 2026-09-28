@@ -139,5 +139,14 @@
   "Creditnota op een factuur die niet in dit pakket staat": "Credit note for an invoice that is not in this package",
   "tegoed :amount op :n creditnota's, saldo :balance": "credit of :amount on :n credit notes, balance :balance",
   "tegoed :amount op creditnota, saldo :balance": "credit of :amount on a credit note, balance :balance",
-  "tegoed :amount op creditnota's": "credit of :amount on credit notes"
+  "tegoed :amount op creditnota's": "credit of :amount on credit notes",
+  "(kies een dag in die week)": "(pick a day in that week)",
+  "(tekening, bestek of foto’s: wat er precies gemaakt moet worden)": "(drawing, specification or photos: what exactly has to be made)",
+  "Bijlage weghalen": "Remove attachment",
+  "Nog een bestand toevoegen": "Add another file",
+  "Gaat mee met de mail en staat op de reactiepagina van elk bedrijf. PDF, PNG, JPG of WEBP, max. 10 MB per bestand. Let op: stuur geen stukken mee waar je verkoopprijs of het adres van de klant op staat.": "Is sent with the e-mail and shown on each company’s response page. PDF, PNG, JPG or WEBP, max. 10 MB per file. Note: do not include documents that show your selling price or the customer’s address.",
+  "Beschikbaar vanaf": "Available from",
+  "Bijlagen voor de bedrijven": "Attachments for the companies",
+  "Geen bijlagen. Voeg een tekening, bestek of foto’s toe zodat de bedrijven precies weten wat er gemaakt moet worden.": "No attachments. Add a drawing, specification or photos so the companies know exactly what has to be made.",
+  "Een bijlage die je nu toevoegt staat meteen op de reactiepagina van elk bedrijf en gaat mee met herinneringen. Er gaat geen nieuwe mail uit.": "An attachment you add now appears on each company’s response page right away and is sent with reminders. No new e-mail is sent."
 }

@@ -144,13 +144,16 @@ class TenderTest extends TestCase
             'available_week' => '2026-W43',
             'valid_until' => now()->addDays(30)->toDateString(),
             'remarks' => 'Inclusief afvoer',
-            'attachment' => UploadedFile::fake()->create('offerte.pdf', 120, 'application/pdf'),
+            'attachment' => UploadedFile::fake()->createWithContent('offerte.pdf', '%PDF-1.4 offerte'),
         ])->assertRedirect()->assertSessionHasNoErrors();
         $reqA->refresh();
         $this->assertSame('responded', $reqA->status);
         $this->assertEqualsWithDelta(4250.50, (float) $reqA->price, 0.001);
         $this->assertSame('offerte.pdf', $reqA->attachment_name);
-        Storage::disk('local')->assertExists($reqA->attachment_path);
+        // In de database, niet op schijf: daar verdwijnt alles bij een deploy.
+        $this->assertNull($reqA->attachment_path);
+        $this->assertSame(1, $reqA->attachments()->count());
+        $this->assertSame($user->company_id, $reqA->attachments()->first()->company_id);
 
         $this->post(route('tender.decline', $reqB->token), ['reason' => 'Geen capaciteit'])->assertRedirect();
         $this->assertSame('declined', $reqB->fresh()->status);
@@ -183,6 +186,100 @@ class TenderTest extends TestCase
         $this->post(route('tender.respond', $reqB->token), ['price' => '1'])->assertSessionHasErrors('tender');
         $this->get(route('tender.respond.show', $reqA->token))
             ->assertInertia(fn ($page) => $page->where('request.status', 'awarded')->where('round.open', false));
+    }
+
+    public function test_attachments_go_out_with_the_request_and_are_on_the_response_page(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a, $b] = $this->pool();
+
+        $this->post(route('tenders.store'), [
+            'work_package_id' => $package->id,
+            'subcontractor_ids' => [$a->id, $b->id],
+            'start_week' => '2026-W44',
+            'deadline' => now()->addDays(5)->toDateString(),
+            'files' => [
+                UploadedFile::fake()->createWithContent('tekening.pdf', '%PDF-1.4 tekening'),
+                UploadedFile::fake()->image('situatie.jpg', 40, 30),
+            ],
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $round = TenderRound::firstOrFail();
+        $this->assertSame(['tekening.pdf', 'situatie.jpg'], $round->attachments()->pluck('filename')->all());
+        $this->assertSame($user->company_id, $round->attachments()->first()->company_id);
+        $request = $round->requests()->where('subcontractor_id', $a->id)->firstOrFail();
+
+        // De mail: beide bestanden als bijlage, met naam in de tekst en de week met datums.
+        $mail = new TenderMail($request, 'request');
+        $this->assertCount(2, $mail->attachments());
+        $html = $mail->render();
+        $this->assertStringContainsString('tekening.pdf', $html);
+        $this->assertStringContainsString('week 44 (26 okt. – 1 nov. 2026)', $html);
+        $this->assertCount(2, (new TenderMail($request, 'reminder'))->attachments());
+        $this->assertCount(0, (new TenderMail($request, 'reject'))->attachments(), 'Bij een afwijzing gaat er niets mee');
+
+        // Eigenaar: lijst op de uitvraagpagina en achteraf een bestand erbij.
+        $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page
+            ->has('round.attachments', 2)
+            ->where('round.attachments.0.filename', 'tekening.pdf')
+            ->where('round.start_week', '44 (26 okt. – 1 nov. 2026)'));
+        $this->post(route('tenders.attachments.store', $round), [
+            'files' => [UploadedFile::fake()->createWithContent('bestek.pdf', '%PDF-1.4 bestek')],
+        ])->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertSame(3, $round->attachments()->count());
+        $this->post(route('tenders.attachments.store', $round), [
+            'files' => [UploadedFile::fake()->create('calculatie.xlsx', 50, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
+        ])->assertSessionHasErrors('files.0');
+
+        // Het bedrijf: ziet en opent de bijlagen via zijn eigen link, zonder inlog.
+        $file = $round->attachments()->first();
+        $this->asGuest();
+        $this->get(route('tender.respond.show', $request->token))->assertOk()->assertInertia(fn ($page) => $page
+            ->has('round.attachments', 3)
+            ->where('round.attachments.0.filename', 'tekening.pdf')
+            ->where('round.start_week_label', '44 (26 okt. – 1 nov. 2026)'));
+        $this->get(route('tender.attachment', [$request->token, $file->id]))->assertOk()
+            ->assertHeader('Content-Type', 'application/pdf');
+        $this->get(route('tender.attachment', [str_repeat('b', 64), $file->id]))->assertNotFound();
+
+        // Een bijlage van een andere uitvraag is met deze link niet te openen.
+        $this->actingAs($user);
+        $this->post(route('tenders.store'), [
+            'work_package_id' => $package->id,
+            'subcontractor_ids' => [$b->id],
+            'deadline' => now()->addDays(5)->toDateString(),
+            'files' => [UploadedFile::fake()->createWithContent('ander-project.pdf', '%PDF-1.4 ander')],
+        ])->assertRedirect()->assertSessionHasNoErrors();
+        $other = TenderRound::latest('id')->firstOrFail()->attachments()->firstOrFail();
+        $this->asGuest();
+        $this->get(route('tender.attachment', [$request->token, $other->id]))->assertNotFound();
+    }
+
+    public function test_closed_rounds_take_no_more_attachments(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a] = $this->pool();
+        $this->post(route('tenders.store'), ['work_package_id' => $package->id, 'subcontractor_ids' => [$a->id], 'deadline' => now()->addDays(5)->toDateString()])->assertRedirect();
+        $round = TenderRound::firstOrFail();
+        $this->post(route('tenders.close', $round))->assertRedirect();
+
+        $this->post(route('tenders.attachments.store', $round), [
+            'files' => [UploadedFile::fake()->create('tekening.pdf', 50, 'application/pdf')],
+        ])->assertSessionHasErrors('files');
+        $this->assertSame(0, $round->attachments()->count());
+    }
+
+    public function test_weeks_are_shown_with_their_dates(): void
+    {
+        $this->assertSame('44 (26 okt. – 1 nov. 2026)', \App\Support\IsoWeek::label('2026-W44'));
+        $this->assertSame('1 (29 dec. – 4 jan. 2026)', \App\Support\IsoWeek::label('2026-W01'));
+        $this->assertSame('week 42 of later', \App\Support\IsoWeek::label(' week 42 of later '), 'Vrije tekst van vóór de kalender blijft staan');
+        $this->assertNull(\App\Support\IsoWeek::label(null));
+        $this->assertNull(\App\Support\IsoWeek::monday('2026-W60'));
     }
 
     public function test_the_runner_up_gets_a_polite_rejection(): void

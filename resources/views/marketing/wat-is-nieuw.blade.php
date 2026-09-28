@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.59.0</div>
+        <h2>Bijlagen bij een prijsaanvraag</h2>
+        <ul class="tl-list">
+          <li><b>Tekening of bestek meesturen</b> — bij het opvragen van prijzen voeg je bestanden toe (PDF, PNG, JPG of WEBP). Ze gaan mee met de mail aan elk bedrijf en staan op de pagina waar het bedrijf zijn prijs doorgeeft. Ook bij een herinnering en bij de opdracht gaan ze mee.</li>
+          <li><b>Achteraf toevoegen</b> — op de pagina van een lopende uitvraag voeg je nog een bestand toe of haal je er een weg. Er gaat dan geen nieuwe mail uit.</li>
+          <li><b>Startweek kiezen in de kalender</b> — je kiest een dag en ziet welke week dat is, met de datums erbij. Bedrijven lezen "week 44 (26 okt. – 1 nov. 2026)" en kiezen hun beschikbaarheid op dezelfde manier.</li>
+          <li><b>Offertes van bedrijven blijven bewaard</b> — een offerte die een bedrijf als bestand meestuurt staat nu in de database, net als je andere bijlagen.</li>
+          <li><b>Vinkjes</b> — de lijst met bedrijven in het venster toont weer gewone vinkjes.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.58.1</div>
         <h2>Op pauze als status</h2>
         <ul class="tl-list">

@@ -403,6 +403,8 @@ Route::post('uitvraag/{token}', [TenderResponseController::class, 'respond'])
     ->middleware('throttle:20,1')->name('tender.respond');
 Route::post('uitvraag/{token}/afwijzen', [TenderResponseController::class, 'decline'])
     ->middleware('throttle:20,1')->name('tender.decline');
+Route::get('uitvraag/{token}/bijlage/{attachment}', [TenderResponseController::class, 'attachment'])
+    ->whereNumber('attachment')->middleware('throttle:60,1')->name('tender.attachment');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
@@ -620,6 +622,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('uitvragen/{round}/herinneren/{tenderRequest}', [TenderController::class, 'remind'])->name('tenders.remind');
     Route::post('uitvragen/{round}/sluiten', [TenderController::class, 'close'])->name('tenders.close');
     Route::get('uitvragen/{round}/bijlage/{tenderRequest}', [TenderController::class, 'attachment'])->name('tenders.attachment');
+    Route::post('uitvragen/{round}/bijlagen', [TenderController::class, 'storeAttachments'])->name('tenders.attachments.store');
     Route::get('onderaannemers', [TenderPoolController::class, 'index'])->name('tenders.pool');
     Route::post('onderaannemers/pakketten', [TenderPoolController::class, 'storePackage'])->name('tenders.packages.store');
     Route::post('onderaannemers/pakketten/standaard', [TenderPoolController::class, 'seedPackages'])->name('tenders.packages.seed');

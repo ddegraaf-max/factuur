@@ -1,6 +1,7 @@
 <script setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import { dayValue, isoWeek, parseDay, weekLabel, weekMonday } from '@/week.js';
 
 /**
  * Reactieformulier voor de onderaannemer (openbaar, via de tokenlink). Geen
@@ -27,11 +28,16 @@ const form = useForm({
   remarks: props.request?.remarks || '',
   attachment: null,
 });
+// Beschikbaar vanaf: een dag in de kalender; de week gaat mee in het antwoord.
+const startOf = (week) => { const monday = weekMonday(week); return monday ? dayValue(monday) : ''; };
+const availableDay = ref(startOf(props.request?.available_week) || startOf(props.round?.start_week));
+const availableWeek = computed(() => { const day = parseDay(availableDay.value); return day ? isoWeek(day) : ''; });
+
 const declineForm = useForm({ reason: '' });
 const showDecline = ref(false);
 
 const submit = () => form
-  .transform((d) => ({ ...d, price: String(d.price).replace(',', '.') }))
+  .transform((d) => ({ ...d, price: String(d.price).replace(',', '.'), available_week: availableWeek.value || d.available_week }))
   .post(route('tender.respond', props.token), { forceFormData: true, preserveScroll: true, onSuccess: () => { form.attachment = null; } });
 const decline = () => declineForm.post(route('tender.decline', props.token), { preserveScroll: true, onSuccess: () => { showDecline.value = false; } });
 
@@ -59,9 +65,15 @@ const final = computed(() => !props.round?.open || ['awarded', 'rejected'].inclu
 
         <div class="tr-box">
           <div v-if="round.location"><span class="k">{{ $t('Locatie') }}</span><span>{{ round.location }}</span></div>
-          <div v-if="round.start_week"><span class="k">{{ $t('Gewenste start') }}</span><span>{{ $t('week :week', { week: round.start_week }) }}</span></div>
+          <div v-if="round.start_week_label"><span class="k">{{ $t('Gewenste start') }}</span><span>{{ $t('week :week', { week: round.start_week_label }) }}</span></div>
           <div><span class="k">{{ $t('Reageren vóór') }}</span><span><strong>{{ round.deadline_label }}</strong></span></div>
           <div v-if="round.description" class="tr-desc">{{ round.description }}</div>
+          <div v-if="round.attachments?.length" class="tr-files">
+            <div class="tr-files-title">{{ $t('Bijlagen') }}</div>
+            <a v-for="file in round.attachments" :key="file.id" :href="file.url" target="_blank" rel="noopener" class="tr-file">
+              <span>📎 {{ file.filename }}</span><span class="tr-hint">{{ file.size_formatted }}</span>
+            </a>
+          </div>
         </div>
 
         <div v-if="flash" class="tr-flash">{{ flash }}</div>
@@ -89,8 +101,9 @@ const final = computed(() => !props.round?.open || ['awarded', 'rejected'].inclu
               <div v-if="form.errors.price" class="tr-err">{{ form.errors.price }}</div>
             </div>
             <div class="tr-field">
-              <label>{{ $t('Beschikbaar vanaf week') }}</label>
-              <input type="text" v-model="form.available_week" maxlength="12" :placeholder="round.start_week || '2026-W42'">
+              <label>{{ $t('Beschikbaar vanaf') }} <span class="tr-hint">{{ $t('(kies een dag in die week)') }}</span></label>
+              <input type="date" v-model="availableDay">
+              <div v-if="availableWeek" class="tr-hint">{{ $t('week :week', { week: weekLabel(availableWeek) }) }}</div>
             </div>
           </div>
           <div class="tr-row">
@@ -143,6 +156,10 @@ h1 { font-size: 22px; margin: 0 0 8px; letter-spacing: -0.015em; }
 .tr-box > div { display: flex; gap: 12px; padding: 3px 0; }
 .tr-box .k { color: #78716C; width: 140px; flex: 0 0 140px; }
 .tr-desc { display: block !important; white-space: pre-wrap; margin-top: 10px; padding-top: 10px; border-top: 1px solid #E7E5E4; line-height: 1.6; color: #44403C; }
+.tr-files { display: block !important; margin-top: 10px; padding-top: 10px; border-top: 1px solid #E7E5E4; }
+.tr-files-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #78716C; margin-bottom: 6px; }
+.tr-file { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 10px; margin-top: 4px; border: 1px solid #E7E5E4; border-radius: 8px; background: #fff; color: inherit; text-decoration: none; font-weight: 500; }
+.tr-file:hover { border-color: #A8A29E; }
 .tr-flash { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
 .tr-error { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
 .tr-final { background: #F5F5F4; border-radius: 8px; padding: 12px 14px; font-size: 14.5px; line-height: 1.6; margin-bottom: 14px; }
