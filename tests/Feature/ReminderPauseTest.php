@@ -178,6 +178,46 @@ class ReminderPauseTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    public function test_paused_shows_as_a_status_in_the_lists(): void
+    {
+        $invoice = $this->overdueInvoice();
+        app(ReminderService::class)->pause($invoice, now()->addWeek());
+        $overdue = Invoice::regular()->where('company_id', $this->user->company_id)->where('status', 'overdue')->count();
+
+        $this->actingAs($this->user)
+            ->get(route('invoices.index', ['status' => 'paused']))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('counts.paused', 1)
+                ->has('invoices.data', 1)
+                ->where('invoices.data.0.id', $invoice->id)
+                ->where('invoices.data.0.paused', true)
+                ->where('invoices.data.0.status', 'overdue'));
+
+        $this->get(route('dashboard'))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('kpis.overdue_count', $overdue)
+                ->where('kpis.overdue_paused_count', 1));
+
+        // Betaald is betaald: de pauze telt dan niet meer als status.
+        $invoice->forceFill(['status' => 'paid', 'paid_total' => $invoice->total])->save();
+        $this->assertFalse($invoice->fresh()->isPaused());
+        $this->assertSame(0, Invoice::paused()->where('company_id', $this->user->company_id)->count());
+    }
+
+    public function test_a_lapsed_pause_is_no_longer_a_status(): void
+    {
+        $invoice = $this->overdueInvoice();
+        $invoice->forceFill([
+            'reminders_paused_at' => now()->subDays(5),
+            'reminders_paused_until' => now()->subDay()->toDateString(),
+        ])->save();
+
+        $this->assertFalse($invoice->fresh()->isPaused());
+        $this->assertSame(0, Invoice::paused()->where('company_id', $this->user->company_id)->count());
+    }
+
     public function test_a_paid_invoice_cannot_be_paused(): void
     {
         $invoice = Invoice::regular()->where('company_id', $this->user->company_id)->where('status', 'paid')->firstOrFail();

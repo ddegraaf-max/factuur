@@ -518,7 +518,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div class="inv-number">{{ invoice.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
-              <span v-if="paused" class="pause-chip" :title="$t('Geen herinneringen, aanmaningen of incasso zolang de pauze loopt')">{{ $t('Op pauze') }}</span>
+              <StatusPill v-if="paused" :status="invoice.status" :days-overdue="invoice.days_overdue" paused />
               <span v-if="peppol?.sent_at_label" class="peppol-chip on" :title="$t('Afgeleverd via Peppol op :date', { date: peppol.sent_at_label })">
                 ⚡ {{ $t('Via Peppol afgeleverd') }}
               </span>
@@ -1359,11 +1359,6 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 .pause-reason { font-size: 12.5px; margin-top: 2px; opacity: 0.85; }
 .pause-actions { margin-left: auto; flex: none; display: flex; gap: 14px; }
 .pause-hint { font-size: 12px; color: var(--text-3); margin-top: 6px; line-height: 1.5; }
-.pause-chip {
-  display: inline-flex; align-items: center; font-size: 11px; font-weight: 600;
-  padding: 4px 10px; border-radius: 100px;
-  background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border);
-}
 
 /* Wissel factuurregels / PDF-voorvertoning */
 .view-toggle-bar { display: flex; justify-content: center; padding: 14px 16px 0; }

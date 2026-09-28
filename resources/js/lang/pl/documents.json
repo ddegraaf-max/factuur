@@ -372,5 +372,6 @@
   "Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.": "Puste pole = wstrzymanie do czasu samodzielnego wznowienia. Po podaniu daty przypomnienia ruszą automatycznie następnego dnia.",
   "(optioneel — alleen voor jezelf)": "(opcjonalnie — tylko dla Ciebie)",
   "Bijv. betalingsregeling afgesproken, klacht in behandeling": "Np. uzgodniono spłatę w ratach, reklamacja w toku",
-  "Op pauze: geen herinneringen, aanmaningen of incasso": "Wstrzymana: bez przypomnień, wezwań i windykacji"
+  "Op pauze: geen herinneringen, aanmaningen of incasso": "Wstrzymana: bez przypomnień, wezwań i windykacji",
+  ":n op pauze": ":n wstrzymanych"
 }

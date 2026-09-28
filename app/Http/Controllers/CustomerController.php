@@ -150,6 +150,7 @@ class CustomerController extends Controller
                 'due_date_label' => $i->due_date?->translatedFormat('j M Y'),
                 'status' => $i->status,
                 'days_overdue' => $i->days_overdue,
+                'paused' => $i->isPaused(),
                 'total' => (float) $i->total,
                 'remaining' => round((float) $i->total - (float) $i->paid_total, 2),
             ]),

@@ -51,8 +51,9 @@ const greeting = () => {
     <div class="page-header">
       <div>
         <h1 class="page-title">{{ greeting() }}, {{ $page.props.auth.user.name.split(' ')[0] }}</h1>
-        <p class="page-subtitle" v-if="kpis.overdue_count > 0">
-          {{ kpis.overdue_count === 1 ? $t('Je hebt 1 factuur die aandacht nodig heeft.') : $t('Je hebt :n facturen die aandacht nodig hebben.', { n: kpis.overdue_count }) }}
+        <!-- Achterstallig maar op pauze vraagt nu geen aandacht. -->
+        <p class="page-subtitle" v-if="kpis.overdue_count - kpis.overdue_paused_count > 0">
+          {{ kpis.overdue_count - kpis.overdue_paused_count === 1 ? $t('Je hebt 1 factuur die aandacht nodig heeft.') : $t('Je hebt :n facturen die aandacht nodig hebben.', { n: kpis.overdue_count - kpis.overdue_paused_count }) }}
         </p>
         <p class="page-subtitle" v-else>{{ $t('Alles is up-to-date.') }}</p>
       </div>
@@ -93,6 +94,7 @@ const greeting = () => {
         <div class="kpi-meta">
           <template v-if="kpis.overdue_count > 0">
             <span class="change-down">{{ kpis.overdue_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: kpis.overdue_count }) }}</span>
+            <span v-if="kpis.overdue_paused_count > 0"> · {{ $t(':n op pauze', { n: kpis.overdue_paused_count }) }}</span>
           </template>
           <template v-else>{{ $t('Geen') }}</template>
         </div>
@@ -149,7 +151,7 @@ const greeting = () => {
                 <td class="num cell-primary">{{ inv.number || '—' }}</td>
                 <td :data-label="$t('Klant')">{{ inv.customer_name }}</td>
                 <td :data-label="$t('Datum')">{{ inv.invoice_date }}</td>
-                <td :data-label="$t('Status')"><StatusPill :status="inv.status" /></td>
+                <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" /></td>
                 <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
               </tr>
             </tbody>

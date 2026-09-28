@@ -852,6 +852,15 @@ table { border-collapse: collapse; width: 100%; }
 .pill-draft   { color: var(--text-2); background: var(--surface-3); border-color: var(--border-strong); }
 .pill-partial { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-border); }
 .pill-cancelled { color: var(--text-3); background: var(--surface-3); border-color: var(--border-strong); text-decoration: line-through; }
+/* Op pauze: eigen kleur (amber is al 'deels betaald') en een pauzeteken in plaats van de stip. */
+.pill-paused  { color: #6D28D9; background: #F5F3FF; border-color: #DDD6FE; }
+.pill-paused::before {
+  width: 2px; height: 7px;
+  border-radius: 0;
+  background: none;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+}
 
 /* FILTERS */
 .filter-bar {

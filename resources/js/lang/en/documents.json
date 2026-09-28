@@ -372,5 +372,6 @@
   "Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.": "Leave empty to keep it on hold until you resume yourself. With a date, reminders start again automatically the day after.",
   "(optioneel — alleen voor jezelf)": "(optional — for your own reference)",
   "Bijv. betalingsregeling afgesproken, klacht in behandeling": "E.g. payment arrangement agreed, complaint being handled",
-  "Op pauze: geen herinneringen, aanmaningen of incasso": "On hold: no reminders, dunning letters or debt collection"
+  "Op pauze: geen herinneringen, aanmaningen of incasso": "On hold: no reminders, dunning letters or debt collection",
+  ":n op pauze": ":n on hold"
 }

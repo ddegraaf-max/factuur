@@ -117,6 +117,14 @@ class Invoice extends Model
             || $this->reminders_paused_until->copy()->startOfDay()->gte(now()->startOfDay());
     }
 
+    /** 'Op pauze' als status in lijsten: alleen zolang de factuur nog openstaat. */
+    public function isPaused(): bool
+    {
+        return ! $this->is_credit
+            && in_array($this->status, ['sent', 'partial', 'overdue'], true)
+            && $this->remindersPaused();
+    }
+
     public function getRemainingAmountAttribute(): float
     {
         return (float) $this->total - (float) $this->paid_total;
@@ -167,10 +175,21 @@ class Invoice extends Model
         return $query->where('is_credit', true);
     }
 
+    /** Openstaande facturen waarvan de pauze nu loopt (zie isPaused()). */
+    public function scopePaused(Builder $query): Builder
+    {
+        return $query->where('is_credit', false)
+            ->whereIn('status', ['sent', 'partial', 'overdue'])
+            ->whereNotNull('reminders_paused_at')
+            ->where(fn (Builder $q) => $q->whereNull('reminders_paused_until')
+                ->orWhereDate('reminders_paused_until', '>=', now()));
+    }
+
     public function scopeForStatus(Builder $query, ?string $status): Builder
     {
         if (! $status || $status === 'all') return $query;
         if ($status === 'creditnota') return $query->where('is_credit', true);
+        if ($status === 'paused') return $this->scopePaused($query);
         return $query->where('is_credit', false)->where('status', $status);
     }
 

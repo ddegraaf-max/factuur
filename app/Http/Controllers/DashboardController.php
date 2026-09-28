@@ -68,6 +68,7 @@ class DashboardController extends Controller
                 'customer_name' => $i->customer_name,
                 'invoice_date' => $i->invoice_date->format('d M Y'),
                 'status' => $i->status,
+                'paused' => $i->isPaused(),
                 'is_credit' => (bool) $i->is_credit,
                 'total' => (float) $i->total,
             ]);
@@ -151,6 +152,7 @@ class DashboardController extends Controller
                 'open_credit' => (float) $openCredit,
                 'overdue' => (float) $overdue,
                 'overdue_count' => $overdueCount,
+                'overdue_paused_count' => Invoice::paused()->where('status', 'overdue')->count(),
                 'month_revenue' => (float) $monthRevenue,
                 'month_change' => $monthChange,
                 'vat_to_pay' => (float) $vatToPay,

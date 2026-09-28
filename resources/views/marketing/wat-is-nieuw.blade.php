@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.58.1</div>
+        <h2>Op pauze als status</h2>
+        <ul class="tl-list">
+          <li><b>Status "Op pauze"</b> — een gepauzeerde factuur krijgt in de statuskolom een eigen label met pauzeteken: op het dashboard, in de factuurlijst en op de klantpagina. Houd je de muis erboven, dan zie je de gewone status (bijvoorbeeld achterstallig).</li>
+          <li><b>Filteren</b> — in de factuurlijst staat een filter "Op pauze" zodra er een factuur op pauze staat.</li>
+          <li><b>Dashboard</b> — de kaart Achterstallig meldt hoeveel facturen daarvan op pauze staan, en die tellen niet meer mee bij "facturen die aandacht nodig hebben".</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.58.0</div>
         <h2>Pauzeknop op de factuur</h2>
         <ul class="tl-list">
