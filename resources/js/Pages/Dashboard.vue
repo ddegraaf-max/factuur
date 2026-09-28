@@ -140,7 +140,20 @@ const greeting = () => {
         <div class="kpi-meta" v-else>—</div>
       </div>
 
-      <div class="kpi-card">
+      <Link v-if="kpis.kor" :href="route('vat.index')" :class="['kpi-card', 'kor-card', { alert: kpis.kor.state === 'over' }]">
+        <div class="kpi-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          {{ $t('KOR · omzet :year', { year: kpis.kor.year }) }}
+        </div>
+        <div class="kpi-value">{{ eur(kpis.kor.revenue) }}</div>
+        <div class="kpi-meta">
+          <template v-if="kpis.kor.state === 'over'"><span class="change-down">{{ $t('boven de grens van :limit', { limit: eur(kpis.kor.limit, { decimals: 0 }) }) }}</span></template>
+          <template v-else>{{ $t('van :limit · geen btw-aangifte', { limit: eur(kpis.kor.limit, { decimals: 0 }) }) }}</template>
+        </div>
+        <div class="kor-meter" :class="'is-' + kpis.kor.state"><div :style="{ width: Math.max(2, kpis.kor.percent) + '%' }"></div></div>
+      </Link>
+
+      <div v-else class="kpi-card">
         <div class="kpi-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           {{ $t('Btw') }} {{ kpis.vat_period_label || ('Q' + kpis.quarter_number) }}
@@ -300,6 +313,13 @@ const greeting = () => {
 </template>
 
 <style>
+/* Kleineondernemersregeling: omzet tegenover de grens */
+.kor-card { display: block; color: inherit; text-decoration: none; }
+.kor-meter { height: 6px; border-radius: 6px; background: var(--surface-2); overflow: hidden; margin-top: 10px; }
+.kor-meter div { height: 100%; border-radius: 6px; background: var(--success); }
+.kor-meter.is-near div { background: var(--warning); }
+.kor-meter.is-over div { background: var(--brand); }
+
 /* Startlijst voor een nieuw account */
 .start-card { margin-bottom: 20px; border-color: var(--brand-border, var(--border)); }
 .start-card .card-header { align-items: center; gap: 16px; }

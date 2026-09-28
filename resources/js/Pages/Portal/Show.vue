@@ -123,8 +123,8 @@ const returnedUnpaid = computed(() =>
           <span>{{ $t('Subtotaal') }}</span>
           <span class="mono">{{ eur(signed(invoice.subtotal)) }}</span>
         </div>
-        <div v-if="invoice.vat_reversed" class="pi-total-row">
-          <span>{{ $t('Btw verlegd') }}</span>
+        <div v-if="(invoice.vat_exempt || invoice.vat_reversed)" class="pi-total-row">
+          <span>{{ invoice.vat_exempt ? $t('Vrijgesteld van btw') : $t('Btw verlegd') }}</span>
           <span class="mono">{{ eur(0) }}</span>
         </div>
         <template v-else>

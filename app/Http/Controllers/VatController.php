@@ -82,6 +82,8 @@ class VatController extends Controller
                 'reminder_email' => $company->daily_notification_email ?: $company->email ?: auth()->user()->email,
             ],
             'mbz_url' => 'https://mijnzakelijk.belastingdienst.nl',
+            // Kleineondernemersregeling: geen aangifte; wel de omzet tegenover de grens van 20.000 euro.
+            'kor' => \App\Support\Kor::applies($company) ? \App\Support\Kor::status($company) : null,
         ]));
     }
 

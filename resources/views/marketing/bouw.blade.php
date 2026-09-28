@@ -74,7 +74,7 @@
         <div class="feature-desc">Werk je als onderaannemer? Eén vinkje en de factuur staat op 0%, met de vermelding btw verlegd en het btw-nummer van je opdrachtgever. De omzet komt in de juiste rubriek van je aangifte.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h12"/><path d="M4 14h9"/><path d="M19 6a7.7 7.7 0 0 0-5.2-2A7.9 7.9 0 0 0 6 12c0 4.4 3.5 8 7.8 8 2 0 3.8-.8 5.2-2"/></svg></div>
         <div class="feature-title">Betaald krijgen</div>
         <div class="feature-desc">Op elke factuur staat een betaallink met iDEAL en een QR-code. Herinneringen en aanmaningen gaan vanzelf, en loopt er nog een oplevering of klacht, dan zet je ze voor die factuur op pauze.</div>
       </div>

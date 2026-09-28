@@ -373,6 +373,12 @@ class VatService
      */
     public function attention(Company $company): array
     {
+        // Kleineondernemersregeling: geen aangifte, dus ook niets dat openstaat
+        // en geen herinnering of melding op het dashboard.
+        if (\App\Support\Kor::applies($company)) {
+            return ['due' => null, 'current' => null];
+        }
+
         $year = now()->year;
         $due = null;
         $current = null;

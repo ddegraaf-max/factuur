@@ -15,6 +15,7 @@ const props = defineProps({
   totals: Object,
   settings: Object,
   mbz_url: String,
+  kor: { type: Object, default: null }, // kleineondernemersregeling: omzet tegenover de grens
 });
 
 const setYear = (y) => router.get(route('vat.index'), { year: y }, { preserveState: false, preserveScroll: true });
@@ -139,8 +140,21 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
       </div>
     </div>
 
+    <!-- Kleineondernemersregeling: geen aangifte, wel de omzetgrens in de gaten houden -->
+    <div v-if="kor" class="kor-banner" :class="'is-' + kor.state">
+      <div class="kor-banner-text">
+        <strong>{{ $t('Je doet mee aan de kleineondernemersregeling') }}</strong>
+        <span>{{ $t('Je rekent geen btw, doet geen btw-aangifte en kunt geen btw terugvragen. Het overzicht hieronder is er voor je eigen administratie.') }}</span>
+        <span v-if="kor.state === 'over'" class="kor-warn">{{ $t('Je omzet in :year is :amount. Dat is meer dan de grens van :limit: meld je af voor de regeling bij de Belastingdienst en reken vanaf dat moment btw.', { year: kor.year, amount: eur(kor.revenue), limit: eur(kor.limit, { decimals: 0 }) }) }}</span>
+        <span v-else-if="kor.state === 'near'" class="kor-warn">{{ $t('Je omzet in :year is :amount. Boven :limit moet je je afmelden voor de regeling.', { year: kor.year, amount: eur(kor.revenue), limit: eur(kor.limit, { decimals: 0 }) }) }}</span>
+        <span v-else>{{ $t('Omzet in :year: :amount van :limit.', { year: kor.year, amount: eur(kor.revenue), limit: eur(kor.limit, { decimals: 0 }) }) }}</span>
+        <div class="kor-meter" :class="'is-' + kor.state"><div :style="{ width: Math.max(2, kor.percent) + '%' }"></div></div>
+      </div>
+      <Link :href="route('settings.company')" class="btn btn-secondary btn-sm">{{ $t('Instelling wijzigen') }}</Link>
+    </div>
+
     <!-- Actie nodig: aangiftetermijn loopt -->
-    <div v-if="duePeriod" class="btw-alert">
+    <div v-if="duePeriod && !kor" class="btw-alert">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       <div class="btw-alert-text">
         <strong>{{ $t('Aangifte :period :year staat open', { period: duePeriod.label, year }) }}</strong> — {{ duePeriod.days_left === 1 ? $t('nog 1 dag') : $t('nog :n dagen', { n: duePeriod.days_left }) }}.
@@ -409,6 +423,23 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
 </template>
 
 <style scoped>
+/* Kleineondernemersregeling */
+.kor-banner {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--success);
+  border-radius: var(--r-md, 10px); padding: 16px 18px; margin-bottom: 20px;
+}
+.kor-banner.is-near { border-left-color: var(--warning); }
+.kor-banner.is-over { border-left-color: var(--brand); }
+.kor-banner-text { display: flex; flex-direction: column; gap: 4px; font-size: 13.5px; color: var(--text-2); line-height: 1.55; flex: 1; min-width: 0; }
+.kor-banner-text strong { color: var(--text); font-size: 14.5px; }
+.kor-warn { color: var(--text); font-weight: 600; }
+.kor-meter { height: 8px; border-radius: 8px; background: var(--surface-2); overflow: hidden; max-width: 360px; margin-top: 6px; }
+.kor-meter div { height: 100%; border-radius: 8px; background: var(--success); }
+.kor-meter.is-near div { background: var(--warning); }
+.kor-meter.is-over div { background: var(--brand); }
+@media (max-width: 700px) { .kor-banner { flex-direction: column; } }
+
 .btw-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .year-tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); padding: 4px; border-radius: 10px; }
 .tab { padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text-3); border-radius: 7px; cursor: pointer; }

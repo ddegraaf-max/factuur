@@ -159,6 +159,8 @@ class DashboardController extends Controller
                 'vat_period_label' => $vatPeriodLabel,
                 'quarter_number' => $quarterNumber,
                 'quarter_deadline' => $quarterDeadline->translatedFormat('j M Y'),
+                // Kleineondernemersregeling: omzet van dit jaar tegenover de grens, in plaats van btw.
+                'kor' => \App\Support\Kor::applies(auth()->user()->company) ? \App\Support\Kor::status(auth()->user()->company) : null,
             ],
             // Aangifte die nu open staat (afgesloten tijdvak, deadline nog niet voorbij).
             'vat_due' => $vatDue ? [

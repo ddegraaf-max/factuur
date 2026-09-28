@@ -61,6 +61,7 @@ const form = useForm({
   invoice_footers: Object.fromEntries(['nl', 'en', 'pl'].map(l => [l, props.company.invoice_footers?.[l] ?? ''])),
   invoice_number_format: props.company.invoice_number_format ?? formatExample,
   price_mode: props.company.price_mode ?? 'excl',
+  kor: !!props.company.kor,
   daily_notification_enabled: !!props.company.daily_notification_enabled,
   daily_notification_email: props.company.daily_notification_email ?? '',
 });
@@ -235,6 +236,17 @@ const submit = () => form.patch(route('settings.company.update'));
             <div style="font-size:11px;color:var(--text-4);margin-top:4px;">
               {{ $t('Handig voor webshops, horeca en andere particuliere verkoop. De factuur zelf toont altijd netto, btw én totaal — dat is wettelijk verplicht.') }}
             </div>
+          </div>
+          <div v-if="market.kor" class="form-group">
+            <label class="toggle-row">
+              <input type="checkbox" v-model="form.kor">
+              <div>
+                <div class="toggle-title">{{ $t('Ik doe mee aan de kleineondernemersregeling (KOR)') }}</div>
+                <div class="toggle-sub">
+                  {{ $t('Je facturen en offertes krijgen geen btw en wel de vermelding dat de vrijstelling geldt. Er is geen btw-aangifte; op het dashboard zie je je omzet tegenover de grens van 20.000 euro per jaar. Zet dit alleen aan als de Belastingdienst je aanmelding heeft bevestigd.') }}
+                </div>
+              </div>
+            </label>
           </div>
           <div class="form-group">
             <label>{{ $t('Online betalingen — :method via Mollie', { method: market.online_payment_label }) }}<span class="label-hint">{{ $t('(betaallink in de factuurmail en het klantenportaal)') }}</span></label>

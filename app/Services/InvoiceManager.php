@@ -42,9 +42,11 @@ class InvoiceManager
                     ->find($data['brand_profile_id'])
                 : null;
 
-            // Btw verlegd: geen btw op de regels, wel de vermelding op het document.
-            $reversed = \App\Support\VatReverse::requested($data);
-            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
+            // Zonder btw-bedragen: het bedrijf doet mee aan de kleineondernemersregeling
+            // (dan geldt de vrijstelling en is er niets te verleggen), of de btw is verlegd.
+            $exempt = \App\Support\Kor::applies($customer->company);
+            $reversed = ! $exempt && \App\Support\VatReverse::requested($data);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed || $exempt);
             $mode = $this->resolveMode($data, $customer->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
@@ -83,6 +85,7 @@ class InvoiceManager
                 'paid_total' => 0,
                 'vat_breakdown' => $totals['vat_breakdown'],
                 'vat_reversed' => $reversed,
+                'vat_exempt' => $exempt,
 
                 'notes' => $data['notes'] ?? null,
                 'footer' => $customer->company->documentFooter($profile, $language),
@@ -101,11 +104,13 @@ class InvoiceManager
         }
 
         return DB::transaction(function () use ($invoice, $data) {
-            // Zonder keuze op het formulier blijft het document zoals het was.
-            $reversed = array_key_exists('vat_reversed', $data)
+            // Een concept volgt de instelling van het bedrijf: KOR gaat voor btw verlegd.
+            // Zonder keuze op het formulier blijft btw verlegd zoals het was.
+            $exempt = \App\Support\Kor::applies($invoice->company);
+            $reversed = ! $exempt && (array_key_exists('vat_reversed', $data)
                 ? \App\Support\VatReverse::requested($data)
-                : (bool) $invoice->vat_reversed;
-            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
+                : (bool) $invoice->vat_reversed);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed || $exempt);
             $mode = $this->resolveMode($data, $invoice->company);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
@@ -185,6 +190,7 @@ class InvoiceManager
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
                 'vat_reversed' => $reversed,
+                'vat_exempt' => $exempt,
                 'notes' => array_key_exists('notes', $data) ? $data['notes'] : $invoice->notes,
             ]);
 

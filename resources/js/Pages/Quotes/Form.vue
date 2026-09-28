@@ -12,6 +12,7 @@ const props = defineProps({
   customers: Array,
   products: Array,
   vat_rates: Array,
+  vat_exempt: { type: Boolean, default: false }, // kleineondernemersregeling: geen btw op het document
   price_mode: { type: String, default: 'excl' },
   default_valid_days: { type: Number, default: 30 },
   default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
@@ -88,9 +89,10 @@ const form = useForm({
 
 const r2 = (n) => Math.round(n * 100) / 100;
 
-// Bij btw verlegd rekent elke regel met 0%; het gekozen tarief blijft bewaard
+// Bij btw verlegd en onder de kleineondernemersregeling rekent elke regel met 0%; het gekozen tarief blijft bewaard
 // voor als je het vinkje weer uitzet.
-const rateOf = (line) => form.vat_reversed ? 0 : (Number(line.vat_rate) || 0);
+const noVat = computed(() => props.vat_exempt || form.vat_reversed);
+const rateOf = (line) => noVat.value ? 0 : (Number(line.vat_rate) || 0);
 
 /** Btw verlegd aan of uit. In incl-modus rekenen de prijzen mee, zodat het nettobedrag gelijk blijft. */
 const setReversed = (on) => {
@@ -193,7 +195,7 @@ const applyProduct = (line, productId) => {
     line.details = p.description ?? '';
     line.unit = p.unit;
     line.vat_rate = Number(p.vat_rate);
-    line.unit_price = inclMode.value && !form.vat_reversed
+    line.unit_price = inclMode.value && !noVat.value
       ? r2(Number(p.price) * (1 + Number(p.vat_rate) / 100))
       : Number(p.price);
   }
@@ -227,7 +229,7 @@ const applyParsed = (r) => {
       quantity: Number(l.quantity) || 1,
       unit: l.unit || 'stuk',
       // De AI levert prijzen exclusief btw; in incl-modus toont het formulier bruto.
-      unit_price: inclMode.value && !form.vat_reversed
+      unit_price: inclMode.value && !noVat.value
         ? r2(Number(l.unit_price) * (1 + Number(l.vat_rate) / 100))
         : Number(l.unit_price),
       vat_rate: Number(l.vat_rate),
@@ -408,8 +410,13 @@ const submit = (action) => {
               </div>
               <div v-else class="form-group"></div>
             </div>
+            <div v-if="vat_exempt" class="kor-note">
+              <b>{{ $t('Kleineondernemersregeling') }}</b>
+              {{ $t('Op dit document komt geen btw. De vermelding van de vrijstelling staat er vanzelf op.') }}
+              <Link :href="route('settings.company')">{{ $t('Instelling wijzigen') }}</Link>
+            </div>
             <VatReverseField
-              v-if="market.vat_reverse"
+              v-else-if="market.vat_reverse"
               :model-value="form.vat_reversed"
               v-model:vat-number="form.customer_vat_number"
               :customer="selectedCustomer"
@@ -469,7 +476,7 @@ const submit = (action) => {
                   <input type="number" v-model.number="line.discount_pct" min="0" max="100" step="0.01" class="num right" placeholder="0" :title="$t('Korting in procenten op deze regel')">
                 </div>
                 <div class="line-field" :data-label="$t('BTW')">
-                  <div v-if="form.vat_reversed" class="vat-reversed-chip" :title="$t('Btw verlegd')">{{ $t('verlegd') }}</div>
+                  <div v-if="noVat" class="vat-reversed-chip" :title="vat_exempt ? $t('Vrijgesteld van btw') : $t('Btw verlegd')">{{ vat_exempt ? $t('n.v.t.') : $t('verlegd') }}</div>
                   <select v-else v-model.number="line.vat_rate">
                     <option v-for="r in vat_rates" :key="r.value" :value="r.value">{{ r.value }}%</option>
                   </select>
@@ -513,8 +520,8 @@ const submit = (action) => {
           <div class="card-header"><div class="card-title">{{ $t('Totaal') }}</div></div>
           <div class="card-body">
             <div class="total-row"><span>{{ $t('Subtotaal') }}</span><span class="mono">{{ eur(totals.subtotal) }}</span></div>
-            <div v-if="form.vat_reversed" class="total-row">
-              <span>{{ $t('Btw verlegd') }}</span>
+            <div v-if="noVat" class="total-row">
+              <span>{{ vat_exempt ? $t('Vrijgesteld van btw') : $t('Btw verlegd') }}</span>
               <span class="mono">{{ eur(0) }}</span>
             </div>
             <template v-else>

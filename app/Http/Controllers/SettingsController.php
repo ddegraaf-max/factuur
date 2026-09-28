@@ -108,6 +108,8 @@ class SettingsController extends Controller
             'country' => ['required', 'string', 'size:2'],
             // New preference fields — all optional so older forms keep working
             'price_mode' => ['nullable', 'in:excl,incl'],
+            // Kleineondernemersregeling: facturen zonder btw, met de vermelding van de vrijstelling.
+            'kor' => ['nullable', 'boolean'],
             'fiscal_year_start' => ['nullable', 'integer', 'min:1', 'max:12'],
             'results_per_page' => ['nullable', 'integer', 'in:10,25,50,100'],
             'copy_email' => ['nullable', 'email'],

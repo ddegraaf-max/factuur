@@ -543,5 +543,10 @@
   "Acties": "Akcje",
   "Formele aanmaning (PDF)": "Wezwanie do zapłaty (PDF)",
   "Te koop aangeboden": "Zgłoszona do wykupu",
-  "Factuur verkopen": "Sprzedaj fakturę"
+  "Factuur verkopen": "Sprzedaj fakturę",
+  "Je doet mee aan de kleineondernemersregeling": "Korzystasz ze zwolnienia dla małych przedsiębiorców",
+  "Je rekent geen btw, doet geen btw-aangifte en kunt geen btw terugvragen. Het overzicht hieronder is er voor je eigen administratie.": "Nie naliczasz VAT, nie składasz deklaracji i nie odliczasz VAT. Poniższe zestawienie służy do własnej ewidencji.",
+  "Je omzet in :year is :amount. Dat is meer dan de grens van :limit: meld je af voor de regeling bij de Belastingdienst en reken vanaf dat moment btw.": "Twój obrót w :year wynosi :amount. To więcej niż limit :limit: wyrejestruj się ze zwolnienia w urzędzie skarbowym i od tego momentu naliczaj VAT.",
+  "Je omzet in :year is :amount. Boven :limit moet je je afmelden voor de regeling.": "Twój obrót w :year wynosi :amount. Powyżej :limit musisz wyrejestrować się ze zwolnienia.",
+  "Omzet in :year: :amount van :limit.": "Obrót w :year: :amount z :limit."
 }

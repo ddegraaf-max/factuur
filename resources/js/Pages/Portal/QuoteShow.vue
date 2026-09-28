@@ -106,7 +106,7 @@ const decline = () => {
         </div>
         <div class="pq-head-right">
           <div class="pq-total">{{ eur(quote.total) }}</div>
-          <div class="pq-total-sub">{{ quote.vat_reversed ? $t('btw verlegd') : $t('incl. btw') }}</div>
+          <div class="pq-total-sub">{{ quote.vat_exempt ? $t('vrijgesteld van btw') : (quote.vat_reversed ? $t('btw verlegd') : $t('incl. btw')) }}</div>
         </div>
       </div>
 
@@ -150,7 +150,7 @@ const decline = () => {
 
         <div class="pq-totals">
           <div><span>{{ $t('Subtotaal') }}</span><span class="num">{{ eur(quote.subtotal) }}</span></div>
-          <div><span>{{ quote.vat_reversed ? $t('Btw verlegd') : $t('BTW') }}</span><span class="num">{{ eur(quote.vat_total) }}</span></div>
+          <div><span>{{ quote.vat_exempt ? $t('Vrijgesteld van btw') : (quote.vat_reversed ? $t('Btw verlegd') : $t('BTW')) }}</span><span class="num">{{ eur(quote.vat_total) }}</span></div>
           <div class="grand"><span>{{ $t('Totaal') }}</span><span class="num">{{ eur(quote.total) }}</span></div>
         </div>
 

@@ -11,26 +11,35 @@ use Illuminate\Support\Facades\Schema;
  * tegen 0%: de vermelding 'btw verlegd' ontbrak, en die is wettelijk verplicht
  * (onderaanneming in de bouw, diensten aan ondernemers in een ander EU-land).
  * Het is een eigenschap van het hele document; alle regels staan dan op 0%.
+ *
+ * De tabellen staan voluit en niet in een lus: de statische analyse (Larastan)
+ * leest de kolommen van een model uit de migraties en volgt geen variabelen.
  */
 return new class extends Migration
 {
-    private const TABLES = ['invoices', 'quotes', 'recurring_invoices'];
-
     public function up(): void
     {
-        foreach (self::TABLES as $name) {
-            Schema::table($name, function (Blueprint $table) {
-                $table->boolean('vat_reversed')->default(false);
-            });
-        }
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->boolean('vat_reversed')->default(false);
+        });
+        Schema::table('quotes', function (Blueprint $table) {
+            $table->boolean('vat_reversed')->default(false);
+        });
+        Schema::table('recurring_invoices', function (Blueprint $table) {
+            $table->boolean('vat_reversed')->default(false);
+        });
     }
 
     public function down(): void
     {
-        foreach (self::TABLES as $name) {
-            Schema::table($name, function (Blueprint $table) {
-                $table->dropColumn('vat_reversed');
-            });
-        }
+        Schema::table('invoices', function (Blueprint $table) {
+            $table->dropColumn('vat_reversed');
+        });
+        Schema::table('quotes', function (Blueprint $table) {
+            $table->dropColumn('vat_reversed');
+        });
+        Schema::table('recurring_invoices', function (Blueprint $table) {
+            $table->dropColumn('vat_reversed');
+        });
     }
 };

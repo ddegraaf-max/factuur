@@ -12,6 +12,7 @@ class Quote extends Model
 {
     use HasFactory;
     use \App\Models\Concerns\HasBrandProfile;
+    use \App\Models\Concerns\HasVatTreatment;
 
     public const STATUSES = [
         'draft' => 'Concept',
@@ -27,7 +28,7 @@ class Quote extends Model
         'customer_name', 'customer_address_line', 'customer_postal_code',
         'customer_city', 'customer_country', 'customer_vat_number',
         'customer_kvk_number', 'customer_email',
-        'subtotal', 'vat_total', 'total', 'vat_breakdown', 'vat_reversed',
+        'subtotal', 'vat_total', 'total', 'vat_breakdown', 'vat_reversed', 'vat_exempt',
         'intro', 'notes', 'footer',
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
         'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
@@ -48,6 +49,7 @@ class Quote extends Model
         'total' => 'decimal:2',
         'vat_breakdown' => 'array',
         'vat_reversed' => 'boolean',
+        'vat_exempt' => 'boolean',
     ];
 
     protected static function booted(): void

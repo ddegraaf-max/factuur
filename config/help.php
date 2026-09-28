@@ -79,7 +79,7 @@ return [
                     'Kies bij elke factuurregel het juiste btw-tarief. Het hoge tarief is 21%, het lage 9%, en 0% gebruik je bijvoorbeeld bij export. Voor btw verlegd is er een eigen vinkje op de factuur; zie het artikel Btw verlegd.',
                 ]],
                 ['KOR / geen btw', [
-                    'Doe je mee aan de kleineondernemersregeling (KOR)? Zet dan elke regel op 0% en zet in je factuurvoettekst (Instellingen → Bedrijfsgegevens) dat je bent vrijgesteld van btw op grond van de kleineondernemersregeling. Die vermelding is verplicht.',
+                    'Doe je mee aan de kleineondernemersregeling (KOR)? Zet dat één keer aan bij Instellingen → Bedrijfsgegevens. Je facturen en offertes krijgen dan geen btw en wel de vermelding van de vrijstelling; zie het artikel Kleineondernemersregeling.',
                 ]],
                 ['Btw-overzicht', [
                     'Per kwartaal vind je een overzicht van de berekende btw, dat je eenvoudig overneemt bij je aangifte.',
@@ -106,6 +106,32 @@ return [
                 ]],
                 ['In je btw-aangifte', [
                     'De omzet van een verlegde factuur aan een Nederlandse klant komt in rubriek 1e. Bij een klant in een ander EU-land komt hij in rubriek 3b.',
+                ]],
+            ],
+        ],
+
+        'kleineondernemersregeling' => [
+            'category' => 'Facturen',
+            'title' => 'Kleineondernemersregeling (KOR) instellen',
+            'intro' => 'Doe je mee aan de KOR, dan zet je dat één keer aan. Je facturen en offertes zijn daarna zonder btw, met de vermelding van de vrijstelling.',
+            'sections' => [
+                ['Aanzetten', [
+                    'Ga naar Instellingen → Bedrijfsgegevens en vink onder Factuurinstellingen "Ik doe mee aan de kleineondernemersregeling (KOR)" aan. Doe dit pas als de Belastingdienst je aanmelding heeft bevestigd.',
+                ]],
+                ['Wat er op je factuur staat', [
+                    'Geen btw-tarief en geen btw-bedrag. Wel de vermelding: "Factuur vrijgesteld van OB op grond van artikel 25 Wet OB (kleineondernemersregeling)". Dat geldt voor de PDF, het klantenportaal en de e-factuur.',
+                ]],
+                ['Concepten die je al had', [
+                    'Een concept met btw blijft staan zoals het was. Op de factuurpagina zie je een melding; open het concept en sla het opnieuw op, dan vervalt de btw. Facturen die al verstuurd zijn, veranderen niet.',
+                ]],
+                ['De omzetgrens', [
+                    'De regeling geldt tot 20.000 euro omzet per kalenderjaar. Op het dashboard en bij Btw-aangifte zie je je omzet van dit jaar tegenover die grens. Vanaf 16.000 euro krijg je een waarschuwing. Kom je boven de grens, dan meld je je af bij de Belastingdienst en zet je de instelling uit.',
+                ]],
+                ['Geen aangifte, geen herinnering', [
+                    'Zolang de KOR aan staat, vraagt {brand} niet om een btw-aangifte en krijg je geen herinnering. Het btw-overzicht blijft beschikbaar voor je eigen administratie.',
+                ]],
+                ['Afmelden', [
+                    'Zet de instelling uit. Nieuwe facturen en offertes rekenen dan weer met btw. Facturen die onder de KOR zijn verstuurd, houden hun vermelding.',
                 ]],
             ],
         ],

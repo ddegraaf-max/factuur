@@ -98,6 +98,7 @@ class UblGenerator
 
         // ---------- BTW-totalen per tarief ----------
         $reversed = (bool) $invoice->vat_reversed;
+        $exempt = (bool) $invoice->vat_exempt;
         $buckets = []; // rate => ['base' => x, 'vat' => y]
         foreach ($invoice->lines as $line) {
             $rate = (string) (float) $line->vat_rate;
@@ -112,9 +113,12 @@ class UblGenerator
             $xml[] = '      <cbc:TaxableAmount currencyID="'.$this->e($currency).'">'.$this->amount($bucket['base']).'</cbc:TaxableAmount>';
             $xml[] = '      <cbc:TaxAmount currencyID="'.$this->e($currency).'">'.$this->amount($bucket['vat']).'</cbc:TaxAmount>';
             $xml[] = '      <cac:TaxCategory>';
-            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $rate, $reversed).'</cbc:ID>';
+            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $rate, $reversed, $exempt).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $rate).'</cbc:Percent>';
-            if ($reversed) {
+            if ($exempt) {
+                // Kleineondernemersregeling: vrijgesteld, met de reden erbij.
+                $xml[] = '        <cbc:TaxExemptionReason>'.$this->e(__('doc.vat_exempt_note')).'</cbc:TaxExemptionReason>';
+            } elseif ($reversed) {
                 // Btw verlegd: categorie AE met de Europese code voor verlegging.
                 $xml[] = '        <cbc:TaxExemptionReasonCode>VATEX-EU-AE</cbc:TaxExemptionReasonCode>';
                 $xml[] = '        <cbc:TaxExemptionReason>'.$this->e(__('doc.vat_reversed')).'</cbc:TaxExemptionReason>';
@@ -147,7 +151,7 @@ class UblGenerator
             }
             $xml[] = '      <cbc:Name>'.$this->e(mb_substr($line->description, 0, 100) ?: __('Regel :n', ['n' => $index + 1])).'</cbc:Name>';
             $xml[] = '      <cac:ClassifiedTaxCategory>';
-            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $line->vat_rate, $reversed).'</cbc:ID>';
+            $xml[] = '        <cbc:ID>'.$this->taxCategory((float) $line->vat_rate, $reversed, $exempt).'</cbc:ID>';
             $xml[] = '        <cbc:Percent>'.$this->amount((float) $line->vat_rate).'</cbc:Percent>';
             $xml[] = '        <cac:TaxScheme><cbc:ID>VAT</cbc:ID></cac:TaxScheme>';
             $xml[] = '      </cac:ClassifiedTaxCategory>';
@@ -208,9 +212,12 @@ class UblGenerator
         return implode("\n", $p);
     }
 
-    /** UNCL5305-categorie: S = standaard/verlaagd tarief, Z = nultarief, AE = btw verlegd. */
-    protected function taxCategory(float $rate, bool $reversed = false): string
+    /** UNCL5305-categorie: S = standaard/verlaagd tarief, Z = nultarief, AE = btw verlegd, E = vrijgesteld. */
+    protected function taxCategory(float $rate, bool $reversed = false, bool $exempt = false): string
     {
+        if ($exempt) {
+            return 'E';
+        }
         if ($reversed) {
             return 'AE';
         }

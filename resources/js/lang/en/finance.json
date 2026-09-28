@@ -543,5 +543,10 @@
   "Acties": "Actions",
   "Formele aanmaning (PDF)": "Payment demand (PDF)",
   "Te koop aangeboden": "Offered for sale",
-  "Factuur verkopen": "Sell invoice"
+  "Factuur verkopen": "Sell invoice",
+  "Je doet mee aan de kleineondernemersregeling": "You take part in the small businesses scheme",
+  "Je rekent geen btw, doet geen btw-aangifte en kunt geen btw terugvragen. Het overzicht hieronder is er voor je eigen administratie.": "You charge no VAT, file no VAT return and cannot reclaim VAT. The overview below is for your own records.",
+  "Je omzet in :year is :amount. Dat is meer dan de grens van :limit: meld je af voor de regeling bij de Belastingdienst en reken vanaf dat moment btw.": "Your turnover in :year is :amount. That is more than the limit of :limit: deregister from the scheme with the tax authority and charge VAT from that moment.",
+  "Je omzet in :year is :amount. Boven :limit moet je je afmelden voor de regeling.": "Your turnover in :year is :amount. Above :limit you have to deregister from the scheme.",
+  "Omzet in :year: :amount van :limit.": "Turnover in :year: :amount of :limit."
 }

@@ -451,7 +451,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
                 {{ eur(line.unit_price) }}
                 <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% {{ $t('korting') }}</span>
               </td>
-              <td style="text-align:center" :data-label="$t('BTW')">{{ quote.vat_reversed ? $t('verlegd') : Number(line.vat_rate) + '%' }}</td>
+              <td style="text-align:center" :data-label="$t('BTW')">{{ quote.vat_exempt ? $t('n.v.t.') : (quote.vat_reversed ? $t('verlegd') : Number(line.vat_rate) + '%') }}</td>
               <td class="mono" style="text-align:right" :data-label="$t('Totaal')">{{ eur(line.line_subtotal) }}</td>
             </tr>
           </tbody>
@@ -462,8 +462,8 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
             <span class="label">{{ $t('Subtotaal') }}</span>
             <span class="value mono">{{ eur(quote.subtotal) }}</span>
           </div>
-          <div v-if="quote.vat_reversed" class="inv-total-row">
-            <span class="label">{{ $t('Btw verlegd') }}</span>
+          <div v-if="(quote.vat_exempt || quote.vat_reversed)" class="inv-total-row">
+            <span class="label">{{ quote.vat_exempt ? $t('Vrijgesteld van btw') : $t('Btw verlegd') }}</span>
             <span class="value mono">{{ eur(0) }}</span>
           </div>
           <template v-else>

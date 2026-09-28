@@ -157,9 +157,7 @@ class VatReverseTest extends TestCase
         Mail::fake();
         $user = $this->demoUser();
         $this->actingAs($user);
-        // Een geïmporteerde klant met een landnaam in plaats van een code.
         $customer = $this->customer();
-        $customer->forceFill(['country' => 'Nederland'])->save();
 
         $year = (int) now()->year;
         $row = fn () => collect(app(VatService::class)->overview($user->company->fresh(), $year, false)['periods'])

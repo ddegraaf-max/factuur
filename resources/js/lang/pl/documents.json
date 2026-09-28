@@ -379,5 +379,11 @@
   "verlegd": "np.",
   "De klant draagt de btw af, bijvoorbeeld bij onderaanneming in de bouw. Op het document staat geen btw, wel \"btw verlegd\" en het btw-nummer van de klant.": "Podatek rozlicza klient, na przykład przy podwykonawstwie w budownictwie. Na dokumencie nie ma kwoty VAT, jest adnotacja \"odwrotne obciążenie\" i numer VAT klienta.",
   "Btw-nummer van de klant": "Numer VAT klienta",
-  "Dit nummer wordt bij de klant bewaard.": "Numer zostanie zapisany przy kliencie."
+  "Dit nummer wordt bij de klant bewaard.": "Numer zostanie zapisany przy kliencie.",
+  "vrijgesteld van btw": "zwolnienie z VAT",
+  "n.v.t.": "nd.",
+  "Kleineondernemersregeling": "Zwolnienie dla małych przedsiębiorców (KOR)",
+  "Op dit document komt geen btw. De vermelding van de vrijstelling staat er vanzelf op.": "Na tym dokumencie nie ma VAT. Adnotacja o zwolnieniu pojawia się automatycznie.",
+  "Instelling wijzigen": "Zmień ustawienie",
+  "Op dit concept staat btw, terwijl je meedoet aan de kleineondernemersregeling. Open het concept en sla het opnieuw op; de btw vervalt dan.": "Ten szkic zawiera VAT, a korzystasz ze zwolnienia dla małych przedsiębiorców. Otwórz szkic i zapisz go ponownie; VAT zostanie usunięty."
 }

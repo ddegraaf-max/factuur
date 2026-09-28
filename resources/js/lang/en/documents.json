@@ -379,5 +379,11 @@
   "verlegd": "reversed",
   "De klant draagt de btw af, bijvoorbeeld bij onderaanneming in de bouw. Op het document staat geen btw, wel \"btw verlegd\" en het btw-nummer van de klant.": "The customer accounts for the VAT, for example with subcontracting in construction. The document shows no VAT, but it does state \"VAT reverse-charged\" and the customer's VAT number.",
   "Btw-nummer van de klant": "Customer VAT number",
-  "Dit nummer wordt bij de klant bewaard.": "This number is saved with the customer."
+  "Dit nummer wordt bij de klant bewaard.": "This number is saved with the customer.",
+  "vrijgesteld van btw": "exempt from VAT",
+  "n.v.t.": "n/a",
+  "Kleineondernemersregeling": "Small businesses scheme (KOR)",
+  "Op dit document komt geen btw. De vermelding van de vrijstelling staat er vanzelf op.": "No VAT is charged on this document. The statement about the exemption is added automatically.",
+  "Instelling wijzigen": "Change setting",
+  "Op dit concept staat btw, terwijl je meedoet aan de kleineondernemersregeling. Open het concept en sla het opnieuw op; de btw vervalt dan.": "This draft includes VAT, while you take part in the small businesses scheme. Open the draft and save it again; the VAT is then removed."
 }

@@ -24,7 +24,7 @@ class RecurringInvoice extends Model
         'company_id', 'customer_id', 'brand_profile_id', 'source_invoice_id',
         'frequency', 'start_date', 'next_run_on', 'end_date',
         'auto_send', 'active',
-        'reference', 'notes', 'payment_terms', 'lines', 'vat_reversed',
+        'reference', 'notes', 'payment_terms', 'lines', 'vat_reversed', 'vat_exempt',
         'last_run_on', 'invoices_generated',
     ];
 
@@ -36,6 +36,7 @@ class RecurringInvoice extends Model
         'auto_send' => 'boolean',
         'active' => 'boolean',
         'vat_reversed' => 'boolean',
+        'vat_exempt' => 'boolean',
         'payment_terms' => 'integer',
         'invoices_generated' => 'integer',
         'lines' => 'array',

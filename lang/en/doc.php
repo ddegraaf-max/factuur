@@ -50,6 +50,10 @@ return [
     'vat_reversed' => 'VAT reverse-charged',
     'vat_reversed_short' => 'reversed',
     'vat_reversed_note' => 'VAT is reverse-charged to :name, VAT number :number.',
+    // Kleineondernemersregeling: geen btw op het document, wel de vermelding van de vrijstelling.
+    'vat_exempt' => 'Exempt from VAT',
+    'vat_exempt_short' => 'n/a',
+    'vat_exempt_note' => 'Invoice exempt from VAT under Article 25 of the Dutch VAT Act (small businesses scheme).',
     'net' => 'Net',
     'gross' => 'Gross',
     'split_payment' => 'Split payment mechanism',

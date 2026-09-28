@@ -50,6 +50,10 @@ return [
     'vat_reversed' => 'Odwrotne obciążenie',
     'vat_reversed_short' => 'np.',
     'vat_reversed_note' => 'Podatek rozlicza nabywca: :name, numer VAT :number.',
+    // Kleineondernemersregeling: geen btw op het document, wel de vermelding van de vrijstelling.
+    'vat_exempt' => 'Zwolnienie z VAT',
+    'vat_exempt_short' => 'zw.',
+    'vat_exempt_note' => 'Faktura zwolniona z VAT na podstawie art. 25 holenderskiej ustawy o VAT (zwolnienie dla małych przedsiębiorców).',
     'net' => 'Netto',
     'gross' => 'Brutto',
     'split_payment' => 'Mechanizm podzielonej płatności',

@@ -135,7 +135,13 @@ return [
 
         'kleineondernemersregeling-kor' => [
             'category' => 'Btw & Belastingdienst',
-            'updated' => '2026-08-22',
+            'updated' => '2026-09-28',
+            'tool' => [
+                'route' => 'register',
+                'title' => 'Factureren onder de KOR',
+                'text' => 'Zet de regeling één keer aan. Elke factuur is dan zonder btw, met de verplichte vermelding, en je ziet je omzet tegenover de grens van 20.000 euro.',
+                'label' => 'Probeer 14 dagen gratis',
+            ],
             'title' => 'De KOR: factureren zonder btw — slim of niet?',
             'intro' => 'Blijft je omzet onder de € 20.000 per jaar, dan kun je met de kleineondernemersregeling (KOR) zonder btw factureren. Zo werkt het — en zo bepaal je of het voor jou gunstig is.',
             'sections' => [

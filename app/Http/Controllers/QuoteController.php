@@ -369,6 +369,8 @@ class QuoteController extends Controller
             'default_language' => \App\Support\DocumentLocale::default(),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => \App\Support\Market::vatRateOptions(),
+            // Kleineondernemersregeling: geen btw op het document.
+            'vat_exempt' => \App\Support\Kor::applies($company),
             'default_vat_rate' => \App\Support\Market::defaultVatRate(),
             'price_mode' => $company?->price_mode ?? 'excl',
             'default_valid_days' => $company?->quote_valid_days ?? 30,

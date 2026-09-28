@@ -53,6 +53,16 @@ class VatReverse
      */
     public static function prepare(array $data): array
     {
+        // Kleineondernemersregeling: de vrijstelling geldt, er valt niets te verleggen.
+        $customer = Customer::find($data['customer_id'] ?? null);
+        if (Kor::applies($customer?->company)) {
+            $data['vat_reversed'] = false;
+            $data['lines'] = self::lines($data['lines'] ?? [], true);
+            unset($data['customer_vat_number']);
+
+            return $data;
+        }
+
         $data['vat_reversed'] = self::requested($data);
         if (! $data['vat_reversed']) {
             unset($data['customer_vat_number']);
@@ -62,7 +72,6 @@ class VatReverse
 
         $data['lines'] = self::lines($data['lines'] ?? [], true);
 
-        $customer = Customer::find($data['customer_id'] ?? null);
         $entered = self::normalize((string) ($data['customer_vat_number'] ?? ''));
         unset($data['customer_vat_number']);
 

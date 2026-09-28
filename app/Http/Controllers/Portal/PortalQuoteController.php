@@ -62,6 +62,7 @@ class PortalQuoteController extends Controller
                 'total' => (float) $quote->total,
                 'vat_breakdown' => $quote->vat_breakdown,
                 'vat_reversed' => (bool) $quote->vat_reversed,
+                'vat_exempt' => (bool) $quote->vat_exempt,
                 'lines' => $quote->lines->map(fn ($l) => [
                     'id' => $l->id,
                     'description' => $l->description,

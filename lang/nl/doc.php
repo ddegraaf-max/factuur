@@ -51,6 +51,10 @@ return [
     'vat_reversed' => 'Btw verlegd',
     'vat_reversed_short' => 'verlegd',
     'vat_reversed_note' => 'De btw is verlegd naar :name, btw-nummer :number.',
+    // Kleineondernemersregeling: geen btw op het document, wel de vermelding van de vrijstelling.
+    'vat_exempt' => 'Vrijgesteld van btw',
+    'vat_exempt_short' => 'n.v.t.',
+    'vat_exempt_note' => 'Factuur vrijgesteld van OB op grond van artikel 25 Wet OB (kleineondernemersregeling).',
     'net' => 'Netto',
     'gross' => 'Bruto',
 

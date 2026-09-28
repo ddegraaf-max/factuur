@@ -37,9 +37,11 @@ class QuoteManager
                     ->find($data['brand_profile_id'])
                 : null;
 
-            // Btw verlegd: geen btw op de regels, wel de vermelding op het document.
-            $reversed = \App\Support\VatReverse::requested($data);
-            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
+            // Zonder btw-bedragen: het bedrijf doet mee aan de kleineondernemersregeling
+            // (dan geldt de vrijstelling en is er niets te verleggen), of de btw is verlegd.
+            $exempt = \App\Support\Kor::applies($company);
+            $reversed = ! $exempt && \App\Support\VatReverse::requested($data);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed || $exempt);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             // Documenttaal: momentopname van de klantinstelling, tenzij op het
@@ -71,6 +73,7 @@ class QuoteManager
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
                 'vat_reversed' => $reversed,
+                'vat_exempt' => $exempt,
 
                 'intro' => $data['intro'] ?? null,
                 'notes' => $data['notes'] ?? null,
@@ -91,11 +94,13 @@ class QuoteManager
 
         return DB::transaction(function () use ($quote, $data) {
             $mode = $this->resolveMode($data, $quote->company);
-            // Zonder keuze op het formulier blijft het document zoals het was.
-            $reversed = array_key_exists('vat_reversed', $data)
+            // Een concept volgt de instelling van het bedrijf: KOR gaat voor btw verlegd.
+            // Zonder keuze op het formulier blijft btw verlegd zoals het was.
+            $exempt = \App\Support\Kor::applies($quote->company);
+            $reversed = ! $exempt && (array_key_exists('vat_reversed', $data)
                 ? \App\Support\VatReverse::requested($data)
-                : (bool) $quote->vat_reversed;
-            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed);
+                : (bool) $quote->vat_reversed);
+            $lines = \App\Support\VatReverse::lines($data['lines'] ?? [], $reversed || $exempt);
             $totals = $this->vat->calculateInvoice($lines, $mode);
 
             $quoteDate = isset($data['quote_date']) ? Carbon::parse($data['quote_date']) : $quote->quote_date;
@@ -164,6 +169,7 @@ class QuoteManager
                 'total' => $totals['total'],
                 'vat_breakdown' => $totals['vat_breakdown'],
                 'vat_reversed' => $reversed,
+                'vat_exempt' => $exempt,
                 'intro' => array_key_exists('intro', $data) ? $data['intro'] : $quote->intro,
                 'notes' => array_key_exists('notes', $data) ? $data['notes'] : $quote->notes,
             ]);

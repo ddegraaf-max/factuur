@@ -89,6 +89,8 @@ class InvoiceController extends Controller
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms', 'language']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => Market::vatRateOptions(),
+            // Kleineondernemersregeling: geen btw op het document.
+            'vat_exempt' => \App\Support\Kor::applies(auth()->user()->company),
             'preselect_customer_id' => $request->input('customer_id'),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
@@ -210,6 +212,9 @@ class InvoiceController extends Controller
                     'invoice_date_label' => $c->invoice_date->translatedFormat('j M Y'),
                 ]),
                 'settle_options' => $this->settleOptions($invoice),
+                // Concept met btw terwijl het bedrijf meedoet aan de kleineondernemersregeling.
+                'kor_mismatch' => $invoice->status === 'draft' && ! $invoice->vat_exempt
+                    && (float) $invoice->vat_total > 0 && \App\Support\Kor::applies($company),
             ]),
             'company' => $company,
         ]);
@@ -298,6 +303,8 @@ class InvoiceController extends Controller
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'payment_terms', 'language']),
             'products' => Product::active()->orderBy('name')->get(['id', 'name', 'description', 'unit', 'price', 'vat_rate']),
             'vat_rates' => Market::vatRateOptions(),
+            // Kleineondernemersregeling: geen btw op het document.
+            'vat_exempt' => \App\Support\Kor::applies(auth()->user()->company),
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
             // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).

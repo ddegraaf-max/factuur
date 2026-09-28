@@ -490,6 +490,15 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
       {{ $page.props.errors.schedule }}
     </div>
 
+    <!-- Concept met btw terwijl het bedrijf meedoet aan de kleineondernemersregeling -->
+    <div v-if="invoice.kor_mismatch" class="inv-alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>
+        {{ $t('Op dit concept staat btw, terwijl je meedoet aan de kleineondernemersregeling. Open het concept en sla het opnieuw op; de btw vervalt dan.') }}
+        <Link :href="route('invoices.edit', invoice.id)" style="font-weight:600;text-decoration:underline;">{{ $t('Bewerken') }}</Link>
+      </span>
+    </div>
+
     <!-- Ingepland: wordt automatisch verstuurd -->
     <div v-if="invoice.scheduled_send_on_label && invoice.status === 'draft'" class="sched-banner">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -619,7 +628,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
                 {{ eur(signed(line.unit_price)) }}
                 <span v-if="Number(line.discount_pct) > 0" style="display:block;font-size:11px;color:var(--text-3);">−{{ Number(line.discount_pct) }}% {{ $t('korting') }}</span>
               </td>
-              <td style="text-align:center" :data-label="$t('BTW')">{{ invoice.vat_reversed ? $t('verlegd') : Number(line.vat_rate) + '%' }}</td>
+              <td style="text-align:center" :data-label="$t('BTW')">{{ invoice.vat_exempt ? $t('n.v.t.') : (invoice.vat_reversed ? $t('verlegd') : Number(line.vat_rate) + '%') }}</td>
               <td class="mono" style="text-align:right" :data-label="$t('Totaal')">{{ eur(signed(line.line_subtotal)) }}</td>
             </tr>
           </tbody>
@@ -630,8 +639,8 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <span class="label">{{ $t('Subtotaal') }}</span>
             <span class="value mono">{{ eur(signed(invoice.subtotal)) }}</span>
           </div>
-          <div v-if="invoice.vat_reversed" class="inv-total-row">
-            <span class="label">{{ $t('Btw verlegd') }}</span>
+          <div v-if="(invoice.vat_exempt || invoice.vat_reversed)" class="inv-total-row">
+            <span class="label">{{ invoice.vat_exempt ? $t('Vrijgesteld van btw') : $t('Btw verlegd') }}</span>
             <span class="value mono">{{ eur(0) }}</span>
           </div>
           <template v-else>

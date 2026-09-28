@@ -173,8 +173,8 @@
 
 <table class="totals">
   <tr><td>{{ __('doc.subtotal') }}</td><td class="value">{{ money($pdfSign * $invoice->subtotal) }}</td></tr>
-  @if($invoice->vat_reversed)
-    <tr><td>{{ __('doc.vat_reversed') }}</td><td class="value">{{ money(0) }}</td></tr>
+  @if($invoice->vatTreatment())
+    <tr><td>{{ __('doc.vat_' . $invoice->vatTreatment()) }}</td><td class="value">{{ money(0) }}</td></tr>
   @elseif(is_array($invoice->vat_breakdown))
     @foreach($invoice->vat_breakdown as $rate => $amount)
       <tr><td>{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money($pdfSign * (float) $amount) }}</td></tr>

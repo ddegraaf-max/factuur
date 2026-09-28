@@ -579,5 +579,7 @@
   "Ingeschakeld": "Enabled",
   "Uitgeschakeld": "Disabled",
   "Voetnoot": "Footer",
-  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(for invoices and quotes in this language; empty = the default footer)"
+  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(for invoices and quotes in this language; empty = the default footer)",
+  "Ik doe mee aan de kleineondernemersregeling (KOR)": "I take part in the small businesses scheme (KOR)",
+  "Je facturen en offertes krijgen geen btw en wel de vermelding dat de vrijstelling geldt. Er is geen btw-aangifte; op het dashboard zie je je omzet tegenover de grens van 20.000 euro per jaar. Zet dit alleen aan als de Belastingdienst je aanmelding heeft bevestigd.": "Your invoices and quotes carry no VAT and state that the exemption applies. There is no VAT return; the dashboard shows your turnover against the limit of 20,000 euros a year. Only switch this on once the tax authority has confirmed your registration."
 }

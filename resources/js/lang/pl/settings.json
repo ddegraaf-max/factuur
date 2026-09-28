@@ -579,5 +579,7 @@
   "Ingeschakeld": "Włączone",
   "Uitgeschakeld": "Wyłączone",
   "Voetnoot": "Stopka",
-  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(dla faktur i ofert w tym języku; puste = domyślna stopka)"
+  "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(dla faktur i ofert w tym języku; puste = domyślna stopka)",
+  "Ik doe mee aan de kleineondernemersregeling (KOR)": "Korzystam ze zwolnienia dla małych przedsiębiorców (KOR)",
+  "Je facturen en offertes krijgen geen btw en wel de vermelding dat de vrijstelling geldt. Er is geen btw-aangifte; op het dashboard zie je je omzet tegenover de grens van 20.000 euro per jaar. Zet dit alleen aan als de Belastingdienst je aanmelding heeft bevestigd.": "Faktury i oferty nie zawierają VAT i mają adnotację o zwolnieniu. Nie ma deklaracji VAT; na pulpicie widzisz obrót na tle limitu 20 000 euro rocznie. Włącz to dopiero po potwierdzeniu zgłoszenia przez urząd skarbowy."
 }

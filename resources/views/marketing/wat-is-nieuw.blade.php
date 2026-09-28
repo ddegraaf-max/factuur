@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.63.0</div>
+        <h2>Kleineondernemersregeling (KOR)</h2>
+        <ul class="tl-list">
+          <li><b>Eén keer aanzetten</b> — doe je mee aan de KOR, vink dat dan aan bij Instellingen → Bedrijfsgegevens. Je facturen en offertes zijn daarna zonder btw. <a href="{{ route('help.article', 'kleineondernemersregeling') }}">Zo werkt het</a>.</li>
+          <li><b>De vermelding staat er vanzelf op</b> — "Factuur vrijgesteld van OB op grond van artikel 25 Wet OB (kleineondernemersregeling)", op de PDF, in het klantenportaal en in de e-factuur.</li>
+          <li><b>Je omzet tegenover de grens</b> — op het dashboard en bij Btw-aangifte zie je je omzet van dit jaar tegenover 20.000 euro, met een waarschuwing vanaf 16.000 euro.</li>
+          <li><b>Geen aangifte, geen herinnering</b> — zolang de KOR aan staat, vraagt {{ brand('name') }} niet om een btw-aangifte.</li>
+          <li><b>Concepten met btw</b> — had je al een concept met btw, dan zie je daar een melding. Opnieuw opslaan haalt de btw eraf.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.62.0</div>
         <h2>Btw verlegd, sneller aanmelden en je gratis factuur meenemen</h2>
         <ul class="tl-list">

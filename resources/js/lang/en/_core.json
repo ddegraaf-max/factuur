@@ -97,5 +97,8 @@
   "Topklanten?": "Top customers?",
   "Verrekend": "Settled",
   "In drie stappen je eerste factuur": "Your first invoice in three steps",
-  ":done van :total gedaan": ":done of :total done"
+  ":done van :total gedaan": ":done of :total done",
+  "KOR · omzet :year": "KOR · turnover :year",
+  "boven de grens van :limit": "above the limit of :limit",
+  "van :limit · geen btw-aangifte": "of :limit · no VAT return"
 }
