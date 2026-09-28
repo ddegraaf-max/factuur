@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.1</div>
+        <h2>Prijsaanvraag: logo en ondertekening</h2>
+        <ul class="tl-list">
+          <li><b>Logo blijft staan</b> — antwoordt een bedrijf op je prijsaanvraag, dan stond in het geciteerde bericht "&lt;logo.png&gt;" in plaats van je logo. Het logo komt nu van een vast adres en blijft zichtbaar.</li>
+          <li><b>Ondertekening onderaan</b> — een ondertekening die je uit je mailprogramma plakt, werd niet herkend door een onzichtbaar teken achter de streepjes. Dat is opgelost: hij staat onderaan de mail.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.60.0</div>
         <h2>Uitvragen: afzeggen, bedrijven toevoegen en een nettere mail</h2>
         <ul class="tl-list">

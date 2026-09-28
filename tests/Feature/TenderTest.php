@@ -311,7 +311,7 @@ class TenderTest extends TestCase
             'work_package_id' => $package->id,
             'subcontractor_ids' => [$a->id],
             'deadline' => now()->addDays(5)->toDateString(),
-            'description' => "Uitbouw 5,50 x 1,80 m.\n\nGevraagd:\n- HSB-wanden leveren\n- Balklaag plat dak\n\n-- \n\nMet vriendelijke groet,\nJan Jansen\nDe inhoud van dit bericht is vertrouwelijk.",
+            'description' => "Uitbouw 5,50 x 1,80 m.\n\nGevraagd:\n- HSB-wanden leveren\n- Balklaag plat dak\n\n--\u{00A0}\n\nMet vriendelijke groet,\nJan Jansen\nDe inhoud van dit bericht is vertrouwelijk.",
         ])->assertRedirect()->assertSessionHasNoErrors();
         $round = TenderRound::firstOrFail();
         $request = $round->requests()->firstOrFail();
@@ -331,6 +331,34 @@ class TenderTest extends TestCase
             ->where('round.signature', $text['signature']));
         $this->asGuest();
         $this->get(route('tender.respond.show', $request->token))->assertInertia(fn ($page) => $page->where('round.description', $text['body']));
+    }
+
+    public function test_the_mail_shows_the_logo_from_an_address_that_survives_a_reply(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a] = $this->pool();
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+        $user->company->forceFill(['logo_data' => 'data:image/png;base64,' . base64_encode($png)])->save();
+
+        $this->post(route('tenders.store'), ['work_package_id' => $package->id, 'subcontractor_ids' => [$a->id], 'deadline' => now()->addDays(5)->toDateString()])->assertRedirect();
+        $request = TenderRound::firstOrFail()->requests()->firstOrFail();
+
+        $url = $user->company->fresh()->logoUrl();
+        $this->assertNotNull($url);
+        $html = (new TenderMail($request, 'request'))->render();
+        $this->assertStringContainsString($url, $html);
+        $this->assertStringNotContainsString('cid:', $html);
+
+        // Het mailprogramma van het bedrijf haalt het logo op zonder inlog.
+        $this->asGuest();
+        $this->get($url)->assertOk()->assertHeader('Content-Type', 'image/png');
+        $this->get(route('company.logo', [$user->company_id, str_repeat('0', 16)]))->assertNotFound();
+
+        // Zonder logo staat de bedrijfsnaam in de kop.
+        $user->company->forceFill(['logo_data' => null])->save();
+        $this->assertNull($user->company->fresh()->logoUrl());
     }
 
     public function test_closed_rounds_take_no_more_attachments(): void

@@ -12,9 +12,11 @@ class TenderText
     /** @return array{body: string, signature: ?string} */
     public static function split(?string $text): array
     {
-        $text = str_replace(["\r\n", "\r"], "\n", (string) $text);
+        // Mailprogramma's zetten achter de streepjes vaak een harde spatie (U+00A0);
+        // die telt hier als gewone spatie, anders wordt de scheiding niet herkend.
+        $text = str_replace(["\r\n", "\r", "\u{00A0}", "\u{202F}", "\u{2007}"], ["\n", "\n", ' ', ' ', ' '], (string) $text);
         // De gangbare scheiding voor een ondertekening: een regel met alleen "--".
-        $parts = preg_split('/^\s*--\s*$/m', $text, 2);
+        $parts = preg_split('/^[ \t]*--[ \t]*$/m', $text, 2);
         $signature = isset($parts[1]) ? trim(preg_replace("/\n{3,}/", "\n\n", $parts[1])) : '';
 
         return [

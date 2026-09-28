@@ -398,6 +398,11 @@ Route::match(['get', 'post', 'delete'], '/mcp/{token}', [\App\Http\Controllers\M
 // ---------- GUEST AUTH ----------
 // Reactie van een onderaannemer op een prijsaanvraag: geheime tokenlink uit de
 // mail, zonder inlog (dus buiten de guest- én auth-groep).
+// Bedrijfslogo als afbeelding, voor in e-mails (zie Company::logoUrl).
+Route::get('bedrijfslogo/{company}/{hash}', [\App\Http\Controllers\CompanyLogoController::class, 'show'])
+    ->whereNumber('company')->where('hash', '[a-f0-9]{16}')
+    ->middleware('throttle:120,1')->name('company.logo');
+
 Route::get('uitvraag/{token}', [TenderResponseController::class, 'show'])->name('tender.respond.show');
 Route::post('uitvraag/{token}', [TenderResponseController::class, 'respond'])
     ->middleware('throttle:20,1')->name('tender.respond');

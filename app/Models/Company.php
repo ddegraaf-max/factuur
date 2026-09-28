@@ -245,6 +245,27 @@ class Company extends Model
         return ['data' => $bytes, 'mime' => $mime, 'name' => 'logo.'.$extension];
     }
 
+    /**
+     * Het logo als gewone afbeelding op een vast adres. Voor mail waarop
+     * geantwoord wordt: een ingesloten logo (cid) verdwijnt uit het geciteerde
+     * bericht en laat dan "<logo.png>" achter, een adres blijft werken. De code
+     * in het adres verandert mee met het logo, zodat het oude niet blijft hangen.
+     */
+    public function logoUrl(): ?string
+    {
+        $logo = $this->logoBinary();
+        if (! $logo || ! in_array($logo['mime'], ['image/png', 'image/jpeg', 'image/webp', 'image/gif'], true)) {
+            return null; // svg tonen mailprogramma's niet
+        }
+
+        return route('company.logo', [$this->id, $this->logoHash()]);
+    }
+
+    public function logoHash(): string
+    {
+        return substr(sha1((string) $this->logo_data), 0, 16);
+    }
+
     public function getFullAddressAttribute(): string
     {
         return collect([

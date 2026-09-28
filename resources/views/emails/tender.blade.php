@@ -2,8 +2,8 @@
     $color = $company->brand_color ?: brand('color');
     $name = $subcontractor?->contact_name ?: $subcontractor?->name;
     $deadline = $round->deadline?->translatedFormat('j F Y');
-    $logo = $company->logoBinary();
-    $asks = in_array($kind, ['request', 'reminder'], true);
+    $logoUrl = $company->logoUrl();
+    $asks =in_array($kind, ['request', 'reminder'], true);
     $eyebrow = match ($kind) {
         'reminder' => __('Herinnering'),
         'award' => __('Opdracht'),
@@ -30,8 +30,10 @@
 
         {{-- Kop: logo of bedrijfsnaam, met een streep in de huiskleur --}}
         <div style="padding:22px 32px;border-bottom:3px solid {{ $color }};">
-            @if($logo && isset($message))
-                <img src="{{ $message->embedData($logo['data'], $logo['name'], $logo['mime']) }}" alt="{{ $company->name }}" style="max-height:46px;max-width:230px;display:block;border:0;">
+            @if($logoUrl)
+                {{-- Via een adres in plaats van ingesloten: zo blijft het logo staan als het bedrijf
+                     op de mail antwoordt. Staan afbeeldingen uit, dan staat hier de bedrijfsnaam. --}}
+                <img src="{{ $logoUrl }}" alt="{{ $company->name }}" style="max-height:46px;max-width:230px;display:block;border:0;font-size:19px;font-weight:700;color:{{ $color }};">
             @else
                 <div style="font-size:19px;font-weight:700;letter-spacing:-0.01em;color:{{ $color }};">{{ $company->name }}</div>
             @endif
