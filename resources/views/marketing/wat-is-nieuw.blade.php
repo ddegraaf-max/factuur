@@ -31,6 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.59.1</div>
+        <h2>Werkpakket dakbedekking in bitumen</h2>
+        <ul class="tl-list">
+          <li><b>Bitumen in plaats van EPDM</b> — het standaardwerkpakket voor het dak heet nu "Dakconstructie &amp; dakbedekking (bitumen)" en vraagt om bitumen dakbedekking met onderlaag. Een pakket dat je al had, pas je zelf aan onder Inkoop → Onderaannemers.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.59.0</div>
         <h2>Bijlagen bij een prijsaanvraag</h2>
         <ul class="tl-list">

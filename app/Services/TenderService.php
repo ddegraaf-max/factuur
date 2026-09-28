@@ -35,7 +35,7 @@ class TenderService
         ['Sloopwerk & geveldoorbraak (incl. staal)', 'Breedte doorbraak, staalprofiel (HEA/IPE) en lengte, stempelwerk, constructieberekening, afvoer puin.'],
         ['Houtskeletbouw (HSB-wanden)', 'm² wand, hoogte, isolatiewaarde (Rc), kozijnsparingen, dampremmende laag, tekening.'],
         ['Metselwerk', 'm² gevel, steenkeuze en voeg, lateien, spouwisolatie, steiger.'],
-        ['Dakconstructie & dakbedekking (EPDM)', 'm² dak, balklaag en hoogte, isolatie, EPDM inclusief randafwerking en hemelwaterafvoer, lichtkoepels.'],
+        ['Dakconstructie & dakbedekking (bitumen)', 'm² dak, balklaag en hoogte, isolatie, bitumen dakbedekking met onderlaag inclusief randafwerking en hemelwaterafvoer, lichtkoepels.'],
         ['Kozijnen & beglazing', 'Aantal en maten, materiaal (hout/kunststof/aluminium), HR++ of triple, levering én montage.'],
         ['Stukadoorswerk', 'm² wand en plafond, afwerking (glad, spachtelputz), hoeken en dagkanten.'],
         ['Tegelwerk', 'm² vloer en wand, tegelmaat, legpatroon, kitwerk, ondervloer.'],
