@@ -356,5 +356,21 @@
   "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "The credit note already is your correction of revenue and VAT. This settlement only closes the two open items against each other; nothing changes on the invoice PDF.",
   "(optioneel — standaard \"Verrekend met creditnota …\")": "(optional — defaults to \"Settled against credit note …\")",
   "Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer, gaat per e-mail naar de klant en wordt verrekend met deze factuur.": "The full amount of :amount will be reversed. The credit note gets a final number right away, is e-mailed to the customer and is settled against this invoice.",
-  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "You open a draft in which you adjust the lines and amounts yourself. Then you send it, just like an invoice."
+  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "You open a draft in which you adjust the lines and amounts yourself. Then you send it, just like an invoice.",
+  "Pauze opheffen? Herinneringen en aanmaningen lopen dan weer volgens schema.": "Lift the pause? Reminders and dunning letters will run on schedule again.",
+  "Zet herinneringen, aanmaningen en incasso voor deze factuur op pauze": "Put reminders, dunning letters and debt collection for this invoice on hold",
+  "Hef de pauze op; herinneringen lopen weer volgens schema": "Lift the pause; reminders run on schedule again",
+  "Deze factuur staat <strong>op pauze t/m :date</strong>. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.": "This invoice is <strong>on hold until :date</strong>. No reminders or dunning letters are sent and it cannot go to debt collection.",
+  "Deze factuur staat <strong>op pauze</strong> tot je hervat. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.": "This invoice is <strong>on hold</strong> until you resume. No reminders or dunning letters are sent and it cannot go to debt collection.",
+  "Aanpassen": "Change",
+  "Geen herinneringen, aanmaningen of incasso zolang de pauze loopt": "No reminders, dunning letters or debt collection while the pause lasts",
+  "Op pauze": "On hold",
+  "Pauze aanpassen": "Change pause",
+  "Factuur op pauze zetten": "Put invoice on hold",
+  "Zolang de pauze loopt krijgt <b>:customer</b> geen herinneringen of aanmaningen en kan de factuur niet naar incasso. De factuur zelf blijft gewoon openstaan. Handig bij een betalingsregeling of een lopende klacht.": "While the pause lasts, <b>:customer</b> receives no reminders or dunning letters and the invoice cannot go to debt collection. The invoice itself simply stays open. Useful for a payment arrangement or a pending complaint.",
+  "Pauzeren tot en met": "Hold until (inclusive)",
+  "Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.": "Leave empty to keep it on hold until you resume yourself. With a date, reminders start again automatically the day after.",
+  "(optioneel — alleen voor jezelf)": "(optional — for your own reference)",
+  "Bijv. betalingsregeling afgesproken, klacht in behandeling": "E.g. payment arrangement agreed, complaint being handled",
+  "Op pauze: geen herinneringen, aanmaningen of incasso": "On hold: no reminders, dunning letters or debt collection"
 }

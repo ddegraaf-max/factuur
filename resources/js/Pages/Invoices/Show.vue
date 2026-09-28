@@ -61,9 +61,43 @@ const phaseLabels = {
   executie: t('Executie'),
 };
 
+/* ---------- Pauze: geen herinneringen, aanmaningen of incasso ---------- */
+const canPause = computed(() =>
+  !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
+);
+const paused = computed(() => canPause.value && !!props.invoice.reminders_paused);
+
+const showPauseModal = ref(false);
+const today = new Date().toISOString().slice(0, 10);
+const pauseForm = useForm({ until: '', reason: '' });
+
+// Ook voor 'Aanpassen' op een lopende pauze: het formulier begint bij wat er nu staat.
+const openPauseModal = () => {
+  pauseForm.clearErrors();
+  pauseForm.until = props.invoice.reminders_paused_until || '';
+  pauseForm.reason = props.invoice.reminders_pause_reason || '';
+  showPauseModal.value = true;
+};
+
+const pauseReminders = () => {
+  pauseForm
+    .transform((data) => ({ ...data, until: data.until || null }))
+    .post(route('invoices.pause', props.invoice.id), {
+      preserveScroll: true,
+      onSuccess: () => { showPauseModal.value = false; },
+    });
+};
+
+const resumeReminders = () => {
+  if (confirm(t('Pauze opheffen? Herinneringen en aanmaningen lopen dan weer volgens schema.'))) {
+    router.delete(route('invoices.resume', props.invoice.id), { preserveScroll: true });
+  }
+};
+
 // Alleen in markten met een incassopartner (Polen niet: daar verkoop je de factuur).
 const canIncasso = computed(() =>
   !!market.incasso_partner && !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
+  && !paused.value
 );
 
 /* ---------- Handmatige herinnering ---------- */
@@ -71,6 +105,7 @@ const canRemind = computed(() =>
   !props.invoice.is_credit
   && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
   && !!props.invoice.customer_email
+  && !paused.value
 );
 
 const sendReminder = () => {
@@ -414,6 +449,14 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
           {{ $t('Herinnering sturen') }}
         </button>
+        <button v-if="canPause && !paused" class="btn btn-secondary btn-sm" :title="$t('Zet herinneringen, aanmaningen en incasso voor deze factuur op pauze')" @click="openPauseModal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+          {{ $t('Pauzeren') }}
+        </button>
+        <button v-if="paused" class="btn btn-secondary btn-sm" :title="$t('Hef de pauze op; herinneringen lopen weer volgens schema')" @click="resumeReminders">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+          {{ $t('Hervatten') }}
+        </button>
         <button
           v-if="canThank"
           class="btn btn-secondary btn-sm"
@@ -454,6 +497,20 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
       <button type="button" class="link-btn" style="margin-left:auto;flex:none;" @click="unschedule">{{ $t('Annuleren') }}</button>
     </div>
 
+    <!-- Op pauze: geen herinneringen, aanmaningen of incasso -->
+    <div v-if="paused" class="sched-banner pause-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+      <div>
+        <div v-if="invoice.reminders_paused_until_label" v-html="$t('Deze factuur staat <strong>op pauze t/m :date</strong>. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.', { date: esc(invoice.reminders_paused_until_label) })"></div>
+        <div v-else v-html="$t('Deze factuur staat <strong>op pauze</strong> tot je hervat. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.')"></div>
+        <div v-if="invoice.reminders_pause_reason" class="pause-reason">{{ $t('Reden') }}: {{ invoice.reminders_pause_reason }}</div>
+      </div>
+      <div class="pause-actions">
+        <button type="button" class="link-btn" @click="openPauseModal">{{ $t('Aanpassen') }}</button>
+        <button type="button" class="link-btn" @click="resumeReminders">{{ $t('Hervatten') }}</button>
+      </div>
+    </div>
+
     <div class="inv-detail">
       <div class="inv-detail-header">
         <div class="inv-detail-top">
@@ -461,6 +518,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div class="inv-number">{{ invoice.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
+              <span v-if="paused" class="pause-chip" :title="$t('Geen herinneringen, aanmaningen of incasso zolang de pauze loopt')">{{ $t('Op pauze') }}</span>
               <span v-if="peppol?.sent_at_label" class="peppol-chip on" :title="$t('Afgeleverd via Peppol op :date', { date: peppol.sent_at_label })">
                 ⚡ {{ $t('Via Peppol afgeleverd') }}
               </span>
@@ -819,6 +877,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
                 <svg v-else-if="e.icon === 'check'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 <svg v-else-if="e.icon === 'gavel'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
                 <svg v-else-if="e.icon === 'heart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <svg v-else-if="e.icon === 'pause'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
                 <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
               </span>
               <div class="hist-label">{{ e.label }}</div>
@@ -1088,6 +1147,39 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
       </div>
     </div>
 
+    <!-- Pauze modal -->
+    <div v-if="showPauseModal" class="modal-overlay" @click.self="showPauseModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">{{ paused ? $t('Pauze aanpassen') : $t('Factuur op pauze zetten') }}</div>
+          <button class="icon-btn" @click="showPauseModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;line-height:1.6;" v-html="$t('Zolang de pauze loopt krijgt <b>:customer</b> geen herinneringen of aanmaningen en kan de factuur niet naar incasso. De factuur zelf blijft gewoon openstaan. Handig bij een betalingsregeling of een lopende klacht.', { customer: esc(invoice.customer_name) })"></p>
+          <div class="form-group">
+            <label>{{ $t('Pauzeren tot en met') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+            <input type="date" v-model="pauseForm.until" :min="today">
+            <div class="pause-hint">{{ $t('Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.') }}</div>
+            <div v-if="pauseForm.errors.until" class="field-error">{{ pauseForm.errors.until }}</div>
+          </div>
+          <div class="form-group">
+            <label>{{ $t('Reden') }}<span class="label-hint">{{ $t('(optioneel — alleen voor jezelf)') }}</span></label>
+            <input type="text" v-model="pauseForm.reason" maxlength="255" :placeholder="$t('Bijv. betalingsregeling afgesproken, klacht in behandeling')">
+            <div v-if="pauseForm.errors.reason" class="field-error">{{ pauseForm.errors.reason }}</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showPauseModal = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" :disabled="pauseForm.processing" @click="pauseReminders">{{ paused ? $t('Opslaan') : $t('Pauzeren') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Recurring modal -->
     <div v-if="showRecurringModal" class="modal-overlay" @click.self="showRecurringModal = false">
       <div class="modal">
@@ -1261,6 +1353,17 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
   font-size: 13.5px; line-height: 1.5;
 }
 .sched-banner svg { width: 18px; height: 18px; flex: none; }
+
+/* Op pauze */
+.pause-banner { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+.pause-reason { font-size: 12.5px; margin-top: 2px; opacity: 0.85; }
+.pause-actions { margin-left: auto; flex: none; display: flex; gap: 14px; }
+.pause-hint { font-size: 12px; color: var(--text-3); margin-top: 6px; line-height: 1.5; }
+.pause-chip {
+  display: inline-flex; align-items: center; font-size: 11px; font-weight: 600;
+  padding: 4px 10px; border-radius: 100px;
+  background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border);
+}
 
 /* Wissel factuurregels / PDF-voorvertoning */
 .view-toggle-bar { display: flex; justify-content: center; padding: 14px 16px 0; }

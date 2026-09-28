@@ -53,6 +53,7 @@ class InvoiceController extends Controller
             'status' => $i->status,
             'is_credit' => (bool) $i->is_credit,
             'days_overdue' => $i->days_overdue,
+            'reminders_paused' => ! $i->is_credit && in_array($i->status, ['sent', 'partial', 'overdue'], true) && $i->remindersPaused(),
             'viewed_label' => $i->first_viewed_at?->translatedFormat('j M Y, H:i'),
             'total' => (float) $i->total,
             'paid_total' => (float) $i->paid_total,
@@ -158,6 +159,10 @@ class InvoiceController extends Controller
                 'scheduled_send_on_label' => $invoice->scheduled_send_on?->translatedFormat('j F Y'),
                 'first_viewed_at_label' => $invoice->first_viewed_at?->translatedFormat('j M Y, H:i'),
                 'thanks_sent_at_label' => $invoice->thanks_sent_at?->translatedFormat('j M Y, H:i'),
+                // Pauze: geen herinneringen, aanmaningen of incasso.
+                'reminders_paused' => $invoice->remindersPaused(),
+                'reminders_paused_until' => $invoice->reminders_paused_until?->format('Y-m-d'),
+                'reminders_paused_until_label' => $invoice->reminders_paused_until?->translatedFormat('j M Y'),
                 'history' => $this->history($invoice),
                 'portal_url' => $invoice->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de factuur, anders dat van de klant.
@@ -467,6 +472,45 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Pauzeknop: zolang de pauze loopt gaan er geen herinneringen of
+     * aanmaningen uit en kan de factuur niet naar incasso — tot en met een
+     * gekozen dag, of tot je zelf hervat.
+     */
+    public function pauseReminders(Request $request, Invoice $invoice, \App\Services\ReminderService $reminders): RedirectResponse
+    {
+        $data = $request->validate([
+            'until' => ['nullable', 'date', 'after_or_equal:today'],
+            'reason' => ['nullable', 'string', 'max:255'],
+        ], [
+            'until.date' => __('Vul een geldige einddatum in.'),
+            'until.after_or_equal' => __('Kies een einddatum vanaf vandaag.'),
+        ]);
+
+        try {
+            $reminders->pause(
+                $invoice,
+                filled($data['until'] ?? null) ? \Illuminate\Support\Carbon::parse($data['until']) : null,
+                $data['reason'] ?? null,
+            );
+        } catch (\DomainException $e) {
+            return back()->withErrors(['reminder' => $e->getMessage()]);
+        }
+
+        $until = $invoice->fresh()->reminders_paused_until;
+
+        return back()->with('flash', $until
+            ? __('Op pauze t/m :date: er gaan geen herinneringen of aanmaningen uit.', ['date' => $until->translatedFormat('j F Y')])
+            : __('Op pauze: er gaan geen herinneringen of aanmaningen uit tot je hervat.'));
+    }
+
+    public function resumeReminders(Invoice $invoice, \App\Services\ReminderService $reminders): RedirectResponse
+    {
+        $reminders->resume($invoice);
+
+        return back()->with('flash', __('Pauze opgeheven: herinneringen lopen weer volgens schema.'));
+    }
+
+    /**
      * Bedankmail (opnieuw) sturen voor een betaalde factuur — een bewuste
      * keuze van de ondernemer, dus ook als er al eerder een is verstuurd.
      */
@@ -662,6 +706,12 @@ class InvoiceController extends Controller
         }
 
         $push($invoice->thanks_sent_at, 'heart', $invoice->thanks_sent_to ? __('Bedankmail verstuurd naar :email', ['email' => $invoice->thanks_sent_to]) : __('Bedankmail verstuurd'));
+
+        if ($invoice->remindersPaused()) {
+            $push($invoice->reminders_paused_at, 'pause', $invoice->reminders_paused_until
+                ? __('Op pauze gezet t/m :date', ['date' => $invoice->reminders_paused_until->translatedFormat('j M Y')])
+                : __('Op pauze gezet'));
+        }
 
         $push($invoice->incasso_sent_at, 'gavel', __('Overgedragen aan incasso') . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));
 

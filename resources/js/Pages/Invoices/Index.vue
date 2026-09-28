@@ -88,6 +88,10 @@ const setStatus = (s) => {
             <td :data-label="$t('Status')">
               <span style="display:inline-flex;align-items:center;gap:7px;">
                 <StatusPill :status="inv.status" :days-overdue="inv.days_overdue" />
+                <svg v-if="inv.reminders_paused" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;">
+                  <title>{{ $t('Op pauze: geen herinneringen, aanmaningen of incasso') }}</title>
+                  <circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/>
+                </svg>
                 <svg v-if="inv.viewed_label" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;">
                   <title>{{ $t('Bekeken door klant op :date', { date: inv.viewed_label }) }}</title>
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>

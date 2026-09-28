@@ -356,5 +356,21 @@
   "De creditnota is al je correctie op omzet en btw. Deze verrekening sluit alleen de twee openstaande posten tegen elkaar af; op de factuur-PDF verandert niets.": "Faktura korygująca jest już Twoją korektą przychodu i VAT. To rozliczenie jedynie zamyka obie otwarte pozycje wzajemnie; na PDF faktury nic się nie zmienia.",
   "(optioneel — standaard \"Verrekend met creditnota …\")": "(opcjonalnie — domyślnie \"Rozliczono z fakturą korygującą …\")",
   "Het hele bedrag van :amount wordt teruggeboekt. De creditnota krijgt meteen een definitief nummer, gaat per e-mail naar de klant en wordt verrekend met deze factuur.": "Cała kwota :amount zostanie skorygowana. Faktura korygująca od razu otrzyma ostateczny numer, zostanie wysłana e-mailem do klienta i rozliczona z tą fakturą.",
-  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "Otworzysz szkic, w którym sam poprawisz pozycje i kwoty. Potem go wyślesz, tak jak fakturę."
+  "Je opent een concept waarin je zelf de regels en bedragen aanpast. Daarna verstuur je hem, net als een factuur.": "Otworzysz szkic, w którym sam poprawisz pozycje i kwoty. Potem go wyślesz, tak jak fakturę.",
+  "Pauze opheffen? Herinneringen en aanmaningen lopen dan weer volgens schema.": "Zakończyć wstrzymanie? Przypomnienia i wezwania będą znów wysyłane zgodnie z harmonogramem.",
+  "Zet herinneringen, aanmaningen en incasso voor deze factuur op pauze": "Wstrzymaj przypomnienia, wezwania i windykację dla tej faktury",
+  "Hef de pauze op; herinneringen lopen weer volgens schema": "Zakończ wstrzymanie; przypomnienia znów będą wysyłane zgodnie z harmonogramem",
+  "Deze factuur staat <strong>op pauze t/m :date</strong>. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.": "Ta faktura jest <strong>wstrzymana do :date</strong>. Nie są wysyłane przypomnienia ani wezwania i nie można jej przekazać do windykacji.",
+  "Deze factuur staat <strong>op pauze</strong> tot je hervat. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.": "Ta faktura jest <strong>wstrzymana</strong> do czasu wznowienia. Nie są wysyłane przypomnienia ani wezwania i nie można jej przekazać do windykacji.",
+  "Aanpassen": "Zmień",
+  "Geen herinneringen, aanmaningen of incasso zolang de pauze loopt": "Bez przypomnień, wezwań i windykacji, dopóki trwa wstrzymanie",
+  "Op pauze": "Wstrzymana",
+  "Pauze aanpassen": "Zmień wstrzymanie",
+  "Factuur op pauze zetten": "Wstrzymaj fakturę",
+  "Zolang de pauze loopt krijgt <b>:customer</b> geen herinneringen of aanmaningen en kan de factuur niet naar incasso. De factuur zelf blijft gewoon openstaan. Handig bij een betalingsregeling of een lopende klacht.": "Dopóki trwa wstrzymanie, <b>:customer</b> nie otrzymuje przypomnień ani wezwań, a faktury nie można przekazać do windykacji. Sama faktura pozostaje nieopłacona. Przydatne przy ugodzie ratalnej lub otwartej reklamacji.",
+  "Pauzeren tot en met": "Wstrzymaj do (włącznie)",
+  "Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.": "Puste pole = wstrzymanie do czasu samodzielnego wznowienia. Po podaniu daty przypomnienia ruszą automatycznie następnego dnia.",
+  "(optioneel — alleen voor jezelf)": "(opcjonalnie — tylko dla Ciebie)",
+  "Bijv. betalingsregeling afgesproken, klacht in behandeling": "Np. uzgodniono spłatę w ratach, reklamacja w toku",
+  "Op pauze: geen herinneringen, aanmaningen of incasso": "Wstrzymana: bez przypomnień, wezwań i windykacji"
 }

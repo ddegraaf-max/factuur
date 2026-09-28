@@ -23,6 +23,9 @@ class IncassoService
         if ($invoice->status === 'incasso') {
             throw new \DomainException(__('Deze factuur is al bij incasso.'));
         }
+        if ($invoice->remindersPaused()) {
+            throw new \DomainException(__('Deze factuur staat op pauze. Hervat eerst voordat je hem naar incasso stuurt.'));
+        }
 
         $reference = $this->nextReference($invoice->company);
 

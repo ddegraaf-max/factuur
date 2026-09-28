@@ -1067,5 +1067,19 @@
   ":label verrekend met creditnota :number (:amount)": ":label rozliczono z fakturą korygującą :number (:amount)",
   ":label verrekend met factuur :number (:amount)": ":label rozliczono z fakturą :number (:amount)",
   "Creditnota :credit verrekend met factuur :invoice (:amount). Omzet en btw veranderen niet.": "Faktura korygująca :credit rozliczona z fakturą :invoice (:amount). Przychód i VAT się nie zmieniają.",
-  "Verrekend met creditnota": "Rozliczono z fakturą korygującą"
+  "Verrekend met creditnota": "Rozliczono z fakturą korygującą",
+  "Deze factuur staat op pauze. Hervat de herinneringen eerst om er een te kunnen sturen.": "Ta faktura jest wstrzymana. Najpierw wznów przypomnienia, aby móc je wysłać.",
+  "Alleen een verstuurde factuur die nog openstaat kun je op pauze zetten.": "Wstrzymać można tylko wysłaną fakturę, która jest jeszcze nieopłacona.",
+  ":label op pauze gezet t/m :date: geen herinneringen, aanmaningen of incasso": ":label wstrzymana do :date: bez przypomnień, wezwań i windykacji",
+  ":label op pauze gezet: geen herinneringen, aanmaningen of incasso": ":label wstrzymana: bez przypomnień, wezwań i windykacji",
+  ":label: pauze afgelopen, herinneringen lopen weer": ":label: wstrzymanie wygasło, przypomnienia znów są wysyłane",
+  ":label: pauze opgeheven, herinneringen lopen weer": ":label: wstrzymanie zakończone, przypomnienia znów są wysyłane",
+  "Deze factuur staat op pauze. Hervat eerst voordat je hem naar incasso stuurt.": "Ta faktura jest wstrzymana. Najpierw wznów, zanim przekażesz ją do windykacji.",
+  "Vul een geldige einddatum in.": "Podaj prawidłową datę końcową.",
+  "Kies een einddatum vanaf vandaag.": "Wybierz datę końcową nie wcześniejszą niż dzisiaj.",
+  "Op pauze t/m :date: er gaan geen herinneringen of aanmaningen uit.": "Wstrzymana do :date: przypomnienia i wezwania nie będą wysyłane.",
+  "Op pauze: er gaan geen herinneringen of aanmaningen uit tot je hervat.": "Wstrzymana: przypomnienia i wezwania nie będą wysyłane do czasu wznowienia.",
+  "Pauze opgeheven: herinneringen lopen weer volgens schema.": "Wstrzymanie zakończone: przypomnienia znów są wysyłane zgodnie z harmonogramem.",
+  "Op pauze gezet t/m :date": "Wstrzymano do :date",
+  "Op pauze gezet": "Wstrzymano"
 }

@@ -41,6 +41,9 @@ class Invoice extends Model
         'first_viewed_at' => 'datetime',
         'paid_at' => 'datetime',
         'thanks_sent_at' => 'datetime',
+        'reminders_paused_at' => 'datetime',
+        'reminders_paused_until' => 'date',
+        'reminder_shift_days' => 'integer',
         'incasso_sent_at' => 'datetime',
         'peppol_sent_at' => 'datetime',
         'subtotal' => 'decimal:2',
@@ -98,6 +101,20 @@ class Invoice extends Model
         return $this->portal_token
             ? route('portal.invoice', $this->portal_token)
             : null;
+    }
+
+    /**
+     * Staan herinneringen, aanmaningen en incasso op pauze? Een pauze met
+     * einddatum loopt tot en met die dag en vervalt daarna vanzelf.
+     */
+    public function remindersPaused(): bool
+    {
+        if (! $this->reminders_paused_at) {
+            return false;
+        }
+
+        return ! $this->reminders_paused_until
+            || $this->reminders_paused_until->copy()->startOfDay()->gte(now()->startOfDay());
     }
 
     public function getRemainingAmountAttribute(): float

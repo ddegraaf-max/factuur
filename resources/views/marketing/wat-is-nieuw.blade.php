@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.58.0</div>
+        <h2>Pauzeknop op de factuur</h2>
+        <ul class="tl-list">
+          <li><b>Pauzeren</b> — betalingsregeling afgesproken of een klacht in behandeling? Zet de factuur op pauze. Zolang de pauze loopt gaan er geen herinneringen of aanmaningen uit en kan de factuur niet naar incasso. De factuur zelf blijft gewoon openstaan.</li>
+          <li><b>Met of zonder einddatum</b> — kies een datum tot en met wanneer de pauze loopt, of laat hem leeg en hervat zelf. Een reden erbij zetten kan; die is alleen voor jezelf.</li>
+          <li><b>Geen inhaalslag</b> — na de pauze schuift het herinneringsschema mee op. Je klant krijgt de eerstvolgende herinnering op dezelfde afstand als vóór de pauze, niet elke dag een bericht.</li>
+          <li><b>In één oogopslag</b> — een gepauzeerde factuur herken je aan het pauzeteken in de lijst en aan de balk bovenaan de factuur. Pauzeren en hervatten staan in het logboek.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 18 september 2026 · {{ brand('version_prefix') }} 1.57.1</div>
         <h2>Creditnota gaat naar de klant</h2>
         <ul class="tl-list">

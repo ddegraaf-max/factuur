@@ -1067,5 +1067,19 @@
   ":label verrekend met creditnota :number (:amount)": ":label settled against credit note :number (:amount)",
   ":label verrekend met factuur :number (:amount)": ":label settled against invoice :number (:amount)",
   "Creditnota :credit verrekend met factuur :invoice (:amount). Omzet en btw veranderen niet.": "Credit note :credit settled against invoice :invoice (:amount). Revenue and VAT do not change.",
-  "Verrekend met creditnota": "Settled against credit note"
+  "Verrekend met creditnota": "Settled against credit note",
+  "Deze factuur staat op pauze. Hervat de herinneringen eerst om er een te kunnen sturen.": "This invoice is on hold. Resume the reminders first to be able to send one.",
+  "Alleen een verstuurde factuur die nog openstaat kun je op pauze zetten.": "Only a sent invoice that is still open can be put on hold.",
+  ":label op pauze gezet t/m :date: geen herinneringen, aanmaningen of incasso": ":label put on hold until :date: no reminders, dunning letters or debt collection",
+  ":label op pauze gezet: geen herinneringen, aanmaningen of incasso": ":label put on hold: no reminders, dunning letters or debt collection",
+  ":label: pauze afgelopen, herinneringen lopen weer": ":label: pause ended, reminders are running again",
+  ":label: pauze opgeheven, herinneringen lopen weer": ":label: pause lifted, reminders are running again",
+  "Deze factuur staat op pauze. Hervat eerst voordat je hem naar incasso stuurt.": "This invoice is on hold. Resume first before sending it to debt collection.",
+  "Vul een geldige einddatum in.": "Enter a valid end date.",
+  "Kies een einddatum vanaf vandaag.": "Choose an end date from today onwards.",
+  "Op pauze t/m :date: er gaan geen herinneringen of aanmaningen uit.": "On hold until :date: no reminders or dunning letters will be sent.",
+  "Op pauze: er gaan geen herinneringen of aanmaningen uit tot je hervat.": "On hold: no reminders or dunning letters will be sent until you resume.",
+  "Pauze opgeheven: herinneringen lopen weer volgens schema.": "Pause lifted: reminders run on schedule again.",
+  "Op pauze gezet t/m :date": "Put on hold until :date",
+  "Op pauze gezet": "Put on hold"
 }
