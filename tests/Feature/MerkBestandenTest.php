@@ -68,6 +68,9 @@ class MerkBestandenTest extends TestCase
      * Twee merken met dezelfde kleur of hetzelfde domein is bijna zeker een
      * kopieerfout: bij een nieuw merk wordt het blok van een bestaand merk
      * overgenomen en blijft er iets staan.
+     *
+     * De kleur vergelijken we binnen één markt: Lopra en Lopra Polska zijn
+     * hetzelfde merk in twee landen en delen hun kleur met opzet.
      */
     public function test_merken_zijn_van_elkaar_te_onderscheiden(): void
     {
@@ -80,13 +83,14 @@ class MerkBestandenTest extends TestCase
 
             $this->assertNotEmpty($domein, "Merk {$merk} heeft geen domein.");
             $this->assertArrayNotHasKey($domein, $domeinen,
-                "Merk {$merk} deelt het domein {$domein} met {$domeinen[$domein]}.");
+                "Merk {$merk} deelt het domein {$domein} met " . ($domeinen[$domein] ?? '') . '.');
             $domeinen[$domein] = $merk;
 
             if ($kleur !== '') {
-                $this->assertArrayNotHasKey($kleur, $kleuren,
-                    "Merk {$merk} heeft dezelfde kleur {$kleur} als {$kleuren[$kleur]}.");
-                $kleuren[$kleur] = $merk;
+                $sleutel = ($gegevens['market'] ?? 'nl') . ' ' . $kleur;
+                $this->assertArrayNotHasKey($sleutel, $kleuren,
+                    "Merk {$merk} heeft dezelfde kleur {$kleur} als " . ($kleuren[$sleutel] ?? '') . '.');
+                $kleuren[$sleutel] = $merk;
             }
         }
     }
