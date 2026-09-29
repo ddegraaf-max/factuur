@@ -68,7 +68,35 @@ const destroySub = (s) => {
 /* ---------- Import ---------- */
 const importModal = ref(false);
 const importForm = useForm({ lines: '' });
+const importFileError = ref('');
 const runImport = () => importForm.post(route('tenders.subcontractors.import'), { preserveScroll: true, onSuccess: () => { importModal.value = false; importForm.reset(); } });
+const openImport = () => { importFileError.value = ''; importModal.value = true; };
+// Een bestand kiezen in plaats van plakken. De inhoud komt in het veld, zodat je ziet wat je toevoegt.
+const loadImportFile = (event) => {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  importFileError.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    // Excel zet aanhalingstekens om de velden en een onzichtbaar teken vooraan. Een puntkomma
+    // binnen aanhalingstekens hoort bij het veld; in de lijst wordt dat een komma.
+    const cells = (line) => (line.match(/("(?:[^"]|"")*"|[^;]*)(;|$)/g) || [])
+      .slice(0, -1)
+      .map((part) => part.replace(/;$/, '').trim().replace(/^"(.*)"$/, '$1').replace(/""/g, '"').replace(/;/g, ','));
+    const lines = String(reader.result || '').replace(/^﻿/, '').split(/\r?\n/)
+      .map((line) => cells(line).join('; '))
+      .filter((line) => line.replace(/[;\s]/g, '') !== '');
+    const text = lines.join('\n');
+    if (text.length > 20000) {
+      importFileError.value = t('Dit bestand is te lang voor één keer. Plak de regels in delen.');
+      return;
+    }
+    importForm.lines = text;
+  };
+  reader.onerror = () => { importFileError.value = t('Het bestand kon niet worden gelezen.'); };
+  reader.readAsText(file);
+};
 
 const packageName = (id) => props.packages.find(p => p.id === id)?.name || '';
 const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':n dagen', { n: Math.round(h / 24) }));
@@ -79,7 +107,7 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
   <AppLayout>
     <template #breadcrumb>{{ $t('Inkoop') }} / <span class="breadcrumb-current">{{ $t('Onderaannemers') }}</span></template>
     <template #topbar-actions>
-      <button class="btn btn-secondary btn-sm" @click="importModal = true">{{ $t('Meerdere bedrijven plakken') }}</button>
+      <button class="btn btn-secondary btn-sm" @click="openImport">{{ $t('Importeren') }}</button>
       <button class="btn btn-primary btn-sm" @click="openSub()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         {{ $t('Bedrijf toevoegen') }}
@@ -92,6 +120,9 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
         <p class="page-subtitle">{{ $t('Per werkpakket de bedrijven die je een prijs vraagt. De cijfers groeien mee: reactietijd, prijsniveau en gewonnen opdrachten.') }}</p>
       </div>
       <div class="page-actions">
+        <!-- Ook hier: op een smal scherm vallen de knoppen in de bovenbalk buiten beeld. -->
+        <button class="btn btn-secondary btn-sm" @click="openSub()">{{ $t('Bedrijf toevoegen') }}</button>
+        <button class="btn btn-secondary btn-sm" @click="openImport">{{ $t('Bedrijven importeren') }}</button>
         <Link :href="route('tenders.index')" class="btn btn-secondary btn-sm">{{ $t('Naar uitvragen') }}</Link>
       </div>
     </div>
@@ -260,13 +291,18 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
     <!-- Modal: import -->
     <div v-if="importModal" class="modal-overlay" @click.self="importModal = false">
       <div class="modal" style="max-width:640px;">
-        <div class="modal-header"><div class="modal-title">{{ $t('Meerdere bedrijven plakken') }}</div></div>
+        <div class="modal-header"><div class="modal-title">{{ $t('Bedrijven importeren') }}</div></div>
         <div class="modal-body">
           <p class="sub" style="margin:0 0 10px;line-height:1.6;">{{ $t('Eén bedrijf per regel, velden gescheiden door een puntkomma: naam; e-mail; telefoon; plaats; werkpakketten (door komma\'s gescheiden, op naam). Bestaande namen worden overgeslagen.') }}</p>
           <div class="form-group">
             <textarea v-model="importForm.lines" rows="8" placeholder="Jansen Funderingstechniek; info@jansen.nl; 035-1234567; Hilversum; Schroefpalen, Grondwerk"></textarea>
             <div v-if="importForm.errors.lines" class="field-error">{{ importForm.errors.lines }}</div>
           </div>
+          <div class="sub" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.6;">
+            <span>{{ $t('Of kies een bestand met deze regels (.txt of .csv):') }}</span>
+            <input type="file" accept=".txt,.csv,text/plain,text/csv" style="width:auto;height:auto;padding:0;border:0;" @change="loadImportFile">
+          </div>
+          <div v-if="importFileError" class="field-error">{{ importFileError }}</div>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary btn-sm" @click="importModal = false">{{ $t('Annuleren') }}</button>

@@ -167,5 +167,10 @@
   "Afwijzen en mailen": "Reject and e-mail",
   "afgewezen :date": "rejected :date",
   "Jouw bericht bij de afwijzing:": "Your message with the rejection:",
-  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "We will not proceed with your quote for this project. Thank you for your offer."
+  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "We will not proceed with your quote for this project. Thank you for your offer.",
+  "Importeren": "Import",
+  "Bedrijven importeren": "Import companies",
+  "Of kies een bestand met deze regels (.txt of .csv):": "Or choose a file with these lines (.txt or .csv):",
+  "Dit bestand is te lang voor één keer. Plak de regels in delen.": "This file is too long for one go. Paste the lines in parts.",
+  "Het bestand kon niet worden gelezen.": "The file could not be read."
 }

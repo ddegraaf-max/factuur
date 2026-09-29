@@ -167,5 +167,10 @@
   "Afwijzen en mailen": "Odrzuć i wyślij e-mail",
   "afgewezen :date": "odrzucono :date",
   "Jouw bericht bij de afwijzing:": "Twoja wiadomość przy odmowie:",
-  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "W tym projekcie nie skorzystamy z Państwa oferty cenowej. Dziękujemy za ofertę."
+  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "W tym projekcie nie skorzystamy z Państwa oferty cenowej. Dziękujemy za ofertę.",
+  "Importeren": "Importuj",
+  "Bedrijven importeren": "Importuj firmy",
+  "Of kies een bestand met deze regels (.txt of .csv):": "Albo wybierz plik z tymi wierszami (.txt lub .csv):",
+  "Dit bestand is te lang voor één keer. Plak de regels in delen.": "Ten plik jest za długi na jeden raz. Wklej wiersze w częściach.",
+  "Het bestand kon niet worden gelezen.": "Nie udało się odczytać pliku."
 }
