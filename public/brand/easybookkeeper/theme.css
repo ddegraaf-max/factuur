@@ -1,0 +1,60 @@
+/* EasyBookkeeper — kleuren bovenop de standaard-ontwerptokens.
+ * Wordt alleen geladen als APP_BRAND=easybookkeeper (zie config/brand.php);
+ * html[data-brand] wint van :root, dus de volgorde van laden maakt niet uit.
+ *
+ * Groen #146B4F · Diepgroen #0E4D39 · Koper #C87A2C (spaarzaam, alleen de
+ * belangrijkste actie) · Papier #F7F6F3 · Inkt #23211E · Gedempt #86827C
+ *
+ * Waarom groen: het is de kleur die mensen met boekhouden verbinden, en het
+ * staat ver genoeg van het rood van EasyInvoice en het blauw van Lopra dat je
+ * de drie merken naast elkaar niet verwart.
+ */
+html[data-brand="easybookkeeper"] {
+  --brand: #146B4F;
+  --brand-dark: #105A42;
+  --brand-darker: #0E4D39;
+  --brand-tint: #ECF4F0;
+  --brand-tint-2: #D7E8E0;
+  --brand-border: #B4D2C5;
+
+  --accent: #C87A2C;
+  --accent-dark: #A6621F;
+  --accent-light: #E0A867;
+  --accent-tint: #FBF2E8;
+
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --surface-2: #F0EEE9;
+  --surface-3: #E6E3DD;
+  --border: #D9D6D0;
+  --border-strong: #C6C2BB;
+
+  --text: #23211E;
+  --text-2: #3A3733;
+  --text-3: #86827C;
+  --text-4: #A8A49E;
+
+  --shadow-brand: 0 12px 40px rgba(20, 107, 79, 0.18);
+}
+
+/*
+ * Koper voor de primaire actie, groen voor navigatie, koppen en links.
+ *
+ * Eén accentkleur die alleen op de belangrijkste knop staat, werkt beter dan
+ * een tweede merkkleur die overal opduikt: dan weet een bezoeker weer waar hij
+ * moet klikken.
+ */
+html[data-brand="easybookkeeper"] .btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+html[data-brand="easybookkeeper"] .btn-primary:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+/* De zijbalk staat donker (dark_sidebar in config/brand.php). */
+html[data-brand="easybookkeeper"] .sidebar {
+  background: var(--brand-darker);
+}

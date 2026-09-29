@@ -205,5 +205,79 @@ return [
             'trademark' => null,
             'brand_watch' => false,
         ],
+
+        /*
+         * EasyBookkeeper — boekhouden, niet alleen factureren.
+         *
+         * Draait op dezelfde motor als EasyInvoice; het verschil is waar het
+         * verhaal begint. EasyInvoice gaat over de factuur die de deur uit
+         * gaat, EasyBookkeeper over de administratie die eronder ligt: een
+         * echt grootboek, een sluitende balans en een auditfile die de
+         * accountant zonder morren inleest.
+         *
+         * Zet APP_BRAND=easybookkeeper op de Railway-service die op
+         * easybookkeeper.nl draait. Verder deelt hij alles: dezelfde
+         * facturatie, dezelfde bankkoppeling, dezelfde btw-aangifte.
+         */
+        'easybookkeeper' => [
+            'name' => 'EasyBookkeeper',
+            'market' => 'nl',
+            'home_view' => 'easybookkeeper.landing',
+            'version_prefix' => 'EasyBookkeeper',
+            'tagline' => 'Boekhouden dat klopt',
+            'assistant' => 'Boek',
+            'positioning' => 'Online boekhouden voor zzp en mkb, met een echt grootboek',
+            'domain' => 'easybookkeeper.nl',
+            'email' => 'hallo@easybookkeeper.nl',
+            'contact_inbox' => null,
+
+            // Groen: de kleur die mensen met boekhouden verbinden, en ver
+            // genoeg van het rood van EasyInvoice en het blauw van Lopra.
+            'color' => '#146B4F',
+            'color_dark' => '#0E4D39',
+            'accent' => '#C87A2C',      // koper, alleen voor de belangrijkste knop
+            'background' => '#F7F6F3',
+            'fonts_url' => null,
+            'theme_css' => '/brand/easybookkeeper/theme.css',
+
+            'mark' => '/brand/easybookkeeper/eb-icon.svg',
+            'email_mark' => '/brand/easybookkeeper/eb-icon-180.png',
+            'sidebar_mark' => '/brand/easybookkeeper/eb-mark-white.svg',
+            'dark_sidebar' => true,
+            'icon' => '/brand/easybookkeeper/eb-icon-512.png',
+            'favicon_32' => '/brand/easybookkeeper/eb-icon-32.png',
+            'favicon_512' => '/brand/easybookkeeper/eb-icon-512.png',
+            'favicon_svg' => '/brand/easybookkeeper/favicon.svg',
+            'favicon_ico' => '/brand/easybookkeeper/favicon.ico',
+            'apple_touch' => '/brand/easybookkeeper/eb-icon-180.png',
+            'og_image' => '/brand/easybookkeeper/og-easybookkeeper.png',
+            'wordmark' => '/brand/easybookkeeper/eb-logo.svg',
+            'wordmark_dark' => '/brand/easybookkeeper/eb-logo-dark.svg',
+
+            'seo_title' => 'EasyBookkeeper — online boekhouden met een echt grootboek',
+            'seo_description' => 'Boekhouden voor zzp en mkb: facturen, bank, btw-aangifte en een volledig '
+                . 'grootboek met balans, proefbalans en auditfile. Uw accountant leest het zo in. '
+                . '14 dagen gratis proberen.',
+            'og_description' => 'Facturen, bank, btw en een echt grootboek — met een auditfile die uw '
+                . 'accountant zonder morren inleest.',
+            'app_description' => 'Online boekhouden voor zzp en mkb: facturen en offertes, bankkoppeling, '
+                . 'btw-aangifte, en een volledig grootboek met proefbalans, balans, grootboekkaarten '
+                . 'en de auditfile voor de accountant.',
+            'pwa_description' => 'Facturen, bank, btw en een echt grootboek — boekhouden dat klopt.',
+            'footer_description' => 'Online boekhouden met een echt grootboek: facturen, bank, btw-aangifte, '
+                . 'balans en auditfile. Gemaakt in Nederland.',
+            'auth_title' => 'Boekhouden dat klopt',
+            'auth_subtitle' => 'Facturen, bank, btw en een volledig grootboek — op één plek.',
+            'login_seo_title' => 'Inloggen bij EasyBookkeeper',
+            'login_seo_description' => 'Log in bij EasyBookkeeper en ga verder met uw boekhouding: '
+                . 'facturen, bank, btw en grootboek.',
+            'register_seo_title' => 'Probeer EasyBookkeeper 14 dagen gratis — account aanmaken',
+            'register_seo_description' => 'Maak in één minuut uw account aan en probeer alles 14 dagen '
+                . 'gratis. Geen creditcard nodig.',
+
+            'registered' => false,
+            'trademark' => null,
+            'brand_watch' => false,
+        ],
     ],
 ];

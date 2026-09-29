@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EasyBookkeeper">
+  <!--
+    Twee kolommen van gelijke hoogte op één streep: debet is credit.
+    Drie vormen, en daarom bij zestien pixels nog te herkennen.
+  -->
+  <rect x="13" y="18" width="17" height="32" rx="2.5" fill="currentColor"/>
+  <rect x="34" y="18" width="17" height="32" rx="2.5" fill="currentColor" opacity=".55"/>
+  <rect x="9" y="54" width="46" height="5" rx="2.5" fill="currentColor"/>
+</svg>
