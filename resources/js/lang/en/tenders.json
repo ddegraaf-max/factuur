@@ -159,5 +159,13 @@
   "De ondertekening die in je tekst stond, staat onderaan de mail en niet meer in de omschrijving. Dat hoeft niet: zonder eigen ondertekening sluit de mail af met je bedrijfsgegevens.": "The signature that was in your text is placed at the bottom of the e-mail and no longer in the description. You can leave it out: without your own signature the e-mail closes with your company details.",
   "Bedrijven toevoegen aan deze uitvraag": "Add companies to this request",
   "Deze bedrijven staan in de pool van :package en zijn nog niet aangeschreven. Ze krijgen dezelfde aanvraag met dezelfde bijlagen.": "These companies are in the pool of :package and have not been contacted yet. They get the same request with the same attachments.",
-  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(without a signature: the e-mail closes with your company details)"
+  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(without a signature: the e-mail closes with your company details)",
+  "De offerte afwijzen en het bedrijf een vriendelijk bericht mailen. De uitvraag blijft open.": "Reject the quote and e-mail the company a friendly message. The request stays open.",
+  "Offerte van :name afwijzen": "Reject the quote from :name",
+  ":name krijgt dit bericht per mail. De aanhef en de afsluiting met je gegevens staan er al omheen. De uitvraag blijft open voor de andere bedrijven.": ":name receives this message by e-mail. The greeting and the closing with your details are already around it. The request stays open for the other companies.",
+  "Bezig met versturen…": "Sending…",
+  "Afwijzen en mailen": "Reject and e-mail",
+  "afgewezen :date": "rejected :date",
+  "Jouw bericht bij de afwijzing:": "Your message with the rejection:",
+  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "We will not proceed with your quote for this project. Thank you for your offer."
 }

@@ -71,6 +71,8 @@ class TenderController extends Controller
                 'city' => $s->city,
                 'has_email' => filled($s->email),
             ])->values(),
+            // Staat klaar in het venster 'Afwijzen'; de ondernemer past het aan.
+            'rejectDefault' => $this->service->defaultRejection(),
             'round' => $this->summary($round) + [
                 'description' => $text['body'],
                 'signature' => $text['signature'],
@@ -99,6 +101,8 @@ class TenderController extends Controller
                 'valid_until_label' => $r->valid_until?->translatedFormat('j M Y'),
                 'remarks' => $r->remarks,
                 'decline_reason' => $r->decline_reason,
+                'reject_message' => $r->reject_message,
+                'rejected_at_label' => $r->rejected_at?->translatedFormat('j M, H:i'),
                 'attachment_name' => $r->attachment_name,
                 'attachment_url' => $r->attachment_name ? route('tenders.attachment', [$round, $r]) : null,
                 'sent_at_label' => $r->sent_at?->translatedFormat('j M, H:i'),
@@ -196,6 +200,23 @@ class TenderController extends Controller
         }
 
         return back()->with('flash', __(':name staat op afgezegd en krijgt geen herinnering meer.', ['name' => $tenderRequest->subcontractor?->name]));
+    }
+
+    /** Eén offerte afwijzen met een bericht; de uitvraag blijft open voor de rest. */
+    public function rejectRequest(Request $request, TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+        $data = $request->validate(['message' => ['nullable', 'string', 'max:2000']], [
+            'message.max' => __('Het bericht mag maximaal 2000 tekens lang zijn.'),
+        ]);
+
+        try {
+            $this->service->reject($tenderRequest, $data['message'] ?? null);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Offerte van :name afgewezen. Het bericht is gemaild.', ['name' => $tenderRequest->subcontractor?->name]));
     }
 
     /** Bedrijf uit de ronde halen, bijvoorbeeld als het per vergissing is aangeschreven. */

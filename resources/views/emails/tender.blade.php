@@ -46,6 +46,9 @@
             <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Beste :name,', ['name' => $name]) }}</p>
             @if($kind === 'award')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave voor :package. Wij gunnen u de opdracht en nemen binnenkort contact met u op over de planning en de opdrachtbevestiging.', ['package' => $round->title]) }}</p>
+            @elseif($kind === 'reject' && $rejection)
+                {{-- Afgewezen met een eigen bericht van de ondernemer --}}
+                @include('emails.partials.tender-blocks', ['blocks' => $rejection, 'color' => $color, 'size' => '15px', 'ink' => '#44403C', 'gap' => '12px'])
             @elseif($kind === 'reject')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave. Voor dit project hebben wij een andere partij gekozen. Wij houden u graag in beeld voor volgende projecten.') }}</p>
             @elseif($kind === 'reminder')
@@ -68,20 +71,7 @@
 
             @if($asks && $blocks)
                 <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#78716C;margin:26px 0 8px;">{{ __('Omschrijving') }}</div>
-                @foreach($blocks as $block)
-                    @if($block['type'] === 'ul')
-                        <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 10px;">
-                            @foreach($block['lines'] as $line)
-                                <tr>
-                                    <td style="width:18px;padding:3px 0;font-size:14.5px;line-height:1.6;color:{{ $color }};vertical-align:top;">•</td>
-                                    <td style="padding:3px 0;font-size:14.5px;line-height:1.6;color:#292524;vertical-align:top;">{{ $line }}</td>
-                                </tr>
-                            @endforeach
-                        </table>
-                    @else
-                        <p style="font-size:14.5px;line-height:1.65;color:#292524;margin:0 0 10px;">{!! implode('<br>', array_map('e', $block['lines'])) !!}</p>
-                    @endif
-                @endforeach
+                @include('emails.partials.tender-blocks', ['blocks' => $blocks, 'color' => $color, 'size' => '14.5px', 'ink' => '#292524', 'gap' => '10px'])
             @endif
 
             @if($files)

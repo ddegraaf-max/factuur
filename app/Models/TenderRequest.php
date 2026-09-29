@@ -20,8 +20,8 @@ class TenderRequest extends Model
 
     protected $fillable = [
         'tender_round_id', 'subcontractor_id', 'token', 'status', 'sent_at', 'reminded_at', 'opened_at',
-        'responded_at', 'price', 'available_week', 'valid_until', 'remarks', 'decline_reason',
-        'attachment_name', 'attachment_path',
+        'responded_at', 'rejected_at', 'price', 'available_week', 'valid_until', 'remarks', 'decline_reason',
+        'reject_message', 'attachment_name', 'attachment_path',
     ];
 
     protected $casts = [
@@ -29,6 +29,7 @@ class TenderRequest extends Model
         'reminded_at' => 'datetime',
         'opened_at' => 'datetime',
         'responded_at' => 'datetime',
+        'rejected_at' => 'datetime',
         'valid_until' => 'date',
         'price' => 'decimal:2',
     ];

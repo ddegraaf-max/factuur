@@ -408,6 +408,89 @@ class TenderTest extends TestCase
         Mail::assertSent(TenderMail::class, fn (TenderMail $mail) => $mail->kind === 'award' && $mail->hasTo('offerte@devries.test'));
     }
 
+    public function test_the_owner_rejects_one_quote_with_a_message_and_the_round_stays_open(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        [$package, $a, $b] = $this->pool();
+        $c = Subcontractor::create(['name' => 'Klein Timmerwerk', 'email' => 'info@klein.test', 'city' => 'Alphen aan den Rijn']);
+        $c->workPackages()->sync([$package->id]);
+        $this->post(route('tenders.store'), ['work_package_id' => $package->id, 'subcontractor_ids' => [$a->id, $b->id, $c->id], 'deadline' => now()->addDays(5)->toDateString()])->assertRedirect();
+        $round = TenderRound::firstOrFail();
+        $reqA = $round->requests()->where('subcontractor_id', $a->id)->firstOrFail();
+        $reqB = $round->requests()->where('subcontractor_id', $b->id)->firstOrFail();
+        $reqC = $round->requests()->where('subcontractor_id', $c->id)->firstOrFail();
+        $rejections = fn () => collect(Mail::sent(TenderMail::class))->filter(fn (TenderMail $mail) => $mail->kind === 'reject')->count();
+
+        // Zonder prijs valt er niets af te wijzen.
+        $this->post(route('tenders.requests.reject', [$round, $reqA]), ['message' => 'Helaas'])->assertSessionHasErrors('tender');
+        $this->assertSame('sent', $reqA->fresh()->status);
+
+        $this->asGuest();
+        $this->post(route('tender.respond', $reqA->token), ['price' => '5000'])->assertRedirect();
+        $this->post(route('tender.respond', $reqB->token), ['price' => '4800'])->assertRedirect();
+        $this->post(route('tender.respond', $reqC->token), ['price' => '5200'])->assertRedirect();
+
+        // Het venster begint met een vriendelijk bericht dat de ondernemer kan aanpassen.
+        $this->actingAs($user);
+        $default = app(TenderService::class)->defaultRejection();
+        $this->assertStringStartsWith('Bedankt voor uw prijsopgave', $default);
+        $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page->where('rejectDefault', $default));
+
+        $message = "Bedankt voor uw offerte.\n\nDe prijs ligt boven ons budget:\n- wij zoeken nog verder\n- bij een volgend project hoort u van ons";
+        $this->post(route('tenders.requests.reject', [$round, $reqA]), ['message' => $message])->assertRedirect()->assertSessionHasNoErrors();
+        $reqA->refresh();
+        $this->assertSame('rejected', $reqA->status);
+        $this->assertSame($message, $reqA->reject_message);
+        $this->assertNotNull($reqA->rejected_at);
+        $this->assertSame('open', $round->fresh()->status, 'De uitvraag blijft open voor de andere bedrijven');
+        $this->assertSame('responded', $reqB->fresh()->status);
+        $this->assertSame(1, $rejections());
+        Mail::assertSent(TenderMail::class, fn (TenderMail $mail) => $mail->kind === 'reject' && $mail->hasTo('info@jansen.test'));
+        $this->assertDatabaseHas('activity_logs', ['subject_type' => 'uitvraag', 'subject_id' => $round->id, 'action' => 'updated']);
+
+        // De mail: het eigen bericht in alinea's en opsommingen, niet de standaardtekst van het gunnen.
+        $mail = new TenderMail($reqA, 'reject');
+        $this->assertStringStartsWith('Uw prijsopgave voor', $mail->envelope()->subject);
+        $html = $mail->render();
+        $this->assertStringContainsString('De prijs ligt boven ons budget', $html);
+        $this->assertStringContainsString('wij zoeken nog verder', $html);
+        $this->assertStringNotContainsString('hebben wij een andere partij gekozen', $html);
+        $this->assertStringNotContainsString('uitvraag/' . $reqA->token, $html, 'Geen knop meer om te reageren');
+
+        // Zonder eigen tekst gaat het standaardbericht uit.
+        $this->post(route('tenders.requests.reject', [$round, $reqC]), ['message' => '  '])->assertSessionHasNoErrors();
+        $this->assertSame($default, $reqC->fresh()->reject_message);
+        $this->assertSame(2, $rejections());
+
+        $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('round.responded', 3)
+            ->where('requests', fn ($rows) => collect($rows)->firstWhere('id', $reqA->id)['reject_message'] === $message
+                && collect($rows)->firstWhere('id', $reqA->id)['status'] === 'rejected'));
+
+        // Afgewezen is definitief: geen tweede mail, en via de link komt er geen nieuwe prijs binnen.
+        $this->post(route('tenders.requests.reject', [$round, $reqA]), ['message' => 'Nog eens'])->assertSessionHasErrors('tender');
+        $this->assertSame(2, $rejections());
+        $this->asGuest();
+        $this->get(route('tender.respond.show', $reqA->token))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('request.status', 'rejected')
+            ->where('request.reject_message', $message)
+            ->where('round.open', true)
+            ->where('round.awarded', false));
+        $this->post(route('tender.respond', $reqA->token), ['price' => '4000'])->assertSessionHasErrors('tender');
+        $this->post(route('tender.decline', $reqA->token), ['reason' => 'Dan niet'])->assertSessionHasErrors('tender');
+        $this->assertSame('rejected', $reqA->fresh()->status);
+
+        // Bij het gunnen krijgt wie al is afgewezen niet nog een afwijzing.
+        $this->actingAs($user);
+        $this->post(route('tenders.award', [$round, $reqA]))->assertSessionHasErrors('tender');
+        $this->post(route('tenders.award', [$round, $reqB]))->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertSame(2, $rejections());
+        $this->assertSame('awarded', $reqB->fresh()->status);
+        $this->assertSame($message, $reqA->fresh()->reject_message);
+    }
+
     public function test_silent_companies_get_one_reminder_after_three_days(): void
     {
         Mail::fake();

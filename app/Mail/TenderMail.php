@@ -43,7 +43,9 @@ class TenderMail extends Mailable
         $subject = match ($this->kind) {
             'reminder' => __('Herinnering: prijsaanvraag :package — :company', $vars),
             'award' => __('Opdracht: :package — :company', $vars),
-            'reject' => __('Prijsaanvraag :package — niet gegund', $vars),
+            'reject' => filled($this->tenderRequest->reject_message)
+                ? __('Uw prijsopgave voor :package — :company', $vars)
+                : __('Prijsaanvraag :package — niet gegund', $vars),
             default => __('Prijsaanvraag: :package — :company', $vars),
         };
 
@@ -60,6 +62,8 @@ class TenderMail extends Mailable
         $files = $this->files();
         $token = $this->tenderRequest->token;
         $text = TenderText::split($round->description);
+        // Een afwijzing met een eigen bericht: dat bericht is de tekst van de mail.
+        $rejection = $this->kind === 'reject' ? $this->tenderRequest->reject_message : null;
         $row = fn ($file, bool $attached) => [
             'name' => $file->filename,
             'size' => $file->size_formatted,
@@ -80,7 +84,9 @@ class TenderMail extends Mailable
                 // Omschrijving in alinea's en opsommingen; een meegeplakte
                 // ondertekening komt onderaan de mail, niet in de aanvraag.
                 'blocks' => TenderText::blocks($round->description),
-                'signature' => $text['signature'],
+                // Niet 'message': die naam gebruikt Laravel zelf in mailsjablonen.
+                'rejection' => TenderText::blocks($rejection),
+                'signature' => TenderText::split($rejection)['signature'] ?? $text['signature'],
                 'files' => array_merge(
                     array_map(fn ($file) => $row($file, true), $files['attached']),
                     array_map(fn ($file) => $row($file, false), $files['online']),

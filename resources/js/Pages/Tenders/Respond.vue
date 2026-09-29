@@ -83,7 +83,9 @@ const final = computed(() => !props.round?.open || ['awarded', 'rejected'].inclu
           <div class="tr-final good"><strong>{{ $t('Gefeliciteerd: de opdracht is aan u gegund.') }}</strong> {{ $t(':company neemt contact met u op over de planning.', { company: company.name }) }}</div>
         </template>
         <template v-else-if="request.status === 'rejected'">
-          <div class="tr-final">{{ $t('Deze opdracht is aan een ander bedrijf gegund. Bedankt voor uw prijsopgave.') }}</div>
+          <div v-if="request.reject_message" class="tr-final tr-message">{{ request.reject_message }}</div>
+          <div v-else-if="round.awarded" class="tr-final">{{ $t('Deze opdracht is aan een ander bedrijf gegund. Bedankt voor uw prijsopgave.') }}</div>
+          <div v-else class="tr-final">{{ $t('Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.') }}</div>
         </template>
         <template v-else-if="!round.open">
           <div class="tr-final">{{ $t('Deze prijsaanvraag is gesloten.') }}</div>
@@ -164,6 +166,7 @@ h1 { font-size: 22px; margin: 0 0 8px; letter-spacing: -0.015em; }
 .tr-error { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 14px; }
 .tr-final { background: #F5F5F4; border-radius: 8px; padding: 12px 14px; font-size: 14.5px; line-height: 1.6; margin-bottom: 14px; }
 .tr-final.good { background: #ECFDF5; color: #065F46; }
+.tr-message { white-space: pre-wrap; }
 .tr-note { font-size: 13px; color: #78716C; margin-bottom: 12px; }
 .tr-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 560px) { .tr-row { grid-template-columns: 1fr; } }

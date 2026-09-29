@@ -210,7 +210,7 @@ class TenderService
     /** Het bedrijf geeft prijs en beschikbaarheid door (mag bijwerken zolang de ronde open is). */
     public function respond(TenderRequest $request, array $data, ?UploadedFile $file = null): void
     {
-        if (! $request->round?->isOpen()) {
+        if (! $request->round?->isOpen() || $request->status === 'rejected') {
             throw new \DomainException(__('Deze prijsaanvraag is gesloten.'));
         }
 
@@ -245,7 +245,7 @@ class TenderService
 
     public function decline(TenderRequest $request, ?string $reason = null): void
     {
-        if (! $request->round?->isOpen()) {
+        if (! $request->round?->isOpen() || $request->status === 'rejected') {
             throw new \DomainException(__('Deze prijsaanvraag is gesloten.'));
         }
 
@@ -271,6 +271,36 @@ class TenderService
             'decline_reason' => filled($reason) ? trim($reason) : __('Afgezegd (door jou vastgelegd)'),
             'responded_at' => now(),
         ])->save();
+    }
+
+    /** Het bericht dat klaarstaat bij een afwijzing, in de taal waarin de mail uitgaat. */
+    public function defaultRejection(): string
+    {
+        return DocumentLocale::using(DocumentLocale::default(), fn () => __('Bedankt voor uw prijsopgave en voor de tijd die u erin heeft gestoken. Wij hebben uw aanbieding zorgvuldig bekeken en gaan er voor dit project niet mee verder. Wij houden u graag in beeld voor volgende projecten.'));
+    }
+
+    /**
+     * Wijst één prijsopgave af met een bericht van de ondernemer; de ronde
+     * blijft open voor de andere bedrijven. Lukt de mail niet, dan verandert
+     * er niets, zodat afwijzen opnieuw kan.
+     */
+    public function reject(TenderRequest $request, ?string $message = null): void
+    {
+        if (! $request->round?->isOpen() || $request->status !== 'responded') {
+            throw new \DomainException(__('Afwijzen kan alleen zolang de uitvraag open is en het bedrijf een prijs heeft doorgegeven.'));
+        }
+
+        // Nog niet opslaan: de mail leest het bericht van de aanvraag.
+        $request->reject_message = filled($message) ? trim($message) : $this->defaultRejection();
+        if (! $this->mail($request, 'reject')) {
+            throw new \DomainException(__('De afwijzing kon niet worden gemaild. Er is niets gewijzigd; probeer het later opnieuw.'));
+        }
+
+        $request->forceFill(['status' => 'rejected', 'rejected_at' => now()])->save();
+
+        Audit::log('updated', $request->round, __(':label: offerte van :name afgewezen', [
+            'label' => Audit::label($request->round), 'name' => $request->subcontractor?->name,
+        ]), [], $request->round->company_id);
     }
 
     /** Haalt een bedrijf uit de ronde, met alles wat het had ingestuurd. Er gaat geen bericht uit. */
@@ -349,7 +379,7 @@ class TenderService
             $winner->forceFill(['status' => 'awarded'])->save();
             $round->requests()->where('id', '!=', $winner->id)
                 ->whereIn('status', ['sent', 'responded'])
-                ->update(['status' => 'rejected']);
+                ->update(['status' => 'rejected', 'rejected_at' => now()]);
             $round->forceFill(['status' => 'awarded', 'awarded_request_id' => $winner->id, 'awarded_at' => now()])->save();
         });
 

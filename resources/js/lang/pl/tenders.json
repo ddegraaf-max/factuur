@@ -159,5 +159,13 @@
   "De ondertekening die in je tekst stond, staat onderaan de mail en niet meer in de omschrijving. Dat hoeft niet: zonder eigen ondertekening sluit de mail af met je bedrijfsgegevens.": "Podpis, który był w Twoim tekście, znajduje się na dole wiadomości, a nie w opisie. Nie jest potrzebny: bez własnego podpisu wiadomość kończy się danymi Twojej firmy.",
   "Bedrijven toevoegen aan deze uitvraag": "Dodaj firmy do tego zapytania",
   "Deze bedrijven staan in de pool van :package en zijn nog niet aangeschreven. Ze krijgen dezelfde aanvraag met dezelfde bijlagen.": "Te firmy są w puli :package i nie zostały jeszcze zapytane. Otrzymają to samo zapytanie z tymi samymi załącznikami.",
-  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(bez podpisu: wiadomość kończy się danymi Twojej firmy)"
+  "(zonder ondertekening: de mail sluit af met je bedrijfsgegevens)": "(bez podpisu: wiadomość kończy się danymi Twojej firmy)",
+  "De offerte afwijzen en het bedrijf een vriendelijk bericht mailen. De uitvraag blijft open.": "Odrzuć ofertę i wyślij firmie uprzejmą wiadomość e-mailem. Zapytanie pozostaje otwarte.",
+  "Offerte van :name afwijzen": "Odrzuć ofertę firmy :name",
+  ":name krijgt dit bericht per mail. De aanhef en de afsluiting met je gegevens staan er al omheen. De uitvraag blijft open voor de andere bedrijven.": ":name otrzyma tę wiadomość e-mailem. Powitanie i zakończenie z Twoimi danymi są już dodane. Zapytanie pozostaje otwarte dla pozostałych firm.",
+  "Bezig met versturen…": "Wysyłanie…",
+  "Afwijzen en mailen": "Odrzuć i wyślij e-mail",
+  "afgewezen :date": "odrzucono :date",
+  "Jouw bericht bij de afwijzing:": "Twoja wiadomość przy odmowie:",
+  "Wij gaan voor dit project niet verder met uw prijsopgave. Bedankt voor uw aanbieding.": "W tym projekcie nie skorzystamy z Państwa oferty cenowej. Dziękujemy za ofertę."
 }

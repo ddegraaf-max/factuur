@@ -9,6 +9,7 @@ const props = defineProps({
   round: Object,
   requests: Array,
   candidates: { type: Array, default: () => [] },
+  rejectDefault: { type: String, default: '' },
 });
 
 const page = usePage();
@@ -19,8 +20,9 @@ const pillLabel = { open: 'Open', awarded: 'Gegund', closed: 'Gesloten' };
 const reqClass = { sent: 'pill-sent', responded: 'pill-partial', declined: 'pill-cancelled', awarded: 'pill-paid', rejected: 'pill-draft' };
 const reqLabel = { sent: 'Aangeschreven', responded: 'Prijs ontvangen', declined: 'Afgezegd', awarded: 'Gegund', rejected: 'Niet gegund' };
 
+// De laagste prijs van wie nog meedoet; een afgewezen offerte telt niet mee.
 const lowestId = computed(() => {
-  const priced = props.requests.filter(r => r.price !== null);
+  const priced = props.requests.filter(r => r.price !== null && r.status === 'responded');
   if (!priced.length) return null;
   return priced.reduce((a, b) => (b.price < a.price ? b : a)).id;
 });
@@ -36,6 +38,15 @@ const remind = (r) => {
     router.post(route('tenders.remind', [props.round.id, r.id]), {}, { preserveScroll: true });
   }
 };
+
+/* ---------- Offerte afwijzen met een bericht ---------- */
+const rejecting = ref(null);
+const rejectForm = useForm({ message: '' });
+const openReject = (r) => { rejectForm.clearErrors(); rejectForm.message = props.rejectDefault; rejecting.value = r; };
+const reject = () => rejectForm.post(route('tenders.requests.reject', [props.round.id, rejecting.value.id]), {
+  preserveScroll: true,
+  onSuccess: () => { rejecting.value = null; },
+});
 
 /* ---------- Afgezegd of per vergissing aangeschreven ---------- */
 const markDeclined = (r) => {
@@ -162,7 +173,8 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
             <td>
               <span :class="['pill', reqClass[r.status]]">{{ $t(reqLabel[r.status]) }}</span>
               <div class="sub">
-                <template v-if="r.responded_at_label">{{ $t('gereageerd :date', { date: r.responded_at_label }) }}</template>
+                <template v-if="r.status === 'rejected' && r.rejected_at_label">{{ $t('afgewezen :date', { date: r.rejected_at_label }) }}</template>
+                <template v-else-if="r.responded_at_label">{{ $t('gereageerd :date', { date: r.responded_at_label }) }}</template>
                 <template v-else-if="r.opened_at_label">{{ $t('geopend :date', { date: r.opened_at_label }) }}</template>
                 <template v-else-if="r.sent_at_label">{{ $t('gemaild :date', { date: r.sent_at_label }) }}</template>
                 <template v-else>{{ $t('mail niet verstuurd') }}</template>
@@ -179,9 +191,11 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
               <template v-if="r.status === 'declined'">{{ r.decline_reason || $t('Geen reden opgegeven') }}</template>
               <template v-else>{{ r.remarks || '—' }}</template>
               <div v-if="r.attachment_url"><a :href="r.attachment_url" target="_blank" class="lnk">📎 {{ r.attachment_name }}</a></div>
+              <div v-if="r.status === 'rejected' && r.reject_message" class="sent-note"><b>{{ $t('Jouw bericht bij de afwijzing:') }}</b> {{ r.reject_message }}</div>
             </td>
             <td class="right actions">
               <button v-if="round.status === 'open' && r.status === 'responded'" class="btn btn-primary btn-sm" @click="award(r)">{{ $t('Gunnen') }}</button>
+              <button v-if="round.status === 'open' && r.status === 'responded'" class="btn btn-secondary btn-sm" :title="$t('De offerte afwijzen en het bedrijf een vriendelijk bericht mailen. De uitvraag blijft open.')" @click="openReject(r)">{{ $t('Afwijzen') }}</button>
               <button v-if="round.status === 'open' && r.status === 'sent'" class="btn btn-secondary btn-sm" @click="remind(r)">{{ $t('Herinneren') }}</button>
               <button v-if="round.status === 'open' && ['sent', 'responded'].includes(r.status)" class="btn btn-ghost btn-sm" :title="$t('Het bedrijf heeft afgezegd, bijvoorbeeld per telefoon of mail. Er gaat geen bericht uit.')" @click="markDeclined(r)">{{ $t('Afgezegd') }}</button>
               <button v-if="round.status === 'open' && r.status !== 'awarded'" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" :title="$t('Bedrijf uit deze uitvraag halen. Er gaat geen bericht uit.')" @click="removeRequest(r)">{{ $t('Verwijder') }}</button>
@@ -229,6 +243,33 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
       </div>
     </div>
 
+    <!-- Offerte afwijzen met een bericht -->
+    <div v-if="rejecting" class="modal-overlay" @click.self="rejecting = null">
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Offerte van :name afwijzen', { name: rejecting.name }) }}</div>
+          <button class="btn btn-ghost btn-sm" @click="rejecting = null">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin:0 0 14px;line-height:1.6;">
+            {{ $t(':name krijgt dit bericht per mail. De aanhef en de afsluiting met je gegevens staan er al omheen. De uitvraag blijft open voor de andere bedrijven.', { name: rejecting.name }) }}
+          </p>
+          <div v-if="pageError" class="field-error" style="margin-bottom:12px;">{{ pageError }}</div>
+          <div class="form-group">
+            <label>{{ $t('Bericht') }}</label>
+            <textarea v-model="rejectForm.message" rows="7" maxlength="2000"></textarea>
+            <div v-if="rejectForm.errors.message" class="field-error">{{ rejectForm.errors.message }}</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="rejecting = null">{{ $t('Annuleren') }}</button>
+          <button class="btn btn-primary btn-sm" :disabled="rejectForm.processing" @click="reject">
+            {{ rejectForm.processing ? $t('Bezig met versturen…') : $t('Afwijzen en mailen') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Extra bedrijven aanschrijven -->
     <div v-if="showInvite" class="modal-overlay" @click.self="showInvite = false">
       <div class="modal" style="max-width:640px;">
@@ -271,6 +312,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
 .good { color: var(--success); font-weight: 600; }
 .bad { color: var(--warning); font-weight: 600; }
 .remarks { max-width: 280px; font-size: 13px; white-space: pre-wrap; }
+.sent-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12.5px; color: var(--text-3); }
 .actions { white-space: nowrap; }
 .lnk { color: var(--brand); }
 .sig-note { font-size: 12.5px; color: var(--text-3); line-height: 1.6; border-top: 1px solid var(--border); }

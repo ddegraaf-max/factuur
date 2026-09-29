@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.64.0</div>
+        <h2>Uitvragen: een offerte afwijzen met een bericht</h2>
+        <ul class="tl-list">
+          <li><b>Afwijzen</b> — past een prijsopgave niet, dan wijs je hem in de vergelijking af. Het bedrijf krijgt een mail uit jouw naam; de uitvraag blijft open voor de andere bedrijven.</li>
+          <li><b>Een vriendelijk bericht staat klaar</b> — je past de tekst aan of verstuurt hem zoals hij is. De aanhef en je bedrijfsgegevens staan er al omheen.</li>
+          <li><b>Terug te lezen</b> — het bericht dat je stuurde staat bij het bedrijf in de vergelijking, met de prijs erbij.</li>
+          <li><b>Geen dubbele afwijzing</b> — gun je later de opdracht aan een ander, dan krijgt wie al is afgewezen niet nog een mail.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 september 2026 · {{ brand('version_prefix') }} 1.63.0</div>
         <h2>Kleineondernemersregeling (KOR)</h2>
         <ul class="tl-list">

@@ -1123,5 +1123,12 @@
   "Je klant krijgt een mail met de PDF en een link om online te bekijken.": "Your customer receives an e-mail with the PDF and a link to view it online.",
   "Btw verlegd. De btw is verlegd naar de afnemer (artikel 12 Wet OB).": "VAT reverse-charged. The VAT is reverse-charged to the customer (article 12 of the Dutch VAT Act).",
   "Vrijgesteld van btw. Op deze factuur is geen btw van toepassing.": "Exempt from VAT. No VAT applies to this invoice.",
-  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Welcome! Your invoice for :customer is ready as a draft. Check it and send it."
+  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Welcome! Your invoice for :customer is ready as a draft. Check it and send it.",
+  "Bedankt voor uw prijsopgave en voor de tijd die u erin heeft gestoken. Wij hebben uw aanbieding zorgvuldig bekeken en gaan er voor dit project niet mee verder. Wij houden u graag in beeld voor volgende projecten.": "Thank you for your quote and for the time you put into it. We have looked at your offer carefully and will not proceed with it for this project. We would be glad to keep you in mind for future projects.",
+  "Afwijzen kan alleen zolang de uitvraag open is en het bedrijf een prijs heeft doorgegeven.": "You can only reject while the request is open and the company has submitted a price.",
+  "De afwijzing kon niet worden gemaild. Er is niets gewijzigd; probeer het later opnieuw.": "The rejection could not be e-mailed. Nothing has changed; please try again later.",
+  ":label: offerte van :name afgewezen": ":label: quote from :name rejected",
+  "Het bericht mag maximaal 2000 tekens lang zijn.": "The message may be at most 2000 characters long.",
+  "Offerte van :name afgewezen. Het bericht is gemaild.": "Quote from :name rejected. The message has been e-mailed.",
+  "Uw prijsopgave voor :package — :company": "Your quote for :package — :company"
 }

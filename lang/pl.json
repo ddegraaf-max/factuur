@@ -1123,5 +1123,12 @@
   "Je klant krijgt een mail met de PDF en een link om online te bekijken.": "Klient dostanie e-mail z plikiem PDF i linkiem do podglądu online.",
   "Btw verlegd. De btw is verlegd naar de afnemer (artikel 12 Wet OB).": "Odwrotne obciążenie. Podatek rozlicza nabywca (art. 12 holenderskiej ustawy o VAT).",
   "Vrijgesteld van btw. Op deze factuur is geen btw van toepassing.": "Zwolnienie z VAT. Na tej fakturze nie nalicza się VAT.",
-  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Witaj! Faktura dla :customer czeka jako szkic. Sprawdź ją i wyślij."
+  "Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.": "Witaj! Faktura dla :customer czeka jako szkic. Sprawdź ją i wyślij.",
+  "Bedankt voor uw prijsopgave en voor de tijd die u erin heeft gestoken. Wij hebben uw aanbieding zorgvuldig bekeken en gaan er voor dit project niet mee verder. Wij houden u graag in beeld voor volgende projecten.": "Dziękujemy za ofertę cenową i za czas poświęcony na jej przygotowanie. Dokładnie zapoznaliśmy się z Państwa ofertą i w tym projekcie z niej nie skorzystamy. Chętnie będziemy pamiętać o Państwu przy kolejnych projektach.",
+  "Afwijzen kan alleen zolang de uitvraag open is en het bedrijf een prijs heeft doorgegeven.": "Odrzucić można tylko wtedy, gdy zapytanie jest otwarte, a firma podała cenę.",
+  "De afwijzing kon niet worden gemaild. Er is niets gewijzigd; probeer het later opnieuw.": "Nie udało się wysłać odmowy e-mailem. Nic nie zostało zmienione; spróbuj ponownie później.",
+  ":label: offerte van :name afgewezen": ":label: oferta firmy :name odrzucona",
+  "Het bericht mag maximaal 2000 tekens lang zijn.": "Wiadomość może mieć najwyżej 2000 znaków.",
+  "Offerte van :name afgewezen. Het bericht is gemaild.": "Oferta firmy :name odrzucona. Wiadomość została wysłana e-mailem.",
+  "Uw prijsopgave voor :package — :company": "Państwa oferta cenowa na :package — :company"
 }

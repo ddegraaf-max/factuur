@@ -55,6 +55,7 @@ class TenderResponseController extends Controller
                 'start_week_label' => IsoWeek::label($round->start_week),
                 'deadline_label' => $round->deadline->translatedFormat('j F Y'),
                 'open' => $round->isOpen(),
+                'awarded' => $round->status === 'awarded',
                 // Tekening, bestek: te openen via dezelfde geheime link.
                 'attachments' => $round->attachments()->get(['id', 'filename', 'mime_type', 'size_bytes'])->map(fn (Attachment $a) => [
                     'id' => $a->id,
@@ -72,6 +73,8 @@ class TenderResponseController extends Controller
                 'valid_until' => $request->valid_until?->toDateString(),
                 'remarks' => $request->remarks,
                 'decline_reason' => $request->decline_reason,
+                // Zonder een meegeplakte ondertekening, net als de omschrijving.
+                'reject_message' => $request->status === 'rejected' ? (TenderText::body($request->reject_message) ?: null) : null,
                 'attachment_name' => $request->attachment_name,
                 'responded_at_label' => $request->responded_at?->translatedFormat('j F Y, H:i'),
             ],
