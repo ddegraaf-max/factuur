@@ -12,7 +12,12 @@ const props = defineProps({
   prefill: { type: Object, default: null },
 });
 
-const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
+// De sleutel komt van de server; VITE_TURNSTILE_SITEKEY blijft werken als
+// terugval. Alleen op de bouwwaarde vertrouwen betekende dat het instellen
+// van de sleutel pas na een herbouw effect had — terwijl het geheim wél
+// meteen werkt, en dan wordt elke aanmelding geweigerd.
+const turnstileSitekey = usePage().props.turnstile_sitekey
+  || import.meta.env.VITE_TURNSTILE_SITEKEY || '';
 const brand = usePage().props.brand;
 
 // Markt (nl/pl): labels, placeholders en rechtsvormen van KvK/REGON en btw-nummer/NIP

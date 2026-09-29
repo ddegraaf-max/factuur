@@ -25,6 +25,21 @@ class HandleInertiaRequests extends Middleware
             'market' => \App\Support\Market::forClient(),
             // Actieve interfacetaal (kan in Polen afwijken van de markttaal: PL/EN).
             'locale' => app()->getLocale(),
+            /*
+             * De publieke Turnstile-sitesleutel, vanaf de server.
+             *
+             * Hij stond alleen in VITE_TURNSTILE_SITEKEY, en die wordt bij het
+             * bouwen van de frontend ingebakken. Zet je hem daarna als
+             * omgevingsvariabele, dan verandert er niets tot er opnieuw wordt
+             * gebouwd — terwijl TURNSTILE_SECRET wél meteen werkt. Dat geeft de
+             * slechtst denkbare stand: de controle staat aan, het widget wordt
+             * niet getekend, en dus wordt élke aanmelding geweigerd.
+             *
+             * Dat overkwam EasyBookkeeper bij het live zetten. Via de server
+             * werkt de sleutel meteen; VITE_TURNSTILE_SITEKEY blijft werken
+             * voor wie hem al zo heeft staan.
+             */
+            'turnstile_sitekey' => (string) config('services.turnstile.sitekey', ''),
             'auth' => [
                 'user' => $request->user(),
                 'company' => $request->user()?->company,
