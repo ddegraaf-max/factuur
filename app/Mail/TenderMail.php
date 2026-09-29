@@ -73,8 +73,11 @@ class TenderMail extends Mailable
 
         return new Content(
             view: 'emails.tender',
+            // Ook als platte tekst: een mail met alleen opmaak belandt eerder bij de ongewenste post.
+            text: 'emails.tender-text',
             with: [
                 'kind' => $this->kind,
+                'firstContact' => $this->firstContact(),
                 'request' => $this->tenderRequest,
                 'round' => $round,
                 'company' => $round->company,
@@ -93,6 +96,22 @@ class TenderMail extends Mailable
                 ),
             ],
         );
+    }
+
+    /**
+     * Kent dit bedrijf de prijsaanvraag nog niet? Dan legt de mail uit wie er
+     * vraagt en waarom: geen reclame, maar een vraag om een prijs. Wie al eens
+     * een prijs heeft doorgegeven, krijgt die uitleg niet meer.
+     */
+    private function firstContact(): bool
+    {
+        if (! in_array($this->kind, ['request', 'reminder'], true)) {
+            return false;
+        }
+
+        return ! TenderRequest::where('subcontractor_id', $this->tenderRequest->subcontractor_id)
+            ->whereNotNull('price')
+            ->exists();
     }
 
     /** Tekening en bestek gaan mee met de aanvraag, de herinnering en de opdracht. */

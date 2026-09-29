@@ -53,6 +53,8 @@
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave. Voor dit project hebben wij een andere partij gekozen. Wij houden u graag in beeld voor volgende projecten.') }}</p>
             @elseif($kind === 'reminder')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Wij hebben nog geen reactie van u ontvangen op onze prijsaanvraag. Kunt u uiterlijk :deadline uw prijs en beschikbaarheid doorgeven? Dat kan in een minuut via de knop hieronder.', ['deadline' => $deadline]) }}</p>
+            @elseif($firstContact)
+                <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __(':company zoekt een vakman voor onderstaand werk en vraagt u om een prijs en uw beschikbaarheid. Dit is een persoonlijke aanvraag, geen reclame. Reageren kan in een minuut via de knop hieronder.', ['company' => $company->name]) }}</p>
             @else
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __(':company vraagt u om een prijs en uw beschikbaarheid voor onderstaand onderdeel van een project. Reageren kan in een minuut via de knop hieronder.', ['company' => $company->name]) }}</p>
             @endif
@@ -100,6 +102,24 @@
                 </table>
                 <p style="font-size:13px;line-height:1.6;color:#78716C;margin:0;">{{ __('Liever uw eigen offerte sturen? Die kunt u op dezelfde pagina als PDF toevoegen. Antwoorden op deze mail kan ook.') }}</p>
                 <p style="font-size:13px;line-height:1.6;color:#78716C;margin:6px 0 0;">{{ __('Geen tijd of past het niet? Laat het ons via dezelfde knop weten, dan sturen wij geen herinnering.') }}</p>
+
+                @if($firstContact)
+                    {{-- Eerste contact: wie vraagt dit en waarom. Een mail met een knop van een onbekende lijkt anders al snel op reclame. --}}
+                    <div style="margin:22px 0 0;padding:16px 18px;background:#FAFAF9;border:1px solid #E7E5E4;border-left:3px solid {{ $color }};border-radius:8px;">
+                        <div style="font-size:14px;font-weight:700;color:#1C1917;margin:0 0 6px;">{{ __('Waarom krijgt u deze mail?') }}</div>
+                        <p style="font-size:13.5px;line-height:1.6;color:#44403C;margin:0 0 8px;">{{ __(':company kwam bij u uit omdat u dit werk in de regio doet. Wij willen u niets verkopen; wij willen u een opdracht geven. Deze mail is dus geen reclame en geen spam.', ['company' => $company->name]) }}</p>
+                        <p style="font-size:13.5px;line-height:1.6;color:#44403C;margin:0 0 8px;">{{ __('Wij werken volledig digitaal: onze prijsaanvragen versturen wij met :brand. Achter de knop staat de aanvraag met de bijlagen en vult u uw prijs in. U maakt geen account aan, het kost niets en u zit nergens aan vast.', ['brand' => brand('name')]) }}</p>
+                        <p style="font-size:13.5px;line-height:1.6;color:#44403C;margin:0;">
+                            @if($company->phone)
+                                {{ __('Twijfelt u, of overlegt u liever eerst? Bel ons op :phone.', ['phone' => $company->phone]) }}
+                            @else
+                                {{ __('Twijfelt u, of overlegt u liever eerst? Antwoord op deze mail; uw bericht komt rechtstreeks bij ons.') }}
+                            @endif
+                        </p>
+                    </div>
+                @endif
+
+                <p style="font-size:12px;line-height:1.55;color:#A8A29E;margin:14px 0 0;word-break:break-all;">{{ __('Werkt de knop niet? Open dan dit adres:') }} <a href="{{ $url }}" style="color:#78716C;">{{ $url }}</a></p>
             @endif
 
             {{-- Afsluiting: eigen ondertekening uit de tekst, anders de bedrijfsgegevens --}}

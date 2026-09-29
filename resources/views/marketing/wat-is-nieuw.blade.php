@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.68.0</div>
+        <h2>Uitvragen: een prijsaanvraag die niet op reclame lijkt</h2>
+        <ul class="tl-list">
+          <li><b>Waarom krijgt u deze mail?</b> — een bedrijf dat je voor het eerst aanschrijft, leest in de mail dat het geen reclame of spam is: je wilt niets verkopen, je wilt een opdracht geven.</li>
+          <li><b>Eerst even bellen</b> — je telefoonnummer staat erbij voor wie twijfelt. Ook staat er dat reageren geen account vraagt en niets kost.</li>
+          <li><b>Alleen bij het eerste contact</b> — heeft een bedrijf al eens een prijs doorgegeven, dan blijft de uitleg weg.</li>
+          <li><b>Minder kans op de map ongewenst</b> — de mail gaat nu ook als gewone tekst mee, en het adres achter de knop staat er voluit onder.</li>
+          <li><b>Gratis tools op de hoofdpagina</b> — de <a href="{{ route('gratis-factuur') }}">gratis factuur</a> en de <a href="{{ route('aanmaning') }}">gratis online aanmaning</a> staan nu direct onder de kop.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.67.0</div>
         <h2>Online aanmaning: de laatste stap vóór de deurwaarder</h2>
         <ul class="tl-list">

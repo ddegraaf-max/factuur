@@ -130,6 +130,34 @@
   #heroDash .d-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-4); font-weight: 700; margin-bottom: 4px; }
   #heroDash .d-field .val { font-size: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 11px; }
 
+  /* ===== Gratis tools onder de hero: twee kaarten, elk met een knop die van kleur verschuift ===== */
+  .free-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 940px; margin: 34px auto 0; text-align: left; }
+  .free-tool { display: flex; flex-direction: column; gap: 16px; padding: 20px 22px 22px; background: var(--surface); border: 1px solid var(--brand-border); border-radius: 16px; box-shadow: var(--shadow-md); color: inherit; text-decoration: none; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+  .free-tool:hover { transform: translateY(-3px); box-shadow: var(--shadow-brand); border-color: var(--brand); }
+  .ft-top { display: flex; gap: 14px; align-items: flex-start; }
+  .ft-icon { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--brand-tint); color: var(--brand); display: inline-flex; align-items: center; justify-content: center; }
+  .ft-icon svg { width: 22px; height: 22px; }
+  .ft-body { display: flex; flex-direction: column; gap: 3px; }
+  .ft-kicker { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); }
+  .ft-title { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.25; letter-spacing: -0.02em; color: var(--text); }
+  .ft-text { font-size: 14px; line-height: 1.55; color: var(--text-2); margin-top: 3px; }
+  .btn-live { position: relative; isolation: isolate; align-self: flex-start; margin-top: auto; color: #fff; border: 0; text-shadow: 0 1px 1px rgba(0, 0, 0, 0.22); background-image: linear-gradient(115deg, var(--brand-darker) 0%, var(--brand) 26%, #EA580C 50%, var(--brand) 74%, var(--brand-darker) 100%); background-size: 260% 100%; background-position: 0% 50%; animation: live-shift 4.5s ease-in-out infinite; box-shadow: 0 4px 18px rgba(232, 35, 31, 0.30); }
+  .btn-live.dark { background-image: linear-gradient(115deg, #1C1917 0%, #44403C 26%, var(--brand) 50%, #44403C 74%, #1C1917 100%); animation-delay: -2.2s; box-shadow: 0 4px 18px rgba(28, 25, 23, 0.28); }
+  .free-tool:hover .btn-live { animation-duration: 1.6s; box-shadow: 0 8px 26px rgba(232, 35, 31, 0.42); }
+  .btn-live::after { content: ''; position: absolute; inset: -5px; border-radius: inherit; border: 2px solid var(--brand); opacity: 0; pointer-events: none; animation: live-ring 2.6s ease-out 1.2s 3; }
+  .btn-live.dark::after { animation-delay: 2.4s; }
+  .live-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #fff; color: var(--brand-darker); font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; text-shadow: none; }
+  @keyframes live-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  @keyframes live-ring { 0% { opacity: 0.9; transform: scale(0.94); } 100% { opacity: 0; transform: scale(1.14); } }
+  @media (max-width: 760px) {
+    .free-tools { grid-template-columns: 1fr; margin-top: 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-live { animation: none; background-position: 50% 50%; }
+    .btn-live::after { display: none; }
+    .free-tool, .free-tool:hover { transition: none; transform: none; }
+  }
+
   @media (max-width: 760px) {
     #heroDash .d-body { grid-template-columns: 1fr; height: auto; }
     #heroDash .d-side { display: none; }
@@ -166,6 +194,32 @@
     </div>
     <div class="hero-trust">
       Geen creditcard nodig · 14 dagen gratis · Daarna vanaf <b>€ 12,10/maand incl. btw</b>
+    </div>
+
+    <!-- Gratis tools: direct te gebruiken, zonder account -->
+    <div class="free-tools">
+      <a class="free-tool" href="{{ route('gratis-factuur') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Gratis · zonder account</span>
+            <span class="ft-title">Gratis factuur maken</span>
+            <span class="ft-text">Vul je gegevens in en download je factuur als PDF, met alle verplichte vermeldingen erop.</span>
+          </span>
+        </span>
+        <span class="btn btn-live">Maak je factuur <span class="live-badge">Gratis</span></span>
+      </a>
+      <a class="free-tool" href="{{ route('aanmaning') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Gratis · zonder account</span>
+            <span class="ft-title">Gratis online aanmaning</span>
+            <span class="ft-text">Betaalt je klant niet? Verstuur een aanmaning waarop de rente elke dag oploopt en je klant met één klik reageert.</span>
+          </span>
+        </span>
+        <span class="btn btn-live dark">Verstuur een aanmaning <span class="live-badge">Nieuw</span></span>
+      </a>
     </div>
 
     <!-- APP MOCKUP — geanimeerd, realistisch dashboard -->

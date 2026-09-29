@@ -522,6 +522,52 @@ class TenderTest extends TestCase
         $this->assertSame(1, $reminders(), 'Eén herinnering, niet elke dag');
     }
 
+    public function test_a_first_request_explains_who_asks_and_why(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        $user->company->update(['phone' => '0348 - 12 34 56']);
+        [$package, $a, $b] = $this->pool();
+
+        $this->post(route('tenders.store'), [
+            'work_package_id' => $package->id,
+            'subcontractor_ids' => [$a->id, $b->id],
+            'description' => "Metselwerk van de uitbouw.\n- halfsteens verband\n- voegen in kleur",
+            'deadline' => now()->addDays(5)->toDateString(),
+        ])->assertRedirect()->assertSessionHasNoErrors();
+        $round = TenderRound::firstOrFail();
+        $reqA = $round->requests()->where('subcontractor_id', $a->id)->firstOrFail();
+        $reqB = $round->requests()->where('subcontractor_id', $b->id)->firstOrFail();
+
+        // Een bedrijf dat ons nog niet kent: geen reclame maar een vraag om een prijs, met een nummer om te bellen.
+        $mail = new TenderMail($reqA, 'request');
+        $mail->assertSeeInHtml('Waarom krijgt u deze mail?');
+        $mail->assertSeeInHtml('geen reclame en geen spam');
+        $mail->assertSeeInHtml('Bel ons op 0348 - 12 34 56');
+        $mail->assertSeeInHtml('Werkt de knop niet?');
+
+        // Ook als platte tekst: met alleen opmaak belandt een mail eerder bij de ongewenste post.
+        $mail->assertSeeInText('geen reclame en geen spam');
+        $mail->assertSeeInText($reqA->responseUrl());
+        $mail->assertSeeInText('- halfsteens verband');
+        $mail->assertSeeInText('Bel ons op 0348 - 12 34 56');
+
+        // De herinnering legt het ook uit; de opdracht niet.
+        (new TenderMail($reqA, 'reminder'))->assertSeeInHtml('Waarom krijgt u deze mail?');
+        (new TenderMail($reqA, 'award'))->assertDontSeeInHtml('Waarom krijgt u deze mail?');
+
+        // Wie al eens een prijs gaf, kent de aanvraag en krijgt de uitleg niet meer.
+        $reqA->update(['status' => 'responded', 'price' => 1500, 'responded_at' => now()]);
+        (new TenderMail($reqA->fresh(), 'request'))->assertDontSeeInHtml('Waarom krijgt u deze mail?');
+        (new TenderMail($reqA->fresh(), 'request'))->assertDontSeeInText('geen reclame en geen spam');
+        (new TenderMail($reqB, 'request'))->assertSeeInHtml('Waarom krijgt u deze mail?');
+
+        // Zonder telefoonnummer: antwoorden op de mail.
+        $user->company->update(['phone' => null]);
+        (new TenderMail($reqB->fresh(), 'request'))->assertSeeInHtml('Antwoord op deze mail; uw bericht komt rechtstreeks bij ons.');
+    }
+
     public function test_pool_management_and_bulk_paste(): void
     {
         $user = $this->demoUser();
