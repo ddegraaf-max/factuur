@@ -7,7 +7,6 @@ use App\Mail\VerificationCodeMail;
 use App\Models\Company;
 use App\Models\PageView;
 use App\Models\User;
-use App\Services\FreeDemandImport;
 use App\Services\FreeInvoiceImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,15 +23,8 @@ class RegisteredUserController extends Controller
         // Komt de bezoeker van de gratis factuurtool en nam hij zijn factuur mee?
         // Dan staan bedrijfsnaam en e-mailadres alvast ingevuld.
         $free = $request->session()->get(FreeInvoiceImport::SESSION);
-        // Of van de gratis aanmaning: dezelfde velden, met de naam van de klant.
-        $demand = $request->session()->get(FreeDemandImport::SESSION);
-        if (! is_array($free) && is_array($demand)) {
-            $free = ['van_bedrijf' => $demand['van_bedrijf'] ?? '', 'van_email' => $demand['van_email'] ?? '', 'aan_bedrijf' => $demand['aan_naam'] ?? ''];
-        }
 
         return Inertia::render('Auth/Register', [
-            // Wat er na het aanmelden klaarstaat: een factuur of een aanmaning.
-            'prefillKind' => is_array($demand) ? 'demand' : (is_array($free) ? 'invoice' : null),
             'prefill' => is_array($free) ? [
                 'companyName' => (string) ($free['van_bedrijf'] ?? ''),
                 'email' => filter_var($free['van_email'] ?? '', FILTER_VALIDATE_EMAIL) ?: '',
@@ -154,24 +146,6 @@ class RegisteredUserController extends Controller
                 }
             } catch (\Throwable $e) {
                 \Illuminate\Support\Facades\Log::warning('Factuur uit de gratis tool niet meegenomen', ['company' => $user->company_id, 'error' => $e->getMessage()]);
-            }
-        }
-
-        // Aanmaning meegenomen uit de gratis tool: bedrijfsgegevens, klant en de factuur
-        // waar het om gaat. Versturen kan pas als het e-mailadres is bevestigd.
-        $demand = $request->session()->pull(FreeDemandImport::SESSION);
-        if (is_array($demand) && ! $pl) {
-            try {
-                $invoice = app(FreeDemandImport::class)->apply($user->company, $demand);
-                if ($invoice) {
-                    Session::put(FreeDemandImport::WELCOME, [
-                        'invoice' => $invoice->id,
-                        'termijn' => $demand['termijn'] ?? null,
-                        'rente' => (bool) ($demand['rente'] ?? true),
-                    ]);
-                }
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Aanmaning uit de gratis tool niet meegenomen', ['company' => $user->company_id, 'error' => $e->getMessage()]);
             }
         }
 

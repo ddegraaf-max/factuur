@@ -122,18 +122,20 @@ Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders')->middl
 // Voor aannemers en bouwbedrijven: offertes, termijnfacturen en prijsaanvragen bij onderaannemers.
 Route::view('/factuurprogramma-bouw', 'marketing.bouw')->name('bouw')->middleware('market:nl');
 
-// Online aanmaning: de laatste aanmaning met een eigen pagina, en daarna met één klik naar de deurwaarder.
-Route::view('/online-aanmaning', 'marketing.aanmaning')->name('aanmaning')->middleware('market:nl');
-
-// Gratis aanmaning maken: de brief als PDF, zonder account. Er wordt niets verstuurd of opgeslagen;
-// online versturen kan alleen vanuit een account (meenemen).
-Route::get('/aanmaning-maken', [\App\Http\Controllers\FreeDemandController::class, 'show'])->name('aanmaning-maken')->middleware('market:nl');
-Route::post('/aanmaning-maken', [\App\Http\Controllers\FreeDemandController::class, 'download'])
-    ->middleware(['throttle:15,1', 'turnstile', 'market:nl'])->name('aanmaning-maken.download');
-Route::get('/aanmaning-maken/berekening', [\App\Http\Controllers\FreeDemandController::class, 'calculation'])
-    ->middleware(['throttle:60,1', 'market:nl'])->name('aanmaning-maken.calculation');
-Route::post('/aanmaning-maken/meenemen', [\App\Http\Controllers\FreeDemandController::class, 'keep'])
-    ->middleware(['throttle:15,1', 'market:nl'])->name('aanmaning-maken.keep');
+// Online aanmaning zonder account: formulier, bevestigen via de link in de mail, en dan staat de
+// pagina online en gaat de mail naar de klant. De pagina zelf staat verderop (aanmaning/{token}).
+Route::middleware('market:nl')->group(function () {
+    Route::get('/online-aanmaning', [\App\Http\Controllers\PublicDemandController::class, 'page'])->name('aanmaning');
+    Route::post('/online-aanmaning', [\App\Http\Controllers\PublicDemandController::class, 'store'])
+        ->middleware(['throttle:15,1', 'turnstile'])->name('aanmaning.store');
+    Route::post('/online-aanmaning/opnieuw', [\App\Http\Controllers\PublicDemandController::class, 'resend'])
+        ->middleware('throttle:15,1')->name('aanmaning.resend');
+    Route::get('/online-aanmaning/berekening', [\App\Http\Controllers\PublicDemandController::class, 'calculation'])
+        ->middleware('throttle:60,1')->name('aanmaning.calculation');
+    Route::get('/online-aanmaning/voorbeeld', [\App\Http\Controllers\PublicDemandController::class, 'example'])->name('aanmaning.example');
+    // De tool van 1.66.0 (brief als PDF) is opgegaan in de online aanmaning.
+    Route::permanentRedirect('/aanmaning-maken', '/online-aanmaning');
+});
 
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
@@ -444,6 +446,20 @@ Route::post('aanmaning/{token}', [\App\Http\Controllers\PaymentDemandPageControl
     ->middleware(['market:nl', 'throttle:20,1'])->name('demand.respond');
 Route::get('aanmaning/{token}/brief', [\App\Http\Controllers\PaymentDemandPageController::class, 'pdf'])
     ->middleware(['market:nl', 'throttle:30,1'])->name('demand.pdf');
+Route::get('aanmaning/{token}/factuur', [\App\Http\Controllers\PaymentDemandPageController::class, 'file'])
+    ->middleware(['market:nl', 'throttle:30,1'])->name('demand.file');
+// Zonder account: bevestigen via de link uit de mail (de knop bevestigt, niet de link), en daarna
+// met de sleutel van de schuldeiser: betaald, intrekken of overdragen aan de deurwaarder.
+Route::get('aanmaning/{token}/bevestigen', [\App\Http\Controllers\PublicDemandController::class, 'confirmShow'])
+    ->middleware(['market:nl', 'throttle:60,1'])->name('demand.confirm');
+Route::post('aanmaning/{token}/bevestigen', [\App\Http\Controllers\PublicDemandController::class, 'confirm'])
+    ->middleware(['market:nl', 'throttle:20,1'])->name('demand.confirm.store');
+Route::post('aanmaning/{token}/betaald', [\App\Http\Controllers\PaymentDemandPageController::class, 'paid'])
+    ->middleware(['market:nl', 'throttle:20,1'])->name('demand.paid');
+Route::post('aanmaning/{token}/intrekken', [\App\Http\Controllers\PaymentDemandPageController::class, 'withdraw'])
+    ->middleware(['market:nl', 'throttle:20,1'])->name('demand.withdraw');
+Route::post('aanmaning/{token}/overdragen', [\App\Http\Controllers\PaymentDemandPageController::class, 'transfer'])
+    ->middleware(['market:nl', 'throttle:20,1'])->name('demand.transfer');
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');

@@ -25,6 +25,11 @@ class PageView extends Model
 
     public const EVENT_REGISTERED = 'registered';
 
+    /** Online aanmaning zonder account: gemaakt, en daarna bevestigd via de link in de mail. */
+    public const EVENT_DEMAND = 'demand_created';
+
+    public const EVENT_DEMAND_CONFIRMED = 'demand_confirmed';
+
     /** Herkomst die we als zoekmachine of AI-assistent rekenen. */
     public const SEARCH_HOSTS = ['google', 'bing', 'duckduckgo', 'ecosia', 'startpage', 'yahoo', 'qwant', 'brave',
         'chatgpt', 'openai', 'perplexity', 'claude', 'gemini', 'copilot'];

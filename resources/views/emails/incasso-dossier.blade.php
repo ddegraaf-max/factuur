@@ -51,6 +51,7 @@
           {{-- Online aanmaning: wat er is gevorderd, en wat de debiteur daarmee deed --}}
           <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">{{ __('Laatste aanmaning') }}</h3>
           <table style="width:100%;font-size:14px;line-height:1.7;border-collapse:collapse;">
+            @if($demand->isStandalone())<tr><td style="color:#78716c;vertical-align:top;">{{ __('Herkomst') }}</td><td style="text-align:right;">{{ __('Gemaakt zonder account; e-mailadres van de schuldeiser bevestigd op :date', ['date' => optional($demand->confirmed_at)->format(market('date_format') . ' H:i')]) }}@if($demand->confirm_ip) <span style="color:#a8a29e;">· IP {{ $demand->confirm_ip }}</span>@endif</td></tr>@endif
             <tr><td style="color:#78716c;">{{ __('Verstuurd aan') }}</td><td style="text-align:right;">{{ $demand->sent_to }} · {{ optional($demand->sent_at)->format(market('date_format')) }}</td></tr>
             <tr><td style="color:#78716c;">{{ __('Debiteur') }}</td><td style="text-align:right;">{{ $demand->isBusiness() ? __('Zakelijk') : __('Particulier') }}</td></tr>
             <tr><td style="color:#78716c;">{{ __('Termijn') }}</td><td style="text-align:right;">{{ __(':days dagen, tot en met :date', ['days' => $demand->term_days, 'date' => $demand->deadline->format(market('date_format'))]) }}</td></tr>
@@ -64,6 +65,7 @@
           @if($demand->events->isNotEmpty())
             <table style="width:100%;font-size:13px;line-height:1.6;border-collapse:collapse;margin-top:10px;">
               @foreach($demand->events as $event)
+                @continue($event->actor === 'bot')
                 <tr>
                   <td style="padding:3px 0;color:#78716c;white-space:nowrap;vertical-align:top;">{{ optional($event->created_at)->format(market('date_format') . ' H:i') }}</td>
                   <td style="padding:3px 0 3px 10px;">{{ $event->description }}@if($event->ip_address) <span style="color:#a8a29e;">· IP {{ $event->ip_address }}</span>@endif</td>
@@ -96,11 +98,15 @@
         <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">{{ __('Bijlagen') }}</h3>
         <p style="font-size:13px;color:#44403c;margin:0;line-height:1.6;">
           @php
-              $extra = $invoice->attachments->count();
+              $extra = $hasInvoicePdf ? $invoice->attachments->count() : $extraFiles;
           @endphp
+          @if(! $hasInvoicePdf)
+            {{ $extra ? __('De kopie van de factuur die de schuldeiser meestuurde, zit erbij.') : __('De schuldeiser heeft geen kopie van de factuur meegestuurd.') }}
+          @else
           {{ $extra
               ? __('Factuur (:file) en :count meegestuurde bijlage(n) uit het originele dossier zijn als bijlage toegevoegd.', ['file' => $invoice->number . '.pdf', 'count' => $extra])
               : __('Factuur (:file) is als bijlage toegevoegd.', ['file' => $invoice->number . '.pdf']) }}
+          @endif
           @if($demand) {{ __('De laatste aanmaning zoals die naar de debiteur is gegaan, zit er als PDF bij.') }}@endif
         </p>
 

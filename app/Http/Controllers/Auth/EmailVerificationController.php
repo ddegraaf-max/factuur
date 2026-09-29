@@ -83,21 +83,6 @@ class EmailVerificationController extends Controller
                 ->with('flash', __('Welkom! Je factuur voor :customer staat als concept klaar. Controleer hem en verstuur.', ['customer' => $draft->customer_name]));
         }
 
-        // Aanmaning meegenomen uit de gratis tool? Dan staat de factuur klaar, met het venster open.
-        $welcome = Session::pull(\App\Services\FreeDemandImport::WELCOME);
-        $invoice = is_array($welcome)
-            ? \App\Models\Invoice::where('company_id', $user->company_id)->whereKey((int) ($welcome['invoice'] ?? 0))->first()
-            : null;
-        if ($invoice) {
-            return redirect()->route('invoices.show', array_filter([
-                'invoice' => $invoice->id,
-                'aanmaning' => 1,
-                'termijn' => $welcome['termijn'] ?? null,
-                'rente' => ($welcome['rente'] ?? true) ? null : 0,
-            ], fn ($value) => $value !== null))
-                ->with('flash', __('Welkom! Je factuur voor :customer staat erin. Controleer de berekening en verstuur de aanmaning.', ['customer' => $invoice->customer_name]));
-        }
-
         return redirect()->route('dashboard')->with('flash', __('Welkom! Je e-mailadres is bevestigd.'));
     }
 

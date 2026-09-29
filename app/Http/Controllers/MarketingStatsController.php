@@ -103,6 +103,8 @@ class MarketingStatsController extends Controller
                 ['label' => 'Registratiepagina bekeken', 'n' => $count($period()->views()->human()->where('path', '/register'))],
                 ['label' => 'Formulier verstuurd', 'n' => $events(PageView::EVENT_REGISTER_TRIED)],
                 ['label' => 'Geregistreerd', 'n' => $events(PageView::EVENT_REGISTERED)],
+                ['label' => 'Aanmaning gemaakt (zonder account)', 'n' => $events(PageView::EVENT_DEMAND)],
+                ['label' => 'Aanmaning bevestigd', 'n' => $events(PageView::EVENT_DEMAND_CONFIRMED)],
             ],
             'measuredSince' => PageView::query()->views()->human()->min('viewed_on'),
             'days' => $days,

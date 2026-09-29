@@ -26,6 +26,8 @@ class PaymentDemandMail extends Mailable
         public array $claim,
         public string $letterPdf,
         public string $invoicePdf,
+        // Losse aanmaning: de kopie van de factuur die de schuldeiser meestuurde (name, data, mime).
+        public ?array $copy = null,
     ) {}
 
     public function envelope(): Envelope
@@ -34,8 +36,13 @@ class PaymentDemandMail extends Mailable
         $company = $invoice->brandedCompany();
         $replyTo = $company->email ?: $invoice->company?->email;
 
+        // Zonder account is alleen het e-mailadres van de schuldeiser bevestigd: dan staat het pakket erbij als afzender.
+        $name = $this->demand->isStandalone()
+            ? __(':company via :brand', ['company' => $company->name, 'brand' => brand('name')])
+            : ($company->name ?: config('mail.from.name'));
+
         return new Envelope(
-            from: Sender::address($invoice->company, $company->name ?: config('mail.from.name')),
+            from: Sender::address($invoice->company, $name),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
             subject: __('Laatste aanmaning: factuur :number — :company', ['number' => $invoice->number, 'company' => $company->name]),
         );
@@ -61,9 +68,13 @@ class PaymentDemandMail extends Mailable
     {
         $number = preg_replace('/[^A-Za-z0-9\-]+/', '-', (string) $this->demand->invoice->number);
 
-        return [
-            Attachment::fromData(fn () => $this->letterPdf, 'aanmaning-' . $number . '.pdf')->withMime('application/pdf'),
-            Attachment::fromData(fn () => $this->invoicePdf, ($this->demand->invoice->number ?: 'factuur') . '.pdf')->withMime('application/pdf'),
-        ];
+        $items = [Attachment::fromData(fn () => $this->letterPdf, 'aanmaning-' . $number . '.pdf')->withMime('application/pdf')];
+        if ($this->copy) {
+            $items[] = Attachment::fromData(fn () => $this->copy['data'], $this->copy['name'])->withMime($this->copy['mime']);
+        } elseif ($this->invoicePdf !== '') {
+            $items[] = Attachment::fromData(fn () => $this->invoicePdf, ($this->demand->invoice->number ?: 'factuur') . '.pdf')->withMime('application/pdf');
+        }
+
+        return $items;
     }
 }

@@ -44,7 +44,11 @@
                 <div class="header-sub">{{ __('Factuur :number', ['number' => $invoice->number]) }} · {{ $invoice->customer_name }}</div>
             </div>
             <div class="body">
-                @if($kind === 'transferred')
+                @if($kind === 'handed')
+                    <h1>{{ __('Het dossier ligt bij de deurwaarder') }}</h1>
+                    <p>{!! __('Je hebt het dossier van factuur :number (<strong>:customer</strong>) overgedragen aan :partner, onder nummer :reference. De aanmaning, de berekening en het logboek zijn meegestuurd. :partner neemt contact met je op.', ['customer' => e($invoice->customer_name), 'number' => e($invoice->number), 'reference' => e($invoice->incasso_reference), 'partner' => e($partner)]) !!}</p>
+                    <div class="tip">{{ __('Komt er toch nog een betaling bij jou binnen? Geef dat dan door aan de deurwaarder.') }}</div>
+                @elseif($kind === 'transferred')
                     <h1>{{ __('Het dossier ligt bij de deurwaarder') }}</h1>
                     <p>{!! __('<strong>:customer</strong> heeft factuur :number niet betaald en niet gereageerd op je aanmaning. Zoals je had ingesteld, is het dossier :reference automatisch overgedragen aan :partner, met de aanmaning, de berekening en het logboek erbij.', ['customer' => e($invoice->customer_name), 'number' => e($invoice->number), 'reference' => e($invoice->incasso_reference), 'partner' => e($partner)]) !!}</p>
                     <div class="tip">{{ __('Komt er toch nog een betaling bij jou binnen? Geef dat dan door aan de deurwaarder.') }}</div>
@@ -64,6 +68,8 @@
                     @endif
                     @if($demand->response === 'promise')
                         <div class="tip">{{ __('Een schriftelijke toezegging is een erkenning van de schuld en stuit de verjaring (artikel 3:318 BW). Bewaar dit bericht. Ga je akkoord, zet de factuur dan op pauze tot en met de toegezegde dag.') }}</div>
+                    @elseif($demand->response === 'paid' && $standalone)
+                        <div class="tip">{{ __('Controleer je bankrekening. Is het bedrag binnen, meld dat dan in je overzicht; de aanmaning sluit dan.') }}</div>
                     @elseif($demand->response === 'paid')
                         <div class="tip">{{ __('Controleer je bankrekening en boek de betaling op de factuur. De aanmaning sluit dan vanzelf.') }}</div>
                     @elseif($demand->response === 'dispute')
@@ -83,13 +89,14 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 8px 0 4px;">
                     <tr>
                         <td class="btn-td">
-                            <a href="{{ $url }}" class="btn">{{ $expired && ! $autoDate ? __('Open de factuur en draag over') : __('Open de factuur in :brand', ['brand' => brand('name')]) }}&nbsp;&nbsp;→</a>
+                            <a href="{{ $url }}" class="btn">{{ $standalone ? ($expired ? __('Open je overzicht en draag over') : __('Open je overzicht')) : ($expired && ! $autoDate ? __('Open de factuur en draag over') : __('Open de factuur in :brand', ['brand' => brand('name')])) }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
 
                 <div class="meta">
                     {{ __('Je ontvangt dit bericht omdat je voor :company een online aanmaning hebt verstuurd.', ['company' => $company?->name ?? __('je administratie')]) }}
+                    @if($standalone) {{ __('De link hierboven is alleen voor jou; stuur hem niet door.') }}@endif
                 </div>
             </div>
             <div class="footer">

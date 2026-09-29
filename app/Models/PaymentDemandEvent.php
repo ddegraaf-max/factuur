@@ -14,7 +14,7 @@ class PaymentDemandEvent extends Model
 {
     public const UPDATED_AT = null;
 
-    protected $fillable = ['payment_demand_id', 'event', 'description', 'ip_address', 'user_agent', 'created_at'];
+    protected $fillable = ['payment_demand_id', 'event', 'actor', 'description', 'ip_address', 'user_agent', 'created_at'];
 
     protected $casts = ['created_at' => 'datetime'];
 

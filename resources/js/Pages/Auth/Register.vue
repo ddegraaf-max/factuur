@@ -10,8 +10,6 @@ import { t } from '@/i18n';
 const props = defineProps({
   // Gegevens uit de gratis factuurtool, als de bezoeker zijn factuur meenam.
   prefill: { type: Object, default: null },
-  // 'invoice' of 'demand': een factuur of een aanmaning uit de gratis tools.
-  prefillKind: { type: String, default: null },
 });
 
 const turnstileSitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
@@ -151,10 +149,7 @@ const submit = () => {
         {{ $t('Heb je al een account?') }} <a :href="route('login')">{{ $t('Inloggen') }}</a>
       </div>
 
-      <div v-if="prefill && prefillKind === 'demand'" class="reg-carry">
-        {{ $t('Je aanmaning voor :customer gaat mee. Na het bevestigen van je e-mailadres staat de factuur in je account en verstuur je de aanmaning met één klik.', { customer: prefill.customer }) }}
-      </div>
-      <div v-else-if="prefill" class="reg-carry">
+      <div v-if="prefill" class="reg-carry">
         {{ prefill.customer
           ? $t('Je factuur voor :customer gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.', { customer: prefill.customer })
           : $t('Je factuur gaat mee: hij staat straks als concept in je account, met je bedrijfsgegevens erbij.') }}

@@ -50,6 +50,8 @@ class IncassoDossierMail extends Mailable
                 'company' => $this->invoice->company,
                 'demand' => $this->demand,
                 'claim' => $this->claim,
+                'hasInvoicePdf' => $this->pdf !== '',
+                'extraFiles' => max(0, count($this->files) - ($this->demand ? 1 : 0)),
             ],
         );
     }
@@ -58,7 +60,8 @@ class IncassoDossierMail extends Mailable
     {
         $name = ($this->invoice->number ?: 'factuur-' . $this->invoice->id) . '.pdf';
 
-        $items = [
+        // Een aanmaning zonder account heeft geen factuur uit het pakket: dan alleen de meegestuurde stukken.
+        $items = $this->pdf === '' ? [] : [
             Attachment::fromData(fn () => $this->pdf, $name)->withMime('application/pdf'),
         ];
 

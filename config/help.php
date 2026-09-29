@@ -224,7 +224,7 @@ return [
                 ]],
                 ['Wat je klant ziet', [
                     'Het bedrag van vandaag, de laatste dag waarop hij zonder incassokosten kan betalen en wat er per dag aan rente bij komt. Hij maakt over met de QR-code van zijn bank. Heb je Mollie gekoppeld, dan kan hij ook online betalen.',
-                    'Hij kan ook reageren: ik heb betaald, ik betaal uiterlijk op een dag die hij kiest, of ik ben het er niet mee eens.',
+                    'Hij kan ook reageren: ik heb betaald, ik betaal uiterlijk op een dag die hij kiest, of ik ben het er niet mee eens. Reageren kan één keer: de eerste reactie blijft staan.',
                 ]],
                 ['Reacties', [
                     'Je krijgt elke reactie per mail en ziet haar op de factuur. Een toegezegde betaaldatum is een erkenning van de schuld en stuit de verjaring. Ga je akkoord, kies dan "Akkoord: op pauze tot en met die dag". Maakt je klant bezwaar, reageer dan inhoudelijk voordat je het dossier overdraagt.',
@@ -238,10 +238,10 @@ return [
                     'Op de factuur zet je automatisch overdragen aan of uit zolang de aanmaning loopt.',
                 ]],
                 ['Een factuur uit een ander pakket', [
-                    'Staat de factuur niet in {brand}? Maak de aanmaning dan met de gratis tool op de website. Je krijgt de brief als PDF. Wil je hem online versturen, dan neem je hem mee naar je account: de klant en de factuur staan er dan in, en je verstuurt de aanmaning met één klik.',
+                    'Staat de factuur niet in {brand}? Maak de aanmaning dan op de website, bij Gratis online aanmaning. Je vult de factuur en je klant in en bevestigt je e-mailadres via de knop in de mail. Daarna staat de pagina online en gaat de aanmaning naar je klant. Via je eigen link zie je wanneer hij haar opent en wat hij antwoordt.',
                 ]],
                 ['Logboek', [
-                    'Bij de aanmaning staat een logboek: verstuurd, geopend door de klant (met tijdstip en IP-adres), elke reactie en de afloop. Jouw eigen bezoek aan de pagina telt niet als geopend.',
+                    'Bij de aanmaning staat een logboek: verstuurd, geopend door de klant (met tijdstip en IP-adres), zijn reactie en de afloop. Jouw eigen bezoek aan de pagina telt niet als geopend, en de scanners van mailprogramma\'s ook niet.',
                 ]],
                 ['Intrekken', [
                     'Een aanmaning trek je in met "Intrekken". Op de pagina van je klant staat dan dat ze is ingetrokken. De factuur blijft openstaan en je kunt een nieuwe aanmaning sturen.',

@@ -198,9 +198,13 @@ class PaymentDemandTest extends TestCase
         $this->post(route('demands.store', $invoice))->assertSessionHasNoErrors();
         $demand = PaymentDemand::firstOrFail();
 
-        // De ondernemer kijkt mee zonder spoor.
-        $this->get(route('demand.show', $demand->token))->assertOk();
+        // De ondernemer kijkt mee zonder spoor, en ziet zijn eigen overzicht in plaats van het formulier.
+        $this->get(route('demand.show', $demand->token))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('creditor.invoice_url', route('invoices.show', $invoice))
+            ->where('creditor.opens', 0)
+            ->where('creditor.actions', null));
         $this->assertNull($demand->fresh()->first_opened_at);
+        $this->assertSame(['sent'], $demand->events()->pluck('event')->all());
 
         $this->asGuest();
         $this->get(route('demand.show', str_repeat('a', 64)))->assertOk()->assertInertia(fn ($page) => $page->where('valid', false));
@@ -214,10 +218,13 @@ class PaymentDemandTest extends TestCase
             ->where('claim.principal', 1000)
             ->where('company.iban', 'NL91ABNA0417164300')
             ->where('t.opt_promise', 'Ik betaal uiterlijk op…')
+            ->where('creditor', null)
+            ->where('demand.standalone', false)
             ->where('qr', fn ($qr) => $qr === null || str_starts_with($qr, 'data:image/png')));
         $this->assertNotNull($demand->fresh()->first_opened_at);
         $opened = $demand->events()->where('event', 'opened')->firstOrFail();
         $this->assertNotNull($opened->ip_address);
+        $this->assertSame('debtor', $opened->actor);
         $this->get(route('demand.show', $demand->token))->assertOk();
         $this->assertSame(1, $demand->events()->where('event', 'opened')->count(), 'Verversen telt niet als nog een keer openen');
         $this->get(route('demand.pdf', $demand->token))->assertOk()->assertHeader('Content-Type', 'application/pdf');
@@ -245,16 +252,18 @@ class PaymentDemandTest extends TestCase
         $this->assertStringContainsString('Na de btw-teruggave', $notice);
         $this->assertStringContainsString('stuit de verjaring', $notice);
 
-        // Een tweede reactie vervangt de eerste; het logboek houdt ze allebei.
-        $this->post(route('demand.respond', $demand->token), ['response' => 'dispute', 'note' => 'Het werk is niet af.'])->assertRedirect()->assertSessionHasNoErrors();
-        $this->assertSame('dispute', $demand->fresh()->response);
-        $this->assertSame(['sent', 'opened', 'promise', 'dispute'], $demand->events()->pluck('event')->all());
+        // Reageren kan één keer: de eerste reactie blijft staan, de tweede poging komt wel in het logboek.
+        $this->post(route('demand.respond', $demand->token), ['response' => 'dispute', 'note' => 'Het werk is niet af.'])->assertSessionHasErrors('demand');
+        $this->assertSame('promise', $demand->fresh()->response);
+        $this->assertSame('Na de btw-teruggave', $demand->fresh()->response_note);
+        $this->assertSame(['sent', 'opened', 'letter', 'promise', 'rejected'], $demand->events()->pluck('event')->all());
+        $this->assertSame(1, collect(Mail::sent(PaymentDemandNoticeMail::class))->count());
 
         // De ondernemer ziet de reactie op de factuur en in het overzicht.
         $this->actingAs($this->user);
         $this->get(route('invoices.show', $invoice))->assertOk()->assertInertia(fn ($page) => $page
-            ->where('invoice.demand.current.response', 'dispute')
-            ->where('invoice.demand.current.response_note', 'Het werk is niet af.')
+            ->where('invoice.demand.current.response', 'promise')
+            ->where('invoice.demand.current.response_note', 'Na de btw-teruggave')
             ->where('invoice.demand.blocker', fn ($reason) => filled($reason)));
         $this->get(route('incasso.index'))->assertOk()->assertInertia(fn ($page) => $page
             ->has('demands', 1)

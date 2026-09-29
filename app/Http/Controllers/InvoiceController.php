@@ -266,7 +266,8 @@ class InvoiceController extends Controller
                 'costs_due' => $claim['costs_due'],
                 'total' => $claim['total'],
                 'total_after' => $claim['total_after'],
-                'events' => $demand->events->map(fn ($event) => [
+                // Automaten (scanners van mailprogramma's) staan wel in het logboek, maar niet in deze lijst.
+                'events' => $demand->events->reject(fn ($event) => $event->actor === 'bot')->map(fn ($event) => [
                     'id' => $event->id,
                     'event' => $event->event,
                     'description' => $event->description,
@@ -765,7 +766,7 @@ class InvoiceController extends Controller
         // Online aanmaning: wat de klant ermee deed en hoe ze afliep (het versturen staat hierboven al).
         foreach ($invoice->demands()->with('events')->get() as $demand) {
             // De overdracht zelf staat verderop al in de tijdlijn.
-            foreach ($demand->events->whereNotIn('event', ['sent', 'transferred']) as $event) {
+            foreach ($demand->events->whereNotIn('event', ['sent', 'transferred'])->reject(fn ($event) => $event->actor === 'bot') as $event) {
                 $push($event->created_at, match ($event->event) {
                     'opened' => 'eye',
                     'settled' => 'check',

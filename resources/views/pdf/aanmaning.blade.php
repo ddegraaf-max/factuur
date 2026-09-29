@@ -55,7 +55,7 @@
         <div class="nm">{{ $invoice->customer_name }}</div>
         @if($invoice->customer_address_line)<div>{{ $invoice->customer_address_line }}</div>@endif
         @if($invoice->customer_postal_code || $invoice->customer_city)<div>{{ trim(($invoice->customer_postal_code ?? '') . ' ' . ($invoice->customer_city ?? '')) }}</div>@endif
-        <div>{{ $demand->sent_to }}</div>
+        @if($demand->sent_to)<div>{{ $demand->sent_to }}</div>@endif
       </div>
       <div style="margin-top:10pt; font-size:9pt; color:#8A8681;">{{ $company->city ? $company->city . ', ' : '' }}{{ $day($claim['on']) }}</div>
     </td>

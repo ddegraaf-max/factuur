@@ -5,7 +5,7 @@ import StatusPill from '@/Components/StatusPill.vue';
 import { eur, fmtDate, num, todayLocal } from '@/format.js';
 import { t } from '@/i18n';
 import axios from 'axios';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps({
   invoice: Object,
@@ -171,22 +171,6 @@ const openDemandModal = () => {
   showDemandModal.value = true;
   loadDemandPreview();
 };
-// Meegenomen uit de gratis aanmaning (?aanmaning=1): het venster staat meteen open,
-// met de termijn en de rente zoals ze daar waren gekozen.
-const demandBlocked = ref('');
-onMounted(() => {
-  const query = new URLSearchParams(window.location.search);
-  if (query.get('aanmaning') !== '1' || !props.invoice.demand || demand.value?.active) return;
-  if (props.invoice.demand.blocker) {
-    demandBlocked.value = props.invoice.demand.blocker;
-    return;
-  }
-  openDemandModal();
-  if (query.get('termijn')) demandForm.term_days = Number(query.get('termijn'));
-  if (query.get('rente') === '0') demandForm.with_interest = false;
-  if (query.get('termijn') || query.get('rente') === '0') loadDemandPreview();
-});
-
 // Zakelijk en particulier hebben elk hun eigen termijn en rente: opnieuw rekenen vanaf de standaard.
 const changeDebtorType = () => { demandForm.term_days = null; loadDemandPreview(); };
 const sendDemand = () => demandForm.post(route('demands.store', props.invoice.id), {
@@ -578,12 +562,6 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           {{ $t('Betaling registreren') }}
         </button>
       </div>
-    </div>
-
-    <!-- Aanmaning meegenomen uit de gratis tool, maar versturen kan nog niet -->
-    <div v-if="demandBlocked" class="inv-alert">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      <span>{{ $t('De aanmaning kan nog niet uit:') }} {{ demandBlocked }}</span>
     </div>
 
     <div v-if="pageError" class="inv-alert">

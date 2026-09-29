@@ -331,26 +331,80 @@ class PaymentDemandService
     }
 
     /**
-     * De klant opent de pagina. De eerste keer telt als ontvangst; daarna komt
-     * er hoogstens elk halfuur een regel bij. Wie zelf is ingelogd bij deze
-     * administratie kijkt mee zonder spoor.
+     * Linkscanners van mailservers, voorvertoningen van chat-apps en scripts:
+     * geen bewijs dat de klant heeft gekeken.
      */
-    public function opened(PaymentDemand $demand, Request $request): void
+    private const AUTOMATON = '/bot|crawl|spider|slurp|preview|scan|fetch|monitor|headless|curl|wget|python|java\/|go-http|okhttp|axios|facebookexternalhit|whatsapp|telegram|skype|safelinks|proofpoint|mimecast|barracuda/i';
+
+    /**
+     * Wie kijkt er: de schuldeiser zelf (zijn sleutel, zijn inlog, of bij een
+     * losse aanmaning het adres waarvandaan ze is gemaakt of bevestigd), een
+     * automaat, of de klant.
+     */
+    public function actor(PaymentDemand $demand, Request $request): string
     {
-        if ((int) $request->user()?->company_id === (int) $demand->company_id) {
-            return;
+        if ($demand->isCreditorKey($request->input('k'))) {
+            return 'creditor';
+        }
+        if ($demand->company_id && (int) $request->user()?->company_id === (int) $demand->company_id) {
+            return 'creditor';
+        }
+        if ($demand->isStandalone() && $request->ip() && in_array($request->ip(), array_filter([$demand->creator_ip, $demand->confirm_ip]), true)) {
+            return 'creditor';
         }
 
-        $key = "demand_seen_{$demand->id}";
-        if (now()->timestamp - (int) $request->session()->get($key, 0) < 1800) {
-            return;
-        }
-        $request->session()->put($key, now()->timestamp);
+        $agent = (string) $request->userAgent();
 
-        if (! $demand->first_opened_at) {
+        return $request->isMethod('HEAD') || $agent === '' || preg_match(self::AUTOMATON, $agent) ? 'bot' : 'debtor';
+    }
+
+    /**
+     * Een weergave van de pagina, de brief of de kopie van de factuur. Alleen
+     * als de klant de pagina opent, telt dat als geopend. De schuldeiser kijkt
+     * mee zonder spoor; een automaat komt wel in het logboek, maar telt niet.
+     * Per bezoeker komt er hoogstens elk halfuur een regel bij.
+     */
+    public function viewed(PaymentDemand $demand, Request $request, string $event = 'opened'): string
+    {
+        $actor = $this->actor($demand, $request);
+        if ($actor === 'creditor') {
+            return $actor;
+        }
+
+        $key = "demand_{$event}_{$demand->id}";
+        $session = $request->hasSession() ? $request->session() : null;
+        if ($session && now()->timestamp - (int) $session->get($key, 0) < 1800) {
+            return $actor;
+        }
+        $session?->put($key, now()->timestamp);
+
+        $this->log($demand, $event, match ($event) {
+            'letter' => __('Brief van de aanmaning geopend'),
+            'file' => __('Kopie van de factuur geopend'),
+            default => __('Pagina van de aanmaning geopend'),
+        }, $request, $actor);
+
+        if ($event === 'opened' && $actor === 'debtor' && ! $demand->first_opened_at) {
             $demand->forceFill(['first_opened_at' => now()])->save();
         }
-        $this->log($demand, 'opened', __('Pagina van de aanmaning geopend'), $request);
+
+        return $actor;
+    }
+
+    /**
+     * Voor het overzicht van de schuldeiser: hoe vaak de klant keek.
+     *
+     * @return array{opens: int, first: ?Carbon, last: ?Carbon}
+     */
+    public function opens(PaymentDemand $demand): array
+    {
+        $opens = $demand->events()->where('event', 'opened')->where(fn ($q) => $q->whereNull('actor')->orWhere('actor', 'debtor'))->pluck('created_at');
+
+        return [
+            'opens' => $opens->count(),
+            'first' => $demand->first_opened_at ?? $opens->first(),
+            'last' => $opens->last(),
+        ];
     }
 
     /**
@@ -370,15 +424,24 @@ class PaymentDemandService
 
         $date = filled($data['date'] ?? null) ? Carbon::parse($data['date'])->startOfDay() : null;
         $note = filled($data['note'] ?? null) ? trim((string) $data['note']) : null;
-
-        $demand->forceFill([
+        $fields = [
             'response' => $response,
             'response_date' => $date?->toDateString(),
             'response_note' => $note,
             'responded_at' => now(),
-        ])->save();
+        ];
 
-        $this->log($demand, $response, $this->responseLabel($demand) . ($note ? ' — ' . $note : ''), $request);
+        // De eerste reactie telt en wordt nooit overschreven; een tweede poging komt wel in het logboek.
+        $first = ! $demand->isAnswered() && PaymentDemand::withoutGlobalScope('company')
+            ->whereKey($demand->id)->whereNull('response')->update($fields) === 1;
+        if (! $first) {
+            $this->log($demand, 'rejected', __('Tweede reactie geweigerd; de eerste blijft staan'), $request, 'debtor');
+
+            throw new \DomainException(__('Op deze aanmaning is al gereageerd.'));
+        }
+        $demand->forceFill($fields)->syncOriginal();
+
+        $this->log($demand, $response, $this->responseLabel($demand) . ($note ? ' — ' . $note : ''), $request, 'debtor');
         $this->notify($demand, 'response');
     }
 
@@ -414,7 +477,8 @@ class PaymentDemandService
         foreach ($due as $demand) {
             $company = $demand->invoice?->company;
             // Geen post namens een demo of een administratie zonder toegang; op pauze wacht de melding.
-            if (! $company || $company->is_demo || ! $company->hasAccess() || $demand->invoice->remindersPaused()) {
+            // Een losse aanmaning hoort bij geen administratie: daar gaat de melding altijd uit.
+            if (! $demand->isStandalone() && (! $company || $company->is_demo || ! $company->hasAccess() || $demand->invoice->remindersPaused())) {
                 continue;
             }
 
@@ -448,7 +512,7 @@ class PaymentDemandService
         foreach ($due as $demand) {
             $invoice = $demand->invoice;
             $company = $invoice?->company;
-            if (! $company || $company->is_demo || ! $company->hasAccess()
+            if ($demand->isStandalone() || ! $company || $company->is_demo || ! $company->hasAccess()
                 || ! in_array($invoice->status, ['sent', 'partial', 'overdue'], true)
                 || now()->startOfDay()->lt($this->autoTransferOn($demand))
                 || $this->autoTransferBlocker($demand)) {
@@ -518,7 +582,21 @@ class PaymentDemandService
 
         $demand->forceFill(['status' => 'withdrawn', 'closed_at' => now()])->save();
         $this->log($demand, 'withdrawn', __('Aanmaning ingetrokken'));
-        Audit::log('updated', $demand->invoice, __('Laatste aanmaning voor :label ingetrokken', ['label' => Audit::label($demand->invoice)]), [], $demand->company_id);
+        if (! $demand->isStandalone()) {
+            Audit::log('updated', $demand->invoice, __('Laatste aanmaning voor :label ingetrokken', ['label' => Audit::label($demand->invoice)]), [], $demand->company_id);
+        }
+    }
+
+    /** Losse aanmaning: de schuldeiser meldt dat de klant heeft betaald. */
+    public function markPaid(PaymentDemand $demand): void
+    {
+        if (! $demand->isStandalone() || ! $demand->isActive()) {
+            throw new \DomainException(__('Deze aanmaning loopt niet meer.'));
+        }
+
+        $demand->forceFill(['status' => 'paid', 'closed_at' => now()])->save();
+        $demand->forgetInvoice();
+        $this->log($demand, 'settled', __('Schuldeiser meldt dat er is betaald; aanmaning gesloten'), null, 'creditor');
     }
 
     /**
@@ -536,77 +614,111 @@ class PaymentDemandService
             ]));
         }
 
+        if ($demand->isStandalone()) {
+            return $this->transferStandalone($demand);
+        }
+
         // IncassoService sluit de aanmaning en stuurt haar mee in het dossier.
         return app(IncassoService::class)->send($demand->invoice);
     }
 
     /**
-     * Een aanmaning die nergens wordt bewaard: voor de gratis tool op de
-     * website. Bedrijf, factuur en aanmaning bestaan alleen zolang de brief
-     * wordt gemaakt. De ondernemer verstuurt hem zelf, dus bij een particulier
-     * tellen we twee dagen voor de post.
-     *
-     * @param  array<string, mixed>  $data  de gevalideerde velden van de tool
+     * Overdracht van een losse aanmaning: er is geen administratie, dus het
+     * dossier wordt uit de aanmaning zelf opgebouwd. Lukt de mail aan de
+     * deurwaarder niet, dan verandert er niets.
      */
-    public function draft(array $data): PaymentDemand
+    private function transferStandalone(PaymentDemand $demand): Invoice
     {
-        $company = (new \App\Models\Company())->forceFill([
-            'name' => $data['van_bedrijf'],
-            'email' => $data['van_email'] ?? null,
-            'phone' => $data['van_telefoon'] ?? null,
-            'kvk_number' => $data['van_kvk'] ?? null,
-            'iban' => $data['van_iban'] ?? null,
-            'kor' => (bool) ($data['geen_btw_aftrek'] ?? false),
-            'brand_color' => (string) brand('color'),
-        ] + $this->address((string) ($data['van_adres'] ?? '')));
-
-        $customer = $this->address((string) ($data['aan_adres'] ?? ''));
-        $invoice = (new Invoice())->forceFill([
-            'number' => $data['factuurnummer'],
-            'status' => 'overdue',
-            'is_credit' => false,
-            'language' => 'nl',
-            'invoice_date' => Carbon::parse($data['factuurdatum'])->toDateString(),
-            'due_date' => Carbon::parse($data['vervaldatum'])->toDateString(),
-            'total' => round((float) $data['bedrag'], 2),
-            'paid_total' => 0,
-            'customer_name' => $data['aan_naam'],
-            'customer_email' => $data['aan_email'] ?? null,
-            'customer_address_line' => $customer['address_line'] ?? null,
-            'customer_postal_code' => $customer['postal_code'] ?? null,
-            'customer_city' => $customer['city'] ?? null,
-        ]);
-        $invoice->setRelation('company', $company)->setRelation('brandProfile', null)->setRelation('customer', null);
-
-        $type = ($data['klant'] ?? 'zakelijk') === 'particulier' ? 'consumer' : 'business';
-        $term = $this->term($type, isset($data['termijn']) && $data['termijn'] !== '' ? (int) $data['termijn'] : null);
-        $principal = round((float) $data['bedrag'], 2);
-        $costs = LegalInterest::collectionCosts($principal);
-
-        $demand = (new PaymentDemand())->forceFill([
-            'status' => 'sent',
-            'debtor_type' => $type,
-            'sent_to' => (string) ($data['aan_email'] ?? ''),
-            'principal' => $principal,
-            'with_interest' => (bool) ($data['rente'] ?? true),
-            'costs' => $costs,
-            'costs_vat' => $this->costsVat($invoice, $costs),
-            'term_days' => $term,
-            'deadline' => $this->deadline($type, $term, $type === 'consumer' ? now()->addDays(self::POST_DAYS) : null)->toDateString(),
-            'sent_at' => now(),
+        $claim = $this->claim($demand);
+        $claim['response'] = $this->responseLabel($demand);
+        $invoice = $demand->invoice->forceFill([
+            'incasso_reference' => sprintf('ARM-%d-W%05d', now()->year, $demand->id),
+            'incasso_sent_at' => now(),
+            'incasso_handler' => Market::incasso('partner_name'),
+            'incasso_phase' => 'minnelijk',
         ]);
 
-        return $demand->setRelation('invoice', $invoice);
+        $files = [[
+            'name' => 'aanmaning-' . preg_replace('/[^A-Za-z0-9\-]+/', '-', (string) $invoice->number) . '.pdf',
+            'data' => $this->pdf($demand)->output(),
+            'mime' => 'application/pdf',
+        ]];
+        $file = $demand->file()->first();
+        if ($copy = $file?->contents()) {
+            $files[] = ['name' => $file->filename, 'data' => $copy, 'mime' => $file->mime_type];
+        }
+
+        $this->log($demand, 'transferred', __('Dossier overgedragen aan :partner', ['partner' => Market::incasso('partner_name')]), null, 'creditor');
+        $demand->load('events');
+
+        try {
+            Mail::to(Market::incasso('claims_email'))
+                ->cc(array_filter([Market::incasso('cc')]))
+                ->send(new \App\Mail\IncassoDossierMail($invoice, '', $files, $demand, $claim));
+        } catch (\Throwable $e) {
+            Log::error('Dossier van losse aanmaning versturen mislukt', ['demand' => $demand->id, 'error' => $e->getMessage()]);
+            $demand->events()->where('event', 'transferred')->delete();
+
+            throw new \DomainException(__('Het dossier kon niet worden verstuurd. Er is niets gewijzigd; probeer het later opnieuw.'));
+        }
+
+        $demand->forceFill(['status' => 'transferred', 'closed_at' => now()])->save();
+        $this->notify($demand, 'handed');
+
+        return $invoice;
     }
 
     /**
-     * Adres uit een tekstvak, op dezelfde manier als bij de gratis factuur.
+     * Een losse aanmaning uit het formulier op de website, nog niet opgeslagen.
+     * Schuldeiser, klant en factuur staan op de aanmaning zelf. Zonder
+     * e-mailadres van de klant stuurt de schuldeiser de link of de brief zelf;
+     * bij een particulier tellen we dan twee dagen voor de post.
      *
-     * @return array{address_line?: string, postal_code?: string, city?: string}
+     * @param  array<string, mixed>  $data  de gevalideerde velden van het formulier
      */
-    private function address(string $text): array
+    public function make(array $data): PaymentDemand
     {
-        return app(FreeInvoiceImport::class)->address($text);
+        $type = ($data['klant'] ?? 'zakelijk') === 'particulier' ? 'consumer' : 'business';
+        $term = $this->term($type, filled($data['termijn'] ?? null) ? (int) $data['termijn'] : null);
+        $principal = round((float) $data['bedrag'], 2);
+        $costs = LegalInterest::collectionCosts($principal);
+        $noVat = (bool) ($data['geen_btw_aftrek'] ?? false);
+        $email = mb_strtolower(trim((string) ($data['aan_email'] ?? '')));
+
+        return (new PaymentDemand())->forceFill([
+            'status' => 'pending',
+            'debtor_type' => $type,
+            'sent_to' => $email,
+            'principal' => $principal,
+            'with_interest' => (bool) ($data['rente'] ?? true),
+            'auto_transfer' => false,
+            'costs' => $costs,
+            'costs_vat' => $noVat ? round($costs * 0.21, 2) : 0,
+            'term_days' => $term,
+            'deadline' => $this->standaloneDeadline($type, $term, $email)->toDateString(),
+            'creditor_name' => trim((string) $data['van_bedrijf']),
+            'creditor_email' => mb_strtolower(trim((string) ($data['van_email'] ?? ''))),
+            'creditor_kvk' => filled($data['van_kvk'] ?? null) ? preg_replace('/\D/', '', (string) $data['van_kvk']) : null,
+            'creditor_iban' => filled($data['van_iban'] ?? null) ? strtoupper(trim(preg_replace('/\s+/', ' ', (string) $data['van_iban']))) : null,
+            'creditor_address' => $data['van_adres'] ?? null,
+            'creditor_phone' => $data['van_telefoon'] ?? null,
+            'creditor_no_vat' => $noVat,
+            'debtor_name' => trim((string) $data['aan_naam']),
+            'debtor_kvk' => filled($data['aan_kvk'] ?? null) ? preg_replace('/\D/', '', (string) $data['aan_kvk']) : null,
+            'debtor_address' => $data['aan_adres'] ?? null,
+            'invoice_number' => trim((string) $data['factuurnummer']),
+            'invoice_date' => filled($data['factuurdatum'] ?? null) ? Carbon::parse($data['factuurdatum'])->toDateString() : null,
+            'due_date' => Carbon::parse($data['vervaldatum'])->toDateString(),
+            'amount' => $principal,
+        ]);
+    }
+
+    /** De laatste dag van de termijn van een losse aanmaning, gerekend vanaf nu. */
+    public function standaloneDeadline(string $debtorType, int $termDays, ?string $debtorEmail): Carbon
+    {
+        $post = $debtorType === 'consumer' && blank($debtorEmail);
+
+        return $this->deadline($debtorType, $termDays, $post ? now()->addDays(self::POST_DAYS) : null);
     }
 
     /** De aanmaning als brief (PDF), in de taal van de factuur en met het bedrag van de dag van verzenden. */
@@ -620,7 +732,7 @@ class PaymentDemandService
             'invoice' => $invoice,
             'company' => $invoice->brandedCompany(),
             'claim' => $this->claimAsSent($demand),
-            // Een losse brief uit de gratis tool heeft geen pagina, dus ook geen code.
+            // Zonder code (een voorbeeld of een berekening vooraf) is er geen pagina om naar te verwijzen.
             'qr' => filled($demand->token) ? PaymentQr::render($demand->url()) : null,
         ])->setPaper('a4'));
     }
@@ -671,7 +783,7 @@ class PaymentDemandService
 
         try {
             // Een demo mailt nooit echt, ook niet als de klant (zonder inlog) reageert.
-            $auto = $kind === 'expired' && $demand->auto_transfer;
+            $auto = $kind === 'expired' && $demand->auto_transfer && ! $demand->isStandalone();
             $blocker = $auto ? $this->autoTransferBlocker($demand) : null;
             Mail::mailer($company->is_demo ? 'log' : null)->to($to)
                 ->send(new PaymentDemandNoticeMail(
@@ -688,10 +800,11 @@ class PaymentDemandService
         }
     }
 
-    public function log(PaymentDemand $demand, string $event, ?string $description = null, ?Request $request = null): void
+    public function log(PaymentDemand $demand, string $event, ?string $description = null, ?Request $request = null, ?string $actor = null): void
     {
         $demand->events()->create([
             'event' => $event,
+            'actor' => $actor,
             'description' => $description ? mb_substr($description, 0, 2000) : null,
             'ip_address' => $request?->ip(),
             'user_agent' => $request ? mb_substr((string) $request->userAgent(), 0, 255) : null,
