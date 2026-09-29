@@ -91,10 +91,10 @@
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         </div>
-        <div class="feature-title">Btw-aangifte uit de cijfers</div>
+        <div class="feature-title">Btw-aangifte per kwartaal</div>
         <div class="feature-desc">
-          Niet nageteld uit facturen, maar afgeleid uit wat er werkelijk geboekt
-          is. Inclusief de correcties die u in het kwartaal nog hebt gemaakt.
+          De bedragen staan klaar op het moment dat de aangifte open gaat, met
+          de facturen en inkopen die eronder liggen. U controleert en dient in.
         </div>
       </div>
 
