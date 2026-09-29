@@ -4,8 +4,9 @@
   $text = \App\Support\DemandText::letter($demand, $claim);
   $day = fn ($d) => $d ? $d->translatedFormat('j F Y') : '—';
   // Het adres van de pagina op twee regels: de code is te lang voor één regel.
-  $url = $demand->url();
-  $cut = strrpos($url, '/') + 1;
+  $online = filled($demand->token);
+  $url = $online ? $demand->url() : '';
+  $cut = $online ? strrpos($url, '/') + 1 : 0;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -85,8 +86,10 @@
     @if($qr)<td style="width:80pt;"><img src="{{ $qr }}" style="width:70pt;height:70pt;" alt=""></td>@endif
     <td>
       <p>{{ $text['respond'] }}</p>
-      <div>{{ $text['l_qr'] }}</div>
-      <div class="url">{{ substr($url, 0, $cut) }}<br>{{ substr($url, $cut) }}</div>
+      @if($online)
+        <div>{{ $text['l_qr'] }}</div>
+        <div class="url">{{ substr($url, 0, $cut) }}<br>{{ substr($url, $cut) }}</div>
+      @endif
     </td>
   </tr>
 </table>
@@ -95,6 +98,6 @@
 
 <div class="legal">{{ $text['legal'] }}</div>
 
-<div class="foot">{{ __('doc.mail_sent_via', ['name' => $company->name, 'brand' => brand('name')]) }}</div>
+<div class="foot">@if($online){{ __('doc.mail_sent_via', ['name' => $company->name, 'brand' => brand('name')]) }}@else{{ __('Gemaakt met :brand, gratis aanmaningen maken op :domain', ['brand' => brand('name'), 'domain' => brand('domain')]) }}@endif</div>
 </body>
 </html>

@@ -20,7 +20,7 @@ class SeoMetaTest extends TestCase
         '/privacy', '/voorwaarden', '/demo', '/login', '/register', '/btw-calculator', '/uurtarief-calculator',
         '/gratis-factuur-maken', '/incassokosten-berekenen', '/cookies', '/verwerkersovereenkomst',
         '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
-        '/factuurprogramma-bouw', '/online-aanmaning',
+        '/factuurprogramma-bouw', '/online-aanmaning', '/aanmaning-maken',
     ];
 
     private function meta(string $html, string $pattern): string

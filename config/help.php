@@ -231,7 +231,14 @@ return [
                 ]],
                 ['Na de termijn: naar de deurwaarder', [
                     'Is de termijn voorbij en is er niet betaald, dan krijg je een bericht. Op de factuur en op de Incasso-pagina staat dan de knop "Overdragen aan de deurwaarder". Het dossier gaat per e-mail naar de deurwaarder, met de factuur, de aanmaning, de berekening van rente en incassokosten en het logboek.',
-                    'Overdragen gebeurt nooit vanzelf: jij beslist.',
+                ]],
+                ['Automatisch overdragen', [
+                    'Vink bij het versturen "Na de termijn automatisch overdragen" aan. Het dossier gaat dan drie werkdagen na de laatste dag van de termijn vanzelf naar de deurwaarder. Die dagen zijn er om een betaling van de laatste dag nog te kunnen boeken. De dag na de termijn krijg je een bericht met de dag van overdracht.',
+                    'Het dossier gaat niet vanzelf over als je klant heeft gereageerd, als de factuur op pauze staat of als de factuur is betaald. Bij een toezegging of een bezwaar beslis je zelf.',
+                    'Op de factuur zet je automatisch overdragen aan of uit zolang de aanmaning loopt.',
+                ]],
+                ['Een factuur uit een ander pakket', [
+                    'Staat de factuur niet in {brand}? Maak de aanmaning dan met de gratis tool op de website. Je krijgt de brief als PDF. Wil je hem online versturen, dan neem je hem mee naar je account: de klant en de factuur staan er dan in, en je verstuurt de aanmaning met één klik.',
                 ]],
                 ['Logboek', [
                     'Bij de aanmaning staat een logboek: verstuurd, geopend door de klant (met tijdstip en IP-adres), elke reactie en de afloop. Jouw eigen bezoek aan de pagina telt niet als geopend.',

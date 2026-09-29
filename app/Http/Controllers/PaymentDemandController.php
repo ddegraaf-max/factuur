@@ -52,6 +52,8 @@ class PaymentDemandController extends Controller
             'costs_total' => $claim['costs_total'],
             'total' => $claim['total'],
             'total_after' => $claim['total_after'],
+            // De dag waarop het dossier vanzelf overgaat, als daarvoor wordt gekozen.
+            'auto_transfer_label' => $claim['deadline']->copy()->addWeekdays(PaymentDemandService::AUTO_TRANSFER_WEEKDAYS)->translatedFormat('j F Y'),
         ]);
     }
 
@@ -81,6 +83,23 @@ class PaymentDemandController extends Controller
         }
 
         return back()->with('flash', __('Aanmaning ingetrokken. Op de pagina van de klant staat dat ook.'));
+    }
+
+    /** Automatische overdracht van een lopende aanmaning aan- of uitzetten. */
+    public function auto(Request $request, Invoice $invoice, PaymentDemand $demand): RedirectResponse
+    {
+        $this->authorizeDemand($invoice, $demand);
+        $on = (bool) $request->validate(['auto_transfer' => ['required', 'boolean']])['auto_transfer'];
+
+        try {
+            $this->service->setAutoTransfer($demand, $on);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['demand' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', $on
+            ? __('Automatische overdracht staat aan: op :date gaat het dossier naar de deurwaarder, als er dan niet is betaald.', ['date' => $this->service->autoTransferOn($demand)->translatedFormat('j F Y')])
+            : __('Automatische overdracht staat uit. Overdragen doe je zelf met de knop.'));
     }
 
     /** Termijn voorbij en niet betaald: met één klik naar de deurwaarder. */
@@ -114,6 +133,7 @@ class PaymentDemandController extends Controller
             'debtor_type' => ['nullable', Rule::in(['business', 'consumer'])],
             'term_days' => ['nullable', 'integer', 'min:1', 'max:' . PaymentDemandService::TERM_MAX],
             'with_interest' => ['nullable', 'boolean'],
+            'auto_transfer' => ['nullable', 'boolean'],
         ]);
     }
 

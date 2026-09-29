@@ -29,7 +29,7 @@ class TrackPageView
         '/veelgestelde-vragen', '/wat-is-nieuw', '/roadmap', '/status',
         '/privacy', '/voorwaarden', '/cookies', '/helpcentrum', '/kennisbank',
         '/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator',
-        '/facturatie-met-ai', '/boekhouders', '/incassokosten-berekenen', '/factuurprogramma-bouw', '/online-aanmaning',
+        '/facturatie-met-ai', '/boekhouders', '/incassokosten-berekenen', '/factuurprogramma-bouw', '/online-aanmaning', '/aanmaning-maken',
     ];
 
     /** Padprefixen die we meten (artikel- en overstappagina's). */

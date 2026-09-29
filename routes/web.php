@@ -125,6 +125,16 @@ Route::view('/factuurprogramma-bouw', 'marketing.bouw')->name('bouw')->middlewar
 // Online aanmaning: de laatste aanmaning met een eigen pagina, en daarna met één klik naar de deurwaarder.
 Route::view('/online-aanmaning', 'marketing.aanmaning')->name('aanmaning')->middleware('market:nl');
 
+// Gratis aanmaning maken: de brief als PDF, zonder account. Er wordt niets verstuurd of opgeslagen;
+// online versturen kan alleen vanuit een account (meenemen).
+Route::get('/aanmaning-maken', [\App\Http\Controllers\FreeDemandController::class, 'show'])->name('aanmaning-maken')->middleware('market:nl');
+Route::post('/aanmaning-maken', [\App\Http\Controllers\FreeDemandController::class, 'download'])
+    ->middleware(['throttle:15,1', 'turnstile', 'market:nl'])->name('aanmaning-maken.download');
+Route::get('/aanmaning-maken/berekening', [\App\Http\Controllers\FreeDemandController::class, 'calculation'])
+    ->middleware(['throttle:60,1', 'market:nl'])->name('aanmaning-maken.calculation');
+Route::post('/aanmaning-maken/meenemen', [\App\Http\Controllers\FreeDemandController::class, 'keep'])
+    ->middleware(['throttle:15,1', 'market:nl'])->name('aanmaning-maken.keep');
+
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
     $brand = \App\Support\Brand::name();
@@ -698,6 +708,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('invoices/{invoice}/aanmaning/berekening', [\App\Http\Controllers\PaymentDemandController::class, 'preview'])->name('demands.preview');
     Route::post('invoices/{invoice}/aanmaning', [\App\Http\Controllers\PaymentDemandController::class, 'store'])->name('demands.store');
     Route::delete('invoices/{invoice}/aanmaning/{demand}', [\App\Http\Controllers\PaymentDemandController::class, 'withdraw'])->name('demands.withdraw');
+    Route::patch('invoices/{invoice}/aanmaning/{demand}/automatisch', [\App\Http\Controllers\PaymentDemandController::class, 'auto'])->name('demands.auto');
     Route::post('invoices/{invoice}/aanmaning/{demand}/overdragen', [\App\Http\Controllers\PaymentDemandController::class, 'transfer'])->name('demands.transfer');
     Route::get('invoices/{invoice}/aanmaning/{demand}/pdf', [\App\Http\Controllers\PaymentDemandController::class, 'pdf'])->name('demands.pdf');
     // Windykacja (Poolse markt): vordering berekenen, wezwanie do zapłaty (PDF) en factuur te koop aanbieden.

@@ -20,9 +20,12 @@ class PaymentDemandNoticeMail extends Mailable
     /** @param  array<string, mixed>  $claim  de vordering van vandaag */
     public function __construct(
         public PaymentDemand $demand,
-        public string $kind, // response | expired
+        public string $kind, // response | expired | transferred
         public array $claim,
         public string $responseLabel = '',
+        // Bij 'expired': de dag waarop het dossier vanzelf overgaat, of waarom dat niet gebeurt.
+        public ?string $autoDate = null,
+        public ?string $autoBlocker = null,
     ) {}
 
     public function envelope(): Envelope
@@ -31,9 +34,11 @@ class PaymentDemandNoticeMail extends Mailable
         $vars = ['number' => $invoice->number, 'customer' => $invoice->customer_name];
 
         return new Envelope(
-            subject: $this->kind === 'expired'
-                ? __('Termijn verstreken: factuur :number van :customer', $vars)
-                : __('Reactie op je aanmaning: factuur :number van :customer', $vars),
+            subject: match ($this->kind) {
+                'expired' => __('Termijn verstreken: factuur :number van :customer', $vars),
+                'transferred' => __('Overgedragen aan de deurwaarder: factuur :number van :customer', $vars),
+                default => __('Reactie op je aanmaning: factuur :number van :customer', $vars),
+            },
         );
     }
 
@@ -48,6 +53,8 @@ class PaymentDemandNoticeMail extends Mailable
                 'company' => $this->demand->invoice->company,
                 'claim' => $this->claim,
                 'responseLabel' => $this->responseLabel,
+                'autoDate' => $this->autoDate,
+                'autoBlocker' => $this->autoBlocker,
                 'url' => route('invoices.show', $this->demand->invoice_id),
             ],
         );

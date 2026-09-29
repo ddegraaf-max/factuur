@@ -24,6 +24,10 @@ class DemandText
         $company = $invoice->brandedCompany();
         $day = fn (?CarbonInterface $date) => $date?->translatedFormat('j F Y');
         $business = $demand->isBusiness();
+        // Zonder code is het een losse brief uit de gratis tool: er is dan geen pagina om op te reageren.
+        $online = filled($demand->token);
+        // De dag waarop de klant de aanmaning geacht wordt te hebben; de dag erna begint de termijn.
+        $received = $demand->deadline->copy()->subDays($demand->term_days + 1);
 
         $consequence = $claim['costs_vat'] > 0
             ? __('Betaalt u niet binnen deze termijn, dan bent u ook incassokosten verschuldigd van :costs, te vermeerderen met :vat btw, samen :total.', [
@@ -41,7 +45,7 @@ class DemandText
             'term' => $business
                 ? __('Wij verzoeken u het openstaande bedrag uiterlijk :deadline te betalen.', ['deadline' => $day($demand->deadline)])
                 : __('Wij verzoeken u het openstaande bedrag te betalen binnen :days dagen nadat u deze aanmaning heeft ontvangen. Wij gaan ervan uit dat u haar op :sent ontvangt; de termijn loopt dan tot en met :deadline.', [
-                    'days' => $demand->term_days, 'sent' => $day($demand->sent_at ?? now()), 'deadline' => $day($demand->deadline),
+                    'days' => $demand->term_days, 'sent' => $day($received), 'deadline' => $day($demand->deadline),
                 ]),
             'interest' => $claim['with_interest']
                 ? __('De rente loopt door tot de dag van betaling; per dag komt er :amount bij.', ['amount' => money($claim['per_day'])])
@@ -52,7 +56,9 @@ class DemandText
                     'iban' => $company->iban, 'name' => $invoice->company?->name ?: $company->name, 'number' => $invoice->number,
                 ])
                 : null,
-            'respond' => __('Heeft u al betaald, wilt u een betaaldatum afspreken of bent u het niet eens met de factuur? Geef het door op de pagina bij deze aanmaning.'),
+            'respond' => $online
+                ? __('Heeft u al betaald, wilt u een betaaldatum afspreken of bent u het niet eens met de factuur? Geef het door op de pagina bij deze aanmaning.')
+                : __('Heeft u al betaald, wilt u een betaaldatum afspreken of bent u het niet eens met de factuur? Neem dan contact met ons op.'),
             'live' => __('Op die pagina staat ook het bedrag van vandaag.'),
             'legal' => $business
                 ? __('Grondslag: artikel 6:96 en 6:119a Burgerlijk Wetboek en het Besluit vergoeding voor buitengerechtelijke incassokosten.')

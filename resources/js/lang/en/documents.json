@@ -430,5 +430,16 @@
   "Incassokosten na de termijn": "Collection costs after the term",
   "Betalen zonder incassokosten kan tot en met :date. Daarna kun je het dossier met één klik overdragen aan :partner.": "Payment without collection costs is possible up to and including :date. After that you can hand over the file with one click to :partner.",
   "De rente loopt door: per dag komt er :day bij.": "Interest continues to accrue: per day :day is added.",
-  "Versturen naar :email": "Send to :email"
+  "Versturen naar :email": "Send to :email",
+  "Je aanmaning voor :customer gaat mee. Na het bevestigen van je e-mailadres staat de factuur in je account en verstuur je de aanmaning met één klik.": "Your notice for :customer comes along. After confirming your e-mail address the invoice is in your account and you send the notice with one click.",
+  "gaat vanzelf over op :date": "goes over by itself on :date",
+  "Automatisch overdragen aanzetten? Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf naar :partner.": "Switch on automatic hand-over? If on :date no payment was made and your customer has not responded, the file goes by itself to :partner.",
+  "Automatisch overdragen uitzetten? Overdragen doe je dan zelf met de knop.": "Switch off automatic hand-over? You then hand over yourself with the button.",
+  "De aanmaning kan nog niet uit:": "The notice cannot go out yet:",
+  "Automatische overdracht: op :date gaat het dossier naar :partner, als er dan niet is betaald en je klant niet heeft gereageerd.": "Automatic hand-over: on :date the file goes to :partner, if no payment was made by then and your customer has not responded.",
+  "Overdragen doe je zelf, na de termijn.": "You hand over yourself, after the term.",
+  "Uitzetten": "Switch off",
+  "Automatisch overdragen": "Hand over automatically",
+  "Na de termijn automatisch overdragen aan :partner": "After the term hand over automatically to :partner",
+  "Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf over. Dat is drie werkdagen na de termijn, zodat je een betaling van de laatste dag nog kunt boeken. Je krijgt vooraf bericht.": "If on :date no payment was made and your customer has not responded, the file goes over by itself. That is three working days after the term, so that you can still record a payment of the last day. You get a message beforehand."
 }

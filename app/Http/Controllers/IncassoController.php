@@ -85,6 +85,8 @@ class IncassoController extends Controller
                     'sent_at' => $demand->sent_at?->toIso8601String(),
                     'deadline' => $demand->deadline->toDateString(),
                     'due' => $demand->isDue(),
+                    'auto_transfer_label' => $demand->auto_transfer && ! $service->autoTransferBlocker($demand)
+                        ? $service->autoTransferOn($demand)->translatedFormat('j M Y') : null,
                     'paused' => $demand->invoice->remindersPaused(),
                     'opened' => (bool) $demand->first_opened_at,
                     'response' => $demand->response,

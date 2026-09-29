@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.66.0</div>
+        <h2>Gratis aanmaning maken, en automatisch naar de deurwaarder</h2>
+        <ul class="tl-list">
+          <li><b>Gratis aanmaning maken</b> — een nieuwe <a href="{{ route('aanmaning-maken') }}">gratis tool</a>: vul de factuur in en download een laatste aanmaning als PDF, met de wettelijke rente, de incassokosten en de termijn die de wet vraagt. Zonder account; er wordt niets opgeslagen of verstuurd.</li>
+          <li><b>Meenemen naar een account</b> — wil je de aanmaning online versturen, dan neem je hem mee naar een proefaccount. Je bevestigt je e-mailadres, de klant en de factuur staan erin, en je verstuurt met één klik.</li>
+          <li><b>Automatisch overdragen</b> — vink bij het versturen aan dat het dossier na de termijn vanzelf naar de deurwaarder gaat. Dat gebeurt drie werkdagen na de laatste dag, en je krijgt vooraf bericht.</li>
+          <li><b>Niet bij een reactie</b> — heeft je klant een betaaldatum toegezegd of bezwaar gemaakt, of staat de factuur op pauze, dan gaat het dossier niet vanzelf over. Dan beslis jij.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.65.0</div>
         <h2>Online aanmaning: de laatste stap vóór de deurwaarder</h2>
         <ul class="tl-list">

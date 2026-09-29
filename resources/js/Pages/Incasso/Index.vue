@@ -117,6 +117,7 @@ const phaseLabels = {
             <td :data-label="$t('Termijn tot en met')">
               {{ formatDate(d.deadline) }}
               <span v-if="d.due" class="due-chip">{{ $t('Termijn verstreken') }}</span>
+              <div v-if="d.auto_transfer_label" class="sub">{{ $t('gaat vanzelf over op :date', { date: d.auto_transfer_label }) }}</div>
             </td>
             <td :data-label="$t('Reactie')">{{ d.response_label || (d.opened ? $t('Geopend, geen reactie') : $t('Nog niet geopend')) }}</td>
             <td class="right num" :data-label="$t('Te betalen vandaag')">{{ eur(d.total) }}</td>

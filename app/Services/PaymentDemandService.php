@@ -48,6 +48,16 @@ class PaymentDemandService
     /** Zo ver vooruit mag een klant een betaaldatum toezeggen. */
     public const PROMISE_MAX_DAYS = 60;
 
+    /**
+     * Automatische overdracht: zoveel werkdagen na de laatste dag van de
+     * termijn. Een overboeking van de laatste dag staat dan op de rekening
+     * en kan nog worden geboekt.
+     */
+    public const AUTO_TRANSFER_WEEKDAYS = 3;
+
+    /** Een brief die de ondernemer zelf op de post doet, is er na twee dagen. */
+    public const POST_DAYS = 2;
+
     /** De aanmaning rust op Nederlands recht en heeft een deurwaarder nodig om naar over te dragen. */
     public function available(): bool
     {
@@ -84,6 +94,39 @@ class PaymentDemandService
         $from = ($from ?? now())->copy()->startOfDay();
 
         return $from->addDays($termDays + ($debtorType === 'consumer' ? 1 : 0));
+    }
+
+    /** De dag waarop het dossier vanzelf naar de deurwaarder gaat, als dat is gevraagd. */
+    public function autoTransferOn(PaymentDemand $demand): Carbon
+    {
+        return $demand->deadline->copy()->startOfDay()->addWeekdays(self::AUTO_TRANSFER_WEEKDAYS);
+    }
+
+    /**
+     * Waarom het dossier niet vanzelf overgaat, of null als niets het tegenhoudt.
+     * Heeft de klant gereageerd, dan beslist de ondernemer zelf: een toezegging
+     * of een bezwaar vraagt om een antwoord, niet om een deurwaarder.
+     */
+    public function autoTransferBlocker(PaymentDemand $demand): ?string
+    {
+        return match (true) {
+            filled($demand->response) => __('Je klant heeft gereageerd. Het dossier gaat daarom niet vanzelf naar de deurwaarder; jij beslist.'),
+            (bool) $demand->invoice?->remindersPaused() => __('De factuur staat op pauze. Zolang de pauze loopt, gaat het dossier niet naar de deurwaarder.'),
+            default => null,
+        };
+    }
+
+    /** Zet de automatische overdracht van een lopende aanmaning aan of uit. */
+    public function setAutoTransfer(PaymentDemand $demand, bool $on): void
+    {
+        if (! $demand->isActive()) {
+            throw new \DomainException(__('Deze aanmaning loopt niet meer.'));
+        }
+
+        $demand->forceFill(['auto_transfer' => $on])->save();
+        $this->log($demand, 'auto', $on
+            ? __('Automatische overdracht aangezet: op :date, als er dan niet is betaald', ['date' => $this->autoTransferOn($demand)->translatedFormat('j F Y')])
+            : __('Automatische overdracht uitgezet'));
     }
 
     /** Waarom er (nog) geen aanmaning uit kan, of null als het kan. */
@@ -232,6 +275,7 @@ class PaymentDemandService
             'sent_to' => $invoice->customer_email,
             'principal' => $principal,
             'with_interest' => (bool) ($options['with_interest'] ?? true),
+            'auto_transfer' => (bool) ($options['auto_transfer'] ?? false),
             'costs' => $costs,
             'costs_vat' => $this->costsVat($invoice, $costs),
             'term_days' => $term,
@@ -261,6 +305,11 @@ class PaymentDemandService
         $this->log($demand, 'sent', __('Aanmaning gemaild naar :to; betalen zonder incassokosten kan tot en met :date', [
             'to' => $demand->sent_to, 'date' => $demand->deadline->translatedFormat('j F Y'),
         ]));
+        if ($demand->auto_transfer) {
+            $this->log($demand, 'auto', __('Automatische overdracht aangezet: op :date, als er dan niet is betaald', [
+                'date' => $this->autoTransferOn($demand)->translatedFormat('j F Y'),
+            ]));
+        }
 
         // In het verloop van de factuur, en daarmee ook in het incassodossier.
         ReminderLog::create([
@@ -376,6 +425,49 @@ class PaymentDemandService
             }
         }
 
+        $this->transferDue();
+
+        return $count;
+    }
+
+    /**
+     * Automatische overdracht: aanmaningen waarbij dat is gevraagd, een paar
+     * werkdagen na de termijn, als er niet is betaald en de klant niets heeft
+     * laten horen. Geeft het aantal overgedragen dossiers terug.
+     */
+    public function transferDue(): int
+    {
+        $due = PaymentDemand::withoutGlobalScope('company')
+            ->where('status', 'sent')
+            ->where('auto_transfer', true)
+            ->whereDate('deadline', '<', now()->toDateString())
+            ->with(['invoice.company', 'invoice.customer'])
+            ->get();
+
+        $count = 0;
+        foreach ($due as $demand) {
+            $invoice = $demand->invoice;
+            $company = $invoice?->company;
+            if (! $company || $company->is_demo || ! $company->hasAccess()
+                || ! in_array($invoice->status, ['sent', 'partial', 'overdue'], true)
+                || now()->startOfDay()->lt($this->autoTransferOn($demand))
+                || $this->autoTransferBlocker($demand)) {
+                continue;
+            }
+
+            try {
+                app(IncassoService::class)->send($invoice);
+                $this->log($demand, 'auto', __('Automatisch overgedragen: termijn voorbij, niet betaald en geen reactie'));
+                Audit::log('updated', $invoice, __(':label automatisch overgedragen aan :partner na de laatste aanmaning', [
+                    'label' => Audit::label($invoice), 'partner' => Market::incasso('partner_name'),
+                ]), [], $invoice->company_id);
+                $this->notify($demand->fresh(['invoice.company']), 'transferred');
+                $count++;
+            } catch (\Throwable $e) {
+                Log::error('Automatische overdracht mislukt', ['demand' => $demand->id, 'error' => $e->getMessage()]);
+            }
+        }
+
         return $count;
     }
 
@@ -448,6 +540,75 @@ class PaymentDemandService
         return app(IncassoService::class)->send($demand->invoice);
     }
 
+    /**
+     * Een aanmaning die nergens wordt bewaard: voor de gratis tool op de
+     * website. Bedrijf, factuur en aanmaning bestaan alleen zolang de brief
+     * wordt gemaakt. De ondernemer verstuurt hem zelf, dus bij een particulier
+     * tellen we twee dagen voor de post.
+     *
+     * @param  array<string, mixed>  $data  de gevalideerde velden van de tool
+     */
+    public function draft(array $data): PaymentDemand
+    {
+        $company = (new \App\Models\Company())->forceFill([
+            'name' => $data['van_bedrijf'],
+            'email' => $data['van_email'] ?? null,
+            'phone' => $data['van_telefoon'] ?? null,
+            'kvk_number' => $data['van_kvk'] ?? null,
+            'iban' => $data['van_iban'] ?? null,
+            'kor' => (bool) ($data['geen_btw_aftrek'] ?? false),
+            'brand_color' => (string) brand('color'),
+        ] + $this->address((string) ($data['van_adres'] ?? '')));
+
+        $customer = $this->address((string) ($data['aan_adres'] ?? ''));
+        $invoice = (new Invoice())->forceFill([
+            'number' => $data['factuurnummer'],
+            'status' => 'overdue',
+            'is_credit' => false,
+            'language' => 'nl',
+            'invoice_date' => Carbon::parse($data['factuurdatum'])->toDateString(),
+            'due_date' => Carbon::parse($data['vervaldatum'])->toDateString(),
+            'total' => round((float) $data['bedrag'], 2),
+            'paid_total' => 0,
+            'customer_name' => $data['aan_naam'],
+            'customer_email' => $data['aan_email'] ?? null,
+            'customer_address_line' => $customer['address_line'] ?? null,
+            'customer_postal_code' => $customer['postal_code'] ?? null,
+            'customer_city' => $customer['city'] ?? null,
+        ]);
+        $invoice->setRelation('company', $company)->setRelation('brandProfile', null)->setRelation('customer', null);
+
+        $type = ($data['klant'] ?? 'zakelijk') === 'particulier' ? 'consumer' : 'business';
+        $term = $this->term($type, isset($data['termijn']) && $data['termijn'] !== '' ? (int) $data['termijn'] : null);
+        $principal = round((float) $data['bedrag'], 2);
+        $costs = LegalInterest::collectionCosts($principal);
+
+        $demand = (new PaymentDemand())->forceFill([
+            'status' => 'sent',
+            'debtor_type' => $type,
+            'sent_to' => (string) ($data['aan_email'] ?? ''),
+            'principal' => $principal,
+            'with_interest' => (bool) ($data['rente'] ?? true),
+            'costs' => $costs,
+            'costs_vat' => $this->costsVat($invoice, $costs),
+            'term_days' => $term,
+            'deadline' => $this->deadline($type, $term, $type === 'consumer' ? now()->addDays(self::POST_DAYS) : null)->toDateString(),
+            'sent_at' => now(),
+        ]);
+
+        return $demand->setRelation('invoice', $invoice);
+    }
+
+    /**
+     * Adres uit een tekstvak, op dezelfde manier als bij de gratis factuur.
+     *
+     * @return array{address_line?: string, postal_code?: string, city?: string}
+     */
+    private function address(string $text): array
+    {
+        return app(FreeInvoiceImport::class)->address($text);
+    }
+
     /** De aanmaning als brief (PDF), in de taal van de factuur en met het bedrag van de dag van verzenden. */
     public function pdf(PaymentDemand $demand): \Barryvdh\DomPDF\PDF
     {
@@ -459,7 +620,8 @@ class PaymentDemandService
             'invoice' => $invoice,
             'company' => $invoice->brandedCompany(),
             'claim' => $this->claimAsSent($demand),
-            'qr' => PaymentQr::render($demand->url()),
+            // Een losse brief uit de gratis tool heeft geen pagina, dus ook geen code.
+            'qr' => filled($demand->token) ? PaymentQr::render($demand->url()) : null,
         ])->setPaper('a4'));
     }
 
@@ -509,8 +671,14 @@ class PaymentDemandService
 
         try {
             // Een demo mailt nooit echt, ook niet als de klant (zonder inlog) reageert.
+            $auto = $kind === 'expired' && $demand->auto_transfer;
+            $blocker = $auto ? $this->autoTransferBlocker($demand) : null;
             Mail::mailer($company->is_demo ? 'log' : null)->to($to)
-                ->send(new PaymentDemandNoticeMail($demand, $kind, $this->claim($demand), $this->responseLabel($demand)));
+                ->send(new PaymentDemandNoticeMail(
+                    $demand, $kind, $this->claim($demand), $this->responseLabel($demand),
+                    $auto && ! $blocker ? $this->autoTransferOn($demand)->translatedFormat('j F Y') : null,
+                    $blocker,
+                ));
 
             return true;
         } catch (\Throwable $e) {

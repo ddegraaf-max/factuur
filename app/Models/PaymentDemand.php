@@ -19,12 +19,13 @@ class PaymentDemand extends Model
 
     protected $fillable = [
         'company_id', 'invoice_id', 'token', 'status', 'debtor_type', 'sent_to', 'principal', 'with_interest',
-        'costs', 'costs_vat', 'term_days', 'deadline', 'sent_at', 'first_opened_at', 'response', 'response_date',
+        'auto_transfer', 'costs', 'costs_vat', 'term_days', 'deadline', 'sent_at', 'first_opened_at', 'response', 'response_date',
         'response_note', 'responded_at', 'expiry_notified_at', 'closed_at',
     ];
 
     protected $casts = [
         'with_interest' => 'boolean',
+        'auto_transfer' => 'boolean',
         'principal' => 'decimal:2',
         'costs' => 'decimal:2',
         'costs_vat' => 'decimal:2',

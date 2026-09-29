@@ -100,7 +100,7 @@ class FreeInvoiceImport
      *
      * @return array{address_line?: string, postal_code?: string, city?: string}
      */
-    protected function address(string $text): array
+    public function address(string $text): array
     {
         $lines = array_values(array_filter(array_map('trim', preg_split('/\R/', $text) ?: [])));
         if ($lines === []) {

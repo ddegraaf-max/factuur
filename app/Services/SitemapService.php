@@ -40,7 +40,7 @@ class SitemapService
                 '/facturatie-met-ai', '/boekhouders', '/factuurprogramma-bouw', '/online-aanmaning', '/roadmap', '/wat-is-nieuw', '/status',
                 '/privacy', '/voorwaarden', '/cookies', '/verwerkersovereenkomst', '/login', '/register',
             ], Brand::watchesTrademark() ? ['/zocht-u-een-ander-easyinvoice'] : [])),
-            'tools' => fn () => $this->plain(['/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator', '/incassokosten-berekenen']),
+            'tools' => fn () => $this->plain(['/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator', '/incassokosten-berekenen', '/aanmaning-maken']),
             'overstappen' => fn () => $this->plain(['/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden']),
             'helpcentrum' => fn () => $this->articles('/helpcentrum/', config('help.articles', [])),
             'kennisbank' => fn () => $this->articles('/kennisbank/', config('kennisbank.articles', [])),

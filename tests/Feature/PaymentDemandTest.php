@@ -332,6 +332,80 @@ class PaymentDemandTest extends TestCase
         $this->get(route('demand.show', $demand->token))->assertOk()->assertInertia(fn ($page) => $page->where('demand.status', 'paid')->where('qr', null));
     }
 
+    public function test_on_request_the_file_goes_over_by_itself_three_working_days_after_the_term(): void
+    {
+        // Maandag 5 oktober 2026: termijn van 7 dagen loopt t/m maandag 12 oktober,
+        // drie werkdagen later is donderdag 15 oktober.
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-05 09:00'));
+        $invoice = $this->overdueInvoice('business', 40, 1000.0);
+
+        $this->getJson(route('demands.preview', $invoice))->assertOk()->assertJson(['auto_transfer_label' => '15 oktober 2026']);
+        $this->post(route('demands.store', $invoice), ['auto_transfer' => true])->assertSessionHasNoErrors();
+        $demand = PaymentDemand::firstOrFail();
+        $this->assertTrue($demand->auto_transfer);
+        $this->assertSame('2026-10-12', $demand->deadline->toDateString());
+        $this->assertSame(['sent', 'auto'], $demand->events()->pluck('event')->all());
+
+        // De dag na de termijn: bericht met de dag van overdracht, maar nog geen overdracht.
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-13 08:30'));
+        $this->artisan('demands:notify')->assertSuccessful();
+        Mail::assertSent(PaymentDemandNoticeMail::class, fn (PaymentDemandNoticeMail $mail) => $mail->kind === 'expired' && $mail->autoDate === '15 oktober 2026');
+        $this->assertSame('overdue', $invoice->fresh()->status);
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-14 08:30'));
+        $this->artisan('demands:notify')->assertSuccessful();
+        $this->assertSame('overdue', $invoice->fresh()->status);
+
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-15 08:30'));
+        $this->artisan('demands:notify')->assertSuccessful();
+        $this->assertSame('incasso', $invoice->fresh()->status);
+        $this->assertSame('transferred', $demand->fresh()->status);
+        Mail::assertSent(IncassoDossierMail::class, fn (IncassoDossierMail $mail) => $mail->demand?->id === $demand->id);
+        Mail::assertSent(PaymentDemandNoticeMail::class, fn (PaymentDemandNoticeMail $mail) => $mail->kind === 'transferred' && $mail->hasTo('administratie@jansen.test'));
+
+        $service = app(PaymentDemandService::class);
+        $html = (new PaymentDemandNoticeMail($demand->fresh(), 'transferred', $service->claim($demand->fresh())))->render();
+        $this->assertStringContainsString('automatisch overgedragen', $html);
+        $this->assertStringContainsString($invoice->fresh()->incasso_reference, $html);
+    }
+
+    public function test_a_response_or_a_pause_keeps_the_file_from_going_over_by_itself(): void
+    {
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-05 09:00'));
+        $invoice = $this->overdueInvoice('business', 40, 1000.0);
+        $this->post(route('demands.store', $invoice), ['auto_transfer' => true])->assertSessionHasNoErrors();
+        $demand = PaymentDemand::firstOrFail();
+
+        $this->asGuest();
+        $this->post(route('demand.respond', $demand->token), ['response' => 'dispute', 'note' => 'Het werk is niet af.'])->assertSessionHasNoErrors();
+        $this->actingAs($this->user);
+
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-20 08:30'));
+        $this->artisan('demands:notify')->assertSuccessful();
+        $this->assertSame('overdue', $invoice->fresh()->status, 'Na een bezwaar beslist de ondernemer zelf');
+        $this->assertSame('sent', $demand->fresh()->status);
+        Mail::assertSent(PaymentDemandNoticeMail::class, fn (PaymentDemandNoticeMail $mail) => $mail->kind === 'expired' && $mail->autoDate === null && filled($mail->autoBlocker));
+        Mail::assertNotSent(IncassoDossierMail::class);
+        $this->get(route('invoices.show', $invoice))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('invoice.demand.current.auto_transfer', true)
+            ->where('invoice.demand.current.auto_blocker', fn ($reason) => filled($reason)));
+
+        // Uitzetten en weer aanzetten kan zolang de aanmaning loopt.
+        $this->patch(route('demands.auto', [$invoice, $demand]), ['auto_transfer' => false])->assertSessionHasNoErrors();
+        $this->assertFalse($demand->fresh()->auto_transfer);
+
+        // Zonder reactie maar op pauze: ook dan blijft het dossier liggen.
+        $other = Invoice::regular()->where('company_id', $this->user->company_id)->where('id', '!=', $invoice->id)
+            ->whereIn('status', ['sent', 'overdue'])->whereNotNull('customer_email')->firstOrFail();
+        $other->forceFill(['due_date' => '2026-09-01', 'status' => 'overdue', 'paid_total' => 0])->save();
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-10-21 09:00'));
+        $this->post(route('demands.store', $other), ['auto_transfer' => true])->assertSessionHasNoErrors();
+        app(ReminderService::class)->pause($other->fresh());
+        $this->travelTo(\Illuminate\Support\Carbon::parse('2026-11-10 08:30'));
+        $this->artisan('demands:notify')->assertSuccessful();
+        $this->assertSame('overdue', $other->fresh()->status);
+        Mail::assertNotSent(IncassoDossierMail::class);
+    }
+
     public function test_the_owner_withdraws_a_demand_and_the_old_button_still_carries_it_along(): void
     {
         $invoice = $this->overdueInvoice('business', 12, 800.0);

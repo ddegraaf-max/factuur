@@ -5,7 +5,7 @@ import StatusPill from '@/Components/StatusPill.vue';
 import { eur, fmtDate, num, todayLocal } from '@/format.js';
 import { t } from '@/i18n';
 import axios from 'axios';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 const props = defineProps({
   invoice: Object,
@@ -143,7 +143,7 @@ const demand = computed(() => props.invoice.demand?.current || null);
 const canDemand = computed(() => !!props.invoice.demand && !props.invoice.demand.blocker);
 const showDemandModal = ref(false);
 const showDemandLog = ref(false);
-const demandForm = useForm({ debtor_type: null, term_days: null, with_interest: true });
+const demandForm = useForm({ debtor_type: null, term_days: null, with_interest: true, auto_transfer: false });
 const demandPreview = ref(null);
 const demandLoading = ref(false);
 const demandError = ref('');
@@ -171,6 +171,22 @@ const openDemandModal = () => {
   showDemandModal.value = true;
   loadDemandPreview();
 };
+// Meegenomen uit de gratis aanmaning (?aanmaning=1): het venster staat meteen open,
+// met de termijn en de rente zoals ze daar waren gekozen.
+const demandBlocked = ref('');
+onMounted(() => {
+  const query = new URLSearchParams(window.location.search);
+  if (query.get('aanmaning') !== '1' || !props.invoice.demand || demand.value?.active) return;
+  if (props.invoice.demand.blocker) {
+    demandBlocked.value = props.invoice.demand.blocker;
+    return;
+  }
+  openDemandModal();
+  if (query.get('termijn')) demandForm.term_days = Number(query.get('termijn'));
+  if (query.get('rente') === '0') demandForm.with_interest = false;
+  if (query.get('termijn') || query.get('rente') === '0') loadDemandPreview();
+});
+
 // Zakelijk en particulier hebben elk hun eigen termijn en rente: opnieuw rekenen vanaf de standaard.
 const changeDebtorType = () => { demandForm.term_days = null; loadDemandPreview(); };
 const sendDemand = () => demandForm.post(route('demands.store', props.invoice.id), {
@@ -205,6 +221,15 @@ const demandState = computed(() => {
   if (d.due) return { cls: 'warn', label: t('Termijn verstreken') };
   return { cls: 'run', label: d.days_left === 0 ? t('Laatste dag van de termijn') : t('Nog :n dagen', { n: d.days_left }) };
 });
+const setAutoTransfer = (on) => {
+  const d = demand.value;
+  const ask = on
+    ? t('Automatisch overdragen aanzetten? Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf naar :partner.', { date: d.auto_transfer_label, partner: market.incasso_partner })
+    : t('Automatisch overdragen uitzetten? Overdragen doe je dan zelf met de knop.');
+  if (confirm(ask)) {
+    router.patch(route('demands.auto', [props.invoice.id, d.id]), { auto_transfer: on }, { preserveScroll: true });
+  }
+};
 const copyDemandLink = async () => { try { await navigator.clipboard.writeText(demand.value.url); } catch (e) { /* stil */ } };
 
 /* ---------- Bijlagen ---------- */
@@ -555,6 +580,12 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
       </div>
     </div>
 
+    <!-- Aanmaning meegenomen uit de gratis tool, maar versturen kan nog niet -->
+    <div v-if="demandBlocked" class="inv-alert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>{{ $t('De aanmaning kan nog niet uit:') }} {{ demandBlocked }}</span>
+    </div>
+
     <div v-if="pageError" class="inv-alert">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
       {{ pageError }}
@@ -764,6 +795,12 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div><span class="inv-meta-label">{{ $t('Geopend door de klant') }}</span><span>{{ demand.opened_at_label || $t('Nog niet') }}</span></div>
             <div><span class="inv-meta-label">{{ $t('Te betalen vandaag') }}</span><span class="mono">{{ eur(demand.total) }}</span></div>
             <div><span class="inv-meta-label">{{ demand.costs_due ? $t('Waarvan incassokosten') : $t('Na de termijn') }}</span><span class="mono">{{ demand.costs_due ? eur(demand.costs_total) : eur(demand.total_after) }}</span></div>
+          </div>
+          <div v-if="demand.active" class="dm-auto">
+            <template v-if="demand.auto_transfer && demand.auto_blocker">{{ demand.auto_blocker }}</template>
+            <template v-else-if="demand.auto_transfer">{{ $t('Automatische overdracht: op :date gaat het dossier naar :partner, als er dan niet is betaald en je klant niet heeft gereageerd.', { date: demand.auto_transfer_label, partner: $page.props.market.incasso_partner }) }}</template>
+            <template v-else>{{ $t('Overdragen doe je zelf, na de termijn.') }}</template>
+            <button type="button" class="link-btn" @click="setAutoTransfer(!demand.auto_transfer)">{{ demand.auto_transfer ? $t('Uitzetten') : $t('Automatisch overdragen') }}</button>
           </div>
           <div v-if="demand.active && demand.with_interest && demand.per_day > 0" class="dm-note">{{ $t('Hoofdsom :principal, rente tot vandaag :interest. Per dag komt er :day bij.', { principal: eur(demand.principal), interest: eur(demand.interest), day: eur(demand.per_day) }) }}</div>
 
@@ -1321,6 +1358,11 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <input type="checkbox" v-model="demandForm.with_interest" @change="loadDemandPreview">
             <span>{{ $t('Wettelijke rente meerekenen') }}</span>
           </label>
+          <label class="dm-check">
+            <input type="checkbox" v-model="demandForm.auto_transfer">
+            <span>{{ $t('Na de termijn automatisch overdragen aan :partner', { partner: $page.props.market.incasso_partner }) }}</span>
+          </label>
+          <div v-if="demandForm.auto_transfer && demandPreview" class="pause-hint" style="margin:-8px 0 14px;">{{ $t('Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf over. Dat is drie werkdagen na de termijn, zodat je een betaling van de laatste dag nog kunt boeken. Je krijgt vooraf bericht.', { date: demandPreview.auto_transfer_label }) }}</div>
 
           <div class="dm-calc" :class="{ loading: demandLoading }">
             <template v-if="demandPreview">
@@ -1528,6 +1570,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 .dm-meta > div { display: flex; flex-direction: column; gap: 3px; }
 .dm-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
 .dm-note { font-size: 12px; color: var(--text-3); margin-top: 10px; }
+.dm-auto { font-size: 12.5px; color: var(--text-2); margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
 .dm-response { margin-top: 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
 .dm-response.dispute { border-color: #FCA5A5; }
 .dm-response.promise { border-color: var(--info-border); }

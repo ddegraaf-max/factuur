@@ -430,5 +430,16 @@
   "Incassokosten na de termijn": "Koszty windykacji po terminie",
   "Betalen zonder incassokosten kan tot en met :date. Daarna kun je het dossier met één klik overdragen aan :partner.": "Zapłata bez kosztów windykacji jest możliwa do dnia :date. Potem możesz jednym kliknięciem przekazać sprawę do :partner.",
   "De rente loopt door: per dag komt er :day bij.": "Odsetki są naliczane dalej: każdego dnia dochodzi :day.",
-  "Versturen naar :email": "Wyślij do :email"
+  "Versturen naar :email": "Wyślij do :email",
+  "Je aanmaning voor :customer gaat mee. Na het bevestigen van je e-mailadres staat de factuur in je account en verstuur je de aanmaning met één klik.": "Twoje wezwanie dla :customer zostanie przeniesione. Po potwierdzeniu adresu e-mail faktura będzie na Twoim koncie, a wezwanie wyślesz jednym kliknięciem.",
+  "gaat vanzelf over op :date": "zostanie przekazane automatycznie :date",
+  "Automatisch overdragen aanzetten? Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf naar :partner.": "Włączyć automatyczne przekazanie? Jeśli w dniu :date nie będzie zapłaty i klient nie odpowie, sprawa sama trafi do :partner.",
+  "Automatisch overdragen uitzetten? Overdragen doe je dan zelf met de knop.": "Wyłączyć automatyczne przekazanie? Sprawę przekażesz wtedy samodzielnie przyciskiem.",
+  "De aanmaning kan nog niet uit:": "Wezwania nie można jeszcze wysłać:",
+  "Automatische overdracht: op :date gaat het dossier naar :partner, als er dan niet is betaald en je klant niet heeft gereageerd.": "Automatyczne przekazanie: w dniu :date sprawa trafi do :partner, jeśli do tego czasu nie będzie zapłaty i klient nie odpowie.",
+  "Overdragen doe je zelf, na de termijn.": "Sprawę przekazujesz samodzielnie, po terminie.",
+  "Uitzetten": "Wyłącz",
+  "Automatisch overdragen": "Przekaż automatycznie",
+  "Na de termijn automatisch overdragen aan :partner": "Po terminie przekaż automatycznie do :partner",
+  "Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf over. Dat is drie werkdagen na de termijn, zodat je een betaling van de laatste dag nog kunt boeken. Je krijgt vooraf bericht.": "Jeśli w dniu :date nie będzie zapłaty i klient nie odpowie, sprawa zostanie przekazana automatycznie. To trzy dni robocze po terminie, aby można było jeszcze zaksięgować płatność z ostatniego dnia. Wcześniej dostaniesz wiadomość."
 }

@@ -11,7 +11,8 @@
       ['Wanneer zijn de incassokosten verschuldigd?', 'Na de termijn die in de aanmaning staat. Tot en met de laatste dag betaalt je klant alleen de hoofdsom en de rente. Bij een particulier is de termijn wettelijk minstens veertien dagen, te rekenen vanaf de dag na ontvangst. ' . brand('name') . ' houdt dat minimum aan en noemt het bedrag van de kosten in de aanmaning, zoals de wet vraagt.'],
       ['Wat kan mijn klant antwoorden?', 'Drie dingen: ik heb betaald, ik betaal uiterlijk op een dag die hij kiest, of ik ben het er niet mee eens, met de reden erbij. Je krijgt elk antwoord per mail. Een toegezegde betaaldatum is een erkenning van de schuld en stuit de verjaring.'],
       ['Wat gebeurt er als de termijn voorbij is?', 'Je krijgt een bericht. Op de factuur staat dan de knop Overdragen aan de deurwaarder. Met één klik gaat het dossier naar ' . $partner . ': de factuur, de aanmaning, de berekening van rente en kosten en het logboek met wat je klant heeft gedaan.'],
-      ['Gaat het dossier vanzelf naar de deurwaarder?', 'Nee. Jij beslist. Heeft je klant een betaaldatum toegezegd of bezwaar gemaakt, dan wil je daar eerst zelf naar kijken. Akkoord met de toegezegde dag? Dan zet je de factuur tot en met die dag op pauze.'],
+      ['Gaat het dossier vanzelf naar de deurwaarder?', 'Alleen als je daarvoor kiest. Bij het versturen vink je aan dat het dossier na de termijn automatisch overgaat. Dat gebeurt drie werkdagen na de laatste dag, zodat je een betaling van die dag nog kunt boeken, en je krijgt vooraf bericht. Heeft je klant een betaaldatum toegezegd of bezwaar gemaakt, dan gaat het dossier niet vanzelf over: dan beslis jij.'],
+      ['Kan ik het eerst proberen zonder account?', 'Ja. Met de gratis tool maak je de aanmaning als PDF, met dezelfde berekening. Je verstuurt de brief dan zelf. Wil je hem daarna online versturen, dan neem je hem mee naar een proefaccount.'],
       ['Kan ik de aanmaning ook per post sturen?', 'Ja. De aanmaning is een PDF met een QR-code. Wie de code scant, komt op dezelfde pagina met het bedrag van vandaag.'],
   ];
 @endphp
@@ -34,7 +35,7 @@
     <p class="lead">Een aanmaning met een eigen pagina. Het bedrag loopt elke dag op met de wettelijke rente, je klant reageert met één klik en jij ziet wanneer hij haar heeft geopend. Betaalt hij niet, dan gaat het dossier met één klik naar de deurwaarder.</p>
     <div class="hero-ctas" style="margin-top:28px;">
       <a href="{{ route('register') }}" class="btn btn-primary btn-lg">Probeer 14 dagen gratis →</a>
-      <a href="{{ route('demo') }}" class="btn btn-secondary btn-lg">Bekijk de demo</a>
+      <a href="{{ route('aanmaning-maken') }}" class="btn btn-secondary btn-lg">Maak gratis een aanmaning (PDF)</a>
     </div>
     <div class="hero-trust">Geen betaalgegevens nodig · € 12,10 per maand incl. btw · per maand opzegbaar</div>
   </div>
@@ -92,7 +93,7 @@
       <li><strong>Je klant krijgt de aanmaning</strong>Per mail, uit jouw naam, met de aanmaning en de factuur als PDF en een knop naar de pagina.</li>
       <li><strong>De pagina houdt het bedrag bij</strong>Elke dag komt de rente erbij. Je klant ziet tot wanneer hij zonder incassokosten kan betalen en maakt over met de QR-code van zijn bank of met iDEAL.</li>
       <li><strong>Je klant reageert</strong>Betaald, een betaaldatum of een bezwaar. Je krijgt een mail en ziet het antwoord op de factuur.</li>
-      <li><strong>Termijn voorbij en niet betaald</strong>Je krijgt een bericht en draagt het dossier met één klik over aan de deurwaarder.</li>
+      <li><strong>Termijn voorbij en niet betaald</strong>Je krijgt een bericht en draagt het dossier met één klik over aan de deurwaarder. Heb je automatisch overdragen aangevinkt, dan gaat het drie werkdagen later vanzelf.</li>
     </ol>
   </div>
 </section>

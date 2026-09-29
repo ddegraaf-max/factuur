@@ -8,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $expired ? __('Termijn verstreken') : __('Reactie op je aanmaning') }}</title>
+    <title>{{ $kind === 'transferred' ? __('Het dossier ligt bij de deurwaarder') : ($expired ? __('Termijn verstreken') : __('Reactie op je aanmaning')) }}</title>
     <style>
         body { margin: 0; padding: 0; background: #FAFAF9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1C1917; }
         .wrapper { width: 100%; background: #FAFAF9; padding: 40px 16px; }
@@ -44,9 +44,18 @@
                 <div class="header-sub">{{ __('Factuur :number', ['number' => $invoice->number]) }} · {{ $invoice->customer_name }}</div>
             </div>
             <div class="body">
-                @if($expired)
+                @if($kind === 'transferred')
+                    <h1>{{ __('Het dossier ligt bij de deurwaarder') }}</h1>
+                    <p>{!! __('<strong>:customer</strong> heeft factuur :number niet betaald en niet gereageerd op je aanmaning. Zoals je had ingesteld, is het dossier :reference automatisch overgedragen aan :partner, met de aanmaning, de berekening en het logboek erbij.', ['customer' => e($invoice->customer_name), 'number' => e($invoice->number), 'reference' => e($invoice->incasso_reference), 'partner' => e($partner)]) !!}</p>
+                    <div class="tip">{{ __('Komt er toch nog een betaling bij jou binnen? Geef dat dan door aan de deurwaarder.') }}</div>
+                @elseif($expired)
                     <h1>{{ __('De termijn van je aanmaning is voorbij') }}</h1>
                     <p>{!! __('<strong>:customer</strong> heeft factuur :number niet betaald binnen de termijn, die liep tot en met :date. Je kunt het dossier nu met één klik overdragen aan :partner.', ['customer' => e($invoice->customer_name), 'number' => e($invoice->number), 'date' => e($day($demand->deadline)), 'partner' => e($partner)]) !!}</p>
+                    @if($autoDate)
+                        <div class="reason">{!! __('<strong>Automatische overdracht op :date.</strong> Doe je niets, dan gaat het dossier die dag vanzelf naar :partner. Is er betaald? Boek de betaling dan vóór die dag. Wil je wachten, zet de factuur dan op pauze of zet de automatische overdracht uit.', ['date' => e($autoDate), 'partner' => e($partner)]) !!}</div>
+                    @elseif($autoBlocker)
+                        <div class="tip">{{ $autoBlocker }}</div>
+                    @endif
                 @else
                     <h1>{{ $responseLabel }}</h1>
                     <p>{!! __('<strong>:customer</strong> heeft gereageerd op je aanmaning voor factuur :number.', ['customer' => e($invoice->customer_name), 'number' => e($invoice->number)]) !!}</p>
@@ -74,7 +83,7 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 8px 0 4px;">
                     <tr>
                         <td class="btn-td">
-                            <a href="{{ $url }}" class="btn">{{ $expired ? __('Open de factuur en draag over') : __('Open de factuur in :brand', ['brand' => brand('name')]) }}&nbsp;&nbsp;→</a>
+                            <a href="{{ $url }}" class="btn">{{ $expired && ! $autoDate ? __('Open de factuur en draag over') : __('Open de factuur in :brand', ['brand' => brand('name')]) }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
