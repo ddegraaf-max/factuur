@@ -172,5 +172,20 @@
   "Bedrijven importeren": "Importuj firmy",
   "Of kies een bestand met deze regels (.txt of .csv):": "Albo wybierz plik z tymi wierszami (.txt lub .csv):",
   "Dit bestand is te lang voor één keer. Plak de regels in delen.": "Ten plik jest za długi na jeden raz. Wklej wiersze w częściach.",
-  "Het bestand kon niet worden gelezen.": "Nie udało się odczytać pliku."
+  "Het bestand kon niet worden gelezen.": "Nie udało się odczytać pliku.",
+  "per sms": "SMS-em",
+  "Herinnering per sms sturen naar :name?": "Wysłać przypomnienie SMS-em do :name?",
+  "aangeschreven :date": "powiadomiono :date",
+  "sms niet verstuurd": "SMS nie został wysłany",
+  "sms :date": "SMS :date",
+  "Een sms met de link naar de aanvraag, naar :number": "SMS z linkiem do zapytania, na numer :number",
+  "Sms": "SMS",
+  "Sms: een bedrijf met een mobiel nummer kun je een sms sturen met de link naar de aanvraag. Afzender :sender; deze maand nog :n te versturen.": "SMS: firmie z numerem komórkowym możesz wysłać SMS z linkiem do zapytania. Nadawca :sender; w tym miesiącu pozostało :n.",
+  "Sms staat nog uit: in de omgeving ontbreekt :name.": "SMS-y są jeszcze wyłączone: w środowisku brakuje :name.",
+  "Sms naar :name": "SMS do :name",
+  "Naar :number, met als afzender :sender. De link leidt naar de aanvraag; het bedrijf geeft daar zijn prijs door.": "Na numer :number, nadawca :sender. Link prowadzi do zapytania; firma podaje tam swoją cenę.",
+  ":n tekens, :parts sms": ":n znaków, :parts SMS",
+  "te lang, maak het korter": "za długie, skróć",
+  "de link ontbreekt": "brakuje linku",
+  "Sms versturen": "Wyślij SMS"
 }

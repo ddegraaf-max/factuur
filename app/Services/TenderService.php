@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Mail\TenderMail;
 use App\Models\Company;
 use App\Models\Quote;
+use App\Models\ShortLink;
 use App\Models\Subcontractor;
 use App\Models\TenderRequest;
 use App\Models\TenderRound;
 use App\Models\WorkPackage;
 use App\Support\Audit;
 use App\Support\DocumentLocale;
+use App\Support\PhoneNumber;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -71,6 +73,8 @@ class TenderService
     /** Pakketten met hun bedrijven, voor de kiezer in het uitvraagvenster. */
     public function packagesForPicker(Company $company): array
     {
+        $sms = app(SmsService::class)->available($company);
+
         return WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
             ->with('subcontractors')
             ->orderBy('sort_order')->orderBy('name')
@@ -84,14 +88,24 @@ class TenderService
                     'name' => $s->name,
                     'city' => $s->city,
                     'has_email' => filled($s->email),
+                    // Zonder e-mailadres maar met een mobiel nummer: de aanvraag gaat per sms.
+                    'by_sms' => blank($s->email) && $sms && PhoneNumber::isMobile($s->phone),
                 ])->values()->all(),
             ])->values()->all();
     }
 
+    /** Is dit bedrijf aan te schrijven: per mail, of anders per sms naar een mobiel nummer? */
+    public function reachable(Subcontractor $subcontractor, Company $company): bool
+    {
+        return filled($subcontractor->email)
+            || (PhoneNumber::isMobile($subcontractor->phone) && app(SmsService::class)->available($company));
+    }
+
     /**
-     * Opent een ronde: één aanvraag per gekozen bedrijf (alleen bedrijven mét
-     * e-mailadres), elk met eigen tokenlink, en meteen de aanvraagmail — met
-     * de bijlagen (tekening, bestek) erbij.
+     * Opent een ronde: één aanvraag per gekozen bedrijf, elk met eigen
+     * tokenlink, en meteen de aanvraagmail — met de bijlagen (tekening, bestek)
+     * erbij. Een bedrijf zonder e-mailadres maar met een mobiel nummer krijgt
+     * de aanvraag per sms, als sms voor deze administratie aanstaat.
      *
      * @param  array<int, UploadedFile>  $files
      */
@@ -101,12 +115,15 @@ class TenderService
             ->findOrFail($data['work_package_id']);
         $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $company->id)
             ->whereIn('id', $data['subcontractor_ids'] ?? [])
-            ->whereNotNull('email')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->filter(fn (Subcontractor $s) => $this->reachable($s, $company))
+            ->values();
 
         if ($subcontractors->isEmpty()) {
-            throw new \DomainException(__('Kies minstens één bedrijf met een e-mailadres.'));
+            throw new \DomainException(app(SmsService::class)->available($company)
+                ? __('Kies minstens één bedrijf met een e-mailadres of een mobiel nummer.')
+                : __('Kies minstens één bedrijf met een e-mailadres.'));
         }
 
         $round = DB::transaction(function () use ($company, $quote, $package, $subcontractors, $data, $files) {
@@ -138,7 +155,7 @@ class TenderService
         });
 
         foreach ($round->requests()->with(['round', 'subcontractor'])->get() as $request) {
-            if ($this->mail($request, 'request')) {
+            if ($this->notify($request, 'request')) {
                 $request->forceFill(['sent_at' => now()])->save();
             }
         }
@@ -199,12 +216,72 @@ class TenderService
         if ($request->status !== 'sent' || ! $request->round?->isOpen()) {
             return false;
         }
-        if (! $this->mail($request, 'reminder')) {
+        if (! $this->notify($request, 'reminder')) {
             return false;
         }
         $request->forceFill(['reminded_at' => now()])->save();
 
         return true;
+    }
+
+    /**
+     * Stuurt het bedrijf een sms met de link naar de aanvraag: als eerste
+     * bericht, of als herinnering na de mail. De tekst mag de ondernemer
+     * aanpassen; de link moet erin blijven staan.
+     */
+    public function sms(TenderRequest $request, ?string $text = null, ?int $userId = null): void
+    {
+        $round = $request->round;
+        if ($request->status !== 'sent' || ! $round?->isOpen()) {
+            throw new \DomainException(__('Een sms kan alleen zolang de uitvraag open is en het bedrijf nog niet heeft gereageerd.'));
+        }
+
+        $link = $this->shortUrl($request);
+        $text = filled($text) ? trim($text) : $this->smsText($request);
+        if (! str_contains($text, $link)) {
+            throw new \DomainException(__('Laat de link in het bericht staan: zonder link kan het bedrijf niet reageren.'));
+        }
+
+        app(SmsService::class)->send($round->company, $request->subcontractor?->phone, $text, $request, $userId);
+        $request->forceFill(['sms_at' => now(), 'sent_at' => $request->sent_at ?? now()])->save();
+
+        Audit::log('updated', $round, __(':label: sms naar :name', [
+            'label' => Audit::label($round), 'name' => $request->subcontractor?->name,
+        ]), [], $round->company_id);
+    }
+
+    /** De tekst die klaarstaat voor de sms, in de taal waarin de mail uitgaat. */
+    public function smsText(TenderRequest $request, ?string $kind = null): string
+    {
+        $round = $request->round;
+        $company = $round->company;
+        $kind ??= $request->sent_at ? 'reminder' : 'request';
+        $vars = [
+            'company' => $company->name,
+            'title' => $round->title,
+            'place' => filled($round->location) ? ' (' . $round->location . ')' : '',
+            'link' => $this->shortUrl($request),
+        ];
+
+        return DocumentLocale::using(DocumentLocale::default(), function () use ($kind, $vars, $company) {
+            $text = match ($kind) {
+                'reminder' => __('Herinnering van :company: wij ontvangen graag uw prijs voor :title:place. Reageren: :link', $vars),
+                'award' => __(':company gunt u de opdracht voor :title:place. Wij nemen contact met u op over de planning.', $vars),
+                'reject' => __('Bedankt voor uw prijsopgave voor :title. :company heeft voor dit project een andere partij gekozen.', $vars),
+                default => __(':company vraagt u om een prijs voor :title:place. Bekijk de aanvraag en reageer: :link', $vars),
+            };
+            if (filled($company->phone) && in_array($kind, ['request', 'reminder'], true)) {
+                $text .= ' ' . __('Vragen? Bel :phone', ['phone' => $company->phone]);
+            }
+
+            return $text;
+        });
+    }
+
+    /** Het korte adres van de reactiepagina, voor in een sms. */
+    public function shortUrl(TenderRequest $request): string
+    {
+        return ShortLink::for($request->responseUrl(), $request->round?->company_id)->shortUrl();
     }
 
     /** Het bedrijf geeft prijs en beschikbaarheid door (mag bijwerken zolang de ronde open is). */
@@ -292,7 +369,7 @@ class TenderService
 
         // Nog niet opslaan: de mail leest het bericht van de aanvraag.
         $request->reject_message = filled($message) ? trim($message) : $this->defaultRejection();
-        if (! $this->mail($request, 'reject')) {
+        if (! $this->notify($request, 'reject')) {
             throw new \DomainException(__('De afwijzing kon niet worden gemaild. Er is niets gewijzigd; probeer het later opnieuw.'));
         }
 
@@ -325,7 +402,8 @@ class TenderService
 
     /**
      * Schrijft extra bedrijven aan in een lopende ronde: zelfde aanvraag,
-     * zelfde bijlagen. Wie al meedoet of geen e-mailadres heeft, slaat het over.
+     * zelfde bijlagen. Wie al meedoet of niet te bereiken is (geen
+     * e-mailadres en geen mobiel nummer voor een sms), slaat het over.
      */
     public function invite(TenderRound $round, array $subcontractorIds): int
     {
@@ -336,9 +414,10 @@ class TenderService
         $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $round->company_id)
             ->whereIn('id', $subcontractorIds)
             ->whereNotIn('id', $round->requests()->pluck('subcontractor_id'))
-            ->whereNotNull('email')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->filter(fn (Subcontractor $s) => $this->reachable($s, $round->company))
+            ->values();
 
         if ($subcontractors->isEmpty()) {
             throw new \DomainException(__('Kies minstens één bedrijf met een e-mailadres dat nog niet is aangeschreven.'));
@@ -351,7 +430,7 @@ class TenderService
                 'status' => 'sent',
             ]);
             $request->setRelation('round', $round)->setRelation('subcontractor', $subcontractor);
-            if ($this->mail($request, 'request')) {
+            if ($this->notify($request, 'request')) {
                 $request->forceFill(['sent_at' => now()])->save();
             }
         }
@@ -383,9 +462,9 @@ class TenderService
             $round->forceFill(['status' => 'awarded', 'awarded_request_id' => $winner->id, 'awarded_at' => now()])->save();
         });
 
-        $this->mail($winner->fresh(['round', 'subcontractor']), 'award');
+        $this->notify($winner->fresh(['round', 'subcontractor']), 'award');
         foreach (TenderRequest::whereIn('id', $losers)->with(['round', 'subcontractor'])->get() as $request) {
-            $this->mail($request, 'reject');
+            $this->notify($request, 'reject');
         }
 
         Audit::log('awarded', $round, __(':label gegund aan :name', [
@@ -435,6 +514,33 @@ class TenderService
             'avg_response_hours' => $hours !== null ? (int) round($hours) : null,
             'price_index' => $index !== null ? (int) round($index) : null,
         ];
+    }
+
+    /**
+     * Bericht naar het bedrijf: per mail, en zonder e-mailadres per sms naar
+     * het mobiele nummer. Een mislukt bericht breekt de ronde niet.
+     */
+    protected function notify(TenderRequest $request, string $kind): bool
+    {
+        if (filled($request->subcontractor?->email)) {
+            return $this->mail($request, $kind);
+        }
+
+        $company = $request->round?->company;
+        if (! $company || ! $request->subcontractor || ! $this->reachable($request->subcontractor, $company)) {
+            return false;
+        }
+
+        try {
+            app(SmsService::class)->send($company, $request->subcontractor->phone, $this->smsText($request, $kind), $request);
+            $request->forceFill(['sms_at' => now()])->save();
+
+            return true;
+        } catch (\DomainException $e) {
+            Log::warning('Uitvraag-sms niet verstuurd', ['request' => $request->id, 'kind' => $kind, 'reason' => $e->getMessage()]);
+
+            return false;
+        }
     }
 
     /** Mail naar het bedrijf, in de taal van de markt; een mislukte mail breekt de ronde niet. */

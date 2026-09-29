@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Quote;
 use App\Models\TenderRequest;
 use App\Models\TenderRound;
+use App\Services\SmsService;
 use App\Services\TenderService;
 use App\Support\IsoWeek;
+use App\Support\OwnerAccess;
+use App\Support\PhoneNumber;
 use App\Support\StorageUsage;
 use App\Support\TenderText;
 use Illuminate\Http\RedirectResponse;
@@ -25,7 +28,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class TenderController extends Controller
 {
-    public function __construct(private TenderService $service) {}
+    public function __construct(private TenderService $service, private SmsService $sms) {}
 
     public function index(Request $request): Response
     {
@@ -64,13 +67,26 @@ class TenderController extends Controller
             ? $round->workPackage->subcontractors()->get()->reject(fn ($s) => $invited->contains($s->id))
             : collect();
 
+        $company = auth()->user()->company;
+        $smsOn = $this->sms->available($company);
+
         return Inertia::render('Tenders/Show', [
             'candidates' => $candidates->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
                 'city' => $s->city,
                 'has_email' => filled($s->email),
+                'by_sms' => blank($s->email) && $smsOn && PhoneNumber::isMobile($s->phone),
             ])->values(),
+            // Sms naar een mobiel nummer, met een korte link naar de aanvraag.
+            'sms' => [
+                'available' => $smsOn,
+                'sender' => $smsOn ? $this->sms->sender($company) : null,
+                'remaining' => $smsOn ? $this->sms->remaining($company) : 0,
+                'max_segments' => SmsService::MAX_SEGMENTS,
+                // Alleen de eigenaar van het platform ziet wat er nog ontbreekt.
+                'missing' => ! $smsOn && OwnerAccess::allows(auth()->user()) ? $this->sms->missing() : null,
+            ],
             // Staat klaar in het venster 'Afwijzen'; de ondernemer past het aan.
             'rejectDefault' => $this->service->defaultRejection(),
             'round' => $this->summary($round) + [
@@ -108,10 +124,32 @@ class TenderController extends Controller
                 'sent_at_label' => $r->sent_at?->translatedFormat('j M, H:i'),
                 'opened_at_label' => $r->opened_at?->translatedFormat('j M, H:i'),
                 'reminded_at_label' => $r->reminded_at?->translatedFormat('j M, H:i'),
+                'sms_at_label' => $r->sms_at?->translatedFormat('j M, H:i'),
                 'responded_at_label' => $r->responded_at?->translatedFormat('j M, H:i'),
                 'response_url' => $r->responseUrl(),
+                // Een sms kan naar een mobiel nummer, zolang het bedrijf nog niet heeft gereageerd.
+                'mobile' => ($mobile = PhoneNumber::mobile($r->subcontractor?->phone)) ? PhoneNumber::display($mobile) : null,
+                'sms_text' => $smsOn && $mobile && $r->status === 'sent' && $round->isOpen() ? $this->service->smsText($r) : null,
+                'sms_link' => $smsOn && $mobile && $r->status === 'sent' && $round->isOpen() ? $this->service->shortUrl($r) : null,
             ])->values(),
         ]);
+    }
+
+    /** Sms met de link naar de aanvraag, als eerste bericht of als herinnering. */
+    public function sms(Request $request, TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+        $data = $request->validate(['text' => ['nullable', 'string', 'max:500']], [
+            'text.max' => __('Het bericht is te lang voor een sms. Maak het korter.'),
+        ]);
+
+        try {
+            $this->service->sms($tenderRequest, $data['text'] ?? null, auth()->id());
+        } catch (\DomainException $e) {
+            return back()->withErrors(['sms' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Sms verstuurd naar :name.', ['name' => $tenderRequest->subcontractor?->name]));
     }
 
     /** Vanuit een (geaccepteerde) offerte: de ronde hoort bij dat project. */
@@ -183,7 +221,7 @@ class TenderController extends Controller
         $sent = $this->service->remind($tenderRequest);
 
         return back()->with('flash', $sent
-            ? __('Herinnering gemaild naar :name.', ['name' => $tenderRequest->subcontractor?->name])
+            ? __('Herinnering verstuurd naar :name.', ['name' => $tenderRequest->subcontractor?->name])
             : __('Geen herinnering verstuurd: dit bedrijf heeft al gereageerd of de uitvraag is gesloten.'));
     }
 

@@ -31,6 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.69.0</div>
+        <h2>Uitvragen: een prijsaanvraag per sms (proef)</h2>
+        <ul class="tl-list">
+          <li><b>Voor bedrijven zonder e-mailadres</b> — veel kleine vakmensen hebben alleen een mobiel nummer. Zij krijgen de aanvraag per sms, met een korte link naar de pagina waar ze hun prijs doorgeven.</li>
+          <li><b>Een sms achter je mail aan</b> — in de vergelijking stuur je met de knop Sms een bericht naar wie nog niet reageerde. De tekst staat klaar en pas je aan.</li>
+          <li><b>Een kort adres van onszelf</b> — de link in de sms loopt via ons eigen adres, niet via een dienst van een ander.</li>
+          <li><b>Eerst een proef</b> — sms staat nog niet voor iedereen aan. Wil je het gebruiken, <a href="{{ route('contact') }}">laat het ons weten</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.68.0</div>
         <h2>Uitvragen: een prijsaanvraag die niet op reclame lijkt</h2>
         <ul class="tl-list">

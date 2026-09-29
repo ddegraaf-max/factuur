@@ -104,4 +104,16 @@ return [
         // Weergaveprijs per rekening per maand (excl. btw); het echte bedrag zit in de Stripe-price.
         'account_price' => (float) env('PONTO_ACCOUNT_PRICE', 5),
     ],
+    // Sms via Smstools (api.smsgatewayapi.com). Zonder beide sleutels bestaat de functie niet.
+    // De korte namen (client_id, client_secret) lezen we ook, voor wie ze zo in Railway heeft gezet.
+    // SMSTOOLS_COMPANIES: ids van administraties die mogen sms'en, of * voor iedereen;
+    // leeg = alleen de administraties van de eigenaar van het platform.
+    'smstools' => [
+        'client_id' => env('SMSTOOLS_CLIENT_ID', env('CLIENT_ID', env('client_id'))),
+        'client_secret' => env('SMSTOOLS_CLIENT_SECRET', env('CLIENT_SECRET', env('client_secret'))),
+        'sender' => env('SMSTOOLS_SENDER'),
+        'url' => env('SMSTOOLS_URL', 'https://api.smsgatewayapi.com/v1'),
+        'companies' => env('SMSTOOLS_COMPANIES', ''),
+        'monthly_limit' => (int) env('SMSTOOLS_MONTHLY_LIMIT', 300),
+    ],
 ];

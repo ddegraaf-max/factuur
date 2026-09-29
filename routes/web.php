@@ -431,6 +431,9 @@ Route::get('bedrijfslogo/{company}/{hash}', [\App\Http\Controllers\CompanyLogoCo
     ->whereNumber('company')->where('hash', '[a-f0-9]{16}')
     ->middleware('throttle:120,1')->name('company.logo');
 
+// Kort adres voor in een sms: leidt door naar het lange adres met de sleutel.
+Route::get('u/{code}', \App\Http\Controllers\ShortLinkController::class)->name('short');
+
 Route::get('uitvraag/{token}', [TenderResponseController::class, 'show'])->name('tender.respond.show');
 Route::post('uitvraag/{token}', [TenderResponseController::class, 'respond'])
     ->middleware('throttle:20,1')->name('tender.respond');
@@ -675,6 +678,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('uitvragen/{round}', [TenderController::class, 'show'])->name('tenders.show');
     Route::post('uitvragen/{round}/gunnen/{tenderRequest}', [TenderController::class, 'award'])->name('tenders.award');
     Route::post('uitvragen/{round}/herinneren/{tenderRequest}', [TenderController::class, 'remind'])->name('tenders.remind');
+    Route::post('uitvragen/{round}/sms/{tenderRequest}', [TenderController::class, 'sms'])->name('tenders.sms');
     Route::post('uitvragen/{round}/sluiten', [TenderController::class, 'close'])->name('tenders.close');
     Route::post('uitvragen/{round}/bedrijven', [TenderController::class, 'invite'])->name('tenders.requests.store');
     Route::post('uitvragen/{round}/afzeggen/{tenderRequest}', [TenderController::class, 'declineRequest'])->name('tenders.requests.decline');

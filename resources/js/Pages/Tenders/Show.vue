@@ -10,10 +10,12 @@ const props = defineProps({
   requests: Array,
   candidates: { type: Array, default: () => [] },
   rejectDefault: { type: String, default: '' },
+  sms: { type: Object, default: () => ({ available: false }) },
 });
 
 const page = usePage();
 const pageError = computed(() => (page.props.errors || {}).tender ?? null);
+const smsError = computed(() => (page.props.errors || {}).sms ?? null);
 
 const pillClass = { open: 'pill-sent', awarded: 'pill-paid', closed: 'pill-cancelled' };
 const pillLabel = { open: 'Open', awarded: 'Gegund', closed: 'Gesloten' };
@@ -34,10 +36,24 @@ const award = (r) => {
 };
 // Een herinnering is een mail: altijd eerst vragen, zodat een misklik niets verstuurt.
 const remind = (r) => {
-  if (confirm(t('Herinnering mailen naar :name?', { name: r.name }))) {
+  const question = r.email ? t('Herinnering mailen naar :name?', { name: r.name }) : t('Herinnering per sms sturen naar :name?', { name: r.name });
+  if (confirm(question)) {
     router.post(route('tenders.remind', [props.round.id, r.id]), {}, { preserveScroll: true });
   }
 };
+
+/* ---------- Sms met de link naar de aanvraag ---------- */
+const texting = ref(null);
+const smsForm = useForm({ text: '' });
+const openSms = (r) => { smsForm.clearErrors(); smsForm.text = r.sms_text || ''; texting.value = r; };
+const sendSms = () => smsForm.post(route('tenders.sms', [props.round.id, texting.value.id]), {
+  preserveScroll: true,
+  onSuccess: () => { texting.value = null; },
+});
+// Boven 160 tekens gaat het bericht in delen van 153; een paar tekens tellen dubbel.
+const smsLength = computed(() => [...smsForm.text].reduce((n, c) => n + ('^{}\\[~]|€'.includes(c) ? 2 : 1), 0));
+const smsParts = computed(() => (smsLength.value <= 160 ? 1 : Math.ceil(smsLength.value / 153)));
+const smsHasLink = computed(() => !texting.value?.sms_link || smsForm.text.includes(texting.value.sms_link));
 
 /* ---------- Offerte afwijzen met een bericht ---------- */
 const rejecting = ref(null);
@@ -168,7 +184,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
             <td class="cell-primary">
               {{ r.name }}
               <div class="sub">{{ [r.contact_name, r.city].filter(Boolean).join(' · ') }}</div>
-              <div class="sub">{{ r.email }}<template v-if="r.phone"> · {{ r.phone }}</template></div>
+              <div class="sub">{{ [r.email, r.phone].filter(Boolean).join(' · ') }}</div>
             </td>
             <td>
               <span :class="['pill', reqClass[r.status]]">{{ $t(reqLabel[r.status]) }}</span>
@@ -176,9 +192,12 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
                 <template v-if="r.status === 'rejected' && r.rejected_at_label">{{ $t('afgewezen :date', { date: r.rejected_at_label }) }}</template>
                 <template v-else-if="r.responded_at_label">{{ $t('gereageerd :date', { date: r.responded_at_label }) }}</template>
                 <template v-else-if="r.opened_at_label">{{ $t('geopend :date', { date: r.opened_at_label }) }}</template>
-                <template v-else-if="r.sent_at_label">{{ $t('gemaild :date', { date: r.sent_at_label }) }}</template>
-                <template v-else>{{ $t('mail niet verstuurd') }}</template>
+                <template v-else-if="r.sent_at_label && r.email">{{ $t('gemaild :date', { date: r.sent_at_label }) }}</template>
+                <template v-else-if="r.sent_at_label">{{ $t('aangeschreven :date', { date: r.sent_at_label }) }}</template>
+                <template v-else-if="r.email">{{ $t('mail niet verstuurd') }}</template>
+                <template v-else>{{ $t('sms niet verstuurd') }}</template>
                 <template v-if="r.reminded_at_label"> · {{ $t('herinnerd :date', { date: r.reminded_at_label }) }}</template>
+                <template v-if="r.sms_at_label"> · {{ $t('sms :date', { date: r.sms_at_label }) }}</template>
               </div>
             </td>
             <td class="right num">{{ r.price !== null ? eur(r.price) : '—' }}</td>
@@ -197,6 +216,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
               <button v-if="round.status === 'open' && r.status === 'responded'" class="btn btn-primary btn-sm" @click="award(r)">{{ $t('Gunnen') }}</button>
               <button v-if="round.status === 'open' && r.status === 'responded'" class="btn btn-secondary btn-sm" :title="$t('De offerte afwijzen en het bedrijf een vriendelijk bericht mailen. De uitvraag blijft open.')" @click="openReject(r)">{{ $t('Afwijzen') }}</button>
               <button v-if="round.status === 'open' && r.status === 'sent'" class="btn btn-secondary btn-sm" @click="remind(r)">{{ $t('Herinneren') }}</button>
+              <button v-if="sms.available && r.sms_text" class="btn btn-secondary btn-sm" :title="$t('Een sms met de link naar de aanvraag, naar :number', { number: r.mobile })" @click="openSms(r)">{{ $t('Sms') }}</button>
               <button v-if="round.status === 'open' && ['sent', 'responded'].includes(r.status)" class="btn btn-ghost btn-sm" :title="$t('Het bedrijf heeft afgezegd, bijvoorbeeld per telefoon of mail. Er gaat geen bericht uit.')" @click="markDeclined(r)">{{ $t('Afgezegd') }}</button>
               <button v-if="round.status === 'open' && r.status !== 'awarded'" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" :title="$t('Bedrijf uit deze uitvraag halen. Er gaat geen bericht uit.')" @click="removeRequest(r)">{{ $t('Verwijder') }}</button>
               <button class="btn btn-ghost btn-sm" :title="$t('Link naar het reactieformulier kopiëren (voor als je zelf belt)')" @click="copy(r.response_url)">🔗</button>
@@ -204,6 +224,12 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
           </tr>
         </tbody>
       </table>
+      <div v-if="sms.available" class="card-body att-note" style="margin-top:0;">
+        {{ $t('Sms: een bedrijf met een mobiel nummer kun je een sms sturen met de link naar de aanvraag. Afzender :sender; deze maand nog :n te versturen.', { sender: sms.sender, n: sms.remaining }) }}
+      </div>
+      <div v-else-if="sms.missing" class="card-body att-note" style="margin-top:0;">
+        {{ $t('Sms staat nog uit: in de omgeving ontbreekt :name.', { name: sms.missing }) }}
+      </div>
     </div>
 
     <div class="card" style="margin-top:16px;">
@@ -270,6 +296,38 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
       </div>
     </div>
 
+    <!-- Sms met de link naar de aanvraag -->
+    <div v-if="texting" class="modal-overlay" @click.self="texting = null">
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Sms naar :name', { name: texting.name }) }}</div>
+          <button class="btn btn-ghost btn-sm" @click="texting = null">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin:0 0 14px;line-height:1.6;">
+            {{ $t('Naar :number, met als afzender :sender. De link leidt naar de aanvraag; het bedrijf geeft daar zijn prijs door.', { number: texting.mobile, sender: sms.sender }) }}
+          </p>
+          <div v-if="smsError" class="field-error" style="margin-bottom:12px;">{{ smsError }}</div>
+          <div class="form-group">
+            <label>{{ $t('Bericht') }}</label>
+            <textarea v-model="smsForm.text" rows="5" maxlength="500"></textarea>
+            <div v-if="smsForm.errors.text" class="field-error">{{ smsForm.errors.text }}</div>
+            <div class="sub" style="margin-top:6px;">
+              {{ $t(':n tekens, :parts sms', { n: smsLength, parts: smsParts }) }}
+              <template v-if="smsParts > sms.max_segments"> · <span class="bad">{{ $t('te lang, maak het korter') }}</span></template>
+              <template v-if="!smsHasLink"> · <span class="bad">{{ $t('de link ontbreekt') }}</span></template>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="texting = null">{{ $t('Annuleren') }}</button>
+          <button class="btn btn-primary btn-sm" :disabled="smsForm.processing || !smsForm.text.trim() || !smsHasLink || smsParts > sms.max_segments" @click="sendSms">
+            {{ smsForm.processing ? $t('Bezig met versturen…') : $t('Sms versturen') }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Extra bedrijven aanschrijven -->
     <div v-if="showInvite" class="modal-overlay" @click.self="showInvite = false">
       <div class="modal" style="max-width:640px;">
@@ -283,10 +341,10 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
           </p>
           <div v-if="pageError" class="field-error" style="margin-bottom:12px;">{{ pageError }}</div>
           <div class="inv-list">
-            <label v-for="c in candidates" :key="c.id" class="inv-item" :class="{ off: !c.has_email }">
-              <input type="checkbox" :checked="inviteForm.subcontractor_ids.includes(c.id)" :disabled="!c.has_email" @change="toggleInvite(c.id)">
+            <label v-for="c in candidates" :key="c.id" class="inv-item" :class="{ off: !c.has_email && !c.by_sms }">
+              <input type="checkbox" :checked="inviteForm.subcontractor_ids.includes(c.id)" :disabled="!c.has_email && !c.by_sms" @change="toggleInvite(c.id)">
               <span class="inv-name">{{ c.name }}</span>
-              <span class="sub">{{ c.city || '' }}<template v-if="!c.has_email"> · {{ $t('geen e-mailadres') }}</template></span>
+              <span class="sub">{{ c.city || '' }}<template v-if="c.by_sms"> · {{ $t('per sms') }}</template><template v-else-if="!c.has_email"> · {{ $t('geen e-mailadres') }}</template></span>
             </label>
           </div>
           <div v-if="inviteForm.errors.subcontractor_ids" class="field-error">{{ inviteForm.errors.subcontractor_ids }}</div>

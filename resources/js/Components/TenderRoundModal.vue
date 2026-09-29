@@ -66,14 +66,15 @@ const fileErrors = computed(() => Object.entries(form.errors)
 
 const selectedPackage = computed(() => props.packages.find(p => p.id === Number(form.work_package_id)) || null);
 const candidates = computed(() => selectedPackage.value?.subcontractors || []);
-const mailable = computed(() => candidates.value.filter(c => c.has_email));
+// Aan te schrijven: per mail, of zonder e-mailadres per sms naar een mobiel nummer.
+const mailable = computed(() => candidates.value.filter(c => c.has_email || c.by_sms));
 
 const prefill = () => {
   const pkg = selectedPackage.value;
   if (!pkg) return;
   form.title = pkg.name;
-  // Standaard: de eerste vijf bedrijven mét e-mailadres.
-  form.subcontractor_ids = mailable.value.slice(0, 5).map(c => c.id);
+  // Standaard: de eerste vijf bedrijven mét e-mailadres; een sms kost geld en kies je zelf.
+  form.subcontractor_ids = mailable.value.filter(c => c.has_email).slice(0, 5).map(c => c.id);
   const lines = [];
   if (location.value) lines.push(t('Project in :location.', { location: location.value }));
   lines.push(t('Onderdeel: :package', { package: pkg.name }));
@@ -150,10 +151,10 @@ const submit = () => {
             {{ $t('Nog geen bedrijven gekoppeld aan dit werkpakket. Voeg ze toe bij Inkoop → Onderaannemers.') }}
           </div>
           <div v-else class="tm-list">
-            <label v-for="c in candidates" :key="c.id" class="tm-item" :class="{ off: !c.has_email }">
-              <input type="checkbox" :checked="form.subcontractor_ids.includes(c.id)" :disabled="!c.has_email" @change="toggle(c.id)">
+            <label v-for="c in candidates" :key="c.id" class="tm-item" :class="{ off: !c.has_email && !c.by_sms }">
+              <input type="checkbox" :checked="form.subcontractor_ids.includes(c.id)" :disabled="!c.has_email && !c.by_sms" @change="toggle(c.id)">
               <span class="tm-name">{{ c.name }}</span>
-              <span class="tm-meta">{{ c.city || '' }}<template v-if="!c.has_email"> · {{ $t('geen e-mailadres') }}</template></span>
+              <span class="tm-meta">{{ c.city || '' }}<template v-if="c.by_sms"> · {{ $t('per sms') }}</template><template v-else-if="!c.has_email"> · {{ $t('geen e-mailadres') }}</template></span>
             </label>
           </div>
           <div v-if="form.errors.subcontractor_ids" class="field-error">{{ form.errors.subcontractor_ids }}</div>
