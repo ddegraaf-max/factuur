@@ -32,40 +32,18 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.67.0</div>
-        <h2>Online aanmaning zonder account</h2>
+        <h2>Online aanmaning: de laatste stap vóór de deurwaarder</h2>
         <ul class="tl-list">
           <li><b>Gratis, zonder account</b> — op de <a href="{{ route('aanmaning') }}">website</a> vul je de factuur en je klant in. Je krijgt een aanmaning met een eigen pagina, waarop het bedrag elke dag oploopt en je klant met één klik reageert.</li>
           <li><b>Eerst je e-mailadres bevestigen</b> — je krijgt een mail met een knop. Pas na je bevestiging staat de pagina online en gaat de aanmaning naar je klant. Zo kan niemand uit jouw naam een aanmaning versturen.</li>
-          <li><b>Je eigen overzicht</b> — via een link die alleen jij hebt, zie je wanneer je klant de aanmaning opende en wat hij antwoordde. Je eigen bezoeken en de scanners van mailprogramma's tellen niet als geopend.</li>
-          <li><b>Kopie van de factuur</b> — stuur de factuur mee als PDF of foto. Je klant krijgt haar als bijlage en via de pagina.</li>
-          <li><b>Eén reactie per aanmaning</b> — de eerste reactie van je klant telt en blijft staan, met tijdstip en IP-adres. Dat geldt ook voor aanmaningen vanuit je administratie.</li>
-          <li><b>Naar de deurwaarder</b> — is de termijn voorbij en is er niet betaald, dan draag je het dossier vanuit je overzicht met één klik over.</li>
-          <li><b>Voorbeeld</b> — bekijk vooraf <a href="{{ route('aanmaning.example') }}">precies wat we versturen</a>: de pagina en alle mails.</li>
-        </ul>
-      </article>
-
-      <article class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.66.0</div>
-        <h2>Gratis aanmaning maken, en automatisch naar de deurwaarder</h2>
-        <ul class="tl-list">
-          <li><b>Gratis aanmaning maken</b> — een gratis tool om zonder account een laatste aanmaning als PDF te maken, met de wettelijke rente, de incassokosten en de termijn die de wet vraagt. In 1.67.0 is deze tool opgegaan in de <a href="{{ route('aanmaning') }}">online aanmaning zonder account</a>.</li>
-          <li><b>Automatisch overdragen</b> — vink bij het versturen aan dat het dossier na de termijn vanzelf naar de deurwaarder gaat. Dat gebeurt drie werkdagen na de laatste dag, en je krijgt vooraf bericht.</li>
-          <li><b>Niet bij een reactie</b> — heeft je klant een betaaldatum toegezegd of bezwaar gemaakt, of staat de factuur op pauze, dan gaat het dossier niet vanzelf over. Dan beslis jij.</li>
-        </ul>
-      </article>
-
-      <article class="tl-item">
-        <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.65.0</div>
-        <h2>Online aanmaning: de laatste stap vóór de deurwaarder</h2>
-        <ul class="tl-list">
-          <li><b>Laatste aanmaning</b> — vanaf een factuur waarvan de betaaltermijn voorbij is. Je klant krijgt een mail met de aanmaning en de factuur als PDF, en een link naar een eigen pagina. <a href="{{ route('aanmaning') }}">Zo werkt het</a>.</li>
-          <li><b>Het bedrag van vandaag</b> — op die pagina staat de hoofdsom met de wettelijke rente tot en met vandaag. Elke dag komt er rente bij.</li>
-          <li><b>Reageren met één klik</b> — ik heb betaald, ik betaal uiterlijk op, of ik ben het er niet mee eens. Je krijgt elk antwoord per mail en ziet wanneer je klant de aanmaning heeft geopend.</li>
+          <li><b>Vanuit je administratie</b> — bij een factuur waarvan de betaaltermijn voorbij is, verstuur je de laatste aanmaning met één knop. Je klant krijgt de aanmaning en de factuur als PDF. Zolang de aanmaning loopt, gaan er voor die factuur geen gewone herinneringen meer uit. <a href="{{ route('help.article', 'online-aanmaning') }}">Zo werkt het</a>.</li>
+          <li><b>Reageren met één klik</b> — ik heb betaald, ik betaal uiterlijk op, of ik ben het er niet mee eens. De eerste reactie telt en blijft staan, met tijdstip en IP-adres. Je krijgt het antwoord per mail.</li>
+          <li><b>Je eigen overzicht</b> — je ziet wanneer je klant de aanmaning opende en wat hij antwoordde. Je eigen bezoeken en de scanners van mailprogramma's tellen niet als geopend.</li>
+          <li><b>Kopie van de factuur</b> — zonder account stuur je de factuur mee als PDF of foto. Je klant krijgt haar als bijlage en via de pagina.</li>
           <li><b>De termijn die de wet vraagt</b> — voor een particulier minstens veertien dagen, met het bedrag van de incassokosten erbij. Tot en met de laatste dag betaalt je klant zonder incassokosten.</li>
           <li><b>Met één klik naar de deurwaarder</b> — is de termijn voorbij en is er niet betaald, dan draag je het dossier over. De aanmaning, de berekening en het logboek gaan mee.</li>
-          <li><b>Geen herinnering erachteraan</b> — zolang de aanmaning loopt, gaan er voor die factuur geen gewone herinneringen meer uit.</li>
+          <li><b>Automatisch overdragen</b> — vanuit je administratie kan het dossier ook vanzelf naar de deurwaarder: drie werkdagen na de laatste dag, en je krijgt vooraf bericht. Heeft je klant gereageerd of staat de factuur op pauze, dan beslis jij.</li>
+          <li><b>Voorbeeld</b> — bekijk vooraf <a href="{{ route('aanmaning.example') }}">precies wat we versturen</a>: de pagina en alle mails.</li>
         </ul>
       </article>
 
