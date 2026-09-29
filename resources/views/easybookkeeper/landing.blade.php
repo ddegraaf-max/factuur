@@ -89,7 +89,10 @@
 
       <div class="feature-card">
         <div class="feature-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          {{-- Een euro, geen dollar: de boog met de twee dwarsstrepen. Hier
+               stond het dollarteken uit de icoonset, en dat leest een
+               Nederlandse bezoeker meteen als het verkeerde land. --}}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16.5 6.5a6.5 6.5 0 1 0 0 11"/><path d="M4.5 10.5H13"/><path d="M4.5 13.5H13"/></svg>
         </div>
         <div class="feature-title">Btw-aangifte per kwartaal</div>
         <div class="feature-desc">
