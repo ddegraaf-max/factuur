@@ -235,7 +235,9 @@ return [
             // genoeg van het rood van EasyInvoice en het blauw van Lopra.
             'color' => '#146B4F',
             'color_dark' => '#0E4D39',
-            'accent' => '#C87A2C',      // koper, alleen voor de belangrijkste knop
+            // Koper als tweede kleur, maar niet op de knoppen: op dit groen
+            // wordt het modderig. De primaire actie is groen (theme.css).
+            'accent' => '#C87A2C',
             'background' => '#F7F6F3',
             'fonts_url' => null,
             'theme_css' => '/brand/easybookkeeper/theme.css',

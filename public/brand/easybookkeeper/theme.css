@@ -2,8 +2,9 @@
  * Wordt alleen geladen als APP_BRAND=easybookkeeper (zie config/brand.php);
  * html[data-brand] wint van :root, dus de volgorde van laden maakt niet uit.
  *
- * Groen #146B4F · Diepgroen #0E4D39 · Koper #C87A2C (spaarzaam, alleen de
- * belangrijkste actie) · Papier #F7F6F3 · Inkt #23211E · Gedempt #86827C
+ * Groen #146B4F · Diepgroen #0E4D39 · Koper #C87A2C (staat klaar voor kleine
+ * markeringen, maar nergens op een knop) · Papier #F7F6F3 · Inkt #23211E ·
+ * Gedempt #86827C
  *
  * Waarom groen: het is de kleur die mensen met boekhouden verbinden, en het
  * staat ver genoeg van het rood van EasyInvoice en het blauw van Lopra dat je
@@ -38,20 +39,29 @@ html[data-brand="easybookkeeper"] {
 }
 
 /*
- * Koper voor de primaire actie, groen voor navigatie, koppen en links.
+ * De belangrijkste knop is groen, niet koper.
  *
- * Eén accentkleur die alleen op de belangrijkste knop staat, werkt beter dan
- * een tweede merkkleur die overal opduikt: dan weet een bezoeker weer waar hij
- * moet klikken.
+ * Bij Lopra staat er koper op de primaire actie, en daar werkt het: blauw en
+ * koper is een klassiek paar dat elkaar versterkt. Datzelfde koper op dit
+ * groen niet — het wordt modderig, en de knop leest als iets dat van een ander
+ * merk is overgewaaid in plaats van als de volgende stap.
+ *
+ * De merkkleur zelf is hier het sterkste signaal. Koper blijft als token
+ * bestaan voor kleine markeringen later, maar staat nu op geen enkele knop.
+ *
+ * De standaardknop krijgt een rode gloed mee (die van EasyInvoice staat
+ * hardgecodeerd in de marketinglayout); die zetten we hier recht.
  */
 html[data-brand="easybookkeeper"] .btn-primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--brand);
+  border-color: var(--brand);
+  box-shadow: 0 4px 14px rgba(20, 107, 79, 0.22);
 }
 
 html[data-brand="easybookkeeper"] .btn-primary:hover {
-  background: var(--accent-dark);
-  border-color: var(--accent-dark);
+  background: var(--brand-dark);
+  border-color: var(--brand-dark);
+  box-shadow: 0 6px 20px rgba(20, 107, 79, 0.32);
 }
 
 /* De zijbalk staat donker (dark_sidebar in config/brand.php). */
