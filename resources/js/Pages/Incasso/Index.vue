@@ -6,6 +6,7 @@ import { eur, fmtDate } from '@/format';
 import { computed } from 'vue';
 
 const props = defineProps({
+  demands: { type: Array, default: () => [] },
   cases: Array,
   stats: Object,
   handler: Object,
@@ -21,6 +22,16 @@ const changePhase = (invoice, phase) => {
   if (!phase || phase === invoice.incasso_phase) return;
   router.patch(route('incasso.phase', invoice.id), { phase }, { preserveScroll: true });
 };
+
+// Online aanmaning: termijn voorbij en niet betaald, dan gaat het dossier met één klik over.
+const transfer = (d) => {
+  const msg = t('Factuur :number overdragen aan :partner?', { number: d.number, partner: partnerName.value }) + '\n\n'
+    + t('De factuur, de aanmaning, het logboek en de berekening van rente en incassokosten gaan per e-mail mee. Dit kun je niet ongedaan maken.');
+  if (confirm(msg)) {
+    router.post(route('demands.transfer', [d.invoice_id, d.id]), {}, { preserveScroll: true });
+  }
+};
+const demandError = computed(() => (usePage().props.errors || {}).demand ?? null);
 
 const formatDate = (s) => s ? fmtDate(s, { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
 
@@ -76,10 +87,53 @@ const phaseLabels = {
       </div>
     </div>
 
+    <div v-if="demandError" class="field-error" style="margin-bottom:12px;">{{ demandError }}</div>
+
+    <!-- Lopende online aanmaningen: de stap vóór de overdracht -->
+    <div v-if="demands.length" class="card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">{{ $t('Laatste aanmaningen') }}</div>
+          <div class="card-subtitle">{{ $t('Is de termijn voorbij en is er niet betaald, dan draag je het dossier met één klik over.') }}</div>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{{ $t('Factuur') }}</th>
+            <th>{{ $t('Klant') }}</th>
+            <th>{{ $t('Verstuurd') }}</th>
+            <th>{{ $t('Termijn tot en met') }}</th>
+            <th>{{ $t('Reactie') }}</th>
+            <th class="right">{{ $t('Te betalen vandaag') }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="d in demands" :key="d.id">
+            <td class="mono cell-primary"><Link :href="route('invoices.show', d.invoice_id)">{{ d.number }}</Link></td>
+            <td :data-label="$t('Klant')">{{ d.customer_name }}</td>
+            <td :data-label="$t('Verstuurd')">{{ formatDate(d.sent_at) }}</td>
+            <td :data-label="$t('Termijn tot en met')">
+              {{ formatDate(d.deadline) }}
+              <span v-if="d.due" class="due-chip">{{ $t('Termijn verstreken') }}</span>
+            </td>
+            <td :data-label="$t('Reactie')">{{ d.response_label || (d.opened ? $t('Geopend, geen reactie') : $t('Nog niet geopend')) }}</td>
+            <td class="right num" :data-label="$t('Te betalen vandaag')">{{ eur(d.total) }}</td>
+            <td class="right">
+              <button v-if="d.due && !d.paused" class="btn btn-primary btn-sm" @click="transfer(d)">{{ $t('Overdragen') }}</button>
+              <span v-else-if="d.paused" class="sub">{{ $t('Op pauze') }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <div v-if="cases.length === 0" class="card empty">
       <div style="font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:6px;">{{ $t('Geen actieve dossiers') }}</div>
       <div style="color:var(--text-3);margin-bottom:18px;">
         {{ $t('Open een achterstallige factuur en klik daar op') }} <b>{{ $t('“Naar incasso”') }}</b> {{ $t('om het dossier over te dragen aan :partner.', { partner: partnerName }) }}
+        {{ $t('Eerst nog één kans geven? Stuur vanaf de factuur een laatste aanmaning.') }}
       </div>
       <Link :href="route('invoices.index', { status: 'overdue' })" class="btn btn-primary btn-sm" style="display:inline-flex;">
         {{ $t('Bekijk verlopen facturen') }}
@@ -139,6 +193,8 @@ const phaseLabels = {
 .stat-card .lbl { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
 .stat-card .val { font-family: var(--font-display); font-weight: 600; font-size: 22px; }
 .empty { padding: 80px 20px; text-align: center; }
+.due-chip { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px; color: #92400E; background: #FEF3C7; border: 1px solid #FCD34D; white-space: nowrap; }
+.sub { font-size: 12px; color: var(--text-3); }
 .pill-incasso { color: #FBBF24; background: #1F2937; border: 1px solid #374151; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 600; }
 .phase-select {
   height: 32px;

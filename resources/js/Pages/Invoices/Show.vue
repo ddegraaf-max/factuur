@@ -37,7 +37,7 @@ const showCreditModal = ref(false);
 const page = usePage();
 const pageError = computed(() => {
   const e = page.props.errors || {};
-  return e.incasso || e.credit || e.reminder || e.thanks || e.ubl || e.status || e.delete || e.peppol || e.windykacja || e.ksef || null;
+  return e.incasso || e.demand || e.credit || e.reminder || e.thanks || e.ubl || e.status || e.delete || e.peppol || e.windykacja || e.ksef || null;
 });
 
 /* ---------- Creditnota ---------- */
@@ -137,6 +137,75 @@ const sendToIncasso = () => {
     router.post(route('incasso.send', props.invoice.id), {}, { preserveScroll: true });
   }
 };
+
+/* ---------- Online aanmaning: de laatste aanmaning vóór de deurwaarder ---------- */
+const demand = computed(() => props.invoice.demand?.current || null);
+const canDemand = computed(() => !!props.invoice.demand && !props.invoice.demand.blocker);
+const showDemandModal = ref(false);
+const showDemandLog = ref(false);
+const demandForm = useForm({ debtor_type: null, term_days: null, with_interest: true });
+const demandPreview = ref(null);
+const demandLoading = ref(false);
+const demandError = ref('');
+
+const loadDemandPreview = async () => {
+  demandLoading.value = true;
+  demandError.value = '';
+  try {
+    const { data } = await axios.get(route('demands.preview', props.invoice.id), {
+      params: { debtor_type: demandForm.debtor_type, term_days: demandForm.term_days, with_interest: demandForm.with_interest ? 1 : 0 },
+    });
+    demandPreview.value = data;
+    demandForm.debtor_type = data.debtor_type;
+    demandForm.term_days = data.term_days;
+  } catch (e) {
+    demandError.value = t('De berekening kon niet worden geladen. Probeer het opnieuw.');
+  } finally {
+    demandLoading.value = false;
+  }
+};
+const openDemandModal = () => {
+  demandForm.clearErrors();
+  demandForm.reset();
+  demandPreview.value = null;
+  showDemandModal.value = true;
+  loadDemandPreview();
+};
+// Zakelijk en particulier hebben elk hun eigen termijn en rente: opnieuw rekenen vanaf de standaard.
+const changeDebtorType = () => { demandForm.term_days = null; loadDemandPreview(); };
+const sendDemand = () => demandForm.post(route('demands.store', props.invoice.id), {
+  preserveScroll: true,
+  onSuccess: () => { showDemandModal.value = false; },
+});
+const withdrawDemand = () => {
+  if (confirm(t('Aanmaning intrekken? Op de pagina van de klant staat dan dat ze is ingetrokken. De factuur blijft openstaan.'))) {
+    router.delete(route('demands.withdraw', [props.invoice.id, demand.value.id]), { preserveScroll: true });
+  }
+};
+const transferDemand = () => {
+  const msg = t('Factuur :number overdragen aan :partner?', { number: props.invoice.number, partner: market.incasso_partner }) + '\n\n'
+    + t('De factuur, de aanmaning, het logboek en de berekening van rente en incassokosten gaan per e-mail mee. Dit kun je niet ongedaan maken.');
+  if (confirm(msg)) {
+    router.post(route('demands.transfer', [props.invoice.id, demand.value.id]), {}, { preserveScroll: true });
+  }
+};
+// Akkoord met de toegezegde dag: de factuur gaat tot en met die dag op pauze.
+const acceptPromise = () => {
+  pauseForm.clearErrors();
+  pauseForm.until = demand.value.response_date || '';
+  pauseForm.reason = t('Betaling toegezegd via de online aanmaning');
+  showPauseModal.value = true;
+};
+const demandState = computed(() => {
+  const d = demand.value;
+  if (!d) return null;
+  if (d.status === 'paid') return { cls: 'ok', label: t('Betaald') };
+  if (d.status === 'transferred') return { cls: 'dark', label: t('Overgedragen') };
+  if (d.status === 'withdrawn') return { cls: 'off', label: t('Ingetrokken') };
+  if (d.due) return { cls: 'warn', label: t('Termijn verstreken') };
+  return { cls: 'run', label: d.days_left === 0 ? t('Laatste dag van de termijn') : t('Nog :n dagen', { n: d.days_left }) };
+});
+const copyDemandLink = async () => { try { await navigator.clipboard.writeText(demand.value.url); } catch (e) { /* stil */ } };
 
 /* ---------- Bijlagen ---------- */
 const fileInput = ref(null);
@@ -298,8 +367,9 @@ const saveNote = () => noteForm.patch(route('invoices.notes.update', props.invoi
 const reminderCounts = computed(() => {
   const logs = props.invoice.reminder_logs || [];
   return {
-    reminders: logs.filter(l => l.kind !== 'warning').length,
+    reminders: logs.filter(l => !['warning', 'demand'].includes(l.kind)).length,
     warnings: logs.filter(l => l.kind === 'warning').length,
+    demands: logs.filter(l => l.kind === 'demand').length,
   };
 });
 
@@ -469,6 +539,10 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
         <button v-if="canCredit" class="btn btn-secondary btn-sm" :title="$t('Maak een creditnota op deze factuur')" @click="showCreditModal = true">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
           {{ $t('Creditnota') }}
+        </button>
+        <button v-if="canDemand" class="btn btn-secondary btn-sm" :title="$t('De laatste stap vóór de deurwaarder: een aanmaning met rente die per dag oploopt en een pagina waarop de klant reageert')" @click="openDemandModal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          {{ $t('Laatste aanmaning') }}
         </button>
         <button v-if="canIncasso" class="btn btn-secondary btn-sm" :title="$t('Draag deze factuur over aan :partner', { partner: $page.props.market.incasso_partner })" @click="sendToIncasso">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
@@ -660,6 +734,57 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           {{ invoice.notes }}
         </div>
         </div><!-- /v-show regels -->
+
+        <!-- Online aanmaning: de laatste aanmaning, en na de termijn met één klik naar de deurwaarder -->
+        <div v-if="demand" class="dm-panel" :class="{ due: demand.due }">
+          <div class="dm-head">
+            <div>
+              <div class="dm-title">{{ $t('Laatste aanmaning') }} <span class="dm-chip" :class="demandState.cls">{{ demandState.label }}</span></div>
+              <div class="dm-sub">{{ $t('Verstuurd op :date naar :to', { date: demand.sent_at_label, to: demand.sent_to }) }}</div>
+            </div>
+            <div class="dm-actions">
+              <button v-if="demand.due && !paused" type="button" class="btn btn-primary btn-sm" @click="transferDemand">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg>
+                {{ $t('Overdragen aan de deurwaarder') }}
+              </button>
+              <a :href="demand.url" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" :title="$t('Zo ziet de klant de aanmaning. Jouw bezoek telt niet als geopend.')">{{ $t('Pagina van de klant') }}</a>
+              <a :href="route('demands.pdf', [invoice.id, demand.id])" class="btn btn-secondary btn-sm">{{ $t('Brief (PDF)') }}</a>
+              <button type="button" class="btn btn-ghost btn-sm" :title="$t('Link naar de pagina kopiëren')" @click="copyDemandLink">🔗</button>
+              <button v-if="demand.active" type="button" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="withdrawDemand">{{ $t('Intrekken') }}</button>
+            </div>
+          </div>
+
+          <div v-if="demand.due" class="dm-due">
+            {{ $t('De termijn liep tot en met :date en er is niet betaald. Je kunt het dossier nu overdragen aan :partner; de aanmaning, het logboek en de berekening gaan mee.', { date: demand.deadline_label, partner: $page.props.market.incasso_partner }) }}
+            <template v-if="paused"> {{ $t('De factuur staat op pauze: hervat eerst.') }}</template>
+          </div>
+
+          <div class="dm-meta">
+            <div><span class="inv-meta-label">{{ $t('Termijn tot en met') }}</span><span>{{ demand.deadline_label }}</span></div>
+            <div><span class="inv-meta-label">{{ $t('Geopend door de klant') }}</span><span>{{ demand.opened_at_label || $t('Nog niet') }}</span></div>
+            <div><span class="inv-meta-label">{{ $t('Te betalen vandaag') }}</span><span class="mono">{{ eur(demand.total) }}</span></div>
+            <div><span class="inv-meta-label">{{ demand.costs_due ? $t('Waarvan incassokosten') : $t('Na de termijn') }}</span><span class="mono">{{ demand.costs_due ? eur(demand.costs_total) : eur(demand.total_after) }}</span></div>
+          </div>
+          <div v-if="demand.active && demand.with_interest && demand.per_day > 0" class="dm-note">{{ $t('Hoofdsom :principal, rente tot vandaag :interest. Per dag komt er :day bij.', { principal: eur(demand.principal), interest: eur(demand.interest), day: eur(demand.per_day) }) }}</div>
+
+          <div v-if="demand.response" class="dm-response" :class="demand.response">
+            <div class="dm-response-title">{{ demand.response_label }}</div>
+            <div v-if="demand.response_note" class="dm-response-note">“{{ demand.response_note }}”</div>
+            <div class="dm-response-meta">
+              {{ $t('Reactie van :date', { date: demand.responded_at_label }) }}
+              <template v-if="demand.response === 'promise'"> · {{ $t('Een toezegging is een erkenning van de schuld en stuit de verjaring.') }}</template>
+            </div>
+            <button v-if="demand.response === 'promise' && demand.active && !paused" type="button" class="btn btn-secondary btn-sm" style="margin-top:10px;" @click="acceptPromise">{{ $t('Akkoord: op pauze tot en met die dag') }}</button>
+          </div>
+
+          <button type="button" class="link-btn dm-log-toggle" @click="showDemandLog = !showDemandLog">{{ showDemandLog ? $t('Logboek verbergen') : $t('Logboek tonen (:n)', { n: demand.events.length }) }}</button>
+          <div v-if="showDemandLog" class="dm-log">
+            <div v-for="e in demand.events" :key="e.id" class="dm-log-row">
+              <span class="dm-log-ts">{{ e.at_label }}</span>
+              <span>{{ e.description }}<span v-if="e.ip_address" class="dm-log-ip"> · IP {{ e.ip_address }}</span></span>
+            </div>
+          </div>
+        </div>
 
         <!-- Incasso-dossier -->
         <div v-if="invoice.status === 'incasso'" class="inc-panel">
@@ -877,6 +1002,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
               <span class="hist-chip" :class="{ on: !!invoice.sent_at_label }">{{ invoice.sent_at_label ? $t('1× verstuurd') : $t('Nog niet verstuurd') }}</span>
               <span v-if="reminderCounts.reminders" class="hist-chip on">{{ $t(':n× herinnering', { n: reminderCounts.reminders }) }}</span>
               <span v-if="reminderCounts.warnings" class="hist-chip warn">{{ $t(':n× aanmaning', { n: reminderCounts.warnings }) }}</span>
+              <span v-if="reminderCounts.demands" class="hist-chip warn">{{ $t('Laatste aanmaning') }}</span>
               <span v-if="invoice.thanks_sent_at_label" class="hist-chip thanks" :title="$t('Verstuurd op :date', { date: invoice.thanks_sent_at_label })">♥ {{ $t('Bedankmail verstuurd') }}</span>
             </div>
           </div>
@@ -906,7 +1032,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div class="sect-title">{{ $t('Verstuurde herinneringen') }}</div>
           <div class="rem-trail">
             <div v-for="r in invoice.reminder_logs" :key="r.id" class="rem-row">
-              <span class="rem-dot" :class="r.kind === 'warning' ? 'warn' : ''"></span>
+              <span class="rem-dot" :class="['warning', 'demand'].includes(r.kind) ? 'warn' : ''"></span>
               <div class="rem-info">
                 <div class="rem-type">{{ r.type }}</div>
                 <div class="rem-meta">{{ r.sent_at_label }} · {{ $t('naar') }} {{ r.sent_to }}</div>
@@ -1162,6 +1288,64 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
       </div>
     </div>
 
+    <!-- Online aanmaning versturen -->
+    <div v-if="showDemandModal" class="modal-overlay" @click.self="showDemandModal = false">
+      <div class="modal" style="max-width:580px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Laatste aanmaning versturen') }}</div>
+          <button class="icon-btn" @click="showDemandModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin-bottom:16px;line-height:1.6;" v-html="$t('De laatste stap vóór de deurwaarder. <b>:customer</b> krijgt een mail met de aanmaning en de factuur als PDF, en een link naar een pagina met het bedrag van vandaag. Daar kan de klant ook reageren.', { customer: esc(invoice.customer_name) })"></p>
+          <div v-if="$page.props.errors?.demand" class="field-error" style="margin-bottom:12px;">{{ $page.props.errors.demand }}</div>
+          <div v-if="demandError" class="field-error" style="margin-bottom:12px;">{{ demandError }}</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>{{ $t('Soort klant') }}</label>
+              <select v-model="demandForm.debtor_type" @change="changeDebtorType">
+                <option value="business">{{ $t('Zakelijk') }}</option>
+                <option value="consumer">{{ $t('Particulier') }}</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>{{ $t('Termijn in dagen') }}</label>
+              <input type="number" v-model.number="demandForm.term_days" :min="demandPreview?.term_min || 5" :max="demandPreview?.term_max || 30" @change="loadDemandPreview">
+              <div v-if="demandForm.errors.term_days" class="field-error">{{ demandForm.errors.term_days }}</div>
+            </div>
+          </div>
+          <div v-if="demandForm.debtor_type === 'consumer'" class="pause-hint" style="margin:-6px 0 12px;">{{ $t('Voor een particulier is de termijn wettelijk minstens 14 dagen, te rekenen vanaf de dag na ontvangst. Pas daarna mag je incassokosten rekenen.') }}</div>
+          <label class="dm-check">
+            <input type="checkbox" v-model="demandForm.with_interest" @change="loadDemandPreview">
+            <span>{{ $t('Wettelijke rente meerekenen') }}</span>
+          </label>
+
+          <div class="dm-calc" :class="{ loading: demandLoading }">
+            <template v-if="demandPreview">
+              <div class="pl-claim-row"><span class="label">{{ $t('Hoofdsom') }}</span><span class="mono">{{ eur(demandPreview.principal) }}</span></div>
+              <div v-if="demandForm.with_interest" class="pl-claim-row"><span class="label">{{ $t('Wettelijke rente') }} ({{ $t(':n dagen', { n: demandPreview.interest_days }) }}, {{ num(demandPreview.rate, 2) }}%)</span><span class="mono">{{ eur(demandPreview.interest) }}</span></div>
+              <div class="pl-claim-row grand"><span class="label">{{ $t('Te betalen vandaag') }}</span><span class="mono">{{ eur(demandPreview.total) }}</span></div>
+              <div class="pl-claim-row"><span class="label">{{ $t('Incassokosten na de termijn') }}<template v-if="demandPreview.costs_vat > 0"> ({{ $t('incl. btw') }})</template></span><span class="mono">{{ eur(demandPreview.costs_total) }}</span></div>
+              <div class="pl-note">{{ $t('Betalen zonder incassokosten kan tot en met :date. Daarna kun je het dossier met één klik overdragen aan :partner.', { date: demandPreview.deadline_label, partner: $page.props.market.incasso_partner }) }}</div>
+              <div v-if="demandForm.with_interest && demandPreview.per_day > 0" class="pl-note">{{ $t('De rente loopt door: per dag komt er :day bij.', { day: eur(demandPreview.per_day) }) }}</div>
+            </template>
+            <div v-else-if="demandLoading" class="pl-note">{{ $t('Berekening laden…') }}</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showDemandModal = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" :disabled="demandForm.processing || demandLoading || !demandPreview" @click="sendDemand">
+              {{ demandForm.processing ? $t('Bezig met versturen…') : $t('Versturen naar :email', { email: demandPreview?.sent_to || invoice.customer_email }) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Pauze modal -->
     <div v-if="showPauseModal" class="modal-overlay" @click.self="showPauseModal = false">
       <div class="modal">
@@ -1326,6 +1510,43 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 /* Sectiekoppen binnen de factuur */
 .sect-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin-bottom: 12px; }
 .sect-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+
+/* Online aanmaning */
+.dm-panel { margin-top: 28px; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+.dm-panel.due { border-color: #FCD34D; background: #FFFBEB; }
+.dm-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.dm-title { font-family: var(--font-display); font-weight: 600; font-size: 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dm-sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.dm-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.dm-chip { font-family: var(--font-body, inherit); font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border); color: var(--text-2); background: var(--surface); }
+.dm-chip.run { color: var(--info); background: var(--info-bg); border-color: var(--info-border); }
+.dm-chip.warn { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+.dm-chip.ok { color: var(--success); background: var(--success-bg); border-color: var(--success-border); }
+.dm-chip.dark { color: #FBBF24; background: #1F2937; border-color: #374151; }
+.dm-due { margin-top: 12px; font-size: 13.5px; line-height: 1.6; color: var(--text-2); }
+.dm-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.dm-meta > div { display: flex; flex-direction: column; gap: 3px; }
+.dm-meta span:not(.inv-meta-label) { font-size: 14px; font-weight: 500; }
+.dm-note { font-size: 12px; color: var(--text-3); margin-top: 10px; }
+.dm-response { margin-top: 14px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
+.dm-response.dispute { border-color: #FCA5A5; }
+.dm-response.promise { border-color: var(--info-border); }
+.dm-response.paid { border-color: var(--success-border); }
+.dm-response-title { font-weight: 600; font-size: 14px; }
+.dm-response-note { font-size: 13.5px; color: var(--text-2); margin-top: 4px; white-space: pre-wrap; }
+.dm-response-meta { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+.dm-log-toggle { margin-top: 12px; font-size: 12.5px; }
+.dm-log { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.dm-log-row { display: flex; gap: 12px; font-size: 12.5px; padding: 3px 0; color: var(--text-2); }
+.dm-log-ts { color: var(--text-3); white-space: nowrap; flex: none; min-width: 130px; }
+.dm-log-ip { color: var(--text-3); }
+.dm-check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; margin-bottom: 14px; cursor: pointer; }
+.dm-check input { width: 17px; height: 17px; padding: 0; flex: none; }
+.dm-calc { border-top: 1px solid var(--border); padding-top: 10px; min-height: 120px; }
+.dm-calc.loading { opacity: 0.55; }
+@media (max-width: 760px) {
+  .dm-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* Incasso-paneel */
 .inc-panel { margin-top: 28px; background: #1F2937; color: #fff; border-radius: 12px; padding: 18px 20px; }

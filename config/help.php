@@ -204,6 +204,44 @@ return [
                 ['Overdragen', [
                     'Op de Incasso-pagina zie je alle lopende trajecten. Met één klik draag je een factuur over aan de volgende fase.',
                 ]],
+                ['Eerst een laatste aanmaning', [
+                    'Wil je je klant nog één kans geven? Stuur dan vanaf de factuur een laatste aanmaning. Je klant ziet online wat hij vandaag moet betalen en tot wanneer dat zonder incassokosten kan. Zie het artikel over de online aanmaning.',
+                ]],
+            ],
+        ],
+
+        'online-aanmaning' => [
+            'category' => 'Betalingen & incasso',
+            'title' => 'Een laatste aanmaning versturen',
+            'intro' => 'De laatste stap vóór de deurwaarder: een aanmaning met een eigen pagina, waarop het bedrag per dag oploopt en je klant met één klik reageert.',
+            'sections' => [
+                ['Versturen', [
+                    'Open een factuur waarvan de betaaltermijn voorbij is en kies "Laatste aanmaning". Je ziet de berekening: de hoofdsom, de wettelijke rente tot vandaag en de incassokosten die na de termijn gelden. Kies zakelijk of particulier en de termijn, en verstuur.',
+                    'Je klant krijgt een mail uit jouw naam, met de aanmaning en de factuur als PDF en een knop naar de pagina van de aanmaning.',
+                ]],
+                ['De termijn', [
+                    'Voor een particulier is de termijn minstens veertien dagen, te rekenen vanaf de dag na ontvangst. Dat vraagt de wet; pas daarna mag je incassokosten rekenen. {brand} telt er een dag bij voor de ontvangst. Voor een zakelijke klant kies je zelf een termijn van 5 tot 30 dagen.',
+                ]],
+                ['Wat je klant ziet', [
+                    'Het bedrag van vandaag, de laatste dag waarop hij zonder incassokosten kan betalen en wat er per dag aan rente bij komt. Hij maakt over met de QR-code van zijn bank. Heb je Mollie gekoppeld, dan kan hij ook online betalen.',
+                    'Hij kan ook reageren: ik heb betaald, ik betaal uiterlijk op een dag die hij kiest, of ik ben het er niet mee eens.',
+                ]],
+                ['Reacties', [
+                    'Je krijgt elke reactie per mail en ziet haar op de factuur. Een toegezegde betaaldatum is een erkenning van de schuld en stuit de verjaring. Ga je akkoord, kies dan "Akkoord: op pauze tot en met die dag". Maakt je klant bezwaar, reageer dan inhoudelijk voordat je het dossier overdraagt.',
+                ]],
+                ['Na de termijn: naar de deurwaarder', [
+                    'Is de termijn voorbij en is er niet betaald, dan krijg je een bericht. Op de factuur en op de Incasso-pagina staat dan de knop "Overdragen aan de deurwaarder". Het dossier gaat per e-mail naar de deurwaarder, met de factuur, de aanmaning, de berekening van rente en incassokosten en het logboek.',
+                    'Overdragen gebeurt nooit vanzelf: jij beslist.',
+                ]],
+                ['Logboek', [
+                    'Bij de aanmaning staat een logboek: verstuurd, geopend door de klant (met tijdstip en IP-adres), elke reactie en de afloop. Jouw eigen bezoek aan de pagina telt niet als geopend.',
+                ]],
+                ['Intrekken', [
+                    'Een aanmaning trek je in met "Intrekken". Op de pagina van je klant staat dan dat ze is ingetrokken. De factuur blijft openstaan en je kunt een nieuwe aanmaning sturen.',
+                ]],
+                ['Goed om te weten', [
+                    'Zolang de aanmaning loopt, gaan er geen gewone herinneringen meer naar deze klant voor deze factuur. De rente en de incassokosten volgen de wet; {brand} geeft geen juridisch advies.',
+                ]],
             ],
         ],
 

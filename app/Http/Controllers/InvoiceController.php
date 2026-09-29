@@ -211,6 +211,7 @@ class InvoiceController extends Controller
                     'remaining' => (float) $c->remaining_amount,
                     'invoice_date_label' => $c->invoice_date->translatedFormat('j M Y'),
                 ]),
+                'demand' => $this->demand($invoice),
                 'settle_options' => $this->settleOptions($invoice),
                 // Concept met btw terwijl het bedrijf meedoet aan de kleineondernemersregeling.
                 'kor_mismatch' => $invoice->status === 'draft' && ! $invoice->vat_exempt
@@ -218,6 +219,65 @@ class InvoiceController extends Controller
             ]),
             'company' => $company,
         ]);
+    }
+
+    /**
+     * Online aanmaning bij deze factuur: of er een verstuurd kan worden, en van
+     * de laatste die is uitgegaan de stand, het bedrag van vandaag en het logboek.
+     */
+    private function demand(Invoice $invoice): ?array
+    {
+        $service = app(\App\Services\PaymentDemandService::class);
+        if (! $service->available() || $invoice->is_credit || $invoice->status === 'draft') {
+            return null;
+        }
+
+        $demand = $invoice->demands()->with('events')->first();
+        $current = null;
+        if ($demand) {
+            $demand = $service->settle($demand->setRelation('invoice', $invoice));
+            $claim = $service->claim($demand);
+            $current = [
+                'id' => $demand->id,
+                'status' => $demand->status,
+                'active' => $demand->isActive(),
+                'due' => $demand->isDue(),
+                'debtor_type' => $demand->debtor_type,
+                'sent_to' => $demand->sent_to,
+                'sent_at_label' => $demand->sent_at?->translatedFormat('j M Y, H:i'),
+                'deadline' => $demand->deadline->toDateString(),
+                'deadline_label' => $demand->deadline->translatedFormat('j F Y'),
+                'days_left' => $demand->isExpired() ? 0 : (int) round(now()->startOfDay()->diffInDays($demand->deadline->copy()->startOfDay(), true)),
+                'opened_at_label' => $demand->first_opened_at?->translatedFormat('j M Y, H:i'),
+                'response' => $demand->response,
+                'response_label' => $demand->response ? $service->responseLabel($demand) : null,
+                'response_note' => $demand->response_note,
+                'response_date' => $demand->response_date?->toDateString(),
+                'responded_at_label' => $demand->responded_at?->translatedFormat('j M Y, H:i'),
+                'url' => $demand->url(),
+                'principal' => $claim['principal'],
+                'with_interest' => $claim['with_interest'],
+                'interest' => $claim['interest'],
+                'per_day' => $claim['per_day'],
+                'costs_total' => $claim['costs_total'],
+                'costs_due' => $claim['costs_due'],
+                'total' => $claim['total'],
+                'total_after' => $claim['total_after'],
+                'events' => $demand->events->map(fn ($event) => [
+                    'id' => $event->id,
+                    'event' => $event->event,
+                    'description' => $event->description,
+                    'ip_address' => $event->ip_address,
+                    'at_label' => $event->created_at?->translatedFormat('j M Y, H:i'),
+                ])->values(),
+            ];
+        }
+
+        return [
+            // Waarom versturen nu niet kan; leeg als het kan.
+            'blocker' => $service->blocker($invoice),
+            'current' => $current,
+        ];
     }
 
     /**
@@ -696,7 +756,19 @@ class InvoiceController extends Controller
         $push($invoice->first_viewed_at, 'eye', __('Voor het eerst bekeken door de klant'));
 
         foreach ($invoice->reminderLogs as $log) {
-            $push($log->sent_at, $log->kind === 'warning' ? 'alert' : 'bell', __(':label verstuurd naar :email', ['label' => $log->type, 'email' => $log->sent_to]));
+            $push($log->sent_at, in_array($log->kind, ['warning', 'demand'], true) ? 'alert' : 'bell', __(':label verstuurd naar :email', ['label' => $log->type, 'email' => $log->sent_to]));
+        }
+
+        // Online aanmaning: wat de klant ermee deed en hoe ze afliep (het versturen staat hierboven al).
+        foreach ($invoice->demands()->with('events')->get() as $demand) {
+            // De overdracht zelf staat verderop al in de tijdlijn.
+            foreach ($demand->events->whereNotIn('event', ['sent', 'transferred']) as $event) {
+                $push($event->created_at, match ($event->event) {
+                    'opened' => 'eye',
+                    'settled' => 'check',
+                    default => 'alert',
+                }, (string) $event->description);
+            }
         }
 
         foreach ($invoice->payments as $payment) {

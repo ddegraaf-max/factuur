@@ -38,9 +38,22 @@ class IncassoService
         ]);
 
         $fresh = $invoice->fresh();
+
+        // Een lopende online aanmaning eindigt hier; ze gaat mee in het dossier.
+        $demands = app(PaymentDemandService::class);
+        foreach ($fresh->demands()->where('status', 'sent')->get() as $demand) {
+            $demands->settle($demand->setRelation('invoice', $fresh));
+        }
+
         $this->emailDossier($fresh);
 
         return $fresh;
+    }
+
+    /** De laatste aanmaning die echt is uitgegaan (ingetrokken telt niet), voor het dossier. */
+    public function demandFor(Invoice $invoice): ?\App\Models\PaymentDemand
+    {
+        return $invoice->demands()->where('status', '!=', 'withdrawn')->with('events')->first();
     }
 
     public function updatePhase(Invoice $invoice, string $phase): Invoice
@@ -83,10 +96,26 @@ class IncassoService
                 }
             }
 
+            // Online aanmaning: de brief zoals hij is verstuurd, met de berekening van vandaag
+            // en het logboek (verstuurd, geopend, reactie van de klant) in de mail zelf.
+            $demand = $this->demandFor($invoice);
+            $claim = null;
+            if ($demand) {
+                $demand->setRelation('invoice', $invoice);
+                $demands = app(PaymentDemandService::class);
+                $claim = $demands->claim($demand);
+                $claim['response'] = $demands->responseLabel($demand);
+                array_unshift($files, [
+                    'name' => 'aanmaning-' . preg_replace('/[^A-Za-z0-9\-]+/', '-', (string) $invoice->number) . '.pdf',
+                    'data' => $demands->pdf($demand)->output(),
+                    'mime' => 'application/pdf',
+                ]);
+            }
+
             // Demo-/voorbeeldadministraties mailen de incassopartner nooit echt.
             Mail::mailer($invoice->company?->is_demo ? 'log' : null)->to(\App\Support\Market::incasso('claims_email'))
                 ->cc(\App\Support\Market::incasso('cc'))
-                ->send(new IncassoDossierMail($invoice, $pdf, $files));
+                ->send(new IncassoDossierMail($invoice, $pdf, $files, $demand, $claim));
         } catch (\Throwable $e) {
             Log::error('Incasso-dossier versturen mislukt', [
                 'invoice' => $invoice->id,

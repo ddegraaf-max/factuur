@@ -18,6 +18,11 @@ Schedule::command('invoices:remind')
     ->dailyAt('08:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: meld dat de termijn van een online aanmaning voorbij is (dan kan het dossier naar de deurwaarder).
+Schedule::command('demands:notify')
+    ->dailyAt('08:30')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: herinner onderaannemers die na drie dagen nog niet op een prijsaanvraag reageerden.
 Schedule::command('tenders:remind')
     ->dailyAt('09:00')

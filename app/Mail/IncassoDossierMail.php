@@ -22,6 +22,9 @@ class IncassoDossierMail extends Mailable
         public Invoice $invoice,
         public string $pdf,
         public array $files = [],
+        // De online aanmaning die aan de overdracht voorafging, met de vordering van vandaag.
+        public ?\App\Models\PaymentDemand $demand = null,
+        public ?array $claim = null,
     ) {}
 
     public function envelope(): Envelope
@@ -45,6 +48,8 @@ class IncassoDossierMail extends Mailable
             with: [
                 'invoice' => $this->invoice,
                 'company' => $this->invoice->company,
+                'demand' => $this->demand,
+                'claim' => $this->claim,
             ],
         );
     }

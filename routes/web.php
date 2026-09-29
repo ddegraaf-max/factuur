@@ -122,6 +122,9 @@ Route::view('/boekhouders', 'marketing.boekhouders')->name('boekhouders')->middl
 // Voor aannemers en bouwbedrijven: offertes, termijnfacturen en prijsaanvragen bij onderaannemers.
 Route::view('/factuurprogramma-bouw', 'marketing.bouw')->name('bouw')->middleware('market:nl');
 
+// Online aanmaning: de laatste aanmaning met een eigen pagina, en daarna met één klik naar de deurwaarder.
+Route::view('/online-aanmaning', 'marketing.aanmaning')->name('aanmaning')->middleware('market:nl');
+
 // Overstappagina's per pakket: stappen, wat er verandert, en de overstapwizard.
 Route::get('/overstappen-van/{pakket}', function (string $pakket) {
     $brand = \App\Support\Brand::name();
@@ -424,6 +427,14 @@ Route::post('uitvraag/{token}/afwijzen', [TenderResponseController::class, 'decl
 Route::get('uitvraag/{token}/bijlage/{attachment}', [TenderResponseController::class, 'attachment'])
     ->whereNumber('attachment')->middleware('throttle:60,1')->name('tender.attachment');
 
+// Online aanmaning: de pagina van de klant, via de geheime link uit de mail (zonder inlog).
+Route::get('aanmaning/{token}', [\App\Http\Controllers\PaymentDemandPageController::class, 'show'])
+    ->middleware(['market:nl', 'throttle:60,1'])->name('demand.show');
+Route::post('aanmaning/{token}', [\App\Http\Controllers\PaymentDemandPageController::class, 'respond'])
+    ->middleware(['market:nl', 'throttle:20,1'])->name('demand.respond');
+Route::get('aanmaning/{token}/brief', [\App\Http\Controllers\PaymentDemandPageController::class, 'pdf'])
+    ->middleware(['market:nl', 'throttle:30,1'])->name('demand.pdf');
+
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])->name('register');
     Route::post('register', [RegisteredUserController::class, 'store'])
@@ -683,6 +694,12 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('incasso', [IncassoController::class, 'index'])->name('incasso.index');
     Route::post('invoices/{invoice}/incasso', [IncassoController::class, 'send'])->name('incasso.send');
     Route::patch('invoices/{invoice}/incasso/phase', [IncassoController::class, 'updatePhase'])->name('incasso.phase');
+    // Online aanmaning: laatste aanmaning met een eigen pagina; na de termijn met één klik naar de deurwaarder (1.65.0)
+    Route::get('invoices/{invoice}/aanmaning/berekening', [\App\Http\Controllers\PaymentDemandController::class, 'preview'])->name('demands.preview');
+    Route::post('invoices/{invoice}/aanmaning', [\App\Http\Controllers\PaymentDemandController::class, 'store'])->name('demands.store');
+    Route::delete('invoices/{invoice}/aanmaning/{demand}', [\App\Http\Controllers\PaymentDemandController::class, 'withdraw'])->name('demands.withdraw');
+    Route::post('invoices/{invoice}/aanmaning/{demand}/overdragen', [\App\Http\Controllers\PaymentDemandController::class, 'transfer'])->name('demands.transfer');
+    Route::get('invoices/{invoice}/aanmaning/{demand}/pdf', [\App\Http\Controllers\PaymentDemandController::class, 'pdf'])->name('demands.pdf');
     // Windykacja (Poolse markt): vordering berekenen, wezwanie do zapłaty (PDF) en factuur te koop aanbieden.
     Route::get('invoices/{invoice}/windykacja', [\App\Http\Controllers\WindykacjaController::class, 'claim'])->name('windykacja.claim');
     Route::get('invoices/{invoice}/wezwanie', [\App\Http\Controllers\WindykacjaController::class, 'wezwanie'])->name('windykacja.wezwanie');

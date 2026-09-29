@@ -86,6 +86,8 @@ class Invoice extends Model
     public function creditNotes(): HasMany { return $this->hasMany(Invoice::class, 'credits_invoice_id'); }
     public function originalInvoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'credits_invoice_id')->withoutGlobalScope('company'); }
     public function views(): HasMany { return $this->hasMany(InvoiceView::class)->orderByDesc('viewed_at'); }
+    /** Online aanmaningen bij deze factuur, de nieuwste eerst. */
+    public function demands(): HasMany { return $this->hasMany(PaymentDemand::class)->withoutGlobalScope('company')->orderByDesc('id'); }
 
     /**
      * Zorgt dat de factuur een geheime portaal-token heeft en geeft die terug.

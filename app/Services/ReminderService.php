@@ -34,6 +34,8 @@ class ReminderService
             ->whereNull('reminders_paused_at')
             ->whereNotNull('due_date')
             ->whereDate('due_date', '<', now())
+            // Na de laatste aanmaning (online aanmaning) geen gewone herinnering meer erachteraan.
+            ->whereDoesntHave('demands', fn ($q) => $q->where('status', 'sent'))
             ->whereHas('company', fn ($q) => $q->where('is_demo', false))
             ->with(['company', 'lines'])
             ->get();

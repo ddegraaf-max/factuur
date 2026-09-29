@@ -31,6 +31,20 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.65.0</div>
+        <h2>Online aanmaning: de laatste stap vóór de deurwaarder</h2>
+        <ul class="tl-list">
+          <li><b>Laatste aanmaning</b> — vanaf een factuur waarvan de betaaltermijn voorbij is. Je klant krijgt een mail met de aanmaning en de factuur als PDF, en een link naar een eigen pagina. <a href="{{ route('aanmaning') }}">Zo werkt het</a>.</li>
+          <li><b>Het bedrag van vandaag</b> — op die pagina staat de hoofdsom met de wettelijke rente tot en met vandaag. Elke dag komt er rente bij.</li>
+          <li><b>Reageren met één klik</b> — ik heb betaald, ik betaal uiterlijk op, of ik ben het er niet mee eens. Je krijgt elk antwoord per mail en ziet wanneer je klant de aanmaning heeft geopend.</li>
+          <li><b>De termijn die de wet vraagt</b> — voor een particulier minstens veertien dagen, met het bedrag van de incassokosten erbij. Tot en met de laatste dag betaalt je klant zonder incassokosten.</li>
+          <li><b>Met één klik naar de deurwaarder</b> — is de termijn voorbij en is er niet betaald, dan draag je het dossier over. De aanmaning, de berekening en het logboek gaan mee.</li>
+          <li><b>Geen herinnering erachteraan</b> — zolang de aanmaning loopt, gaan er voor die factuur geen gewone herinneringen meer uit.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 29 september 2026 · {{ brand('version_prefix') }} 1.64.0</div>
         <h2>Uitvragen: een offerte afwijzen met een bericht</h2>
         <ul class="tl-list">

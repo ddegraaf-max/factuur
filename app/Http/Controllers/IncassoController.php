@@ -42,6 +42,7 @@ class IncassoController extends Controller
         $oldest = $cases->max('days_at_armaere') ?? 0;
 
         return Inertia::render('Incasso/Index', [
+            'demands' => $this->demands(),
             'cases' => $cases,
             'stats' => [
                 'count' => $cases->count(),
@@ -54,6 +55,46 @@ class IncassoController extends Controller
                 'tagline' => __('Gerechtsdeurwaarder · vaste incassopartner'),
             ],
         ]);
+    }
+
+    /**
+     * Lopende online aanmaningen: de stap vóór de overdracht. Wat klaarstaat
+     * voor de deurwaarder (termijn voorbij, niet betaald) staat bovenaan.
+     */
+    private function demands(): array
+    {
+        $service = app(\App\Services\PaymentDemandService::class);
+        if (! $service->available()) {
+            return [];
+        }
+
+        return \App\Models\PaymentDemand::where('status', 'sent')
+            ->with('invoice')
+            ->orderBy('deadline')
+            ->get()
+            ->map(fn ($demand) => $service->settle($demand))
+            ->filter(fn ($demand) => $demand->isActive())
+            ->map(function ($demand) use ($service) {
+                $claim = $service->claim($demand);
+
+                return [
+                    'id' => $demand->id,
+                    'invoice_id' => $demand->invoice_id,
+                    'number' => $demand->invoice->number,
+                    'customer_name' => $demand->invoice->customer_name,
+                    'sent_at' => $demand->sent_at?->toIso8601String(),
+                    'deadline' => $demand->deadline->toDateString(),
+                    'due' => $demand->isDue(),
+                    'paused' => $demand->invoice->remindersPaused(),
+                    'opened' => (bool) $demand->first_opened_at,
+                    'response' => $demand->response,
+                    'response_label' => $demand->response ? $service->responseLabel($demand) : null,
+                    'total' => $claim['total'],
+                ];
+            })
+            ->sortByDesc('due')
+            ->values()
+            ->all();
     }
 
     /** Overzicht "Facturen verkopen": aangeboden facturen en verkoopbare (vervallen, onbetaalde) facturen. */

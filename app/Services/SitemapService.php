@@ -37,7 +37,7 @@ class SitemapService
         return [
             'paginas' => fn () => $this->plain(array_merge([
                 '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum', '/kennisbank',
-                '/facturatie-met-ai', '/boekhouders', '/factuurprogramma-bouw', '/roadmap', '/wat-is-nieuw', '/status',
+                '/facturatie-met-ai', '/boekhouders', '/factuurprogramma-bouw', '/online-aanmaning', '/roadmap', '/wat-is-nieuw', '/status',
                 '/privacy', '/voorwaarden', '/cookies', '/verwerkersovereenkomst', '/login', '/register',
             ], Brand::watchesTrademark() ? ['/zocht-u-een-ander-easyinvoice'] : [])),
             'tools' => fn () => $this->plain(['/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator', '/incassokosten-berekenen']),

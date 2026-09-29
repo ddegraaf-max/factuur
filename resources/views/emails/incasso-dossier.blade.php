@@ -47,6 +47,32 @@
           <tr><td style="border-top:2px solid #1c1917;padding-top:6px;font-weight:700;">{{ __('Openstaand bedrag') }}</td><td style="border-top:2px solid #1c1917;padding-top:6px;text-align:right;font-weight:700;">{{ $open }}</td></tr>
         </table>
 
+        @if($demand && $claim)
+          {{-- Online aanmaning: wat er is gevorderd, en wat de debiteur daarmee deed --}}
+          <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">{{ __('Laatste aanmaning') }}</h3>
+          <table style="width:100%;font-size:14px;line-height:1.7;border-collapse:collapse;">
+            <tr><td style="color:#78716c;">{{ __('Verstuurd aan') }}</td><td style="text-align:right;">{{ $demand->sent_to }} · {{ optional($demand->sent_at)->format(market('date_format')) }}</td></tr>
+            <tr><td style="color:#78716c;">{{ __('Debiteur') }}</td><td style="text-align:right;">{{ $demand->isBusiness() ? __('Zakelijk') : __('Particulier') }}</td></tr>
+            <tr><td style="color:#78716c;">{{ __('Termijn') }}</td><td style="text-align:right;">{{ __(':days dagen, tot en met :date', ['days' => $demand->term_days, 'date' => $demand->deadline->format(market('date_format'))]) }}</td></tr>
+            <tr><td style="color:#78716c;">{{ __('Voor het eerst geopend') }}</td><td style="text-align:right;">{{ $demand->first_opened_at ? $demand->first_opened_at->format(market('date_format') . ' H:i') : __('Niet geopend') }}</td></tr>
+            @if($claim['response'])<tr><td style="color:#78716c;vertical-align:top;">{{ __('Reactie debiteur') }}</td><td style="text-align:right;">{{ $claim['response'] }}@if($demand->response_note)<br><span style="color:#44403c;">“{{ $demand->response_note }}”</span>@endif</td></tr>@endif
+            <tr><td style="color:#78716c;">{{ __('Hoofdsom') }}</td><td style="text-align:right;">{{ money($claim['principal']) }}</td></tr>
+            @if($claim['with_interest'])<tr><td style="color:#78716c;">{{ $claim['business'] ? __('Wettelijke handelsrente') : __('Wettelijke rente') }} ({{ __(':days dagen', ['days' => $claim['interest_days']]) }})</td><td style="text-align:right;">{{ money($claim['interest']) }}</td></tr>@endif
+            <tr><td style="color:#78716c;">{{ __('Incassokosten volgens de staffel') }}@if($claim['costs_vat'] > 0) ({{ __('incl. btw') }})@endif</td><td style="text-align:right;">{{ money($claim['costs_total']) }}</td></tr>
+            <tr><td style="border-top:2px solid #1c1917;padding-top:6px;font-weight:700;">{{ __('Vordering op :date', ['date' => $claim['on']->format(market('date_format'))]) }}</td><td style="border-top:2px solid #1c1917;padding-top:6px;text-align:right;font-weight:700;">{{ money($claim['total_after']) }}</td></tr>
+          </table>
+          @if($demand->events->isNotEmpty())
+            <table style="width:100%;font-size:13px;line-height:1.6;border-collapse:collapse;margin-top:10px;">
+              @foreach($demand->events as $event)
+                <tr>
+                  <td style="padding:3px 0;color:#78716c;white-space:nowrap;vertical-align:top;">{{ optional($event->created_at)->format(market('date_format') . ' H:i') }}</td>
+                  <td style="padding:3px 0 3px 10px;">{{ $event->description }}@if($event->ip_address) <span style="color:#a8a29e;">· IP {{ $event->ip_address }}</span>@endif</td>
+                </tr>
+              @endforeach
+            </table>
+          @endif
+        @endif
+
         <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#78716c;margin:20px 0 8px;">{{ __('Verloop') }}</h3>
         @if($invoice->reminderLogs->isEmpty() && $invoice->payments->isEmpty())
           <p style="font-size:13px;color:#78716c;margin:0;">{{ __('Geen eerdere herinneringen/aanmaningen of betalingen geregistreerd.') }}</p>
@@ -75,6 +101,7 @@
           {{ $extra
               ? __('Factuur (:file) en :count meegestuurde bijlage(n) uit het originele dossier zijn als bijlage toegevoegd.', ['file' => $invoice->number . '.pdf', 'count' => $extra])
               : __('Factuur (:file) is als bijlage toegevoegd.', ['file' => $invoice->number . '.pdf']) }}
+          @if($demand) {{ __('De laatste aanmaning zoals die naar de debiteur is gegaan, zit er als PDF bij.') }}@endif
         </p>
 
         <p style="margin:22px 0 0;font-size:13px;color:#78716c;line-height:1.6;">

@@ -31,6 +31,7 @@ $nl = [
             ['route' => 'btw-calculator', 'label' => 'Btw-calculator'],
             ['route' => 'uurtarief-calculator', 'label' => 'Uurtarief-calculator'],
             ['route' => 'incassokosten-calculator', 'label' => 'Incassokosten berekenen'],
+            ['route' => 'aanmaning', 'label' => 'Online aanmaning'],
             ['route' => 'kennisbank', 'label' => 'Kennisbank'],
             ['route' => 'overstappen.van', 'params' => ['wefact'], 'label' => 'Overstappen van WeFact'],
             ['route' => 'overstappen.van', 'params' => ['moneybird'], 'label' => 'Overstappen van Moneybird'],
