@@ -825,6 +825,52 @@ class GrootboekTest extends TestCase
         ]);
     }
 
+    public function test_zonder_actieve_administratie_is_het_grootboek_dicht(): void
+    {
+        /*
+         * De valkuil zat in de bedrijfsfilter die élk model gebruikt:
+         *
+         *   if (auth()->check() && auth()->user()->company_id) { ... }
+         *
+         * users.company_id is nullable met nullOnDelete. Wordt een administratie
+         * verwijderd, dan blijft de gebruiker bestaan met zijn rol (standaard
+         * 'owner') maar zonder company_id — en dan filtert die regel niet meer.
+         * Zo iemand zag op /grootboek/journaal de boekingen van álle
+         * administraties, met klantnamen en bedragen erin.
+         */
+        $ander = Company::create(['name' => 'Iemand anders', 'country' => 'NL']);
+        $this->ledger->post($ander, 'MEM', '2026-01-01', 'Geheim van de buren', [
+            ['rgs' => Rgs::BANK, 'debit' => 12345],
+            ['rgs' => Rgs::KAPITAAL, 'credit' => 12345],
+        ]);
+
+        // De administratie moet toegang hebben, anders stuurt de
+        // abonnementsmiddleware al door en meten we het verkeerde.
+        $this->company->forceFill(['is_exempt' => true])->save();
+
+        $gebruiker = \App\Models\User::create([
+            'name' => 'De Eigenaar',
+            'email' => 'eigenaar@voorbeeld.nl',
+            'password' => bcrypt('geheim-genoeg-voor-een-test'),
+            'company_id' => $this->company->id,
+            'role' => 'owner',
+        ]);
+
+        // Zolang hij een administratie heeft, mag hij erin.
+        $this->actingAs($gebruiker)->get('/grootboek/journaal')->assertOk();
+
+        // Zijn administratie verdwijnt; company_id wordt NULL (nullOnDelete).
+        $gebruiker->forceFill(['company_id' => null])->save();
+
+        $antwoord = $this->actingAs($gebruiker->fresh())->get('/grootboek/journaal');
+
+        $this->assertTrue(
+            $antwoord->isRedirect() || $antwoord->status() === 403,
+            'zonder administratie hoort het grootboek dicht te zitten, kreeg ' . $antwoord->status()
+        );
+        $antwoord->assertDontSee('Geheim van de buren');
+    }
+
     // -------------------------------------------------------------------- hulp
 
     private function rekening(string $rgs): LedgerAccount

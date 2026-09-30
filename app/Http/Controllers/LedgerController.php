@@ -39,7 +39,7 @@ class LedgerController extends Controller
     /** Het rekeningschema. */
     public function accounts(Request $request)
     {
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
 
         $accounts = LedgerAccount::orderBy('sort')->get()
             ->map(fn (LedgerAccount $a) => [
@@ -78,8 +78,8 @@ class LedgerController extends Controller
             'rgs_code' => ['required', 'string', 'max:20'],
         ]);
 
-        $rekening = $this->chart->addFromRgs($request->user()->company, $data['rgs_code']);
-        $this->ledger->forget($request->user()->company);
+        $rekening = $this->chart->addFromRgs($this->bedrijf($request), $data['rgs_code']);
+        $this->ledger->forget($this->bedrijf($request));
 
         return back()->with('flash', "Rekening {$rekening->number} {$rekening->name} is toegevoegd.");
     }
@@ -87,7 +87,7 @@ class LedgerController extends Controller
     /** Naam aanpassen of een rekening op inactief zetten. */
     public function updateAccount(Request $request, LedgerAccount $account)
     {
-        abort_unless($account->company_id === $request->user()->company_id, 403);
+        abort_unless($account->company_id === $this->bedrijf($request)->id, 403);
 
         $data = $request->validate([
             'name' => ['sometimes', 'string', 'min:2', 'max:200'],
@@ -111,7 +111,7 @@ class LedgerController extends Controller
     /** De proefbalans over een periode. */
     public function trialBalance(Request $request)
     {
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
         [$van, $tot, $jaar] = $this->period($request);
 
         $proef = $this->reports->trialBalance($company, $van, $tot);
@@ -141,7 +141,7 @@ class LedgerController extends Controller
     /** De balans met de winst-en-verliesrekening. */
     public function balanceSheet(Request $request)
     {
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
         $jaar = (int) ($request->integer('year') ?: now()->year);
         $tot = $request->date('to') ? Carbon::parse($request->input('to')) : Carbon::create($jaar, 12, 31);
 
@@ -174,9 +174,9 @@ class LedgerController extends Controller
     /** De grootboekkaart van één rekening. */
     public function card(Request $request, LedgerAccount $account)
     {
-        abort_unless($account->company_id === $request->user()->company_id, 403);
+        abort_unless($account->company_id === $this->bedrijf($request)->id, 403);
 
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
         [$van, $tot, $jaar] = $this->period($request);
 
         $kaart = $this->reports->accountCard($company, $account, $van, $tot);
@@ -207,7 +207,7 @@ class LedgerController extends Controller
     /** Het journaal: alle boekingen, nieuwste eerst. */
     public function entries(Request $request)
     {
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
         [$van, $tot, $jaar] = $this->period($request);
 
         $query = JournalEntry::with(['journal:id,code,name', 'lines.account:id,number,name'])
@@ -281,12 +281,20 @@ class LedgerController extends Controller
             'lines.*.description' => ['nullable', 'string', 'max:300'],
         ]);
 
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
 
-        // De rekeningen moeten van deze administratie zijn. Zonder deze
-        // controle kan iemand met een gewijzigd formulier op de rekening van een
-        // ander boeken.
-        $eigen = LedgerAccount::pluck('id')->all();
+        /*
+         * De rekeningen moeten van deze administratie zijn. Zonder deze controle
+         * kan iemand met een gewijzigd formulier op de rekening van een ander
+         * boeken.
+         *
+         * Uitdrukkelijk op company_id en niet op de globale filter: die slaat
+         * over zodra company_id leeg is, en dan zou deze lijst de rekeningen van
+         * alle administraties bevatten. bedrijf() vangt dat al af; dit is het
+         * tweede slot op de plek waar het écht misgaat als het misgaat.
+         */
+        $eigen = LedgerAccount::withoutGlobalScope('company')
+            ->where('company_id', $company->id)->pluck('id')->all();
         foreach ($data['lines'] as $line) {
             if (! in_array((int) $line['account_id'], $eigen, true)) {
                 return back()->withErrors(['lines' => 'Een van de rekeningen hoort niet bij deze administratie.']);
@@ -310,7 +318,7 @@ class LedgerController extends Controller
                 ['source_type' => 'manual']
             );
         } catch (\Throwable $e) {
-            return back()->withErrors(['lines' => $e->getMessage()]);
+            return back()->withErrors(['lines' => $this->melding($e)]);
         }
 
         return back()->with('flash', "Boeking {$post->number} is vastgelegd.");
@@ -319,14 +327,14 @@ class LedgerController extends Controller
     /** Een boeking terugdraaien met een tegenboeking. */
     public function reverseEntry(Request $request, JournalEntry $entry)
     {
-        abort_unless($entry->company_id === $request->user()->company_id, 403);
+        abort_unless($entry->company_id === $this->bedrijf($request)->id, 403);
 
         $data = $request->validate(['reason' => ['nullable', 'string', 'max:200']]);
 
         try {
             $tegen = $this->ledger->reverse($entry->load('lines', 'journal'), null, $data['reason'] ?? null);
         } catch (\Throwable $e) {
-            return back()->withErrors(['entry' => $e->getMessage()]);
+            return back()->withErrors(['entry' => $this->melding($e)]);
         }
 
         return back()->with('flash', "Boeking {$entry->number} is teruggedraaid met {$tegen->number}.");
@@ -335,7 +343,7 @@ class LedgerController extends Controller
     /** De boekjaren, met de stand van de controle per jaar. */
     public function bookYears(Request $request)
     {
-        $company = $request->user()->company;
+        $company = $this->bedrijf($request);
 
         $jaren = collect($this->knownYears($company));
         // Ook het huidige jaar, ook als er nog niets in geboekt is.
@@ -384,9 +392,9 @@ class LedgerController extends Controller
     public function closeYear(Request $request, int $year)
     {
         try {
-            $this->years->close($request->user()->company, $year, $request->user()->id);
+            $this->years->close($this->bedrijf($request), $year, $request->user()->id);
         } catch (\Throwable $e) {
-            return back()->withErrors(['year' => $e->getMessage()]);
+            return back()->withErrors(['year' => $this->melding($e)]);
         }
 
         return back()->with('flash', "Boekjaar {$year} is vastgesteld. Het resultaat staat in het eigen vermogen.");
@@ -396,9 +404,9 @@ class LedgerController extends Controller
     public function reopenYear(Request $request, int $year)
     {
         try {
-            $this->years->reopen($request->user()->company, $year);
+            $this->years->reopen($this->bedrijf($request), $year);
         } catch (\Throwable $e) {
-            return back()->withErrors(['year' => $e->getMessage()]);
+            return back()->withErrors(['year' => $this->melding($e)]);
         }
 
         return back()->with('flash', "Boekjaar {$year} staat weer open.");
@@ -415,7 +423,10 @@ class LedgerController extends Controller
             'rows.*.credit' => ['nullable', 'numeric', 'between:0,99999999'],
         ]);
 
-        $eigen = LedgerAccount::pluck('id')->all();
+        // Zie storeEntry: uitdrukkelijk op deze administratie.
+        $company = $this->bedrijf($request);
+        $eigen = LedgerAccount::withoutGlobalScope('company')
+            ->where('company_id', $company->id)->pluck('id')->all();
         foreach ($data['rows'] as $row) {
             if (! in_array((int) $row['account_id'], $eigen, true)) {
                 return back()->withErrors(['rows' => 'Een van de rekeningen hoort niet bij deze administratie.']);
@@ -423,9 +434,9 @@ class LedgerController extends Controller
         }
 
         try {
-            $post = $this->years->setOpeningBalance($request->user()->company, (int) $data['year'], $data['rows']);
+            $post = $this->years->setOpeningBalance($this->bedrijf($request), (int) $data['year'], $data['rows']);
         } catch (\Throwable $e) {
-            return back()->withErrors(['rows' => $e->getMessage()]);
+            return back()->withErrors(['rows' => $this->melding($e)]);
         }
 
         return back()->with('flash', "De beginbalans staat erin ({$post->number}).");
@@ -434,20 +445,99 @@ class LedgerController extends Controller
     /** Alles opnieuw boeken vanuit de facturen. */
     public function rebuild(Request $request, LedgerPostingService $posting)
     {
+        $company = $this->bedrijf($request);
+
+        // Een administratie van vóór het grootboek heeft nog geen rekeningschema
+        // en geen dagboeken; zonder dagboek kan er niets worden geboekt. Het
+        // schema aanleggen kan altijd: wat er al staat, blijft staan.
+        $this->chart->seed($company);
+        $this->ledger->forget($company);
+
         $jaar = $request->integer('year') ?: null;
-        $uit = $posting->rebuild($request->user()->company, $jaar ?: null);
+        $uit = $posting->rebuild($company, $jaar ?: null);
 
         $melding = sprintf('Geboekt: %d factu(u)r(en), %d inkoop, %d ontvangst(en).',
             $uit['invoices'], $uit['purchases'], $uit['payments']);
 
         if ($uit['errors']) {
-            return back()->withErrors(['rebuild' => $melding . ' Niet gelukt: ' . implode(' · ', array_slice($uit['errors'], 0, 5))]);
+            /*
+             * De losse foutmeldingen gaan naar het logboek en niet naar het
+             * scherm: er kan een databasefout tussen zitten, en die bevat de hele
+             * query met tabelnamen. Wat de gebruiker moet weten is hoeveel er
+             * niet lukte en waar het staat.
+             */
+            \Illuminate\Support\Facades\Log::warning('Grootboek: herbouw met fouten', [
+                'company' => $company->id,
+                'fouten' => $uit['errors'],
+            ]);
+
+            return back()->withErrors(['rebuild' => $melding . ' ' . count($uit['errors'])
+                . ' document(en) lukten niet; die staan in het logboek.']);
         }
 
         return back()->with('flash', $melding);
     }
 
     // ---------------------------------------------------------------- helpers
+
+    /**
+     * De administratie van de ingelogde gebruiker, of 403.
+     *
+     * ── Waarom dit niet gewoon $request->user()->company is ───────────────
+     *
+     * Omdat company_id NULL kan zijn. users.company_id is nullable met
+     * nullOnDelete: verdwijnt een administratie, dan blijft de gebruiker bestaan
+     * met zijn rol maar zonder administratie. De bedrijfsfilter in de modellen
+     * luidt "if (auth()->check() && auth()->user()->company_id)" en slaat bij
+     * NULL dus over — en dan zou dit scherm het journaal van álle administraties
+     * tonen, met klantnamen en bedragen erin.
+     *
+     * De middleware houdt zo iemand al tegen (EnsureSubscriptionActive). Dit is
+     * het tweede slot: het grootboek is de plek waar alles bij elkaar staat, en
+     * dat wil ik niet laten afhangen van één regel in een middleware die iemand
+     * later kan verplaatsen.
+     */
+    private function bedrijf(Request $request): \App\Models\Company
+    {
+        $company = $request->user()?->company;
+
+        abort_unless($company !== null, 403, 'Geen actieve administratie.');
+
+        return $company;
+    }
+
+    /**
+     * Wat de gebruiker van een mislukte boeking te zien krijgt.
+     *
+     * ── Waarom niet gewoon de foutmelding ─────────────────────────────────
+     *
+     * Omdat er twee soorten fouten langskomen. De ene komt uit LedgerService en
+     * is voor de gebruiker geschreven: "deze boeking is niet in balans: debet
+     * € 100,00, credit € 99,00". Die hoort op het scherm.
+     *
+     * De andere komt uit de database. Zo'n melding bevat de hele query met
+     * tabel- en kolomnamen, en soms de waarden van de regel die werd ingevoegd.
+     * Dat zegt de gebruiker niets en het vertelt wie meekijkt hoe de database in
+     * elkaar zit. Die gaat naar het logboek, met een kenmerk zodat hij terug te
+     * vinden is als iemand belt.
+     */
+    private function melding(\Throwable $e): string
+    {
+        if ($e instanceof \RuntimeException && ! $e instanceof \Illuminate\Database\QueryException) {
+            return $e->getMessage();
+        }
+
+        $kenmerk = substr(md5($e->getMessage() . $e->getFile() . $e->getLine()), 0, 8);
+
+        \Illuminate\Support\Facades\Log::error('Grootboek: boeking mislukt', [
+            'kenmerk' => $kenmerk,
+            'soort' => $e::class,
+            'fout' => $e->getMessage(),
+        ]);
+
+        return 'Deze boeking kon niet worden vastgelegd. De fout staat in het '
+            . "logboek onder kenmerk {$kenmerk}.";
+    }
 
     /**
      * De periode uit de request: een boekjaar, of een eigen van/tot.
