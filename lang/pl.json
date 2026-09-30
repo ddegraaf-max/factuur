@@ -1418,7 +1418,6 @@
   "Kies een van de bundels.": "Wybierz jeden z pakietów.",
   "Betalen is op dit moment niet mogelijk. Probeer het later opnieuw.": "Płatność jest w tej chwili niemożliwa. Spróbuj ponownie później.",
   "Sms-tegoed: :n sms'en": "Pakiet SMS: :n wiadomości",
-  ":excl exclusief btw, :vat btw (:rate%)": ":excl netto, :vat VAT (:rate%)",
   "Je sms-tegoed is niet genoeg voor dit bericht. Koop een bundel bij Instellingen, Sms.": "Twój pakiet SMS nie wystarcza na tę wiadomość. Kup pakiet w Ustawieniach, SMS.",
   "De sms kon niet worden verstuurd. Er is geen tegoed afgeschreven; probeer het later opnieuw.": "Nie udało się wysłać SMS-a. Pakiet nie został pomniejszony; spróbuj ponownie później.",
   "Betaald: :n sms'en bij je tegoed gezet.": "Zapłacono: dodano :n SMS-ów do pakietu.",
@@ -1490,5 +1489,6 @@
   "Geef het project een naam.": "Nadaj projektowi nazwę.",
   "De einddatum ligt vóór de startdatum.": "Data zakończenia jest wcześniejsza niż data rozpoczęcia.",
   "Onbekend soort document.": "Nieznany rodzaj dokumentu.",
-  "Zonder omschrijving": "Bez opisu"
+  "Zonder omschrijving": "Bez opisu",
+  ":excl exclusief btw": ":excl netto (bez VAT)"
 }

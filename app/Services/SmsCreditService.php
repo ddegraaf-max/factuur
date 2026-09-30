@@ -104,12 +104,9 @@ class SmsCreditService
             $session = $this->stripe->createPaymentSession(
                 $company,
                 __('Sms-tegoed: :n sms\'en', ['n' => $bundle['credits']]),
-                __(':excl exclusief btw, :vat btw (:rate%)', [
-                    'excl' => money($bundle['price_excl']),
-                    'vat' => money($bundle['vat']),
-                    'rate' => rtrim(rtrim(number_format((float) config('sms.vat_rate'), 2, ',', ''), '0'), ','),
-                ]),
-                (int) round($bundle['price_incl'] * 100),
+                __(':excl exclusief btw', ['excl' => money($bundle['price_excl'])]),
+                // Exclusief: Stripe rekent de btw er zelf bij en zet die op de factuur.
+                (int) round($bundle['price_excl'] * 100),
                 ['kind' => 'sms_credits', 'sms_purchase_id' => (string) $purchase->id, 'company_id' => (string) $company->id],
                 $successUrl,
                 $cancelUrl,

@@ -89,7 +89,10 @@ class SmsCreditTest extends TestCase
         $this->assertEqualsWithDelta(24.20, (float) $purchase->price_incl, 0.001);
         Http::assertSent(fn ($request) => str_ends_with($request->url(), '/checkout/sessions')
             && $request['mode'] === 'payment'
-            && (int) $request['line_items[0][price_data][unit_amount]'] === 2420
+            && (int) $request['line_items[0][price_data][unit_amount]'] === 2000
+            && $request['line_items[0][price_data][tax_behavior]'] === 'exclusive'
+            && $request['automatic_tax[enabled]'] === 'true'
+            && $request['customer_creation'] === 'always'
             && $request['metadata[kind]'] === 'sms_credits'
             && $request['metadata[sms_purchase_id]'] === (string) $purchase->id);
         $this->assertSame(0, app(SmsCreditService::class)->balance($user->company), 'Pas na de betaling');
