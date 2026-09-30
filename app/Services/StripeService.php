@@ -152,6 +152,46 @@ class StripeService
             'allow_promotion_codes' => 'true',
             'subscription_data[metadata][company_id]' => (string) $company->id,
             'metadata[company_id]' => (string) $company->id,
+
+            /*
+             * Btw laten berekenen door Stripe.
+             *
+             * ── Waarom dit erbij moest ────────────────────────────────────
+             *
+             * Zonder automatic_tax rekent Stripe precies het bedrag van de price
+             * en verder niets. De price voor Basis staat op € 10,00 met
+             * tax_behavior "exclusive"; er kwam dus nooit btw bovenop. Op de site
+             * staat € 12,10 inclusief, en op de factuur die de klant kreeg stond
+             * helemaal geen btw. Twee echte facturen lieten dat zien: subtotal
+             * 1000, total 1000, geen belastingregel.
+             *
+             * Dat kostte twee dingen. Van elke tien euro is € 1,74 btw die wij
+             * afdragen, dus er bleef € 8,26 over in plaats van € 10. En onze
+             * klanten zijn ondernemers: zonder btw op de factuur kunnen zij niets
+             * terugvragen, en een factuur zonder btw-vermelding voldoet niet aan
+             * de factuureisen.
+             *
+             * Let op: dit werkt pas als de btw-registratie voor Nederland in
+             * Stripe actief is. Staat die op "expired", dan berekent Stripe 0% en
+             * verandert er niets aan wat de klant betaalt.
+             */
+            'automatic_tax[enabled]' => 'true',
+
+            /*
+             * Het btw-nummer van zakelijke klanten uitvragen. Dat zet het op de
+             * factuur — nodig voor hun eigen aangifte — en zorgt ervoor dat bij
+             * een klant in een ander EU-land de btw wordt verlegd in plaats van
+             * dat wij Nederlandse btw rekenen die daar niet hoort.
+             */
+            'tax_id_collection[enabled]' => 'true',
+
+            /*
+             * Zonder adres kan Stripe niet weten welk tarief geldt. Bij een
+             * Nederlandse klant is dat 21%, bij een Belgische onderneming met
+             * btw-nummer verlegd. Het adres is dus geen formaliteit maar de
+             * invoer van de berekening.
+             */
+            'billing_address_collection' => 'required',
         ];
 
         // Bij afsluiten tijdens de proefperiode: eerste afschrijving pas op het
@@ -162,6 +202,17 @@ class StripeService
 
         if ($company->stripe_customer_id) {
             $payload['customer'] = $company->stripe_customer_id;
+
+            /*
+             * Bij een bestaande klant eist Stripe dat we zeggen wat er met zijn
+             * adres en naam mag gebeuren zodra automatic_tax aanstaat. Zonder
+             * customer_update weigert Stripe de sessie met "customer_update must
+             * be specified" — de betaalknop zou dan niets meer doen. Met "auto"
+             * wordt wat hij in de checkout invult op zijn klantgegevens gezet,
+             * zodat de volgende factuur meteen het goede tarief heeft.
+             */
+            $payload['customer_update[address]'] = 'auto';
+            $payload['customer_update[name]'] = 'auto';
         } elseif ($company->email) {
             $payload['customer_email'] = $company->email;
         }
