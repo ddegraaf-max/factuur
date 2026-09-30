@@ -399,6 +399,79 @@ class GrootboekTest extends TestCase
         $this->assertSame(1, $aantal, 'dezelfde factuur hoort één keer in de omzet te staan');
     }
 
+    public function test_een_aanbetaling_op_een_concept_komt_niet_op_debiteuren(): void
+    {
+        /*
+         * Dit kwam op de live site boven water: de demo heeft een aanbetaling op
+         * een factuur die nog concept is. Het geld staat op de bank, maar er is
+         * nog geen vordering om af te boeken — de omzet is nog niet genomen.
+         * Ging de ontvangst tóch op debiteuren, dan stond die rekening in de min
+         * en zei de balans dat de klant geld van óns krijgt terwijl hij juist
+         * vooruit had betaald.
+         */
+        $concept = $this->factuur(1000.00, 21, 'draft');
+
+        $betaling = Payment::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'invoice_id' => $concept->id,
+            'kind' => 'advance',
+            'amount' => 500.00,
+            'paid_on' => '2026-03-15',
+            'method' => 'bank_transfer',
+        ]);
+
+        $post = $this->ledger->findBySource($this->company, 'payment', $betaling->id);
+        $this->assertNotNull($post);
+
+        $tegen = $post->lines->first(fn ($l) => $l->credit_cents === 50000);
+        $this->assertSame(Rgs::NOG_TE_VERDELEN, $tegen->account->rgs_code,
+            'een vooruitbetaling hoort een schuld te zijn, geen negatieve vordering');
+
+        // Debiteuren blijft onaangeroerd.
+        $debiteuren = $this->rekening(Rgs::DEBITEUREN);
+        $this->assertSame(0, JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $debiteuren->id)->count());
+    }
+
+    public function test_de_vooruitbetaling_verhuist_naar_debiteuren_als_de_factuur_definitief_wordt(): void
+    {
+        $concept = $this->factuur(1000.00, 21, 'draft');
+
+        Payment::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'invoice_id' => $concept->id,
+            'kind' => 'advance',
+            'amount' => 500.00,
+            'paid_on' => '2026-03-15',
+            'method' => 'bank_transfer',
+        ]);
+
+        // Nu wordt de factuur verstuurd.
+        $concept->status = 'sent';
+        $concept->save();
+
+        $verrekening = $this->ledger->findBySource($this->company, 'advance_settlement', $concept->id);
+        $this->assertNotNull($verrekening, 'er hoort een verrekenboeking te komen');
+        $this->assertSame(50000, $verrekening->totalCents());
+
+        // De parkeerrekening staat weer op nul.
+        $parkeer = $this->rekening(Rgs::NOG_TE_VERDELEN);
+        $regels = JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $parkeer->id)->get();
+        $this->assertSame(0, (int) $regels->sum('credit_cents') - (int) $regels->sum('debit_cents'));
+
+        // En de debiteur staat op € 1.210 minus de aanbetaling van € 500.
+        $debiteuren = $this->rekening(Rgs::DEBITEUREN);
+        $d = JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $debiteuren->id)->get();
+        $this->assertSame(71000, (int) $d->sum('debit_cents') - (int) $d->sum('credit_cents'));
+
+        // En het geheel sluit nog steeds.
+        $proef = app(LedgerReportService::class)->trialBalance(
+            $this->company, Carbon::create(2026, 1, 1), Carbon::create(2026, 12, 31));
+        $this->assertTrue($proef['totals']['balanced']);
+    }
+
     public function test_een_ontvangst_boekt_de_bank_en_de_debiteur(): void
     {
         $factuur = $this->factuur(1000.00, 21);

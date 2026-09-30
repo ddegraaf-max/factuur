@@ -112,7 +112,76 @@ class LedgerPostingService
             return;
         }
 
-        $this->postInvoice($invoice);
+        if ($this->postInvoice($invoice)) {
+            $this->settleAdvances($company, $invoice);
+        }
+    }
+
+    /**
+     * Verhuist wat er vooruit is ontvangen naar de debiteur, op het moment dat
+     * de factuur definitief wordt.
+     *
+     * Een aanbetaling op een concept staat op "overige overlopende passiva":
+     * geld binnen, nog niets geleverd. Zodra de factuur er is, is er wél een
+     * vordering, en hoort de aanbetaling daarop te zijn afgeboekt. Eén boeking
+     * in het memoriaal, met een omschrijving die zegt wat er gebeurt — geen
+     * tegenboeking van de ontvangst, want die is echt gebeurd en hoort in het
+     * bankboek te blijven staan.
+     */
+    private function settleAdvances(Company $company, Invoice $invoice): bool
+    {
+        if ($this->ledger->findBySource($company, 'advance_settlement', $invoice->id)) {
+            return false;
+        }
+
+        $betalingIds = Payment::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->where('invoice_id', $invoice->id)
+            ->pluck('id');
+
+        if ($betalingIds->isEmpty()) {
+            return false;
+        }
+
+        $parkeerrekening = $this->ledger->accountOrAdd($company, Rgs::NOG_TE_VERDELEN);
+
+        $regels = \App\Models\JournalLine::withoutGlobalScope('company')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_lines.journal_entry_id')
+            ->where('journal_lines.company_id', $company->id)
+            ->where('journal_lines.ledger_account_id', $parkeerrekening)
+            ->where('journal_entries.source_type', 'payment')
+            ->whereIn('journal_entries.source_id', $betalingIds)
+            ->selectRaw('COALESCE(SUM(journal_lines.credit_cents),0) AS c,
+                COALESCE(SUM(journal_lines.debit_cents),0) AS d')
+            ->first();
+
+        $bedrag = ((int) ($regels->c ?? 0)) - ((int) ($regels->d ?? 0));
+        if ($bedrag <= 0) {
+            return false;
+        }
+
+        $this->ledger->post(
+            $company,
+            'MEM',
+            Carbon::parse($invoice->invoice_date),
+            'Vooruit ontvangen verrekend met ' . $invoice->number,
+            [
+                [
+                    'rgs' => Rgs::NOG_TE_VERDELEN,
+                    'debit' => $bedrag,
+                    'description' => 'Vooruitbetaling toegerekend aan ' . $invoice->number,
+                ],
+                [
+                    'rgs' => Rgs::DEBITEUREN,
+                    'credit' => $bedrag,
+                    'description' => trim(($invoice->customer_name ?: 'Debiteur') . ' — ' . $invoice->number),
+                    'customer_id' => $invoice->customer_id,
+                ],
+            ],
+            ['source_type' => 'advance_settlement', 'source_id' => $invoice->id]
+        );
+
+        return true;
     }
 
     private function syncPurchase(Company $company, PurchaseInvoice $purchase): void
@@ -343,6 +412,24 @@ class LedgerPostingService
             : ($payment->method === 'cash' ? Rgs::KAS : Rgs::BANK);
 
         /*
+         * Hoort hier een debiteur tegenover te staan?
+         *
+         * Alleen als de factuur zelf in het grootboek staat. Een aanbetaling op
+         * een factuur die nog concept is komt echt binnen op de bank, maar er is
+         * nog geen vordering om af te boeken: de omzet is nog niet genomen. Zou
+         * de ontvangst dan tóch op debiteuren gaan, dan staat die rekening voor
+         * dat bedrag in de min — en dan zegt de balans dat een klant geld van
+         * óns krijgt terwijl hij juist vooruit heeft betaald.
+         *
+         * Het gaat daarom op "overige overlopende passiva": een schuld, want we
+         * moeten nog leveren. Zodra de factuur definitief wordt, verhuist het
+         * naar debiteuren (zie settleAdvances).
+         */
+        $opFactuur = $invoice
+            && $this->ledger->findBySource($company, 'invoice', $invoice->id) !== null;
+        $rekeningKant = $opFactuur ? Rgs::DEBITEUREN : Rgs::NOG_TE_VERDELEN;
+
+        /*
          * Een negatieve betaling komt voor: een terugstorting, of een correctie
          * van een te hoog geboekt bedrag. Dan gaan de kanten om.
          */
@@ -356,11 +443,14 @@ class LedgerPostingService
                     . ($invoice ? ' ' . $invoice->number : '')),
             ],
             [
-                'rgs' => Rgs::DEBITEUREN,
+                'rgs' => $rekeningKant,
                 $terug ? 'debit' : 'credit' => $bedrag,
-                'description' => $invoice
-                    ? trim(($invoice->customer_name ?: 'Debiteur') . ' — ' . $invoice->number)
-                    : 'Ontvangst zonder factuur',
+                'description' => match (true) {
+                    $opFactuur => trim(($invoice->customer_name ?: 'Debiteur') . ' — ' . $invoice->number),
+                    (bool) $invoice => trim('Vooruit ontvangen — ' . $invoice->number
+                        . ' staat nog niet in het grootboek'),
+                    default => 'Ontvangst zonder factuur — nog in te delen',
+                },
                 'customer_id' => $invoice?->customer_id,
             ],
         ];
@@ -454,11 +544,12 @@ class LedgerPostingService
      * Bedoeld om een administratie in één keer op orde te brengen: bij het
      * aanzetten van het grootboek, en na een import.
      *
-     * @return array{invoices:int, purchases:int, payments:int, purchase_payments:int, errors:array<int,string>}
+     * @return array{invoices:int, purchases:int, payments:int, purchase_payments:int, settlements:int, errors:array<int,string>}
      */
     public function rebuild(Company $company, ?int $year = null): array
     {
-        $uit = ['invoices' => 0, 'purchases' => 0, 'payments' => 0, 'purchase_payments' => 0, 'errors' => []];
+        $uit = ['invoices' => 0, 'purchases' => 0, 'payments' => 0,
+            'purchase_payments' => 0, 'settlements' => 0, 'errors' => []];
 
         $binnenJaar = function ($query, string $kolom) use ($year) {
             if ($year) {
@@ -500,7 +591,54 @@ class LedgerPostingService
             $this->probeer($uit, 'payments', "betaling {$payment->id}", fn () => $this->postPayment($payment));
         }
 
+        /*
+         * Tot slot de vooruitbetalingen die inmiddels een definitieve factuur
+         * hebben. Dit moet ná de betalingen: pas dan staat er iets op de
+         * parkeerrekening om te verrekenen. Alleen de facturen die het aangaat,
+         * zodat een herbouw niet over alle facturen hoeft te lopen.
+         */
+        foreach ($this->invoicesWithParkedAdvances($company) as $invoice) {
+            $this->probeer($uit, 'settlements', "verrekening {$invoice->number}",
+                fn () => $this->settleAdvances($company, $invoice));
+        }
+
         return $uit;
+    }
+
+    /**
+     * De definitieve facturen waarvan een vooruitbetaling nog op de
+     * parkeerrekening staat.
+     *
+     * @return \Illuminate\Support\Collection<int, Invoice>
+     */
+    private function invoicesWithParkedAdvances(Company $company)
+    {
+        try {
+            $parkeerrekening = $this->ledger->account($company, Rgs::NOG_TE_VERDELEN);
+        } catch (\Throwable) {
+            return collect();
+        }
+
+        $betalingIds = \App\Models\JournalLine::withoutGlobalScope('company')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_lines.journal_entry_id')
+            ->where('journal_lines.company_id', $company->id)
+            ->where('journal_lines.ledger_account_id', $parkeerrekening)
+            ->where('journal_entries.source_type', 'payment')
+            ->pluck('journal_entries.source_id')
+            ->filter()->unique();
+
+        if ($betalingIds->isEmpty()) {
+            return collect();
+        }
+
+        $factuurIds = Payment::withoutGlobalScope('company')
+            ->whereIn('id', $betalingIds)->pluck('invoice_id')->filter()->unique();
+
+        return Invoice::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->whereIn('id', $factuurIds)
+            ->whereNotIn('status', ['draft', 'cancelled'])
+            ->get();
     }
 
     /**
