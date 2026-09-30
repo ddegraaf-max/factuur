@@ -442,6 +442,12 @@ Route::post('uitvraag/{token}/afwijzen', [TenderResponseController::class, 'decl
 Route::get('uitvraag/{token}/bijlage/{attachment}', [TenderResponseController::class, 'attachment'])
     ->whereNumber('attachment')->middleware('throttle:60,1')->name('tender.attachment');
 
+// Projectplanning: de onderaannemer bevestigt, meldt een probleem of antwoordt
+// op de vraag of hij eerder kan beginnen — via de geheime link uit de mail.
+Route::get('planning/{token}', [\App\Http\Controllers\PlanResponseController::class, 'show'])->name('plan.show');
+Route::post('planning/{token}', [\App\Http\Controllers\PlanResponseController::class, 'respond'])
+    ->middleware('throttle:20,1')->name('plan.respond');
+
 // Online aanmaning: de pagina van de klant, via de geheime link uit de mail (zonder inlog).
 Route::get('aanmaning/{token}', [\App\Http\Controllers\PaymentDemandPageController::class, 'show'])
     ->middleware(['market:nl', 'throttle:60,1'])->name('demand.show');
@@ -547,6 +553,13 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         Route::put('projecten/{project}/calculatie', [\App\Http\Controllers\ProjectController::class, 'budget'])->name('projects.budget');
         Route::post('projecten/{project}/koppelen', [\App\Http\Controllers\ProjectController::class, 'link'])->name('projects.link');
         Route::post('projecten/{project}/losmaken', [\App\Http\Controllers\ProjectController::class, 'unlink'])->name('projects.unlink');
+        // Planning: de tijdslijn met onderdelen, en de automatiek eromheen.
+        Route::post('projecten/{project}/planning', [\App\Http\Controllers\ProjectController::class, 'planSave'])->name('projects.plan.store');
+        Route::patch('projecten/{project}/planning/{item}', [\App\Http\Controllers\ProjectController::class, 'planSave'])->name('projects.plan.update');
+        Route::delete('projecten/{project}/planning/{item}', [\App\Http\Controllers\ProjectController::class, 'planDestroy'])->name('projects.plan.destroy');
+        Route::patch('projecten/{project}/planning/{item}/status', [\App\Http\Controllers\ProjectController::class, 'planStatus'])->name('projects.plan.status');
+        Route::post('projecten/{project}/planning/{item}/eerder', [\App\Http\Controllers\ProjectController::class, 'planEarlier'])->name('projects.plan.earlier');
+        Route::patch('projecten/{project}/planning-automatisch', [\App\Http\Controllers\ProjectController::class, 'planAuto'])->name('projects.plan.auto');
 
         // Peppol: bereikbaarheid checken + facturen afleveren
         // Peppol-koppeling van de administratie (Instellingen → Koppelingen).

@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import ProjectPlanning from '@/Components/ProjectPlanning.vue';
 import { eur, num } from '@/format.js';
 import { t } from '@/i18n';
 
@@ -17,6 +18,8 @@ const props = defineProps({
   rounds: Array,
   candidates: Object,
   kinds: Array,
+  plan: Object,
+  subcontractors: Array,
 });
 
 const kindLabel = { labour: 'Arbeid (uren)', material: 'Materiaal', subcontract: 'Onderaanneming', other: 'Overig' };
@@ -147,6 +150,9 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
         </div>
       </div>
     </div>
+
+    <!-- Planning: de tijdslijn -->
+    <ProjectPlanning :project="project" :plan="plan" :subcontractors="subcontractors" :is-open="isOpen" />
 
     <div class="pr-grid">
       <div class="pr-main">

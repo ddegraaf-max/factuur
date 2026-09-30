@@ -31,7 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.73.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.74.0</div>
+        <h2>Projectplanning: wie wanneer aan de slag gaat — en de mails gaan vanzelf</h2>
+        <ul class="tl-list">
+          <li><b>Tijdslijn per project</b> — een balk per onderdeel, per week. Gun je een uitvraag, dan staat dat werk er meteen op, met de onderaannemer en de gewenste startweek. Eigen werk zet je er zelf bij.</li>
+          <li><b>Herinneringen zonder omkijken</b> — een week vooraf krijgt de onderaannemer een vooraankondiging, en als de week aanbreekt een herinnering met locatie, datum en bijzonderheden. Met één klik bevestigt hij dat hij komt, of meldt hij dat er iets in de weg zit.</li>
+          <li><b>Loopt het vlot? Dan vragen we of het eerder kan</b> — meld een onderdeel eerder klaar en de volgende partijen krijgen automatisch de vraag of zij evenveel eerder kunnen beginnen. Ja, een andere dag of nee: hun antwoord schuift de planning zelf op, en jij krijgt bericht.</li>
+          <li><b>Maandag: je weekoverzicht</b> — wat deze en volgende week start, wie nog niet bevestigd heeft, wie een probleem meldde en wat nog ingepland moet worden. <a href="{{ route('help.article', 'projectplanning') }}">Zo werkt het</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">1 oktober 2026 · {{ brand('version_prefix') }} 1.73.0</div>
         <h2>Projecten: per klus zien wat je verdient</h2>
         <ul class="tl-list">
           <li><b>Eén paraplu per klus</b> — maak een project aan en koppel de offerte, de facturen, de inkoopfacturen, de uren, de ritten en de uitvragen bij onderaannemers. Bij elk formulier kies je voortaan het project.</li>

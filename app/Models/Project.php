@@ -19,13 +19,14 @@ class Project extends Model
     public const KINDS = ['labour', 'material', 'subcontract', 'other'];
 
     protected $fillable = [
-        'company_id', 'customer_id', 'number', 'name', 'status', 'location', 'starts_on', 'ends_on', 'description', 'agreed_price',
+        'company_id', 'customer_id', 'number', 'name', 'status', 'location', 'starts_on', 'ends_on', 'description', 'agreed_price', 'auto_earlier',
     ];
 
     protected $casts = [
         'starts_on' => 'date',
         'ends_on' => 'date',
         'agreed_price' => 'decimal:2',
+        'auto_earlier' => 'boolean',
     ];
 
     protected static function booted(): void
@@ -101,6 +102,12 @@ class Project extends Model
     public function tenderRounds(): HasMany
     {
         return $this->hasMany(TenderRound::class)->withoutGlobalScope('company');
+    }
+
+    /** De tijdslijn: onderdelen op volgorde van start. */
+    public function planItems(): HasMany
+    {
+        return $this->hasMany(ProjectPlanItem::class)->orderByRaw('starts_on is null, starts_on')->orderBy('sort')->orderBy('id');
     }
 
     public function isOpen(): bool

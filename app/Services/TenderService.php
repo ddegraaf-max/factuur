@@ -468,6 +468,8 @@ class TenderService
         foreach (TenderRequest::whereIn('id', $losers)->with(['round', 'subcontractor'])->get() as $request) {
             $this->notify($request, 'reject');
         }
+        // Hoort de uitvraag bij een project, dan staat het gegunde werk meteen op de tijdslijn.
+        app(ProjectPlanService::class)->syncRound($round->fresh());
 
         Audit::log('awarded', $round, __(':label gegund aan :name', [
             'label' => Audit::label($round), 'name' => $winner->subcontractor?->name,

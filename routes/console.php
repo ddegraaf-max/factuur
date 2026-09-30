@@ -28,6 +28,12 @@ Schedule::command('tenders:remind')
     ->dailyAt('09:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: projectplanning — vooraankondiging een week vooraf, herinnering als
+// de week aanbreekt, en op maandag het weekoverzicht voor de ondernemer.
+Schedule::command('projects:plan')
+    ->dailyAt('07:30')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: genereer facturen uit terugkerende profielen die aan de beurt zijn.
 Schedule::command('invoices:generate-recurring')
     ->dailyAt('07:00')

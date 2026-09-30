@@ -761,6 +761,32 @@ return [
             ],
         ],
 
+        'projectplanning' => [
+            'category' => 'Uren',
+            'title' => 'Projectplanning: wie wanneer aan de slag gaat',
+            'intro' => 'Een tijdslijn per project met de gegunde onderdelen en je eigen werk. De onderaannemer krijgt vanzelf een vooraankondiging en een herinnering, en als het vlot loopt de vraag of hij eerder kan.',
+            'sections' => [
+                ['De tijdslijn', [
+                    'Op de projectpagina staat onder de cijfers de planning: een balk per onderdeel, per week, met de streep "vandaag". Gun je een uitvraag die bij het project hoort, dan komt dat werk er meteen op te staan — met de onderaannemer en de gewenste startweek uit de uitvraag (of de week die het bedrijf zelf opgaf, als die later is). Een onderdeel zonder einddatum krijgt één werkweek.',
+                    'Eigen werk of iets zonder uitvraag zet je er zelf bij met "Onderdeel toevoegen": naam, start, einde en eventueel een onderaannemer uit je pool. Bijzonderheden (melden bij de uitvoerder, steiger staat er al) gaan mee in de mail.',
+                    'Blauw is gepland, geel is bezig, groen is klaar. Een rode rand: het onderdeel is over zijn einddatum heen. Een gestippelde rand: er staat een vraag uit of het eerder kan.',
+                ]],
+                ['De mails gaan vanzelf', [
+                    'Heeft de onderaannemer een e-mailadres, dan krijgt hij zeven dagen vóór de start een vooraankondiging en op de maandag van de startweek een herinnering, met project, locatie, datum en bijzonderheden. Beide mails komen uit jouw naam; antwoorden komt bij jou binnen.',
+                    'In de mail zit een knop. Daarmee bevestigt hij met één klik dat hij komt, of meldt hij dat er iets in de weg zit. Een bevestiging zie je in de lijst onder de tijdslijn; een probleem krijg je direct per mail.',
+                    'Verschuif je de startdatum, dan gaan de vooraankondiging en de herinnering opnieuw op tijd uit. Mails gaan alleen bij open projecten en niet vanuit de demo.',
+                ]],
+                ['Loopt het vlot? Dan vragen we of het eerder kan', [
+                    'Meld een onderdeel klaar met "Klaar" en kies de dag. Is dat eerder dan de geplande einddatum, dan krijgen alle latere onderdelen met een onderaannemer mét e-mailadres automatisch de vraag of ze evenveel dagen eerder kunnen beginnen (nooit in het weekend). Wil je dat niet, zet dan "Automatisch om eerder vragen" uit; je kunt het dan per onderdeel doen met "Eerder vragen".',
+                    'De onderaannemer antwoordt via de knop in de mail: ja (de planning schuift naar de voorgestelde dag), een andere dag (de planning gaat op zijn dag) of nee (alles blijft staan). Jij krijgt van elk antwoord een mail, en de lijst onder de tijdslijn laat zien wat er is gevraagd en geantwoord.',
+                    'Wie eerder kan, heeft daarmee ook bevestigd; de vooraankondiging en herinnering gaan voor de nieuwe datum opnieuw uit.',
+                ]],
+                ['Het weekoverzicht op maandag', [
+                    'Elke maandagochtend krijg je één mail met wat er deze week en volgende week start, wie nog niet heeft bevestigd, wie een probleem meldde, welke vragen om eerder te beginnen nog openstaan en welk gegund werk nog geen datum heeft. Geen nieuws, geen mail. Het overzicht gaat naar het adres van het dagoverzicht, anders naar het bedrijfsadres.',
+                ]],
+            ],
+        ],
+
         'urenregistratie' => [
             'category' => 'Uren',
             'title' => 'Uren schrijven en met één klik factureren',

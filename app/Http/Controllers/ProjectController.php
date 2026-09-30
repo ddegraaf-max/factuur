@@ -5,14 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Project;
+use App\Models\ProjectPlanItem;
 use App\Models\PurchaseInvoice;
 use App\Models\Quote;
 use App\Models\TimeEntry;
 use App\Models\Trip;
+use App\Services\ProjectPlanService;
 use App\Services\ProjectService;
 use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,7 +26,7 @@ use Inertia\Response;
  */
 class ProjectController extends Controller
 {
-    public function __construct(private ProjectService $service) {}
+    public function __construct(private ProjectService $service, private ProjectPlanService $plan) {}
 
     public function index(Request $request): Response
     {
@@ -85,6 +88,8 @@ class ProjectController extends Controller
     public function show(Project $project): Response
     {
         $project->load('customer', 'budgetLines');
+        // Gegund werk dat nog niet op de tijdslijn staat, komt erbij.
+        $this->plan->sync($project);
         $figures = $this->service->figures($project);
         $day = fn ($d) => $d?->translatedFormat('j M Y');
 
@@ -102,7 +107,10 @@ class ProjectController extends Controller
                 'customer_id' => $project->customer_id,
                 'customer_name' => $project->customer?->name,
                 'created_at_label' => $day($project->created_at),
+                'auto_earlier' => (bool) $project->auto_earlier,
             ],
+            'plan' => $this->plan->timeline($project),
+            'subcontractors' => $this->plan->subcontractorOptions(auth()->user()->company),
             'figures' => $figures,
             'budget_lines' => $project->budgetLines->map(fn ($l) => [
                 'id' => $l->id, 'kind' => $l->kind, 'description' => $l->description, 'amount' => (float) $l->amount,
@@ -216,6 +224,90 @@ class ProjectController extends Controller
         $this->service->link(auth()->user()->company, null, $data['type'], [$data['id']]);
 
         return back()->with('flash', __('Losgemaakt van :number.', ['number' => $project->number]));
+    }
+
+    /* ------------------------------------------------------------ planning */
+
+    /** Eigen onderdeel toevoegen of een onderdeel aanpassen. */
+    public function planSave(Request $request, Project $project, ?ProjectPlanItem $item = null): RedirectResponse
+    {
+        $this->planItem($project, $item);
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:160'],
+            'starts_on' => ['nullable', 'date'],
+            'ends_on' => ['nullable', 'date'],
+            'subcontractor_id' => ['nullable', 'integer'],
+            'notes' => ['nullable', 'string', 'max:2000'],
+        ], ['title.required' => __('Geef het onderdeel een naam.')]);
+        try {
+            $this->plan->save($project, $data, $item);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['plan' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Planning opgeslagen.'));
+    }
+
+    public function planDestroy(Project $project, ProjectPlanItem $item): RedirectResponse
+    {
+        $this->planItem($project, $item);
+        $this->plan->delete($item);
+
+        return back()->with('flash', __('Onderdeel van de planning gehaald.'));
+    }
+
+    /** Gepland, bezig of klaar; "klaar" vóór de einddatum vraagt de volgende partij(en) automatisch om eerder te beginnen. */
+    public function planStatus(Request $request, Project $project, ProjectPlanItem $item): RedirectResponse
+    {
+        $this->planItem($project, $item);
+        $data = $request->validate([
+            'status' => ['required', Rule::in(ProjectPlanItem::STATUSES)],
+            'done_on' => ['nullable', 'date'],
+        ]);
+        $sent = $this->plan->setStatus($item, $data['status'], filled($data['done_on'] ?? null) ? Carbon::parse($data['done_on']) : null);
+        $flash = match ($data['status']) {
+            'done' => $sent > 0
+                ? trans_choice(':title is klaar. Eén partij is gevraagd of ze eerder kan beginnen.|:title is klaar. :count partijen zijn gevraagd of ze eerder kunnen beginnen.', $sent, ['title' => $item->title, 'count' => $sent])
+                : __(':title is klaar.', ['title' => $item->title]),
+            'started' => __(':title is gestart.', ['title' => $item->title]),
+            default => __(':title staat weer gepland.', ['title' => $item->title]),
+        };
+
+        return back()->with('flash', $flash);
+    }
+
+    /** Zelf vragen of een partij eerder kan beginnen. */
+    public function planEarlier(Request $request, Project $project, ProjectPlanItem $item): RedirectResponse
+    {
+        $this->planItem($project, $item);
+        $data = $request->validate(['start' => ['required', 'date'], 'reason' => ['nullable', 'string', 'max:500']]);
+        try {
+            $ok = $this->plan->askEarlier($item, Carbon::parse($data['start']), filled($data['reason'] ?? null) ? trim($data['reason']) : null);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['plan' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', $ok ? __('Gevraagd aan :name of het eerder kan.', ['name' => $item->subcontractor?->name]) : __('De mail kon niet worden verstuurd.'));
+    }
+
+    /** Automatisch om eerder vragen aan of uit. */
+    public function planAuto(Request $request, Project $project): RedirectResponse
+    {
+        $data = $request->validate(['auto_earlier' => ['required', 'boolean']]);
+        $project->update(['auto_earlier' => $data['auto_earlier']]);
+
+        return back()->with('flash', $data['auto_earlier'] ? __('Automatisch om eerder vragen staat aan.') : __('Automatisch om eerder vragen staat uit.'));
+    }
+
+    /** Alleen onderdelen van dit project, en alleen zolang het open is. */
+    private function planItem(Project $project, ?ProjectPlanItem $item): void
+    {
+        if ($item && (int) $item->project_id !== (int) $project->id) {
+            abort(404);
+        }
+        if (! $project->isOpen()) {
+            abort(403, __('Dit project is gesloten.'));
+        }
     }
 
     /** @return array<string, mixed> */
