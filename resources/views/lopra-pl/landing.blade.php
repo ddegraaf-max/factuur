@@ -72,6 +72,36 @@
       Bez karty · 14 dni za darmo · potem od <b>49 zł netto / mies.</b>
     </div>
 
+    {{--
+      Dwa narzędzia, z których można skorzystać od razu, bez konta.
+      Nie te same co w Holandii: darmowa faktura i wezwanie online są
+      przypisane do rynku holenderskiego (market:nl) i tutaj dają 404.
+    --}}
+    <div class="free-tools">
+      <a class="free-tool" href="{{ route('pl.kalkulator') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="18"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Za darmo · bez konta</span>
+            <span class="ft-title">Kalkulator odsetek</span>
+            <span class="ft-text">Klient nie zapłacił na czas? Policz odsetki ustawowe za opóźnienie i rekompensatę — z aktualnymi stawkami i wyliczeniem dzień po dniu.</span>
+          </span>
+        </span>
+        <span class="btn btn-live">Policz odsetki <span class="live-badge">Za darmo</span></span>
+      </a>
+      <a class="free-tool" href="{{ route('pl.skup-wyrokow') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Bez zobowiązań</span>
+            <span class="ft-title">Skup wyroków</span>
+            <span class="ft-text">Masz stary wyrok, z którego nic nie wyegzekwowałeś? Prześlij go, a odezwiemy się z wyceną. Nie trzeba niczego zakładać.</span>
+          </span>
+        </span>
+        <span class="btn btn-live dark">Wyślij wyrok <span class="live-badge">Nowość</span></span>
+      </a>
+    </div>
+
     <!-- MOCKUP PRODUKTU — klikalne menu, ekrany zmieniają się automatycznie -->
     <div class="app-mockup-wrap">
       <div class="lp-float one" aria-hidden="true">

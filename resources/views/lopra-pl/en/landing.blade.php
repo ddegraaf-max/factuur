@@ -72,6 +72,36 @@
       No card needed · 14 days free · then from <b>49 zł net / month</b>
     </div>
 
+    {{--
+      Two tools you can use right away, without an account. Not the Dutch ones:
+      the free invoice and the online demand are tied to the Dutch market
+      (market:nl) and would 404 here.
+    --}}
+    <div class="free-tools">
+      <a class="free-tool" href="{{ route('pl.kalkulator') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8" y2="11"/><line x1="12" y1="11" x2="12" y2="11"/><line x1="16" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="12" y1="15" x2="12" y2="15"/><line x1="16" y1="15" x2="16" y2="18"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Free · no account</span>
+            <span class="ft-title">Late payment calculator</span>
+            <span class="ft-text">Client paid late? Work out the statutory interest and the fixed compensation — current rates, calculated day by day.</span>
+          </span>
+        </span>
+        <span class="btn btn-live">Calculate interest <span class="live-badge">Free</span></span>
+      </a>
+      <a class="free-tool" href="{{ route('pl.skup-wyrokow') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 12.5-8 8a2.119 2.119 0 1 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">No obligation</span>
+            <span class="ft-title">We buy court judgments</span>
+            <span class="ft-text">Holding an old judgment you never collected on? Send it in and we will come back with an offer. Nothing to sign up for.</span>
+          </span>
+        </span>
+        <span class="btn btn-live dark">Send your judgment <span class="live-badge">New</span></span>
+      </a>
+    </div>
+
     <!-- PRODUCT MOCKUP — clickable menu, screens change automatically -->
     <div class="app-mockup-wrap">
       <div class="lp-float one" aria-hidden="true">
