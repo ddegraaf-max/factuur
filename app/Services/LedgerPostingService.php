@@ -112,6 +112,57 @@ class LedgerPostingService
             return;
         }
 
+        /*
+         * Staat er al een boeking die niet meer bij de factuur past, dan moet
+         * hij opnieuw. Dat gebeurt bij het toevoegen van regels (de factuur is
+         * dan al opgeslagen zonder regels) en bij het aanpassen van een factuur
+         * die al definitief was.
+         *
+         * We vergelijken op het totaal, niet op elke regel: het totaal is wat op
+         * debiteuren staat, en als dát klopt is de boeking van deze factuur
+         * hetzelfde. Zou een gebruiker het btw-tarief wijzigen zonder dat het
+         * totaal verandert, dan klopt de verdeling over de rubrieken niet meer;
+         * daarvoor is `ledger:setup` er, en het komt in de praktijk niet voor
+         * omdat een ander tarief een ander totaal geeft.
+         */
+        $bestaand = $this->ledger->findBySource($company, 'invoice', $invoice->id);
+        if ($bestaand) {
+            $geboekt = $bestaand->load('lines')->totalCents();
+            $hoort = abs((int) round(((float) $invoice->total) * 100));
+
+            if ($geboekt === $hoort) {
+                $this->settleAdvances($company, $invoice);
+
+                return;
+            }
+
+            /*
+             * Opnieuw boeken. In een open jaar mag de oude boeking weg: hij was
+             * onvolledig, en een tegenboeking van iets wat nooit een document is
+             * geweest maakt het journaal alleen onleesbaar. Is het jaar
+             * vastgesteld, dan kan dat niet en blijft de oude staan — dan meldt
+             * `ledger:check` het verschil.
+             */
+            $nummer = $bestaand->number;
+
+            try {
+                $this->ledger->removeForSource($company, 'invoice', $invoice->id);
+            } catch (\Throwable $e) {
+                Log::warning('Grootboek: factuur opnieuw boeken kon niet', [
+                    'invoice' => $invoice->id, 'fout' => $e->getMessage(),
+                ]);
+
+                return;
+            }
+
+            // Hetzelfde document, dus hetzelfde boekstuknummer.
+            if ($this->postInvoice($invoice, $nummer)) {
+                $this->settleAdvances($company, $invoice);
+            }
+
+            return;
+        }
+
         if ($this->postInvoice($invoice)) {
             $this->settleAdvances($company, $invoice);
         }
@@ -199,7 +250,7 @@ class LedgerPostingService
      * Debiteuren debet, omzet per btw-tarief credit, af te dragen btw credit.
      * Bij een creditnota precies omgekeerd.
      */
-    public function postInvoice(Invoice $invoice): ?JournalEntry
+    public function postInvoice(Invoice $invoice, ?string $boekstuk = null): ?JournalEntry
     {
         $company = Company::find($invoice->company_id);
         if (! $company) {
@@ -216,7 +267,9 @@ class LedgerPostingService
             return $bestaand;
         }
 
-        $invoice->loadMissing('lines');
+        // Altijd opnieuw inlezen: bij het toevoegen van een regel is de
+        // relatie in het geheugen nog die van vóór die regel.
+        $invoice->load('lines');
 
         // Een creditnota staat aan de andere kant. We rekenen met positieve
         // bedragen en zetten aan het eind de kanten om; dat is minder foutgevoelig
@@ -285,7 +338,7 @@ class LedgerPostingService
             trim(($credit ? 'Creditnota ' : 'Factuur ') . $invoice->number
                 . ' — ' . ($invoice->customer_name ?: 'onbekende klant')),
             $regels,
-            ['source_type' => 'invoice', 'source_id' => $invoice->id]
+            ['source_type' => 'invoice', 'source_id' => $invoice->id, 'number' => $boekstuk]
         );
     }
 

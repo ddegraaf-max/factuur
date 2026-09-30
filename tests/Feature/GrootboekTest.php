@@ -377,6 +377,65 @@ class GrootboekTest extends TestCase
         $this->assertSame(21000, $opRekening(Rgs::BTW_1A_HOOG)->credit_cents);
     }
 
+    public function test_een_factuur_die_haar_regels_ná_het_opslaan_krijgt_wordt_toch_geboekt(): void
+    {
+        /*
+         * Dit is de fout die op de live demo boven water kwam: vier van de elf
+         * facturen stonden niet in het grootboek, terwijl de proefbalans netjes
+         * sloot. De oorzaak: de factuur wordt opgeslagen en krijgt daarna haar
+         * regels. Hing de boeking alleen aan Invoice::saved, dan was er op dat
+         * moment niets te boeken en gebeurde er daarna niets meer.
+         *
+         * Een boekhouding die sluit maar niet compleet is, is het ergste soort
+         * fout: er is niets aan te zien.
+         */
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id, 'name' => 'Later Regels BV', 'country' => 'NL',
+        ]);
+
+        // Eerst de factuur, mét totalen maar zonder regels.
+        $factuur = Invoice::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'customer_id' => $klant->id,
+            'customer_name' => $klant->name,
+            'customer_country' => 'NL',
+            'number' => 'F-later',
+            'status' => 'partial',
+            'invoice_date' => '2026-04-01',
+            'subtotal' => 1000.00,
+            'vat_total' => 210.00,
+            'total' => 1210.00,
+        ]);
+
+        $this->assertNull($this->ledger->findBySource($this->company, 'invoice', $factuur->id),
+            'zonder regels valt er nog niets te boeken');
+
+        // Dan de regels, één voor één, zonder de factuur opnieuw op te slaan.
+        foreach ([[600.00, 126.00], [400.00, 84.00]] as [$grondslag, $btw]) {
+            $factuur->lines()->create([
+                'description' => 'Werk',
+                'quantity' => 1,
+                'unit_price' => $grondslag,
+                'vat_rate' => 21,
+                'line_subtotal' => $grondslag,
+                'line_vat' => $btw,
+                'line_total' => $grondslag + $btw,
+            ]);
+        }
+
+        $post = $this->ledger->findBySource($this->company, 'invoice', $factuur->id);
+        $this->assertNotNull($post, 'na de laatste regel hoort de factuur geboekt te zijn');
+        $this->assertSame(121000, $post->totalCents(), 'en wel voor het hele factuurbedrag');
+
+        // Eén boeking, niet één per regel.
+        $this->assertSame(1, JournalEntry::withoutGlobalScope('company')
+            ->where('company_id', $this->company->id)
+            ->where('source_type', 'invoice')->where('source_id', $factuur->id)->count());
+
+        // En het boekstuknummer is niet meegeschoven: geen gat in de nummering.
+        $this->assertSame('VRK 2026-0001', $post->number);
+    }
+
     public function test_een_concept_wordt_niet_geboekt(): void
     {
         $factuur = $this->factuur(500.00, 21, 'draft');

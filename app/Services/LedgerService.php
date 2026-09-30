@@ -41,7 +41,11 @@ class LedgerService
      *     description?: string, vat_rate?: float|null, vat_cents?: int,
      *     customer_id?: int|null, supplier_name?: string|null
      * }>  $lines  bedragen in hele centen
-     * @param  array{source_type?: string|null, source_id?: int|null, created_by?: int|null}  $meta
+     * @param  array{source_type?: string|null, source_id?: int|null, created_by?: int|null, number?: string|null}  $meta
+     *                                                                                                                  `number` is voor het opnieuw boeken van hetzelfde document: dan houdt de
+     *                                                                                                                  boeking haar oorspronkelijke boekstuknummer in plaats van de teller op te
+     *                                                                                                                  hogen. Anders laat elke herboeking een gat in de nummering achter, en dat is
+     *                                                                                                                  precies waar een accountant naar gaat zoeken.
      */
     public function post(
         Company $company,
@@ -72,7 +76,7 @@ class LedgerService
                 'company_id' => $company->id,
                 'journal_id' => $journal->id,
                 'year' => $year,
-                'number' => $this->nextNumber($company, $journal, $year),
+                'number' => $meta['number'] ?? $this->nextNumber($company, $journal, $year),
                 'date' => $date->toDateString(),
                 'description' => mb_substr($description, 0, 300),
                 'source_type' => $meta['source_type'] ?? null,
