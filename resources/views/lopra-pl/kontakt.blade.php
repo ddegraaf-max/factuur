@@ -14,7 +14,7 @@
   .contact-line:first-of-type { border-top: none; }
   .contact-ic { width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0; background: var(--brand-tint); display: inline-flex; align-items: center; justify-content: center; font-size: 16px; }
   .contact-partner { display: flex; align-items: center; gap: 12px; }
-  .contact-partner .lg { width: 38px; height: 38px; border-radius: 10px; background: #ec3013; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .contact-partner .lg { width: 38px; height: 38px; border-radius: 10px; background: #E0A55C; color: #132F49; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 </style>
 @endpush
 
@@ -89,7 +89,7 @@
 
       <div class="contact-card" style="margin-top:16px;">
         <div class="contact-partner" style="margin-bottom:10px;">
-          <div class="lg">C</div>
+          <div class="lg">SF</div>
           <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Partner wykupu faktur {{ brand('name') }}</div></div>
         </div>
         <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Pytania o sprzedaż faktury, ofertę wykupu i wypłatę po cesji kieruj bezpośrednio do sprzedamfakture.pl — serwisu, który kupuje nieopłacone faktury B2B.</p>

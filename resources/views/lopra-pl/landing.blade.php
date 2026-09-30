@@ -422,7 +422,7 @@
       <div class="lp-vcard">
         <div class="lp-vcard-visual" aria-hidden="true">
           <div class="lp-mini-inv" style="transform:rotate(-1.5deg);">
-            <div class="top"><div class="t">Wezwanie do zapłaty</div><span class="lg" style="background:#ec3013;">C</span></div>
+            <div class="top"><div class="t">Wezwanie do zapłaty</div><span class="lg" style="background:#E0A55C;color:#132F49;">SF</span></div>
             <div class="row"><span>Należność główna</span><span>2 420,00 zł</span></div>
             <div class="row"><span>Odsetki 14% × 44 dni</span><span>40,84 zł</span></div>
             <div class="row"><span>Rekompensata (40 EUR)</span><span>172,00 zł</span></div>

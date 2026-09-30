@@ -21,7 +21,7 @@
   .wy-steps li:first-child { border-top: none; }
   .wy-steps li::before { content: counter(step); width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0; background: var(--brand-tint); color: var(--brand); font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; }
   .wy-partner { display: flex; align-items: center; gap: 12px; }
-  .wy-partner .lg { width: 38px; height: 38px; border-radius: 10px; background: #ec3013; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .wy-partner .lg { width: 38px; height: 38px; border-radius: 10px; background: #E0A55C; color: #132F49; font-family: var(--font-display); font-weight: 700; font-size: 14px; letter-spacing: 0.02em; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 </style>
 @endpush
 
@@ -205,7 +205,7 @@
 
       <div class="wy-card" style="margin-top:16px;">
         <div class="wy-partner" style="margin-bottom:10px;">
-          <div class="lg">C</div>
+          <div class="lg">SF</div>
           <div><div style="font-weight:700;">sprzedamfakture.pl</div><div style="font-size:13px;color:var(--text-3);">Invoice-purchase partner of {{ brand('name') }}</div></div>
         </div>
         <p style="color:var(--text-2);font-size:14px;margin:0 0 12px;line-height:1.6;">Besides unpaid B2B invoices, sprzedamfakture.pl buys claims confirmed by an enforceable title — single judgments and small portfolios included. The big players buy bank portfolios; five old B2B judgments are exactly the kind of file we look at.</p>

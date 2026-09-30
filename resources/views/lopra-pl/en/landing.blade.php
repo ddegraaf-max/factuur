@@ -422,7 +422,7 @@
       <div class="lp-vcard">
         <div class="lp-vcard-visual" aria-hidden="true">
           <div class="lp-mini-inv" style="transform:rotate(-1.5deg);">
-            <div class="top"><div class="t">Payment demand</div><span class="lg" style="background:#ec3013;">C</span></div>
+            <div class="top"><div class="t">Payment demand</div><span class="lg" style="background:#E0A55C;color:#132F49;">SF</span></div>
             <div class="row"><span>Principal amount</span><span>2 420,00 zł</span></div>
             <div class="row"><span>Interest 14% × 44 days</span><span>40,84 zł</span></div>
             <div class="row"><span>Compensation (40 EUR)</span><span>172,00 zł</span></div>
