@@ -436,6 +436,108 @@ class GrootboekTest extends TestCase
         $this->assertSame('VRK 2026-0001', $post->number);
     }
 
+    public function test_alle_factuurregels_komen_in_de_omzet_en_niet_op_betalingsverschillen(): void
+    {
+        /*
+         * De fout die hierachter zit, was de ergste van deze hele oplevering.
+         *
+         * De boeking wordt bij elke factuurregel opnieuw gemaakt. Na de eerste
+         * regel klopte het nog niet — € 1.650 omzet tegenover een factuur van
+         * € 2.577,30 — en dat verschil werd weggeboekt als "betalingsverschil".
+         * Daarmee sloot de post én kwam het totaal overeen met de factuur, dus
+         * dacht de volgende aanroep dat er niets meer te doen was. Op de live
+         * demo stond zo € 2.888,89 aan ontbrekende factuurregels op
+         * betalingsverschillen, verdeeld over tien facturen: alles sloot, en de
+         * omzet was een vijfde te laag.
+         *
+         * Deze test kijkt daarom niet of het optelt, maar of het klópt.
+         */
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id, 'name' => 'Twee Regels BV', 'country' => 'NL',
+        ]);
+
+        $factuur = Invoice::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'customer_id' => $klant->id,
+            'customer_name' => $klant->name,
+            'customer_country' => 'NL',
+            'number' => 'F-tweeregels',
+            'status' => 'sent',
+            'invoice_date' => '2026-05-01',
+            'subtotal' => 2130.00,
+            'vat_total' => 447.30,
+            'total' => 2577.30,
+        ]);
+
+        foreach ([1650.00, 480.00] as $grondslag) {
+            $factuur->lines()->create([
+                'description' => 'Werk',
+                'quantity' => 1,
+                'unit_price' => $grondslag,
+                'vat_rate' => 21,
+                'line_subtotal' => $grondslag,
+                'line_vat' => round($grondslag * 0.21, 2),
+                'line_total' => $grondslag + round($grondslag * 0.21, 2),
+            ]);
+        }
+
+        $post = $this->ledger->findBySource($this->company, 'invoice', $factuur->id);
+        $this->assertNotNull($post);
+
+        $omzet = $this->rekening(Rgs::OMZET_DIENST_HOOG);
+        $geboekteOmzet = (int) JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $omzet->id)->sum('credit_cents');
+        $this->assertSame(213000, $geboekteOmzet, 'béide regels horen in de omzet te staan');
+
+        $btw = $this->rekening(Rgs::BTW_1A_HOOG);
+        $this->assertSame(44730, (int) JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $btw->id)->sum('credit_cents'));
+
+        // En op betalingsverschillen hoort niets te staan.
+        $verschil = LedgerAccount::withoutGlobalScope('company')
+            ->where('company_id', $this->company->id)
+            ->where('rgs_code', Rgs::BETAALVERSCHIL)->first();
+        if ($verschil) {
+            $bedrag = (int) JournalLine::withoutGlobalScope('company')
+                ->where('ledger_account_id', $verschil->id)->sum('debit_cents')
+                + (int) JournalLine::withoutGlobalScope('company')
+                    ->where('ledger_account_id', $verschil->id)->sum('credit_cents');
+            $this->assertSame(0, $bedrag,
+                'een ontbrekende factuurregel hoort niet als afrondingsverschil weggeboekt te worden');
+        }
+    }
+
+    public function test_een_factuur_waarvan_de_regels_niet_optellen_wordt_niet_geboekt(): void
+    {
+        // Eén regel van € 100 op een factuur van € 1.000: dat is geen afronding.
+        // Niet boeken is dan beter dan het verschil ergens wegwerken; ledger:check
+        // meldt de factuur die nog niet in het grootboek staat.
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id, 'name' => 'Klopt Niet BV', 'country' => 'NL',
+        ]);
+
+        $factuur = Invoice::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'customer_id' => $klant->id,
+            'customer_name' => $klant->name,
+            'customer_country' => 'NL',
+            'number' => 'F-kloptniet',
+            'status' => 'sent',
+            'invoice_date' => '2026-05-01',
+            'subtotal' => 1000.00,
+            'vat_total' => 0,
+            'total' => 1000.00,
+        ]);
+
+        $factuur->lines()->create([
+            'description' => 'Werk', 'quantity' => 1, 'unit_price' => 100.00, 'vat_rate' => 0,
+            'line_subtotal' => 100.00, 'line_vat' => 0, 'line_total' => 100.00,
+        ]);
+
+        $this->assertNull($this->ledger->findBySource($this->company, 'invoice', $factuur->id),
+            'een factuur die niet met zichzelf klopt hoort niet half geboekt te worden');
+    }
+
     public function test_een_concept_wordt_niet_geboekt(): void
     {
         $factuur = $this->factuur(500.00, 21, 'draft');

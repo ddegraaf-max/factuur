@@ -93,7 +93,82 @@ class LedgerCheck extends Command
                 $this->error("  {$oprubriek} regel(s) staan op een rubriek in plaats van op een rekening");
             }
 
-            // 4. De proefbalans per boekjaar.
+            /*
+             * 4. Staat elk document in het grootboek?
+             *
+             * Dit is de controle die het hardst nodig was en die er het langst
+             * niet was. Een proefbalans die sluit zegt niets over wat er
+             * ontbreekt: wat niet geboekt is, telt ook niet mee. Op de live demo
+             * sloten de proefbalans én de balans terwijl er vier van de elf
+             * facturen niet in stonden. Sindsdien wordt er geteld.
+             */
+            $ontbreekt = \App\Models\Invoice::withoutGlobalScope('company')
+                ->where('company_id', $company->id)
+                ->whereNotIn('status', ['draft', 'cancelled'])
+                ->when($this->option('year'), fn ($q) => $q->whereYear('invoice_date', (int) $this->option('year')))
+                ->whereNotExists(function ($q) use ($company) {
+                    $q->selectRaw('1')->from('journal_entries')
+                        ->whereColumn('journal_entries.source_id', 'invoices.id')
+                        ->where('journal_entries.source_type', 'invoice')
+                        ->where('journal_entries.company_id', $company->id);
+                })
+                ->get(['id', 'number', 'status', 'invoice_date', 'total']);
+
+            foreach ($ontbreekt as $factuur) {
+                $problemen++;
+                $this->error(sprintf('  factuur %s (%s, %s, € %s) staat niet in het grootboek',
+                    $factuur->number, $factuur->status,
+                    $factuur->invoice_date?->format('Y-m-d') ?? '?',
+                    number_format((float) $factuur->total, 2, ',', '.')));
+            }
+
+            $inkoopMist = \App\Models\PurchaseInvoice::withoutGlobalScope('company')
+                ->where('company_id', $company->id)
+                ->when($this->option('year'), fn ($q) => $q->whereYear('invoice_date', (int) $this->option('year')))
+                ->whereNotExists(function ($q) use ($company) {
+                    $q->selectRaw('1')->from('journal_entries')
+                        ->whereColumn('journal_entries.source_id', 'purchase_invoices.id')
+                        ->where('journal_entries.source_type', 'purchase_invoice')
+                        ->where('journal_entries.company_id', $company->id);
+                })
+                ->count();
+
+            if ($inkoopMist > 0) {
+                $problemen++;
+                $this->error("  {$inkoopMist} inkoopfactu(u)r(en) staan niet in het grootboek");
+            }
+
+            /*
+             * 5. Een groot bedrag op betalingsverschillen.
+             *
+             * Die rekening is voor een cent afronding. Staat er meer dan een euro
+             * per boeking op, dan wordt er iets weggeboekt wat er niet hoort —
+             * precies hoe de ontbrekende factuurregels destijds onzichtbaar
+             * bleven.
+             */
+            $verschilRekening = \App\Models\LedgerAccount::withoutGlobalScope('company')
+                ->where('company_id', $company->id)
+                ->where('rgs_code', \App\Support\Rgs::BETAALVERSCHIL)->first();
+
+            if ($verschilRekening) {
+                $rij = DB::table('journal_lines')
+                    ->where('company_id', $company->id)
+                    ->where('ledger_account_id', $verschilRekening->id)
+                    ->selectRaw('COUNT(*) AS n, COALESCE(SUM(debit_cents + credit_cents),0) AS totaal')
+                    ->first();
+
+                $n = (int) ($rij->n ?? 0);
+                $totaal = (int) ($rij->totaal ?? 0);
+
+                if ($n > 0 && $totaal > 100 * $n) {
+                    $problemen++;
+                    $this->error(sprintf(
+                        '  betalingsverschillen: € %s over %d regel(s) — dat is te veel voor afronding',
+                        number_format($totaal / 100, 2, ',', '.'), $n));
+                }
+            }
+
+            // 6. De proefbalans per boekjaar.
             $jaren = $this->option('year')
                 ? [(int) $this->option('year')]
                 : DB::table('journal_entries')->where('company_id', $company->id)
@@ -114,7 +189,7 @@ class LedgerCheck extends Command
                     continue;
                 }
 
-                // 5. De balans zelf: bezittingen tegen schulden plus vermogen.
+                // 7. De balans zelf: bezittingen tegen schulden plus vermogen.
                 $balans = $reports->balanceSheet($company, $jaar);
                 if (! $balans['totals']['balanced']) {
                     $problemen++;

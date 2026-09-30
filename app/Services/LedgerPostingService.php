@@ -329,6 +329,43 @@ class LedgerPostingService
             'customer_id' => $invoice->customer_id,
         ];
 
+        /*
+         * Tellen de regels op tot het factuurtotaal?
+         *
+         * ── Waarom dit er staat ───────────────────────────────────────────
+         *
+         * Een factuur wordt opgeslagen en krijgt daarna haar regels. Deze functie
+         * wordt bij elke regel opnieuw aangeroepen, en na de eerste regel klopt
+         * het nog niet: er staat dan € 1.650 aan omzet tegenover een factuur van
+         * € 2.577,30. Zonder deze grens boekte balance() dat verschil weg als
+         * "betalingsverschil" — de post sloot, het totaal klopte met de factuur,
+         * en dus dacht de volgende aanroep dat er niets meer te doen was. Zo
+         * stond er op de live demo € 2.888,89 aan ontbrekende factuurregels op
+         * betalingsverschillen, verdeeld over tien facturen. Alles sloot; de
+         * omzet was een vijfde te laag.
+         *
+         * Een echt afrondingsverschil is een cent per regel, want de bedragen op
+         * een factuur staan in twee decimalen. Meer dan dat betekent dat de
+         * factuur en haar regels nog niet met elkaar kloppen. Dan boeken we niet;
+         * de volgende regel of het volgende opslaan doet het wél goed.
+         */
+        $verschil = 0;
+        foreach ($regels as $r) {
+            $verschil += (int) ($r['debit'] ?? 0) - (int) ($r['credit'] ?? 0);
+        }
+
+        $ruimte = max(5, 2 * $invoice->lines->count());
+        if (abs($verschil) > $ruimte) {
+            Log::info('Grootboek: factuur nog niet geboekt, regels tellen niet op tot het totaal', [
+                'invoice' => $invoice->id,
+                'number' => $invoice->number,
+                'verschil_cent' => $verschil,
+                'regels' => $invoice->lines->count(),
+            ]);
+
+            return null;
+        }
+
         $regels = $this->balance($regels, $invoice->number);
 
         return $this->ledger->post(
@@ -413,6 +450,29 @@ class LedgerPostingService
                 . ' — ' . ($purchase->supplier_reference ?: '')),
             'supplier_name' => $purchase->supplier_name,
         ];
+
+        /*
+         * Dezelfde grens als bij de verkoopfactuur: tellen de bedragregels niet
+         * op tot het totaal, dan is dat geen afronding maar een factuur die niet
+         * met zichzelf klopt. Wegboeken als betalingsverschil zou het verstoppen.
+         * Hier komt het minder snel voor — vat_lines wordt met de factuur zelf
+         * opgeslagen — maar de fout zou even stil zijn.
+         */
+        $verschil = 0;
+        foreach ($regels as $r) {
+            $verschil += (int) ($r['debit'] ?? 0) - (int) ($r['credit'] ?? 0);
+        }
+
+        $ruimte = max(5, 2 * max(1, $lijnen->count()));
+        if (abs($verschil) > $ruimte) {
+            Log::warning('Grootboek: inkoopfactuur niet geboekt, bedragen tellen niet op tot het totaal', [
+                'purchase' => $purchase->id,
+                'leverancier' => $purchase->supplier_name,
+                'verschil_cent' => $verschil,
+            ]);
+
+            return null;
+        }
 
         $regels = $this->balance($regels, (string) ($purchase->supplier_reference ?: $purchase->id));
 
