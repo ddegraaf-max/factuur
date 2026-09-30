@@ -37,6 +37,7 @@ const rawNav = [
       { name: 'Ritten', route: 'trips.index', icon: 'car' },
       { name: 'Terugkerend', route: 'recurring.index', icon: 'repeat' },
       { name: 'Klanten', route: 'customers.index', icon: 'users' },
+      { name: 'Projecten', route: 'projects.index', icon: 'list', badge: 'Nieuw' },
       { name: 'Producten', route: 'products.index', icon: 'box' },
       { name: 'Automatische incasso', route: 'direct-debit.index', icon: 'bank', badge: 'Nieuw' },
       // Markt zonder incassopartner (Polen): dezelfde route toont "Facturen verkopen" (factuurkoper).

@@ -32,6 +32,7 @@ class Audit
         \App\Models\RecurringInvoice::class => 'terugkerend',
         \App\Models\BrandProfile::class => 'handelsnaam',
         \App\Models\TenderRound::class => 'uitvraag',
+        \App\Models\Project::class => 'project',
     ];
 
     public static function log(string $action, ?Model $subject = null, ?string $description = null, array $changes = [], ?int $companyId = null): ?ActivityLog

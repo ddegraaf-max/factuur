@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Trip extends Model
 {
     protected $fillable = [
-        'company_id', 'user_id', 'customer_id', 'invoice_id',
+        'company_id', 'project_id', 'user_id', 'customer_id', 'invoice_id',
         'trip_date', 'from_location', 'to_location', 'round_trip',
         'description', 'kilometers', 'rate', 'billable',
     ];

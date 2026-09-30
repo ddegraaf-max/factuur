@@ -17,7 +17,7 @@ class TenderRound extends Model
     public const STATUSES = ['open' => 'Open', 'awarded' => 'Gegund', 'closed' => 'Gesloten'];
 
     protected $fillable = [
-        'company_id', 'quote_id', 'work_package_id', 'title', 'description', 'location',
+        'company_id', 'project_id', 'quote_id', 'work_package_id', 'title', 'description', 'location',
         'start_week', 'deadline', 'budget', 'status', 'awarded_request_id', 'awarded_at',
     ];
 

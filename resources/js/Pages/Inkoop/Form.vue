@@ -13,6 +13,8 @@ const props = defineProps({
   scan_enabled: Boolean, // bonnetjes scannen met AI (Slim-abonnement + API-key)
   scan_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
   inbox_item: Object,   // aangeleverd bestand uit het Postvak IN (of null)
+  projects: { type: Array, default: () => [] }, // open projecten, voor de projectcalculatie
+  preselect_project_id: { type: [String, Number], default: null },
 });
 
 const isEdit = computed(() => !!props.purchase);
@@ -44,6 +46,7 @@ const form = useForm({
   supplier_name: props.purchase?.supplier_name || '',
   supplier_reference: props.purchase?.supplier_reference || '',
   category: props.purchase?.category || '',
+  project_id: props.purchase?.project_id ?? props.preselect_project_id ?? null,
   invoice_date: props.purchase?.invoice_date || today,
   due_date: props.purchase?.due_date || '',
   rows: initialRows(),
@@ -254,6 +257,7 @@ const submit = () => {
       supplier_name: data.supplier_name,
       supplier_reference: data.supplier_reference || null,
       category: data.category || null,
+      project_id: data.project_id || null,
       invoice_date: data.invoice_date,
       due_date: data.due_date || null,
       vat_lines: data.rows.map(row => {
@@ -337,7 +341,16 @@ const fileError = computed(() => {
                   <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
                 </select>
               </div>
-              <div class="form-group"></div>
+              <!-- Project: telt mee als kosten in de projectcalculatie. -->
+              <div class="form-group">
+                <template v-if="projects.length || form.project_id">
+                  <label>{{ $t('Project') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+                  <select v-model="form.project_id">
+                    <option :value="null">{{ $t('Geen project') }}</option>
+                    <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.label }}</option>
+                  </select>
+                </template>
+              </div>
             </div>
 
             <div class="pf-section-title">{{ $t('Datums') }}</div>

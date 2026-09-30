@@ -31,6 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.73.0</div>
+        <h2>Projecten: per klus zien wat je verdient</h2>
+        <ul class="tl-list">
+          <li><b>Eén paraplu per klus</b> — maak een project aan en koppel de offerte, de facturen, de inkoopfacturen, de uren, de ritten en de uitvragen bij onderaannemers. Bij elk formulier kies je voortaan het project.</li>
+          <li><b>Verkoop tegenover kosten</b> — je ziet de afgesproken prijs, wat is gefactureerd en ontvangen, wat is uitgegeven en wat er overblijft, met de marge.</li>
+          <li><b>Voorcalculatie</b> — begroot per kostensoort (materiaal, arbeid, onderaanneming, overig) en zie per soort het verschil met de werkelijke kosten.</li>
+          <li><b>Gegund werk telt alvast mee</b> — een aan een onderaannemer gegunde prijs staat als verplichting bij het verwachte resultaat, tot zijn factuur binnen is.</li>
+          <li><b>Vanzelf gekoppeld</b> — een factuur uit een offerte en een uitvraag vanuit een offerte horen bij hetzelfde project. <a href="{{ route('help.article', 'projecten') }}">Zo werkt het</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.72.0</div>
         <h2>Een echt grootboek: dubbel boekhouden onder je facturen</h2>
         <ul class="tl-list">

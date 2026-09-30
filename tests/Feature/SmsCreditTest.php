@@ -42,7 +42,8 @@ class SmsCreditTest extends TestCase
 
     private function fakeSms(): void
     {
-        Http::fake(['api.smsgatewayapi.com/*' => Http::response(['messageid' => 'abc123'], 200)]);
+        // Alles wat verder nog naar buiten wil (op de CI bijvoorbeeld een register), krijgt een leeg antwoord.
+        Http::fake(['api.smsgatewayapi.com/*' => Http::response(['messageid' => 'abc123'], 200), '*' => Http::response([], 200)]);
     }
 
     public function test_bundles_cost_the_purchase_price_plus_the_markup(): void
@@ -206,7 +207,9 @@ class SmsCreditTest extends TestCase
             ->assertRedirect()->assertSessionHasNoErrors();
         $demand = PaymentDemand::firstOrFail();
 
-        Http::assertSent(fn ($request) => $request['to'] === '31612345678'
+        // Alleen het verzoek aan Smstools bekijken: op de CI gaan er ook andere verzoeken uit.
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'smsgatewayapi.com')
+            && $request['to'] === '31612345678'
             && str_contains($request['message'], 'laatste aanmaning voor factuur ' . $invoice->number)
             && str_contains($request['message'], '/u/'));
         $this->assertSame(4, $credits->balance($user->company));

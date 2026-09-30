@@ -13,6 +13,7 @@ const props = defineProps({
   timer: Object,               // lopende timer van deze gebruiker (of null)
   customers: Array,            // { id, name, hourly_rate }
   projects: Array,             // eerder gebruikte projectnamen
+  project_options: { type: Array, default: () => [] }, // echte projecten (1.73.0)
   default_hourly_rate: Number, // standaardtarief van het bedrijf (of null)
   time_cards: { type: Array, default: () => [] }, // strippenkaarten (tegoeden per klant)
 });
@@ -42,6 +43,7 @@ const editingId = ref(null);
 const form = useForm({
   customer_id: props.filters.customer_id || null,
   project: '',
+  project_id: null,
   description: '',
   work_date: today,
   duration: '',
@@ -61,6 +63,7 @@ const submit = () => {
     .transform((data) => ({
       customer_id: data.customer_id || null,
       project: data.project || null,
+      project_id: data.project_id || null,
       description: data.description,
       work_date: data.work_date,
       minutes: parseDuration(data.duration),
@@ -85,6 +88,7 @@ const startEdit = (e) => {
   editingId.value = e.id;
   form.customer_id = e.customer_id;
   form.project = e.project || '';
+  form.project_id = e.project_id || null;
   form.description = e.description;
   form.work_date = e.work_date;
   form.duration = dur(e.minutes);
@@ -258,7 +262,15 @@ const totalOpenAmount = computed(() => {
               <option v-for="c in customers" :key="c.id" :value="c.id">{{ c.name }}</option>
             </select>
           </div>
-          <div class="form-group">
+          <!-- Zijn er projecten, dan kies je er een (de uren tellen dan mee in de calculatie); anders een vrije naam. -->
+          <div v-if="project_options.length" class="form-group">
+            <label>{{ $t('Project') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+            <select v-model="form.project_id">
+              <option :value="null">{{ $t('Geen project') }}</option>
+              <option v-for="p in project_options" :key="p.id" :value="p.id">{{ p.label }}</option>
+            </select>
+          </div>
+          <div v-else class="form-group">
             <label>{{ $t('Project') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
             <input type="text" v-model="form.project" list="project-list" maxlength="100" :placeholder="$t('Bijv. Website')">
             <datalist id="project-list"><option v-for="p in projects" :key="p" :value="p" /></datalist>

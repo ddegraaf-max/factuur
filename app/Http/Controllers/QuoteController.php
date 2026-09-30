@@ -69,6 +69,7 @@ class QuoteController extends Controller
         return Inertia::render('Quotes/Form', array_merge($this->formData(), [
             'quote' => null,
             'preselect_customer_id' => $request->input('customer_id'),
+            'preselect_project_id' => $request->integer('project') ?: null,
         ]));
     }
 
@@ -216,8 +217,9 @@ class QuoteController extends Controller
 
         $quote->load('lines');
 
-        return Inertia::render('Quotes/Form', array_merge($this->formData(), [
+        return Inertia::render('Quotes/Form', array_merge($this->formData($quote->project_id), [
             'quote' => $quote,
+            'preselect_project_id' => null,
         ]));
     }
 
@@ -359,11 +361,13 @@ class QuoteController extends Controller
         return redirect()->route('quotes.show', $fresh)->with('flash', $message);
     }
 
-    protected function formData(): array
+    protected function formData(?int $projectId = null): array
     {
         $company = auth()->user()->company;
 
         return [
+            // Open projecten voor de keuzelijst (plus het project van deze offerte, ook als het gesloten is).
+            'projects' => app(\App\Services\ProjectService::class)->options($company, $projectId),
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'address_line', 'postal_code', 'city', 'country', 'vat_number', 'kvk_number', 'email', 'language']),
             // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
             'default_language' => \App\Support\DocumentLocale::default(),
@@ -395,6 +399,7 @@ class QuoteController extends Controller
             'quote_date' => ['required', 'date'],
             'valid_days' => ['required', 'integer', 'min:1', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],
+            'project_id' => ['nullable', 'integer'],
             'intro' => ['nullable', 'string', 'max:2000'],
             'notes' => ['nullable', 'string'],
             'lines' => ['required', 'array', 'min:1'],

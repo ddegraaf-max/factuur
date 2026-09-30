@@ -1477,5 +1477,18 @@
   "Handelsregister (KvK)": "Trade register (KvK)",
   "Insolventieregister": "Insolvency register",
   "Klantscore bijgewerkt: nog te weinig gegevens voor een score.": "Customer score updated: not enough data for a score yet.",
-  "Klantscore bijgewerkt: :grade, :label.": "Customer score updated: :grade, :label."
+  "Klantscore bijgewerkt: :grade, :label.": "Customer score updated: :grade, :label.",
+  "Project :number aangemaakt: :name": "Project :number created: :name",
+  "Project :number aangemaakt.": "Project :number created.",
+  "Project bijgewerkt.": "Project updated.",
+  "Project gesloten.": "Project closed.",
+  "Project heropend.": "Project reopened.",
+  "Project :number verwijderd. De documenten zelf zijn er nog.": "Project :number deleted. The documents themselves still exist.",
+  "Calculatie opgeslagen.": "Calculation saved.",
+  ":n gekoppeld aan :number.": ":n linked to :number.",
+  "Losgemaakt van :number.": "Unlinked from :number.",
+  "Geef het project een naam.": "Give the project a name.",
+  "De einddatum ligt vóór de startdatum.": "The end date is before the start date.",
+  "Onbekend soort document.": "Unknown kind of document.",
+  "Zonder omschrijving": "Without description"
 }

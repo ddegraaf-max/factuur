@@ -56,6 +56,8 @@ class QuoteManager
                 'language' => $language,
                 'status' => 'draft',
                 'reference' => $data['reference'] ?? null,
+                // Alleen een project van dezelfde administratie.
+                'project_id' => \App\Models\Project::withoutGlobalScope('company')->where('company_id', $company->id)->whereKey($data['project_id'] ?? 0)->value('id'),
                 'quote_date' => $quoteDate,
                 'valid_until' => $quoteDate->copy()->addDays($validDays),
 
@@ -162,6 +164,9 @@ class QuoteManager
             $quote->update($brandChanges + $customerChanges + [
                 // Leeggemaakt veld = null; sleutel aanwezig is het criterium (zie InvoiceManager).
                 'reference' => array_key_exists('reference', $data) ? $data['reference'] : $quote->reference,
+                'project_id' => array_key_exists('project_id', $data)
+                    ? \App\Models\Project::withoutGlobalScope('company')->where('company_id', $quote->company_id)->whereKey($data['project_id'] ?? 0)->value('id')
+                    : $quote->project_id,
                 'quote_date' => $quoteDate,
                 'valid_until' => $quoteDate->copy()->addDays($validDays),
                 'subtotal' => $totals['subtotal'],
@@ -381,6 +386,8 @@ class QuoteManager
                 'language' => $quote->language,
                 'invoice_date' => now()->toDateString(),
                 'reference' => $quote->reference ?: __('Offerte :number', ['number' => $quote->number]),
+                // De factuur hoort bij hetzelfde project als de offerte.
+                'project_id' => $quote->project_id,
                 'notes' => $quote->notes,
                 'vat_reversed' => (bool) $quote->vat_reversed,
                 'lines' => $lines,

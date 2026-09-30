@@ -169,6 +169,8 @@ class PurchaseInvoiceController extends Controller
             'purchase' => null,
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::categories(),
+            'projects' => app(\App\Services\ProjectService::class)->options($company),
+            'preselect_project_id' => $request->integer('project') ?: null,
             'scan_enabled' => $scanner->availableFor($company),
             // De functie bestaat wél, maar zit in het Slim-abonnement: toon een upgradehint.
             'scan_locked' => $scanner->enabled() && ! $company->hasAiAccess(),
@@ -256,6 +258,8 @@ class PurchaseInvoiceController extends Controller
             ]),
             'suppliers' => $this->supplierSuggestions(),
             'categories' => self::categories(),
+            'projects' => app(\App\Services\ProjectService::class)->options($company, $purchase->project_id),
+            'preselect_project_id' => null,
             'scan_enabled' => $scanner->availableFor($company),
             'scan_locked' => $scanner->enabled() && ! $company->hasAiAccess(),
         ]);
@@ -506,6 +510,7 @@ class PurchaseInvoiceController extends Controller
             'supplier_name' => ['required', 'string', 'max:180'],
             'supplier_reference' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', 'string', 'max:60'],
+            'project_id' => ['nullable', 'integer'],
             'invoice_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date'],
             'vat_lines' => ['required', 'array', 'min:1'],
@@ -569,6 +574,8 @@ class PurchaseInvoiceController extends Controller
             'supplier_name' => trim($data['supplier_name']),
             'supplier_reference' => $data['supplier_reference'] ?? null,
             'category' => $data['category'] ?? null,
+            // Alleen een project van deze administratie (de scope regelt dat).
+            'project_id' => ! empty($data['project_id']) ? \App\Models\Project::whereKey($data['project_id'])->value('id') : null,
             'invoice_date' => $data['invoice_date'],
             'due_date' => $data['due_date'] ?? null,
             'status' => $isPaid ? 'paid' : 'open',

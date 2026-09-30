@@ -16,7 +16,7 @@ class Invoice extends Model
     use \App\Models\Concerns\HasVatTreatment;
 
     protected $fillable = [
-        'company_id', 'customer_id', 'brand_profile_id', 'number', 'portal_token', 'reference', 'status',
+        'company_id', 'project_id', 'customer_id', 'brand_profile_id', 'number', 'portal_token', 'reference', 'status',
         'is_credit', 'credits_invoice_id',
         'invoice_date', 'due_date', 'payment_terms', 'language',
         'customer_name', 'customer_address_line', 'customer_postal_code',

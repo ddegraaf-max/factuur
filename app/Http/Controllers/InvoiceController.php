@@ -92,6 +92,9 @@ class InvoiceController extends Controller
             // Kleineondernemersregeling: geen btw op het document.
             'vat_exempt' => \App\Support\Kor::applies(auth()->user()->company),
             'preselect_customer_id' => $request->input('customer_id'),
+            // Open projecten voor de keuzelijst; ?project= zet er meteen een klaar.
+            'projects' => app(\App\Services\ProjectService::class)->options(auth()->user()->company),
+            'preselect_project_id' => $request->integer('project') ?: null,
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
             // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
@@ -384,6 +387,8 @@ class InvoiceController extends Controller
             'vat_rates' => Market::vatRateOptions(),
             // Kleineondernemersregeling: geen btw op het document.
             'vat_exempt' => \App\Support\Kor::applies(auth()->user()->company),
+            'projects' => app(\App\Services\ProjectService::class)->options(auth()->user()->company, $invoice->project_id),
+            'preselect_project_id' => null,
             'price_mode' => auth()->user()->company?->price_mode ?? 'excl',
             'default_payment_terms' => (int) (auth()->user()->company?->default_payment_terms ?? 30),
             // Taal van een nieuw document zonder klanttaal: die van de markt (nl of pl).
@@ -845,6 +850,7 @@ class InvoiceController extends Controller
             'invoice_date' => ['required', 'date'],
             'payment_terms' => ['required', 'integer', 'min:0', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],
+            'project_id' => ['nullable', 'integer'],
             'notes' => ['nullable', 'string'],
             'lines' => ['required', 'array', 'min:1'],
             'lines.*.product_id' => ['nullable', 'integer', 'exists:products,id'],

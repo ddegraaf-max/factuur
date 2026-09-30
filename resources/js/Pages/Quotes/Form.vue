@@ -17,6 +17,8 @@ const props = defineProps({
   default_valid_days: { type: Number, default: 30 },
   default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
   preselect_customer_id: { type: [String, Number], default: null },
+  projects: { type: Array, default: () => [] },
+  preselect_project_id: { type: [String, Number], default: null },
   brand_profiles: { type: Array, default: () => [] }, // handelsnamen (leeg = geen keuze tonen)
   ai_enabled: Boolean, // "offerte uit tekst" (Slim-abonnement + API-key)
   ai_locked: Boolean,  // functie bestaat, maar zit in het Slim-abonnement
@@ -67,6 +69,7 @@ const form = useForm({
     ? daysBetween(props.quote.quote_date, props.quote.valid_until)
     : props.default_valid_days,
   reference: props.quote?.reference ?? '',
+  project_id: props.quote?.project_id ?? props.preselect_project_id ?? null,
   intro: props.quote?.intro ?? '',
   notes: props.quote?.notes ?? '',
   lines: props.quote?.lines?.length > 0
@@ -376,6 +379,16 @@ const submit = (action) => {
               <div class="form-group">
                 <label>{{ $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
                 <input type="text" v-model="form.reference" :placeholder="$t('Bijv. Verbouwing kantoor')" maxlength="255">
+              </div>
+            </div>
+            <!-- Project: de offerte is dan de afgesproken prijs in de projectcalculatie. -->
+            <div v-if="projects.length || form.project_id" class="form-row">
+              <div class="form-group">
+                <label>{{ $t('Project') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+                <select v-model="form.project_id">
+                  <option :value="null">{{ $t('Geen project') }}</option>
+                  <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.label }}</option>
+                </select>
               </div>
             </div>
             <div class="form-row">

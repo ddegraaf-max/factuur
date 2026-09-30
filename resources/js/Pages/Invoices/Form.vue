@@ -14,6 +14,8 @@ const props = defineProps({
   vat_rates: Array,
   vat_exempt: { type: Boolean, default: false }, // kleineondernemersregeling: geen btw op het document
   preselect_customer_id: { type: [String, Number], default: null },
+  projects: { type: Array, default: () => [] },
+  preselect_project_id: { type: [String, Number], default: null },
   price_mode: { type: String, default: 'excl' },
   default_payment_terms: { type: Number, default: 30 },
   default_language: { type: String, default: 'nl' }, // documenttaal als de klant er geen heeft (markt)
@@ -74,6 +76,7 @@ const form = useForm({
   // Standaardtermijn uit Instellingen → Bedrijfsgegevens (klant kan afwijken).
   payment_terms: props.invoice?.payment_terms ?? props.default_payment_terms ?? 30,
   reference: props.invoice?.reference ?? '',
+  project_id: props.invoice?.project_id ?? props.preselect_project_id ?? null,
   notes: props.invoice?.notes ?? '',
   lines: props.invoice?.lines?.length > 0
     ? props.invoice.lines.map(l => ({
@@ -373,6 +376,16 @@ const submit = (action) => {
               <div class="form-group">
                 <label>{{ isCredit ? $t('Crediteert factuur') : $t('Referentie') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
                 <input type="text" v-model="form.reference" :placeholder="isCredit ? $t('Factuurnummer, ook uit een ander pakket') : 'PROJ-2026-001'" maxlength="255">
+              </div>
+            </div>
+            <!-- Project: telt mee in de projectcalculatie (verkoop). -->
+            <div v-if="projects.length || form.project_id" class="form-row">
+              <div class="form-group">
+                <label>{{ $t('Project') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
+                <select v-model="form.project_id">
+                  <option :value="null">{{ $t('Geen project') }}</option>
+                  <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.label }}</option>
+                </select>
               </div>
             </div>
             <div class="form-row">

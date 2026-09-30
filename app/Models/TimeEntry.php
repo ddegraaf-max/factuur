@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class TimeEntry extends Model
 {
     protected $fillable = [
-        'company_id', 'user_id', 'customer_id', 'invoice_id', 'time_card_id',
+        'company_id', 'project_id', 'user_id', 'customer_id', 'invoice_id', 'time_card_id',
         'work_date', 'project', 'description', 'minutes',
         'hourly_rate', 'billable', 'timer_started_at',
     ];

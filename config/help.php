@@ -734,6 +734,33 @@ return [
         ],
 
         // ---------- UREN ----------
+        'projecten' => [
+            'category' => 'Uren',
+            'title' => 'Projecten en projectcalculatie',
+            'intro' => 'Per klus de offerte, de facturen, de inkoop, de uren en de uitvragen bij elkaar, met een voorcalculatie en het resultaat.',
+            'sections' => [
+                ['Een project aanmaken', [
+                    'Ga naar Verkoop → Projecten → Nieuw project. Geef het een naam, kies de klant en vul als je wilt de plaats, de periode en een omschrijving in. Het project krijgt een nummer (P-0001, P-0002, …).',
+                    'De afgesproken prijs komt uit de geaccepteerde offertes van het project. Is er geen offerte, vul de prijs dan zelf in.',
+                ]],
+                ['Documenten koppelen', [
+                    'Bij een offerte, factuur, inkoopfactuur en urenregel kies je voortaan het project. Een factuur die je uit een offerte maakt en een uitvraag vanuit een offerte horen vanzelf bij hetzelfde project.',
+                    'Op de projectpagina koppel je met "Koppelen" ook bestaande documenten die nog bij geen project horen, en maak je ze met het kruisje weer los. Het document zelf verandert niet.',
+                ]],
+                ['De calculatie', [
+                    'Met "Calculatie invullen" begroot je de kosten per soort: materiaal, arbeid, onderaanneming en overig. De tabel zet begroot tegenover werkelijk en toont het verschil.',
+                    'Werkelijke kosten: inkoopfacturen (de categorie "Inkoop goederen" telt als materiaal, "Uitbesteed werk" als onderaanneming, de rest als overig), uren tegen het uurtarief van de regel, en ritten tegen de kilometervergoeding.',
+                    'Een aan een onderaannemer gegunde prijs staat als verplichting bij het verwachte resultaat, totdat er een inkoopfactuur van dat bedrijf op het project staat.',
+                ]],
+                ['Resultaat en marge', [
+                    'Resultaat is gefactureerd min kosten; de marge is dat als deel van het gefactureerde bedrag. Het verwachte resultaat gaat uit van de afgesproken prijs en telt de nog te ontvangen inkoop mee. Alle bedragen zijn exclusief btw; ontvangen is wat er echt op je rekening staat.',
+                ]],
+                ['Sluiten', [
+                    'Is de klus klaar, sluit het project dan. Het verdwijnt uit de keuzelijsten, maar blijft te zien in het overzicht onder "Gesloten". Heropenen kan altijd.',
+                ]],
+            ],
+        ],
+
         'urenregistratie' => [
             'category' => 'Uren',
             'title' => 'Uren schrijven en met één klik factureren',

@@ -65,6 +65,8 @@ class InvoiceManager
                 'status' => 'draft',
                 'is_credit' => $isCredit,
                 'reference' => $data['reference'] ?? null,
+                // Alleen een project van dezelfde administratie.
+                'project_id' => \App\Models\Project::withoutGlobalScope('company')->where('company_id', $customer->company_id)->whereKey($data['project_id'] ?? 0)->value('id'),
                 'invoice_date' => $invoiceDate,
                 'due_date' => $isCredit ? $invoiceDate : $invoiceDate->copy()->addDays($paymentTerms),
                 'payment_terms' => $isCredit ? 0 : $paymentTerms,
@@ -182,6 +184,9 @@ class InvoiceManager
             // een opmerking of referentie nooit meer leeg te maken.
             $invoice->update($brandChanges + $customerChanges + [
                 'reference' => array_key_exists('reference', $data) ? $data['reference'] : $invoice->reference,
+                'project_id' => array_key_exists('project_id', $data)
+                    ? \App\Models\Project::withoutGlobalScope('company')->where('company_id', $invoice->company_id)->whereKey($data['project_id'] ?? 0)->value('id')
+                    : $invoice->project_id,
                 'invoice_date' => $invoiceDate,
                 'due_date' => $invoiceDate->copy()->addDays($paymentTerms),
                 'payment_terms' => $paymentTerms,

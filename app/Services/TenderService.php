@@ -130,6 +130,8 @@ class TenderService
             $round = TenderRound::create([
                 'company_id' => $company->id,
                 'quote_id' => $quote?->id,
+                // De uitvraag hoort bij het project van de offerte.
+                'project_id' => $quote?->project_id,
                 'work_package_id' => $package->id,
                 'title' => trim((string) ($data['title'] ?? '')) ?: $package->name,
                 'description' => $data['description'] ?? null,

@@ -13,7 +13,7 @@ class PurchaseInvoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id', 'supplier_name', 'supplier_reference', 'category',
+        'company_id', 'project_id', 'supplier_name', 'supplier_reference', 'category',
         'invoice_date', 'due_date', 'status', 'paid_at', 'payment_method',
         'subtotal', 'vat_total', 'total', 'vat_lines', 'deductions', 'notes',
     ];

@@ -535,6 +535,19 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Customers
         Route::resource('customers', CustomerController::class);
 
+        // Projecten: offertes, facturen, inkoop, uren, ritten en uitvragen per klus, met calculatie (1.73.0)
+        Route::get('projecten', [\App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+        Route::get('projecten/nieuw', [\App\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
+        Route::post('projecten', [\App\Http\Controllers\ProjectController::class, 'store'])->name('projects.store');
+        Route::get('projecten/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+        Route::get('projecten/{project}/bewerken', [\App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+        Route::patch('projecten/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])->name('projects.update');
+        Route::patch('projecten/{project}/status', [\App\Http\Controllers\ProjectController::class, 'status'])->name('projects.status');
+        Route::delete('projecten/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
+        Route::put('projecten/{project}/calculatie', [\App\Http\Controllers\ProjectController::class, 'budget'])->name('projects.budget');
+        Route::post('projecten/{project}/koppelen', [\App\Http\Controllers\ProjectController::class, 'link'])->name('projects.link');
+        Route::post('projecten/{project}/losmaken', [\App\Http\Controllers\ProjectController::class, 'unlink'])->name('projects.unlink');
+
         // Peppol: bereikbaarheid checken + facturen afleveren
         // Peppol-koppeling van de administratie (Instellingen → Koppelingen).
         Route::post('settings/peppol/activeren', [\App\Http\Controllers\PeppolController::class, 'activate'])->name('settings.integrations.peppol.activate');

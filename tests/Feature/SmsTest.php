@@ -207,7 +207,7 @@ class SmsTest extends TestCase
         $link = app(\App\Services\TenderService::class)->shortUrl($request);
         $this->post(route('tenders.sms', [$round, $request]), ['text' => 'Heeft u onze mail gezien? Reageren kan hier: ' . $link])
             ->assertRedirect()->assertSessionHasNoErrors();
-        Http::assertSent(fn ($r) => $r['to'] === '31611111111' && str_contains($r['message'], $link));
+        Http::assertSent(fn ($r) => str_contains($r->url(), 'smsgatewayapi.com') && $r['to'] === '31611111111' && str_contains($r['message'], $link));
         $this->assertNotNull($request->fresh()->sms_at);
         $this->assertSame($user->id, SmsMessage::firstOrFail()->user_id);
 

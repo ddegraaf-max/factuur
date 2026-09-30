@@ -52,6 +52,7 @@ class TimeEntryController extends Controller
             'customer_id' => $e->customer_id,
             'customer_name' => $e->customer?->name,
             'project' => $e->project,
+            'project_id' => $e->project_id,
             'description' => $e->description,
             'minutes' => $e->minutes,
             'hourly_rate' => $e->hourly_rate !== null ? (float) $e->hourly_rate : null,
@@ -110,6 +111,8 @@ class TimeEntryController extends Controller
             ] : null,
             'customers' => Customer::orderBy('name')->get(['id', 'name', 'hourly_rate']),
             'projects' => TimeEntry::whereNotNull('project')->select('project')->distinct()->orderBy('project')->limit(100)->pluck('project'),
+            // Echte projecten (1.73.0): de uren tellen dan mee in de projectcalculatie.
+            'project_options' => app(\App\Services\ProjectService::class)->options($company),
             'default_hourly_rate' => $company->default_hourly_rate !== null ? (float) $company->default_hourly_rate : null,
             // Strippenkaarten: tegoeden per klant (voor het beheerblok en de
             // "wordt afgeschreven van..."-hint bij het schrijven).
@@ -260,6 +263,7 @@ class TimeEntryController extends Controller
         $data = $request->validate([
             'customer_id' => ['nullable', 'integer', Rule::exists('customers', 'id')->where('company_id', $request->user()->company_id)],
             'project' => ['nullable', 'string', 'max:100'],
+            'project_id' => ['nullable', 'integer'],
             'description' => ['required', 'string', 'max:500'],
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
@@ -275,6 +279,8 @@ class TimeEntryController extends Controller
         return [
             'customer_id' => $data['customer_id'] ?? null,
             'project' => filled($data['project'] ?? null) ? trim($data['project']) : null,
+            // Alleen een project van deze administratie (de scope regelt dat).
+            'project_id' => ! empty($data['project_id']) ? \App\Models\Project::whereKey($data['project_id'])->value('id') : null,
             'description' => trim($data['description']),
             'work_date' => $data['work_date'],
             'minutes' => (int) $data['minutes'],

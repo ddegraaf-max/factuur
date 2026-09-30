@@ -1477,5 +1477,18 @@
   "Handelsregister (KvK)": "Rejestr (KvK)",
   "Insolventieregister": "Rejestr upadłości",
   "Klantscore bijgewerkt: nog te weinig gegevens voor een score.": "Ocena klienta zaktualizowana: wciąż za mało danych na ocenę.",
-  "Klantscore bijgewerkt: :grade, :label.": "Ocena klienta zaktualizowana: :grade, :label."
+  "Klantscore bijgewerkt: :grade, :label.": "Ocena klienta zaktualizowana: :grade, :label.",
+  "Project :number aangemaakt: :name": "Utworzono projekt :number: :name",
+  "Project :number aangemaakt.": "Utworzono projekt :number.",
+  "Project bijgewerkt.": "Projekt zaktualizowany.",
+  "Project gesloten.": "Projekt zamknięty.",
+  "Project heropend.": "Projekt ponownie otwarty.",
+  "Project :number verwijderd. De documenten zelf zijn er nog.": "Projekt :number usunięty. Same dokumenty nadal istnieją.",
+  "Calculatie opgeslagen.": "Kalkulacja zapisana.",
+  ":n gekoppeld aan :number.": ":n powiązano z :number.",
+  "Losgemaakt van :number.": "Odłączono od :number.",
+  "Geef het project een naam.": "Nadaj projektowi nazwę.",
+  "De einddatum ligt vóór de startdatum.": "Data zakończenia jest wcześniejsza niż data rozpoczęcia.",
+  "Onbekend soort document.": "Nieznany rodzaj dokumentu.",
+  "Zonder omschrijving": "Bez opisu"
 }
