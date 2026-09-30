@@ -65,6 +65,16 @@ class Payment extends Model
                     app(VvemaatService::class)->meldBetaling($invoice);
                 }
             }
+
+            /*
+             * De ontvangst in het grootboek: bank debet, debiteuren credit.
+             *
+             * Om dezelfde reden als de melding aan VvEMaat hierboven hangt dit
+             * hier en niet bij Mollie, het bankafletteren of het handmatig
+             * afboeken: dit is de enige plek waar alle vijf betaalwegen
+             * langskomen.
+             */
+            app(\App\Services\LedgerPostingService::class)->sync($payment);
         });
 
         static::deleted(function (Payment $payment) {
@@ -73,6 +83,36 @@ class Payment extends Model
                 $invoice->paid_total = $invoice->payments()->sum('amount');
                 $invoice->refreshStatus();
                 $invoice->saveQuietly();
+            }
+
+            /*
+             * Een verwijderde betaling hoort ook uit het grootboek. In een
+             * vastgesteld jaar kan dat niet meer; dan komt er een tegenboeking,
+             * zodat er geen gat in de nummering valt en zichtbaar blijft wat er
+             * is teruggedraaid.
+             */
+            $company = \App\Models\Company::find($payment->company_id);
+            $posting = app(\App\Services\LedgerPostingService::class);
+            if (! $company || ! $posting->enabled($company)) {
+                return;
+            }
+
+            $ledger = app(\App\Services\LedgerService::class);
+            $entry = $ledger->findBySource($company, 'payment', $payment->id);
+            if (! $entry) {
+                return;
+            }
+
+            try {
+                $ledger->removeForSource($company, 'payment', $payment->id);
+            } catch (\Throwable) {
+                try {
+                    $ledger->reverse($entry, null, 'betaling verwijderd');
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning('Grootboek: betaling terugboeken mislukt', [
+                        'payment' => $payment->id, 'fout' => $e->getMessage(),
+                    ]);
+                }
             }
         });
     }

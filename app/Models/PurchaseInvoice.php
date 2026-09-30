@@ -42,6 +42,17 @@ class PurchaseInvoice extends Model
                 $purchase->company_id = auth()->user()->company_id;
             }
         });
+
+        /*
+         * Het grootboek bijwerken: kosten debet, voorbelasting debet,
+         * crediteuren credit — en zodra er is betaald ook de betaling.
+         *
+         * Een inkoopfactuur heeft geen conceptfase: hij bestaat pas als iemand
+         * hem invoert, en dan is hij ook echt. Daarom boekt hij meteen.
+         */
+        static::saved(function (PurchaseInvoice $purchase) {
+            app(\App\Services\LedgerPostingService::class)->sync($purchase);
+        });
     }
 
     public function company(): BelongsTo { return $this->belongsTo(Company::class); }

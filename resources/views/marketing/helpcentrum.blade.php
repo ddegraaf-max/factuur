@@ -90,6 +90,15 @@
         <a class="help-link" href="{{ route('help.article', 'cashflow-prognose') }}">De cashflow-prognose →</a>
         <a class="help-link" href="{{ route('help.article', 'ouderdomsanalyse-debiteuren') }}">Debiteuren: wie staat er hoe lang open? →</a>
       </div>
+      {{-- Het grootboek krijgt een eigen kaart en staat niet onder "Inkoop &
+           BTW". Het is geen rapport over je facturen maar de boekhouding
+           eronder; wie ernaar zoekt zoekt niet bij de btw-aangifte. --}}
+      <div class="info-card">
+        <div class="ic-emoji">📗</div>
+        <h2 class="help-cat-title">Boekhouding</h2>
+        <p style="margin-bottom:12px;">Dubbel boekhouden onder je facturen: het grootboek, de balans en het boekjaar.</p>
+        <a class="help-link" href="{{ route('help.article', 'grootboek') }}">Het grootboek: proefbalans, balans en grootboekkaart →</a>
+      </div>
       <div class="info-card">
         <div class="ic-emoji">🤝</div>
         <h2 class="help-cat-title">Samenwerken &amp; klantenportaal</h2>

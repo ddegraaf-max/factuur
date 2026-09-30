@@ -772,6 +772,40 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         // Ouderdomsanalyse debiteuren: wie staat er hoe lang open
         Route::get('debiteuren', [\App\Http\Controllers\DebtorAgingController::class, 'index'])->name('aging.index');
+
+        /*
+         * Het grootboek (1.72.0). Inzien mag de boekhouder ook — dat is precies
+         * waar hij voor is ingehuurd. Boeken en vaststellen niet; dat staat in de
+         * groep voor de beheerder hieronder.
+         *
+         * market:nl, want dit is Nederlands recht: het rekeningschema is RGS,
+         * de btw-rubrieken zijn die van de Nederlandse aangifte en de auditfile
+         * is de XAF van de Belastingdienst. In Polen zou dit een boekhouding
+         * zijn die er wel uitziet maar niets betekent.
+         */
+        Route::middleware('market:nl')->group(function () {
+            Route::get('grootboek', [\App\Http\Controllers\LedgerController::class, 'accounts'])->name('ledger.accounts');
+            Route::get('grootboek/journaal', [\App\Http\Controllers\LedgerController::class, 'entries'])->name('ledger.entries');
+            Route::get('grootboek/proefbalans', [\App\Http\Controllers\LedgerController::class, 'trialBalance'])->name('ledger.trial');
+            Route::get('grootboek/balans', [\App\Http\Controllers\LedgerController::class, 'balanceSheet'])->name('ledger.sheet');
+            Route::get('grootboek/boekjaren', [\App\Http\Controllers\LedgerController::class, 'bookYears'])->name('ledger.years');
+            Route::get('grootboek/rekening/{account}', [\App\Http\Controllers\LedgerController::class, 'card'])->name('ledger.card');
+        });
+    });
+
+    // Boeken in het grootboek: alleen de beheerder, alleen in Nederland.
+    Route::middleware(['role:owner', 'market:nl'])->group(function () {
+        Route::post('grootboek/rekening', [\App\Http\Controllers\LedgerController::class, 'storeAccount'])->name('ledger.accounts.store');
+        Route::patch('grootboek/rekening/{account}', [\App\Http\Controllers\LedgerController::class, 'updateAccount'])->name('ledger.accounts.update');
+        Route::post('grootboek/journaal', [\App\Http\Controllers\LedgerController::class, 'storeEntry'])->name('ledger.entries.store');
+        Route::post('grootboek/journaal/{entry}/terugdraaien', [\App\Http\Controllers\LedgerController::class, 'reverseEntry'])->name('ledger.entries.reverse');
+        Route::post('grootboek/beginbalans', [\App\Http\Controllers\LedgerController::class, 'storeOpeningBalance'])->name('ledger.opening.store');
+        Route::post('grootboek/boekjaar/{year}/vaststellen', [\App\Http\Controllers\LedgerController::class, 'closeYear'])
+            ->where('year', '[0-9]{4}')->name('ledger.years.close');
+        Route::post('grootboek/boekjaar/{year}/heropenen', [\App\Http\Controllers\LedgerController::class, 'reopenYear'])
+            ->where('year', '[0-9]{4}')->name('ledger.years.reopen');
+        Route::post('grootboek/herbouwen', [\App\Http\Controllers\LedgerController::class, 'rebuild'])
+            ->middleware('throttle:5,1')->name('ledger.rebuild');
     });
 
     // Settings (alleen de beheerder)

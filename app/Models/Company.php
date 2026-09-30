@@ -76,6 +76,40 @@ class Company extends Model
         'subscription_cancel_emailed_at' => 'datetime',
     ];
 
+    protected static function booted(): void
+    {
+        /*
+         * Elke nieuwe administratie krijgt meteen een rekeningschema en
+         * dagboeken.
+         *
+         * Dat gebeurt hier en niet in de drie plekken waar een administratie
+         * ontstaat (aanmelden, administratie toevoegen, demo): dan vergeet de
+         * vierde het. Zonder schema kan er niets geboekt worden, en dan staat de
+         * eerste factuur van een nieuwe gebruiker buiten de boekhouding.
+         *
+         * Lukt het niet, dan gaat het aanmaken gewoon door — iemand die zich
+         * aanmeldt mag daar niet op stuklopen. `php artisan ledger:setup` haalt
+         * het achteraf in.
+         */
+        static::created(function (Company $company) {
+            // Alleen in de Nederlandse markt: het schema is RGS en de rubrieken
+            // zijn die van de Nederlandse btw-aangifte. Een Poolse administratie
+            // honderdvijfendertig Nederlandse rekeningen geven helpt niemand.
+            if (\App\Support\Market::key() !== 'nl') {
+                return;
+            }
+
+            try {
+                app(\App\Services\ChartOfAccountsService::class)->seed($company);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Rekeningschema aanleggen mislukt', [
+                    'company' => $company->id,
+                    'fout' => $e->getMessage(),
+                ]);
+            }
+        });
+    }
+
     public function users(): HasMany { return $this->hasMany(User::class); }
 
     /** Uniek inboek-adres voor het Postvak IN (bon-<token>@<inboekdomein>). */

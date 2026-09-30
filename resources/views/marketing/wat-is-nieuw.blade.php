@@ -31,6 +31,22 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.72.0</div>
+        <h2>Een echt grootboek: dubbel boekhouden onder je facturen</h2>
+        <ul class="tl-list">
+          <li><b>Debet is credit — altijd</b> — elke boeking moet in balans zijn, en dat wordt door de database zelf afgedwongen. Een post die niet sluit komt er domweg niet in.</li>
+          <li><b>Het officiële rekeningschema</b> — de rekeningen en nummers komen uit het Referentie Grootboekschema (RGS 3.3). Je accountant kent ze, en je kiest er zelf rekeningen uit bij.</li>
+          <li><b>Proefbalans, balans en grootboekkaart</b> — de stukken waar een boekhouder om vraagt, op elk moment van het jaar. De kaart van een rekening komt precies uit op wat de proefbalans zegt.</li>
+          <li><b>Je facturen boeken zichzelf</b> — een verstuurde factuur, een inkoopfactuur en een ontvangst komen automatisch in het journaal. Alles wat geen factuur is (een afschrijving, een privé-opname, een correctie) boek je in het memoriaal.</li>
+          <li><b>Overstappen zonder een jaar over te typen</b> — vul de beginbalans uit je oude pakket in: banksaldo, openstaande facturen, btw-stand. Sluit het niet helemaal, dan zie je precies hoeveel er nog uitgezocht moet worden.</li>
+          <li><b>Een vastgesteld jaar zit dicht</b> — na het vaststellen gaat het resultaat naar je eigen vermogen en kan er in dat jaar niets meer veranderen. Een correctie hoort dan in het lopende jaar.</li>
+          <li><b>De auditfile komt nu uit je boekhouding</b> — het XAF-bestand voor je accountant wordt niet meer uit je facturen afgeleid maar rechtstreeks uit het grootboek, met de RGS-code per rekening erbij.</li>
+          <li><b>Uitleg</b> — <a href="{{ route('help.article', 'grootboek') }}">zo werkt het grootboek</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.71.0</div>
         <h2>Klantscore: weet met wie je zaken doet</h2>
         <ul class="tl-list">

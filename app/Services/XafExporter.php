@@ -12,16 +12,31 @@ use XMLWriter;
 
 /**
  * Auditfile Financieel XAF 3.2 — dé standaard waarmee Nederlandse accountants
- * en de Belastingdienst een administratie inlezen. EasyInvoice is een
- * factuurpakket, geen grootboek; we bouwen daarom een compacte, sluitende
- * boekhouding op uit wat we wél weten:
+ * en de Belastingdienst een administratie inlezen.
+ *
+ * ── Twee wegen, en waarom er nog twee zijn ────────────────────────────────
+ *
+ * Is er een grootboek met boekingen in dit jaar, dan komt de auditfile daar
+ * regelrecht uit: de journaalposten zijn de transacties, de grootboekrekeningen
+ * zijn het rekeningschema, en de RGS-code gaat mee in leadCode zodat de
+ * accountant hem aan zijn eigen schema kan hangen. Dat is wat een echte
+ * boekhouding oplevert, en de reden dat het grootboek er is.
+ *
+ * Heeft een administratie nog geen grootboek — elke administratie die ouder is
+ * dan die functie — dan blijft de oude weg staan: een sluitende boekhouding ter
+ * plekke afleiden uit de facturen.
  *
  *   verkoopboek (S)  factuur → debiteuren (D) / omzet per btw-tarief (C) / af te dragen btw (C)
  *   inkoopboek  (P)  inkoopfactuur → kosten (D) / te vorderen btw (D) / crediteuren (C)
  *   bankboek    (B)  betaling → bank (D) / debiteuren (C)  ·  inkoop betaald → crediteuren (D) / bank (C)
  *
- * Creditnota's en afboekingen worden als tegengestelde boekingen opgenomen.
- * Het rekeningschema volgt de gangbare NL-nummering (RGS-achtig).
+ * Dat weghalen zou betekenen dat wie het grootboek nog niet heeft aangezet,
+ * ineens geen auditfile meer krijgt. Het is wel de mindere van de twee: er zit
+ * niets in wat geen factuur was, en de nummering is de onze in plaats van die
+ * van RGS. `php artisan ledger:setup` zet de goede weg aan.
+ *
+ * De toegestane waarden voor jrnTp (B, C, G, M, O, P, S, T, Y, Z) en accTp
+ * (B, M, P) komen uit XmlAuditfileFinancieel3.2.xsd zelf, niet uit ons hoofd.
  */
 class XafExporter
 {
@@ -61,6 +76,15 @@ class XafExporter
             ->whereBetween('invoice_date', [$start, $end])->orderBy('invoice_date')->orderBy('id')->get();
         $customers = Customer::withoutGlobalScope('company')->where('company_id', $company->id)->orderBy('id')->get();
         $suppliers = $purchases->pluck('supplier_name')->filter()->unique()->values();
+
+        /*
+         * Staat er een grootboek voor dit jaar? Dan komt de auditfile daaruit.
+         * Dit is de enige plek waar dat wordt beslist; de rest van deze functie
+         * kijkt alleen naar $uitGrootboek.
+         */
+        $boekingen = \App\Models\JournalEntry::withoutGlobalScope('company')
+            ->where('company_id', $company->id)->where('year', $year)->count();
+        $uitGrootboek = $boekingen > 0;
 
         $w = new XMLWriter();
         $w->openMemory();
@@ -111,17 +135,44 @@ class XafExporter
         $w->endElement();
 
         $w->startElement('generalLedger');
-        foreach (self::ACCOUNTS as $id => [$desc, $type]) {
-            $w->startElement('ledgerAccount');
-            $this->el($w, 'accID', $id);
-            $this->el($w, 'accDesc', $desc);
-            $this->el($w, 'accTp', $type);
-            $w->endElement();
+        if ($uitGrootboek) {
+            /*
+             * Het echte rekeningschema. leadCode krijgt de RGS-referentiecode:
+             * daarmee kan de accountant onze rekening aan zijn eigen schema
+             * hangen zonder een vertaaltabel te maken. Dat veld is er precies
+             * voor, en het is de reden dat we RGS-codes bijhouden.
+             */
+            foreach ($this->ledgerAccounts($company) as $a) {
+                $w->startElement('ledgerAccount');
+                $this->el($w, 'accID', $this->str($a['number'], 35));
+                $this->el($w, 'accDesc', $this->str($a['name'], 999));
+                $this->el($w, 'accTp', $a['type']);
+                if ($a['rgs']) {
+                    $this->el($w, 'leadCode', $a['rgs']);
+                    $this->el($w, 'leadDescription', $this->str($a['name'], 999));
+                    $this->el($w, 'leadReference', 'RGS 3.3');
+                }
+                $w->endElement();
+            }
+        } else {
+            foreach (self::ACCOUNTS as $id => [$desc, $type]) {
+                $w->startElement('ledgerAccount');
+                $this->el($w, 'accID', $id);
+                $this->el($w, 'accDesc', $desc);
+                $this->el($w, 'accTp', $type);
+                $w->endElement();
+            }
         }
         $w->endElement();
 
+        /*
+         * vatToPayAccID en vatToClaimAccID zijn in het schema een keyref naar
+         * accID: een btw-code mag alleen naar een rekening verwijzen die ook in
+         * generalLedger staat. Bij een export uit het grootboek zijn dat de
+         * RGS-nummers, niet de vaste nummers van de oude weg.
+         */
         $w->startElement('vatCodes');
-        foreach (self::VAT as [$id, $desc, $pay, $claim]) {
+        foreach ($uitGrootboek ? $this->ledgerVatCodes($company) : self::VAT as [$id, $desc, $pay, $claim]) {
             $w->startElement('vatCode');
             $this->el($w, 'vatID', $id);
             $this->el($w, 'vatDesc', $desc);
@@ -144,13 +195,15 @@ class XafExporter
 
         // ---- transactions (eerst opbouwen, dan schrijven: de totalen staan vooraan)
         $supplierIds = $suppliers->flip()->map(fn ($i) => 'L' . ($i + 1))->all();
-        $journals = [
-            'S' => ['desc' => 'Verkoopboek', 'transactions' => []],
-            'P' => ['desc' => 'Inkoopboek', 'transactions' => []],
-            'B' => ['desc' => 'Bankboek', 'transactions' => []],
-        ];
+        $journals = $uitGrootboek
+            ? $this->ledgerJournals($company, $year, $customers->pluck('id')->all())
+            : [
+                'S' => ['desc' => 'Verkoopboek', 'transactions' => []],
+                'P' => ['desc' => 'Inkoopboek', 'transactions' => []],
+                'B' => ['desc' => 'Bankboek', 'transactions' => []],
+            ];
 
-        foreach ($invoices as $inv) {
+        foreach ($uitGrootboek ? [] : $invoices as $inv) {
             $sign = $inv->is_credit ? -1 : 1;
             $lines = [];
             $lines[] = $this->line('1300', $inv->number, $inv->invoice_date, 'Factuur ' . $inv->number . ' ' . $inv->customer_name, $sign * (float) $inv->total, 'D', 'K' . $inv->customer_id, $inv->number);
@@ -178,7 +231,7 @@ class XafExporter
             }
         }
 
-        foreach ($purchases as $pi) {
+        foreach ($uitGrootboek ? [] : $purchases as $pi) {
             $ref = $pi->supplier_reference ?: ('INK-' . $pi->id);
             $supId = $supplierIds[$pi->supplier_name] ?? null;
             $lines = [];
@@ -209,7 +262,10 @@ class XafExporter
             $w->startElement('journal');
             $this->el($w, 'jrnID', $jrnId);
             $this->el($w, 'desc', $journal['desc']);
-            $this->el($w, 'jrnTp', $jrnId);
+            // Bij de oude weg is de sleutel zelf al de schemacode (S/P/B); bij een
+            // export uit het grootboek staat de code apart, want daar heet het
+            // dagboek VRK of INK.
+            $this->el($w, 'jrnTp', $journal['tp'] ?? $jrnId);
             foreach ($journal['transactions'] as $t) {
                 $w->startElement('transaction');
                 $this->el($w, 'nr', $t['nr']);
@@ -249,6 +305,140 @@ class XafExporter
         $w->endDocument();
 
         return $w->outputMemory();
+    }
+
+    /**
+     * Het rekeningschema uit het grootboek.
+     *
+     * Alle rekeningen waarop geboekt kan worden gaan mee, ook als er dit jaar
+     * niets op staat. Dat moet: trLine/accID is in het schema een keyref naar
+     * accID, dus een regel mag niet verwijzen naar een rekening die hier
+     * ontbreekt. Een rekening te veel is onschuldig; een rekening te weinig
+     * maakt het hele bestand ongeldig.
+     *
+     * @return array<int, array{number:string, name:string, type:string, rgs:?string}>
+     */
+    private function ledgerAccounts(Company $company): array
+    {
+        return \App\Models\LedgerAccount::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->where('postable', true)
+            ->orderBy('sort')
+            ->get(['number', 'name', 'statement', 'rgs_code'])
+            ->map(fn ($a) => [
+                'number' => $a->number,
+                'name' => $a->name,
+                // Accounttype uit het schema: B = balans, P = winst en verlies.
+                'type' => $a->statement === 'balans' ? 'B' : 'P',
+                'rgs' => $a->rgs_code,
+            ])
+            ->all();
+    }
+
+    /**
+     * De btw-codes met de rekeningen uit dít schema erbij.
+     *
+     * @return array<int, array{0:string,1:string,2:?string,3:?string}>
+     */
+    private function ledgerVatCodes(Company $company): array
+    {
+        $nummer = \App\Models\LedgerAccount::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->whereNotNull('rgs_code')
+            ->pluck('number', 'rgs_code');
+
+        $voorbelasting = $nummer[\App\Support\Rgs::BTW_5B_VOORBELASTING] ?? null;
+
+        return [
+            ['H', 'Btw hoog 21%', $nummer[\App\Support\Rgs::BTW_1A_HOOG] ?? null, $voorbelasting],
+            ['L', 'Btw laag 9%', $nummer[\App\Support\Rgs::BTW_1B_LAAG] ?? null, $voorbelasting],
+            ['N', 'Btw 0% / verlegd / vrijgesteld', null, null],
+        ];
+    }
+
+    /**
+     * De journaalposten van het boekjaar, per dagboek, in de vorm die deze
+     * exporter verderop wegschrijft.
+     *
+     * De dagboeksoort wordt omgezet naar de codes die het schema toestaat:
+     * S verkoop, P inkoop, B bank, C kas, M memoriaal. Alles wat daar niet in
+     * past wordt Z (overig) — een geldige waarde, zodat een eigen dagboek het
+     * bestand niet onbruikbaar maakt.
+     *
+     * @param  array<int, int>  $klantIds  klanten die in customersSuppliers staan
+     */
+    private function ledgerJournals(Company $company, int $year, array $klantIds): array
+    {
+        $soort = ['verkoop' => 'S', 'inkoop' => 'P', 'bank' => 'B', 'kas' => 'C', 'memoriaal' => 'M'];
+        $bekend = array_flip($klantIds);
+
+        $posten = \App\Models\JournalEntry::withoutGlobalScope('company')
+            ->where('company_id', $company->id)
+            ->where('year', $year)
+            ->with(['journal:id,code,name,kind', 'lines.account:id,number'])
+            ->orderBy('date')->orderBy('id')
+            ->get();
+
+        $journals = [];
+
+        foreach ($posten as $post) {
+            $code = $post->journal?->code ?: 'MEM';
+            $type = $soort[$post->journal?->kind ?? ''] ?? 'Z';
+
+            $journals[$code] ??= ['desc' => $post->journal?->name ?: $code, 'transactions' => [], 'tp' => $type];
+
+            $regels = [];
+            foreach ($post->lines as $regel) {
+                $debet = $regel->debit_cents > 0;
+                $bedrag = ($debet ? $regel->debit_cents : $regel->credit_cents) / 100;
+
+                /*
+                 * custSupID is ook een keyref. Een klant die inmiddels is
+                 * verwijderd staat niet in customersSuppliers, en dan mag zijn
+                 * id hier niet staan — anders is het bestand ongeldig om een
+                 * klant die er niet meer is.
+                 */
+                $klant = ($regel->customer_id && isset($bekend[$regel->customer_id]))
+                    ? 'K' . $regel->customer_id
+                    : null;
+
+                $btw = null;
+                if ($regel->vat_cents != 0 && $regel->vat_rate !== null) {
+                    $tarief = (float) $regel->vat_rate;
+                    $id = match (true) {
+                        $tarief >= 20.5 => 'H',
+                        $tarief >= 8.5 => 'L',
+                        default => 'N',
+                    };
+                    $btw = [$id, $tarief, $regel->vat_cents / 100, $debet ? 'D' : 'C'];
+                }
+
+                $regels[] = $this->line(
+                    $regel->account?->number ?: '-',
+                    $post->number,
+                    $post->date,
+                    $regel->description ?: $post->description,
+                    $bedrag,
+                    $debet ? 'D' : 'C',
+                    $klant,
+                    $post->source_type === 'invoice' ? $post->number : null,
+                    $btw
+                );
+            }
+
+            if (! $regels) {
+                continue;
+            }
+
+            $journals[$code]['transactions'][] = [
+                'nr' => $post->number,
+                'desc' => $post->description,
+                'date' => Carbon::parse($post->date),
+                'lines' => $regels,
+            ];
+        }
+
+        return $journals;
     }
 
     /** Boekingsregel; negatieve bedragen (creditnota's) draaien de D/C-kant om. */

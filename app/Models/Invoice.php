@@ -75,6 +75,22 @@ class Invoice extends Model
                 $invoice->company_id = auth()->user()->company_id;
             }
         });
+
+        /*
+         * Het grootboek bijwerken.
+         *
+         * Een concept boekt niet; op het moment dat de factuur definitief wordt
+         * staat de status op 'sent' en zijn de regels er, en dan gaat de boeking
+         * erin. Dit hangt aan het opslaan en niet aan het versturen, omdat een
+         * factuur ook definitief kan worden zonder mail — bij het afletteren van
+         * de bank, bij een import, of bij een creditnota.
+         *
+         * Mislukt de boeking, dan gaat het opslaan gewoon door: zie de
+         * toelichting bij LedgerPostingService::sync().
+         */
+        static::saved(function (Invoice $invoice) {
+            app(\App\Services\LedgerPostingService::class)->sync($invoice);
+        });
     }
 
     public function company(): BelongsTo { return $this->belongsTo(Company::class); }

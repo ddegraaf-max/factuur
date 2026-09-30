@@ -280,6 +280,55 @@ return [
             ],
         ],
 
+        // ---------- GROOTBOEK ----------
+        'grootboek' => [
+            'category' => 'Boekhouding',
+            'title' => 'Het grootboek',
+            'intro' => 'Onder je facturen ligt een echte boekhouding: dubbel boekhouden, met een proefbalans die sluit en een balans die klopt. Dit is wat je accountant bedoelt als hij om "de cijfers" vraagt.',
+            'sections' => [
+                ['Wat dubbel boekhouden betekent', [
+                    'Elk bedrag staat twee keer: één keer waar het vandaan komt en één keer waar het naartoe gaat. Stuur je een factuur van € 1.210, dan staat er € 1.210 bij "wat klanten je nog moeten betalen" (debet) en daartegenover € 1.000 omzet plus € 210 btw die je moet afdragen (credit).',
+                    'Die twee kanten moeten altijd gelijk zijn. In {brand} wordt dat door de database zelf afgedwongen: een boeking die niet sluit komt er niet in. Niet door een controle die iemand kan overslaan — het kan gewoon niet.',
+                    'Daar heb je iets aan: als de proefbalans sluit, weet je dat er niets half is geboekt.',
+                ]],
+                ['Je facturen boeken zichzelf', [
+                    'Een factuur die je verstuurt komt in het verkoopboek. Een inkoopfactuur die je invoert komt in het inkoopboek, met de btw op voorbelasting. Een ontvangst komt in het bankboek en boekt de klant af.',
+                    'Je hoeft daar niets voor te doen. In het journaal zie je bij elke boeking waar hij vandaan komt.',
+                ]],
+                ['Het rekeningschema', [
+                    'De rekeningen komen uit het Referentie Grootboekschema (RGS 3.3) — de officiële lijst waarmee boekhoudpakketten, accountants en de Belastingdienst dezelfde taal spreken. De nummers zien er lang uit (1101010 voor debiteuren), maar dat is precies waarom je accountant ze herkent.',
+                    'Je begint met het startschema: ruim honderd rekeningen die voor een zzp\'er of klein mkb genoeg zijn. Wil je meer detail — telefoonkosten los van de rest bijvoorbeeld — dan kies je er een rekening bij uit RGS. Je krijgt de officiële code en het officiële nummer er automatisch bij.',
+                ]],
+                ['Wat geen factuur is: het memoriaal', [
+                    'Een afschrijving op je bestelauto, een privé-opname, de btw die je hebt afgedragen, een correctie van een verkeerde boeking: dat zijn geen facturen. Die boek je zelf, bij Grootboek → Journaal → Handmatige boeking.',
+                    'Het scherm rekent de twee kanten voor en zegt hoeveel er nog aan één kant te veel staat. Met "Rest" zet je het verschil in één klik op de laatste regel.',
+                    'Een boeking terugdraaien gaat met een tegenboeking, niet door hem te wissen. Een gat in de nummering is precies waar een accountant naar gaat zoeken.',
+                ]],
+                ['De stukken', [
+                    'Proefbalans: per rekening het totaal debet en credit. Bovenaan staat of hij sluit.',
+                    'Balans en resultaat: wat je hebt en wat je schuldig bent op een datum, met de winst of het verlies van het jaar eronder. Het resultaat staat ook op de balans, bij je eigen vermogen — daar sluit hij op.',
+                    'Grootboekkaart: alle boekingen op één rekening, met het beginsaldo erboven en een doorlopend saldo per regel. Handig als je wilt weten waar een bedrag vandaan komt.',
+                ]],
+                ['Overstappen van een ander pakket', [
+                    'Bij Grootboek → Boekjaren → Beginbalans neem je de eindbalans van vorig jaar over: je banksaldo, wat klanten nog moeten betalen, wat je nog aan leveranciers moet, en de btw-stand. Je hoeft geen jaar over te typen.',
+                    'Sluit je beginbalans niet helemaal, dan komt het verschil zichtbaar op een eigen regel bij je kapitaal te staan, met de aantekening dat het nog uitgezocht moet worden. Dat is beter dan een balans die klopt terwijl er iets mist.',
+                ]],
+                ['Een boekjaar vaststellen', [
+                    'Als je jaar klaar is, stel je het vast. De winst of het verlies gaat naar je ondernemingsvermogen, en daarna kan er in dat jaar niets meer worden geboekt — ook niet door ons.',
+                    'Dat laatste is het punt. Anders zou een jaarrekening niets betekenen, en zou de aangifte die je hebt ingediend later niet meer kloppen met je boeken. Een correctie hoort in het lopende jaar.',
+                    'Vaststellen kan alleen als de proefbalans en de balans van dat jaar sluiten. Je ziet per jaar of dat zo is.',
+                ]],
+                ['De auditfile voor je accountant', [
+                    'Bij Rapporten → Export boekhouder download je de auditfile (XAF 3.2) van een jaar. Die komt rechtstreeks uit je grootboek, met per rekening de RGS-code erbij, zodat je accountant hem zonder vertaaltabel inleest.',
+                    'Hij hoeft dan niets uit te zoeken, en rekent dus ook geen uren voor het uitzoeken.',
+                ]],
+                ['Goed om te weten', [
+                    'Het grootboek is er voor de Nederlandse markt: het rekeningschema is RGS, de btw-rubrieken zijn die van de Nederlandse aangifte en de auditfile is die van de Belastingdienst.',
+                    'Een boekhouder die je uitnodigt kan het grootboek inzien en de stukken downloaden, maar er niet in boeken.',
+                ]],
+            ],
+        ],
+
         // ---------- KLANTEN & PRODUCTEN ----------
         'klantscore' => [
             'category' => 'Klanten & producten',

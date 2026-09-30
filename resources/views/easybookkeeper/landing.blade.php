@@ -79,11 +79,12 @@
         <div class="feature-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         </div>
-        <div class="feature-title">Bank die zichzelf boekt</div>
+        <div class="feature-title">Bankmutaties die zichzelf afletteren</div>
         <div class="feature-desc">
-          Mutaties komen binnen via de bankkoppeling en worden voorgesteld op de
-          juiste rekening. U bevestigt; het pakket boekt. Wat het niet zeker weet,
-          blijft liggen in plaats van dat het iets verzint.
+          Mutaties komen binnen via de bankkoppeling en worden voorgesteld bij de
+          factuur waar ze bij horen. U bevestigt; het pakket boekt de ontvangst in
+          het grootboek. Wat het niet zeker weet blijft openstaan in plaats van
+          dat het iets verzint.
         </div>
       </div>
 
