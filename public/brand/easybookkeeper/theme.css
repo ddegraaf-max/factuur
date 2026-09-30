@@ -64,6 +64,30 @@ html[data-brand="easybookkeeper"] .btn-primary:hover {
   box-shadow: 0 6px 20px rgba(20, 107, 79, 0.32);
 }
 
+/*
+ * Drie plekken waar het rood van EasyInvoice hardgecodeerd in de
+ * marketinglayout staat en niet uit --brand komt.
+ *
+ * De stip vóór elk kopje kreeg daardoor een groene kern met een rode rand,
+ * meteen bovenaan de pagina, en achter de hero hing een rode waas over het
+ * groen. Lopra heeft hiervoor dezelfde drie regels; bij dit merk ontbraken ze.
+ *
+ * Het hoort eigenlijk in de layout zelf uit een variabele te komen. Dat is een
+ * wijziging in een bestand dat alle merken delen, en die laat ik liever niet
+ * tussendoor vallen terwijl er iemand anders in dezelfde repo werkt.
+ */
+html[data-brand="easybookkeeper"] .eyebrow::before {
+  box-shadow: 0 0 0 4px rgba(20, 107, 79, 0.14);
+}
+
+html[data-brand="easybookkeeper"] .hero::before {
+  background: radial-gradient(circle, rgba(20, 107, 79, 0.07) 0%, transparent 60%);
+}
+
+html[data-brand="easybookkeeper"] .page-hero::before {
+  background: radial-gradient(circle, rgba(20, 107, 79, 0.06) 0%, transparent 60%);
+}
+
 /* De zijbalk staat donker (dark_sidebar in config/brand.php). */
 html[data-brand="easybookkeeper"] .sidebar {
   background: var(--brand-darker);
