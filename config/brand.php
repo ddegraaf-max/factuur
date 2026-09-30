@@ -56,6 +56,21 @@ return [
             'favicon_ico' => null,
             'apple_touch' => '/images/easyinvoice-favicon-180.png',
             'og_image' => '/images/og-easyinvoice.png',
+            /*
+             * Het beeldmerk van dit merk zoals Stripe het kent.
+             *
+             * Een Stripe-account heeft één huisstijl, en dit account bedient
+             * alle merken. Wat je in het dashboard instelt zou dus ook een
+             * EasyBookkeeper-klant te zien krijgen. Een Checkout-sessie kan het
+             * per keer overschrijven (branding_settings), en dat gebeurt met
+             * deze bestand-id's — zie StripeService::createCheckoutSession.
+             *
+             * De id's horen bij bestanden die met purpose business_icon en
+             * business_logo in Stripe staan; scripts/stripe-merkbestanden.sh
+             * zet ze erin en is opnieuw te draaien zonder dubbele kopieën.
+             */
+            'stripe_icon' => 'file_1ULTP8Bp1NB4xbZwYNh7VkQi',
+            'stripe_logo' => 'file_1ULTP8Bp1NB4xbZwklBtGfBF',
             'wordmark' => null,          // logo met naam (SVG); null = beeldmerk + tekst
             'wordmark_dark' => null,
 
@@ -112,6 +127,9 @@ return [
             'favicon_ico' => '/brand/lopra/favicon.ico',
             'apple_touch' => '/brand/lopra/lopra-icon-180.png',
             'og_image' => '/brand/lopra/og-lopra.png',
+            // Zie de toelichting bij EasyInvoice hierboven.
+            'stripe_icon' => 'file_1ULTPABp1NB4xbZwKwUaGHTj',
+            'stripe_logo' => 'file_1ULTPBBp1NB4xbZwBSEVvrKj',
             'wordmark' => '/brand/lopra/lopra-logo.svg',
             'wordmark_dark' => '/brand/lopra/lopra-logo-dark.svg',
 
@@ -165,6 +183,9 @@ return [
             'favicon_ico' => '/brand/lopra/favicon.ico',
             'apple_touch' => '/brand/lopra/lopra-icon-180.png',
             'og_image' => '/brand/lopra/og-lopra-pl.png',
+            // Zie de toelichting bij EasyInvoice hierboven.
+            'stripe_icon' => 'file_1ULTPABp1NB4xbZwKwUaGHTj',
+            'stripe_logo' => 'file_1ULTPBBp1NB4xbZwBSEVvrKj',
             'wordmark' => '/brand/lopra/lopra-logo.svg',
             'wordmark_dark' => '/brand/lopra/lopra-logo-dark.svg',
 
@@ -253,6 +274,9 @@ return [
             'favicon_ico' => '/brand/easybookkeeper/favicon.ico',
             'apple_touch' => '/brand/easybookkeeper/eb-icon-180.png',
             'og_image' => '/brand/easybookkeeper/og-easybookkeeper.png',
+            // Zie de toelichting bij EasyInvoice hierboven.
+            'stripe_icon' => 'file_1ULTP9Bp1NB4xbZwX0WeRaaA',
+            'stripe_logo' => null,
             'wordmark' => '/brand/easybookkeeper/eb-logo.svg',
             'wordmark_dark' => '/brand/easybookkeeper/eb-logo-dark.svg',
 

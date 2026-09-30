@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Company;
+use App\Support\Brand;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -105,6 +106,44 @@ class StripeService
         });
     }
 
+    /**
+     * Het beeldmerk van het actieve merk voor deze Checkout-sessie.
+     *
+     * ── Waarom dit per sessie moet ────────────────────────────────────────
+     *
+     * Een Stripe-account heeft één huisstijl, en dit account bedient
+     * EasyInvoice, EasyBookkeeper en Lopra. Wat in het dashboard staat zou dus
+     * ook een EasyBookkeeper-klant te zien krijgen op zijn betaalpagina, en dat
+     * is precies het moment waarop iemand wil herkennen bij wie hij afrekent.
+     *
+     * De Checkout-sessie kan het per keer overschrijven. De vorm is genest en
+     * niet plat: branding_settings[icon][file] met daarnaast [type]=file. Dat
+     * is uitgezocht door het de API te vragen — de platte vorm levert "Invalid
+     * object" op, wat er verwarrend genoeg uitziet als een ongeldig bestand.
+     *
+     * Staat er voor een merk geen bestand-id in config/brand.php, dan sturen we
+     * niets mee en geldt de huisstijl van het account. Beter een merkloze
+     * pagina dan een pagina met het verkeerde merk erop.
+     *
+     * @return array<string, string>
+     */
+    private function brandingSettings(): array
+    {
+        $uit = [];
+
+        foreach (['icon' => 'stripe_icon', 'logo' => 'stripe_logo'] as $veld => $sleutel) {
+            $bestand = (string) Brand::get($sleutel, '');
+            if ($bestand === '') {
+                continue;
+            }
+
+            $uit["branding_settings[{$veld}][file]"] = $bestand;
+            $uit["branding_settings[{$veld}][type]"] = 'file';
+        }
+
+        return $uit;
+    }
+
     /** Vertaal een Stripe-price-id naar onze abonnementssmaak. */
     public function planForPrice(?string $priceId): ?string
     {
@@ -194,6 +233,8 @@ class StripeService
             'billing_address_collection' => 'required',
         ];
 
+        $payload += $this->brandingSettings();
+
         // Bij afsluiten tijdens de proefperiode: eerste afschrijving pas op het
         // einde van de proef (geen dubbele dagen, geen directe kosten).
         if ($trialEnd) {
@@ -228,19 +269,22 @@ class StripeService
 
     /**
      * Eenmalige betaling (bijvoorbeeld sms-tegoed): maakt een Checkout-sessie
-     * voor één bedrag inclusief btw en geeft het id en het adres terug. Stripe
-     * maakt er een betaalbewijs bij.
+     * voor één bedrag exclusief btw en geeft het id en het adres terug. Stripe
+     * rekent de btw erbovenop (zelfde werkwijze als het abonnement: automatic_tax,
+     * btw-nummer en adres uitvragen) en maakt er een factuur bij, mét btw-regel.
      *
      * @param  array<string, string>  $metadata
      * @return array{id: string, url: string}
      */
-    public function createPaymentSession(Company $company, string $name, string $description, int $amountCents, array $metadata, string $successUrl, string $cancelUrl): array
+    public function createPaymentSession(Company $company, string $name, string $description, int $amountExclCents, array $metadata, string $successUrl, string $cancelUrl): array
     {
         $payload = [
             'mode' => 'payment',
             'line_items[0][quantity]' => 1,
             'line_items[0][price_data][currency]' => 'eur',
-            'line_items[0][price_data][unit_amount]' => $amountCents,
+            'line_items[0][price_data][unit_amount]' => $amountExclCents,
+            // Verplicht zodra automatic_tax aanstaat: het bedrag is exclusief.
+            'line_items[0][price_data][tax_behavior]' => 'exclusive',
             'line_items[0][price_data][product_data][name]' => $name,
             'line_items[0][price_data][product_data][description]' => $description,
             'success_url' => $successUrl,
@@ -248,6 +292,11 @@ class StripeService
             'client_reference_id' => (string) $company->id,
             'invoice_creation[enabled]' => 'true',
             'invoice_creation[invoice_data][description]' => $name . ' — ' . $description,
+            // Zie createCheckoutSession: zonder dit rekent Stripe geen btw en
+            // krijgt de klant een factuur zonder btw-regel.
+            'automatic_tax[enabled]' => 'true',
+            'tax_id_collection[enabled]' => 'true',
+            'billing_address_collection' => 'required',
         ];
         foreach ($metadata as $key => $value) {
             $payload["metadata[{$key}]"] = $value;
@@ -255,8 +304,15 @@ class StripeService
 
         if ($company->stripe_customer_id) {
             $payload['customer'] = $company->stripe_customer_id;
-        } elseif ($company->email) {
-            $payload['customer_email'] = $company->email;
+            $payload['customer_update[address]'] = 'auto';
+            $payload['customer_update[name]'] = 'auto';
+        } else {
+            // Bij een losse betaling maakt Stripe anders een "gast"; die kan geen
+            // btw-nummer dragen en de factuur hangt nergens aan. Dus altijd een klant.
+            $payload['customer_creation'] = 'always';
+            if ($company->email) {
+                $payload['customer_email'] = $company->email;
+            }
         }
 
         $response = $this->request()->post(self::BASE.'/checkout/sessions', $payload);
