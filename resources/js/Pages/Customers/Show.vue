@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import StatusPill from '@/Components/StatusPill.vue';
@@ -15,6 +15,15 @@ const props = defineProps({
   quotes: Array,
   quotes_total: Number,
   hours_url: { type: String, default: null },
+  score: { type: Object, default: null },
+});
+
+// Klantscore opnieuw laten rekenen, met een verse blik op de openbare bronnen.
+const refreshing = ref(false);
+const refreshScore = () => router.post(route('customers.score', props.customer.id), {}, {
+  preserveScroll: true,
+  onStart: () => { refreshing.value = true; },
+  onFinish: () => { refreshing.value = false; },
 });
 
 // Kolom Open: bij een factuur wat de klant nog moet betalen, bij een creditnota het tegoed (negatief).
@@ -204,8 +213,41 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
         </div>
       </div>
 
-      <!-- Zijkolom: gegevens en notities -->
+      <!-- Zijkolom: klantscore, gegevens en notities -->
       <div class="cust-side">
+        <div v-if="score" class="card score-card" style="margin-bottom:16px;">
+          <div class="card-header">
+            <div class="card-title">{{ $t('Klantscore') }}</div>
+            <button type="button" class="card-link link-btn" :disabled="refreshing" @click="refreshScore">{{ refreshing ? $t('Bezig…') : $t('Opnieuw controleren') }}</button>
+          </div>
+          <div class="card-body">
+            <div class="score-head">
+              <div class="score-grade" :class="'g-' + (score.grade || 'x')">{{ score.grade || '?' }}</div>
+              <div>
+                <div class="score-label">{{ score.label }}</div>
+                <div class="score-sub">
+                  <template v-if="score.score !== null">{{ $t(':n van 100', { n: score.score }) }} · </template>{{ $t('gecontroleerd :date', { date: score.checked_at_label }) }}
+                </div>
+              </div>
+            </div>
+            <ul class="score-signals">
+              <li v-for="(s, i) in score.signals" :key="i" :class="{ neg: s.impact < 0 }">
+                <span>{{ s.label }}</span><b v-if="s.impact">{{ s.impact }}</b>
+              </li>
+            </ul>
+            <div class="score-sources">
+              <div v-for="src in score.sources" :key="src.key" class="score-source" :class="src.status">
+                <span class="dot"></span>
+                <div><b>{{ src.label }}</b> {{ src.text }}<span v-if="src.checked_at_label" class="muted"> ({{ src.checked_at_label }})</span></div>
+              </div>
+            </div>
+            <p class="score-note">
+              <template v-if="score.kind === 'consumer'">{{ $t('Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Voor een particulier zijn er verder geen openbare bronnen. Jij beslist.') }}</template>
+              <template v-else>{{ $t('Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.') }}</template>
+            </p>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <div class="card-title">{{ $t('Gegevens') }}</div>
@@ -293,4 +335,27 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
 
 @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .cust-grid { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) { .kpi-grid { grid-template-columns: minmax(0, 1fr); } }
+/* Klantscore */
+.score-head { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.score-grade { width: 52px; height: 52px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 26px; color: #fff; background: var(--text-4); flex: none; }
+.score-grade.g-A { background: var(--success); }
+.score-grade.g-B { background: #16A34A; }
+.score-grade.g-C { background: #D97706; }
+.score-grade.g-D { background: #EA580C; }
+.score-grade.g-E { background: var(--brand); }
+.score-label { font-weight: 700; font-size: 15px; }
+.score-sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+.score-signals { list-style: none; margin: 0 0 12px; padding: 0; font-size: 13px; }
+.score-signals li { display: flex; justify-content: space-between; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.score-signals li b { color: var(--text-3); font-variant-numeric: tabular-nums; }
+.score-signals li.neg b { color: var(--brand); }
+.score-sources { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; line-height: 1.5; }
+.score-source { display: flex; gap: 8px; align-items: flex-start; }
+.score-source .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; flex: none; background: var(--text-4); }
+.score-source.ok .dot { background: var(--success); }
+.score-source.warn .dot { background: #D97706; }
+.score-source.bad .dot { background: var(--brand); }
+.score-note { font-size: 12px; color: var(--text-3); line-height: 1.55; margin: 12px 0 0; }
+.link-btn { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
+.link-btn:disabled { opacity: 0.6; cursor: wait; }
 </style>

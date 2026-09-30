@@ -7,12 +7,14 @@ use App\Mail\PaymentDemandNoticeMail;
 use App\Models\Invoice;
 use App\Models\PaymentDemand;
 use App\Models\ReminderLog;
+use App\Models\ShortLink;
 use App\Support\Audit;
 use App\Support\DocumentLocale;
 use App\Support\Kor;
 use App\Support\LegalInterest;
 use App\Support\Market;
 use App\Support\PaymentQr;
+use App\Support\PhoneNumber;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -327,7 +329,58 @@ class PaymentDemandService
             'label' => Audit::label($invoice), 'to' => $demand->sent_to,
         ]), [], $invoice->company_id);
 
+        // Ook per sms, als daarvoor is gekozen. Mislukt de sms, dan staat de aanmaning er gewoon.
+        if (! empty($options['also_sms'])) {
+            try {
+                $this->sms($demand);
+            } catch (\DomainException $e) {
+                $this->log($demand, 'sms_failed', __('Sms niet verstuurd: :reason', ['reason' => $e->getMessage()]), null, 'creditor');
+            }
+        }
+
         return $demand;
+    }
+
+    /** Het mobiele nummer van de klant, als er een sms naartoe kan. */
+    public function mobile(PaymentDemand $demand): ?string
+    {
+        return $demand->isStandalone() ? null : PhoneNumber::mobile($demand->invoice?->customer?->phone);
+    }
+
+    /** De tekst die klaarstaat voor de sms, in de taal van de factuur. */
+    public function smsText(PaymentDemand $demand): string
+    {
+        $invoice = $demand->invoice;
+        $claim = $this->claim($demand);
+        $link = ShortLink::for($demand->url(), $demand->company_id)->shortUrl();
+
+        return DocumentLocale::using($invoice->language, fn () => __(':company: laatste aanmaning voor factuur :number. Te betalen :amount, uiterlijk :date. Bekijk en betaal: :link', [
+            'company' => $invoice->brandedCompany()->name,
+            'number' => $invoice->number,
+            'amount' => money($claim['total']),
+            'date' => $demand->deadline->translatedFormat('j F Y'),
+            'link' => $link,
+        ]));
+    }
+
+    /**
+     * Stuurt de klant een sms met de link naar de pagina van de aanmaning.
+     * Alleen bij een aanmaning vanuit een administratie, zolang ze loopt.
+     */
+    public function sms(PaymentDemand $demand, ?string $text = null, ?int $userId = null): void
+    {
+        if ($demand->isStandalone() || ! $demand->isActive()) {
+            throw new \DomainException(__('Een sms kan alleen bij een lopende aanmaning.'));
+        }
+
+        $link = ShortLink::for($demand->url(), $demand->company_id)->shortUrl();
+        $text = filled($text) ? trim($text) : $this->smsText($demand);
+        if (! str_contains($text, $link)) {
+            throw new \DomainException(__('Laat de link in het bericht staan: zonder link komt je klant niet bij de aanmaning.'));
+        }
+
+        $message = app(SmsService::class)->send($demand->invoice->company, $demand->invoice->customer?->phone, $text, $demand, $userId);
+        $this->log($demand, 'sms', __('Sms met de link naar de aanmaning verstuurd naar :to', ['to' => PhoneNumber::display($message->recipient)]), null, 'creditor');
     }
 
     /**

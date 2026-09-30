@@ -61,6 +61,17 @@ class StripeWebhookController extends Controller
 
     private function onCheckoutCompleted(array $session): void
     {
+        // Sms-tegoed is een losse betaling: tegoed bijboeken, en verder niets
+        // (geen abonnement, en de mails van de proefperiode lopen gewoon door).
+        if (($session['metadata']['kind'] ?? null) === 'sms_credits') {
+            $purchase = app(\App\Services\SmsCreditService::class)->fulfil($session);
+            if ($purchase && ! empty($session['customer']) && ! $purchase->company->stripe_customer_id) {
+                $purchase->company->forceFill(['stripe_customer_id' => $session['customer']])->save();
+            }
+
+            return;
+        }
+
         $company = $this->resolveCompany($session, $session['client_reference_id'] ?? null);
         if (! $company) {
             return;

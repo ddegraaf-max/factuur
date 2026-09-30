@@ -21,6 +21,12 @@ class StripeService
             && ! empty(config('services.stripe.price_id'));
     }
 
+    /** Kan er een losse betaling worden gedaan (bijvoorbeeld sms-tegoed)? Daarvoor is alleen de sleutel nodig. */
+    public function canCharge(): bool
+    {
+        return ! empty(config('services.stripe.secret'));
+    }
+
     /** Is het Slim-abonnement af te sluiten (aparte Stripe-price ingesteld)? */
     public function slimConfigured(): bool
     {
@@ -167,6 +173,48 @@ class StripeService
         }
 
         return $response->json('url');
+    }
+
+    /**
+     * Eenmalige betaling (bijvoorbeeld sms-tegoed): maakt een Checkout-sessie
+     * voor één bedrag inclusief btw en geeft het id en het adres terug. Stripe
+     * maakt er een betaalbewijs bij.
+     *
+     * @param  array<string, string>  $metadata
+     * @return array{id: string, url: string}
+     */
+    public function createPaymentSession(Company $company, string $name, string $description, int $amountCents, array $metadata, string $successUrl, string $cancelUrl): array
+    {
+        $payload = [
+            'mode' => 'payment',
+            'line_items[0][quantity]' => 1,
+            'line_items[0][price_data][currency]' => 'eur',
+            'line_items[0][price_data][unit_amount]' => $amountCents,
+            'line_items[0][price_data][product_data][name]' => $name,
+            'line_items[0][price_data][product_data][description]' => $description,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'client_reference_id' => (string) $company->id,
+            'invoice_creation[enabled]' => 'true',
+            'invoice_creation[invoice_data][description]' => $name . ' — ' . $description,
+        ];
+        foreach ($metadata as $key => $value) {
+            $payload["metadata[{$key}]"] = $value;
+        }
+
+        if ($company->stripe_customer_id) {
+            $payload['customer'] = $company->stripe_customer_id;
+        } elseif ($company->email) {
+            $payload['customer_email'] = $company->email;
+        }
+
+        $response = $this->request()->post(self::BASE.'/checkout/sessions', $payload);
+
+        if ($response->failed()) {
+            throw new RuntimeException('Stripe betaling mislukt: '.$response->body());
+        }
+
+        return ['id' => (string) $response->json('id'), 'url' => (string) $response->json('url')];
     }
 
     /**

@@ -104,6 +104,13 @@ return [
         // Weergaveprijs per rekening per maand (excl. btw); het echte bedrag zit in de Stripe-price.
         'account_price' => (float) env('PONTO_ACCOUNT_PRICE', 5),
     ],
+    // Centraal Insolventieregister (Rechtspraak): gratis webservice na aanmelden op
+    // insolventies.rechtspraak.nl. Zonder gebruikersnaam en wachtwoord slaat de klantscore deze bron over.
+    'cir' => [
+        'username' => env('CIR_USERNAME'),
+        'password' => env('CIR_PASSWORD'),
+        'url' => env('CIR_URL', 'https://webservice.rechtspraak.nl/cir.asmx'),
+    ],
     // Sms via Smstools (api.smsgatewayapi.com). Zonder beide sleutels bestaat de functie niet.
     // De korte namen (client_id, client_secret) lezen we ook, voor wie ze zo in Railway heeft gezet.
     // SMSTOOLS_COMPANIES: ids van administraties die mogen sms'en, of * voor iedereen;

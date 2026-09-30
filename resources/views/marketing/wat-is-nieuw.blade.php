@@ -31,13 +31,39 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.71.0</div>
+        <h2>Klantscore: weet met wie je zaken doet</h2>
+        <ul class="tl-list">
+          <li><b>Een letter per klant</b> — van A (betaalt goed) tot E (hoog risico), met een getal van 0 tot 100 en de signalen erachter. Op de pagina van elke klant.</li>
+          <li><b>Betaalgedrag bij jou</b> — hoeveel dagen te laat, hoe vaak, openstaande achterstand, herinneringen en incasso.</li>
+          <li><b>Openbare bronnen</b> — het btw-nummer bij VIES, het Handelsregister (hoe lang bestaat het bedrijf, is het uitgeschreven) en het insolventieregister van de Rechtspraak.</li>
+          <li><b>Ook voor particulieren</b> — op basis van je eigen facturen en het insolventieregister; verder zijn er voor een persoon geen openbare bronnen.</li>
+          <li><b>Jij beslist</b> — het is een indicatie, geen kredietrapport. {{ brand('name') }} weigert niets en deelt niets met anderen. <a href="{{ route('help.article', 'klantscore') }}">Zo werkt het</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.70.0</div>
+        <h2>Sms: een aanmaning of prijsaanvraag op de telefoon van je klant</h2>
+        <ul class="tl-list">
+          <li><b>Aanmaning per sms</b> — vink bij de laatste aanmaning aan dat je klant ook een sms krijgt. Daarin staat een korte link naar de pagina waar hij betaalt of reageert.</li>
+          <li><b>Tegoed met een teller</b> — bij Instellingen → Sms koop je een bundel van 100 tot 1.000 sms'en. Je ziet hoeveel je er nog hebt; elke verstuurde sms gaat eraf.</li>
+          <li><b>Je betaalt alleen wat aankomt</b> — een sms die niet verstuurd kon worden, kost geen tegoed. Je tegoed verloopt niet.</li>
+          <li><b>Vooraf zien wat het kost</b> — voor het versturen staat erbij uit hoeveel sms'en je bericht bestaat.</li>
+          <li><b>Uitleg</b> — <a href="{{ route('help.article', 'sms-versturen') }}">zo werkt sms versturen</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 30 september 2026 · {{ brand('version_prefix') }} 1.69.0</div>
-        <h2>Uitvragen: een prijsaanvraag per sms (proef)</h2>
+        <h2>Uitvragen: een prijsaanvraag per sms</h2>
         <ul class="tl-list">
           <li><b>Voor bedrijven zonder e-mailadres</b> — veel kleine vakmensen hebben alleen een mobiel nummer. Zij krijgen de aanvraag per sms, met een korte link naar de pagina waar ze hun prijs doorgeven.</li>
           <li><b>Een sms achter je mail aan</b> — in de vergelijking stuur je met de knop Sms een bericht naar wie nog niet reageerde. De tekst staat klaar en pas je aan.</li>
           <li><b>Een kort adres van onszelf</b> — de link in de sms loopt via ons eigen adres, niet via een dienst van een ander.</li>
-          <li><b>Eerst een proef</b> — sms staat nog niet voor iedereen aan. Wil je het gebruiken, <a href="{{ route('contact') }}">laat het ons weten</a>.</li>
+          <li><b>Uit je tegoed</b> — een sms verstuur je uit je sms-tegoed; zie het bericht hierboven.</li>
         </ul>
       </article>
 

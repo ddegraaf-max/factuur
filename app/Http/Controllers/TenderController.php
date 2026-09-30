@@ -80,9 +80,13 @@ class TenderController extends Controller
             ])->values(),
             // Sms naar een mobiel nummer, met een korte link naar de aanvraag.
             'sms' => [
+                // Bestaat sms hier, en kan er nu een worden verstuurd (gratis of met tegoed)?
+                'enabled' => $this->sms->enabled($company),
                 'available' => $smsOn,
+                'free' => $this->sms->free($company),
                 'sender' => $smsOn ? $this->sms->sender($company) : null,
                 'remaining' => $smsOn ? $this->sms->remaining($company) : 0,
+                'buy_url' => auth()->user()->isOwner() && $this->sms->enabled($company) ? route('settings.sms') : null,
                 'max_segments' => SmsService::MAX_SEGMENTS,
                 // Alleen de eigenaar van het platform ziet wat er nog ontbreekt.
                 'missing' => ! $smsOn && OwnerAccess::allows(auth()->user()) ? $this->sms->missing() : null,

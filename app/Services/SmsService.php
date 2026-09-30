@@ -4,20 +4,24 @@ namespace App\Services;
 
 use App\Models\Company;
 use App\Models\SmsMessage;
+use App\Support\Market;
 use App\Support\OwnerAccess;
 use App\Support\PhoneNumber;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 /**
  * Sms versturen via Smstools (api.smsgatewayapi.com). De sleutels staan in de
  * omgeving (SMSTOOLS_CLIENT_ID en SMSTOOLS_CLIENT_SECRET); zonder sleutels
- * bestaat de functie niet. Het account is van het platform: elke sms kost
- * geld, dus alleen de administraties die daarvoor zijn aangewezen mogen
- * versturen, met een grens per maand.
+ * bestaat de functie niet. Het account is van het platform en elke sms kost
+ * geld: een administratie verstuurt uit haar gekochte tegoed
+ * (SmsCreditService), de eigen administraties van het platform zonder tegoed
+ * met een grens per maand.
  */
 class SmsService
 {
@@ -38,14 +42,31 @@ class SmsService
         return filled(config('services.smstools.client_id')) && filled(config('services.smstools.client_secret'));
     }
 
-    /** Mag deze administratie sms'en op kosten van het account? */
-    public function available(?Company $company): bool
+    /** Bestaat sms voor deze administratie? Los van de vraag of er tegoed is. */
+    public function enabled(?Company $company): bool
     {
-        if (! $company || $company->is_demo || ! $this->configured()) {
+        return $company !== null && ! $company->is_demo && $this->configured() && Market::is('nl');
+    }
+
+    /**
+     * Verstuurt deze administratie op kosten van het platform, zonder tegoed?
+     * Dat geldt voor de eigen administraties van de eigenaar (of wie in
+     * SMSTOOLS_COMPANIES staat); voor hen geldt alleen de grens per maand.
+     */
+    public function free(?Company $company): bool
+    {
+        if (! $this->enabled($company)) {
             return false;
         }
 
         return $this->allowed[$company->id] ??= $this->allows($company);
+    }
+
+    /** Kan deze administratie nu een sms versturen: gratis, of met tegoed? */
+    public function available(?Company $company): bool
+    {
+        return $this->enabled($company)
+            && ($this->free($company) || app(SmsCreditService::class)->balance($company) > 0);
     }
 
     /**
@@ -96,9 +117,13 @@ class SmsService
         return $length <= 160 ? 1 : (int) ceil($length / 153);
     }
 
-    /** Hoeveel sms'en deze administratie deze maand nog mag versturen. */
+    /** Hoeveel sms'en deze administratie nog kan versturen: het tegoed, of wat er deze maand nog mag. */
     public function remaining(Company $company): int
     {
+        if (! $this->free($company)) {
+            return $this->enabled($company) ? app(SmsCreditService::class)->balance($company) : 0;
+        }
+
         $used = (int) SmsMessage::where('company_id', $company->id)
             ->where('status', 'sent')
             ->where('created_at', '>=', now()->startOfMonth())
@@ -114,9 +139,10 @@ class SmsService
      */
     public function send(Company $company, ?string $to, string $body, ?Model $subject = null, ?int $userId = null): SmsMessage
     {
-        if (! $this->available($company)) {
+        if (! $this->enabled($company)) {
             throw new \DomainException(__('Sms versturen staat voor deze administratie niet aan.'));
         }
+        $free = $this->free($company);
         $number = PhoneNumber::mobile($to);
         if ($number === null) {
             throw new \DomainException(__('Er is geen mobiel nummer bekend; een sms kan alleen naar een mobiel nummer.'));
@@ -130,7 +156,9 @@ class SmsService
             throw new \DomainException(__('Het bericht is te lang voor een sms. Maak het korter.'));
         }
         if ($this->remaining($company) < $segments) {
-            throw new \DomainException(__('De grens van :limit sms\'en per maand is bereikt.', ['limit' => (int) config('services.smstools.monthly_limit')]));
+            throw new \DomainException($free
+                ? __('De grens van :limit sms\'en per maand is bereikt.', ['limit' => (int) config('services.smstools.monthly_limit')])
+                : __('Je sms-tegoed is niet genoeg voor dit bericht. Koop een bundel bij Instellingen, Sms.'));
         }
 
         $message = new SmsMessage([
@@ -168,6 +196,10 @@ class SmsService
         $id = $response->json('messageid');
         if ($response->successful() && filled($id)) {
             $message->fill(['status' => 'sent', 'provider_id' => Str::limit((string) $id, 80, '')])->save();
+            // Alleen een verstuurde sms kost tegoed.
+            if (! $free) {
+                app(SmsCreditService::class)->spend($company, $message);
+            }
 
             return $message;
         }
@@ -175,8 +207,33 @@ class SmsService
         $reason = (string) ($response->json('errorMsg') ?: ('HTTP ' . $response->status()));
         Log::error('Sms geweigerd', ['company' => $company->id, 'status' => $response->status(), 'reason' => $reason]);
         $message->fill(['error' => Str::limit($reason, 250, '')])->save();
+        $this->warnOwner($reason);
 
-        throw new \DomainException(__('De sms is niet verstuurd: :reason', ['reason' => $reason]));
+        throw new \DomainException($free
+            ? __('De sms is niet verstuurd: :reason', ['reason' => $reason])
+            : __('De sms kon niet worden verstuurd. Er is geen tegoed afgeschreven; probeer het later opnieuw.'));
+    }
+
+    /**
+     * Is het tegoed bij Smstools zelf op, dan kan geen enkele klant nog
+     * versturen: de eigenaar krijgt daar bericht van, hooguit eens per zes uur.
+     */
+    private function warnOwner(string $reason): void
+    {
+        if (! preg_match('/credit|saldo|balance/i', $reason) || ! Cache::add('sms:owner-warned', true, now()->addHours(6))) {
+            return;
+        }
+
+        try {
+            foreach (OwnerAccess::emails() as $email) {
+                Mail::raw(
+                    "Smstools weigert sms'en: {$reason}\n\nKlanten kunnen nu geen sms versturen. Koop credits bij Smstools.",
+                    fn ($mail) => $mail->to($email)->subject('Sms-tegoed bij Smstools is op'),
+                );
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Melding over sms-tegoed niet verstuurd', ['error' => $e->getMessage()]);
+        }
     }
 
     private function allows(Company $company): bool

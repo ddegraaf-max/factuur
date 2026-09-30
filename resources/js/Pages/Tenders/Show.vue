@@ -224,8 +224,16 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
           </tr>
         </tbody>
       </table>
-      <div v-if="sms.available" class="card-body att-note" style="margin-top:0;">
+      <div v-if="sms.available && sms.free" class="card-body att-note" style="margin-top:0;">
         {{ $t('Sms: een bedrijf met een mobiel nummer kun je een sms sturen met de link naar de aanvraag. Afzender :sender; deze maand nog :n te versturen.', { sender: sms.sender, n: sms.remaining }) }}
+      </div>
+      <div v-else-if="sms.available" class="card-body att-note" style="margin-top:0;">
+        {{ $t('Sms: een bedrijf met een mobiel nummer kun je een sms sturen met de link naar de aanvraag. Afzender :sender; tegoed: :n sms\'en.', { sender: sms.sender, n: sms.remaining }) }}
+        <Link v-if="sms.buy_url" :href="sms.buy_url" class="lnk">{{ $t('Tegoed kopen') }}</Link>
+      </div>
+      <div v-else-if="sms.enabled" class="card-body att-note" style="margin-top:0;">
+        {{ $t('Sms: je hebt geen tegoed. Met tegoed stuur je een bedrijf met een mobiel nummer een sms met de link naar de aanvraag.') }}
+        <Link v-if="sms.buy_url" :href="sms.buy_url" class="lnk">{{ $t('Tegoed kopen') }}</Link>
       </div>
       <div v-else-if="sms.missing" class="card-body att-note" style="margin-top:0;">
         {{ $t('Sms staat nog uit: in de omgeving ontbreekt :name.', { name: sms.missing }) }}

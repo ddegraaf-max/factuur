@@ -341,5 +341,11 @@
   "Versturen…": "Sending…",
   "Stuur nieuwe code": "Send new code",
   "Ander e-mailadres": "Different email address",
-  "De code is 10 minuten geldig. Check ook je spam-map.": "The code is valid for 10 minutes. Check your spam folder too."
+  "De code is 10 minuten geldig. Check ook je spam-map.": "The code is valid for 10 minutes. Check your spam folder too.",
+  "Klantscore": "Customer score",
+  "Opnieuw controleren": "Check again",
+  ":n van 100": ":n out of 100",
+  "gecontroleerd :date": "checked :date",
+  "Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Voor een particulier zijn er verder geen openbare bronnen. Jij beslist.": "An indication based on the payment behaviour with you and the insolvency register; not a credit report. For a private person there are no other public sources. You decide.",
+  "Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.": "An indication based on the payment behaviour with you and public sources; not a credit report. You decide."
 }

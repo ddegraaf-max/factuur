@@ -252,7 +252,63 @@ return [
             ],
         ],
 
+        'sms-versturen' => [
+            'category' => 'Betalingen & incasso',
+            'title' => 'Een sms versturen',
+            'intro' => 'Een aanmaning of een prijsaanvraag ook per sms, met een korte link. Je betaalt per sms, uit je tegoed.',
+            'sections' => [
+                ['Tegoed kopen', [
+                    'Ga naar Instellingen → Sms en kies een bundel. Je betaalt via Stripe, met iDEAL of kaart. Het tegoed staat er direct na de betaling en verloopt niet.',
+                    'Op dezelfde pagina zie je hoeveel sms\'en je nog hebt, welke bundels je kocht en welke berichten er zijn verstuurd.',
+                ]],
+                ['Wat kost een sms', [
+                    'Eén sms is 160 tekens en kost één uit je tegoed. Een langer bericht telt als twee of drie sms\'en; dat zie je voordat je verstuurt. Een sms die niet verstuurd kon worden, kost niets.',
+                ]],
+                ['Bij een aanmaning', [
+                    'Vink bij het versturen van een laatste aanmaning "Ook een sms sturen" aan. Je klant krijgt dan naast de mail een sms met de link naar de pagina van de aanmaning. Bij een lopende aanmaning stuur je met de knop Sms nog een bericht.',
+                    'Dat kan alleen als bij de klant een mobiel nummer staat. Naar een vast nummer gaat geen sms.',
+                ]],
+                ['Bij een uitvraag', [
+                    'Een bedrijf zonder e-mailadres maar met een mobiel nummer kun je bij een uitvraag aanvinken; er staat "per sms" achter. In de vergelijking stuur je met de knop Sms een bericht naar wie nog niet reageerde.',
+                ]],
+                ['De link en de afzender', [
+                    'De sms bevat een kort adres van {brand} dat doorleidt naar de pagina. Laat die link in de tekst staan: zonder link kan de ontvanger niet reageren. Als afzender staat je bedrijfsnaam erboven, ingekort tot elf tekens.',
+                ]],
+                ['Goed om te weten', [
+                    'Stuur een sms alleen aan wie dat van je mag verwachten: je eigen klant over zijn factuur, of een bedrijf dat je om een prijs vraagt. Reclame per sms mag alleen met toestemming.',
+                ]],
+            ],
+        ],
+
         // ---------- KLANTEN & PRODUCTEN ----------
+        'klantscore' => [
+            'category' => 'Klanten & producten',
+            'title' => 'De klantscore',
+            'intro' => 'Een indicatie per klant: hoe waarschijnlijk is het dat hij op tijd betaalt? Op basis van het betaalgedrag bij jou en openbare bronnen.',
+            'sections' => [
+                ['Wat je ziet', [
+                    'Op de pagina van een klant staat de klantscore: een letter van A (betaalt goed) tot E (hoog risico) met een getal van 0 tot 100. Daaronder staan de signalen die meetellen, met wat elk signaal kost, en per bron wat die zei.',
+                    'Bij een nieuwe klant zonder facturen en zonder gegevens uit de bronnen staat er nog geen score.',
+                ]],
+                ['Het betaalgedrag bij jou', [
+                    'Hoeveel dagen na de vervaldatum de klant gemiddeld betaalt, hoe vaak dat te laat was, of er nu facturen over de vervaldatum openstaan, en of er het afgelopen jaar herinneringen, aanmaningen of een incasso nodig waren.',
+                ]],
+                ['De openbare bronnen', [
+                    'Btw-nummer: {brand} controleert bij VIES van de Europese Commissie of het nummer geldig is.',
+                    'Handelsregister: met de KvK-koppeling zie je hoe lang het bedrijf bestaat, de rechtsvorm en het aantal mensen, en of het is uitgeschreven.',
+                    'Insolventieregister: een faillissement, surseance of schuldsanering weegt het zwaarst. Deze bron werkt zodra {brand} is aangemeld bij het Centraal Insolventieregister van de Rechtspraak.',
+                    'De bronnen worden eens per week opnieuw bevraagd. Met "Opnieuw controleren" doe je dat meteen.',
+                ]],
+                ['Particulieren', [
+                    'Voor een particulier zijn er geen openbare bronnen over betaalgedrag. De score komt van de facturen bij jou; het insolventieregister wordt doorzocht op achternaam met postcode en huisnummer. Een treffer kan een naamgenoot op hetzelfde adres zijn: controleer dat zelf.',
+                    'Twijfel je bij een nieuwe particuliere klant? Vraag een aanbetaling of laat vooraf betalen.',
+                ]],
+                ['Goed om te weten', [
+                    'De score is een hulpmiddel, geen kredietrapport en geen oordeel over een persoon. Jij beslist of je levert en onder welke voorwaarden. {brand} weigert niets automatisch en deelt het betaalgedrag van je klanten niet met andere administraties.',
+                ]],
+            ],
+        ],
+
         'klant-toevoegen' => [
             'category' => 'Klanten & producten',
             'title' => 'Een klant toevoegen',

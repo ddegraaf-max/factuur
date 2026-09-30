@@ -143,7 +143,20 @@ const demand = computed(() => props.invoice.demand?.current || null);
 const canDemand = computed(() => !!props.invoice.demand && !props.invoice.demand.blocker);
 const showDemandModal = ref(false);
 const showDemandLog = ref(false);
-const demandForm = useForm({ debtor_type: null, term_days: null, with_interest: true, auto_transfer: false });
+const demandForm = useForm({ debtor_type: null, term_days: null, with_interest: true, auto_transfer: false, also_sms: false });
+// Sms bij de aanmaning: bestaat het hier, is er tegoed, en heeft de klant een mobiel nummer?
+const demandSms = computed(() => props.invoice.demand?.sms || null);
+const showDemandSms = ref(false);
+const demandSmsForm = useForm({ text: '' });
+const openDemandSms = () => { demandSmsForm.clearErrors(); demandSmsForm.text = demand.value.sms_text || ''; showDemandSms.value = true; };
+const sendDemandSms = () => demandSmsForm.post(route('demands.sms', [props.invoice.id, demand.value.id]), {
+  preserveScroll: true,
+  onSuccess: () => { showDemandSms.value = false; },
+});
+// Boven 160 tekens gaat het bericht in delen van 153; een paar tekens tellen dubbel.
+const demandSmsLength = computed(() => [...demandSmsForm.text].reduce((n, c) => n + ('^{}\\[~]|€'.includes(c) ? 2 : 1), 0));
+const demandSmsParts = computed(() => (demandSmsLength.value <= 160 ? 1 : Math.ceil(demandSmsLength.value / 153)));
+const demandSmsHasLink = computed(() => !demand.value?.sms_link || demandSmsForm.text.includes(demand.value.sms_link));
 const demandPreview = ref(null);
 const demandLoading = ref(false);
 const demandError = ref('');
@@ -758,6 +771,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
               </button>
               <a :href="demand.url" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" :title="$t('Zo ziet de klant de aanmaning. Jouw bezoek telt niet als geopend.')">{{ $t('Pagina van de klant') }}</a>
               <a :href="route('demands.pdf', [invoice.id, demand.id])" class="btn btn-secondary btn-sm">{{ $t('Brief (PDF)') }}</a>
+              <button v-if="demand.sms_text" type="button" class="btn btn-secondary btn-sm" :title="$t('Een sms met de link naar de aanmaning, naar :number', { number: demandSms?.mobile })" @click="openDemandSms">{{ $t('Sms') }}</button>
               <button type="button" class="btn btn-ghost btn-sm" :title="$t('Link naar de pagina kopiëren')" @click="copyDemandLink">🔗</button>
               <button v-if="demand.active" type="button" class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" @click="withdrawDemand">{{ $t('Intrekken') }}</button>
             </div>
@@ -1341,6 +1355,19 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <span>{{ $t('Na de termijn automatisch overdragen aan :partner', { partner: $page.props.market.incasso_partner }) }}</span>
           </label>
           <div v-if="demandForm.auto_transfer && demandPreview" class="pause-hint" style="margin:-8px 0 14px;">{{ $t('Is er op :date niet betaald en heeft je klant niet gereageerd, dan gaat het dossier vanzelf over. Dat is drie werkdagen na de termijn, zodat je een betaling van de laatste dag nog kunt boeken. Je krijgt vooraf bericht.', { date: demandPreview.auto_transfer_label }) }}</div>
+          <!-- Sms erbij: alleen naar een mobiel nummer, en alleen met tegoed -->
+          <template v-if="demandSms && demandSms.mobile">
+            <label class="dm-check" :class="{ off: !demandSms.available }">
+              <input type="checkbox" v-model="demandForm.also_sms" :disabled="!demandSms.available">
+              <span>{{ $t('Ook een sms sturen naar :number, met de link naar de aanmaning', { number: demandSms.mobile }) }}</span>
+            </label>
+            <div class="pause-hint" style="margin:-8px 0 14px;">
+              <template v-if="demandSms.available && demandSms.free">{{ $t('Deze maand nog :n sms\'en te versturen.', { n: demandSms.remaining }) }}</template>
+              <template v-else-if="demandSms.available">{{ $t('Kost één sms uit je tegoed. Tegoed: :n.', { n: demandSms.remaining }) }}</template>
+              <template v-else>{{ $t('Je hebt geen sms-tegoed.') }}</template>
+              <Link v-if="!demandSms.free && demandSms.buy_url" :href="demandSms.buy_url" style="color:var(--brand);font-weight:600;"> {{ $t('Tegoed kopen') }}</Link>
+            </div>
+          </template>
 
           <div class="dm-calc" :class="{ loading: demandLoading }">
             <template v-if="demandPreview">
@@ -1360,6 +1387,42 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <button class="btn btn-secondary btn-sm" @click="showDemandModal = false">{{ $t('Annuleren') }}</button>
             <button class="btn btn-primary btn-sm" :disabled="demandForm.processing || demandLoading || !demandPreview" @click="sendDemand">
               {{ demandForm.processing ? $t('Bezig met versturen…') : $t('Versturen naar :email', { email: demandPreview?.sent_to || invoice.customer_email }) }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sms bij een lopende aanmaning -->
+    <div v-if="showDemandSms && demand" class="modal-overlay" @click.self="showDemandSms = false">
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Sms naar :name', { name: invoice.customer_name }) }}</div>
+          <button class="btn btn-ghost btn-sm" @click="showDemandSms = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p style="font-size:13px;color:var(--text-3);margin:0 0 14px;line-height:1.6;">
+            {{ $t('Naar :number. De link leidt naar de pagina van de aanmaning; je klant ziet daar het bedrag van vandaag en kan betalen of reageren.', { number: demandSms?.mobile }) }}
+          </p>
+          <div v-if="$page.props.errors?.sms" class="field-error" style="margin-bottom:12px;">{{ $page.props.errors.sms }}</div>
+          <div class="form-group">
+            <label>{{ $t('Bericht') }}</label>
+            <textarea v-model="demandSmsForm.text" rows="5" maxlength="500"></textarea>
+            <div v-if="demandSmsForm.errors.text" class="field-error">{{ demandSmsForm.errors.text }}</div>
+            <div class="pause-hint" style="margin-top:6px;">
+              {{ $t(':n tekens, :parts sms', { n: demandSmsLength, parts: demandSmsParts }) }}
+              <template v-if="demandSms && !demandSms.free"> · {{ $t('tegoed: :n', { n: demandSms.remaining }) }}</template>
+              <template v-if="demandSmsParts > (demandSms?.max_segments || 3)"> · {{ $t('te lang, maak het korter') }}</template>
+              <template v-if="!demandSmsHasLink"> · {{ $t('de link ontbreekt') }}</template>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showDemandSms = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" :disabled="demandSmsForm.processing || !demandSmsForm.text.trim() || !demandSmsHasLink || demandSmsParts > (demandSms?.max_segments || 3)" @click="sendDemandSms">
+              {{ demandSmsForm.processing ? $t('Bezig met versturen…') : $t('Sms versturen') }}
             </button>
           </div>
         </div>
@@ -1563,6 +1626,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 .dm-log-ip { color: var(--text-3); }
 .dm-check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; margin-bottom: 14px; cursor: pointer; }
 .dm-check input { width: 17px; height: 17px; padding: 0; flex: none; }
+.dm-check.off { opacity: 0.6; cursor: not-allowed; }
 .dm-calc { border-top: 1px solid var(--border); padding-top: 10px; min-height: 120px; }
 .dm-calc.loading { opacity: 0.55; }
 @media (max-width: 760px) {

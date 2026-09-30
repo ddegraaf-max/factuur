@@ -83,6 +83,57 @@ class KvkService
     }
 
     /**
+     * Wat het Handelsregister over een bedrijf zegt, voor de klantscore: hoe
+     * lang het bestaat, de rechtsvorm, het aantal mensen en of het nog
+     * bestaat. Zonder Basisprofiel-API (of zonder sleutel) null.
+     *
+     * @return array{name: ?string, legal_form: ?string, registered_on: ?string, started_on: ?string, ended_on: ?string, employees: ?int, active: bool, checked_at: string}|null
+     */
+    public function facts(string $kvkNumber, bool $fresh = false): ?array
+    {
+        $kvkNumber = preg_replace('/\D/', '', $kvkNumber) ?? '';
+        if (! preg_match('/^\d{8}$/', $kvkNumber) || ! $this->enabled()) {
+            return null;
+        }
+        if ($fresh) {
+            Cache::forget("kvk:feiten:{$kvkNumber}");
+        }
+
+        return Cache::remember("kvk:feiten:{$kvkNumber}", now()->addDays(7), function () use ($kvkNumber) {
+            try {
+                $response = Http::timeout(8)
+                    ->withHeaders(['apikey' => config('services.kvk.key')])
+                    ->get(config('services.kvk.base') . "/api/v1/basisprofielen/{$kvkNumber}");
+            } catch (\Throwable $e) {
+                Log::info('KvK Basisprofiel niet bereikbaar', ['kvk' => $kvkNumber, 'error' => $e->getMessage()]);
+
+                return null;
+            }
+            if ($response->failed()) {
+                Log::info('KvK Basisprofiel niet beschikbaar', ['kvk' => $kvkNumber, 'status' => $response->status()]);
+
+                return null;
+            }
+
+            $data = $response->json();
+            // Datums komen als jjjjmmdd.
+            $date = fn ($raw) => preg_match('/^(\d{4})(\d{2})(\d{2})$/', (string) $raw, $m) ? "{$m[1]}-{$m[2]}-{$m[3]}" : null;
+            $ended = $date($data['materieleRegistratie']['datumEinde'] ?? null) ?? $date($data['_embedded']['eigenaar']['datumUitschrijving'] ?? null);
+
+            return [
+                'name' => $data['naam'] ?? ($data['statutaireNaam'] ?? null),
+                'legal_form' => $data['_embedded']['eigenaar']['uitgebreideRechtsvorm'] ?? ($data['_embedded']['eigenaar']['rechtsvorm'] ?? null),
+                'registered_on' => $date($data['formeleRegistratiedatum'] ?? null),
+                'started_on' => $date($data['materieleRegistratie']['datumAanvang'] ?? null),
+                'ended_on' => $ended,
+                'employees' => isset($data['totaalWerkzamePersonen']) ? (int) $data['totaalWerkzamePersonen'] : null,
+                'active' => $ended === null,
+                'checked_at' => now()->toIso8601String(),
+            ];
+        });
+    }
+
+    /**
      * Volledige bedrijfsgegevens voor het invullen van het klantformulier.
      * Basisprofiel niet beschikbaar? Dan null (frontend gebruikt zoekresultaat).
      */

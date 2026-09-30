@@ -169,6 +169,10 @@ class CustomerController extends Controller
             ]),
             'quotes_total' => $quotes->count(),
             'hours_url' => \Illuminate\Support\Facades\Route::has('hours.index') ? route('hours.index') : null,
+            // Klantscore: betaalgedrag bij jou plus de openbare bronnen (die worden wekelijks opnieuw bevraagd).
+            'score' => app(\App\Services\CustomerScoreService::class)->available()
+                ? app(\App\Services\CustomerScoreService::class)->score($customer)
+                : null,
         ]);
     }
 

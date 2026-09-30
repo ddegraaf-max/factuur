@@ -59,6 +59,26 @@ const rawNav = [
       { name: 'Transacties', route: 'bank.index', icon: 'bank', badge: 'Nieuw' },
     ],
   },
+  /*
+   * Het grootboek staat als eigen kop en niet onder Rapporten. Een rapport lees
+   * je; hier boek je. Wie dat door elkaar haalt gaat in een rapport zoeken naar
+   * een knop die daar niet zit.
+   *
+   * Alleen in de Nederlandse markt. Het rekeningschema is RGS, de btw-rubrieken
+   * zijn die van de Nederlandse aangifte en de auditfile is XAF van de
+   * Belastingdienst; in Polen is dat alle drie niet zo. Een half werkende
+   * boekhouding aanbieden is slechter dan hem niet aanbieden.
+   */
+  {
+    title: 'Grootboek',
+    items: [
+      { name: 'Journaal', route: 'ledger.entries', icon: 'book', can: 'reports', market: 'nl', badge: 'Nieuw' },
+      { name: 'Proefbalans', route: 'ledger.trial', icon: 'scale', can: 'reports', market: 'nl' },
+      { name: 'Balans en resultaat', route: 'ledger.sheet', icon: 'chart', can: 'reports', market: 'nl' },
+      { name: 'Rekeningschema', route: 'ledger.accounts', icon: 'list', can: 'reports', market: 'nl' },
+      { name: 'Boekjaren', route: 'ledger.years', icon: 'lock', can: 'reports', market: 'nl' },
+    ],
+  },
   {
     title: 'Rapporten',
     items: [
@@ -81,6 +101,8 @@ const rawNav = [
       { name: 'Nummering', route: 'settings.numbering', icon: 'hash', can: 'settings' },
       { name: 'Herinneringen', route: 'settings.reminders', icon: 'bell', can: 'settings' },
       { name: 'E-mailteksten', route: 'settings.emails', icon: 'mail', can: 'settings' },
+      // Alleen waar sms bestaat (Nederland, sleutels ingesteld, geen demo).
+      { name: 'Sms', route: 'settings.sms', icon: 'mail', can: 'sms', badge: 'Nieuw' },
       { name: 'Koppelingen', route: 'settings.integrations', icon: 'plug', can: 'settings', badge: 'Nieuw' },
       { name: 'Team', route: 'settings.team', icon: 'users', can: 'team' },
       { name: 'Overstappen', route: 'import.index', icon: 'download', can: 'settings', badge: 'Nieuw' },
@@ -106,7 +128,12 @@ const nav = computed(() =>
   rawNav
     .map(section => ({
       ...section,
-      items: section.items.filter(item => (!item.can || can.value[item.can]) && (!item.brand || item.brand === page.props.brand?.key)),
+      items: section.items.filter(item =>
+        (!item.can || can.value[item.can])
+        && (!item.brand || item.brand === page.props.brand?.key)
+        // Onderdelen die op één markt berusten (het grootboek op RGS, XAF en de
+        // Nederlandse btw-rubrieken) horen elders niet in het menu.
+        && (!item.market || item.market === page.props.market?.key)),
     }))
     .filter(section => section.items.length > 0)
 );
@@ -199,6 +226,13 @@ const logout = () => {
             <svg v-else-if="item.icon === 'quote'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg>
             <svg v-else-if="item.icon === 'repeat'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
             <svg v-else-if="item.icon === 'download'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <!-- Grootboek: een opengeslagen boek voor het journaal, een weegschaal
+                 voor de proefbalans, een lijst voor het rekeningschema en een slot
+                 voor het vastgestelde boekjaar. -->
+            <svg v-else-if="item.icon === 'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5C10.5 5 8.5 4.5 6 4.5H3v14h3c2.5 0 4.5.5 6 2"/><path d="M12 6.5C13.5 5 15.5 4.5 18 4.5h3v14h-3c-2.5 0-4.5.5-6 2"/><line x1="12" y1="6.5" x2="12" y2="20.5"/></svg>
+            <svg v-else-if="item.icon === 'scale'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="20"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="4" y1="7" x2="20" y2="7"/><path d="M4 7 1.5 13h5z"/><path d="M20 7l-2.5 6h5z"/></svg>
+            <svg v-else-if="item.icon === 'list'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+            <svg v-else-if="item.icon === 'lock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
             {{ $t(item.name) }}
             <span v-if="item.badge" class="nav-badge">{{ $t(item.badge) }}</span>
           </component>

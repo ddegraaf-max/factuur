@@ -102,6 +102,23 @@ class PaymentDemandController extends Controller
             : __('Automatische overdracht staat uit. Overdragen doe je zelf met de knop.'));
     }
 
+    /** Een sms met de link naar de pagina van de aanmaning. */
+    public function sms(Request $request, Invoice $invoice, PaymentDemand $demand): RedirectResponse
+    {
+        $this->authorizeDemand($invoice, $demand);
+        $data = $request->validate(['text' => ['nullable', 'string', 'max:500']], [
+            'text.max' => __('Het bericht is te lang voor een sms. Maak het korter.'),
+        ]);
+
+        try {
+            $this->service->sms($demand->setRelation('invoice', $invoice->loadMissing('company', 'customer')), $data['text'] ?? null, $request->user()->id);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['sms' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Sms verstuurd naar :name.', ['name' => $invoice->customer_name]));
+    }
+
     /** Termijn voorbij en niet betaald: met één klik naar de deurwaarder. */
     public function transfer(Invoice $invoice, PaymentDemand $demand): RedirectResponse
     {
@@ -134,6 +151,7 @@ class PaymentDemandController extends Controller
             'term_days' => ['nullable', 'integer', 'min:1', 'max:' . PaymentDemandService::TERM_MAX],
             'with_interest' => ['nullable', 'boolean'],
             'auto_transfer' => ['nullable', 'boolean'],
+            'also_sms' => ['nullable', 'boolean'],
         ]);
     }
 

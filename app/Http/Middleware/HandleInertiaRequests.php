@@ -52,6 +52,8 @@ class HandleInertiaRequests extends Middleware
                     'settings' => $request->user()->isOwner(),
                     'team' => $request->user()->isOwner(),
                     'billing' => $request->user()->isOwner(),
+                    // Sms-tegoed: alleen waar sms bestaat (zie SmsService::enabled).
+                    'sms' => $request->user()->isOwner() && app(\App\Services\SmsService::class)->enabled($request->user()->company),
                     // Platform-eigenaar (EasyInvoice zelf): marketing-inzichten,
                     // merkbewaking, administraties — zie App\Support\OwnerAccess.
                     'platform' => \App\Support\OwnerAccess::allows($request->user()),

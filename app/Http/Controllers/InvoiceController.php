@@ -232,6 +232,9 @@ class InvoiceController extends Controller
             return null;
         }
 
+        $sms = app(\App\Services\SmsService::class);
+        $mobile = \App\Support\PhoneNumber::mobile($invoice->customer?->phone);
+
         $demand = $invoice->demands()->with('events')->first();
         $current = null;
         if ($demand) {
@@ -258,6 +261,9 @@ class InvoiceController extends Controller
                 'response_date' => $demand->response_date?->toDateString(),
                 'responded_at_label' => $demand->responded_at?->translatedFormat('j M Y, H:i'),
                 'url' => $demand->url(),
+                // De tekst die klaarstaat voor een sms, als er nu een naartoe kan.
+                'sms_text' => $demand->isActive() && $sms->available($invoice->company) && $service->mobile($demand) ? $service->smsText($demand) : null,
+                'sms_link' => $demand->isActive() && $sms->available($invoice->company) && $service->mobile($demand) ? \App\Models\ShortLink::for($demand->url(), $demand->company_id)->shortUrl() : null,
                 'principal' => $claim['principal'],
                 'with_interest' => $claim['with_interest'],
                 'interest' => $claim['interest'],
@@ -281,6 +287,15 @@ class InvoiceController extends Controller
             // Waarom versturen nu niet kan; leeg als het kan.
             'blocker' => $service->blocker($invoice),
             'current' => $current,
+            // Sms erbij: alleen naar een mobiel nummer, en alleen met tegoed.
+            'sms' => $sms->enabled($invoice->company) ? [
+                'available' => $sms->available($invoice->company),
+                'free' => $sms->free($invoice->company),
+                'remaining' => $sms->remaining($invoice->company),
+                'max_segments' => \App\Services\SmsService::MAX_SEGMENTS,
+                'mobile' => $mobile ? \App\Support\PhoneNumber::display($mobile) : null,
+                'buy_url' => auth()->user()?->isOwner() ? route('settings.sms') : null,
+            ] : null,
         ];
     }
 

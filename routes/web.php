@@ -548,6 +548,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
             ->middleware('throttle:20,1')->name('settings.integrations.maildomain.refresh');
         Route::delete('settings/maildomein', [\App\Http\Controllers\MailDomainController::class, 'disconnect'])->name('settings.integrations.maildomain.disconnect');
 
+        // Klantscore: betaalgedrag en openbare bronnen, opnieuw laten rekenen
+        Route::post('customers/{customer}/score', [\App\Http\Controllers\CustomerScoreController::class, 'refresh'])
+            ->middleware('throttle:20,1')->name('customers.score');
         Route::post('customers/{customer}/peppol-check', [\App\Http\Controllers\PeppolController::class, 'check'])
             ->middleware('throttle:20,1')->name('customers.peppol.check');
         Route::post('invoices/{invoice}/peppol', [\App\Http\Controllers\PeppolController::class, 'send'])
@@ -730,6 +733,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::delete('invoices/{invoice}/aanmaning/{demand}', [\App\Http\Controllers\PaymentDemandController::class, 'withdraw'])->name('demands.withdraw');
     Route::patch('invoices/{invoice}/aanmaning/{demand}/automatisch', [\App\Http\Controllers\PaymentDemandController::class, 'auto'])->name('demands.auto');
     Route::post('invoices/{invoice}/aanmaning/{demand}/overdragen', [\App\Http\Controllers\PaymentDemandController::class, 'transfer'])->name('demands.transfer');
+    Route::post('invoices/{invoice}/aanmaning/{demand}/sms', [\App\Http\Controllers\PaymentDemandController::class, 'sms'])->name('demands.sms');
     Route::get('invoices/{invoice}/aanmaning/{demand}/pdf', [\App\Http\Controllers\PaymentDemandController::class, 'pdf'])->name('demands.pdf');
     // Windykacja (Poolse markt): vordering berekenen, wezwanie do zapłaty (PDF) en factuur te koop aanbieden.
     Route::get('invoices/{invoice}/windykacja', [\App\Http\Controllers\WindykacjaController::class, 'claim'])->name('windykacja.claim');
@@ -813,6 +817,10 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
         Route::get('settings/numbering', [SettingsController::class, 'numbering'])->name('settings.numbering');
         Route::patch('settings/numbering', [SettingsController::class, 'updateNumbering'])->name('settings.numbering.update');
+
+        // Sms-tegoed: bundels kopen en zien wat er is verstuurd
+        Route::get('settings/sms', [\App\Http\Controllers\SmsSettingsController::class, 'show'])->name('settings.sms');
+        Route::post('settings/sms/kopen', [\App\Http\Controllers\SmsSettingsController::class, 'buy'])->name('settings.sms.buy');
 
         Route::get('settings/reminders', [SettingsController::class, 'reminders'])->name('settings.reminders');
         Route::patch('settings/reminders', [SettingsController::class, 'updateReminders'])->name('settings.reminders.update');
