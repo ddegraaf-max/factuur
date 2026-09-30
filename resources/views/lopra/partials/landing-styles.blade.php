@@ -271,23 +271,31 @@
   .lp-card-demo .qr i.o { background: transparent; }
   .lp-card-cap { margin-top: 12px; font-size: 12px; color: var(--text-3); text-align: center; }
 
-  /*
-   * De twee gratis hulpmiddelen onder de hero.
-   *
-   * ── Waarom ze er zijn ───────────────────────────────────────────────────
-   *
-   * Deze pagina had alles behalve dit: een mockup, prijzen, functies, een FAQ —
-   * twaalf secties. Toch voelde hij vlakker dan de andere merken, en dat komt
-   * doordat er onder de hero meteen een stilstaand plaatje begint. Bij
-   * EasyInvoice en EasyBookkeeper staat daar iets dat beweegt én dat een
-   * bezoeker nú kan doen zonder account. Dat is het verschil, niet de
-   * hoeveelheid inhoud.
-   *
-   * Het verloop loopt van diepblauw via het koperen accent terug naar blauw;
-   * blauw en koper is bij dit merk het paar dat overal terugkomt. De tweede
-   * knop komt uit het donker en loopt een halve slag uit de maat, anders zien
-   * twee knoppen die gelijk bewegen eruit als één knop die dubbel staat.
-   */
+  {{--
+    De twee gratis hulpmiddelen onder de hero.
+
+    ── Waarom ze er zijn ─────────────────────────────────────────────────────
+
+    Deze pagina had alles behalve dit: een mockup, prijzen, functies, een FAQ —
+    twaalf secties. Toch voelde hij vlakker dan de zustermerken, en dat komt
+    doordat er onder de hero meteen een stilstaand plaatje begint. Bij de andere
+    twee staat daar iets dat beweegt én dat een bezoeker nú kan doen zonder
+    account. Dat is het verschil, niet de hoeveelheid inhoud.
+
+    Het verloop loopt van diepblauw via het koperen accent terug naar blauw;
+    blauw en koper is bij dit merk het paar dat overal terugkomt. De tweede knop
+    komt uit het donker en loopt een halve slag uit de maat, anders zien twee
+    knoppen die gelijk bewegen eruit als één knop die dubbel staat.
+
+    ── Waarom dit een Blade-commentaar is en geen CSS-commentaar ─────────────
+
+    Omdat dit blok binnen <style> staat en dus met de pagina meegaat naar de
+    browser. In de eerste versie noemde deze uitleg de zustermerken bij naam, en
+    daar is een test op: BrandTest controleert dat een Lopra-pagina de naam van
+    het andere merk nergens laat zien. Die test sloeg terecht aan. Blade haalt
+    {{-- --}} weg vóór het renderen, dus de uitleg blijft in de broncode staan
+    en bereikt geen enkele bezoeker.
+  --}}
   .free-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 940px; margin: 34px auto 0; text-align: left; }
   .free-tool { display: flex; flex-direction: column; gap: 16px; padding: 20px 22px 22px; background: var(--surface); border: 1px solid var(--brand-border); border-radius: 16px; box-shadow: var(--shadow-md); color: inherit; text-decoration: none; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .free-tool:hover { transform: translateY(-3px); box-shadow: var(--shadow-brand); border-color: var(--brand); }
