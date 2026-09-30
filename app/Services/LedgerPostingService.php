@@ -414,19 +414,29 @@ class LedgerPostingService
         /*
          * Hoort hier een debiteur tegenover te staan?
          *
-         * Alleen als de factuur zelf in het grootboek staat. Een aanbetaling op
-         * een factuur die nog concept is komt echt binnen op de bank, maar er is
-         * nog geen vordering om af te boeken: de omzet is nog niet genomen. Zou
-         * de ontvangst dan tóch op debiteuren gaan, dan staat die rekening voor
-         * dat bedrag in de min — en dan zegt de balans dat een klant geld van
-         * óns krijgt terwijl hij juist vooruit heeft betaald.
+         * Een aanbetaling op een factuur die nog concept is komt echt binnen op
+         * de bank, maar er is nog geen vordering om af te boeken: de omzet is nog
+         * niet genomen. Zou de ontvangst dan tóch op debiteuren gaan, dan staat
+         * die rekening voor dat bedrag in de min — en dan zegt de balans dat de
+         * klant geld van óns krijgt terwijl hij juist vooruit heeft betaald.
+         * Zulk geld gaat op "overige overlopende passiva": een schuld, want er
+         * moet nog geleverd worden. Zodra de factuur definitief wordt verhuist
+         * het naar debiteuren (zie settleAdvances).
          *
-         * Het gaat daarom op "overige overlopende passiva": een schuld, want we
-         * moeten nog leveren. Zodra de factuur definitief wordt, verhuist het
-         * naar debiteuren (zie settleAdvances).
+         * We kijken naar de stáát van de factuur, niet naar of de boeking er al
+         * is. Dat is niet hetzelfde: een betaling kan worden vastgelegd voordat
+         * de factuur is geboekt — de demo-bouwer en de import doen dat, en het
+         * afletteren van de bank kan het ook. Keken we naar de boeking, dan
+         * maakte élke betaling een omweg via de overlopende passiva met een
+         * extra memoriaalpost per factuur erachteraan. Dat telt niet verkeerd,
+         * maar het maakt het journaal onleesbaar voor een accountant — en dat
+         * was op de live demo precies wat er gebeurde.
+         *
+         * Is de factuur definitief maar de boeking niet gelukt, dan staat er een
+         * losse credit op debiteuren. Dat is een fout die `ledger:check` meldt,
+         * en zeldzamer dan de omweg.
          */
-        $opFactuur = $invoice
-            && $this->ledger->findBySource($company, 'invoice', $invoice->id) !== null;
+        $opFactuur = $invoice && ! in_array($invoice->status, ['draft', 'cancelled'], true);
         $rekeningKant = $opFactuur ? Rgs::DEBITEUREN : Rgs::NOG_TE_VERDELEN;
 
         /*
