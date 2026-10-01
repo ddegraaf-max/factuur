@@ -874,7 +874,117 @@ class GrootboekTest extends TestCase
         $antwoord->assertDontSee('Geheim van de buren');
     }
 
+    public function test_een_factuur_met_een_negatieve_regel_komt_gewoon_in_het_grootboek(): void
+    {
+        /*
+         * Dit is factuur 2026-0019 van Creditline BV, cijfer voor cijfer.
+         *
+         * Op één factuur stond het geplaatste glas (9%) en daaronder een
+         * teruggebrachte container als negatieve regel (21%). De boeking zette
+         * die negatieve regel met abs() aan dezelfde kant als de positieve;
+         * daarmee liep de post € 840,00 uit de balans en weigerde de grens in
+         * postInvoice — terecht — te boeken. Gevolg: een factuur van € 6.717,51
+         * stond niet in het grootboek, terwijl de proefbalans netjes sloot.
+         *
+         * Een negatieve factuurregel is iets anders dan een creditnota: de
+         * factuur blijft een vordering, alleen die ene regel hoort aan de
+         * andere kant.
+         */
+        $klant = Customer::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id, 'name' => 'Glas en Container BV', 'country' => 'NL',
+        ]);
+
+        $factuur = Invoice::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'customer_id' => $klant->id,
+            'customer_name' => $klant->name,
+            'customer_country' => 'NL',
+            'number' => 'F-negatieveregel',
+            'status' => 'sent',
+            'invoice_date' => '2026-06-01',
+            'due_date' => '2026-06-15',
+            'subtotal' => 6201.06,
+            'vat_total' => 516.45,
+            'total' => 6717.51,
+        ]);
+
+        foreach ([['Plaatsen hr+++ glas', 6548.17, 9.0, 589.34],
+            ['Credit container', -347.11, 21.0, -72.89]] as [$wat, $grondslag, $tarief, $btw]) {
+            $factuur->lines()->create([
+                'description' => $wat,
+                'quantity' => 1,
+                'unit_price' => $grondslag,
+                'vat_rate' => $tarief,
+                'line_subtotal' => $grondslag,
+                'line_vat' => $btw,
+                'line_total' => $grondslag + $btw,
+            ]);
+        }
+
+        $post = $this->ledger->findBySource($this->company, 'invoice', $factuur->id);
+        $this->assertNotNull($post, 'een factuur met een negatieve regel hoort geboekt te worden');
+
+        // Het glas: gewone omzet, credit.
+        $this->assertSame(654817, $this->saldo(Rgs::OMZET_DIENST_LAAG, 'credit'));
+        $this->assertSame(58934, $this->saldo(Rgs::BTW_1B_LAAG, 'credit'));
+
+        // De container: dezelfde rubriek, maar aan de debetkant.
+        $this->assertSame(34711, $this->saldo(Rgs::OMZET_DIENST_HOOG, 'debit'));
+        $this->assertSame(0, $this->saldo(Rgs::OMZET_DIENST_HOOG, 'credit'));
+        $this->assertSame(7289, $this->saldo(Rgs::BTW_1A_HOOG, 'debit'));
+
+        // De vordering is het factuurtotaal, want dat is wat de klant betaalt.
+        $this->assertSame(671751, $this->saldo(Rgs::DEBITEUREN, 'debit'));
+
+        // En er is niets weggemoffeld.
+        $this->assertSame(0, $this->saldo(Rgs::BETAALVERSCHIL, 'debit'));
+        $this->assertSame(0, $this->saldo(Rgs::BETAALVERSCHIL, 'credit'));
+    }
+
+    public function test_een_inkoopfactuur_met_een_negatief_bedrag_komt_in_het_grootboek(): void
+    {
+        /*
+         * Dezelfde fout, maar hier viel hij harder: een negatief bedrag op
+         * `debit` wordt door Postgres geweigerd (journal_lines_niet_negatief),
+         * en die fout verdween in het logboek, omdat een mislukte boeking het
+         * opslaan van een factuur nooit mag breken. De inkoopfactuur stond er
+         * dan simpelweg niet in.
+         */
+        $inkoop = PurchaseInvoice::withoutGlobalScope('company')->create([
+            'company_id' => $this->company->id,
+            'supplier_name' => 'Groothandel BV',
+            'supplier_reference' => 'INK-9',
+            'invoice_date' => '2026-06-01',
+            'category' => 'Inkoop',
+            'subtotal' => 900.00,
+            'vat_total' => 189.00,
+            'total' => 1089.00,
+            'vat_lines' => [
+                ['base' => 1000.00, 'rate' => 21, 'vat' => 210.00],
+                ['base' => -100.00, 'rate' => 21, 'vat' => -21.00],
+            ],
+        ]);
+
+        $post = $this->ledger->findBySource($this->company, 'purchase_invoice', $inkoop->id);
+        $this->assertNotNull($post, 'een inkoopfactuur met een retourregel hoort geboekt te worden');
+
+        $this->assertSame(100000, $this->saldo(Rgs::KOSTEN_ALGEMEEN, 'debit'));
+        $this->assertSame(10000, $this->saldo(Rgs::KOSTEN_ALGEMEEN, 'credit'));
+        $this->assertSame(18900, $this->saldo(Rgs::BTW_5B_VOORBELASTING, 'debit'));
+        $this->assertSame(108900, $this->saldo(Rgs::CREDITEUREN, 'credit'));
+        $this->assertSame(0, $this->saldo(Rgs::BETAALVERSCHIL, 'debit'));
+        $this->assertSame(0, $this->saldo(Rgs::BETAALVERSCHIL, 'credit'));
+    }
+
     // -------------------------------------------------------------------- hulp
+
+    /** Wat staat er op deze rekening, aan deze kant, in centen? */
+    private function saldo(string $rgs, string $kant): int
+    {
+        return (int) JournalLine::withoutGlobalScope('company')
+            ->where('ledger_account_id', $this->rekening($rgs)->id)
+            ->sum($kant . '_cents');
+    }
 
     private function rekening(string $rgs): LedgerAccount
     {

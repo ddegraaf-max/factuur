@@ -300,34 +300,45 @@ class LedgerPostingService
 
         $regels = [];
         foreach ($omzet as $rgs => $centen) {
-            $regels[] = [
+            if ($centen === 0) {
+                continue;
+            }
+
+            $regels[] = $this->kant([
                 'rgs' => $rgs,
-                $credit ? 'debit' : 'credit' => abs($centen),
                 'description' => 'Omzet ' . $invoice->number,
                 'vat_rate' => $tarieven[$rgs] ?? null,
                 'customer_id' => $invoice->customer_id,
-            ];
+            ], $centen, $credit);
         }
         foreach ($btw as $rgs => $centen) {
-            $regels[] = [
+            if ($centen === 0) {
+                continue;
+            }
+
+            $regels[] = $this->kant([
                 'rgs' => $rgs,
-                $credit ? 'debit' : 'credit' => abs($centen),
                 'description' => 'Btw ' . $invoice->number,
                 'vat_cents' => abs($centen),
                 'customer_id' => $invoice->customer_id,
-            ];
+            ], $centen, $credit);
         }
 
         // De tegenrekening: wat de klant ons schuldig is. Dit moet exact het
         // factuurtotaal zijn, want daar wordt de betaling straks tegen
         // afgeboekt.
-        $totaal = abs($this->cents($invoice->total));
-        $regels[] = [
-            'rgs' => Rgs::DEBITEUREN,
-            $credit ? 'credit' : 'debit' => $totaal,
-            'description' => trim(($invoice->customer_name ?: 'Debiteur') . ' — ' . $invoice->number),
-            'customer_id' => $invoice->customer_id,
-        ];
+        $totaal = $this->cents($invoice->total);
+        if ($totaal !== 0) {
+            $regels[] = $this->kant([
+                'rgs' => Rgs::DEBITEUREN,
+                'description' => trim(($invoice->customer_name ?: 'Debiteur') . ' — ' . $invoice->number),
+                'customer_id' => $invoice->customer_id,
+            ], $totaal, ! $credit);
+        }
+
+        if (! $regels) {
+            return null;
+        }
 
         /*
          * Tellen de regels op tot het factuurtotaal?
@@ -418,38 +429,38 @@ class LedgerPostingService
         foreach ($lijnen as $l) {
             $grondslag = $this->cents($l['base'] ?? 0);
             if ($grondslag !== 0) {
-                $regels[] = [
+                $regels[] = $this->kant([
                     'rgs' => $kostenRekening,
-                    'debit' => $grondslag,
                     'description' => trim(($purchase->category ?: 'Inkoop') . ' — ' . ($purchase->supplier_name ?: '')),
                     'vat_rate' => isset($l['rate']) ? (float) $l['rate'] : null,
                     'supplier_name' => $purchase->supplier_name,
-                ];
+                ], $grondslag, true);
             }
             $voorbelasting += $this->cents($l['vat'] ?? 0);
         }
 
         if ($voorbelasting !== 0) {
-            $regels[] = [
+            $regels[] = $this->kant([
                 'rgs' => Rgs::BTW_5B_VOORBELASTING,
-                'debit' => $voorbelasting,
                 'description' => 'Voorbelasting ' . ($purchase->supplier_reference ?: $purchase->supplier_name),
-                'vat_cents' => $voorbelasting,
+                'vat_cents' => abs($voorbelasting),
                 'supplier_name' => $purchase->supplier_name,
-            ];
+            ], $voorbelasting, true);
         }
 
         if (! $regels) {
             return null;
         }
 
-        $regels[] = [
-            'rgs' => Rgs::CREDITEUREN,
-            'credit' => abs($this->cents($purchase->total)),
-            'description' => trim(($purchase->supplier_name ?: 'Crediteur')
-                . ' — ' . ($purchase->supplier_reference ?: '')),
-            'supplier_name' => $purchase->supplier_name,
-        ];
+        $totaal = $this->cents($purchase->total);
+        if ($totaal !== 0) {
+            $regels[] = $this->kant([
+                'rgs' => Rgs::CREDITEUREN,
+                'description' => trim(($purchase->supplier_name ?: 'Crediteur')
+                    . ' — ' . ($purchase->supplier_reference ?: '')),
+                'supplier_name' => $purchase->supplier_name,
+            ], $totaal, false);
+        }
 
         /*
          * Dezelfde grens als bij de verkoopfactuur: tellen de bedragregels niet
@@ -940,6 +951,38 @@ class LedgerPostingService
         ];
 
         return $regels;
+    }
+
+    /**
+     * Zet een bedrag met teken aan de juiste kant van de journaalpost.
+     *
+     * ── Waarom dit er staat ───────────────────────────────────────────────
+     *
+     * Een factuurregel mag negatief zijn. Dat is niet hetzelfde als een
+     * creditnota: op één factuur staat dan bijvoorbeeld het glas dat geleverd
+     * is, en daaronder de container die is teruggebracht. Zo'n regel hoort aan
+     * de andere kant van de post — en dat moet ook, want een journaalregel mag
+     * geen negatief bedrag bevatten (journal_lines_niet_negatief).
+     *
+     * Hier stond eerst abs() over het bedrag. Daardoor kwam een negatieve regel
+     * aan dezelfde kant als de positieve en liep de post twee keer dat bedrag
+     * uit de balans. De grens hieronder weigerde dan — terecht — te boeken, en
+     * dus stond factuur 2026-0019 van € 6.717,51 niet in het grootboek terwijl
+     * de proefbalans netjes sloot. Bij een inkoopfactuur was het erger: een
+     * negatief bedrag op `debit` werd door de database geweigerd, en die fout
+     * verdween in het logboek.
+     *
+     * @param  array<string, mixed>  $regel  de regel zonder bedrag
+     * @param  int  $centen  het bedrag, met teken
+     * @param  bool  $debetBijPositief  waar hoort een positief bedrag: debet of credit
+     * @return array<string, mixed>
+     */
+    private function kant(array $regel, int $centen, bool $debetBijPositief): array
+    {
+        $debet = $debetBijPositief !== ($centen < 0);
+        $regel[$debet ? 'debit' : 'credit'] = abs($centen);
+
+        return $regel;
     }
 
     /** Euro's met twee decimalen naar hele centen, zonder afrondingsdrift. */
