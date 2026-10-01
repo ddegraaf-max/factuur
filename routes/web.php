@@ -407,6 +407,8 @@ Route::prefix('portaal')->name('portal.')->group(function () {
 
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
+// Afleverstatus van sms'en (Smstools, type delivery_report).
+Route::post('/webhooks/smstools', [AppHttpControllersSmstoolsWebhookController::class, 'handle'])->middleware('throttle:120,1')->name('webhooks.smstools');
 
 // ---------- MOLLIE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
@@ -737,6 +739,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('onderaannemers/startlijst', [TenderPoolController::class, 'startlist'])->name('tenders.subcontractors.startlist');
     Route::patch('onderaannemers/{subcontractor}', [TenderPoolController::class, 'updateSubcontractor'])->name('tenders.subcontractors.update');
     Route::delete('onderaannemers/{subcontractor}', [TenderPoolController::class, 'destroySubcontractor'])->name('tenders.subcontractors.destroy');
+    Route::patch('onderaannemers/{subcontractor}/terugzetten', [TenderPoolController::class, 'restoreSubcontractor'])->name('tenders.subcontractors.restore');
 
     // Vaste lasten: terugkerende inkoop automatisch inboeken
     Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');
