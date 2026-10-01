@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\VerificationCodeMail;
 use App\Models\Company;
 use App\Models\PageView;
 use App\Models\User;
@@ -11,7 +10,6 @@ use App\Services\FreeInvoiceImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -149,8 +147,12 @@ class RegisteredUserController extends Controller
             }
         }
 
-        $code = $user->generateVerificationCode();
-        Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+        // Lukt de mail niet, dan gaat het aanmelden tóch door: het account
+        // bestaat op dit punt al, en de bezoeker kan de code opnieuw laten
+        // sturen. Zie VerificationCodeSender voor wat er anders gebeurde.
+        if (! app(\App\Services\VerificationCodeSender::class)->send($user)) {
+            Session::put('verification_mail_failed', true);
+        }
 
         // Plan de proef-mails vooruit in via Resend, zodat er geen cron nodig is:
         // 1) de "proefperiode eindigt bijna"-herinnering (enkele dagen vooraf), en

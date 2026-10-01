@@ -6,6 +6,9 @@ import AuthLayout from '@/Layouts/AuthLayout.vue';
 const props = defineProps({
   email: String,
   canResendIn: { type: Number, default: 0 },
+  // De mailserver weigerde de code te versturen. Dat moet op het scherm staan,
+  // anders wacht iemand op een mail die nooit komt.
+  mailFailed: { type: Boolean, default: false },
 });
 
 const page = usePage();
@@ -123,6 +126,10 @@ const logout = () => {
       <div class="login-form-title">{{ $t('Bevestig je e-mailadres') }}</div>
       <div class="login-form-sub">
         {{ $t('We stuurden een code naar') }} <strong>{{ email }}</strong>.
+      </div>
+
+      <div v-if="mailFailed" class="status-message status-message--warn">
+        {{ $t('Je account is aangemaakt, maar de e-mail met de code kon niet worden verstuurd. Vraag hieronder een nieuwe code aan; lukt dat ook niet, neem dan contact met ons op.') }}
       </div>
 
       <div v-if="flash" class="status-message">{{ flash }}</div>

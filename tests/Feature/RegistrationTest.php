@@ -111,4 +111,85 @@ class RegistrationTest extends TestCase
         $this->assertNull(Onboarding::for($user->company->fresh()));
         $this->get(route('dashboard'))->assertOk()->assertInertia(fn ($page) => $page->where('onboarding', null));
     }
+
+    // ------------------------------------------- een weigerende mailserver
+
+    /**
+     * Laat het versturen van de verificatiecode mislukken, zoals een mailserver
+     * die de inlog weigert.
+     */
+    private function mailServerWeigert(): void
+    {
+        $wachtend = \Mockery::mock();
+        $wachtend->shouldReceive('send')
+            ->andThrow(new \RuntimeException('Failed to authenticate on SMTP server'));
+
+        Mail::shouldReceive('to')->andReturn($wachtend);
+    }
+
+    public function test_aanmelden_lukt_ook_als_de_verificatiemail_niet_verstuurd_kan_worden(): void
+    {
+        /*
+         * Dit is wat er op lopra.nl gebeurde op 30-09-2026. `MAIL_PASSWORD` was
+         * daar leeg, dus smtp.resend.com weigerde de inlog. De administratie en
+         * de gebruiker waren op dat moment al vastgelegd, en daarna gooide
+         * `Mail::send()` een uitzondering — midden in de afhandeling, ná de
+         * transactie. De bezoeker kreeg een foutpagina terwijl zijn account
+         * bestond, en opnieuw aanmelden zei "dit e-mailadres is al in gebruik".
+         *
+         * Een mislukte mail is hinderlijk. Het mag geen account opleveren dat je
+         * niet kunt gebruiken en niet kunt overdoen.
+         */
+        Http::fake();
+        $this->mailServerWeigert();
+
+        $this->post('/register', $this->form())
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('verification.show'));
+
+        $user = User::where('email', 'sanne@example.com')->first();
+        $this->assertNotNull($user, 'het account hoort gewoon te bestaan');
+        $this->assertNotNull($user->verification_code, 'de code hoort klaar te staan om opnieuw te sturen');
+        $this->assertNull($user->email_verified_at);
+
+        // En het scherm zegt wat er is, in plaats van te wachten op een mail
+        // die nooit komt.
+        $this->get(route('verification.show'))->assertOk()
+            ->assertInertia(fn ($page) => $page->where('mailFailed', true));
+    }
+
+    public function test_inloggen_met_een_onbevestigd_account_loopt_niet_vast_op_de_mail(): void
+    {
+        Http::fake();
+        Mail::fake();
+
+        $this->post('/register', $this->form())->assertSessionHasNoErrors();
+        $this->flushSession();
+
+        // Zonder deze reparatie kwam je hierna nooit meer bij je eigen account:
+        // het inloggen maakte een nieuwe code aan en klapte op het versturen.
+        $this->travel(16)->minutes();
+        $this->mailServerWeigert();
+
+        $this->post('/login', ['email' => 'sanne@example.com', 'password' => 'geheim-wachtwoord-1'])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect(route('verification.show'));
+    }
+
+    public function test_opnieuw_sturen_zegt_eerlijk_dat_het_niet_gelukt_is(): void
+    {
+        Http::fake();
+        Mail::fake();
+
+        $this->post('/register', $this->form())->assertSessionHasNoErrors();
+
+        // De wachttijd tussen twee aanvragen overslaan.
+        $this->travel(2)->minutes();
+        $this->mailServerWeigert();
+
+        // Geen "nieuwe code verstuurd" terwijl er niets verstuurd is.
+        $this->post(route('verification.resend'))
+            ->assertSessionHasErrors('code')
+            ->assertSessionMissing('flash');
+    }
 }

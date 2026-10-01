@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -32,6 +30,9 @@ class EmailVerificationController extends Controller
         return Inertia::render('Auth/VerifyEmail', [
             'email' => $user->email,
             'canResendIn' => $this->resendCooldownSeconds($user),
+            // Kon de code niet verstuurd worden, dan moet dat op het scherm
+            // staan. Anders wacht iemand op een mail die nooit komt.
+            'mailFailed' => (bool) Session::pull('verification_mail_failed', false),
         ]);
     }
 
@@ -104,8 +105,11 @@ class EmailVerificationController extends Controller
             ]);
         }
 
-        $code = $user->generateVerificationCode();
-        Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+        if (! app(\App\Services\VerificationCodeSender::class)->send($user)) {
+            throw ValidationException::withMessages([
+                'code' => __('We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.'),
+            ]);
+        }
 
         return back()->with('flash', __('Nieuwe code verstuurd naar :email', ['email' => $user->email]));
     }

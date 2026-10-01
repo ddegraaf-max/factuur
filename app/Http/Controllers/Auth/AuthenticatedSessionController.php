@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\VerificationCodeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -51,8 +49,11 @@ class AuthenticatedSessionController extends Controller
         if (! $user->hasVerifiedEmail()) {
             // Issue a fresh code if the previous one is missing or expired
             if (! $user->verification_code || ! $user->verification_code_expires_at || now()->greaterThan($user->verification_code_expires_at)) {
-                $code = $user->generateVerificationCode();
-                Mail::to($user->email)->send(new VerificationCodeMail($user, $code));
+                // Een weigerende mailserver mag het inloggen niet blokkeren:
+                // dan kom je nooit meer bij je eigen account.
+                if (! app(\App\Services\VerificationCodeSender::class)->send($user)) {
+                    Session::put('verification_mail_failed', true);
+                }
             }
 
             Session::put('verifying_user_id', $user->id);
