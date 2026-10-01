@@ -31,4 +31,4 @@ npm run build
 
 echo ""
 echo "✓ Klaar! Start met:  php artisan serve"
-echo "  Login: demo@easyinvoice.test / password"
+echo "  Login: demo@easyinvoice.test — het wachtwoord staat hierboven bij de seeder"

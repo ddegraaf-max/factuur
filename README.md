@@ -116,10 +116,18 @@ Open vervolgens [http://localhost:8000](http://localhost:8000).
 
 ## Demo-inloggegevens
 
+De seeder maakt de gebruiker `demo@easyinvoice.test` met een **willekeurig
+wachtwoord** en zet dat in je terminal:
+
 ```
-E-mail:     demo@easyinvoice.test
-Wachtwoord: password
+✓ Demo login: demo@easyinvoice.test / <hier staat jouw wachtwoord>
+  Schrijf dit wachtwoord over — het staat nergens anders.
 ```
+
+Het staat hier bewust niet. Deze repo is openbaar, en een vast wachtwoord in
+een openbare repo is een werkend wachtwoord op elke omgeving waar de seeder
+ooit heeft gelopen. Kwijt? Dan `php artisan migrate:fresh --seed` opnieuw, of
+zelf een wachtwoord zetten met `php artisan tinker`.
 
 De seeder maakt:
 - 1 demo-bedrijf "Vries Design B.V."

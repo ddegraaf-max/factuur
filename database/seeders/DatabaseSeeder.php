@@ -12,6 +12,7 @@ use App\Services\InvoiceManager;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -53,13 +54,26 @@ class DatabaseSeeder extends Seeder
             'invoice_number_format' => '{year}-{sequence:4}',
         ]);
 
-        // 2. Create demo user (login: demo@easyinvoice.test / wachtwoord: password)
+        /*
+         * 2. De demo-gebruiker. Het wachtwoord wordt hier verzonnen en
+         * onderaan in je terminal gezet.
+         *
+         * Hier stond 'password', en dat stond ook in README.md, DEPLOYMENT.md
+         * en install.sh. Die repo is openbaar, dus dat was een gepubliceerd
+         * wachtwoord — en op 28-08-2026 draaide deze seeder per ongeluk in
+         * productie. Daarmee stond er een werkend account met een publiek
+         * bekend wachtwoord op internet, als eigenaar van twee administraties.
+         * De grendel hierboven voorkomt dat de seeder daar nog komt; dit
+         * voorkomt dat het erg is als hij er tóch komt.
+         */
+        $wachtwoord = Str::password(16, symbols: false);
+
         $user = User::create([
             'company_id' => $company->id,
             'role' => 'owner',
             'name' => 'Demo Gebruiker',
             'email' => 'demo@easyinvoice.test',
-            'password' => Hash::make('password'),
+            'password' => Hash::make($wachtwoord),
             'email_verified_at' => now(),
         ]);
 
@@ -315,7 +329,8 @@ class DatabaseSeeder extends Seeder
         Auth::logout();
 
         $this->command->info('✓ Demo company: Vries Design B.V.');
-        $this->command->info('✓ Demo login: demo@easyinvoice.test / password');
+        $this->command->info('✓ Demo login: demo@easyinvoice.test / ' . $wachtwoord);
+        $this->command->warn('  Schrijf dit wachtwoord over — het staat nergens anders.');
         $this->command->info('✓ ' . count($customers) . ' klanten, ' . count($products) . ' producten, 15 facturen');
     }
 }

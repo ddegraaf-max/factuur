@@ -41,20 +41,26 @@ DB_PASSWORD=${{Postgres.PGPASSWORD}}
 
 Bij de deploy draait automatisch (via `railway.json` preDeployCommand):
 ```
-php artisan migrate --force --seed
+php artisan migrate --force
 ```
-Dit maakt alle tabellen aan én vult demo-data. De 500 verdwijnt.
+Dit maakt alle tabellen aan. De 500 verdwijnt.
+
+**Geen `--seed` erbij zetten.** Hier stond eerder `migrate --force --seed`, en
+op 28-08-2026 zette die seeder na een deploy de voorbeeldadministratie "Vries
+Design B.V." in de productiedatabase — inclusief een incassodossier dat naar de
+incassopartner gemaild werd, en een gebruiker met een wachtwoord dat in deze
+openbare repo stond. De seeder weigert nu zelf te draaien in productie, en
+`--seed` is uit `railway.json` gehaald. Voorbeelddata hoort bij lokaal
+ontwikkelen; de publieke demo op de site loopt via `DemoDataBuilder`, dat
+afgeschermde omgevingen maakt met `is_demo` en een vervaldatum.
 
 ## Inloggen
 
-Na een geslaagde deploy met database:
-```
-E-mail:    demo@easyinvoice.test
-Wachtwoord: password
-```
+Op een nieuwe productieomgeving maak je zelf het eerste account aan via de
+registratiepagina. Er is geen standaardaccount en geen standaardwachtwoord.
 
-De seeder is idempotent: hij vult demo-data alleen de EERSTE keer. Bij volgende
-deploys slaat hij zichzelf over (geen dubbele data, geen crash).
+Lokaal maakt de seeder `demo@easyinvoice.test` met een willekeurig wachtwoord
+dat hij in je terminal zet — zie README.md.
 
 ## Belangrijke correctie
 
