@@ -13,9 +13,7 @@
         .logo table { border-collapse: collapse; }
         .logo img { width: 34px; height: 34px; border: 0; border-radius: 9px; display: block; }
         .logo .name { font-size: 18px; font-weight: 700; color: #FFFFFF; padding-left: 10px; line-height: 1.2; }
-        .logo .name span { color: #F87171; }
         .logo .tag { font-size: 12px; font-weight: 500; color: #A8A29E; padding-left: 10px; }
-        .logo .accent { color: #FCA5A5; }
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }

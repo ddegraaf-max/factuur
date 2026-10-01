@@ -28,7 +28,7 @@
         .list .nr { font-size: 12px; color: #A8A29E; }
         .list .when { text-align: right; white-space: nowrap; }
         .ok { color: #15803D; font-size: 12px; }
-        .warn { color: #B81814; font-size: 12px; }
+        .warn { color: #B91C1C; font-size: 12px; }
         .muted { color: #78716C; font-size: 12px; }
         .btn { display: inline-block; background: {{ brand('color') }}; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 28px 0 4px; }

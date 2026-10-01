@@ -14,8 +14,8 @@
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
-        .days-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
-        .days-num { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; color: #7F1310; line-height: 1; }
+        .days-box { background: {{ brand('color_tint') }}; border: 1px solid {{ brand('color_tint_border') }}; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
+        .days-num { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; color: {{ brand('color_strong') }}; line-height: 1; }
         .days-label { font-size: 13px; font-weight: 600; color: {{ brand('color_dark') }}; margin-top: 6px; }
         .btn { display: inline-block; background: {{ brand('color') }}; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 13px 26px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 28px 0 8px; }

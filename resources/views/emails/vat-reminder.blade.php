@@ -25,9 +25,9 @@
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
         .kpis { width: 100%; border-collapse: separate; border-spacing: 8px 0; margin: 4px 0 20px; }
         .kpi { background: #F5F5F4; border-radius: 10px; padding: 14px 12px; text-align: center; }
-        .kpi.tint { background: #FEF2F2; border: 1px solid #FECACA; }
+        .kpi.tint { background: {{ brand('color_tint') }}; border: 1px solid {{ brand('color_tint_border') }}; }
         .kpi-val { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #1C1917; }
-        .kpi.tint .kpi-val { color: #7F1310; }
+        .kpi.tint .kpi-val { color: {{ brand('color_strong') }}; }
         .kpi-lbl { font-size: 11px; font-weight: 600; color: #78716C; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 5px; }
         .pay { width: 100%; border-collapse: collapse; background: #FAFAF9; border: 1px solid #E7E5E4; border-radius: 10px; margin: 6px 0 20px; font-size: 14px; }
         .pay td { padding: 9px 14px; border-bottom: 1px solid #EBE9E6; }

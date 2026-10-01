@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use App\Support\Brand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -131,6 +132,62 @@ class BrandTest extends TestCase
 
         // De sitemap mag geen pagina's noemen die onder Lopra niet bestaan.
         $this->assertStringNotContainsString('zocht-u-een-ander', implode(' ', $this->sitemapUrls()));
+    }
+
+    // --------------------------------------------------- de kleuren in de mail
+
+    public function test_de_merktinten_worden_uit_de_merkkleur_berekend(): void
+    {
+        // EasyInvoice-rood: de lichte tint hoort exact op de oude, met de hand
+        // gekozen waarde uit te komen, zodat daar niets verschuift.
+        $this->assertSame('#E8231F', Brand::get('color'));
+        $this->assertSame('#FEF2F2', Brand::get('color_tint'));
+
+        config(['brand.active' => 'lopra']);
+        $this->assertSame('#1C4E7A', Brand::get('color'));
+
+        // Blauw merk, dus een blauwe tint en geen rode.
+        foreach (['color_tint', 'color_tint_border', 'color_strong'] as $toon) {
+            $hex = Brand::get($toon);
+            $this->assertMatchesRegularExpression('/^#[0-9A-F]{6}$/', (string) $hex, "{$toon} hoort een kleurcode te zijn");
+
+            [$r, $g, $b] = sscanf(substr((string) $hex, 1), '%2x%2x%2x');
+            $this->assertGreaterThanOrEqual($r, $b, "{$toon} ({$hex}) is roder dan blauwer; de tint volgt de merkkleur niet");
+        }
+
+        // Een merk zonder kleur levert geen onzin op.
+        config(['brand.active' => 'bestaat-niet']);
+        $this->assertSame('#FEF2F2', Brand::get('color_tint'), 'onbekend merk valt terug op EasyInvoice');
+    }
+
+    public function test_de_verificatiemail_draagt_geen_easyinvoice_rood_naar_een_ander_merk(): void
+    {
+        /*
+         * In zeven mailsjablonen stonden de lichte tinten van het
+         * EasyInvoice-rood als vaste waarde: #FEF2F2, #FECACA en #7F1310. Die
+         * gingen mee naar élk merk. De verificatiecode van Lopra stond daardoor
+         * in donkerrode cijfers in een roze vak, met een blauw labeltje erboven.
+         *
+         * Rood dat een signaal is (te laat tegenover op tijd, in de
+         * dagsamenvatting) blijft staan — dat is geen merkkleur.
+         */
+        config(['brand.active' => 'lopra']);
+
+        // De mail leest alleen de naam; opslaan is niet nodig.
+        $gebruiker = new User(['name' => 'Sanne de Boer', 'email' => 'sanne@example.com']);
+        $html = (new \App\Mail\VerificationCodeMail($gebruiker, '123456'))->render();
+
+        foreach (['#E8231F', '#B81814', '#7F1310', '#FECACA', '#FEF2F2'] as $easyinvoiceRood) {
+            $this->assertStringNotContainsStringIgnoringCase(
+                $easyinvoiceRood,
+                $html,
+                "de Lopra-verificatiemail bevat nog het EasyInvoice-rood {$easyinvoiceRood}"
+            );
+        }
+
+        // En de merkkleur hoort er juist wél in te staan.
+        $this->assertStringContainsStringIgnoringCase((string) Brand::get('color_tint'), $html);
+        $this->assertStringContainsStringIgnoringCase((string) Brand::get('color_strong'), $html);
     }
 
     /**

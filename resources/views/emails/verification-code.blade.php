@@ -14,8 +14,8 @@
         .body { padding: 36px 36px 32px; }
         h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 12px; color: #1C1917; }
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
-        .code-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
-        .code { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 34px; font-weight: 700; letter-spacing: 0.4em; color: #7F1310; padding-left: 0.4em; }
+        .code-box { background: {{ brand('color_tint') }}; border: 1px solid {{ brand('color_tint_border') }}; border-radius: 10px; padding: 22px; text-align: center; margin: 24px 0; }
+        .code { font-family: 'SF Mono', Menlo, Consolas, monospace; font-size: 34px; font-weight: 700; letter-spacing: 0.4em; color: {{ brand('color_strong') }}; padding-left: 0.4em; }
         .code-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: {{ brand('color_dark') }}; margin-bottom: 10px; }
         .meta { font-size: 13px; color: #78716C; margin-top: 24px; padding-top: 20px; border-top: 1px solid #E7E5E4; }
         .footer { padding: 20px 36px 28px; font-size: 12px; color: #A8A29E; text-align: center; }

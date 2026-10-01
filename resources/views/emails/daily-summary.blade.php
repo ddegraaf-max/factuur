@@ -21,10 +21,12 @@
         p { font-size: 15px; line-height: 1.6; color: #44403C; margin: 0 0 16px; }
         .kpis { width: 100%; border-collapse: separate; border-spacing: 8px 0; margin: 4px 0 24px; }
         .kpi { background: #F5F5F4; border-radius: 10px; padding: 14px 16px; text-align: center; }
+        /* Rood en groen zijn hier signaalkleuren — te laat tegenover op tijd —
+           en geen merkkleuren. Ze blijven dus op elk merk hetzelfde. */
         .kpi.alert { background: #FEF2F2; border: 1px solid #FECACA; }
         .kpi.good { background: #DCFCE7; border: 1px solid #86EFAC; }
         .kpi-val { font-size: 19px; font-weight: 700; letter-spacing: -0.02em; color: #1C1917; }
-        .kpi.alert .kpi-val { color: #7F1310; }
+        .kpi.alert .kpi-val { color: #7F1D1D; }
         .kpi.good .kpi-val { color: #15803D; }
         .kpi-lbl { font-size: 11px; font-weight: 600; color: #78716C; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 5px; }
         h2 { font-size: 14px; font-weight: 700; margin: 26px 0 10px; color: #1C1917; }
@@ -34,7 +36,7 @@
         .list .who { font-weight: 600; color: #1C1917; }
         .list .nr { font-size: 12px; color: #A8A29E; }
         .list .amt { text-align: right; white-space: nowrap; font-weight: 600; }
-        .late { color: #B81814; font-size: 12px; }
+        .late { color: #B91C1C; font-size: 12px; }
         .more { font-size: 13px; color: #78716C; padding-top: 10px; }
         .btn { display: inline-block; background: {{ brand('color') }}; color: #ffffff !important; text-decoration: none; font-size: 15px; font-weight: 600; padding: 12px 24px; border-radius: 8px; }
         .btn-wrap { text-align: center; margin: 28px 0 4px; }

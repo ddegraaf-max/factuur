@@ -48,7 +48,65 @@ class Brand
             }
         }
 
-        return config('brand.brands.' . $brandKey . '.' . $key, $default);
+        $waarde = config('brand.brands.' . $brandKey . '.' . $key);
+        if ($waarde !== null) {
+            return $waarde;
+        }
+
+        return static::toon($key) ?? $default;
+    }
+
+    /**
+     * Tinten van de merkkleur: een lichte vlakvulling, een randje daarbij, en
+     * een donkere variant voor tekst daarop.
+     *
+     * ── Waarom berekend en niet per merk ingetypt ─────────────────────────
+     *
+     * In de mailsjablonen stonden deze drie tinten als vaste waarden:
+     * #FEF2F2, #FECACA en #7F1310. Dat zijn de lichte tinten van het
+     * EasyInvoice-rood, en ze gingen mee naar élk merk. De verificatiecode van
+     * Lopra stond daardoor in donkerrode cijfers in een roze vak, met een
+     * blauw labeltje erboven — hetzelfde euvel als het EasyInvoice-rood dat in
+     * de EasyBookkeeper-pagina zat.
+     *
+     * Ze zijn hier berekend en niet aan config/brand.php toegevoegd, omdat er
+     * vier merkdefinities zijn: drie extra kleuren per merk is twaalf waarden
+     * die stilletjes uit de pas gaan lopen. Eén berekening uit `color` blijft
+     * vanzelf kloppen, ook voor een merk dat er later bij komt. Wie een tint
+     * tóch met de hand wil kiezen, zet hem in config/brand.php — die gaat voor.
+     *
+     * Voor EasyInvoice levert dit (bijna) exact de oude waarden op, dus daar
+     * verandert er niets zichtbaar.
+     */
+    private static function toon(string $key): ?string
+    {
+        // Positief = naar wit toe, negatief = naar zwart toe.
+        $mengen = match ($key) {
+            'color_tint' => 0.94,
+            'color_tint_border' => 0.76,
+            'color_strong' => -0.42,
+            default => null,
+        };
+
+        if ($mengen === null) {
+            return null;
+        }
+
+        $kleur = (string) config('brand.brands.' . static::key() . '.color', '');
+        if (! preg_match('/^#([0-9A-Fa-f]{6})$/', $kleur, $m)) {
+            return null;
+        }
+
+        [$r, $g, $b] = sscanf($m[1], '%2x%2x%2x');
+        $doel = $mengen > 0 ? 255 : 0;
+        $deel = abs($mengen);
+
+        return sprintf(
+            '#%02X%02X%02X',
+            (int) round($r + ($doel - $r) * $deel),
+            (int) round($g + ($doel - $g) * $deel),
+            (int) round($b + ($doel - $b) * $deel)
+        );
     }
 
     public static function name(): string
