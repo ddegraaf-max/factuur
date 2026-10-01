@@ -1628,5 +1628,9 @@
   "Deze startlijst bestaat niet.": "Ta lista startowa nie istnieje.",
   "Startlijst :package: :added bedrijven toegevoegd": "Lista startowa :package: dodano :added firm",
   ":name is uit de pool gehaald. De eerdere uitvragen blijven bewaard; terugzetten kan onderaan de lijst.": ":name usunięto z puli. Wcześniejsze zapytania pozostają; przywrócić można na dole listy.",
-  ":name staat weer in de pool.": ":name znów jest w puli."
+  ":name staat weer in de pool.": ":name znów jest w puli.",
+  "afgeleverd": "dostarczono",
+  "niet afgeleverd": "nie dostarczono",
+  "onderweg": "w drodze",
+  "aflevering onbekend": "dostarczenie nieznane"
 }

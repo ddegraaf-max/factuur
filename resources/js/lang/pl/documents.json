@@ -626,5 +626,9 @@
   ":n uit de pool gehaald": ":n usunięto z puli",
   "uit de pool sinds :date": "poza pulą od :date",
   ":n uitvragen": ":n zapytań",
-  "Terugzetten": "Przywróć"
+  "Terugzetten": "Przywróć",
+  "Afleverstatus": "Status dostarczenia",
+  "stel in Smstools een webhook in van het type delivery_report op dit adres:": "ustaw w Smstools webhook typu delivery_report pod tym adresem:",
+  "De secret van de webhook staat in de omgeving (SMSTOOLS_WEBHOOK_SECRET); meldingen worden op handtekening gecontroleerd.": "Sekret webhooka jest ustawiony w środowisku (SMSTOOLS_WEBHOOK_SECRET); powiadomienia są sprawdzane podpisem.",
+  "Zet de secret van de webhook in Railway als SMSTOOLS_WEBHOOK_SECRET; tot die tijd worden alleen meldingen over een bekend messageid verwerkt.": "Umieść sekret webhooka w Railway jako SMSTOOLS_WEBHOOK_SECRET; do tego czasu przetwarzane są tylko powiadomienia o znanym messageid."
 }

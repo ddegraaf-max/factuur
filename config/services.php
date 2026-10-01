@@ -122,5 +122,7 @@ return [
         'url' => env('SMSTOOLS_URL', 'https://api.smsgatewayapi.com/v1'),
         'companies' => env('SMSTOOLS_COMPANIES', ''),
         'monthly_limit' => (int) env('SMSTOOLS_MONTHLY_LIMIT', 300),
+        // Secret van de delivery_report-webhook in Smstools; zonder secret geldt alleen een bekend messageid als controle.
+        'webhook_secret' => env('SMSTOOLS_WEBHOOK_SECRET'),
     ],
 ];

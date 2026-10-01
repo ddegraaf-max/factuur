@@ -63,8 +63,16 @@ class SmsSettingsController extends Controller
                     'segments' => $m->segments,
                     'status' => $m->status,
                     'error' => $m->error,
+                    'delivery' => $m->delivery_status,
+                    'delivery_label' => $m->deliveryLabel(),
+                    'delivery_detail' => $m->delivery_detail,
                     'sent_at_label' => $m->created_at?->translatedFormat('j M Y, H:i'),
                 ])->values(),
+            // Alleen de eigenaar van het platform: hoe de afleverstatus binnenkomt.
+            'webhook' => \App\Support\OwnerAccess::allows(auth()->user()) ? [
+                'url' => route('webhooks.smstools'),
+                'secret_set' => filled(config('services.smstools.webhook_secret')),
+            ] : null,
             'used_this_month' => (int) abs((int) SmsCreditEntry::where('company_id', $company->id)->where('kind', 'use')
                 ->where('created_at', '>=', now()->startOfMonth())->sum('amount')),
         ]);

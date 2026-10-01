@@ -14,6 +14,7 @@ const props = defineProps({
   can_buy: Boolean,
   purchases: { type: Array, default: () => [] },
   messages: { type: Array, default: () => [] },
+  webhook: { type: Object, default: null },
   used_this_month: { type: Number, default: 0 },
 });
 
@@ -108,12 +109,17 @@ const perSms = (bundle) => eur(bundle.per_sms, { decimals: Math.round(bundle.per
             <td class="body">{{ m.body }}</td>
             <td class="right num">{{ m.status === 'sent' ? m.segments : 0 }}</td>
             <td>
-              <span :class="['pill', m.status === 'sent' ? 'pill-paid' : 'pill-cancelled']">{{ m.status === 'sent' ? $t('Verstuurd') : $t('Mislukt') }}</span>
+              <span :class="['pill', m.status !== 'sent' ? 'pill-cancelled' : m.delivery === 'delivered' ? 'pill-paid' : m.delivery === 'failed' ? 'pill-overdue' : 'pill-sent']">{{ m.status !== 'sent' ? $t('Mislukt') : (m.delivery_label || $t('Verstuurd')) }}</span>
+              <div v-if="m.delivery === 'failed' && m.delivery_detail" class="sub">{{ m.delivery_detail }}</div>
             </td>
           </tr>
         </tbody>
       </table>
       <div v-else class="card-body sub">{{ $t('Nog geen sms verstuurd. Dat doe je bij een uitvraag of bij een aanmaning.') }}</div>
+      <div v-if="webhook" class="card-body sub" style="border-top:1px solid var(--border);line-height:1.6;">
+        <b>{{ $t('Afleverstatus') }}</b> — {{ $t('stel in Smstools een webhook in van het type delivery_report op dit adres:') }} <code>{{ webhook.url }}</code>.
+        {{ webhook.secret_set ? $t('De secret van de webhook staat in de omgeving (SMSTOOLS_WEBHOOK_SECRET); meldingen worden op handtekening gecontroleerd.') : $t('Zet de secret van de webhook in Railway als SMSTOOLS_WEBHOOK_SECRET; tot die tijd worden alleen meldingen over een bekend messageid verwerkt.') }}
+      </div>
     </div>
   </AppLayout>
 </template>

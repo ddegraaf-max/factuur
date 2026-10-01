@@ -1628,5 +1628,9 @@
   "Deze startlijst bestaat niet.": "This starter list does not exist.",
   "Startlijst :package: :added bedrijven toegevoegd": "Starter list :package: :added companies added",
   ":name is uit de pool gehaald. De eerdere uitvragen blijven bewaard; terugzetten kan onderaan de lijst.": ":name has been taken out of the pool. The earlier price requests are kept; you can put it back at the bottom of the list.",
-  ":name staat weer in de pool.": ":name is back in the pool."
+  ":name staat weer in de pool.": ":name is back in the pool.",
+  "afgeleverd": "delivered",
+  "niet afgeleverd": "not delivered",
+  "onderweg": "in transit",
+  "aflevering onbekend": "delivery unknown"
 }

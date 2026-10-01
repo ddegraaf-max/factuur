@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.75.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.76.0</div>
+        <h2>Sms: je ziet nu of hij is afgeleverd</h2>
+        <ul class="tl-list">
+          <li><b>Afgeleverd of niet</b> — bij een prijsaanvraag of aanmaning per sms stond er alleen "sms verstuurd". Nu meldt Smstools terug of het bericht is aangekomen; dat staat bij de uitvraag en bij Instellingen → Sms, met de reden als het misging (bijv. ongeldig nummer).</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">1 oktober 2026 · {{ brand('version_prefix') }} 1.75.0</div>
         <h2>Offertecheck: elke prijsopgave van een onderaannemer beoordeeld</h2>
         <ul class="tl-list">
           <li><b>Reëel, hoog of laag?</b> — komt er een prijs binnen op een uitvraag, dan beoordeelt de AI hem binnen tien minuten tegen jouw calculatie, de andere prijzen, je eerdere prijzen voor dat werk en gangbare marktprijzen. Je krijgt het advies per mail.</li>

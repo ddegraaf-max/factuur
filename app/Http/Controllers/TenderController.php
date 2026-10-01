@@ -71,6 +71,11 @@ class TenderController extends Controller
         $company = auth()->user()->company;
         $smsOn = $this->sms->available($company);
         $aiOn = $this->reviews->availableFor($company);
+        // Afleverstatus van de laatste sms per aanvraag (via de webhook van Smstools).
+        $delivery = \App\Models\SmsMessage::where('company_id', $company->id)
+            ->where('subject_type', (new TenderRequest)->getMorphClass())
+            ->whereIn('subject_id', $round->requests->pluck('id'))
+            ->orderBy('id')->get()->keyBy('subject_id');
 
         return Inertia::render('Tenders/Show', [
             // Offertecheck: kan de AI hier beoordelen (Slim, proef of demo)?
@@ -138,6 +143,8 @@ class TenderController extends Controller
                 'opened_at_label' => $r->opened_at?->translatedFormat('j M, H:i'),
                 'reminded_at_label' => $r->reminded_at?->translatedFormat('j M, H:i'),
                 'sms_at_label' => $r->sms_at?->translatedFormat('j M, H:i'),
+                'sms_delivery' => $delivery->get($r->id)?->delivery_status,
+                'sms_delivery_label' => $delivery->get($r->id)?->deliveryLabel(),
                 'responded_at_label' => $r->responded_at?->translatedFormat('j M, H:i'),
                 'response_url' => $r->responseUrl(),
                 // Een sms kan naar een mobiel nummer, zolang het bedrijf nog niet heeft gereageerd.

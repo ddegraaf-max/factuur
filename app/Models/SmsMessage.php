@@ -14,10 +14,24 @@ class SmsMessage extends Model
 {
     protected $fillable = [
         'company_id', 'user_id', 'recipient', 'sender', 'body', 'segments', 'status', 'provider_id', 'error',
-        'subject_type', 'subject_id',
+        'subject_type', 'subject_id', 'delivery_status', 'delivery_code', 'delivery_detail', 'delivered_at',
     ];
 
+
+    /** De afleverstatus in gewone taal, of null als Smstools nog niets heeft gemeld. */
+    public function deliveryLabel(): ?string
+    {
+        return match ($this->delivery_status) {
+            'delivered' => __('afgeleverd'),
+            'failed' => __('niet afgeleverd'),
+            'pending' => __('onderweg'),
+            'unknown' => __('aflevering onbekend'),
+            default => null,
+        };
+    }
+
     protected $casts = [
+        'delivered_at' => 'datetime',
         'segments' => 'integer',
     ];
 

@@ -49,6 +49,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Webhooks van buitenaf sturen geen CSRF-token mee.
         $middleware->validateCsrfTokens(except: [
             'stripe/webhook',
+            'webhooks/smstools',
             'webhooks/mollie',
             'webhooks/recommand',
             'webhooks/inbound-mail/*',

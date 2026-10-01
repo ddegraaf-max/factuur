@@ -223,7 +223,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
                 <template v-else-if="r.email">{{ $t('mail niet verstuurd') }}</template>
                 <template v-else>{{ $t('sms niet verstuurd') }}</template>
                 <template v-if="r.reminded_at_label"> · {{ $t('herinnerd :date', { date: r.reminded_at_label }) }}</template>
-                <template v-if="r.sms_at_label"> · {{ $t('sms :date', { date: r.sms_at_label }) }}</template>
+                <template v-if="r.sms_at_label"> · {{ $t('sms :date', { date: r.sms_at_label }) }}<span v-if="r.sms_delivery_label" :class="{ good: r.sms_delivery === 'delivered', bad: r.sms_delivery === 'failed' }"> · {{ r.sms_delivery_label }}</span></template>
               </div>
             </td>
             <td class="right num">
