@@ -173,7 +173,48 @@ class CustomerController extends Controller
             'score' => app(\App\Services\CustomerScoreService::class)->available()
                 ? app(\App\Services\CustomerScoreService::class)->score($customer)
                 : null,
+            /*
+             * Curatele en bewind staat náást de score en niet erin: het is iets
+             * om te weten vóór je aanmaant, geen signaal om mee te rekenen. De
+             * gebruiksvoorwaarden van het register laten alleen het eerste toe.
+             * Alleen bij een particulier, want de maatregel geldt voor mensen.
+             */
+            'ccbr' => $this->ccbrVoorScherm($customer),
         ]);
+    }
+
+    /** @return array<string, mixed>|null */
+    private function ccbrVoorScherm(Customer $customer): ?array
+    {
+        if ($customer->type !== 'consumer' || ! app(\App\Services\CcbrService::class)->enabled()) {
+            return null;
+        }
+
+        $check = \App\Models\CcbrCheck::where('customer_id', $customer->id)
+            ->orderByDesc('checked_at')
+            ->first();
+
+        return [
+            // Een voorzet voor het formulier: de achternaam is meestal het
+            // laatste woord van de klantnaam. De gebruiker kan hem aanpassen.
+            'achternaam_voorstel' => (string) \Illuminate\Support\Str::afterLast(trim((string) $customer->name), ' '),
+            'check' => $check ? [
+                'gevonden' => $check->gevonden,
+                'maatregel' => $check->maatregel,
+                'grond_tekst' => $check->grond_tekst,
+                'kaartnummer' => $check->kaartnummer,
+                'ingangsdatum' => $check->ingangsdatum?->translatedFormat('j F Y'),
+                'rechtbank' => $check->rechtbank,
+                'beperkt_bewind' => $check->beperkt_bewind,
+                'vertegenwoordigers' => $check->vertegenwoordigers ?? [],
+                'volledige_match' => $check->volledige_match,
+                'gezocht_op' => trim(($check->voorvoegsel ? $check->voorvoegsel . ' ' : '') . $check->achternaam
+                    . ', ' . ($check->geboortedatum?->translatedFormat('j F Y') ?? $check->geboortejaar)),
+                'checked_at_label' => $check->checked_at->translatedFormat('j M Y, H:i'),
+                'vernietigen_op_label' => $check->vernietigen_op->translatedFormat('j F Y'),
+                'verlopen' => $check->verlopen(),
+            ] : null,
+        ];
     }
 
     public function update(Request $request, Customer $customer): RedirectResponse

@@ -16,6 +16,7 @@ const props = defineProps({
   quotes_total: Number,
   hours_url: { type: String, default: null },
   score: { type: Object, default: null },
+  ccbr: { type: Object, default: null },
 });
 
 // Klantscore opnieuw laten rekenen, met een verse blik op de openbare bronnen.
@@ -24,6 +25,38 @@ const refreshScore = () => router.post(route('customers.score', props.customer.i
   preserveScroll: true,
   onStart: () => { refreshing.value = true; },
   onFinish: () => { refreshing.value = false; },
+});
+
+/*
+ * Curatele- en bewindregister. Dit staat in dezelfde kaart maar telt niet mee
+ * in de score: de voorwaarden van de Rechtspraak staan alleen toe dat je er
+ * handelspartijen mee informeert, en een score is een ander doel. Het register
+ * zoekt op achternaam én geboortedatum, en die laatste staat niet bij een klant
+ * in een facturatiepakket — vandaar een formuliertje en niet één knop.
+ */
+const ccbrOpen = ref(false);
+const ccbrBezig = ref(false);
+const ccbrForm = ref({ achternaam: '', voorvoegsel: '', geboortedatum: '', geboortejaar: '' });
+
+const ccbrOpenen = () => {
+  ccbrForm.value = {
+    achternaam: props.ccbr?.achternaam_voorstel || '',
+    voorvoegsel: '',
+    geboortedatum: '',
+    geboortejaar: '',
+  };
+  ccbrOpen.value = true;
+};
+
+const ccbrZoeken = () => router.post(route('customers.ccbr.check', props.customer.id), ccbrForm.value, {
+  preserveScroll: true,
+  onStart: () => { ccbrBezig.value = true; },
+  onFinish: () => { ccbrBezig.value = false; },
+  onSuccess: () => { ccbrOpen.value = false; },
+});
+
+const ccbrVergeten = () => router.delete(route('customers.ccbr.forget', props.customer.id), {
+  preserveScroll: true,
 });
 
 // Kolom Open: bij een factuur wat de klant nog moet betalen, bij een creditnota het tegoed (negatief).
@@ -242,9 +275,98 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
               </div>
             </div>
             <p class="score-note">
-              <template v-if="score.kind === 'consumer'">{{ $t('Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Voor een particulier zijn er verder geen openbare bronnen. Jij beslist.') }}</template>
+              <template v-if="score.kind === 'consumer'">{{ $t('Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Jij beslist.') }}</template>
               <template v-else>{{ $t('Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.') }}</template>
             </p>
+
+            <!--
+              Curatele en bewind. Staat bewust ónder de voetnoot van de score en
+              achter een eigen streep: het is geen signaal dat meetelt in het
+              cijfer, maar iets om te weten vóór je aanmaant.
+            -->
+            <div v-if="ccbr" class="ccbr">
+              <div class="ccbr-head">
+                <b>{{ $t('Curatele en bewind') }}</b>
+                <button v-if="!ccbrOpen" type="button" class="link-btn" @click="ccbrOpenen">
+                  {{ ccbr.check ? $t('Opnieuw opzoeken') : $t('Opzoeken in het register') }}
+                </button>
+              </div>
+
+              <!-- Het formulier: de geboortedatum staat niet bij de klant. -->
+              <form v-if="ccbrOpen" class="ccbr-form" @submit.prevent="ccbrZoeken">
+                <label>
+                  {{ $t('Achternaam') }}
+                  <input v-model="ccbrForm.achternaam" type="text" required maxlength="120" />
+                </label>
+                <label>
+                  {{ $t('Tussenvoegsel') }}
+                  <input v-model="ccbrForm.voorvoegsel" type="text" maxlength="40" placeholder="van der" />
+                </label>
+                <label>
+                  {{ $t('Geboortedatum') }}
+                  <input v-model="ccbrForm.geboortedatum" type="date" />
+                </label>
+                <label>
+                  {{ $t('Of alleen het geboortejaar') }}
+                  <input v-model="ccbrForm.geboortejaar" type="number" min="1900" :max="new Date().getFullYear()" placeholder="1975" />
+                </label>
+                <p class="ccbr-uitleg">{{ $t('Het register zoekt op achternaam én geboortedatum. Weet je de datum niet, vul dan het jaar in; je krijgt dan meer mogelijke treffers.') }}</p>
+                <div class="ccbr-knoppen">
+                  <button type="submit" class="btn btn-primary btn-sm" :disabled="ccbrBezig">{{ ccbrBezig ? $t('Bezig…') : $t('Opzoeken') }}</button>
+                  <button type="button" class="link-btn" @click="ccbrOpen = false">{{ $t('Annuleren') }}</button>
+                </div>
+              </form>
+
+              <!-- Nog nooit gekeken. -->
+              <div v-else-if="!ccbr.check" class="score-source off">
+                <span class="dot"></span>
+                <div>{{ $t('Nog niet gecontroleerd. Staat iemand onder bewind of curatele, dan loopt een vordering via de bewindvoerder of curator.') }}</div>
+              </div>
+
+              <!-- Gezocht, niets gevonden. -->
+              <div v-else-if="!ccbr.check.gevonden" class="score-source ok">
+                <span class="dot"></span>
+                <div>
+                  {{ $t('Niet gevonden in het curatele- en bewindregister.') }}
+                  <span class="muted">({{ ccbr.check.gezocht_op }} · {{ ccbr.check.checked_at_label }})</span>
+                </div>
+              </div>
+
+              <!-- Gevonden. -->
+              <div v-else class="score-source bad">
+                <span class="dot"></span>
+                <div>
+                  <b v-if="ccbr.check.maatregel === 'curatele'">{{ $t('Staat onder curatele.') }}</b>
+                  <b v-else-if="ccbr.check.maatregel === 'bewind'">{{ $t('Staat onder bewind.') }}</b>
+                  <b v-else>{{ $t('Staat in het curatele- en bewindregister.') }}</b>
+                  <template v-if="ccbr.check.grond_tekst"> {{ ccbr.check.grond_tekst }}.</template>
+                  <template v-if="ccbr.check.beperkt_bewind"> {{ $t('Het bewind is beperkt.') }}</template>
+
+                  <div v-if="ccbr.check.vertegenwoordigers.length" class="ccbr-regel">
+                    {{ $t('Loopt via:') }} {{ ccbr.check.vertegenwoordigers.join(', ') }}
+                  </div>
+                  <div v-if="ccbr.check.ingangsdatum || ccbr.check.rechtbank" class="ccbr-regel muted">
+                    <template v-if="ccbr.check.ingangsdatum">{{ $t('Sinds :date', { date: ccbr.check.ingangsdatum }) }}</template>
+                    <template v-if="ccbr.check.ingangsdatum && ccbr.check.rechtbank"> · </template>
+                    <template v-if="ccbr.check.rechtbank">{{ ccbr.check.rechtbank }}</template>
+                    <template v-if="ccbr.check.kaartnummer"> · {{ ccbr.check.kaartnummer }}</template>
+                  </div>
+                  <!--
+                    De gebruiker moet zelf kunnen zien of dit zijn klant is: een
+                    achternaam met een geboortejaar kan een naamgenoot opleveren.
+                  -->
+                  <div class="ccbr-regel muted">
+                    {{ $t('Gezocht op :vraag, op :datum', { vraag: ccbr.check.gezocht_op, datum: ccbr.check.checked_at_label }) }}
+                    <template v-if="!ccbr.check.volledige_match"> · <b>{{ $t('geen volledige match') }}</b></template>
+                  </div>
+                  <button type="button" class="link-btn" @click="ccbrVergeten">{{ $t('Dit is mijn klant niet — weghalen') }}</button>
+                </div>
+              </div>
+
+              <p v-if="ccbr.check" class="ccbr-noot">
+                {{ $t('Telt niet mee in de score. Deze gegevens worden op :date vernietigd; dat moet van de Rechtspraak, dus controleer opnieuw als je ze dan nog nodig hebt.', { date: ccbr.check.vernietigen_op_label }) }}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -356,6 +478,19 @@ const openQuote = (q) => router.visit(route('quotes.show', q.id));
 .score-source.warn .dot { background: #D97706; }
 .score-source.bad .dot { background: var(--brand); }
 .score-note { font-size: 12px; color: var(--text-3); line-height: 1.55; margin: 12px 0 0; }
+
+/* Curatele en bewind: eigen blok, met een streep ertussen omdat het níet
+   meetelt in de score erboven. */
+.ccbr { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.5; }
+.ccbr-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.ccbr-head b { font-size: 13px; }
+.ccbr-regel { margin-top: 3px; }
+.ccbr-noot { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin: 10px 0 0; }
+.ccbr-uitleg { font-size: 11.5px; color: var(--text-3); line-height: 1.5; margin: 2px 0 0; }
+.ccbr-form { display: flex; flex-direction: column; gap: 8px; }
+.ccbr-form label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--text-2); }
+.ccbr-form input { padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; font-size: 13px; font-family: inherit; }
+.ccbr-knoppen { display: flex; align-items: center; gap: 12px; margin-top: 2px; }
 .link-btn { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; }
 .link-btn:disabled { opacity: 0.6; cursor: wait; }
 </style>

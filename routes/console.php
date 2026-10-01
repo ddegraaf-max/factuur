@@ -13,6 +13,17 @@ Schedule::command('trials:remind')
     ->dailyAt('09:00')
     ->timezone('Europe/Amsterdam');
 
+/*
+ * Dagelijks: vernietig uitkomsten uit het curatele- en bewindregister waarvan
+ * de bewaartermijn is verlopen. Dit is geen opruimklusje maar een voorwaarde
+ * van het abonnement bij de Rechtspraak (artikel 2): zonder deze taak worden
+ * gegevens langer bewaard dan is toegestaan. Vroeg in de ochtend, zodat de
+ * termijn op de dag zelf wordt gehaald.
+ */
+Schedule::command('ccbr:opruimen')
+    ->dailyAt('03:30')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: verstuur betalingsherinneringen en aanmaningen voor achterstallige facturen.
 Schedule::command('invoices:remind')
     ->dailyAt('08:00')
