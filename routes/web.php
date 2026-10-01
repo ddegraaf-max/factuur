@@ -408,7 +408,7 @@ Route::prefix('portaal')->name('portal.')->group(function () {
 // ---------- STRIPE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name('stripe.webhook');
 // Afleverstatus van sms'en (Smstools, type delivery_report).
-Route::post('/webhooks/smstools', [AppHttpControllersSmstoolsWebhookController::class, 'handle'])->middleware('throttle:120,1')->name('webhooks.smstools');
+Route::post('/webhooks/smstools', [\App\Http\Controllers\SmstoolsWebhookController::class, 'handle'])->middleware('throttle:120,1')->name('webhooks.smstools');
 
 // ---------- MOLLIE WEBHOOK (publiek, geen CSRF) ----------
 Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
