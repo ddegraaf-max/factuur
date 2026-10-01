@@ -65,7 +65,7 @@ class TenderController extends Controller
         // Bedrijven uit de pool van dit werkpakket die nog niet zijn aangeschreven.
         $invited = $round->requests->pluck('subcontractor_id');
         $candidates = $round->isOpen() && $round->workPackage
-            ? $round->workPackage->subcontractors()->get()->reject(fn ($s) => $invited->contains($s->id))
+            ? $round->workPackage->subcontractors()->active()->get()->reject(fn ($s) => $invited->contains($s->id))
             : collect();
 
         $company = auth()->user()->company;

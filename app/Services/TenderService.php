@@ -207,7 +207,7 @@ class TenderService
         $sms = app(SmsService::class)->available($company);
 
         return WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
-            ->with('subcontractors')
+            ->with(['subcontractors' => fn ($q) => $q->active()])
             ->orderBy('sort_order')->orderBy('name')
             ->get()
             ->map(fn (WorkPackage $package) => [
@@ -244,7 +244,7 @@ class TenderService
     {
         $package = WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
             ->findOrFail($data['work_package_id']);
-        $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $company->id)
+        $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $company->id)->active()
             ->whereIn('id', $data['subcontractor_ids'] ?? [])
             ->orderBy('name')
             ->get()
@@ -584,7 +584,7 @@ class TenderService
             throw new \DomainException(__('Deze uitvraag is al gegund of gesloten; bedrijven toevoegen kan niet meer.'));
         }
 
-        $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $round->company_id)
+        $subcontractors = Subcontractor::withoutGlobalScope('company')->where('company_id', $round->company_id)->active()
             ->whereIn('id', $subcontractorIds)
             ->whereNotIn('id', $round->requests()->pluck('subcontractor_id'))
             ->orderBy('name')

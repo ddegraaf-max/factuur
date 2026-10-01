@@ -577,6 +577,14 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Klantscore: betaalgedrag en openbare bronnen, opnieuw laten rekenen
         Route::post('customers/{customer}/score', [\App\Http\Controllers\CustomerScoreController::class, 'refresh'])
             ->middleware('throttle:20,1')->name('customers.score');
+        // Curatele- en bewindregister: alleen voor particulieren, en bewust
+        // buiten de klantscore. De gebruiksvoorwaarden staan alleen toe dat je
+        // handelspartijen informeert over de maatregel; er iets mee uitrekenen
+        // is een ander doel. Zie CcbrService.
+        Route::post('customers/{customer}/curatele-bewind', [\App\Http\Controllers\CcbrController::class, 'check'])
+            ->middleware('throttle:10,1')->name('customers.ccbr.check');
+        Route::delete('customers/{customer}/curatele-bewind', [\App\Http\Controllers\CcbrController::class, 'forget'])
+            ->name('customers.ccbr.forget');
         Route::post('customers/{customer}/peppol-check', [\App\Http\Controllers\PeppolController::class, 'check'])
             ->middleware('throttle:20,1')->name('customers.peppol.check');
         Route::post('invoices/{invoice}/peppol', [\App\Http\Controllers\PeppolController::class, 'send'])
@@ -729,6 +737,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('onderaannemers/startlijst', [TenderPoolController::class, 'startlist'])->name('tenders.subcontractors.startlist');
     Route::patch('onderaannemers/{subcontractor}', [TenderPoolController::class, 'updateSubcontractor'])->name('tenders.subcontractors.update');
     Route::delete('onderaannemers/{subcontractor}', [TenderPoolController::class, 'destroySubcontractor'])->name('tenders.subcontractors.destroy');
+    Route::patch('onderaannemers/{subcontractor}/terugzetten', [TenderPoolController::class, 'restoreSubcontractor'])->name('tenders.subcontractors.restore');
 
     // Vaste lasten: terugkerende inkoop automatisch inboeken
     Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');

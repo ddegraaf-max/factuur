@@ -621,5 +621,10 @@
   "Startlijsten": "Listy startowe",
   "Kant-en-klare bedrijven per werkpakket, opgezocht en nagekeken. Eén klik zet ze in je pool; bedrijven die er al staan worden overgeslagen.": "Gotowe firmy dla pakietu prac, wyszukane i sprawdzone. Jedno kliknięcie dodaje je do puli; firmy już obecne zostaną pominięte.",
   ":n bedrijven, :m met e-mailadres": ":n firm, :m z adresem e-mail",
-  "In de pool zetten": "Dodaj do puli"
+  "In de pool zetten": "Dodaj do puli",
+  ":name uit de pool halen? Het bedrijf krijgt geen nieuwe aanvragen meer; de eerdere uitvragen blijven bewaard en terugzetten kan altijd.": "Usunąć :name z puli? Firma nie dostanie nowych zapytań; wcześniejsze zapytania pozostają i zawsze można ją przywrócić.",
+  ":n uit de pool gehaald": ":n usunięto z puli",
+  "uit de pool sinds :date": "poza pulą od :date",
+  ":n uitvragen": ":n zapytań",
+  "Terugzetten": "Przywróć"
 }

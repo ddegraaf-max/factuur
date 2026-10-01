@@ -15,8 +15,21 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Subcontractor extends Model
 {
     protected $fillable = [
-        'company_id', 'name', 'contact_name', 'email', 'phone', 'city', 'website', 'notes', 'source',
+        'company_id', 'name', 'contact_name', 'email', 'phone', 'city', 'website', 'notes', 'source', 'archived_at',
     ];
+
+    protected $casts = ['archived_at' => 'datetime'];
+
+    /** Alleen bedrijven die in de pool staan (niet uit de pool gehaald). */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->whereNull('subcontractors.archived_at');
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->archived_at !== null;
+    }
 
     protected static function booted(): void
     {

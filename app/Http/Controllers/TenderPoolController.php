@@ -20,6 +20,20 @@ class TenderPoolController extends Controller
     {
         $packages = WorkPackage::withCount('subcontractors')->orderBy('sort_order')->orderBy('name')->get();
         $subcontractors = Subcontractor::with('workPackages')->orderBy('name')->get();
+        $row = fn (Subcontractor $s) => [
+            'id' => $s->id,
+            'name' => $s->name,
+            'contact_name' => $s->contact_name,
+            'email' => $s->email,
+            'phone' => $s->phone,
+            'city' => $s->city,
+            'website' => $s->website,
+            'notes' => $s->notes,
+            'source' => $s->source,
+            'package_ids' => $s->workPackages->pluck('id')->all(),
+            'stats' => $this->service->stats($s),
+            'archived_at_label' => $s->archived_at?->translatedFormat('j M Y'),
+        ];
 
         return Inertia::render('Tenders/Pool', [
             'packages' => $packages->map(fn (WorkPackage $p) => [
@@ -28,19 +42,9 @@ class TenderPoolController extends Controller
                 'description' => $p->description,
                 'subcontractors_count' => $p->subcontractors_count,
             ])->values(),
-            'subcontractors' => $subcontractors->map(fn (Subcontractor $s) => [
-                'id' => $s->id,
-                'name' => $s->name,
-                'contact_name' => $s->contact_name,
-                'email' => $s->email,
-                'phone' => $s->phone,
-                'city' => $s->city,
-                'website' => $s->website,
-                'notes' => $s->notes,
-                'source' => $s->source,
-                'package_ids' => $s->workPackages->pluck('id')->all(),
-                'stats' => $this->service->stats($s),
-            ])->values(),
+            'subcontractors' => $subcontractors->reject(fn (Subcontractor $s) => $s->isArchived())->map($row)->values(),
+            // Uit de pool gehaald, maar met geschiedenis: apart, en terug te zetten.
+            'archived' => $subcontractors->filter(fn (Subcontractor $s) => $s->isArchived())->map($row)->values(),
             // Kant-en-klare startlijsten per werkpakket; alleen de eigenaar van het platform ziet ze.
             'startlists' => OwnerAccess::allows(auth()->user()) ? $this->service->startlists() : [],
         ]);
@@ -116,12 +120,23 @@ class TenderPoolController extends Controller
 
     public function destroySubcontractor(Subcontractor $subcontractor): RedirectResponse
     {
+        // Met prijsaanvragen in de geschiedenis gaat het bedrijf uit de pool, maar niet uit de uitvragen.
         if ($subcontractor->requests()->exists()) {
-            return back()->withErrors(['subcontractor' => __('Dit bedrijf heeft al prijsaanvragen gehad; verwijderen zou die geschiedenis wissen. Haal het in plaats daarvan bij de werkpakketten weg.')]);
+            $subcontractor->forceFill(['archived_at' => now()])->save();
+
+            return back()->with('flash', __(':name is uit de pool gehaald. De eerdere uitvragen blijven bewaard; terugzetten kan onderaan de lijst.', ['name' => $subcontractor->name]));
         }
         $subcontractor->delete();
 
         return back()->with('flash', __('Bedrijf uit de pool verwijderd.'));
+    }
+
+    /** Een uit de pool gehaald bedrijf weer meenemen. */
+    public function restoreSubcontractor(Subcontractor $subcontractor): RedirectResponse
+    {
+        $subcontractor->forceFill(['archived_at' => null])->save();
+
+        return back()->with('flash', __(':name staat weer in de pool.', ['name' => $subcontractor->name]));
     }
 
     /**

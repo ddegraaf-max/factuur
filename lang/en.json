@@ -1626,5 +1626,7 @@
   "Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.": "Your quote stays on file with us; we would like to keep you in mind for future projects. Questions? Reply to this e-mail.",
   "Opdracht ingetrokken": "Order withdrawn",
   "Deze startlijst bestaat niet.": "This starter list does not exist.",
-  "Startlijst :package: :added bedrijven toegevoegd": "Starter list :package: :added companies added"
+  "Startlijst :package: :added bedrijven toegevoegd": "Starter list :package: :added companies added",
+  ":name is uit de pool gehaald. De eerdere uitvragen blijven bewaard; terugzetten kan onderaan de lijst.": ":name has been taken out of the pool. The earlier price requests are kept; you can put it back at the bottom of the list.",
+  ":name staat weer in de pool.": ":name is back in the pool."
 }

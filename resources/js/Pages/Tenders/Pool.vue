@@ -8,7 +8,10 @@ const props = defineProps({
   packages: Array,
   subcontractors: Array,
   startlists: { type: Array, default: () => [] },
+  archived: { type: Array, default: () => [] },
 });
+const showArchived = ref(false);
+const restoreSub = (s) => router.patch(route('tenders.subcontractors.restore', s.id), {}, { preserveScroll: true });
 
 /* ---------- Startlijsten (alleen de eigenaar van het platform ziet ze) ---------- */
 const applying = ref(null);
@@ -71,7 +74,10 @@ const saveSub = () => {
     : subForm.post(route('tenders.subcontractors.store'), opts);
 };
 const destroySub = (s) => {
-  if (confirm(t(':name uit de pool verwijderen?', { name: s.name }))) router.delete(route('tenders.subcontractors.destroy', s.id), { preserveScroll: true });
+  const ask = s.stats.requests > 0
+    ? t(':name uit de pool halen? Het bedrijf krijgt geen nieuwe aanvragen meer; de eerdere uitvragen blijven bewaard en terugzetten kan altijd.', { name: s.name })
+    : t(':name uit de pool verwijderen?', { name: s.name });
+  if (confirm(ask)) router.delete(route('tenders.subcontractors.destroy', s.id), { preserveScroll: true });
 };
 
 /* ---------- Import ---------- */
@@ -234,6 +240,19 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
         </tbody>
       </table>
       <div v-else class="card-body sub">{{ $t('Nog geen bedrijven. Voeg ze één voor één toe, of plak een lijst.') }}</div>
+      <!-- Uit de pool gehaald, met geschiedenis -->
+      <div v-if="archived.length" class="card-body" style="border-top:1px solid var(--border);">
+        <button type="button" class="lnk-btn" @click="showArchived = !showArchived">{{ showArchived ? '▾' : '▸' }} {{ $t(':n uit de pool gehaald', { n: archived.length }) }}</button>
+        <table v-if="showArchived" class="data-table" style="margin-top:10px;">
+          <tbody>
+            <tr v-for="s in archived" :key="s.id">
+              <td class="cell-primary">{{ s.name }}<div class="sub">{{ [s.city, s.email].filter(Boolean).join(' · ') }}</div></td>
+              <td class="sub">{{ $t('uit de pool sinds :date', { date: s.archived_at_label }) }} · {{ $t(':n uitvragen', { n: s.stats.requests }) }}</td>
+              <td class="right actions"><button class="btn btn-secondary btn-sm" @click="restoreSub(s)">{{ $t('Terugzetten') }}</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Modal: werkpakket -->
@@ -342,6 +361,7 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
 </template>
 
 <style scoped>
+.lnk-btn { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 13px; color: var(--brand); font-weight: 600; }
 .sub { font-size: 12px; color: var(--text-3); font-weight: 400; }
 .warn { color: var(--warning); }
 .desc { font-size: 12.5px; color: var(--text-2); max-width: 420px; }

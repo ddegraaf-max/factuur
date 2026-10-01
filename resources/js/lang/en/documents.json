@@ -621,5 +621,10 @@
   "Startlijsten": "Starter lists",
   "Kant-en-klare bedrijven per werkpakket, opgezocht en nagekeken. Eén klik zet ze in je pool; bedrijven die er al staan worden overgeslagen.": "Ready-made companies per work package, researched and checked. One click puts them in your pool; companies already there are skipped.",
   ":n bedrijven, :m met e-mailadres": ":n companies, :m with an e-mail address",
-  "In de pool zetten": "Put in the pool"
+  "In de pool zetten": "Put in the pool",
+  ":name uit de pool halen? Het bedrijf krijgt geen nieuwe aanvragen meer; de eerdere uitvragen blijven bewaard en terugzetten kan altijd.": "Take :name out of the pool? The company gets no new requests; the earlier price requests are kept and you can always put it back.",
+  ":n uit de pool gehaald": ":n taken out of the pool",
+  "uit de pool sinds :date": "out of the pool since :date",
+  ":n uitvragen": ":n price requests",
+  "Terugzetten": "Put back"
 }
