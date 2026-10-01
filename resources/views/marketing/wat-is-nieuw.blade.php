@@ -31,7 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.74.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 oktober 2026 · {{ brand('version_prefix') }} 1.75.0</div>
+        <h2>Offertecheck: elke prijsopgave van een onderaannemer beoordeeld</h2>
+        <ul class="tl-list">
+          <li><b>Reëel, hoog of laag?</b> — komt er een prijs binnen op een uitvraag, dan beoordeelt de AI hem binnen tien minuten tegen jouw calculatie, de andere prijzen, je eerdere prijzen voor dat werk en gangbare marktprijzen. Je krijgt het advies per mail.</li>
+          <li><b>Wat zit erin, wat niet</b> — de meegestuurde offerte wordt volledig gelezen: inbegrepen, uitgesloten, stelposten en voorwaarden, en wat uit jouw aanvraag niet gedekt is. Een opvallend lage prijs krijgt net zo goed een waarschuwing als een hoge.</li>
+          <li><b>Vragen met één klik</b> — de vragen die de check oplevert mail je vanaf de uitvraag aan het bedrijf; dat vult zijn prijsopgave aan op dezelfde pagina. Het advies staat als label bij de prijs in de vergelijking. <a href="{{ route('help.article', 'offertecheck') }}">Zo werkt het</a>.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">1 oktober 2026 · {{ brand('version_prefix') }} 1.74.0</div>
         <h2>Projectplanning: wie wanneer aan de slag gaat — en de mails gaan vanzelf</h2>
         <ul class="tl-list">
           <li><b>Tijdslijn per project</b> — een balk per onderdeel, per week. Gun je een uitvraag, dan staat dat werk er meteen op, met de onderaannemer en de gewenste startweek. Eigen werk zet je er zelf bij.</li>

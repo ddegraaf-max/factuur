@@ -715,6 +715,28 @@ return [
             ],
         ],
 
+        'offertecheck' => [
+            'category' => 'Inkoop',
+            'title' => 'Offertecheck: elke prijsopgave van een onderaannemer beoordeeld',
+            'intro' => 'Komt er een prijs binnen op een uitvraag, dan beoordeelt de AI hem: reëel, aan de hoge kant of opvallend laag, wat er wel en niet in zit, en welke vragen je nog moet stellen. Jij krijgt het advies per mail.',
+            'sections' => [
+                ['Wat er gebeurt', [
+                    'Geeft een bedrijf via zijn link een prijs door (met opmerkingen en eventueel zijn eigen offerte als PDF), dan wordt die prijsopgave binnen tien minuten beoordeeld. Je krijgt een mail met het oordeel, de onderbouwing, wat er wel en niet is inbegrepen, wat uit de aanvraag niet gedekt is, de vragen aan het bedrijf en een advies: gunnen, onderhandelen, eerst vragen stellen of afwachten.',
+                    'Op de uitvraagpagina staat het oordeel als label bij de prijs (reëel, aan de hoge kant, opvallend laag, onduidelijk). Klik erop voor het hele advies. Past het bedrijf zijn prijs aan, dan wordt hij opnieuw beoordeeld; met "Opnieuw beoordelen" doe je dat zelf, bijvoorbeeld als er intussen meer prijzen binnen zijn.',
+                ]],
+                ['Waar het oordeel op rust', [
+                    'De aanvraag (omschrijving, werkpakket, locatie), jouw eigen calculatie voor het onderdeel, de andere prijzen in dezelfde uitvraag, je eerdere prijzen voor hetzelfde werkpakket van de afgelopen twee jaar, de opmerkingen van het bedrijf en de meegestuurde offerte — die wordt volledig gelezen, inclusief uitsluitingen en voorwaarden. Daarnaast gebruikt de AI algemene kennis van gangbare prijzen; een marktindicatie geeft hij alleen als de omschrijving genoeg houvast biedt (hoeveelheden, afmetingen).',
+                    'Een opvallend lage prijs krijgt net zo goed een waarschuwing als een hoge: vaak is er iets vergeten of niet alles inbegrepen. Vul bij een uitvraag je calculatie in en beschrijf het werk met hoeveelheden — hoe beter de aanvraag, hoe scherper het oordeel.',
+                ]],
+                ['Vragen mailen', [
+                    'De vragen uit de check staan klaar in "Vragen mailen". Pas ze aan of haal ze weg en verstuur: het bedrijf krijgt ze per mail, uit jouw naam, met een knop om zijn prijsopgave aan te vullen op dezelfde pagina als eerst. Antwoorden op de mail komt bij jou binnen.',
+                ]],
+                ['Goed om te weten', [
+                    'De offertecheck zit in het Slim-abonnement en werkt tijdens de proefperiode. Het is een tweede paar ogen: de AI ziet de tekening niet en kent het bedrijf niet — jij beslist. Beoordelingen tellen mee in het AI-gebruik van je administratie (fair use).',
+                ]],
+            ],
+        ],
+
         'vaste-lasten' => [
             'category' => 'Inkoop',
             'title' => 'Vaste lasten automatisch inboeken',

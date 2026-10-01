@@ -712,6 +712,9 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('uitvragen/{round}/bedrijven', [TenderController::class, 'invite'])->name('tenders.requests.store');
     Route::post('uitvragen/{round}/afzeggen/{tenderRequest}', [TenderController::class, 'declineRequest'])->name('tenders.requests.decline');
     Route::post('uitvragen/{round}/afwijzen/{tenderRequest}', [TenderController::class, 'rejectRequest'])->name('tenders.requests.reject');
+    // Offertecheck: beoordelen en de vragen mailen.
+    Route::post('uitvragen/{round}/beoordelen/{tenderRequest}', [TenderController::class, 'review'])->name('tenders.requests.review');
+    Route::post('uitvragen/{round}/vragen/{tenderRequest}', [TenderController::class, 'questions'])->name('tenders.requests.questions');
     Route::delete('uitvragen/{round}/aanvragen/{tenderRequest}', [TenderController::class, 'destroyRequest'])->name('tenders.requests.destroy');
     Route::get('uitvragen/{round}/bijlage/{tenderRequest}', [TenderController::class, 'attachment'])->name('tenders.attachment');
     Route::post('uitvragen/{round}/bijlagen', [TenderController::class, 'storeAttachments'])->name('tenders.attachments.store');

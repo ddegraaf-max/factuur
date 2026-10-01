@@ -21,7 +21,7 @@ class TenderRequest extends Model
     protected $fillable = [
         'tender_round_id', 'subcontractor_id', 'token', 'status', 'sent_at', 'reminded_at', 'sms_at', 'opened_at',
         'responded_at', 'rejected_at', 'price', 'available_week', 'valid_until', 'remarks', 'decline_reason',
-        'reject_message', 'attachment_name', 'attachment_path',
+        'reject_message', 'attachment_name', 'attachment_path', 'review', 'reviewed_at', 'review_error', 'review_attempts',
     ];
 
     protected $casts = [
@@ -33,6 +33,8 @@ class TenderRequest extends Model
         'rejected_at' => 'datetime',
         'valid_until' => 'date',
         'price' => 'decimal:2',
+        'review' => 'array',
+        'reviewed_at' => 'datetime',
     ];
 
     public function round(): BelongsTo
@@ -58,6 +60,12 @@ class TenderRequest extends Model
     public function responseUrl(): string
     {
         return route('tender.respond.show', $this->token);
+    }
+
+    /** De AI-beoordeling van de prijsopgave, als die er is. */
+    public function hasReview(): bool
+    {
+        return is_array($this->review) && isset($this->review['verdict']);
     }
 
     public function hasPrice(): bool

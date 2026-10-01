@@ -3,10 +3,11 @@
     $name = $subcontractor?->contact_name ?: $subcontractor?->name;
     $deadline = $round->deadline?->translatedFormat('j F Y');
     $logoUrl = $company->logoUrl();
-    $asks =in_array($kind, ['request', 'reminder'], true);
+    $asks = in_array($kind, ['request', 'reminder', 'questions'], true);
     $eyebrow = match ($kind) {
         'reminder' => __('Herinnering'),
         'award' => __('Opdracht'),
+        'questions' => __('Vragen over uw prijsopgave'),
         'reject' => __('Prijsaanvraag'),
         default => __('Prijsaanvraag'),
     };
@@ -14,7 +15,7 @@
         __('Onderdeel') => $round->title,
         __('Locatie') => $round->location,
         __('Gewenste start') => $startWeek ? __('week :week', ['week' => $startWeek]) : null,
-        __('Reageren vóór') => $asks ? $deadline : null,
+        __('Reageren vóór') => $asks && $kind !== 'questions' ? $deadline : null,
     ]);
     $website = $company->website ? preg_replace('#^https?://#', '', rtrim($company->website, '/')) : null;
 @endphp
@@ -51,6 +52,14 @@
                 @include('emails.partials.tender-blocks', ['blocks' => $rejection, 'color' => $color, 'size' => '15px', 'ink' => '#44403C', 'gap' => '12px'])
             @elseif($kind === 'reject')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave. Voor dit project hebben wij een andere partij gekozen. Wij houden u graag in beeld voor volgende projecten.') }}</p>
+            @elseif($kind === 'questions')
+                <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave voor :package. Om de offertes goed te kunnen vergelijken hebben wij nog een paar vragen:', ['package' => $round->title]) }}</p>
+                <ol style="font-size:15px;line-height:1.65;color:#1C1917;margin:0 0 12px;padding-left:22px;">
+                    @foreach($questions as $question)
+                        <li style="margin:0 0 6px;">{{ $question }}</li>
+                    @endforeach
+                </ol>
+                <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Antwoorden kan door op deze mail te reageren, of via de knop hieronder: daar kunt u uw prijs, opmerkingen en offerte aanvullen.') }}</p>
             @elseif($kind === 'reminder')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Wij hebben nog geen reactie van u ontvangen op onze prijsaanvraag. Kunt u uiterlijk :deadline uw prijs en beschikbaarheid doorgeven? Dat kan in een minuut via de knop hieronder.', ['deadline' => $deadline]) }}</p>
             @elseif($firstContact)
@@ -71,7 +80,7 @@
                 </table>
             @endif
 
-            @if($asks && $blocks)
+            @if($asks && $kind !== 'questions' && $blocks)
                 <div style="font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#78716C;margin:26px 0 8px;">{{ __('Omschrijving') }}</div>
                 @include('emails.partials.tender-blocks', ['blocks' => $blocks, 'color' => $color, 'size' => '14.5px', 'ink' => '#292524', 'gap' => '10px'])
             @endif
@@ -96,12 +105,14 @@
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0 10px;">
                     <tr>
                         <td style="border-radius:9px;background:{{ $color }};">
-                            <a href="{{ $url }}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:9px;">{{ __('Prijs en beschikbaarheid doorgeven') }}&nbsp;&nbsp;→</a>
+                            <a href="{{ $url }}" style="display:inline-block;padding:14px 28px;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;border-radius:9px;">{{ $kind === 'questions' ? __('Prijsopgave aanvullen') : __('Prijs en beschikbaarheid doorgeven') }}&nbsp;&nbsp;→</a>
                         </td>
                     </tr>
                 </table>
+                @if($kind !== 'questions')
                 <p style="font-size:13px;line-height:1.6;color:#78716C;margin:0;">{{ __('Liever uw eigen offerte sturen? Die kunt u op dezelfde pagina als PDF toevoegen. Antwoorden op deze mail kan ook.') }}</p>
                 <p style="font-size:13px;line-height:1.6;color:#78716C;margin:6px 0 0;">{{ __('Geen tijd of past het niet? Laat het ons via dezelfde knop weten, dan sturen wij geen herinnering.') }}</p>
+                @endif
 
                 @if($firstContact)
                     {{-- Eerste contact: wie vraagt dit en waarom. Een mail met een knop van een onbekende lijkt anders al snel op reclame. --}}

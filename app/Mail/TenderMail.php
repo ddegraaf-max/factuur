@@ -31,7 +31,9 @@ class TenderMail extends Mailable
 
     public function __construct(
         public TenderRequest $tenderRequest,
-        public string $kind = 'request', // request | reminder | award | reject
+        public string $kind = 'request', // request | reminder | award | reject | questions
+        /** @var array<int, string> Bij 'questions': de vragen aan het bedrijf over zijn prijsopgave. */
+        public array $questions = [],
     ) {}
 
     public function envelope(): Envelope
@@ -43,6 +45,7 @@ class TenderMail extends Mailable
         $subject = match ($this->kind) {
             'reminder' => __('Herinnering: prijsaanvraag :package — :company', $vars),
             'award' => __('Opdracht: :package — :company', $vars),
+            'questions' => __('Vragen over uw prijsopgave voor :package — :company', $vars),
             'reject' => filled($this->tenderRequest->reject_message)
                 ? __('Uw prijsopgave voor :package — :company', $vars)
                 : __('Prijsaanvraag :package — niet gegund', $vars),
@@ -77,6 +80,7 @@ class TenderMail extends Mailable
             text: 'emails.tender-text',
             with: [
                 'kind' => $this->kind,
+                'questions' => $this->questions,
                 'firstContact' => $this->firstContact(),
                 'request' => $this->tenderRequest,
                 'round' => $round,

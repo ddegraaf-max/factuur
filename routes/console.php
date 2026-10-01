@@ -28,6 +28,11 @@ Schedule::command('tenders:remind')
     ->dailyAt('09:00')
     ->timezone('Europe/Amsterdam');
 
+// Elke tien minuten: offertecheck van nieuwe prijsopgaven, met een mail aan de ondernemer.
+Schedule::command('tenders:review')
+    ->everyTenMinutes()
+    ->withoutOverlapping(30);
+
 // Dagelijks: projectplanning — vooraankondiging een week vooraf, herinnering als
 // de week aanbreekt, en op maandag het weekoverzicht voor de ondernemer.
 Schedule::command('projects:plan')

@@ -319,7 +319,47 @@ class TenderService
             'remarks' => $data['remarks'] ?? null,
             'decline_reason' => null,
             'responded_at' => now(),
+            // Een nieuwe of aangepaste prijsopgave krijgt een nieuwe offertecheck.
+            'review' => null,
+            'reviewed_at' => null,
+            'review_error' => null,
+            'review_attempts' => 0,
         ])->save();
+    }
+
+    /**
+     * Vragen over een prijsopgave mailen aan het bedrijf (meestal de vragen uit
+     * de offertecheck, door de ondernemer nagelezen). Het bedrijf kan zijn
+     * prijsopgave via dezelfde link aanvullen.
+     *
+     * @param  array<int, string>  $questions
+     */
+    public function askQuestions(TenderRequest $request, array $questions): void
+    {
+        if (! $request->round?->isOpen() || $request->status !== 'responded') {
+            throw new \DomainException(__('Vragen stellen kan alleen zolang de uitvraag open is en het bedrijf een prijs heeft doorgegeven.'));
+        }
+        $questions = collect($questions)->map(fn ($q) => trim((string) $q))->filter()->take(5)->values()->all();
+        if ($questions === []) {
+            throw new \DomainException(__('Schrijf minstens één vraag.'));
+        }
+        $email = $request->subcontractor?->email;
+        if (! $email) {
+            throw new \DomainException(__('Dit bedrijf heeft geen e-mailadres; bel het of stuur zelf een bericht.'));
+        }
+        try {
+            DocumentLocale::using(DocumentLocale::default(), fn () => Mail::to($email)->send(new TenderMail($request, 'questions', $questions)));
+        } catch (\Throwable $e) {
+            Log::error('Vragenmail mislukt', ['request' => $request->id, 'error' => $e->getMessage()]);
+            throw new \DomainException(__('De vragen konden niet worden gemaild. Probeer het later opnieuw.'));
+        }
+        $review = is_array($request->review) ? $request->review : [];
+        $review['questions_sent'] = ['at' => now()->toDateTimeString(), 'questions' => $questions];
+        $request->forceFill(['review' => $review])->save();
+
+        Audit::log('sent', $request->round, __(':label: vragen gemaild aan :name', [
+            'label' => Audit::label($request->round), 'name' => $request->subcontractor?->name,
+        ]), [], $request->round->company_id);
     }
 
     public function decline(TenderRequest $request, ?string $reason = null): void

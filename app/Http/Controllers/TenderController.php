@@ -6,6 +6,7 @@ use App\Models\Quote;
 use App\Models\TenderRequest;
 use App\Models\TenderRound;
 use App\Services\SmsService;
+use App\Services\TenderReviewService;
 use App\Services\TenderService;
 use App\Support\IsoWeek;
 use App\Support\OwnerAccess;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class TenderController extends Controller
 {
-    public function __construct(private TenderService $service, private SmsService $sms) {}
+    public function __construct(private TenderService $service, private SmsService $sms, private TenderReviewService $reviews) {}
 
     public function index(Request $request): Response
     {
@@ -69,8 +70,11 @@ class TenderController extends Controller
 
         $company = auth()->user()->company;
         $smsOn = $this->sms->available($company);
+        $aiOn = $this->reviews->availableFor($company);
 
         return Inertia::render('Tenders/Show', [
+            // Offertecheck: kan de AI hier beoordelen (Slim, proef of demo)?
+            'ai' => ['available' => $aiOn, 'auto' => $aiOn && ! $company->is_demo],
             'candidates' => $candidates->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
@@ -125,6 +129,11 @@ class TenderController extends Controller
                 'rejected_at_label' => $r->rejected_at?->translatedFormat('j M, H:i'),
                 'attachment_name' => $r->attachment_name,
                 'attachment_url' => $r->attachment_name ? route('tenders.attachment', [$round, $r]) : null,
+                'review' => $r->hasReview() ? $r->review + [
+                    'verdict_label' => TenderReviewService::verdictLabel($r->review['verdict']),
+                    'reviewed_at_label' => $r->reviewed_at?->translatedFormat('j M, H:i'),
+                ] : null,
+                'review_error' => $r->review_error,
                 'sent_at_label' => $r->sent_at?->translatedFormat('j M, H:i'),
                 'opened_at_label' => $r->opened_at?->translatedFormat('j M, H:i'),
                 'reminded_at_label' => $r->reminded_at?->translatedFormat('j M, H:i'),
@@ -259,6 +268,38 @@ class TenderController extends Controller
         }
 
         return back()->with('flash', __('Offerte van :name afgewezen. Het bericht is gemaild.', ['name' => $tenderRequest->subcontractor?->name]));
+    }
+
+    /** Offertecheck: de prijsopgave (opnieuw) laten beoordelen door de AI. */
+    public function review(TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+
+        try {
+            $review = $this->reviews->review($tenderRequest, 'button');
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Offertecheck :name: :verdict.', ['name' => $tenderRequest->subcontractor?->name, 'verdict' => TenderReviewService::verdictLabel($review['verdict'])]));
+    }
+
+    /** De vragen uit de offertecheck (of eigen vragen) mailen aan het bedrijf. */
+    public function questions(Request $request, TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
+    {
+        abort_unless((int) $tenderRequest->tender_round_id === (int) $round->id, 404);
+        $data = $request->validate([
+            'questions' => ['required', 'array', 'min:1', 'max:5'],
+            'questions.*' => ['nullable', 'string', 'max:500'],
+        ], ['questions.required' => __('Schrijf minstens één vraag.')]);
+
+        try {
+            $this->service->askQuestions($tenderRequest, $data['questions']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Vragen gemaild aan :name.', ['name' => $tenderRequest->subcontractor?->name]));
     }
 
     /** Bedrijf uit de ronde halen, bijvoorbeeld als het per vergissing is aangeschreven. */
