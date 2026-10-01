@@ -609,5 +609,12 @@
   "Vraag toevoegen": "Add question",
   "hoog": "high",
   "gemiddeld": "medium",
-  "laag": "low"
+  "laag": "low",
+  "Gunning intrekken": "Revoke award",
+  "Gunning aan :name intrekken": "Revoke the award to :name",
+  "Het bedrijf krijgt een nette mail dat de opdracht is ingetrokken, met je toelichting erbij. De uitvraag gaat weer open: je kunt een ander bedrijf gunnen, bedrijven toevoegen of sluiten.": "The company gets a polite e-mail that the order has been withdrawn, with your explanation. The price request opens again: you can award another company, add companies or close it.",
+  "(optioneel, gaat mee in de mail)": "(optional, included in the e-mail)",
+  "Bijv. de opdrachtgever heeft het werk uitgesteld": "E.g. the client has postponed the work",
+  "Bedrijven die bij deze gunning een afwijzing kregen, doen weer mee. Zij krijgen nu geen bericht; bij een nieuwe gunning gewoon de opdrachtmail.": "Companies that were rejected with this award take part again. They get no message now; with a new award simply the order e-mail.",
+  "Intrekken en mailen": "Revoke and e-mail"
 }

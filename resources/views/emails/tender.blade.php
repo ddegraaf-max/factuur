@@ -8,6 +8,7 @@
         'reminder' => __('Herinnering'),
         'award' => __('Opdracht'),
         'questions' => __('Vragen over uw prijsopgave'),
+        'revoke' => __('Opdracht ingetrokken'),
         'reject' => __('Prijsaanvraag'),
         default => __('Prijsaanvraag'),
     };
@@ -52,6 +53,12 @@
                 @include('emails.partials.tender-blocks', ['blocks' => $rejection, 'color' => $color, 'size' => '15px', 'ink' => '#44403C', 'gap' => '12px'])
             @elseif($kind === 'reject')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave. Voor dit project hebben wij een andere partij gekozen. Wij houden u graag in beeld voor volgende projecten.') }}</p>
+            @elseif($kind === 'revoke')
+                <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.', ['package' => $round->title, 'date' => $round->awarded_at?->translatedFormat('j F Y')]) }}</p>
+                @if($noteBlocks)
+                    @include('emails.partials.tender-blocks', ['blocks' => $noteBlocks, 'color' => $color, 'size' => '15px', 'ink' => '#44403C', 'gap' => '12px'])
+                @endif
+                <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.') }}</p>
             @elseif($kind === 'questions')
                 <p style="font-size:15px;line-height:1.65;color:#44403C;margin:0 0 12px;">{{ __('Bedankt voor uw prijsopgave voor :package. Om de offertes goed te kunnen vergelijken hebben wij nog een paar vragen:', ['package' => $round->title]) }}</p>
                 <ol style="font-size:15px;line-height:1.65;color:#1C1917;margin:0 0 12px;padding-left:22px;">

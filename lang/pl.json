@@ -1616,5 +1616,13 @@
   "Advies": "Rada",
   "Open de uitvraag": "Otwórz zapytanie",
   "Vanaf de uitvraag mail je de vragen met één klik aan het bedrijf.": "Z zapytania wyślesz pytania do firmy jednym kliknięciem.",
-  "Een beoordeling door AI op basis van de aanvraag, je calculatie, de andere prijzen en de meegestuurde offerte. Een tweede paar ogen — jij beslist.": "Ocena AI na podstawie zapytania, Twojej kalkulacji, innych cen i załączonej oferty. Druga para oczu — decyzja należy do Ciebie."
+  "Een beoordeling door AI op basis van de aanvraag, je calculatie, de andere prijzen en de meegestuurde offerte. Een tweede paar ogen — jij beslist.": "Ocena AI na podstawie zapytania, Twojej kalkulacji, innych cen i załączonej oferty. Druga para oczu — decyzja należy do Ciebie.",
+  "Gunning aan :name ingetrokken; de uitvraag is weer open.": "Zlecenie dla :name cofnięto; zapytanie jest znów otwarte.",
+  "Opdracht :package ingetrokken — :company": "Zlecenie :package cofnięte — :company",
+  "Deze uitvraag is niet gegund.": "To zapytanie nie zostało zlecone.",
+  "De mail aan het bedrijf kon niet worden verstuurd. Er is niets gewijzigd; probeer het later opnieuw.": "Nie udało się wysłać e-maila do firmy. Nic nie zmieniono; spróbuj później.",
+  ":label: gunning aan :name ingetrokken": ":label: zlecenie dla :name cofnięte",
+  "Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.": "Niestety musimy cofnąć zlecenie na :package, które przyznaliśmy Państwu :date. Przepraszamy za niedogodność.",
+  "Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.": "Państwa oferta pozostaje u nas; chętnie pamiętamy o Państwu przy kolejnych projektach. Pytania? Proszę odpowiedzieć na tę wiadomość.",
+  "Opdracht ingetrokken": "Zlecenie cofnięte"
 }

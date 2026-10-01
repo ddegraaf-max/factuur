@@ -83,6 +83,12 @@ const sendQuestions = () => questionForm
   .transform((d) => ({ questions: d.questions.map((q) => q.trim()).filter(Boolean) }))
   .post(route('tenders.requests.questions', [props.round.id, asking.value.id]), { preserveScroll: true, onSuccess: () => { asking.value = null; } });
 
+/* ---------- Gunning intrekken ---------- */
+const revoking = ref(false);
+const revokeForm = useForm({ message: '', reopen: true });
+const openRevoke = () => { revokeForm.clearErrors(); revokeForm.message = ''; revokeForm.reopen = true; revoking.value = true; };
+const revoke = () => revokeForm.post(route('tenders.revoke', props.round.id), { preserveScroll: true, onSuccess: () => { revoking.value = false; } });
+
 /* ---------- Afgezegd of per vergissing aangeschreven ---------- */
 const markDeclined = (r) => {
   const reason = prompt(t(':name heeft afgezegd. Reden (mag leeg blijven):', { name: r.name }), t('Geen tijd'));
@@ -165,6 +171,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
       </div>
       <div class="page-actions">
         <button v-if="round.status === 'open'" class="btn btn-secondary btn-sm" @click="close">{{ $t('Sluiten zonder gunning') }}</button>
+        <button v-if="round.status === 'awarded'" class="btn btn-secondary btn-sm" @click="openRevoke">{{ $t('Gunning intrekken') }}</button>
       </div>
     </div>
 
@@ -355,6 +362,32 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
     </div>
 
     <!-- Offerte afwijzen met een bericht -->
+    <!-- Gunning intrekken -->
+    <div v-if="revoking" class="modal-overlay" @click.self="revoking = false">
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Gunning aan :name intrekken', { name: round.awarded_to }) }}</div>
+          <button class="btn btn-ghost btn-sm" @click="revoking = false">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="sub" style="margin:0 0 12px;line-height:1.6;">{{ $t('Het bedrijf krijgt een nette mail dat de opdracht is ingetrokken, met je toelichting erbij. De uitvraag gaat weer open: je kunt een ander bedrijf gunnen, bedrijven toevoegen of sluiten.') }}</p>
+          <div class="form-group">
+            <label>{{ $t('Toelichting') }} <span class="sub">{{ $t('(optioneel, gaat mee in de mail)') }}</span></label>
+            <textarea v-model="revokeForm.message" rows="4" maxlength="2000" :placeholder="$t('Bijv. de opdrachtgever heeft het werk uitgesteld')"></textarea>
+            <div v-if="revokeForm.errors.message" class="field-error">{{ revokeForm.errors.message }}</div>
+          </div>
+          <label class="check" style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;">
+            <input type="checkbox" v-model="revokeForm.reopen" style="margin-top:3px;width:16px;height:16px;padding:0;">
+            <span>{{ $t('Bedrijven die bij deze gunning een afwijzing kregen, doen weer mee. Zij krijgen nu geen bericht; bij een nieuwe gunning gewoon de opdrachtmail.') }}</span>
+          </label>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" @click="revoking = false">{{ $t('Annuleren') }}</button>
+          <button class="btn btn-primary btn-sm" :disabled="revokeForm.processing" @click="revoke">{{ $t('Intrekken en mailen') }}</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Vragen mailen aan het bedrijf -->
     <div v-if="asking" class="modal-overlay" @click.self="asking = null">
       <div class="modal" style="max-width:600px;">

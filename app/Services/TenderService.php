@@ -516,6 +516,48 @@ class TenderService
         ]), [], $round->company_id);
     }
 
+    /**
+     * Een gunning intrekken: het bedrijf krijgt een nette mail, de uitvraag gaat
+     * weer open en de winnaar staat weer als 'prijs ontvangen'. De bedrijven die
+     * bij de gunning een afwijzing kregen, doen desgewenst weer mee (zonder
+     * bericht; bij een nieuwe gunning krijgen ze gewoon de opdrachtmail).
+     */
+    public function revoke(TenderRound $round, ?string $message = null, bool $reopenOthers = true): void
+    {
+        if ($round->status !== 'awarded' || ! $round->awardedRequest) {
+            throw new \DomainException(__('Deze uitvraag is niet gegund.'));
+        }
+        $winner = $round->awardedRequest->loadMissing('subcontractor');
+        $awardedAt = $round->awarded_at;
+
+        // Eerst de mail: lukt die niet, dan verandert er niets.
+        if (filled($winner->subcontractor?->email)) {
+            try {
+                DocumentLocale::using(DocumentLocale::default(), fn () => Mail::to($winner->subcontractor->email)->send(new TenderMail($winner, 'revoke', [], filled($message) ? trim($message) : null)));
+            } catch (\Throwable $e) {
+                Log::error('Intrekmail mislukt', ['request' => $winner->id, 'error' => $e->getMessage()]);
+                throw new \DomainException(__('De mail aan het bedrijf kon niet worden verstuurd. Er is niets gewijzigd; probeer het later opnieuw.'));
+            }
+        }
+
+        DB::transaction(function () use ($round, $winner, $awardedAt, $reopenOthers) {
+            $winner->forceFill(['status' => 'responded'])->save();
+            if ($reopenOthers && $awardedAt) {
+                // Alleen wie door déze gunning werd afgewezen; een eigen afwijzing met bericht blijft staan.
+                $round->requests()->where('status', 'rejected')->whereNull('reject_message')
+                    ->where('rejected_at', '>=', $awardedAt->copy()->subMinute())
+                    ->update(['status' => 'responded', 'rejected_at' => null]);
+            }
+            $round->forceFill(['status' => 'open', 'awarded_request_id' => null, 'awarded_at' => null])->save();
+            // Het onderdeel dat de gunning op de projectplanning zette, gaat weer weg zolang er nog niets mee is gebeurd.
+            \App\Models\ProjectPlanItem::where('tender_round_id', $round->id)->where('status', 'planned')->delete();
+        });
+
+        Audit::log('updated', $round, __(':label: gunning aan :name ingetrokken', [
+            'label' => Audit::label($round), 'name' => $winner->subcontractor?->name,
+        ]), [], $round->company_id);
+    }
+
     /** Sluit een ronde zonder te gunnen (bijvoorbeeld: project gaat niet door). */
     public function close(TenderRound $round): void
     {

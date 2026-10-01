@@ -270,6 +270,24 @@ class TenderController extends Controller
         return back()->with('flash', __('Offerte van :name afgewezen. Het bericht is gemaild.', ['name' => $tenderRequest->subcontractor?->name]));
     }
 
+    /** Een gunning intrekken: mail aan het bedrijf, de uitvraag weer open. */
+    public function revoke(Request $request, TenderRound $round): RedirectResponse
+    {
+        $data = $request->validate([
+            'message' => ['nullable', 'string', 'max:2000'],
+            'reopen' => ['nullable', 'boolean'],
+        ], ['message.max' => __('Het bericht mag maximaal 2000 tekens lang zijn.')]);
+        $name = $round->awardedRequest?->subcontractor?->name;
+
+        try {
+            $this->service->revoke($round, $data['message'] ?? null, (bool) ($data['reopen'] ?? true));
+        } catch (\DomainException $e) {
+            return back()->withErrors(['tender' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Gunning aan :name ingetrokken; de uitvraag is weer open.', ['name' => $name]));
+    }
+
     /** Offertecheck: de prijsopgave (opnieuw) laten beoordelen door de AI. */
     public function review(TenderRound $round, TenderRequest $tenderRequest): RedirectResponse
     {

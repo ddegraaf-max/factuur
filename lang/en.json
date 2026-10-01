@@ -1616,5 +1616,13 @@
   "Advies": "Advice",
   "Open de uitvraag": "Open the price request",
   "Vanaf de uitvraag mail je de vragen met één klik aan het bedrijf.": "From the price request you e-mail the questions to the company with one click.",
-  "Een beoordeling door AI op basis van de aanvraag, je calculatie, de andere prijzen en de meegestuurde offerte. Een tweede paar ogen — jij beslist.": "An AI assessment based on the request, your estimate, the other prices and the attached quote. A second pair of eyes — you decide."
+  "Een beoordeling door AI op basis van de aanvraag, je calculatie, de andere prijzen en de meegestuurde offerte. Een tweede paar ogen — jij beslist.": "An AI assessment based on the request, your estimate, the other prices and the attached quote. A second pair of eyes — you decide.",
+  "Gunning aan :name ingetrokken; de uitvraag is weer open.": "Award to :name revoked; the price request is open again.",
+  "Opdracht :package ingetrokken — :company": "Order :package withdrawn — :company",
+  "Deze uitvraag is niet gegund.": "This price request has not been awarded.",
+  "De mail aan het bedrijf kon niet worden verstuurd. Er is niets gewijzigd; probeer het later opnieuw.": "The e-mail to the company could not be sent. Nothing has changed; try again later.",
+  ":label: gunning aan :name ingetrokken": ":label: award to :name revoked",
+  "Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.": "Unfortunately we have to withdraw the order for :package that we awarded to you on :date. Our apologies for the inconvenience.",
+  "Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.": "Your quote stays on file with us; we would like to keep you in mind for future projects. Questions? Reply to this e-mail.",
+  "Opdracht ingetrokken": "Order withdrawn"
 }

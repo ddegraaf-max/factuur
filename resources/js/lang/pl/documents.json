@@ -609,5 +609,12 @@
   "Vraag toevoegen": "Dodaj pytanie",
   "hoog": "wysoka",
   "gemiddeld": "średnia",
-  "laag": "niska"
+  "laag": "niska",
+  "Gunning intrekken": "Cofnij zlecenie",
+  "Gunning aan :name intrekken": "Cofnij zlecenie dla :name",
+  "Het bedrijf krijgt een nette mail dat de opdracht is ingetrokken, met je toelichting erbij. De uitvraag gaat weer open: je kunt een ander bedrijf gunnen, bedrijven toevoegen of sluiten.": "Firma otrzyma uprzejmy e-mail o cofnięciu zlecenia z Twoim wyjaśnieniem. Zapytanie znów się otwiera: możesz zlecić innej firmie, dodać firmy albo zamknąć.",
+  "(optioneel, gaat mee in de mail)": "(opcjonalnie, trafi do e-maila)",
+  "Bijv. de opdrachtgever heeft het werk uitgesteld": "Np. zleceniodawca przełożył prace",
+  "Bedrijven die bij deze gunning een afwijzing kregen, doen weer mee. Zij krijgen nu geen bericht; bij een nieuwe gunning gewoon de opdrachtmail.": "Firmy odrzucone przy tym zleceniu znów biorą udział. Teraz nie dostaną wiadomości; przy nowym zleceniu zwykły e-mail ze zleceniem.",
+  "Intrekken en mailen": "Cofnij i wyślij"
 }

@@ -37,6 +37,7 @@
           <li><b>Reëel, hoog of laag?</b> — komt er een prijs binnen op een uitvraag, dan beoordeelt de AI hem binnen tien minuten tegen jouw calculatie, de andere prijzen, je eerdere prijzen voor dat werk en gangbare marktprijzen. Je krijgt het advies per mail.</li>
           <li><b>Wat zit erin, wat niet</b> — de meegestuurde offerte wordt volledig gelezen: inbegrepen, uitgesloten, stelposten en voorwaarden, en wat uit jouw aanvraag niet gedekt is. Een opvallend lage prijs krijgt net zo goed een waarschuwing als een hoge.</li>
           <li><b>Vragen met één klik</b> — de vragen die de check oplevert mail je vanaf de uitvraag aan het bedrijf; dat vult zijn prijsopgave aan op dezelfde pagina. Het advies staat als label bij de prijs in de vergelijking. <a href="{{ route('help.article', 'offertecheck') }}">Zo werkt het</a>.</li>
+          <li><b>Gunning intrekken</b> (1.75.1) — toch niet door met het gegunde bedrijf? Trek de gunning in: het bedrijf krijgt een nette mail met je toelichting, de uitvraag gaat weer open en de eerder afgewezen bedrijven doen desgewenst weer mee.</li>
         </ul>
       </article>
 

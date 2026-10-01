@@ -14,6 +14,9 @@
         $kind === 'award' => __('Bedankt voor uw prijsopgave voor :package. Wij gunnen u de opdracht en nemen binnenkort contact met u op over de planning en de opdrachtbevestiging.', ['package' => $round->title]),
         $kind === 'reject' && filled($rejection) => $plain($rejection),
         $kind === 'reject' => __('Bedankt voor uw prijsopgave. Voor dit project hebben wij een andere partij gekozen. Wij houden u graag in beeld voor volgende projecten.'),
+        $kind === 'revoke' => __('Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.', ['package' => $round->title, 'date' => $round->awarded_at?->translatedFormat('j F Y')])
+            . (filled($note) ? "\n\n" . trim($note) : '')
+            . "\n\n" . __('Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.'),
         $kind === 'questions' => __('Bedankt voor uw prijsopgave voor :package. Om de offertes goed te kunnen vergelijken hebben wij nog een paar vragen:', ['package' => $round->title])
             . "\n\n" . collect($questions)->map(fn ($q, $i) => ($i + 1) . '. ' . $q)->implode("\n")
             . "\n\n" . __('Antwoorden kan door op deze mail te reageren, of via de knop hieronder: daar kunt u uw prijs, opmerkingen en offerte aanvullen.'),

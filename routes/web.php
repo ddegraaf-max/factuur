@@ -709,6 +709,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('uitvragen/{round}/herinneren/{tenderRequest}', [TenderController::class, 'remind'])->name('tenders.remind');
     Route::post('uitvragen/{round}/sms/{tenderRequest}', [TenderController::class, 'sms'])->name('tenders.sms');
     Route::post('uitvragen/{round}/sluiten', [TenderController::class, 'close'])->name('tenders.close');
+    Route::post('uitvragen/{round}/intrekken', [TenderController::class, 'revoke'])->name('tenders.revoke');
     Route::post('uitvragen/{round}/bedrijven', [TenderController::class, 'invite'])->name('tenders.requests.store');
     Route::post('uitvragen/{round}/afzeggen/{tenderRequest}', [TenderController::class, 'declineRequest'])->name('tenders.requests.decline');
     Route::post('uitvragen/{round}/afwijzen/{tenderRequest}', [TenderController::class, 'rejectRequest'])->name('tenders.requests.reject');
