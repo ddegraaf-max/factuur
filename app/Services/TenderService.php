@@ -47,6 +47,137 @@ class TenderService
     ];
 
     /** Voegt de standaardpakketten toe die er nog niet zijn; geeft het aantal nieuwe terug. */
+    /**
+     * Meerdere bedrijven tegelijk in de pool: één record per bedrijf, zonder
+     * dubbelen op naam. Pakketten worden op naam gezocht (ook op het begin van
+     * de naam). Geeft [toegevoegd, overgeslagen] terug.
+     *
+     * @param  array<int, array<string, mixed>>  $records  name, email, phone, city, website, notes, packages (namen)
+     * @return array{0: int, 1: int}
+     */
+    public function importRecords(Company $company, array $records, string $source = 'import'): array
+    {
+        $packages = WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)->orderBy('sort_order')->get();
+        $findPackage = function (string $name) use ($packages) {
+            $needle = mb_strtolower(trim($name));
+
+            return $needle === '' ? null : $packages->first(fn (WorkPackage $p) => mb_strtolower($p->name) === $needle
+                || str_starts_with(mb_strtolower($p->name), $needle));
+        };
+        $existing = Subcontractor::withoutGlobalScope('company')->where('company_id', $company->id)->pluck('name')
+            ->map(fn ($n) => mb_strtolower(trim((string) $n)))->flip();
+
+        $added = 0;
+        $skipped = 0;
+        foreach ($records as $record) {
+            $name = trim((string) ($record['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            if ($existing->has(mb_strtolower($name))) {
+                $skipped++;
+                continue;
+            }
+            $email = filter_var(trim((string) ($record['email'] ?? '')), FILTER_VALIDATE_EMAIL) ? trim((string) $record['email']) : null;
+            $subcontractor = Subcontractor::create([
+                'company_id' => $company->id,
+                'name' => mb_substr($name, 0, 160),
+                'email' => $email,
+                'phone' => mb_substr(trim((string) ($record['phone'] ?? '')), 0, 40) ?: null,
+                'city' => mb_substr(trim((string) ($record['city'] ?? '')), 0, 120) ?: null,
+                'website' => mb_substr(trim((string) ($record['website'] ?? '')), 0, 180) ?: null,
+                'notes' => mb_substr(trim((string) ($record['notes'] ?? '')), 0, 2000) ?: null,
+                'source' => $source,
+            ]);
+            $ids = collect($record['packages'] ?? [])->map(fn ($n) => $findPackage((string) $n)?->id)->filter()->unique()->values()->all();
+            $subcontractor->workPackages()->sync($ids);
+            $existing->put(mb_strtolower($name), true);
+            $added++;
+        }
+
+        return [$added, $skipped];
+    }
+
+    /**
+     * Plaklijst: één bedrijf per regel — naam; e-mail; telefoon; plaats; werkpakketten (komma's).
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function importLines(Company $company, string $lines): array
+    {
+        $records = [];
+        foreach (preg_split('/\r?\n/', $lines) as $line) {
+            $parts = array_map('trim', explode(';', $line));
+            $records[] = [
+                'name' => $parts[0] ?? '', 'email' => $parts[1] ?? '', 'phone' => $parts[2] ?? '', 'city' => $parts[3] ?? '',
+                'packages' => array_filter(array_map('trim', explode(',', $parts[4] ?? ''))),
+            ];
+        }
+
+        return $this->importRecords($company, $records);
+    }
+
+    /**
+     * Startlijsten: kant-en-klare lijsten met bedrijven voor een werkpakket, uit
+     * resources/data/startlijsten. Alleen voor de eigenaar van het platform.
+     *
+     * @return array<int, array{key: string, package: string, description: string, count: int, with_email: int, region: string}>
+     */
+    public function startlists(): array
+    {
+        $lists = [];
+        foreach (glob(resource_path('data/startlijsten/*.json')) ?: [] as $file) {
+            $data = json_decode((string) file_get_contents($file), true);
+            if (! is_array($data) || empty($data['package']['name']) || empty($data['companies'])) {
+                continue;
+            }
+            $lists[] = [
+                'key' => basename($file, '.json'),
+                'package' => (string) $data['package']['name'],
+                'description' => (string) ($data['package']['description'] ?? ''),
+                'count' => count($data['companies']),
+                'with_email' => collect($data['companies'])->filter(fn ($c) => filled($c['email'] ?? null))->count(),
+                'region' => (string) ($data['region'] ?? ''),
+            ];
+        }
+
+        return $lists;
+    }
+
+    /**
+     * Een startlijst in de pool zetten: het werkpakket komt erbij als het nog
+     * niet bestaat, de bedrijven worden toegevoegd (dubbelen op naam overgeslagen).
+     *
+     * @return array{0: int, 1: int}
+     */
+    public function applyStartlist(Company $company, string $key): array
+    {
+        $file = resource_path('data/startlijsten/' . preg_replace('/[^a-z0-9-]/', '', $key) . '.json');
+        $data = is_file($file) ? json_decode((string) file_get_contents($file), true) : null;
+        if (! is_array($data) || empty($data['package']['name'])) {
+            throw new \DomainException(__('Deze startlijst bestaat niet.'));
+        }
+        $name = (string) $data['package']['name'];
+        $package = WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
+            ->whereRaw('lower(name) = ?', [mb_strtolower($name)])->first();
+        if (! $package) {
+            $package = WorkPackage::create([
+                'company_id' => $company->id,
+                'name' => $name,
+                'description' => $data['package']['description'] ?? null,
+                'sort_order' => (int) WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)->max('sort_order') + 1,
+            ]);
+        }
+        $records = collect($data['companies'])->map(fn ($c) => [
+            'name' => $c['name'] ?? '', 'email' => $c['email'] ?? '', 'phone' => $c['phone'] ?? '', 'city' => $c['city'] ?? '',
+            'website' => $c['website'] ?? '', 'notes' => $c['note'] ?? '', 'packages' => [$package->name],
+        ])->all();
+        [$added, $skipped] = $this->importRecords($company, $records, 'startlist');
+        Audit::log('created', $package, __('Startlijst :package: :added bedrijven toegevoegd', ['package' => $package->name, 'added' => $added]), [], $company->id);
+
+        return [$added, $skipped];
+    }
+
     public function seedDefaultPackages(Company $company): int
     {
         $existing = WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Subcontractor;
 use App\Models\WorkPackage;
 use App\Services\TenderService;
+use App\Support\OwnerAccess;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -40,7 +41,24 @@ class TenderPoolController extends Controller
                 'package_ids' => $s->workPackages->pluck('id')->all(),
                 'stats' => $this->service->stats($s),
             ])->values(),
+            // Kant-en-klare startlijsten per werkpakket; alleen de eigenaar van het platform ziet ze.
+            'startlists' => OwnerAccess::allows(auth()->user()) ? $this->service->startlists() : [],
         ]);
+    }
+
+    /** Een startlijst in de pool zetten (werkpakket erbij als dat nog niet bestaat). */
+    public function startlist(Request $request): RedirectResponse
+    {
+        abort_unless(OwnerAccess::allows(auth()->user()), 403);
+        $data = $request->validate(['key' => ['required', 'string', 'max:60']]);
+
+        try {
+            [$added, $skipped] = $this->service->applyStartlist(auth()->user()->company, $data['key']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['subcontractor' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __(':added bedrijven toegevoegd, :skipped overgeslagen (bestonden al).', ['added' => $added, 'skipped' => $skipped]));
     }
 
     public function seedPackages(): RedirectResponse
@@ -113,39 +131,7 @@ class TenderPoolController extends Controller
     public function import(Request $request): RedirectResponse
     {
         $data = $request->validate(['lines' => ['required', 'string', 'max:20000']]);
-
-        $packages = WorkPackage::orderBy('sort_order')->get();
-        $findPackage = function (string $name) use ($packages) {
-            $needle = mb_strtolower(trim($name));
-
-            return $packages->first(fn (WorkPackage $p) => mb_strtolower($p->name) === $needle
-                || str_starts_with(mb_strtolower($p->name), $needle));
-        };
-
-        $added = 0;
-        $skipped = 0;
-        foreach (preg_split('/\r?\n/', $data['lines']) as $line) {
-            $parts = array_map('trim', explode(';', $line));
-            $name = $parts[0] ?? '';
-            if ($name === '') {
-                continue;
-            }
-            if (Subcontractor::whereRaw('lower(name) = ?', [mb_strtolower($name)])->exists()) {
-                $skipped++;
-                continue;
-            }
-            $email = filter_var($parts[1] ?? '', FILTER_VALIDATE_EMAIL) ? $parts[1] : null;
-            $subcontractor = Subcontractor::create([
-                'name' => mb_substr($name, 0, 160),
-                'email' => $email,
-                'phone' => mb_substr($parts[2] ?? '', 0, 40) ?: null,
-                'city' => mb_substr($parts[3] ?? '', 0, 120) ?: null,
-                'source' => 'import',
-            ]);
-            $ids = collect(explode(',', $parts[4] ?? ''))->map(fn ($n) => $findPackage($n)?->id)->filter()->unique()->values()->all();
-            $subcontractor->workPackages()->sync($ids);
-            $added++;
-        }
+        [$added, $skipped] = $this->service->importLines(auth()->user()->company, $data['lines']);
 
         return back()->with('flash', __(':added bedrijven toegevoegd, :skipped overgeslagen (bestonden al).', ['added' => $added, 'skipped' => $skipped]));
     }

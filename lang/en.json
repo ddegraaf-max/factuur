@@ -1624,5 +1624,7 @@
   ":label: gunning aan :name ingetrokken": ":label: award to :name revoked",
   "Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.": "Unfortunately we have to withdraw the order for :package that we awarded to you on :date. Our apologies for the inconvenience.",
   "Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.": "Your quote stays on file with us; we would like to keep you in mind for future projects. Questions? Reply to this e-mail.",
-  "Opdracht ingetrokken": "Order withdrawn"
+  "Opdracht ingetrokken": "Order withdrawn",
+  "Deze startlijst bestaat niet.": "This starter list does not exist.",
+  "Startlijst :package: :added bedrijven toegevoegd": "Starter list :package: :added companies added"
 }

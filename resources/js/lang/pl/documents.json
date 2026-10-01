@@ -616,5 +616,10 @@
   "(optioneel, gaat mee in de mail)": "(opcjonalnie, trafi do e-maila)",
   "Bijv. de opdrachtgever heeft het werk uitgesteld": "Np. zleceniodawca przełożył prace",
   "Bedrijven die bij deze gunning een afwijzing kregen, doen weer mee. Zij krijgen nu geen bericht; bij een nieuwe gunning gewoon de opdrachtmail.": "Firmy odrzucone przy tym zleceniu znów biorą udział. Teraz nie dostaną wiadomości; przy nowym zleceniu zwykły e-mail ze zleceniem.",
-  "Intrekken en mailen": "Cofnij i wyślij"
+  "Intrekken en mailen": "Cofnij i wyślij",
+  "Startlijst \":package\" toevoegen? Het werkpakket komt erbij als het nog niet bestaat en :n bedrijven worden in de pool gezet (bedrijven die er al staan worden overgeslagen).": "Dodać listę startową \":package\"? Pakiet prac zostanie utworzony, jeśli jeszcze nie istnieje, a :n firm trafi do puli (firmy już obecne zostaną pominięte).",
+  "Startlijsten": "Listy startowe",
+  "Kant-en-klare bedrijven per werkpakket, opgezocht en nagekeken. Eén klik zet ze in je pool; bedrijven die er al staan worden overgeslagen.": "Gotowe firmy dla pakietu prac, wyszukane i sprawdzone. Jedno kliknięcie dodaje je do puli; firmy już obecne zostaną pominięte.",
+  ":n bedrijven, :m met e-mailadres": ":n firm, :m z adresem e-mail",
+  "In de pool zetten": "Dodaj do puli"
 }

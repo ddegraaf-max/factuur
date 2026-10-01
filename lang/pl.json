@@ -1624,5 +1624,7 @@
   ":label: gunning aan :name ingetrokken": ":label: zlecenie dla :name cofnięte",
   "Helaas moeten wij de opdracht voor :package, die wij u op :date gunden, intrekken. Onze excuses voor het ongemak.": "Niestety musimy cofnąć zlecenie na :package, które przyznaliśmy Państwu :date. Przepraszamy za niedogodność.",
   "Uw prijsopgave blijft bij ons bekend; wij houden u graag in beeld voor volgende projecten. Vragen? Antwoord op deze mail.": "Państwa oferta pozostaje u nas; chętnie pamiętamy o Państwu przy kolejnych projektach. Pytania? Proszę odpowiedzieć na tę wiadomość.",
-  "Opdracht ingetrokken": "Zlecenie cofnięte"
+  "Opdracht ingetrokken": "Zlecenie cofnięte",
+  "Deze startlijst bestaat niet.": "Ta lista startowa nie istnieje.",
+  "Startlijst :package: :added bedrijven toegevoegd": "Lista startowa :package: dodano :added firm"
 }

@@ -726,6 +726,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::delete('onderaannemers/pakketten/{package}', [TenderPoolController::class, 'destroyPackage'])->name('tenders.packages.destroy');
     Route::post('onderaannemers', [TenderPoolController::class, 'storeSubcontractor'])->name('tenders.subcontractors.store');
     Route::post('onderaannemers/importeren', [TenderPoolController::class, 'import'])->name('tenders.subcontractors.import');
+    Route::post('onderaannemers/startlijst', [TenderPoolController::class, 'startlist'])->name('tenders.subcontractors.startlist');
     Route::patch('onderaannemers/{subcontractor}', [TenderPoolController::class, 'updateSubcontractor'])->name('tenders.subcontractors.update');
     Route::delete('onderaannemers/{subcontractor}', [TenderPoolController::class, 'destroySubcontractor'])->name('tenders.subcontractors.destroy');
 

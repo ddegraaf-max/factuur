@@ -1,0 +1,161 @@
+{
+  "package": {
+    "name": "Vloerverwarming",
+    "description": "Infrezen of aanleggen van vloerverwarming (nieuwbouw en bestaande vloeren), verdeler en aansluiten; zonering op verzoek."
+  },
+  "region": "kleine bedrijven (0–5 man) binnen 50 km van Aalsmeer, opgezocht 1 oktober 2026",
+  "companies": [
+    {
+      "name": "Kauf Installatietechniek",
+      "email": "info@kaufbv.nl",
+      "phone": "06-17676260",
+      "city": "Nieuwveen",
+      "website": "https://www.kaufbv.nl/",
+      "note": "Loodgieter/installateur met eigen pagina voor infrezen en natbouw-vloerverwarming (ook zoneregeling); werkgebied Nieuwkoop, Aalsmeer, Uithoorn · Omvang: Alleen 06-nummer, 'uw betaalbare en vakkundige loodgieter in Nieuwveen', bereikbaar 06:30-21:00; geen namen of aantallen · ± 9 km van Aalsmeer · E-mail gezien op https://www.kaufbv.nl/verwarming/vloerverwarming"
+    },
+    {
+      "name": "B. Hordijk",
+      "email": "info@bhordijk.nl",
+      "phone": "06-31683370",
+      "city": "Vinkeveen",
+      "website": "https://bhordijk.nl/",
+      "note": "Betonboor-/freesbedrijf met aparte dienst vloerverwarming infrezen; kernactiviteit is betonboren, sleuven frezen en sloopwerk, dus geen pure vloerverwarmingsspecialist. · Omvang: Gestart als zzp'er (Bram), nu V.O.F. 'samen met onze collega's'; KvK 85602698 · ± 12 km van Aalsmeer · E-mail gezien op https://bhordijk.nl/vloerverwarming-infrezen-utrecht/"
+    },
+    {
+      "name": "Gasservice de Vries",
+      "email": "",
+      "phone": "0297-256449",
+      "city": "Mijdrecht",
+      "website": "https://www.gasservicedevries.nl/",
+      "note": "Cv-installateur met eigen vloerverwarmingspagina (aanleg, Radson); werkgebied Mijdrecht, Aalsmeer, Vinkeveen, Wilnis, Uithoorn. Website gaf 503/certificaatfout, e-mail daarom niet bevestigd. · Omvang: Erkend installateur, 30+ jaar; Ridderschapstraat 26 (woonwijk), vast + 06 (06-47091888); omvang niet vermeld · ± 12 km van Aalsmeer"
+    },
+    {
+      "name": "Vloerverwarming Alphen aan den Rijn (JR Vloerverwarming)",
+      "email": "info@vloerverwarming-alphen.nl",
+      "phone": "06-13113040",
+      "city": "Alphen aan den Rijn",
+      "website": "https://www.vloerverwarming-alphen.nl/",
+      "note": "Infrezen en aanleggen van vloerverwarming (nieuwbouw/renovatie), verdeler, aansluiten op cv, egaliseren; stofvrij werken · Omvang: Twee namen op de site (Joeri en Rudy, elk met eigen 06); onderdeel van Mawin Elektrotechniek (erkend installatiebedrijf sinds 2009) · ± 16 km van Aalsmeer · E-mail gezien op https://www.vloerverwarming-alphen.nl/"
+    },
+    {
+      "name": "JOOSTEN installatietechniek",
+      "email": "info@joosteninstallatietechniek.nl",
+      "phone": "06-82502224",
+      "city": "Sassenheim",
+      "website": "https://joosteninstallatietechniek.nl/",
+      "note": "Kleine installateur (cv, ventilatie, hybride warmtepomp) met aparte pagina voor vloerverwarming aanleggen in bestaand en nieuwbouw; vloerverwarming is niet de hoofdactiviteit · Omvang: Eenmanszaak van Bryan Joosten, gestart begin 2021 na 15 jaar bij installatiebedrijven in de regio · ± 17 km van Aalsmeer · E-mail gezien op https://joosteninstallatietechniek.nl/contact/"
+    },
+    {
+      "name": "Harry de Roos Warmteservice",
+      "email": "info@harryderoos.nl",
+      "phone": "0252-218170",
+      "city": "Voorhout",
+      "website": "https://www.harryderoos.nl/",
+      "note": "Cv-installateur die vloerverwarming als specialiteit noemt (ook als bijverwarming via aftakking); infrezen wordt niet genoemd · Omvang: Eenmanszaak op naam (KvK 28098673), woonadres Basilicumhof, vast nummer plus twee 06-nummers; in de branche sinds 1976 · ± 19 km van Aalsmeer · E-mail gezien op https://www.harryderoos.nl/contact"
+    },
+    {
+      "name": "Alesso Floors (Alesso Allround)",
+      "email": "info@alessofloors.com",
+      "phone": "06-38421345",
+      "city": "Breukelen",
+      "website": "https://www.alessofloors.com/",
+      "note": "Gietvloerenbedrijf dat op Werkspot (4,8/5, ~300 reviews) 'infrezen vloerverwarming 1-1500 m2' aanbiedt; op de eigen site staan gietvloeren voorop, vloerverwarming is nevenactiviteit. · Omvang: Twee contactpersonen (Ramon 06-38421345, Luuk 06-43875097); KvK 64485269, Irenestraat 7 Breukelen · ± 22 km van Aalsmeer · E-mail gezien op https://www.alessofloors.com/"
+    },
+    {
+      "name": "Green Flow Systems",
+      "email": "contact@greenflowsystems.nl",
+      "phone": "06-12387313",
+      "city": "Katwijk aan Zee",
+      "website": "https://www.greenflowsystems.nl/",
+      "note": "Specialist vloerverwarming met lage opbouw (vanaf 15 mm) op hout en beton; ook infrezen, krimpnetten en noppenplaten; heel Zuid-Holland · Omvang: KvK 89922719 (2023), woonadres-achtig vestigingsadres, alleen 06-nummer, 'zonder onderaannemers' · ± 26 km van Aalsmeer · E-mail gezien op https://www.greenflowsystems.nl/"
+    },
+    {
+      "name": "Kruger Combitechniek",
+      "email": "info@krugercombitechniek.nl",
+      "phone": "06-23885640",
+      "city": "Maarssen",
+      "website": "https://krugercombitechniek.nl/",
+      "note": "Kleine allround installateur met vloerverwarming infrezen/aanleggen als speerpunt (eigen stadspagina's voor Utrecht, Nieuwegein, Zeist, IJsselstein, De Meern); ook loodgieterswerk en badkamers. · Omvang: Eenmanszaak (allround installateur), alleen 06-nummer; adres Zwanenkamp 196, 3607 RM Maarssen · ± 26 km van Aalsmeer · E-mail gezien op https://krugercombitechniek.nl/vloerverwarming/"
+    },
+    {
+      "name": "SMIT Installatie Techniek",
+      "email": "k.smitinstallatietechniek@outlook.com",
+      "phone": "06-29528454",
+      "city": "Kortenhoef",
+      "website": "https://www.smit-installatie-techniek.nl/",
+      "note": "Kleine dak-, loodgieters- en cv-installateur in 't Gooi; vloerverwarming is een van de diensten (met lage-temperatuurverwarming/warmtepomp), geen hoofdactiviteit. · Omvang: Eén contactpersoon (K. Smit), alleen 06/WhatsApp en Outlook-adres; 'ik'-vorm op contactpagina · ± 27 km van Aalsmeer · E-mail gezien op https://www.smit-installatie-techniek.nl/contact"
+    },
+    {
+      "name": "FB Vloerverwarming",
+      "email": "",
+      "phone": "06-38562598",
+      "city": "Utrecht",
+      "website": "",
+      "note": "Plaatsen en infrezen van vloerverwarming (frezen, tackeren, netten, noppen, droogbouw, fermacell) voor particulier en zakelijk, regio Utrecht/Gooi. Website fbvloerverwarming.nl resolvet niet meer. · Omvang: Alleen 06-nummer en woonadres (Schooneggendreef 222, 3562 GM Utrecht) in Telefoonboek; op Solvari 'meer dan 10 jaar ervaring' · ± 30 km van Aalsmeer"
+    },
+    {
+      "name": "MYLINH Stone",
+      "email": "info@mylinhstone.nl",
+      "phone": "06-14911929",
+      "city": "Utrecht",
+      "website": "https://www.mylinhstone.nl/",
+      "note": "Tegelzetter/natuursteen met vloerverwarming frezen en egaliseren als vast onderdeel (Werkspot 4,3/5, 106 reviews; genoemd voor Harmelen). Specialisme is tegelwerk, vloerverwarming nevenactiviteit. · Omvang: 'Wij zijn een aannemersbedrijf', alleen 06-nummer; KvK 54054826; ca. 14 jaar actief · ± 30 km van Aalsmeer · E-mail gezien op https://www.mylinhstone.nl/"
+    },
+    {
+      "name": "IBP Installaties (Installatiebedrijf Pepijn)",
+      "email": "info@installatiebedrijfpepijn.nl",
+      "phone": "06-54728611",
+      "city": "Voorburg",
+      "website": "https://www.installatiebedrijfpepijn.nl/",
+      "note": "Kleine cv-installateur met vloerverwarmingspagina (advies, verkoop, aanleg; Danfoss-zoneregeling), werkgebied Voorburg, Den Haag, Leidschendam, Rijswijk, Delft · Omvang: Alleen 06-nummer, woonadres Wethouder Hillenaarplantsoen, 'de installateur' (enkelvoud) op de sjabloonsite; lid Techniek Nederland, CO-vrij · ± 34 km van Aalsmeer · E-mail gezien op https://www.installatiebedrijfpepijn.nl/"
+    },
+    {
+      "name": "BOAS Installatietechniek",
+      "email": "info@boasinstallatietechniek.nl",
+      "phone": "070-2042274",
+      "city": "Den Haag (Ypenburg)",
+      "website": "https://boasinstallatietechniek.nl/",
+      "note": "Kleine installateur met vloerverwarming als een van vier hoofddiensten (naast cv, warmtepomp, airco); aparte landingspagina's per plaats voor vloerverwarming · Omvang: KvK 88174107 (2022); 'we nemen alleen opdrachten aan die we zeker goed kunnen uitvoeren'; klanten spreken over 'de mannen'; geen namen of aantallen · ± 35 km van Aalsmeer · E-mail gezien op https://boasinstallatietechniek.nl/over-ons/"
+    },
+    {
+      "name": "Klusbedrijf van Zijl",
+      "email": "info@klusbedrijfvanzijl.nl",
+      "phone": "030-2271863",
+      "city": "Nieuwegein",
+      "website": "https://klusbedrijfvanzijl.nl/",
+      "note": "Noemt zich 'Specialist in vloerverwarming': frezen, knopen, gipsvezelvloeren, zoneregeling; werkgebied Nieuwegein, Houten, Bunnik, Leidsche Rijn, Maarssen. · Omvang: Stefan en Sanne van Zijl: hij freest/installeert, zij administratie en ca. 3 dagen per week mee op de vloer (over-ons-pagina) · ± 35 km van Aalsmeer · E-mail gezien op https://klusbedrijfvanzijl.nl/contact/"
+    },
+    {
+      "name": "Goois Verwarmings- en Installatiebedrijf Robert van der Poel",
+      "email": "info@gooisverwarmingsbedrijf.nl",
+      "phone": "06-53399213",
+      "city": "Huizen",
+      "website": "https://www.gooisverwarmingsbedrijf.nl/",
+      "note": "Erkend gas/water/cv-installateur in 't Gooi; vloerverwarming is een van de genoemde diensten, geen specialisme. E-mail stond als (HTML-gecodeerde) mailto-link op de site. · Omvang: 'Bel mij gerust ... of stuur mij een mail' - één man (Robert van der Poel), alleen 06-nummer; bedrijf sinds 1972 · ± 38 km van Aalsmeer · E-mail gezien op https://www.gooisverwarmingsbedrijf.nl/over-ons-bedrijf"
+    },
+    {
+      "name": "Caldi Vloerverwarming",
+      "email": "",
+      "phone": "06-57062344",
+      "city": "Zeist",
+      "website": "https://caldi.nl/",
+      "note": "Pure vloerverwarmingsspecialist: frezen in bestaande dekvloeren, staalmat, droogbouw, tacker/noppen; regio Utrecht. Geen e-mail op de site (alleen formulier); telefoon uit door eigenaar geverifieerde Telefoonboek-vermelding. · Omvang: Eenmanszaak; eigenaar Sal(ly) Loffeld 'staat zowel op de werkvloer als runt het bedrijf' (contactpagina); KvK 72915250; gestart 2018 · ± 42 km van Aalsmeer"
+    },
+    {
+      "name": "Weidema Vloerverwarming B.V.",
+      "email": "",
+      "phone": "06-10183266",
+      "city": "Zeist",
+      "website": "",
+      "note": "Vloerverwarmingsinstallateur, Dijnselweg 37 Zeist; 4,8/5 op Werkspot (22 reviews). Domein weidema-vloerverwarming.nl was niet bereikbaar, dus e-mail niet bevestigd. · Omvang: B.V. met 1 werkzame persoon volgens bedrijvengids (cvketel-gids/Oozo); KvK 82904553; opgericht 2021 · ± 42 km van Aalsmeer"
+    },
+    {
+      "name": "Martin de Wit Warmtetechniek",
+      "email": "info@martindewit-warmtetechniek.nl",
+      "phone": "035-5314253",
+      "city": "Eemnes",
+      "website": "https://www.martindewit-warmtetechniek.nl/",
+      "note": "Cv-installateur die vloerverwarming (ingefreesd en elektrisch) compleet aanlegt in Eemnes, Laren, Blaricum, Huizen; hoofdactiviteit is cv-ketels. · Omvang: Familiebedrijf: Cees Oversteegen (sinds 2001) runt het samen met zijn vrouw Karin · ± 42 km van Aalsmeer · E-mail gezien op https://www.martindewit-warmtetechniek.nl/"
+    }
+  ]
+}

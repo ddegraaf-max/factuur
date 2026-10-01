@@ -7,7 +7,16 @@ import { computed, ref } from 'vue';
 const props = defineProps({
   packages: Array,
   subcontractors: Array,
+  startlists: { type: Array, default: () => [] },
 });
+
+/* ---------- Startlijsten (alleen de eigenaar van het platform ziet ze) ---------- */
+const applying = ref(null);
+const applyStartlist = (list) => {
+  if (!confirm(t('Startlijst ":package" toevoegen? Het werkpakket komt erbij als het nog niet bestaat en :n bedrijven worden in de pool gezet (bedrijven die er al staan worden overgeslagen).', { package: list.package, n: list.count }))) return;
+  applying.value = list.key;
+  router.post(route('tenders.subcontractors.startlist'), { key: list.key }, { preserveScroll: true, onFinish: () => { applying.value = null; } });
+};
 
 const page = usePage();
 const errors = computed(() => page.props.errors || {});
@@ -128,6 +137,25 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
     </div>
 
     <div v-if="errors.package || errors.subcontractor" class="field-error" style="margin-bottom:12px;">{{ errors.package || errors.subcontractor }}</div>
+
+    <!-- Startlijsten: kant-en-klare bedrijven per werkpakket -->
+    <div v-if="startlists.length" class="card" style="margin-bottom:16px;">
+      <div class="card-header">
+        <div>
+          <div class="card-title">{{ $t('Startlijsten') }}</div>
+          <div class="card-subtitle">{{ $t('Kant-en-klare bedrijven per werkpakket, opgezocht en nagekeken. Eén klik zet ze in je pool; bedrijven die er al staan worden overgeslagen.') }}</div>
+        </div>
+      </div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px;">
+        <div v-for="l in startlists" :key="l.key" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:240px;">
+            <b>{{ l.package }}</b> <span class="sub">· {{ $t(':n bedrijven, :m met e-mailadres', { n: l.count, m: l.with_email }) }}<template v-if="l.region"> · {{ l.region }}</template></span>
+            <div v-if="l.description" class="sub">{{ l.description }}</div>
+          </div>
+          <button class="btn btn-primary btn-sm" :disabled="applying === l.key" @click="applyStartlist(l)">{{ applying === l.key ? $t('Bezig…') : $t('In de pool zetten') }}</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Werkpakketten -->
     <div class="card" style="margin-bottom:16px;">
