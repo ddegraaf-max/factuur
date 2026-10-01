@@ -1,0 +1,89 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+	<s:Header>
+		<a:Action s:mustUnderstand="1">http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal</a:Action>
+		<a:RelatesTo>urn:uuid:d06c3461-74ec-4db5-a0f2-bc422bb53cd2</a:RelatesTo>
+		<o:Security s:mustUnderstand="1" xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+			<u:Timestamp u:Id="_0">
+				<u:Created>2018-05-30T08:04:14.892Z</u:Created>
+				<u:Expires>2018-05-30T08:09:14.892Z</u:Expires>
+			</u:Timestamp>
+		</o:Security>
+	</s:Header>
+	<s:Body>
+		<trust:RequestSecurityTokenResponseCollection xmlns:trust="http://docs.oasis-open.org/ws-sx/ws-trust/200512">
+			<trust:RequestSecurityTokenResponse>
+				<trust:Lifetime>
+					<wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2018-05-30T08:04:14.892Z</wsu:Created>
+					<wsu:Expires xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2018-05-30T09:04:14.892Z</wsu:Expires>
+				</trust:Lifetime>
+				<wsp:AppliesTo xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy">
+					<wsa:EndpointReference xmlns:wsa="http://www.w3.org/2005/08/addressing">
+						<wsa:Address>https://curateleenbewindregisterservice.rechtspraak.nl/</wsa:Address>
+					</wsa:EndpointReference>
+				</wsp:AppliesTo>
+				<trust:RequestedSecurityToken>
+					<saml:Assertion MajorVersion="1" MinorVersion="1" AssertionID="_db7066d6-d23f-41fa-b53c-a760c67b392f" Issuer="http://sts.rechtspraak.nl/adfs/services/trust" IssueInstant="2018-05-30T08:04:14.892Z" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion">
+						<saml:Conditions NotBefore="2018-05-30T08:04:14.892Z" NotOnOrAfter="2018-05-30T09:04:14.892Z">
+							<saml:AudienceRestrictionCondition>
+								<saml:Audience>https://curateleenbewindregisterservice.rechtspraak.nl/</saml:Audience>
+							</saml:AudienceRestrictionCondition>
+						</saml:Conditions>
+						<saml:AttributeStatement>
+							<saml:Subject>
+								<saml:SubjectConfirmation>
+									<saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:bearer</saml:ConfirmationMethod>
+								</saml:SubjectConfirmation>
+							</saml:Subject>
+							<saml:Attribute AttributeName="name" AttributeNamespace="http://schemas.xmlsoap.org/ws/2005/05/identity/claims">
+								<saml:AttributeValue>[Gebruikersnaam]</saml:AttributeValue>
+							</saml:Attribute>
+							<saml:Attribute AttributeName="role" AttributeNamespace="http://schemas.microsoft.com/ws/2008/06/identity/claims">
+								<saml:AttributeValue>CCBR</saml:AttributeValue>
+							</saml:Attribute>
+						</saml:AttributeStatement>
+						<saml:AuthenticationStatement AuthenticationMethod="urn:oasis:names:tc:SAML:1.0:am:password" AuthenticationInstant="2018-05-30T08:04:14.892Z">
+							<saml:Subject>
+								<saml:SubjectConfirmation>
+									<saml:ConfirmationMethod>urn:oasis:names:tc:SAML:1.0:cm:bearer</saml:ConfirmationMethod>
+								</saml:SubjectConfirmation>
+							</saml:Subject>
+						</saml:AuthenticationStatement>
+						<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+							<ds:SignedInfo>
+								<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+								<ds:SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+								<ds:Reference URI="#_db7066d6-d23f-41fa-b53c-a760c67b392f">
+									<ds:Transforms>
+										<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+										<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+									</ds:Transforms>
+									<ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+									<ds:DigestValue>2Kgs1OCgt+ugq6BvKUYJfAeoflbjqmoadLwcrVvZUg4=</ds:DigestValue>
+								</ds:Reference>
+							</ds:SignedInfo>
+							<ds:SignatureValue>T8LqhBr/sd5dTbbN2xz7rZnMLcjt+U5NbooylfhB6zWnDQsr6Pfz+/de6qxS6Elusll5ZUjXeBRmQa77N99S0hAyftM5m4wnMB6h3HWB9AsCcPm21qXBaLU7uzLSeW6fKFAMG3/Z9cDoOhPCMmChwHGk6YWGOhXzw4TkxZgWguE8buF7mtixdB8AKKz+kivLXnJOkj4I0JP3MF6vVlZ0zXawElcCiq6XcCjR45MZhprvxnlg5opVL3P1ZyD0slH1mu47ue8dg+meIIue8Byvx2VOAFS1ZdOGrjsCDPKbCI65XsKe3bIJg2GLGRlJ45nWNCo3oLX+MY2DjnbP0hev0Q==</ds:SignatureValue>
+							<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+								<X509Data>
+									<X509Certificate>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</X509Certificate>
+								</X509Data>
+							</KeyInfo>
+						</ds:Signature>
+					</saml:Assertion>
+				</trust:RequestedSecurityToken>
+				<trust:RequestedAttachedReference>
+					<o:SecurityTokenReference xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+						<o:KeyIdentifier ValueType="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID">_db7066d6-d23f-41fa-b53c-a760c67b392f</o:KeyIdentifier>
+					</o:SecurityTokenReference>
+				</trust:RequestedAttachedReference>
+				<trust:RequestedUnattachedReference>
+					<o:SecurityTokenReference xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+						<o:KeyIdentifier ValueType="http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.0#SAMLAssertionID">_db7066d6-d23f-41fa-b53c-a760c67b392f</o:KeyIdentifier>
+					</o:SecurityTokenReference>
+				</trust:RequestedUnattachedReference>
+				<trust:TokenType>urn:oasis:names:tc:SAML:1.0:assertion</trust:TokenType>
+				<trust:RequestType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Issue</trust:RequestType>
+				<trust:KeyType>http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer</trust:KeyType>
+			</trust:RequestSecurityTokenResponse>
+		</trust:RequestSecurityTokenResponseCollection>
+	</s:Body>
+</s:Envelope>

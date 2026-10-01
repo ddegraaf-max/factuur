@@ -1,0 +1,121 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+	<s:Header>
+		<a:Action s:mustUnderstand="1">ccbr.rechtspraak.nl/v1/CcbrDataservice/RaadpleegRegisterkaartResponse</a:Action>
+		<a:RelatesTo>urn:uuid:8a6c91e6-84e8-45da-a527-b95696b8a643</a:RelatesTo>
+		<o:Security s:mustUnderstand="1" xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+			<u:Timestamp u:Id="_0">
+				<u:Created>2018-05-30T08:04:33.308Z</u:Created>
+				<u:Expires>2018-05-30T08:09:33.308Z</u:Expires>
+			</u:Timestamp>
+		</o:Security>
+	</s:Header>
+	<s:Body>
+		<RaadpleegRegisterkaartResponse xmlns="ccbr.rechtspraak.nl/v1">
+			<RaadpleegRegisterkaartResult xmlns:b="ccbr.rechtspraak.nl/v1/CcbrDataservice/berichten" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+				<b:Foutmelding i:nil="true"/>
+				<b:Registerkaart>
+					<b:Aantekeningen>
+						<b:Aantekening>
+							<b:Beslissing>
+								<b:Beslissingcode>
+									<b:Nummer>-102</b:Nummer>
+								</b:Beslissingcode>
+								<b:Beslissingstekst>De kantonrechter te Lutjebroek....</b:Beslissingstekst>
+								<b:DatumBeslissing>2013-07-14T00:00:00</b:DatumBeslissing>
+								<b:Geldigheid>
+									<b:DatumBegin>2013-07-31T00:00:00</b:DatumBegin>
+									<b:DatumEinde i:nil="true"/>
+								</b:Geldigheid>
+								<b:RechtspraakZaakreferentie>
+									<b:Zaakidentificatie>
+										<b:Zaakidentificatiecode>0000000</b:Zaakidentificatiecode>
+									</b:Zaakidentificatie>
+								</b:RechtspraakZaakreferentie>
+								<b:UitspraakInstantie>Zittingsplaats Lutjebroek</b:UitspraakInstantie>
+							</b:Beslissing>
+						</b:Aantekening>
+					</b:Aantekeningen>
+					<b:BeperktBewind>false</b:BeperktBewind>
+					<b:BewindvoerdersNatuurlijkpersoon/>
+					<b:BewindvoerdersNietNatuurlijkPersoon>
+						<b:BewindvoerderNietNatuurlijkPersoon>
+							<b:Adressen>
+								<b:Adres>
+									<b:BuitenlandsAdres>
+										<b:Land i:nil="true"/>
+										<b:Regel1 i:nil="true"/>
+										<b:Regel2 i:nil="true"/>
+										<b:Regel3 i:nil="true"/>
+										<b:Regel4 i:nil="true"/>
+										<b:Regel5 i:nil="true"/>
+										<b:Regel6 i:nil="true"/>
+									</b:BuitenlandsAdres>
+									<b:NederlandsAdres>
+										<b:AdresOpenbareRuimte>
+											<b:Huisletter i:nil="true"/>
+											<b:Huisnummer>00000</b:Huisnummer>
+											<b:Huisnummertoevoeging i:nil="true"/>
+											<b:NaamOpenbareRuimte>Postbus</b:NaamOpenbareRuimte>
+										</b:AdresOpenbareRuimte>
+										<b:Antwoordadres>
+											<b:Antwoordnummer i:nil="true"/>
+										</b:Antwoordadres>
+										<b:Gemeente>
+											<b:Naam i:nil="true"/>
+										</b:Gemeente>
+										<b:Postbusadres>
+											<b:Postbusnummer i:nil="true"/>
+										</b:Postbusadres>
+										<b:Postcode>
+											<b:AlfabetischDeel>ZZ</b:AlfabetischDeel>
+											<b:NumeriekDeel>1234</b:NumeriekDeel>
+										</b:Postcode>
+										<b:Woonplaats>
+											<b:Naam>Lutjebroek</b:Naam>
+										</b:Woonplaats>
+									</b:NederlandsAdres>
+									<b:SoortAdres>01</b:SoortAdres>
+								</b:Adres>
+							</b:Adressen>
+							<b:NaamOrganisatieVolledig i:nil="true"/>
+						</b:BewindvoerderNietNatuurlijkPersoon>
+					</b:BewindvoerdersNietNatuurlijkPersoon>
+					<b:CentraalCurateleNummer>0</b:CentraalCurateleNummer>
+					<b:CuratorenNatuurlijkPersoon/>
+					<b:CuratorenNietNatuurlijkPersoon/>
+					<b:DatumPublicatie>2013-07-31T00:00:00</b:DatumPublicatie>
+					<b:Geldigheid>
+						<b:DatumBegin>2013-07-30T00:00:00</b:DatumBegin>
+						<b:DatumEinde i:nil="true"/>
+					</b:Geldigheid>
+					<b:Geregistreerde>
+						<b:Geboorte>
+							<b:BuitenlandsePlaats i:nil="true"/>
+							<b:Datum>1991-04-01T00:00:00</b:Datum>
+							<b:Jaar>1991</b:Jaar>
+							<b:Land>
+								<b:Naam i:nil="true"/>
+							</b:Land>
+							<b:Woonplaats>
+								<b:Naam>Lutjebroek</b:Naam>
+							</b:Woonplaats>
+						</b:Geboorte>
+						<b:SamengesteldeNaam>
+							<b:Geslachtsnaam>Jansen</b:Geslachtsnaam>
+							<b:Voornamen>Jan</b:Voornamen>
+							<b:Voorvoegsel/>
+						</b:SamengesteldeNaam>
+					</b:Geregistreerde>
+					<b:Grond>02</b:Grond>
+					<b:InstantieBeheer>Rechtbank Noord-Holland, zittingsplaats Lutjebroek</b:InstantieBeheer>
+					<b:Registerkaartidentificatie>
+						<b:RegisterkaartAanduiding>HNyPZgyLRWLndli1PpXwicNfX3LpbGimbz7HVbzJc5QNBnTUJdPnNiKQjfPvCRc0UJH38HtseTyoNJXFRm03Nw==</b:RegisterkaartAanduiding>
+						<b:RegisterkaartIndentificatieCode>BM00001/0001</b:RegisterkaartIndentificatieCode>
+					</b:Registerkaartidentificatie>
+					<b:SoortRegister>Item02</b:SoortRegister>
+				</b:Registerkaart>
+				<b:VerificatieCode>8c5jpdQbFTvYFQzgNsWvcAYRqP5qY/Tn/dfUeqBOxrzQYG1hdDvrnsgpFXa7D4/rmxbzffzgp/PyZA8KBltPx/BzqXWv81t9bRlV+XHo3Gpa3003GoQRjNpzVHHRqKivl5/yMM+JRdu28o5CpzQYDT/z/6qysTOzFORArdp4U1l0ICb4dCsNszyvrXHmgqf5LE3ExuuxK3Fa7ptxa1o1B5kYfYAr0utnIYRsztnunEbKm2mzdBqysqFgu7tHmgW0A4o7H2gMAB+JczjnLm5agEWsQbesemJh2E648q555gB+J/Qgt6LeWW8YFJo7UHVShKBm+cpYwT2v0fW//XrTn5vsUQWUYnRoda9zad/Kre5VurMJzG89RzmoTG1ak5Yj</b:VerificatieCode>
+			</RaadpleegRegisterkaartResult>
+		</RaadpleegRegisterkaartResponse>
+	</s:Body>
+</s:Envelope>

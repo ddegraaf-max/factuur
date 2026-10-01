@@ -1,0 +1,48 @@
+<s:Envelope xmlns:s="http://www.w3.org/2003/05/soap-envelope" xmlns:a="http://www.w3.org/2005/08/addressing" xmlns:u="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+	<s:Header>
+		<a:Action s:mustUnderstand="1">ccbr.rechtspraak.nl/v1/CcbrDataservice/ZoekRegisterkaartenResponse</a:Action>
+		<a:RelatesTo>urn:uuid:b823fcf0-2f97-42b0-8888-05b36726ba3b</a:RelatesTo>
+		<o:Security s:mustUnderstand="1" xmlns:o="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+			<u:Timestamp u:Id="_0">
+				<u:Created>2018-05-30T08:04:29.206Z</u:Created>
+				<u:Expires>2018-05-30T08:09:29.206Z</u:Expires>
+			</u:Timestamp>
+		</o:Security>
+	</s:Header>
+	<s:Body>
+		<ZoekRegisterkaartenResponse xmlns="ccbr.rechtspraak.nl/v1">
+			<ZoekRegisterkaartenResult xmlns:b="ccbr.rechtspraak.nl/v1/CcbrDataservice/berichten" xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+				<b:Foutmelding i:nil="true"/>
+				<b:Registerkaarten>
+					<b:ZoekRegisterkaart>
+						<b:Geregistreerde>
+							<b:Geboorte>
+								<b:BuitenlandsePlaats i:nil="true"/>
+								<b:Datum>1991-04-01T00:00:00</b:Datum>
+								<b:Jaar>1991</b:Jaar>
+								<b:Land>
+									<b:Naam i:nil="true"/>
+								</b:Land>
+								<b:Woonplaats>
+									<b:Naam>Lutjebroek</b:Naam>
+								</b:Woonplaats>
+							</b:Geboorte>
+							<b:SamengesteldeNaam>
+								<b:Geslachtsnaam>Jansen</b:Geslachtsnaam>
+								<b:Voornamen>Jan</b:Voornamen>
+								<b:Voorvoegsel/>
+							</b:SamengesteldeNaam>
+						</b:Geregistreerde>
+						<b:HonderdProcentMatch>true</b:HonderdProcentMatch>
+						<b:Registerkaartidentificatie>
+							<b:RegisterkaartAanduiding>mOuLkPpQWGkY3UvkDHsS9prlAHsliyc7nh0WthZzhqKG5TEmEE/evUVrxF20CNEyUo5vKKalkpRHXV9Z7WwOew==</b:RegisterkaartAanduiding>
+							<b:RegisterkaartIndentificatieCode>BM00001/0001</b:RegisterkaartIndentificatieCode>
+						</b:Registerkaartidentificatie>
+						<b:SoortRegister>Item02</b:SoortRegister>
+					</b:ZoekRegisterkaart>
+				</b:Registerkaarten>
+				<b:VerificatieCode>8c5jpdQbFTvYFQzgNsWvcIWRq+0ZuJFxPLW04zyevIRYREfyWGLCZGPCkgEqXQpTZjZJRNrZHtsQMgTzYNmtRdUy63+b+YSmycCDGJw6d1+kLL1FnlUGVjioKv1qBntZSdZIoxnzYyvYNHhjOFoUhijyjeAMIfYB/gtmyi66GIaW90f0T4Jt0kzRWtMCMrerqnLnOz7DDrO+AER+mkPmx1yXKhivBrfSGTyoCHe//kTnX5ZKBUY31N0JBxtnWorqVTLASjqJlvESjnCq7lg1t/0fsMpO23EjiGJne9TvRw5Y0FrWNH/18lC/oIYWnBUg1bGXRFkh/k2e2fvKJAB9HQJkXw915hkBDGeExUv3H9ux0tjyz2JlSYkhqC+ljBr8xhm2dfPpqovHcL1MrJtLwt/dS4dUBn0PZi9Yncjws3A=</b:VerificatieCode>
+			</ZoekRegisterkaartenResult>
+		</ZoekRegisterkaartenResponse>
+	</s:Body>
+</s:Envelope>

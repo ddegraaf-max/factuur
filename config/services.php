@@ -111,6 +111,37 @@ return [
         'password' => env('CIR_PASSWORD'),
         'url' => env('CIR_URL', 'https://webservice.rechtspraak.nl/cir.asmx'),
     ],
+    /*
+     * Centraal Curatele- en Bewindregister (Rechtspraak). Gratis webservice na
+     * aanmelden via het abonnementenportaal; zonder gebruikersnaam en wachtwoord
+     * bestaat de controle niet.
+     *
+     * ── Twee dingen die hier niet vanzelf gaan ────────────────────────────
+     *
+     * 1. De dataservice draait op een PKIoverheid-certificaat waarvan de stam
+     *    ("Staat der Nederlanden Private Root CA - G1") in géén enkele
+     *    truststore zit. Vandaar `cacert`: die stam staat in de repo, want een
+     *    certificaat is openbaar. Verificatie uitzetten is hier geen optie —
+     *    er gaan persoonsgegevens over deze verbinding.
+     * 2. Het token komt van een aparte secure token service (ADFS, WS-Trust
+     *    1.3) en is een uur geldig. `realm` is de relying party waarvoor het
+     *    token wordt uitgegeven en moet exact overeenkomen met wat de
+     *    Rechtspraak heeft geconfigureerd.
+     *
+     * Wat je met de uitkomsten mág doen staat in de gebruiksvoorwaarden:
+     * alleen handelspartijen informeren over de curatele of het bewind. Een
+     * ander doel — bijvoorbeeld een risicoscore — is volgens artikel 2
+     * onrechtmatig. Daarom voedt dit register bewust níet de klantscore, waar
+     * het insolventieregister ('cir') hierboven wél in meegaat.
+     */
+    'ccbr' => [
+        'username' => env('CCBR_USERNAME'),
+        'password' => env('CCBR_PASSWORD'),
+        'sts' => env('CCBR_STS', 'https://sts.rechtspraak.nl/adfs/services/trust/13/usernamemixed'),
+        'url' => env('CCBR_URL', 'https://ccbrservice.rechtspraak.nl/ccbrdataservice.svc'),
+        'realm' => env('CCBR_REALM', 'https://ccbrservice.rechtspraak.nl/'),
+        'cacert' => env('CCBR_CACERT', resource_path('certs/pkioverheid-private-root-g1.pem')),
+    ],
     // Sms via Smstools (api.smsgatewayapi.com). Zonder beide sleutels bestaat de functie niet.
     // De korte namen (client_id, client_secret) lezen we ook, voor wie ze zo in Railway heeft gezet.
     // SMSTOOLS_COMPANIES: ids van administraties die mogen sms'en, of * voor iedereen;
