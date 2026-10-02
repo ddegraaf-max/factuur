@@ -22,7 +22,9 @@ class SecurityHeadersTest extends TestCase
     {
         $antwoord = $this->get('/register');
 
-        $antwoord->assertHeader('X-Frame-Options', 'DENY');
+        // SAMEORIGIN, geen DENY: de factuurpagina en de inkoopfactuur laden hun
+        // PDF in een iframe van de eigen site, en DENY blokkeert ook die.
+        $antwoord->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $antwoord->assertHeader('X-Content-Type-Options', 'nosniff');
         $antwoord->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
         $this->assertStringContainsString(

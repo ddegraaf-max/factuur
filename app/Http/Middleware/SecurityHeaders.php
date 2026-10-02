@@ -45,9 +45,11 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
-        // Niet in een iframe. Er is geen enkele reden om deze applicatie in te
-        // sluiten, en zonder deze kop is een klik op de verkeerde plek te sturen.
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Niet in een iframe van een andere site: zonder deze kop is een klik op
+        // de verkeerde plek te sturen. SAMEORIGIN en niet DENY, want de applicatie
+        // laadt haar eigen PDF's wél in een iframe: de voorvertoning op de
+        // factuurpagina en de bon bij een inkoopfactuur. DENY blokkeert ook die.
+        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
         // Geen eigen gok over het soort bestand. Een geüpload bestand dat als
         // afbeelding is bedoeld mag nooit als script worden uitgevoerd.
