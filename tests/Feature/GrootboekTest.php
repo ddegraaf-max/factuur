@@ -968,8 +968,10 @@ class GrootboekTest extends TestCase
         $post = $this->ledger->findBySource($this->company, 'purchase_invoice', $inkoop->id);
         $this->assertNotNull($post, 'een inkoopfactuur met een retourregel hoort geboekt te worden');
 
-        $this->assertSame(100000, $this->saldo(Rgs::KOSTEN_ALGEMEEN, 'debit'));
-        $this->assertSame(10000, $this->saldo(Rgs::KOSTEN_ALGEMEEN, 'credit'));
+        // Categorie "Inkoop" komt op inkoopwaarde handelsgoederen, niet op algemene
+        // kosten. De retourregel staat aan de creditkant van diezelfde rekening.
+        $this->assertSame(100000, $this->saldo(Rgs::INKOOP_HANDELSGOEDEREN, 'debit'));
+        $this->assertSame(10000, $this->saldo(Rgs::INKOOP_HANDELSGOEDEREN, 'credit'));
         $this->assertSame(18900, $this->saldo(Rgs::BTW_5B_VOORBELASTING, 'debit'));
         $this->assertSame(108900, $this->saldo(Rgs::CREDITEUREN, 'credit'));
         $this->assertSame(0, $this->saldo(Rgs::BETAALVERSCHIL, 'debit'));

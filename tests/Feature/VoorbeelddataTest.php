@@ -37,7 +37,10 @@ class VoorbeelddataTest extends TestCase
     {
         $this->app->detectEnvironment(fn () => 'production');
 
-        $this->artisan('db:seed')->assertExitCode(0);
+        // Met --force, want zo liep hij op 28-08 ook: migrate --force --seed geeft
+        // dat door. Zonder --force vraagt Laravel zelf om een bevestiging; dat is
+        // Laravels grendel, hier gaat het om die van de seeder.
+        $this->artisan('db:seed', ['--force' => true])->assertExitCode(0);
 
         $this->assertDatabaseMissing('companies', ['name' => 'Vries Design B.V.']);
         $this->assertDatabaseMissing('users', ['email' => 'demo@easyinvoice.test']);

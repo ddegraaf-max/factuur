@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\DateOnly;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +23,9 @@ class JournalEntry extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
+        // Zonder tijd in de opslag; met de gewone date-cast viel een boeking van
+        // 31 december op sqlite buiten het jaar. Zie App\Casts\DateOnly.
+        'date' => DateOnly::class,
         'year' => 'integer',
         'source_id' => 'integer',
     ];

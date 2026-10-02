@@ -53,7 +53,10 @@ class Brand
             return $waarde;
         }
 
-        return static::toon($key) ?? $default;
+        // self:: en niet static::. toon() is private, en een private methode is
+        // niet te overschrijven — met static:: belooft deze aanroep een late binding
+        // die nooit iets anders kan opleveren. Larastan noemt dat terecht onveilig.
+        return self::toon($key) ?? $default;
     }
 
     /**
