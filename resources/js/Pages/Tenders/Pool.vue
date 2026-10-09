@@ -200,7 +200,8 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
           <div class="sub">{{ $t('Zonder e-mailadres kan een bedrijf niet worden aangeschreven.') }}</div>
         </div>
       </div>
-      <table v-if="subcontractors.length" class="data-table">
+      <div v-if="subcontractors.length" class="table-scroll">
+      <table class="data-table">
         <thead>
           <tr>
             <th>{{ $t('Bedrijf') }}</th>
@@ -234,11 +235,12 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
             <td class="right num">{{ s.stats.won }}</td>
             <td class="right actions">
               <button class="btn btn-ghost btn-sm" @click="openSub(s)">{{ $t('Bewerken') }}</button>
-              <button class="btn btn-ghost btn-sm" @click="destroySub(s)">✕</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" :title="$t('Uit de pool halen. Heeft het bedrijf al uitvragen gehad, dan wordt het gearchiveerd en kun je het terugzetten.')" @click="destroySub(s)">{{ $t('Verwijder') }}</button>
             </td>
           </tr>
         </tbody>
       </table>
+      </div>
       <div v-else class="card-body sub">{{ $t('Nog geen bedrijven. Voeg ze één voor één toe, of plak een lijst.') }}</div>
       <!-- Uit de pool gehaald, met geschiedenis -->
       <div v-if="archived.length" class="card-body" style="border-top:1px solid var(--border);">
@@ -365,7 +367,12 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
 .sub { font-size: 12px; color: var(--text-3); font-weight: 400; }
 .warn { color: var(--warning); }
 .desc { font-size: 12.5px; color: var(--text-2); max-width: 420px; }
-.actions { white-space: nowrap; }
+/* Knoppen mogen over twee regels; met nowrap liep de tabel op een laptop uit
+   de kaart en stond "Verwijder" buiten beeld. Past het dan nog niet, dan
+   scrolt de tabel zijwaarts. */
+.actions { white-space: normal; min-width: 150px; }
+.actions .btn { margin: 2px 0 2px 4px; }
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .tagx { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--surface-2, #F5F5F4); border: 1px solid var(--border); margin: 1px 3px 1px 0; color: var(--text-2); }
 .good { color: var(--success); font-weight: 600; }
 .bad { color: var(--warning); font-weight: 600; }
