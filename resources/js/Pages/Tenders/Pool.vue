@@ -79,6 +79,11 @@ const destroySub = (s) => {
     : t(':name uit de pool verwijderen?', { name: s.name });
   if (confirm(ask)) router.delete(route('tenders.subcontractors.destroy', s.id), { preserveScroll: true });
 };
+/* Tweede stap, alleen voor een bedrijf dat al uit de pool is: écht wissen, ook uit de eerdere uitvragen. */
+const forceDestroySub = (s) => {
+  const ask = t(':name definitief verwijderen? Het bedrijf verdwijnt dan ook uit :n eerdere uitvragen, met de prijzen die het daar opgaf. Dit kan niet ongedaan worden gemaakt.', { name: s.name, n: s.stats.requests });
+  if (confirm(ask)) router.delete(route('tenders.subcontractors.force-destroy', s.id), { preserveScroll: true });
+};
 
 /* ---------- Import ---------- */
 const importModal = ref(false);
@@ -275,7 +280,10 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
             <tr v-for="s in archived" :key="s.id">
               <td class="cell-primary">{{ s.name }}<div class="sub">{{ [s.city, s.email].filter(Boolean).join(' · ') }}</div></td>
               <td class="sub">{{ $t('uit de pool sinds :date', { date: s.archived_at_label }) }} · {{ $t(':n uitvragen', { n: s.stats.requests }) }}</td>
-              <td class="right actions"><button class="btn btn-secondary btn-sm" @click="restoreSub(s)">{{ $t('Terugzetten') }}</button></td>
+              <td class="right actions">
+                <button class="btn btn-secondary btn-sm" @click="restoreSub(s)">{{ $t('Terugzetten') }}</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--brand-dark);" :title="$t('Ook uit de eerdere uitvragen; kan niet ongedaan worden gemaakt.')" @click="forceDestroySub(s)">{{ $t('Definitief verwijderen') }}</button>
+              </td>
             </tr>
           </tbody>
         </table>

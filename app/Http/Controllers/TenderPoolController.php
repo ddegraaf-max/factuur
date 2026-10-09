@@ -140,6 +140,28 @@ class TenderPoolController extends Controller
     }
 
     /**
+     * Een uit de pool gehaald bedrijf écht wissen (1.76.13, "hoe kan ik Martin de
+     * Wit definitief verwijderen?"). De prijsaanvragen van het bedrijf gaan mee
+     * (cascade), dus het verdwijnt ook uit de vergelijking van eerdere
+     * uitvragen. Daarom pas ná het archiveren, met een aparte bevestiging — en
+     * nooit voor een bedrijf dat ergens is gegund: die gunning is een afspraak.
+     */
+    public function forceDestroySubcontractor(Subcontractor $subcontractor): RedirectResponse
+    {
+        if ($subcontractor->requests()->where('status', 'awarded')->exists()) {
+            return back()->with('flash', __(':name is bij een uitvraag gegund en kan daarom niet definitief worden verwijderd. Laat het bedrijf uit de pool, dan krijgt het geen nieuwe aanvragen.', ['name' => $subcontractor->name]));
+        }
+
+        $name = $subcontractor->name;
+        $requests = $subcontractor->requests()->count();
+        $subcontractor->delete();
+
+        return back()->with('flash', $requests
+            ? __(':name is definitief verwijderd, ook uit :n eerdere uitvragen.', ['name' => $name, 'n' => $requests])
+            : __(':name is definitief verwijderd.', ['name' => $name]));
+    }
+
+    /**
      * Meerdere bedrijven tegelijk: één per regel, velden gescheiden door een
      * puntkomma — naam; e-mail; telefoon; plaats; werkpakketten (komma's).
      */

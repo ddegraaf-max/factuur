@@ -57,4 +57,34 @@ class TenderArchiveTest extends TestCase
         $this->get(route('tenders.pool'))->assertOk()->assertInertia(fn ($page) => $page->has('subcontractors', 1)->has('archived', 0));
         $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page->has('candidates', 0), 'Al aangeschreven, dus geen kandidaat');
     }
+
+    /**
+     * 1.76.13: definitief verwijderen wist het bedrijf én zijn aanvragen; een
+     * gegund bedrijf blijft staan, want die gunning is een afspraak.
+     */
+    public function test_a_removed_company_can_be_deleted_for_good_unless_it_was_awarded(): void
+    {
+        Mail::fake();
+        $this->actingAs($this->demoUser());
+        $this->post(route('tenders.packages.seed'))->assertRedirect();
+        $package = WorkPackage::where('name', 'Metselwerk')->firstOrFail();
+        $gone = Subcontractor::create(['name' => 'Weg BV', 'email' => 'weg@metsel.test']);
+        $winner = Subcontractor::create(['name' => 'Winnaar BV', 'email' => 'win@metsel.test']);
+        $gone->workPackages()->sync([$package->id]);
+        $winner->workPackages()->sync([$package->id]);
+        $this->post(route('tenders.store'), [
+            'title' => 'Gevel', 'work_package_id' => $package->id, 'subcontractor_ids' => [$gone->id, $winner->id], 'deadline' => now()->addDays(7)->toDateString(),
+        ])->assertRedirect()->assertSessionHasNoErrors();
+        $round = TenderRound::firstOrFail();
+        $round->requests()->where('subcontractor_id', $winner->id)->update(['status' => 'awarded']);
+
+        $this->delete(route('tenders.subcontractors.force-destroy', $gone))->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertNull(Subcontractor::find($gone->id));
+        $this->assertSame(0, $round->requests()->where('subcontractor_id', $gone->id)->count(), 'de aanvragen gaan mee');
+
+        $this->delete(route('tenders.subcontractors.force-destroy', $winner))->assertRedirect();
+        $this->assertNotNull(Subcontractor::find($winner->id), 'een gegund bedrijf blijft bestaan');
+        $this->assertSame(1, $round->requests()->where('subcontractor_id', $winner->id)->count());
+        $this->get(route('tenders.show', $round))->assertOk()->assertInertia(fn ($page) => $page->has('requests', 1));
+    }
 }

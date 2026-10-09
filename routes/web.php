@@ -740,6 +740,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::patch('onderaannemers/{subcontractor}', [TenderPoolController::class, 'updateSubcontractor'])->name('tenders.subcontractors.update');
     Route::delete('onderaannemers/{subcontractor}', [TenderPoolController::class, 'destroySubcontractor'])->name('tenders.subcontractors.destroy');
     Route::patch('onderaannemers/{subcontractor}/terugzetten', [TenderPoolController::class, 'restoreSubcontractor'])->name('tenders.subcontractors.restore');
+    Route::delete('onderaannemers/{subcontractor}/definitief', [TenderPoolController::class, 'forceDestroySubcontractor'])->name('tenders.subcontractors.force-destroy');
 
     // Vaste lasten: terugkerende inkoop automatisch inboeken
     Route::get('vaste-lasten', [\App\Http\Controllers\RecurringPurchaseController::class, 'index'])->name('purchases.recurring.index');
