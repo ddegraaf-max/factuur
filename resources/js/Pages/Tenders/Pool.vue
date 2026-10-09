@@ -114,6 +114,21 @@ const loadImportFile = (event) => {
 };
 
 const packageName = (id) => props.packages.find(p => p.id === id)?.name || '';
+
+/* ---------- Zoeken en filteren in de pool (in de browser, de lijst is al geladen) ---------- */
+const search = ref('');
+const packageFilter = ref(null);
+const norm = (s) => String(s || '').toLowerCase();
+const countFor = (packageId) => props.subcontractors.filter((s) => s.package_ids.includes(packageId)).length;
+const filteredSubcontractors = computed(() => {
+  const words = norm(search.value).split(/\s+/).filter(Boolean);
+  return props.subcontractors.filter((s) => {
+    if (packageFilter.value && !s.package_ids.includes(packageFilter.value)) return false;
+    if (!words.length) return true;
+    const hay = [s.name, s.city, s.contact_name, s.email, s.phone, ...s.package_ids.map(packageName)].map(norm).join(' ');
+    return words.every((w) => hay.includes(w));
+  });
+});
 const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':n dagen', { n: Math.round(h / 24) }));
 </script>
 
@@ -196,12 +211,22 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
     <div class="card">
       <div class="card-header">
         <div>
-          <div class="card-title">{{ $t('Bedrijven') }} <span class="sub">({{ subcontractors.length }})</span></div>
+          <div class="card-title">{{ $t('Bedrijven') }} <span class="sub">({{ filteredSubcontractors.length === subcontractors.length ? subcontractors.length : $t(':n van :total', { n: filteredSubcontractors.length, total: subcontractors.length }) }})</span></div>
           <div class="sub">{{ $t('Zonder e-mailadres kan een bedrijf niet worden aangeschreven.') }}</div>
         </div>
       </div>
+      <!-- Zoeken en filteren: handig zodra de pool groeit -->
+      <div v-if="subcontractors.length > 1" class="filter-bar pool-filter">
+        <div class="filter-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input v-model="search" type="text" :placeholder="$t('Zoek op naam, plaats, contact, e-mail of werkpakket…')">
+        </div>
+        <button :class="['filter-chip', { active: packageFilter === null }]" @click="packageFilter = null">{{ $t('Alle') }} <span class="count">{{ subcontractors.length }}</span></button>
+        <button v-for="p in packages" :key="p.id" :class="['filter-chip', { active: packageFilter === p.id }]" @click="packageFilter = packageFilter === p.id ? null : p.id">{{ p.name }} <span class="count">{{ countFor(p.id) }}</span></button>
+      </div>
       <div v-if="subcontractors.length" class="table-scroll">
-      <table class="data-table">
+      <div v-if="!filteredSubcontractors.length" class="card-body sub">{{ $t('Geen bedrijf gevonden. Probeer een ander woord of zet het filter op "Alle".') }}</div>
+      <table v-else class="data-table">
         <thead>
           <tr>
             <th>{{ $t('Bedrijf') }}</th>
@@ -216,7 +241,7 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
           </tr>
         </thead>
         <tbody>
-          <tr v-for="s in subcontractors" :key="s.id">
+          <tr v-for="s in filteredSubcontractors" :key="s.id">
             <td class="cell-primary">
               {{ s.name }}
               <div class="sub">{{ s.city || '' }}<template v-if="s.source === 'suggested'"> · <span class="tagx">{{ $t('nog te controleren') }}</span></template></div>
@@ -373,6 +398,7 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
 .actions { white-space: normal; min-width: 150px; }
 .actions .btn { margin: 2px 0 2px 4px; }
 .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.pool-filter { padding: 12px 16px; border-bottom: 1px solid var(--border); margin: 0; }
 .tagx { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 999px; background: var(--surface-2, #F5F5F4); border: 1px solid var(--border); margin: 1px 3px 1px 0; color: var(--text-2); }
 .good { color: var(--success); font-weight: 600; }
 .bad { color: var(--warning); font-weight: 600; }
