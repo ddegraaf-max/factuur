@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Mail\InvoiceMail;
 use App\Mail\PaymentReminderMail;
+use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Services\ReminderService;
@@ -160,6 +161,47 @@ class PaymentOnDocumentsTest extends TestCase
 
         $this->assertStringNotContainsString('PrepaidAmount', $xml);
         $this->assertMatchesRegularExpression('/<cbc:PayableAmount currencyID="[A-Z]{3}">' . preg_quote($total, '/') . '<\/cbc:PayableAmount>/', $xml);
+    }
+
+    /**
+     * Factuur 2026-0021 van 9 oktober 2026: op het formulier € 5.000 als "reeds
+     * ontvangen" ingevuld en meteen verstuurd. De verrekening werkte paid_total
+     * bij op een ander exemplaar van de factuur; het versturen zag nog 0. De
+     * mail vroeg € 6.050 en de factuur bleef op "verstuurd" staan.
+     */
+    public function test_direct_versturen_met_reeds_ontvangen_geeft_de_mail_het_restant(): void
+    {
+        Mail::fake();
+        $this->actingAs($this->demoUser());
+        $customer = Customer::orderBy('id')->firstOrFail();
+        $customer->forceFill(['email' => 'klant@example.com'])->save();
+
+        $this->post(route('invoices.store'), [
+            'customer_id' => $customer->id,
+            'invoice_date' => now()->toDateString(),
+            'payment_terms' => 14,
+            'reference' => 'Alleen de btw nog',
+            'lines' => [
+                ['description' => 'Montage', 'quantity' => 1, 'unit' => 'stuk', 'unit_price' => 5000, 'vat_rate' => 21, 'discount_pct' => 0],
+            ],
+            'advances' => [
+                ['description' => 'Reeds ontvangen', 'date' => now()->toDateString(), 'amount' => 5000],
+            ],
+            'action' => 'send',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $invoice = Invoice::where('reference', 'Alleen de btw nog')->firstOrFail();
+
+        $this->assertSame('partial', $invoice->status, 'met € 5.000 van € 6.050 binnen is de factuur deels betaald');
+        $this->assertEqualsWithDelta(5000.0, (float) $invoice->paid_total, 0.001);
+        $this->assertEqualsWithDelta(1050.0, $invoice->remaining_amount, 0.001);
+
+        Mail::assertSent(InvoiceMail::class, function (InvoiceMail $mail) {
+            $body = DocumentLocale::using('nl', fn () => $mail->render());
+
+            return str_contains($body, 'het te betalen bedrag is')
+                && str_contains($body, money(1050));
+        });
     }
 
     public function test_de_poolse_aanmaning_rekent_met_het_openstaande_bedrag(): void

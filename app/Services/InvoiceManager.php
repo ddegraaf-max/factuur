@@ -216,6 +216,18 @@ class InvoiceManager
         }
 
         $invoice = DB::transaction(function () use ($invoice) {
+            /*
+             * Eerst opnieuw uit de database lezen. Een verrekening die in
+             * dezelfde handeling is opgeslagen ("reeds ontvangen" op het
+             * formulier, daarna direct versturen) werkt paid_total bij via het
+             * Payment-model — op een ánder exemplaar van deze factuur. Dit
+             * exemplaar stond nog op 0: de factuur kwam op "verstuurd" in plaats
+             * van "deels betaald", en de mail vroeg het volle bedrag zonder
+             * verrekeningsregel. Factuur 2026-0021 van 9 oktober 2026 vroeg zo
+             * € 6.050 terwijl € 5.000 al binnen was en alleen de btw openstond.
+             */
+            $invoice->refresh();
+
             if (! $invoice->number) {
                 // Creditnota's hebben hun eigen reeks (C-jaar-volgnummer).
                 $invoice->number = $invoice->is_credit
