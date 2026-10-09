@@ -135,7 +135,20 @@ class UblGenerator
         $xml[] = '    <cbc:LineExtensionAmount currencyID="'.$this->e($currency).'">'.$this->amount($invoice->subtotal).'</cbc:LineExtensionAmount>';
         $xml[] = '    <cbc:TaxExclusiveAmount currencyID="'.$this->e($currency).'">'.$this->amount($invoice->subtotal).'</cbc:TaxExclusiveAmount>';
         $xml[] = '    <cbc:TaxInclusiveAmount currencyID="'.$this->e($currency).'">'.$this->amount($invoice->total).'</cbc:TaxInclusiveAmount>';
-        $xml[] = '    <cbc:PayableAmount currencyID="'.$this->e($currency).'">'.$this->amount($invoice->total).'</cbc:PayableAmount>';
+
+        /*
+         * Wat al is voldaan (aanbetaling, betaling, verrekening) gaat mee als
+         * PrepaidAmount, en PayableAmount is het restant: de Peppol-regel
+         * BR-CO-16 eist dat totaal, vooruitbetaald en te betalen optellen. Tot
+         * 1.76.8 stond hier altijd het volle totaal, ook bij een aanbetaling.
+         * Een kwijtschelding is geen vooruitbetaling en blijft hier buiten.
+         */
+        $prepaid = $invoice->is_credit ? 0.0 : round((float) $invoice->payments()
+            ->whereIn('kind', ['advance', 'payment', 'credit'])->sum('amount'), 2);
+        if ($prepaid > 0) {
+            $xml[] = '    <cbc:PrepaidAmount currencyID="'.$this->e($currency).'">'.$this->amount($prepaid).'</cbc:PrepaidAmount>';
+        }
+        $xml[] = '    <cbc:PayableAmount currencyID="'.$this->e($currency).'">'.$this->amount(max((float) $invoice->total - $prepaid, 0)).'</cbc:PayableAmount>';
         $xml[] = '  </cac:LegalMonetaryTotal>';
 
         // ---------- Factuurregels ----------

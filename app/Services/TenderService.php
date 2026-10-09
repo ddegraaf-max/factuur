@@ -207,7 +207,9 @@ class TenderService
         $sms = app(SmsService::class)->available($company);
 
         return WorkPackage::withoutGlobalScope('company')->where('company_id', $company->id)
-            ->with(['subcontractors' => fn ($q) => $q->active()])
+            // Dezelfde voorwaarde als Subcontractor::scopeActive(). Larastan kent
+            // de scope niet op een BelongsToMany in een with()-closure.
+            ->with(['subcontractors' => fn ($q) => $q->whereNull('subcontractors.archived_at')])
             ->orderBy('sort_order')->orderBy('name')
             ->get()
             ->map(fn (WorkPackage $package) => [

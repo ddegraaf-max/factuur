@@ -23,6 +23,22 @@ class Payment extends Model
         'paid_on' => 'date:Y-m-d',
     ];
 
+    /**
+     * Het opschrift van deze post op de factuur-PDF, tussen het totaal en
+     * "Te betalen". Een aanbetaling draagt haar eigen omschrijving (de
+     * referentie, bijv. "Aanbetaling 50%"); een verrekening noemt de creditnota;
+     * een gewone betaling en een kwijtschelding krijgen een vaste tekst.
+     */
+    public function documentLabel(): string
+    {
+        return match ($this->kind) {
+            'advance' => $this->reference ?: __('doc.already_settled'),
+            'credit' => $this->reference ?: __('doc.settled_credit'),
+            'write_off' => __('doc.written_off'),
+            default => __('doc.already_paid'),
+        };
+    }
+
     protected static function booted(): void
     {
         static::addGlobalScope('company', function (Builder $builder) {

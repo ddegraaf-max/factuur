@@ -106,6 +106,28 @@ class Invoice extends Model
     public function demands(): HasMany { return $this->hasMany(PaymentDemand::class)->withoutGlobalScope('company')->orderByDesc('id'); }
 
     /**
+     * Wat er op de PDF van het factuurtotaal afgaat vóór "Te betalen": elke
+     * geboekte betaling, aanbetaling, verrekening en kwijtschelding, op datum.
+     *
+     * Tot 1.76.8 stonden hier alleen aanbetalingen. Een betaling die je boekte
+     * nadat de factuur was verstuurd, bleef op de PDF onzichtbaar: de herinnering
+     * zei "nog € 710 te betalen" en de bijgevoegde factuur "Te betalen € 1.210".
+     *
+     * Een creditnota toont alleen aanbetalingen, zoals altijd: haar verrekening
+     * met de factuur staat al op die factuur.
+     */
+    public function documentSettlements(): \Illuminate\Database\Eloquent\Collection
+    {
+        $query = $this->payments()->orderBy('paid_on')->orderBy('id');
+
+        if ($this->is_credit) {
+            $query->where('kind', 'advance');
+        }
+
+        return $query->get();
+    }
+
+    /**
      * Zorgt dat de factuur een geheime portaal-token heeft en geeft die terug.
      * Wordt aangeroepen bij het versturen (factuurmail en herinneringen).
      */

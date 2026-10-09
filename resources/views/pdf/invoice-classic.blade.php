@@ -199,19 +199,7 @@
       <tr><td class="label">{{ __('doc.vat') }} {{ rtrim(rtrim(number_format((float) $rate, 2, ',', '.'), '0'), ',') }}%</td><td class="value">{{ money($pdfSign * (float) $amount) }}</td></tr>
     @endforeach
   @endif
-  @php
-    $pdfAdvances = $invoice->payments()->where('kind', 'advance')->orderBy('paid_on')->get();
-    $pdfPayable = max((float) $invoice->total - (float) $pdfAdvances->sum('amount'), 0);
-  @endphp
-  @if($pdfAdvances->isNotEmpty())
-    <tr><td class="label">{{ __('doc.total_incl_vat') }}</td><td class="value">{{ money($pdfSign * $invoice->total) }}</td></tr>
-    @foreach($pdfAdvances as $adv)
-      <tr><td class="label">{{ $adv->reference ?: __('doc.already_settled') }} ({{ $adv->paid_on->format(market('date_format')) }})</td><td class="value">-&nbsp;{{ money($adv->amount) }}</td></tr>
-    @endforeach
-    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value">{{ money($pdfSign * $pdfPayable) }}</td></tr>
-  @else
-    <tr class="grand-row"><td>{{ __($invoice->is_credit ? 'doc.amount_credited' : 'doc.amount_due') }}</td><td class="value">{{ money($pdfSign * $invoice->total) }}</td></tr>
-  @endif
+  @include('pdf.partials.settlements', ['pdfLabelClass' => 'label', 'pdfValueClass' => 'value'])
 </table>
 @include('pdf.partials.vat-summary')
 

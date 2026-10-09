@@ -170,7 +170,10 @@ class WindykacjaService
     public function claim(Invoice $invoice, ?Carbon $on = null): array
     {
         $on = $on ?? now();
-        $principal = round(max(0, (float) ($invoice->amount_due ?? $invoice->open_amount ?? $invoice->total)), 2);
+        // Het openstaande bedrag, niet het factuurtotaal: een deelbetaling telt
+        // mee. (Tot 1.76.8 stond hier `amount_due ?? open_amount ?? total`, en de
+        // eerste twee bestaan niet op Invoice, dus het was altijd het totaal.)
+        $principal = round(max(0, (float) $invoice->remaining_amount), 2);
         $days = $this->daysOverdue($invoice, $on);
         $interest = $invoice->due_date
             ? $this->interestBetween($principal, $invoice->due_date, $on)
