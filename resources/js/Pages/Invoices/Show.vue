@@ -1697,7 +1697,9 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
   border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
   background: var(--surface-2);
 }
-.inv-preview iframe { display: block; width: 100%; height: 860px; border: none; }
+/* Zo hoog als een A4 op deze breedte (plus de werkbalk van de PDF-viewer),
+   zodat de hele pagina te zien is zonder scrollen binnen het kader. */
+.inv-preview iframe { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1.45; min-height: 700px; border: none; }
 
 /* Interne notitie */
 .note-badge {

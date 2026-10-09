@@ -382,8 +382,11 @@ const previewAttachment = computed(() =>
   font-size: 12.5px; font-weight: 600;
 }
 .pu-preview-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pu-preview-img { display: block; width: 100%; max-height: 640px; object-fit: contain; background: var(--surface-2); }
-.pu-preview-pdf { display: block; width: 100%; height: 640px; border: none; background: var(--surface-2); }
+.pu-preview-img { display: block; width: 100%; max-height: 85vh; object-fit: contain; background: var(--surface-2); }
+/* Zo hoog als een A4 op deze breedte (plus de werkbalk van de PDF-viewer), in
+   plaats van een vaste 640px: op een laptop staat de voorvertoning onder de
+   gegevens op volle breedte en was alleen het bovenste deel van de pagina te zien. */
+.pu-preview-pdf { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1.45; min-height: 560px; border: none; background: var(--surface-2); }
 
 .modal-overlay { position: fixed; inset: 0; background: rgba(28,25,23,0.4); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 60px 20px; overflow-y: auto; }
 .modal { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 480px; }

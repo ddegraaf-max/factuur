@@ -192,6 +192,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
           {{ $t('Bedrijven toevoegen') }}
         </button>
       </div>
+      <div class="table-scroll">
       <table class="data-table">
         <thead>
           <tr>
@@ -308,6 +309,7 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
           </template>
         </tbody>
       </table>
+      </div>
       <div v-if="sms.available && sms.free" class="card-body att-note" style="margin-top:0;">
         {{ $t('Sms: een bedrijf met een mobiel nummer kun je een sms sturen met de link naar de aanvraag. Afzender :sender; deze maand nog :n te versturen.', { sender: sms.sender, n: sms.remaining }) }}
       </div>
@@ -512,7 +514,12 @@ const copy = async (url) => { try { await navigator.clipboard.writeText(url); } 
 .bad { color: var(--warning); font-weight: 600; }
 .remarks { max-width: 280px; font-size: 13px; white-space: pre-wrap; }
 .sent-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); font-size: 12.5px; color: var(--text-3); }
-.actions { white-space: nowrap; }
+/* De knoppen mogen over twee regels; met nowrap liep de tabel op een laptop
+   uit de kaart en vielen "Afgezegd" en "Verwijder" buiten beeld. */
+.actions { white-space: normal; min-width: 200px; }
+.actions .btn { margin: 2px 0 2px 4px; }
+/* En als het dan nóg niet past: zijwaarts scrollen in plaats van afsnijden. */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .lnk { color: var(--brand); }
 .lnk-btn { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 12px; color: var(--brand); font-weight: 600; }
 .lnk-btn:disabled { color: var(--text-3); cursor: default; }
