@@ -341,6 +341,7 @@ class VatService
             'declaration_due' => $due,
             'unmarked' => $status === 'closed' && ! $filed && $now->gt($meta['deadline']),
             'days_left' => $due ? (int) $now->copy()->startOfDay()->diffInDays($meta['deadline']->copy()->startOfDay(), false) : null,
+            'end' => $meta['end']->toDateString(),
             'deadline' => $meta['deadline']->toDateString(),
             'deadline_label' => $meta['deadline']->translatedFormat('j F Y'),
             'rubrieken' => array_values($rub),
@@ -383,9 +384,17 @@ class VatService
         $due = null;
         $current = null;
 
+        // Btw-aangifte in EasyInvoice pas vanaf een datum (Btw → instellingen):
+        // tijdvakken die eerder eindigen tellen niet mee — geen melding op het
+        // dashboard, geen btw-kaart en geen herinneringsmail.
+        $from = $company->vat_filing_from?->toDateString();
+
         foreach ([$year - 1, $year] as $y) {
             $overview = $this->overview($company, $y, false);
             foreach ($overview['periods'] as $period) {
+                if ($from && $period['end'] < $from) {
+                    continue;
+                }
                 if (! $due && $period['declaration_due']) {
                     $due = $period;
                 }

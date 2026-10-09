@@ -108,6 +108,7 @@ const settingsForm = useForm({
   ob_number: '',
   ob_number_clear: false,
   vat_reminder_enabled: !!props.settings.vat_reminder_enabled,
+  vat_filing_from: props.settings.vat_filing_from || '',
 });
 const saveSettings = () => settingsForm.patch(route('vat.settings'), {
   preserveScroll: true, preserveState: false,
@@ -409,6 +410,12 @@ const saveSettings = () => settingsForm.patch(route('vat.settings'), {
               <div class="opt-sub">{{ $t('Twee weken en drie dagen vóór de deadline naar :email — alleen zolang het tijdvak niet als aangegeven is gemarkeerd.', { email: settings.reminder_email }) }}</div>
             </div>
           </label>
+          <div class="form-group" style="margin-top:14px;">
+            <label>{{ $t('Btw-aangifte in :brand vanaf', { brand: brand.name }) }} <span class="lbl-hint">{{ $t('(optioneel)') }}</span></label>
+            <input type="date" v-model="settingsForm.vat_filing_from" style="max-width:200px;">
+            <div class="hint">{{ $t('Doe je je btw tot een bepaald moment nog ergens anders? Vul dan de datum in vanaf wanneer :brand de aangifte voor je bijhoudt. Tijdvakken die eerder eindigen krijgen geen melding op het dashboard, geen btw-kaart en geen herinnering. Leeg laten = elk tijdvak telt.', { brand: brand.name }) }}</div>
+            <div v-if="settingsForm.errors.vat_filing_from" class="field-error">{{ settingsForm.errors.vat_filing_from }}</div>
+          </div>
         </div>
         <div class="modal-footer">
           <div></div>

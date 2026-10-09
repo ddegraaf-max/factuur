@@ -31,7 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 oktober 2026 · {{ brand('version_prefix') }} 1.76.8</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 oktober 2026 · {{ brand('version_prefix') }} 1.77.0</div>
+        <h2>Btw-aangifte pas vanaf een datum die jij kiest</h2>
+        <ul class="tl-list">
+          <li><b>Doe je je btw voorlopig nog ergens anders?</b> — bij Btw → instellingen vul je in vanaf wanneer {{ brand('name') }} de aangifte voor je bijhoudt, bijvoorbeeld 1 januari 2027. Tijdvakken die eerder eindigen krijgen geen gele melding op het dashboard, geen btw-kaart en geen herinneringsmail. Leeg laten betekent: elk tijdvak telt, zoals altijd.</li>
+          <li><b>Dashboard</b> — bij een factuur die deels is betaald staat onder het bedrag nu wat er nog openstaat, zodat het totaal "Openstaand" te volgen is.</li>
+          <li><b>Status hersteld</b> — facturen die vóór 1.76.9 met een "reeds ontvangen"-bedrag zijn verstuurd en daardoor op "verstuurd" bleven staan, staan nu op "deels betaald".</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">9 oktober 2026 · {{ brand('version_prefix') }} 1.76.8</div>
         <h2>Een geboekte betaling staat nu ook op de factuur-PDF</h2>
         <ul class="tl-list">
           <li><b>Te betalen klopt overal</b> — boek je een ontvangen bedrag op een verstuurde factuur, dan noemden de mail en de herinnering al het restant, maar de bijgevoegde PDF nog het volle bedrag. De PDF toont nu elke betaling, aanbetaling, verrekening en kwijtschelding onder het totaal, met daaronder wat er nog openstaat.</li>

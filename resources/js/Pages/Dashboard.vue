@@ -156,10 +156,18 @@ const greeting = () => {
       <div v-else class="kpi-card">
         <div class="kpi-label">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          {{ $t('Btw') }} {{ kpis.vat_period_label || ('Q' + kpis.quarter_number) }}
+          <template v-if="kpis.vat_from">{{ $t('Btw-aangifte') }}</template>
+          <template v-else>{{ $t('Btw') }} {{ kpis.vat_period_label || ('Q' + kpis.quarter_number) }}</template>
         </div>
-        <div class="kpi-value">{{ eur(kpis.vat_to_pay) }}</div>
-        <div class="kpi-meta">{{ kpis.vat_to_pay < 0 ? $t('Terug te ontvangen') : $t('Per saldo') }} · {{ $t('aangifte vóór :date', { date: kpis.quarter_deadline }) }}</div>
+        <!-- Btw-aangifte pas vanaf een latere datum (Btw → instellingen): geen bedragen, wel de datum. -->
+        <template v-if="kpis.vat_from">
+          <div class="kpi-value">—</div>
+          <div class="kpi-meta">{{ $t('bijgehouden vanaf :date', { date: kpis.vat_from }) }}</div>
+        </template>
+        <template v-else>
+          <div class="kpi-value">{{ eur(kpis.vat_to_pay) }}</div>
+          <div class="kpi-meta">{{ kpis.vat_to_pay < 0 ? $t('Terug te ontvangen') : $t('Per saldo') }} · {{ $t('aangifte vóór :date', { date: kpis.quarter_deadline }) }}</div>
+        </template>
       </div>
     </div>
 
@@ -190,7 +198,10 @@ const greeting = () => {
                 <td :data-label="$t('Klant')">{{ inv.customer_name }}</td>
                 <td :data-label="$t('Datum')">{{ inv.invoice_date }}</td>
                 <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" /></td>
-                <td class="num right" :data-label="$t('Bedrag')">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</td>
+                <td class="num right" :data-label="$t('Bedrag')">
+                  {{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}
+                  <div v-if="inv.remaining !== null && inv.remaining !== undefined" style="font-size:11.5px;color:var(--text-3);font-weight:400;">{{ $t('nog :amount open', { amount: eur(inv.remaining) }) }}</div>
+                </td>
               </tr>
             </tbody>
           </table>

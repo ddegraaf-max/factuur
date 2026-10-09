@@ -79,6 +79,7 @@ class VatController extends Controller
                 'has_ob_number' => filled($company->ob_number),
                 'ob_number_hint' => $this->maskObNumber($company->ob_number),
                 'vat_reminder_enabled' => (bool) $company->vat_reminder_enabled,
+                'vat_filing_from' => $company->vat_filing_from?->toDateString(),
                 'reminder_email' => $company->daily_notification_email ?: $company->email ?: auth()->user()->email,
             ],
             'mbz_url' => 'https://mijnzakelijk.belastingdienst.nl',
@@ -190,12 +191,20 @@ class VatController extends Controller
             'ob_number' => ['nullable', 'string', 'max:30'],
             'ob_number_clear' => ['nullable', 'boolean'],
             'vat_reminder_enabled' => ['nullable', 'boolean'],
+            // Vanaf wanneer EasyInvoice de aangifte bijhoudt; tijdvakken die
+            // vóór deze datum eindigen tellen niet mee (dashboard, kaart, mail).
+            'vat_filing_from' => ['nullable', 'date'],
         ]);
 
         $update = [
             'vat_period' => $data['vat_period'],
             'vat_reminder_enabled' => $request->boolean('vat_reminder_enabled'),
         ];
+
+        // Alleen aanpassen als het formulier het veld meestuurt (de Poolse pagina kent het niet).
+        if ($request->has('vat_filing_from')) {
+            $update['vat_filing_from'] = $data['vat_filing_from'] ?: null;
+        }
 
         if ($request->boolean('ob_number_clear')) {
             $update['ob_number'] = null;

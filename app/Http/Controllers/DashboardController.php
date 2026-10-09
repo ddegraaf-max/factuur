@@ -56,6 +56,9 @@ class DashboardController extends Controller
         $vatPeriodLabel = $vatCurrent['label'] ?? '';
         $quarterNumber = ceil(now()->month / 3);
         $quarterDeadline = $vatCurrent ? Carbon::parse($vatCurrent['deadline']) : now()->lastOfQuarter()->addMonth()->endOfMonth();
+        // Btw-aangifte pas vanaf een latere datum? Dan geen kaart met bedragen, wel de datum.
+        $vatFrom = auth()->user()->company->vat_filing_from;
+        $vatFromLabel = ($vatFrom && ! $vatCurrent && $vatFrom->isFuture()) ? $vatFrom->translatedFormat('j M Y') : null;
 
         // Recent invoices
         $recentInvoices = Invoice::with('customer')
@@ -71,6 +74,8 @@ class DashboardController extends Controller
                 'paused' => $i->isPaused(),
                 'is_credit' => (bool) $i->is_credit,
                 'total' => (float) $i->total,
+                // Bij een deelbetaling: wat er nog openstaat, onder het factuurbedrag.
+                'remaining' => $i->status === 'partial' ? round((float) $i->total - (float) $i->paid_total, 2) : null,
             ]);
 
         // Offertes: wat wacht op een reactie, wat is geaccepteerd maar nog
@@ -159,6 +164,8 @@ class DashboardController extends Controller
                 'vat_period_label' => $vatPeriodLabel,
                 'quarter_number' => $quarterNumber,
                 'quarter_deadline' => $quarterDeadline->translatedFormat('j M Y'),
+                // Btw-aangifte pas vanaf een latere datum: de kaart toont dan die datum in plaats van bedragen.
+                'vat_from' => $vatFromLabel,
                 // Kleineondernemersregeling: omzet van dit jaar tegenover de grens, in plaats van btw.
                 'kor' => \App\Support\Kor::applies(auth()->user()->company) ? \App\Support\Kor::status(auth()->user()->company) : null,
             ],
