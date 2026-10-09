@@ -47,7 +47,7 @@ const dash = computed(() => (fraction.value === null ? '' : `${(fraction.value *
 
 <template>
   <span v-if="paused" class="pill pill-paused" :title="`${label} · ${$t('Op pauze: geen herinneringen, aanmaningen of incasso')}`">{{ $t('Op pauze') }}</span>
-  <span v-else :class="['pill', `pill-${status}`]" :title="percent !== null ? $t(':p% betaald, de rest staat nog open', { p: percent }) : undefined">
+  <span v-else :class="['pill', `pill-${status}`, { 'has-pie': fraction !== null }]" :title="percent !== null ? $t(':p% betaald, de rest staat nog open', { p: percent }) : undefined">
     <svg v-if="fraction !== null" class="pill-pie" viewBox="0 0 14 14" width="12" height="12" aria-hidden="true">
       <circle cx="7" cy="7" :r="R" fill="none" stroke="#DC2626" :stroke-width="R * 2" />
       <circle cx="7" cy="7" :r="R" fill="none" stroke="#15803D" :stroke-width="R * 2" :stroke-dasharray="dash" transform="rotate(-90 7 7)" />
@@ -57,5 +57,7 @@ const dash = computed(() => (fraction.value === null ? '' : `${(fraction.value *
 </template>
 
 <style scoped>
-.pill-pie { display: inline-block; vertical-align: -1px; margin-right: 5px; flex: none; }
+.pill-pie { display: inline-block; vertical-align: -1px; flex: none; }
+/* Het taartje vervangt het standaardstipje van het label; anders staan er twee bolletjes. */
+.pill.has-pie::before { display: none; }
 </style>
