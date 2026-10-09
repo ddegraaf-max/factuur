@@ -74,6 +74,7 @@ class DashboardController extends Controller
                 'paused' => $i->isPaused(),
                 'is_credit' => (bool) $i->is_credit,
                 'total' => (float) $i->total,
+                'paid_total' => (float) $i->paid_total,
                 // Bij een deelbetaling: wat er nog openstaat, onder het factuurbedrag.
                 'remaining' => $i->status === 'partial' ? round((float) $i->total - (float) $i->paid_total, 2) : null,
             ]);

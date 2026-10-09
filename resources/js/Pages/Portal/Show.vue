@@ -65,7 +65,7 @@ const returnedUnpaid = computed(() =>
           </div>
         </div>
         <div class="pi-head-right">
-          <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
+          <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" :paid="Number(invoice.paid_total)" :total="Number(invoice.total)" />
           <div class="pi-total">{{ eur(signed(invoice.total)) }}</div>
           <div v-if="invoice.paid_total > 0 && invoice.remaining > 0" class="pi-remaining">
             {{ $t(':paid betaald · nog :remaining open', { paid: eur(invoice.paid_total), remaining: eur(invoice.remaining) }) }}

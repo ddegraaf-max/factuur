@@ -35,7 +35,7 @@
         <h2>Btw-aangifte pas vanaf een datum die jij kiest</h2>
         <ul class="tl-list">
           <li><b>Doe je je btw voorlopig nog ergens anders?</b> — bij Btw → instellingen vul je in vanaf wanneer {{ brand('name') }} de aangifte voor je bijhoudt, bijvoorbeeld 1 januari 2027. Tijdvakken die eerder eindigen krijgen geen gele melding op het dashboard, geen btw-kaart en geen herinneringsmail. Leeg laten betekent: elk tijdvak telt, zoals altijd.</li>
-          <li><b>Dashboard</b> — bij een factuur die deels is betaald staat onder het bedrag nu wat er nog openstaat, zodat het totaal "Openstaand" te volgen is.</li>
+          <li><b>Dashboard</b> — bij een factuur die deels is betaald staat onder het bedrag nu wat er nog openstaat, zodat het totaal "Openstaand" te volgen is. Het label "Deels betaald" heeft sinds 1.77.1 een taartje: groen is binnen, rood staat nog open; beweeg eroverheen voor het percentage.</li>
           <li><b>Status hersteld</b> — facturen die vóór 1.76.9 met een "reeds ontvangen"-bedrag zijn verstuurd en daardoor op "verstuurd" bleven staan, staan nu op "deels betaald".</li>
         </ul>
       </article>

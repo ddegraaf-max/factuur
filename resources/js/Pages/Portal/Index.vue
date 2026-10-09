@@ -127,7 +127,7 @@ const open = (inv) => router.get(route('portal.invoice', inv.token));
               <div class="portal-row-total">{{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}</div>
               <div v-if="inv.paid_total > 0 && inv.remaining > 0" class="portal-row-remaining">{{ $t('nog :amount open', { amount: eur(inv.remaining) }) }}</div>
             </div>
-            <StatusPill :status="inv.status" :days-overdue="inv.days_overdue" />
+            <StatusPill :status="inv.status" :days-overdue="inv.days_overdue" :paid="Number(inv.paid_total)" :total="Number(inv.total)" />
             <svg class="portal-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
         </button>

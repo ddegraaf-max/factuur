@@ -197,7 +197,7 @@ const greeting = () => {
                 <td class="num cell-primary">{{ inv.number || '—' }}</td>
                 <td :data-label="$t('Klant')">{{ inv.customer_name }}</td>
                 <td :data-label="$t('Datum')">{{ inv.invoice_date }}</td>
-                <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" /></td>
+                <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" :paid="inv.paid_total" :total="inv.total" /></td>
                 <td class="num right" :data-label="$t('Bedrag')">
                   {{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}
                   <div v-if="inv.remaining !== null && inv.remaining !== undefined" style="font-size:11.5px;color:var(--text-3);font-weight:400;">{{ $t('nog :amount open', { amount: eur(inv.remaining) }) }}</div>

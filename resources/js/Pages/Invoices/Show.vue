@@ -622,7 +622,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div>
             <div class="inv-number">{{ invoice.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-              <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" />
+              <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" :paid="Number(invoice.paid_total)" :total="Number(invoice.total)" />
               <StatusPill v-if="paused" :status="invoice.status" :days-overdue="invoice.days_overdue" paused />
               <span v-if="peppol?.sent_at_label" class="peppol-chip on" :title="$t('Afgeleverd via Peppol op :date', { date: peppol.sent_at_label })">
                 ⚡ {{ $t('Via Peppol afgeleverd') }}
