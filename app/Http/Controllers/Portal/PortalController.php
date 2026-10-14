@@ -73,6 +73,7 @@ class PortalController extends Controller
                 $expired => __('Verlopen'),
                 $quote->status === 'accepted' => __('Geaccepteerd'),
                 $quote->status === 'rejected' => __('Afgewezen'),
+                $quote->status === 'withdrawn' => __('Niet meer geldig'),
                 default => __('Wacht op uw reactie'),
             },
             'awaiting' => ! $expired && $quote->status === 'sent',

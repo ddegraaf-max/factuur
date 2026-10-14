@@ -143,4 +143,18 @@ return [
     'mail_accept_attachment' => 'Oferta jest załączona jako PDF — prosimy zachować ją w dokumentacji.',
     'mail_accept_attachment_signed' => 'Oferta, wraz z Państwa podpisem elektronicznym, jest załączona jako PDF — prosimy zachować ją w dokumentacji.',
     'mail_view_quote_online' => 'Zobacz ofertę online',
+    // Oferta wycofana przez nadawcę, ewentualnie zastąpiona nową.
+    'mail_withdrawn_subject' => 'Oferta :number została wycofana',
+    'mail_withdrawn_title' => 'Oferta :number została wycofana',
+    'mail_withdrawn_intro' => 'Oferta <strong>:number</strong> firmy :company z dnia :date została wycofana. Prosimy uznać ją za nieważną; nie można z niej wywodzić żadnych praw.',
+    'mail_withdrawn_replaced' => 'Zastępuje ją oferta <strong>:replacement</strong>.',
+    'mail_withdrawn_replaced_received' => 'Tę ofertę otrzymali Państwo od nas osobno.',
+    'mail_withdrawn_replaced_soon' => 'Wkrótce otrzymają Państwo od nas nową ofertę.',
+    'mail_withdrawn_note' => 'Wyjaśnienie',
+    'mail_withdrawn_quote' => 'Wycofana oferta',
+    'mail_withdrawn_date' => 'Wycofana dnia',
+    'mail_withdrawn_replacement' => 'Zastąpiona przez',
+    'mail_withdrawn_view_replacement' => 'Zobacz nową ofertę online',
+    'mail_withdrawn_questions' => 'W razie pytań wystarczy odpowiedzieć na tego e-maila.',
+    'stamp_withdrawn' => 'WYCOFANA',
 ];

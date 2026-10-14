@@ -42,8 +42,11 @@ class PortalQuoteController extends Controller
             return redirect()->route('portal.verify.show');
         }
 
-        $quote->load('lines');
+        $quote->load('lines', 'replacedBy');
         $company = $quote->brandedCompany();
+        // Vervangen door een nieuwe offerte die al bij de klant ligt? Dan daarheen linken.
+        $replacement = $quote->replacedBy;
+        $replacementLive = $replacement && in_array($replacement->status, ['sent', 'expired', 'accepted'], true);
 
         return Inertia::render('Portal/QuoteShow', [
             'quote' => [
@@ -77,6 +80,12 @@ class PortalQuoteController extends Controller
                 'signed_at_label' => $quote->signed_at?->translatedFormat('j F Y, H:i'),
                 'accepted_at_label' => $quote->accepted_at?->translatedFormat('j F Y'),
                 'rejected_at_label' => $quote->rejected_at?->translatedFormat('j F Y'),
+                'withdrawn_at_label' => $quote->withdrawn_at?->translatedFormat('j F Y'),
+                'withdrawal_note' => $quote->withdrawal_note,
+                'replacement' => $replacementLive ? [
+                    'number' => $replacement->number,
+                    'url' => $replacement->portalUrl(),
+                ] : null,
             ],
             'company' => [
                 'name' => $company?->name,

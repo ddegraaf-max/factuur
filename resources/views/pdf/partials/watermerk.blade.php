@@ -26,6 +26,8 @@
         'aanmaning'    => 'aanmaning',
         'credit'       => 'gecrediteerd', 'credit_note'  => 'gecrediteerd',
         'credited'     => 'gecrediteerd', 'gecrediteerd' => 'gecrediteerd',
+        // Offerte die de afzender heeft laten vervallen (eigen tekst per documenttaal).
+        'withdrawn'    => 'ingetrokken',  'ingetrokken'  => 'ingetrokken',
     ];
 
     // Tekst + kleur. De kleur is de merkkleur op 48% over wit.
@@ -37,6 +39,7 @@
         'herinnering'  => [__('HERINNERING'),  '#FFBF90'],
         'aanmaning'    => [__('AANMANING'),    '#E39892'],
         'gecrediteerd' => [__('GECREDITEERD'), '#B8BABD'],
+        'ingetrokken'  => [__('doc.stamp_withdrawn'), '#E2AA85'],
     ];
 
     // Geen stempel bij sent / verzonden / open: een gewone openstaande

@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 oktober 2026 · {{ brand('version_prefix') }} 1.77.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 14 oktober 2026 · {{ brand('version_prefix') }} 1.78.0</div>
+        <h2>Een offerte laten vervallen — en de klant netjes informeren</h2>
+        <ul class="tl-list">
+          <li><b>Nieuwe offerte in plaats van de oude?</b> — bij een verstuurde of verlopen offerte staat nu de knop "Vervallen". Kies welke offerte hem vervangt (standaard de nieuwste voor dezelfde klant), zet er desgewenst een toelichting bij, en de klant krijgt een korte mail: de oude offerte geldt niet meer, dit is de nieuwe. Zo lijken twee offertes nooit dubbel. De oude blijft met zijn nummer bewaard, krijgt het stempel VERVALLEN op de PDF en telt niet meer mee als openstaand voorstel.</li>
+          <li><b>Klantenportaal</b> — via de ondertekenlink van de vervallen offerte ziet de klant dat hij niet meer geldt, met een link naar de nieuwe; ondertekenen kan niet meer. Nog niet gemaild? Dat kan later alsnog met "Klant informeren". Per ongeluk? "Opnieuw aanbieden" zet hem terug naar concept.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">9 oktober 2026 · {{ brand('version_prefix') }} 1.77.0</div>
         <h2>Btw-aangifte pas vanaf een datum die jij kiest</h2>
         <ul class="tl-list">
           <li><b>Doe je je btw voorlopig nog ergens anders?</b> — bij Btw → instellingen vul je in vanaf wanneer {{ brand('name') }} de aangifte voor je bijhoudt, bijvoorbeeld 1 januari 2027. Tijdvakken die eerder eindigen krijgen geen gele melding op het dashboard, geen btw-kaart en geen herinneringsmail. Leeg laten betekent: elk tijdvak telt, zoals altijd.</li>

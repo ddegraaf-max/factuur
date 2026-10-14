@@ -103,7 +103,7 @@ class SearchController extends Controller
 
     private function status(string $status): string
     {
-        $label = ['draft' => 'concept', 'sent' => 'verstuurd', 'partial' => 'deels betaald', 'overdue' => 'vervallen', 'paid' => 'betaald', 'incasso' => 'incasso', 'cancelled' => 'geannuleerd', 'accepted' => 'geaccepteerd', 'rejected' => 'afgewezen', 'expired' => 'verlopen'][$status] ?? null;
+        $label = ['draft' => 'concept', 'sent' => 'verstuurd', 'partial' => 'deels betaald', 'overdue' => 'vervallen', 'paid' => 'betaald', 'incasso' => 'incasso', 'cancelled' => 'geannuleerd', 'accepted' => 'geaccepteerd', 'rejected' => 'afgewezen', 'expired' => 'verlopen', 'withdrawn' => 'vervallen'][$status] ?? null;
 
         return $label === null ? $status : (string) __($label);
     }

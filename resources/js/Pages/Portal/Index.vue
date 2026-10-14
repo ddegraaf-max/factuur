@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 // Offertes: pil-kleuren als bij facturen; open offertes bovenaan (daar wordt op gewacht).
-const quotePill = (q) => ({ sent: 'pill-sent', accepted: 'pill-paid', rejected: 'pill-overdue', expired: 'pill-partial' }[q.status] ?? 'pill-draft');
+const quotePill = (q) => ({ sent: 'pill-sent', accepted: 'pill-paid', rejected: 'pill-overdue', expired: 'pill-partial', withdrawn: 'pill-cancelled' }[q.status] ?? 'pill-draft');
 const quotesFirst = computed(() => props.quotes.some((q) => q.awaiting));
 const openQuote = (q) => router.get(route('portal.quote', q.token));
 

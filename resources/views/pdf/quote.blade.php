@@ -69,6 +69,10 @@
 </style>
 </head>
 <body>
+{{-- Een vervallen offerte krijgt een stempel, zodat hij nooit voor geldig doorgaat. --}}
+@if($quote->status === 'withdrawn')
+  @include('pdf.partials.watermerk', ['watermarkStatus' => 'withdrawn'])
+@endif
 
 <table class="header">
   <tr>

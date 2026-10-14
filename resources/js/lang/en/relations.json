@@ -347,5 +347,10 @@
   ":n van 100": ":n out of 100",
   "gecontroleerd :date": "checked :date",
   "Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Voor een particulier zijn er verder geen openbare bronnen. Jij beslist.": "An indication based on the payment behaviour with you and the insolvency register; not a credit report. For a private person there are no other public sources. You decide.",
-  "Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.": "An indication based on the payment behaviour with you and public sources; not a credit report. You decide."
+  "Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.": "An indication based on the payment behaviour with you and public sources; not a credit report. You decide.",
+  "Deze offerte is op :date komen te vervallen en geldt niet meer.": "This quotation was withdrawn on :date and is no longer valid.",
+  "Deze offerte is komen te vervallen en geldt niet meer.": "This quotation has been withdrawn and is no longer valid.",
+  "In plaats daarvan geldt offerte :number.": "Quotation :number applies instead.",
+  "Bekijk offerte :number": "View quotation :number",
+  "Vragen? Neem contact op met :company.": "Questions? Contact :company."
 }

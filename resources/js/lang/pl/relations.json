@@ -347,5 +347,10 @@
   ":n van 100": ":n na 100",
   "gecontroleerd :date": "sprawdzono :date",
   "Een indicatie op basis van het betaalgedrag bij jou en het insolventieregister; geen kredietrapport. Voor een particulier zijn er verder geen openbare bronnen. Jij beslist.": "Wskazówka na podstawie historii płatności u Ciebie i rejestru upadłości; to nie raport kredytowy. Dla osoby prywatnej nie ma innych publicznych źródeł. Ty decydujesz.",
-  "Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.": "Wskazówka na podstawie historii płatności u Ciebie i publicznych źródeł; to nie raport kredytowy. Ty decydujesz."
+  "Een indicatie op basis van het betaalgedrag bij jou en openbare bronnen; geen kredietrapport. Jij beslist.": "Wskazówka na podstawie historii płatności u Ciebie i publicznych źródeł; to nie raport kredytowy. Ty decydujesz.",
+  "Deze offerte is op :date komen te vervallen en geldt niet meer.": "Ta oferta została wycofana dnia :date i już nie obowiązuje.",
+  "Deze offerte is komen te vervallen en geldt niet meer.": "Ta oferta została wycofana i już nie obowiązuje.",
+  "In plaats daarvan geldt offerte :number.": "Zamiast niej obowiązuje oferta :number.",
+  "Bekijk offerte :number": "Zobacz ofertę :number",
+  "Vragen? Neem contact op met :company.": "Pytania? Skontaktuj się z :company."
 }

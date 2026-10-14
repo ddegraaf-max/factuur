@@ -20,6 +20,8 @@ class Quote extends Model
         'accepted' => 'Geaccepteerd',
         'rejected' => 'Afgewezen',
         'expired' => 'Verlopen',
+        // Door de afzender ingetrokken, bijv. vervangen door een nieuwe offerte.
+        'withdrawn' => 'Vervallen',
     ];
 
     protected $fillable = [
@@ -33,6 +35,7 @@ class Quote extends Model
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
         'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
         'accept_mail_sent_at', 'accept_mail_sent_to',
+        'withdrawn_at', 'withdrawal_note', 'replaced_by_quote_id', 'withdrawal_mail_sent_at', 'withdrawal_mail_sent_to',
     ];
 
     protected $casts = [
@@ -44,6 +47,8 @@ class Quote extends Model
         'rejected_at' => 'datetime',
         'signed_at' => 'datetime',
         'accept_mail_sent_at' => 'datetime',
+        'withdrawn_at' => 'datetime',
+        'withdrawal_mail_sent_at' => 'datetime',
         'subtotal' => 'decimal:2',
         'vat_total' => 'decimal:2',
         'total' => 'decimal:2',
@@ -72,6 +77,8 @@ class Quote extends Model
     public function lines(): HasMany { return $this->hasMany(QuoteLine::class)->orderBy('sort_order'); }
     public function invoice(): BelongsTo { return $this->belongsTo(Invoice::class, 'converted_invoice_id')->withoutGlobalScope('company'); }
     public function installments(): HasMany { return $this->hasMany(QuoteInstallment::class)->orderBy('sort_order'); }
+    /** De offerte die deze (vervallen) offerte vervangt. */
+    public function replacedBy(): BelongsTo { return $this->belongsTo(Quote::class, 'replaced_by_quote_id')->withoutGlobalScope('company'); }
     public function attachments(): \Illuminate\Database\Eloquent\Relations\MorphMany { return $this->morphMany(Attachment::class, 'attachable'); }
 
     /** Geheime link voor het klantenportaal (bekijken en ondertekenen). */

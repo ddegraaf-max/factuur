@@ -60,6 +60,7 @@ class QuoteController extends Controller
                 'accepted' => Quote::where('status', 'accepted')->count(),
                 'rejected' => Quote::where('status', 'rejected')->count(),
                 'expired' => Quote::where('status', 'expired')->count(),
+                'withdrawn' => Quote::where('status', 'withdrawn')->count(),
             ],
         ]);
     }
@@ -142,7 +143,7 @@ class QuoteController extends Controller
 
     public function show(Quote $quote): Response
     {
-        $quote->load('lines', 'customer', 'invoice', 'installments.invoice', 'attachments');
+        $quote->load('lines', 'customer', 'invoice', 'installments.invoice', 'attachments', 'replacedBy');
 
         // Termijnfacturen: eerstvolgende open termijn (factureren op volgorde).
         $nextInstallmentId = $quote->installments->firstWhere('invoice_id', null)?->id;
@@ -159,6 +160,15 @@ class QuoteController extends Controller
                 'brand_profile_name' => $quote->brandProfile?->name,
                 'signed_at_label' => $quote->signed_at?->translatedFormat('j F Y, H:i'),
                 'accept_mail_sent_at_label' => $quote->accept_mail_sent_at?->translatedFormat('j M Y, H:i'),
+                'withdrawn_at_label' => $quote->withdrawn_at?->translatedFormat('j M Y'),
+                'withdrawal_mail_sent_at_label' => $quote->withdrawal_mail_sent_at?->translatedFormat('j M Y, H:i'),
+                'replaced_by' => $quote->replacedBy ? [
+                    'id' => $quote->replacedBy->id,
+                    'number' => $quote->replacedBy->number,
+                    'status' => $quote->replacedBy->status,
+                ] : null,
+                // Andere offertes van deze klant die deze kunnen vervangen (knop "Vervallen").
+                'replacement_options' => in_array($quote->status, ['sent', 'expired'], true) ? $this->replacementOptions($quote) : [],
                 'portal_url' => $quote->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
                 'send_email' => $quote->customer_email ?: $quote->customer?->email,
@@ -321,6 +331,60 @@ class QuoteController extends Controller
         return back()->with('flash', __('Offerte teruggezet naar concept met een nieuwe geldigheidsdatum. Pas hem aan als je wilt en verstuur hem opnieuw.'));
     }
 
+    /** Offerte laten vervallen (bijv. vervangen door een nieuwe) en de klant desgewenst informeren. */
+    public function withdraw(Request $request, Quote $quote): RedirectResponse
+    {
+        $data = $request->validate([
+            'replaced_by_quote_id' => ['nullable', 'integer'],
+            'note' => ['nullable', 'string', 'max:1000'],
+            'notify' => ['nullable', 'boolean'],
+        ]);
+
+        // Via de company-scope: alleen een eigen offerte kan vervanger zijn.
+        $replacement = ! empty($data['replaced_by_quote_id']) ? Quote::find($data['replaced_by_quote_id']) : null;
+        if (! empty($data['replaced_by_quote_id']) && ! $replacement) {
+            return back()->withErrors(['quote' => __('De gekozen vervangende offerte bestaat niet (meer).')]);
+        }
+
+        try {
+            $quote = $this->manager->withdraw($quote, $replacement, $data['note'] ?? null);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        }
+
+        $flash = __('Offerte :number is vervallen.', ['number' => $quote->number]);
+
+        if ($request->boolean('notify')) {
+            try {
+                $this->manager->sendWithdrawalNotice($quote);
+                $flash .= ' ' . __('De klant is gemaild op :email.', ['email' => $quote->customer_email]);
+            } catch (\DomainException $e) {
+                $flash .= ' ' . __('Geen mail naar de klant: :reason', ['reason' => $e->getMessage()]);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::error('Mail offerte vervallen mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+                $flash .= ' ' . __('De mail naar de klant is niet gelukt — probeer het straks via "Klant informeren".');
+            }
+        }
+
+        return back()->with('flash', $flash);
+    }
+
+    /** De klant (opnieuw) laten weten dat de offerte is vervallen. */
+    public function notifyWithdrawn(Quote $quote): RedirectResponse
+    {
+        try {
+            $this->manager->sendWithdrawalNotice($quote, force: true);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Mail offerte vervallen (handmatig) mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+
+            return back()->withErrors(['quote' => __('Versturen is niet gelukt. Probeer het later opnieuw.')]);
+        }
+
+        return back()->with('flash', __('De klant is gemaild op :email.', ['email' => $quote->customer_email]));
+    }
+
     public function convert(Quote $quote): RedirectResponse
     {
         try {
@@ -359,6 +423,29 @@ class QuoteController extends Controller
             : __('Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.', ['number' => $fresh->number]);
 
         return redirect()->route('quotes.show', $fresh)->with('flash', $message);
+    }
+
+    /** Andere offertes van dezelfde klant die deze kunnen vervangen (nieuwste eerst). */
+    protected function replacementOptions(Quote $quote): array
+    {
+        if (! $quote->customer_id) {
+            return [];
+        }
+
+        return Quote::where('customer_id', $quote->customer_id)
+            ->where('id', '!=', $quote->id)
+            ->whereNotIn('status', ['rejected', 'withdrawn'])
+            ->orderByDesc('id')
+            ->limit(20)
+            ->get()
+            ->map(fn (Quote $q) => [
+                'id' => $q->id,
+                'number' => $q->number,
+                'label' => ($q->number ?: __('concept')) . ' · ' . $q->quote_date->translatedFormat('j M Y') . ' · ' . money((float) $q->total),
+                'status' => $q->status,
+                'status_label' => $q->status_label,
+                'newer' => $q->id > $quote->id,
+            ])->values()->all();
     }
 
     protected function formData(?int $projectId = null): array

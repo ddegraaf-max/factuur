@@ -31,6 +31,7 @@ class ActivityLog extends Model
         'accepted' => 'Geaccepteerd',
         'rejected' => 'Afgewezen',
         'reopened' => 'Opnieuw aangeboden',
+        'withdrawn' => 'Vervallen',
         'paid' => 'Betaald',
         'login' => 'Ingelogd',
         'logout' => 'Uitgelogd',

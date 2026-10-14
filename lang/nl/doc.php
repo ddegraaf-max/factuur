@@ -141,4 +141,18 @@ return [
     'mail_accept_attachment' => 'De offerte is als PDF bijgevoegd — bewaar deze voor uw administratie.',
     'mail_accept_attachment_signed' => 'De offerte, inclusief uw digitale handtekening, is als PDF bijgevoegd — bewaar deze voor uw administratie.',
     'mail_view_quote_online' => 'Bekijk de offerte online',
+    // Offerte vervallen (ingetrokken door de afzender), met eventueel de vervanger.
+    'mail_withdrawn_subject' => 'Offerte :number is komen te vervallen',
+    'mail_withdrawn_title' => 'Offerte :number is komen te vervallen',
+    'mail_withdrawn_intro' => 'Offerte <strong>:number</strong> van :company van :date is komen te vervallen. U kunt deze als niet verzonden beschouwen; er kunnen geen rechten meer aan worden ontleend.',
+    'mail_withdrawn_replaced' => 'In plaats daarvan geldt offerte <strong>:replacement</strong>.',
+    'mail_withdrawn_replaced_received' => 'Die heeft u apart van ons ontvangen.',
+    'mail_withdrawn_replaced_soon' => 'U ontvangt van ons binnenkort een nieuwe offerte.',
+    'mail_withdrawn_note' => 'Toelichting',
+    'mail_withdrawn_quote' => 'Vervallen offerte',
+    'mail_withdrawn_date' => 'Vervallen op',
+    'mail_withdrawn_replacement' => 'Vervangen door',
+    'mail_withdrawn_view_replacement' => 'Bekijk de nieuwe offerte online',
+    'mail_withdrawn_questions' => 'Heeft u vragen? Beantwoord dan gewoon deze e-mail.',
+    'stamp_withdrawn' => 'VERVALLEN',
 ];

@@ -74,7 +74,7 @@ const amount = (n) => (n < 0 ? '− ' : '') + eur(Math.abs(n || 0));
 // Offertestatus in dezelfde pil-kleuren als op de offertepagina.
 const quotePill = (q) => {
   if (q.status === 'sent' && q.is_expired) return 'pill-partial';
-  return { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', rejected: 'pill-overdue', expired: 'pill-partial' }[q.status] ?? 'pill-draft';
+  return { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', rejected: 'pill-overdue', expired: 'pill-partial', withdrawn: 'pill-cancelled' }[q.status] ?? 'pill-draft';
 };
 const quoteLabel = (q) => (q.status === 'sent' && q.is_expired ? t('Verlopen') : q.status_label);
 

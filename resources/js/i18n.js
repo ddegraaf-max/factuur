@@ -29,6 +29,9 @@ export function locale() {
 export function t(text, params) {
   const dict = dictionaries[current];
   let out = (dict && Object.prototype.hasOwnProperty.call(dict, text)) ? dict[text] : text;
+  // Context achter een '|' (bijv. 'Vervallen|offerte') houdt gelijke Nederlandse woorden
+  // met een andere vertaling uit elkaar; zonder vertaling valt de context gewoon weg.
+  if (out === text && text.includes('|')) out = text.slice(0, text.indexOf('|'));
   if (params) {
     for (const [key, value] of Object.entries(params)) {
       out = out.split(':' + key).join(String(value));

@@ -80,7 +80,7 @@ const unlink = (type, id) => {
 };
 const candidateList = computed(() => (linking.value ? props.candidates[candidateKey[linking.value]] || [] : []));
 
-const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', paid: 'pill-paid', partial: 'pill-partial', overdue: 'pill-overdue', open: 'pill-sent', awarded: 'pill-paid', closed: 'pill-cancelled', rejected: 'pill-cancelled', expired: 'pill-cancelled', cancelled: 'pill-cancelled', incasso: 'pill-overdue' };
+const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', paid: 'pill-paid', partial: 'pill-partial', overdue: 'pill-overdue', open: 'pill-sent', awarded: 'pill-paid', closed: 'pill-cancelled', rejected: 'pill-cancelled', expired: 'pill-cancelled', withdrawn: 'pill-cancelled', cancelled: 'pill-cancelled', incasso: 'pill-overdue' };
 </script>
 
 <template>

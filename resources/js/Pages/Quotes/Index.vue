@@ -38,6 +38,7 @@ const chips = [
   { key: 'accepted', label: t('Geaccepteerd') },
   { key: 'rejected', label: t('Afgewezen') },
   { key: 'expired', label: t('Verlopen') },
+  { key: 'withdrawn', label: t('Vervallen|offerte') },
 ];
 
 const pillClass = (status) => ({
@@ -46,6 +47,7 @@ const pillClass = (status) => ({
   accepted: 'pill-paid',
   rejected: 'pill-overdue',
   expired: 'pill-partial',
+  withdrawn: 'pill-cancelled',
 }[status] ?? 'pill-draft');
 </script>
 

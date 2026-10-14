@@ -313,8 +313,8 @@ class QuoteManager
      */
     public function reopen(Quote $quote): Quote
     {
-        if (! in_array($quote->status, ['rejected', 'expired'], true)) {
-            throw new \DomainException(__('Alleen een afgewezen of verlopen offerte kun je opnieuw aanbieden.'));
+        if (! in_array($quote->status, ['rejected', 'expired', 'withdrawn'], true)) {
+            throw new \DomainException(__('Alleen een afgewezen, verlopen of vervallen offerte kun je opnieuw aanbieden.'));
         }
         if ($quote->converted_invoice_id) {
             throw new \DomainException(__('Deze offerte is al omgezet in een factuur.'));
@@ -336,10 +336,105 @@ class QuoteManager
             'signed_email' => null,
             'accept_mail_sent_at' => null,
             'accept_mail_sent_to' => null,
+            'withdrawn_at' => null,
+            'withdrawal_note' => null,
+            'replaced_by_quote_id' => null,
+            'withdrawal_mail_sent_at' => null,
+            'withdrawal_mail_sent_to' => null,
         ])->save();
         \App\Support\Audit::log('reopened', $quote, __(':label opnieuw aangeboden (terug naar concept)', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
 
         return $quote->fresh();
+    }
+
+    /**
+     * Een verstuurde (of verlopen) offerte laten vervallen, bijvoorbeeld omdat
+     * er een nieuwe voor in de plaats komt. De klant kan hem daarna niet meer
+     * ondertekenen via het portaal en hij telt niet meer als open voorstel.
+     * Nummer en portaallink blijven; het logboek bewaart de historie.
+     */
+    public function withdraw(Quote $quote, ?Quote $replacement = null, ?string $note = null): Quote
+    {
+        if (! in_array($quote->status, ['sent', 'expired'], true)) {
+            throw new \DomainException(__('Alleen een verstuurde of verlopen offerte kun je laten vervallen. Een concept verwijder je gewoon.'));
+        }
+        if ($replacement && (
+            $replacement->id === $quote->id
+            || (int) $replacement->company_id !== (int) $quote->company_id
+            || in_array($replacement->status, ['rejected', 'withdrawn'], true)
+        )) {
+            throw new \DomainException(__('Kies een andere offerte als vervanger: deze is afgewezen of zelf vervallen.'));
+        }
+
+        $quote->forceFill([
+            'status' => 'withdrawn',
+            'withdrawn_at' => now(),
+            'withdrawal_note' => filled($note) ? trim($note) : null,
+            'replaced_by_quote_id' => $replacement?->id,
+            'accepted_at' => null,
+            'rejected_at' => null,
+        ])->save();
+
+        \App\Support\Audit::log('withdrawn', $quote, $replacement
+            ? __(':label vervallen, vervangen door :replacement', ['label' => \App\Support\Audit::label($quote), 'replacement' => $replacement->number ?: __('een concept')])
+            : __(':label vervallen', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
+
+        return $quote->fresh();
+    }
+
+    /** Waarom de klant (nu) niet over het vervallen kan worden gemaild — of null als het kan. */
+    public function withdrawalNoticeBlocker(Quote $quote, bool $force = false): ?string
+    {
+        if ($quote->status !== 'withdrawn') {
+            return __('Deze offerte is niet vervallen.');
+        }
+        if (! $quote->customer_email) {
+            return __('Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.');
+        }
+        if ($quote->withdrawal_mail_sent_at && ! $force) {
+            return __('De klant is al gemaild op :date.', ['date' => $quote->withdrawal_mail_sent_at->translatedFormat('j F Y')]);
+        }
+
+        return null;
+    }
+
+    /**
+     * De klant laten weten dat de offerte is vervallen en, als die er is, door
+     * welke hij is vervangen — zodat twee offertes niet dubbel lijken. Bewust
+     * zonder PDF: de oude offerte hoeft niet nog eens de deur uit.
+     *
+     * @throws \DomainException  met een uitlegbare reden wanneer het niet kan
+     */
+    public function sendWithdrawalNotice(Quote $quote, bool $force = false): bool
+    {
+        if ($reason = $this->withdrawalNoticeBlocker($quote, $force)) {
+            throw new \DomainException($reason);
+        }
+
+        $company = $quote->company;
+        $quote->load('replacedBy');
+
+        \App\Support\DocumentLocale::using($quote->language, function () use ($quote, $company) {
+            $branded = $quote->brandedCompany();
+
+            // Uit een demo vertrekt nooit echte post.
+            $mail = Mail::mailer($company->is_demo ? 'log' : null)->to($quote->customer_email);
+
+            // Kopie naar de ondernemer, net als bij de offertemail zelf.
+            $cc = $branded->copy_email ?: $branded->email;
+            if ($cc && strcasecmp($cc, $quote->customer_email) !== 0) {
+                $mail->cc($cc);
+            }
+
+            $mail->send(new \App\Mail\QuoteWithdrawnMail($quote));
+        });
+
+        $quote->forceFill([
+            'withdrawal_mail_sent_at' => now(),
+            'withdrawal_mail_sent_to' => $quote->customer_email,
+        ])->saveQuietly();
+
+        return true;
     }
 
     /**

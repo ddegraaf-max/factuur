@@ -1632,5 +1632,19 @@
   "afgeleverd": "delivered",
   "niet afgeleverd": "not delivered",
   "onderweg": "in transit",
-  "aflevering onbekend": "delivery unknown"
+  "aflevering onbekend": "delivery unknown",
+  "Alleen een afgewezen, verlopen of vervallen offerte kun je opnieuw aanbieden.": "Only a rejected, expired or withdrawn quote can be offered again.",
+  "Alleen een verstuurde of verlopen offerte kun je laten vervallen. Een concept verwijder je gewoon.": "Only a sent or expired quote can be withdrawn. A draft can simply be deleted.",
+  "Kies een andere offerte als vervanger: deze is afgewezen of zelf vervallen.": "Choose another quote as the replacement: this one was rejected or has been withdrawn itself.",
+  ":label vervallen, vervangen door :replacement": ":label withdrawn, replaced by :replacement",
+  ":label vervallen": ":label withdrawn",
+  "een concept": "a draft",
+  "Deze offerte is niet vervallen.": "This quote has not been withdrawn.",
+  "De klant is al gemaild op :date.": "The customer was already e-mailed on :date.",
+  "De gekozen vervangende offerte bestaat niet (meer).": "The chosen replacement quote does not exist (anymore).",
+  "Offerte :number is vervallen.": "Quote :number has been withdrawn.",
+  "De klant is gemaild op :email.": "The customer has been e-mailed at :email.",
+  "Geen mail naar de klant: :reason": "No e-mail to the customer: :reason",
+  "De mail naar de klant is niet gelukt — probeer het straks via \"Klant informeren\".": "The e-mail to the customer failed — try again later via \"Inform customer\".",
+  "Niet meer geldig": "No longer valid"
 }

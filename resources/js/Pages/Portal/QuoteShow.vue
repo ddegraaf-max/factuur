@@ -123,6 +123,17 @@ const decline = () => {
         {{ quote.rejected_at_label ? $t('Deze offerte is afgewezen op :date.', { date: quote.rejected_at_label }) : $t('Deze offerte is afgewezen.') }}
         {{ $t('Van gedachten veranderd? Neem contact op met :company.', { company: company.name }) }}
       </div>
+      <div v-else-if="quote.status === 'withdrawn'" class="pq-banner warn">
+        <div>
+          <div>{{ quote.withdrawn_at_label ? $t('Deze offerte is op :date komen te vervallen en geldt niet meer.', { date: quote.withdrawn_at_label }) : $t('Deze offerte is komen te vervallen en geldt niet meer.') }}</div>
+          <div v-if="quote.replacement" style="margin-top:4px;">
+            {{ $t('In plaats daarvan geldt offerte :number.', { number: quote.replacement.number }) }}
+            <a v-if="quote.replacement.url" :href="quote.replacement.url" style="font-weight:600;color:inherit;">{{ $t('Bekijk offerte :number', { number: quote.replacement.number }) }} →</a>
+          </div>
+          <div v-if="quote.withdrawal_note" style="margin-top:6px;white-space:pre-line;">{{ quote.withdrawal_note }}</div>
+          <div style="margin-top:4px;">{{ $t('Vragen? Neem contact op met :company.', { company: company.name }) }}</div>
+        </div>
+      </div>
       <div v-else-if="quote.is_expired || quote.status === 'expired'" class="pq-banner warn">
         {{ $t('De geldigheid van deze offerte is verlopen (:date). Ondertekenen kan nog — of neem even contact op met :company.', { date: quote.valid_until_label, company: company.name }) }}
       </div>

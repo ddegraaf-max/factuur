@@ -46,7 +46,7 @@ class ProjectService
      */
     public function figures(Project $project): array
     {
-        $quotes = $project->quotes()->whereNotIn('status', ['draft', 'rejected', 'expired'])->get();
+        $quotes = $project->quotes()->whereNotIn('status', ['draft', 'rejected', 'expired', 'withdrawn'])->get();
         $invoices = $project->invoices()->whereNotIn('status', ['draft', 'cancelled'])->get();
         $purchases = $project->purchases()->get();
         $hours = $project->timeEntries()->with(['customer', 'company'])->get();
@@ -173,7 +173,7 @@ class ProjectService
             ->orderByDesc($date)->limit(40);
 
         return [
-            'quotes' => $order(Quote::withoutGlobalScope('company')->whereNotIn('status', ['rejected', 'expired']), 'quote_date')->get()
+            'quotes' => $order(Quote::withoutGlobalScope('company')->whereNotIn('status', ['rejected', 'expired', 'withdrawn']), 'quote_date')->get()
                 ->map(fn (Quote $q) => ['id' => $q->id, 'label' => trim($q->number . ' ' . $q->customer_name), 'sub' => $q->quote_date?->translatedFormat('j M Y') . ' · ' . money((float) $q->subtotal), 'mine' => (int) $q->customer_id === (int) $project->customer_id])->values()->all(),
             'invoices' => $order(Invoice::withoutGlobalScope('company')->where('status', '!=', 'cancelled'), 'invoice_date')->get()
                 ->map(fn (Invoice $i) => ['id' => $i->id, 'label' => trim(($i->number ?: __('concept')) . ' ' . $i->customer_name), 'sub' => $i->invoice_date?->translatedFormat('j M Y') . ' · ' . money((float) $i->subtotal), 'mine' => (int) $i->customer_id === (int) $project->customer_id])->values()->all(),

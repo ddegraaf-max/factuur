@@ -143,4 +143,18 @@ return [
     'mail_accept_attachment' => 'The quotation is attached as a PDF — please keep it for your records.',
     'mail_accept_attachment_signed' => 'The quotation, including your digital signature, is attached as a PDF — please keep it for your records.',
     'mail_view_quote_online' => 'View the quotation online',
+    // Quote withdrawn by the sender, possibly replaced by a new one.
+    'mail_withdrawn_subject' => 'Quotation :number has been withdrawn',
+    'mail_withdrawn_title' => 'Quotation :number has been withdrawn',
+    'mail_withdrawn_intro' => 'Quotation <strong>:number</strong> from :company dated :date has been withdrawn. Please consider it void; no rights can be derived from it.',
+    'mail_withdrawn_replaced' => 'It has been replaced by quotation <strong>:replacement</strong>.',
+    'mail_withdrawn_replaced_received' => 'You have received that quotation from us separately.',
+    'mail_withdrawn_replaced_soon' => 'You will shortly receive a new quotation from us.',
+    'mail_withdrawn_note' => 'Explanation',
+    'mail_withdrawn_quote' => 'Withdrawn quotation',
+    'mail_withdrawn_date' => 'Withdrawn on',
+    'mail_withdrawn_replacement' => 'Replaced by',
+    'mail_withdrawn_view_replacement' => 'View the new quotation online',
+    'mail_withdrawn_questions' => 'Any questions? Simply reply to this e-mail.',
+    'stamp_withdrawn' => 'WITHDRAWN',
 ];
