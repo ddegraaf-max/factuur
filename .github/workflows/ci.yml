@@ -107,7 +107,13 @@ jobs:
           coverage: none
       - run: composer install --no-interaction --prefer-dist --no-progress
       - name: Larastan installeren (alleen in CI)
-        run: composer require --dev "larastan/larastan:^3.0" --no-interaction --no-progress -W
+        # Downloads van codeload.github.com haperen soms (exit 100): drie pogingen voordat we opgeven.
+        run: |
+          for i in 1 2 3; do
+            composer require --dev "larastan/larastan:^3.0" --no-interaction --no-progress -W && exit 0
+            echo "Poging $i mislukt, opnieuw over 20 s"; sleep 20
+          done
+          exit 1
       - name: Analyse (niveau 2 — fatals, onbekende methodes/props)
         run: |
           cat > phpstan.ci.neon <<'NEON'
