@@ -168,7 +168,7 @@ class QuoteController extends Controller
                     'status' => $quote->replacedBy->status,
                 ] : null,
                 // Andere offertes van deze klant die deze kunnen vervangen (knop "Vervallen").
-                'replacement_options' => in_array($quote->status, ['sent', 'expired'], true) ? $this->replacementOptions($quote) : [],
+                'replacement_options' => in_array($quote->status, ['sent', 'expired', 'accepted'], true) ? $this->replacementOptions($quote) : [],
                 'portal_url' => $quote->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
                 'send_email' => $quote->customer_email ?: $quote->customer?->email,

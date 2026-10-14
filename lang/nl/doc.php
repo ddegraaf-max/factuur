@@ -154,5 +154,7 @@ return [
     'mail_withdrawn_replacement' => 'Vervangen door',
     'mail_withdrawn_view_replacement' => 'Bekijk de nieuwe offerte online',
     'mail_withdrawn_questions' => 'Heeft u vragen? Beantwoord dan gewoon deze e-mail.',
+    'mail_withdrawn_intro_accepted' => 'Offerte <strong>:number</strong> van :company van :date, die u op :accepted heeft geaccepteerd, is komen te vervallen. De afspraken uit die offerte gelden niet meer.',
+    'mail_withdrawn_reconfirm' => 'Wij vragen u de nieuwe offerte te bekijken en opnieuw te bevestigen.',
     'stamp_withdrawn' => 'VERVALLEN',
 ];

@@ -156,5 +156,7 @@ return [
     'mail_withdrawn_replacement' => 'Replaced by',
     'mail_withdrawn_view_replacement' => 'View the new quotation online',
     'mail_withdrawn_questions' => 'Any questions? Simply reply to this e-mail.',
+    'mail_withdrawn_intro_accepted' => 'Quotation <strong>:number</strong> from :company dated :date, which you accepted on :accepted, has been withdrawn. The arrangements in that quotation no longer apply.',
+    'mail_withdrawn_reconfirm' => 'Please review the new quotation and confirm it again.',
     'stamp_withdrawn' => 'WITHDRAWN',
 ];

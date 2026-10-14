@@ -36,6 +36,7 @@
         <ul class="tl-list">
           <li><b>Nieuwe offerte in plaats van de oude?</b> — bij een verstuurde of verlopen offerte staat nu de knop "Vervallen". Kies welke offerte hem vervangt (standaard de nieuwste voor dezelfde klant), zet er desgewenst een toelichting bij, en de klant krijgt een korte mail: de oude offerte geldt niet meer, dit is de nieuwe. Zo lijken twee offertes nooit dubbel. De oude blijft met zijn nummer bewaard, krijgt het stempel VERVALLEN op de PDF en telt niet meer mee als openstaand voorstel.</li>
           <li><b>Klantenportaal</b> — via de ondertekenlink van de vervallen offerte ziet de klant dat hij niet meer geldt, met een link naar de nieuwe; ondertekenen kan niet meer. Nog niet gemaild? Dat kan later alsnog met "Klant informeren". Per ongeluk? "Opnieuw aanbieden" zet hem terug naar concept.</li>
+          <li><b>Ook een geaccepteerde offerte</b> (1.78.1) — is de offerte al geaccepteerd of digitaal ondertekend, maar nog niet gefactureerd, dan kun je hem ook laten vervallen. De acceptatie blijft als historie bewaard; de mail vermeldt dat die afspraak niet meer geldt en vraagt de klant de nieuwe offerte te bevestigen.</li>
         </ul>
       </article>
 

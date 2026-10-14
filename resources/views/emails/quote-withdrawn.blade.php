@@ -33,15 +33,27 @@
 
       <div style="padding:14px 24px 26px;font-size:14px;line-height:1.7;">
         <p style="margin:0 0 14px;">{{ __('doc.mail_greeting', ['name' => $quote->customer_name]) }}</p>
-        <p style="margin:0 0 14px;">{!! __('doc.mail_withdrawn_intro', [
-            'number' => e($quote->number),
-            'company' => e($company->name),
-            'date' => e($quote->quote_date->translatedFormat('j F Y')),
-        ]) !!}</p>
+        @if($quote->accepted_at)
+          <p style="margin:0 0 14px;">{!! __('doc.mail_withdrawn_intro_accepted', [
+              'number' => e($quote->number),
+              'company' => e($company->name),
+              'date' => e($quote->quote_date->translatedFormat('j F Y')),
+              'accepted' => e(($quote->signed_at ?? $quote->accepted_at)->translatedFormat('j F Y')),
+          ]) !!}</p>
+        @else
+          <p style="margin:0 0 14px;">{!! __('doc.mail_withdrawn_intro', [
+              'number' => e($quote->number),
+              'company' => e($company->name),
+              'date' => e($quote->quote_date->translatedFormat('j F Y')),
+          ]) !!}</p>
+        @endif
         @if($replacementNumber)
           <p style="margin:0 0 14px;">{!! __('doc.mail_withdrawn_replaced', ['replacement' => e($replacementNumber)]) !!} {{ $replacementUrl ? __('doc.mail_withdrawn_replaced_received') : '' }}</p>
         @elseif($replacement)
           <p style="margin:0 0 14px;">{{ __('doc.mail_withdrawn_replaced_soon') }}</p>
+        @endif
+        @if($quote->accepted_at && $replacement && $replacement->status === 'sent')
+          <p style="margin:0 0 14px;">{{ __('doc.mail_withdrawn_reconfirm') }}</p>
         @endif
 
         @if(filled($quote->withdrawal_note))

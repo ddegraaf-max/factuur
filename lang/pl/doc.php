@@ -156,5 +156,7 @@ return [
     'mail_withdrawn_replacement' => 'Zastąpiona przez',
     'mail_withdrawn_view_replacement' => 'Zobacz nową ofertę online',
     'mail_withdrawn_questions' => 'W razie pytań wystarczy odpowiedzieć na tego e-maila.',
+    'mail_withdrawn_intro_accepted' => 'Oferta <strong>:number</strong> firmy :company z dnia :date, którą zaakceptowali Państwo dnia :accepted, została wycofana. Ustalenia z tej oferty już nie obowiązują.',
+    'mail_withdrawn_reconfirm' => 'Prosimy o zapoznanie się z nową ofertą i jej ponowne potwierdzenie.',
     'stamp_withdrawn' => 'WYCOFANA',
 ];

@@ -658,5 +658,7 @@
   "Mailt :email dat offerte :number is vervallen en is vervangen door :replacement — zonder de oude offerte als bijlage.": "Wyśle na :email informację, że oferta :number została wycofana i zastąpiona przez :replacement — bez starej oferty w załączniku.",
   "Mailt :email dat offerte :number is vervallen en dat er een nieuwe offerte volgt.": "Wyśle na :email informację, że oferta :number została wycofana i że nowa oferta jest w drodze.",
   "Mailt :email dat offerte :number is vervallen en niet meer geldt.": "Wyśle na :email informację, że oferta :number została wycofana i już nie obowiązuje.",
-  "Laten vervallen": "Wycofaj"
+  "Laten vervallen": "Wycofaj",
+  "Let op: de klant heeft deze offerte al geaccepteerd. Laat je hem vervallen, dan geldt die afspraak niet meer en vragen we de klant in de mail om de nieuwe offerte opnieuw te bevestigen.": "Uwaga: klient już zaakceptował tę ofertę. Jeśli ją wycofasz, to ustalenie przestanie obowiązywać, a e-mail poprosi klienta o ponowne potwierdzenie nowej oferty.",
+  "was geaccepteerd op :date": "była zaakceptowana dnia :date"
 }

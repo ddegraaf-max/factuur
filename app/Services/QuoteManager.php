@@ -348,15 +348,19 @@ class QuoteManager
     }
 
     /**
-     * Een verstuurde (of verlopen) offerte laten vervallen, bijvoorbeeld omdat
-     * er een nieuwe voor in de plaats komt. De klant kan hem daarna niet meer
+     * Een verstuurde, verlopen of geaccepteerde offerte laten vervallen,
+     * bijvoorbeeld omdat er een nieuwe voor in de plaats komt. De klant kan hem daarna niet meer
      * ondertekenen via het portaal en hij telt niet meer als open voorstel.
      * Nummer en portaallink blijven; het logboek bewaart de historie.
      */
     public function withdraw(Quote $quote, ?Quote $replacement = null, ?string $note = null): Quote
     {
-        if (! in_array($quote->status, ['sent', 'expired'], true)) {
-            throw new \DomainException(__('Alleen een verstuurde of verlopen offerte kun je laten vervallen. Een concept verwijder je gewoon.'));
+        if (! in_array($quote->status, ['sent', 'expired', 'accepted'], true)) {
+            throw new \DomainException(__('Alleen een verstuurde, verlopen of geaccepteerde offerte kun je laten vervallen. Een concept verwijder je gewoon.'));
+        }
+        // Geaccepteerd mag ook (de nieuwe offerte vervangt de afspraak), maar niet als er al is gefactureerd.
+        if ($quote->converted_invoice_id || $quote->installments()->whereNotNull('invoice_id')->exists()) {
+            throw new \DomainException(__('Van deze offerte is al een factuur gemaakt; dan kun je hem niet meer laten vervallen.'));
         }
         if ($replacement && (
             $replacement->id === $quote->id
@@ -371,8 +375,7 @@ class QuoteManager
             'withdrawn_at' => now(),
             'withdrawal_note' => filled($note) ? trim($note) : null,
             'replaced_by_quote_id' => $replacement?->id,
-            'accepted_at' => null,
-            'rejected_at' => null,
+            // Een eerdere acceptatie of ondertekening blijft als historie staan.
         ])->save();
 
         \App\Support\Audit::log('withdrawn', $quote, $replacement

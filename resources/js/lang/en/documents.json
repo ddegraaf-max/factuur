@@ -658,5 +658,7 @@
   "Mailt :email dat offerte :number is vervallen en is vervangen door :replacement — zonder de oude offerte als bijlage.": "E-mails :email that quote :number has been withdrawn and replaced by :replacement — without the old quote attached.",
   "Mailt :email dat offerte :number is vervallen en dat er een nieuwe offerte volgt.": "E-mails :email that quote :number has been withdrawn and that a new quote will follow.",
   "Mailt :email dat offerte :number is vervallen en niet meer geldt.": "E-mails :email that quote :number has been withdrawn and is no longer valid.",
-  "Laten vervallen": "Withdraw"
+  "Laten vervallen": "Withdraw",
+  "Let op: de klant heeft deze offerte al geaccepteerd. Laat je hem vervallen, dan geldt die afspraak niet meer en vragen we de klant in de mail om de nieuwe offerte opnieuw te bevestigen.": "Note: the customer has already accepted this quote. If you withdraw it, that agreement no longer applies and the e-mail asks the customer to confirm the new quote again.",
+  "was geaccepteerd op :date": "was accepted on :date"
 }

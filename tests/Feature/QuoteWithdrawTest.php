@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Mail\QuoteWithdrawnMail;
+use App\Models\Invoice;
 use App\Models\Quote;
 use App\Services\QuoteManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +24,7 @@ class QuoteWithdrawTest extends TestCase
     private function sentQuote(int $companyId): Quote
     {
         $quote = Quote::withoutGlobalScope('company')->where('company_id', $companyId)->where('status', 'sent')->firstOrFail();
-        $quote->forceFill(['customer_email' => 'klant-' . uniqid() . '@example.com'])->save();
+        $quote->forceFill(['customer_email' => 'klant-' . uniqid() . '@example.com', 'language' => 'nl'])->save();
         $quote->ensurePortalToken();
 
         return $quote->fresh();
@@ -87,6 +88,39 @@ class QuoteWithdrawTest extends TestCase
             ->assertInertia(fn ($page) => $page->where('quote.status', 'withdrawn')->where('quote.replaced_by.number', $new->number));
     }
 
+    public function test_an_accepted_quote_can_be_withdrawn_and_the_customer_is_asked_to_confirm_the_new_one(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+
+        $old = $this->sentQuote($user->company_id);
+        $new = $old->replicate(['number', 'portal_token', 'converted_invoice_id']);
+        $new->forceFill(['status' => 'draft', 'sent_at' => null])->save();
+        app(QuoteManager::class)->send($new->fresh());
+
+        // De klant had de oude al digitaal ondertekend.
+        app(QuoteManager::class)->accept($old);
+        $old->forceFill(['signed_name' => 'Lin Zheng', 'signed_at' => now(), 'signed_email' => $old->customer_email])->save();
+        $old = $old->fresh();
+        $this->get(route('quotes.show', $old))->assertOk()
+            ->assertInertia(fn ($page) => $page->where('quote.status', 'accepted')->where('quote.replacement_options.0.id', $new->fresh()->id));
+
+        $this->post(route('quotes.withdraw', $old), ['replaced_by_quote_id' => $new->id, 'notify' => 1])->assertRedirect()->assertSessionHas('flash');
+        $old->refresh();
+        $this->assertSame('withdrawn', $old->status);
+        $this->assertNotNull($old->accepted_at, 'De acceptatie blijft als historie bewaard');
+        $this->assertSame('Lin Zheng', $old->signed_name);
+
+        Mail::assertSent(QuoteWithdrawnMail::class, function (QuoteWithdrawnMail $mail) use ($old) {
+            $html = $mail->render();
+
+            return $mail->hasTo($old->customer_email)
+                && str_contains($html, 'heeft geaccepteerd')
+                && str_contains($html, 'opnieuw te bevestigen');
+        });
+    }
+
     public function test_portal_shows_the_withdrawal_and_no_longer_lets_the_customer_sign(): void
     {
         Mail::fake();
@@ -113,9 +147,11 @@ class QuoteWithdrawTest extends TestCase
         $user = $this->demoUser();
         $this->actingAs($user);
 
-        $accepted = Quote::withoutGlobalScope('company')->where('company_id', $user->company_id)->where('status', 'accepted')->firstOrFail();
-        $this->post(route('quotes.withdraw', $accepted))->assertRedirect()->assertSessionHasErrors('quote');
-        $this->assertSame('accepted', $accepted->fresh()->status);
+        // Al gefactureerd? Dan niet meer.
+        $invoiced = Quote::withoutGlobalScope('company')->where('company_id', $user->company_id)->where('status', 'accepted')->firstOrFail();
+        $invoiced->forceFill(['converted_invoice_id' => Invoice::withoutGlobalScope('company')->where('company_id', $user->company_id)->value('id')])->save();
+        $this->post(route('quotes.withdraw', $invoiced))->assertRedirect()->assertSessionHasErrors('quote');
+        $this->assertSame('accepted', $invoiced->fresh()->status);
 
         $expired = $this->sentQuote($user->company_id);
         $draft = $expired->replicate(['number', 'portal_token', 'converted_invoice_id']);

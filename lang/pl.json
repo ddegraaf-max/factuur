@@ -1634,7 +1634,6 @@
   "onderweg": "w drodze",
   "aflevering onbekend": "dostarczenie nieznane",
   "Alleen een afgewezen, verlopen of vervallen offerte kun je opnieuw aanbieden.": "Ponownie zaoferować można tylko ofertę odrzuconą, wygasłą lub wycofaną.",
-  "Alleen een verstuurde of verlopen offerte kun je laten vervallen. Een concept verwijder je gewoon.": "Wycofać można tylko wysłaną lub wygasłą ofertę. Szkic po prostu usuń.",
   "Kies een andere offerte als vervanger: deze is afgewezen of zelf vervallen.": "Wybierz inną ofertę jako zastępczą: ta została odrzucona lub sama jest wycofana.",
   ":label vervallen, vervangen door :replacement": ":label wycofana, zastąpiona przez :replacement",
   ":label vervallen": ":label wycofana",
@@ -1646,5 +1645,7 @@
   "De klant is gemaild op :email.": "Wysłano e-mail do klienta na :email.",
   "Geen mail naar de klant: :reason": "Brak e-maila do klienta: :reason",
   "De mail naar de klant is niet gelukt — probeer het straks via \"Klant informeren\".": "E-mail do klienta się nie powiódł — spróbuj później przez „Poinformuj klienta”.",
-  "Niet meer geldig": "Już nieważna"
+  "Niet meer geldig": "Już nieważna",
+  "Alleen een verstuurde, verlopen of geaccepteerde offerte kun je laten vervallen. Een concept verwijder je gewoon.": "Wycofać można tylko wysłaną, wygasłą lub zaakceptowaną ofertę. Szkic po prostu usuń.",
+  "Van deze offerte is al een factuur gemaakt; dan kun je hem niet meer laten vervallen.": "Z tej oferty wystawiono już fakturę; nie można jej już wycofać."
 }

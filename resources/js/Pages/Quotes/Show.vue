@@ -70,7 +70,8 @@ const reject = () => {
 
 /* ---------- Laten vervallen (+ klant informeren) ---------- */
 const showWithdrawModal = ref(false);
-const canWithdraw = computed(() => ['sent', 'expired'].includes(props.quote.status));
+// Ook een geaccepteerde offerte, zolang er nog niet uit is gefactureerd.
+const canWithdraw = computed(() => ['sent', 'expired', 'accepted'].includes(props.quote.status) && !props.quote.invoice && !props.quote.installments_locked);
 const replacementOptions = computed(() => props.quote.replacement_options || []);
 // Standaard de nieuwste latere offerte van dezelfde klant: meestal is dát de vervanger.
 const withdrawForm = useForm({
@@ -216,7 +217,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <template v-if="quote.status === 'draft'">{{ $t('Concept · nog niet verstuurd') }}</template>
           <template v-else-if="quote.status === 'accepted'">{{ $t('Geaccepteerd op :date', { date: quote.accepted_at_label }) }}<template v-if="quote.accept_mail_sent_at_label"> · {{ $t('bevestiging gemaild :date', { date: quote.accept_mail_sent_at_label }) }}</template></template>
           <template v-else-if="quote.status === 'rejected'">{{ $t('Afgewezen op :date', { date: quote.rejected_at_label }) }}<template v-if="quote.decline_reason"> · {{ $t('Reden van de klant: :reason', { reason: quote.decline_reason }) }}</template></template>
-          <template v-else-if="quote.status === 'withdrawn'">{{ $t('Vervallen op :date|offerte', { date: quote.withdrawn_at_label }) }}<template v-if="quote.replaced_by"> · {{ $t('vervangen door') }} <Link :href="route('quotes.show', quote.replaced_by.id)" style="color:inherit;font-weight:600;">{{ quote.replaced_by.number || $t('concept') }}</Link></template><template v-if="quote.withdrawal_mail_sent_at_label"> · {{ $t('klant gemaild :date', { date: quote.withdrawal_mail_sent_at_label }) }}</template></template>
+          <template v-else-if="quote.status === 'withdrawn'">{{ $t('Vervallen op :date|offerte', { date: quote.withdrawn_at_label }) }}<template v-if="quote.accepted_at_label"> · {{ $t('was geaccepteerd op :date', { date: quote.accepted_at_label }) }}</template><template v-if="quote.replaced_by"> · {{ $t('vervangen door') }} <Link :href="route('quotes.show', quote.replaced_by.id)" style="color:inherit;font-weight:600;">{{ quote.replaced_by.number || $t('concept') }}</Link></template><template v-if="quote.withdrawal_mail_sent_at_label"> · {{ $t('klant gemaild :date', { date: quote.withdrawal_mail_sent_at_label }) }}</template></template>
           <template v-else-if="quote.sent_at_label">{{ $t('Verstuurd op :date', { date: quote.sent_at_label }) }}</template>
           <template v-if="quote.brand_profile_name"> · {{ $t('als') }} <b>{{ quote.brand_profile_name }}</b></template>
           <template v-if="quote.language === 'en'"> · {{ $t('Engelstalig') }}</template>
@@ -328,6 +329,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         </div>
         <div class="modal-body">
           <p class="modal-text" v-html="$t('De offerte krijgt de status <b>Vervallen</b>: de klant kan hem niet meer ondertekenen via de link en hij telt niet meer mee als openstaand voorstel. Het nummer blijft bestaan; met &quot;Opnieuw aanbieden&quot; haal je hem later desnoods terug.')"></p>
+          <p v-if="quote.status === 'accepted'" class="modal-text wd-warn">{{ $t('Let op: de klant heeft deze offerte al geaccepteerd. Laat je hem vervallen, dan geldt die afspraak niet meer en vragen we de klant in de mail om de nieuwe offerte opnieuw te bevestigen.') }}</p>
           <div class="wd-field">
             <label>{{ $t('Vervangen door') }}</label>
             <select v-model="withdrawForm.replaced_by_quote_id">
@@ -663,6 +665,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 .wd-field select, .wd-field textarea { width: 100%; font: inherit; font-size: 13.5px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
 .wd-field textarea { resize: vertical; line-height: 1.5; }
 .decide.withdrawn { background: var(--surface-2); }
+.wd-warn { background: var(--brand-tint); border: 1px solid var(--brand-border); color: var(--brand-darker); border-radius: 8px; padding: 10px 12px; }
 
 /* Bijlagen */
 .qa-empty { color: var(--text-3); font-size: 12.5px; background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 9px; padding: 13px 15px; }
