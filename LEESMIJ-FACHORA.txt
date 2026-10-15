@@ -79,8 +79,10 @@ main, deployt bij elke push) en Postgres, beide in europe-west4-drams3a (Amsterd
 Domein: https://fachora.pl (via Cloudflare naar Railway; het Railway-domein
 fachora-production.up.railway.app werkt ook). APP_URL en BRAND_DOMAIN staan op fachora.pl.
 E-mail: fachora.pl is geverifieerd in Resend; MAIL_FROM_ADDRESS en BRAND_EMAIL zijn czesc@fachora.pl.
-Let op: fachora.pl heeft geen MX-records, dus antwoorden aan czesc@fachora.pl komen nergens aan tot
-er een mailbox of doorsturing is (bijv. Cloudflare Email Routing naar het eigenaarsadres).
+Inkomende mail: Cloudflare Email Routing staat aan op fachora.pl (MX + SPF door Cloudflare gezet,
+Resend-records op send./rsend./resend._domainkey staan er los naast); regel czesc@fachora.pl →
+d.degraaf@creditline.nl. hallo@easyinvoice.nl is als bestemming toegevoegd maar nog niet bevestigd;
+na de bevestigingsmail kan de regel daarheen (cf email-routing rules update, cf-CLI is aangemeld).
 BRAND_CONTACT_INBOX (contactformulier) staat op hallo@easyinvoice.nl, net als bij de andere merken
 (dat adres stond van juni tot 16 oktober 2026 op de suppressielijst van Resend na een bounce; nu niet meer).
 Gezet: APP_BRAND=fachora, APP_NAME=Fachora, APP_LOCALE=pl, APP_TIMEZONE=Europe/Warsaw, APP_KEY,
