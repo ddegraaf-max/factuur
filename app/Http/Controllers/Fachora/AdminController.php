@@ -75,6 +75,9 @@ class AdminController extends Controller
             'categories' => Fachora::categoryList('pl'),
             'letterCandidates' => $this->letters->candidates(null, null, 1000)->count(),
             'ceidg' => app(\App\Services\Fachora\CeidgClient::class)->configured(),
+            'pkdOptions' => collect(config('fachora.categories', []))
+                ->flatMap(fn (array $cat) => collect((array) ($cat['pkd'] ?? []))->map(fn (string $code) => ['code' => $code, 'label' => $code . ' · ' . $cat['pl']]))
+                ->unique('code')->values()->all(),
             'jobCounts' => $this->jobCounts(),
         ]);
     }
@@ -199,6 +202,27 @@ class AdminController extends Controller
         $result = $this->providers->importLines($text, ($data['source'] ?? null) ?: 'import', ($data['consent_source'] ?? null) ?: null);
 
         return back()->with('flash', __(':created bedrijven toegevoegd, :skipped overgeslagen (bestonden al), :consented met opt-in.', $result));
+    }
+
+    /**
+     * Import uit CEIDG (API v3) vanaf de eigenaarpagina: één PKD-code, een gebied en
+     * een beperkt aantal pagina's van 25 per keer, zodat de aanvraag binnen de tijd blijft.
+     */
+    public function importCeidg(Request $request, \App\Services\Fachora\CeidgClient $ceidg): RedirectResponse
+    {
+        $data = $request->validate([
+            'pkd' => ['required', 'string', 'regex:/^\d{2}\.?\d{2}\.?[A-Za-z]$/'],
+            'wojewodztwo' => ['nullable', 'string', 'max:40'],
+            'miasto' => ['nullable', 'string', 'max:120'],
+            'pages' => ['nullable', 'integer', 'min:1', 'max:8'],
+        ]);
+        if (! $ceidg->configured()) {
+            return back()->with('error', __('CEIDG-import staat uit: er is geen CEIDG_TOKEN ingesteld.'));
+        }
+
+        $result = $ceidg->import(strtoupper($data['pkd']), ($data['wojewodztwo'] ?? null) ?: null, ($data['miasto'] ?? null) ?: null, (int) ($data['pages'] ?? 4));
+
+        return back()->with('flash', __(":created bedrijven toegevoegd uit CEIDG, :skipped overgeslagen (bestonden al), :pages pagina's opgehaald.", $result));
     }
 
     public function letters(Request $request): HttpResponse

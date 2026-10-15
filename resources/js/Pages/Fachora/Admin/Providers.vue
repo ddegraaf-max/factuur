@@ -19,6 +19,7 @@ const props = defineProps({
   categories: { type: Array, default: () => [] },
   letterCandidates: { type: Number, default: 0 },
   ceidg: { type: Boolean, default: false },
+  pkdOptions: { type: Array, default: () => [] },
   jobCounts: { type: Object, default: () => ({}) },
 });
 
@@ -56,6 +57,9 @@ const importModal = ref(false);
 const importForm = useForm({ text: '', file: null, source: '', consent_source: '' });
 const pickImport = (event) => { importForm.file = event.target.files?.[0] || null; };
 const runImport = () => importForm.post(route('fachora.admin.import'), { forceFormData: true, preserveScroll: true, onSuccess: () => { importModal.value = false; importForm.reset(); } });
+// CEIDG (API v3): één PKD-code, gebied en een paar pagina's per keer; alleen zichtbaar met een token.
+const ceidgForm = useForm({ pkd: '', wojewodztwo: '', miasto: '', pages: 4 });
+const runCeidg = () => ceidgForm.post(route('fachora.admin.ceidg'), { preserveScroll: true });
 
 /* ---------- brieven ---------- */
 const lettersModal = ref(false);
@@ -100,6 +104,20 @@ const lettersUrl = computed(() => route('fachora.admin.letters', {
     <div v-if="!ceidg" class="fx-hint">
       <b>{{ $t('CEIDG-import staat uit.') }}</b> {{ $t('Zet CEIDG_TOKEN (dane.biznes.gov.pl) in de omgeving en draai bijvoorbeeld:') }}
       <code>php artisan fachora:import-ceidg 43.22.Z --wojewodztwo=łódzkie</code>
+    </div>
+    <div v-else class="fx-hint" style="display:block;">
+      <b>{{ $t('Importeren uit CEIDG') }}</b> {{ $t('Actieve eenmanszaken met een PKD-code in een gebied, 25 per pagina. Telefoon en e-mail komen niet mee; de brieven gaan per post.') }}
+      <div class="form-row" style="margin-top:10px;align-items:flex-end;flex-wrap:wrap;gap:10px;">
+        <div class="form-group" style="margin:0;min-width:220px;">
+          <label>PKD</label>
+          <select v-model="ceidgForm.pkd"><option value="">—</option><option v-for="o in pkdOptions" :key="o.code" :value="o.code">{{ o.label }}</option></select>
+        </div>
+        <div class="form-group" style="margin:0;"><label>{{ $t('Województwo') }} <span class="label-hint">{{ $t('(leeg = heel Polen)') }}</span></label><input type="text" v-model="ceidgForm.wojewodztwo" maxlength="40" placeholder="mazowieckie"></div>
+        <div class="form-group" style="margin:0;"><label>{{ $t('Stad') }}</label><input type="text" v-model="ceidgForm.miasto" maxlength="120" placeholder="Warszawa"></div>
+        <div class="form-group" style="margin:0;width:90px;"><label>{{ $t("Pagina's") }}</label><input type="number" min="1" max="8" v-model.number="ceidgForm.pages"></div>
+        <button class="btn btn-primary btn-sm" :disabled="ceidgForm.processing || !ceidgForm.pkd" @click="runCeidg">{{ ceidgForm.processing ? $t('Bezig…') : $t('Ophalen') }}</button>
+      </div>
+      <div v-if="ceidgForm.errors.pkd || ceidgForm.errors.pages" class="field-error">{{ ceidgForm.errors.pkd || ceidgForm.errors.pages }}</div>
     </div>
 
     <!-- Filters -->

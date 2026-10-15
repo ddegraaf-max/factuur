@@ -1809,6 +1809,8 @@
   "Automatische controles opnieuw gedraaid.": "Automatic checks re-run.",
   ":sent uitnodigingen verstuurd, :skipped overgeslagen (geen toestemming of al geclaimd).": ":sent invitations sent, :skipped skipped (no consent or already claimed).",
   "Plak minstens één regel of kies een bestand.": "Paste at least one line or choose a file.",
+  ":created bedrijven toegevoegd uit CEIDG, :skipped overgeslagen (bestonden al), :pages pagina's opgehaald.": ":created companies added from CEIDG, :skipped skipped (already existed), :pages pages fetched.",
+  "CEIDG-import staat uit: er is geen CEIDG_TOKEN ingesteld.": "CEIDG import is off: no CEIDG_TOKEN is set.",
   ":created bedrijven toegevoegd, :skipped overgeslagen (bestonden al), :consented met opt-in.": ":created companies added, :skipped skipped (already existed), :consented with opt-in.",
   "Geen bedrijven met een postadres in deze selectie.": "No companies with a postal address in this selection.",
   "Geen van deze bedrijven kon worden gemaild (geen toestemming of al aangeboden).": "None of these companies could be emailed (no consent or already offered).",

@@ -139,3 +139,12 @@ DEMO VAN HET BEDRIJVENPANEL (1.85.0)
 - Opruimen: DemoCleaner::delete roept DemoBuilder::cleanup aan (demo-zaken + bestanden + profiel), daarna CompanyPurger.
 - Demobalk (AppLayout) toont onder Fachora de knop "Załóż konto swojej firmy" (naar registreren).
 - Turnstile: TURNSTILE_SITEKEY en TURNSTILE_SECRET staan op Railway (widget "napoleonvvesoftware.nl (Spin)", hostnaam fachora.pl).
+
+CEIDG (1.85.1, sleutel sinds 16 okt 2026)
+- CEIDG_TOKEN staat op Railway (aanvraag Budomatch, mail van biznes.gov.pl aan info@creditline.nl). API v3 in het echt:
+  pagina's tellen vanaf 0; limit maximaal 25; de lijst /firmy geeft id, nazwa, adresDzialalnosci (ulica, budynek,
+  miasto, wojewodztwo, powiat, gmina, kraj, kod, terc, simc, ulic), wlasciciel (imie, nazwisko, nip, regon), dataRozpoczecia,
+  status, link; geen pkd/telefon/e-mail (alleen in /firma/{id}). Filters pkd=4322Z, wojewodztwo=mazowieckie (kleine letters
+  werken), miasto=Warszawa, status=AKTYWNY. Telling okt 2026: 43.22.Z mazowieckie 26 442, Warszawa 7 709.
+- Eigenaar → Fachora: bedrijven → "Importeren uit CEIDG": PKD-keuzelijst, województwo, stad, 1–8 pagina's per klik
+  (route fachora.admin.ceidg → AdminController::importCeidg → CeidgClient::import). Categorie uit de gezochte PKD-code.

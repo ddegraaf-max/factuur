@@ -36,6 +36,7 @@
         <ul class="tl-list">
           <li><b>Demo met één klik</b> — op fachora.pl/demo stap je zonder account in het panel van een fictief, geverifieerd bedrijf (Hydro-Serwis Nowak, Warschau) met zaken in elke fase: twee nieuwe aanvragen om te prijzen, een uitgebrachte prijs, een geplande en een lopende klus met voorgesteld meerwerk, een klus die op akkoord wacht, afgeronde klussen met beoordelingen en één afzegging. Pagina in het Pools en Engels, link op de pagina voor bedrijven en in de voettekst.</li>
           <li><b>Niets gaat naar buiten</b> — de klanten in de demo bestaan niet; mail, sms en eigenaarsberichten worden voor demo-zaken overgeslagen, ook vanuit de planner. Na 24 uur ruimt de opschoontaak de demo op, of eerder via "Demo verlaten".</li>
+          <li><b>Import uit CEIDG werkt</b> — met de API-sleutel van dane.biznes.gov.pl haalt de eigenaar vanaf de bedrijvenpagina actieve eenmanszaken op per PKD-code, województwo of stad (25 per pagina, een paar pagina's per keer). De lijst van de API geeft geen telefoon of e-mail, dus deze bedrijven krijgen alleen een brief per post; de categorie volgt uit de gezochte PKD-code. De pagina's van de API tellen vanaf 0, dat zat eerst fout.</li>
           <li><b>Botbescherming aan</b> — de formulieren op fachora.pl (aanvraag, profiel claimen, bedrijf aanmelden) gebruiken nu Cloudflare Turnstile.</li>
         </ul>
       </article>

@@ -29,9 +29,10 @@ class CeidgClient
      * Eén pagina zoekresultaten.
      *
      * @param  array<string, mixed>  $query  bijv. ['pkd' => '4322Z', 'wojewodztwo' => 'łódzkie', 'status' => 'AKTYWNY']
+     * @param  int  $page  de API telt vanaf 0 (links.next van de eerste pagina wijst naar page=1)
      * @return array{firms: list<array<string, mixed>>, count: int}
      */
-    public function search(array $query, int $page = 1, int $limit = 25): array
+    public function search(array $query, int $page = 0, int $limit = 25): array
     {
         $response = Http::withToken((string) config('fachora.ceidg_token'))
             ->acceptJson()->timeout(30)
@@ -52,16 +53,25 @@ class CeidgClient
     /**
      * Van een CEIDG-record naar een importrecord (zie ProviderService::importRecords).
      *
+     * De lijst /firmy geeft alleen id, nazwa, adresDzialalnosci, wlasciciel (imie, nazwisko,
+     * nip, regon), dataRozpoczecia, status en link; PKD-codes, telefoon en e-mail staan alleen
+     * in het detailrecord. Daarom gaan de gezochte PKD-codes als terugval mee: de categorie
+     * volgt dan uit de zoekopdracht. Telefoon en e-mail blijven leeg (brieven gaan per post).
+     *
      * @param  array<string, mixed>  $firm
+     * @param  list<string>  $fallbackPkd  PKD-codes van de zoekopdracht
      * @return array<string, mixed>
      */
-    public function normalize(array $firm): array
+    public function normalize(array $firm, array $fallbackPkd = []): array
     {
         $address = (array) ($firm['adresDzialalnosci'] ?? $firm['adresKorespondencyjny'] ?? []);
         $owner = (array) ($firm['wlasciciel'] ?? []);
         $pkd = collect((array) ($firm['pkd'] ?? []))->map(fn ($p) => is_array($p) ? ($p['kod'] ?? '') : (string) $p)->filter()->values()->all();
         if (isset($firm['pkdGlowny']['kod'])) {
             array_unshift($pkd, $firm['pkdGlowny']['kod']);
+        }
+        if ($pkd === []) {
+            $pkd = array_values(array_filter(array_map('strval', $fallbackPkd)));
         }
         $street = trim(implode(' ', array_filter([$address['ulica'] ?? null, $address['budynek'] ?? null])));
         if (! empty($address['lokal'])) {
@@ -71,8 +81,8 @@ class CeidgClient
         return [
             'name' => (string) ($firm['nazwa'] ?? trim(($owner['imie'] ?? '') . ' ' . ($owner['nazwisko'] ?? ''))),
             'legal_name' => (string) ($firm['nazwa'] ?? ''),
-            'nip' => $owner['nip'] ?? $firm['nip'] ?? null,
-            'regon' => $owner['regon'] ?? $firm['regon'] ?? null,
+            'nip' => ($owner['nip'] ?? $firm['nip'] ?? null) ?: null,
+            'regon' => ($owner['regon'] ?? $firm['regon'] ?? null) ?: null,
             'legal_form' => 'jdg',
             'address' => $street ?: null,
             'postal_code' => $address['kod'] ?? null,
@@ -96,7 +106,7 @@ class CeidgClient
     public function import(string $pkd, ?string $voivodeship = null, ?string $city = null, int $maxPages = 20): array
     {
         $created = $skipped = $pages = 0;
-        for ($page = 1; $page <= $maxPages; $page++) {
+        for ($page = 0; $page < $maxPages; $page++) {
             try {
                 $result = $this->search(['pkd' => str_replace('.', '', $pkd), 'wojewodztwo' => $voivodeship, 'miasto' => $city, 'status' => 'AKTYWNY'], $page);
             } catch (\Throwable $e) {
@@ -107,7 +117,7 @@ class CeidgClient
             if ($result['firms'] === []) {
                 break;
             }
-            $counts = $this->providers->importRecords(array_map(fn ($f) => $this->normalize($f), $result['firms']), 'ceidg');
+            $counts = $this->providers->importRecords(array_map(fn ($f) => $this->normalize($f, [$pkd]), $result['firms']), 'ceidg');
             $created += $counts['created'];
             $skipped += $counts['skipped'];
             // Niet sneller dan de dienst prettig vindt.

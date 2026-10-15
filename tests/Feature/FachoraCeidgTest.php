@@ -46,7 +46,7 @@ class FachoraCeidgTest extends TestCase
     private function fakeCeidg(array $firms): void
     {
         Http::fake([
-            'dane.biznes.gov.pl/*' => fn (ClientRequest $r) => str_contains($r->url(), 'page=1')
+            'dane.biznes.gov.pl/*' => fn (ClientRequest $r) => str_contains($r->url(), 'page=0')
                 ? Http::response(['firmy' => $firms, 'count' => count($firms)], 200)
                 : Http::response(['firmy' => [], 'count' => count($firms)], 200),
             'nominatim.openstreetmap.org/*' => Http::response([], 200),
@@ -91,6 +91,25 @@ class FachoraCeidgTest extends TestCase
         $this->assertSame([], $empty['categories']);
     }
 
+    public function test_the_list_endpoint_has_no_pkd_so_the_searched_code_is_the_fallback_and_empty_regon_becomes_null(): void
+    {
+        // Echte lijstrespons (okt 2026): id, nazwa, adresDzialalnosci, wlasciciel, dataRozpoczecia, status, link; geen pkd/telefon/e-mail.
+        $record = app(CeidgClient::class)->normalize([
+            'id' => 'E7854341-77B6-4131-A8AD-FB41232779E0', 'nazwa' => 'Instalacje Ziemne Konrad Pietrzyk',
+            'adresDzialalnosci' => ['ulica' => 'ul. Rubinowa', 'budynek' => '18', 'miasto' => 'Sadków', 'wojewodztwo' => 'MAZOWIECKIE', 'kraj' => 'PL', 'kod' => '26-613'],
+            'wlasciciel' => ['imie' => 'Konrad', 'nazwisko' => 'Pietrzyk', 'nip' => '7962648883', 'regon' => ''],
+            'dataRozpoczecia' => '2026-10-15', 'status' => 'AKTYWNY',
+        ], ['43.22.Z']);
+
+        $this->assertSame('7962648883', $record['nip']);
+        $this->assertNull($record['regon']);
+        $this->assertSame('ul. Rubinowa 18', $record['address']);
+        $this->assertNull($record['phone']);
+        $this->assertNull($record['email']);
+        $this->assertContains('hydraulik', $record['categories']);
+        $this->assertStringContainsString('PKD 43.22.Z', $record['note']);
+    }
+
     public function test_pkd_codes_map_to_categories_regardless_of_dots_and_case(): void
     {
         $this->assertSame(['elektryk'], CeidgClient::categoriesForPkd(['43.21.z']));
@@ -116,7 +135,7 @@ class FachoraCeidgTest extends TestCase
 
         $this->assertSame(['created' => 2, 'skipped' => 0, 'pages' => 2], $result);
         Http::assertSent(fn (ClientRequest $r) => str_contains($r->url(), 'dane.biznes.gov.pl/api/ceidg/v3/firmy')
-            && str_contains($r->url(), 'pkd=4322Z') && str_contains($r->url(), 'status=AKTYWNY') && str_contains($r->url(), 'page=1')
+            && str_contains($r->url(), 'pkd=4322Z') && str_contains($r->url(), 'status=AKTYWNY') && str_contains($r->url(), 'page=0')
             && $r->hasHeader('Authorization', 'Bearer jwt-token'));
         $this->assertSame(2, Provider::count());
 

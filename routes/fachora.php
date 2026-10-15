@@ -106,6 +106,7 @@ Route::middleware('brand:fachora')->group(function () {
         Route::middleware('owner')->prefix('admin')->name('admin.')->group(function () {
             Route::get('firmy', [AdminController::class, 'providers'])->name('providers');
             Route::post('firmy/import', [AdminController::class, 'import'])->name('import');
+            Route::post('firmy/ceidg', [AdminController::class, 'importCeidg'])->name('ceidg');
             Route::get('firmy/listy.pdf', [AdminController::class, 'letters'])->name('letters');
             Route::post('firmy/zaproszenia', [AdminController::class, 'invite'])->name('invite');
             Route::get('firmy/{provider}', [AdminController::class, 'provider'])->name('providers.show');

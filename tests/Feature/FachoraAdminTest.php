@@ -82,6 +82,37 @@ class FachoraAdminTest extends TestCase
         ]);
     }
 
+    public function test_the_owner_imports_from_ceidg_with_a_pkd_code_and_an_area(): void
+    {
+        $this->owner();
+        config(['fachora.ceidg_token' => 'jwt-token']);
+        // De catch-all van setUp zou vóór deze stub gaan; verse fabriek, dan wint de CEIDG-stub.
+        Http::swap(new \Illuminate\Http\Client\Factory(app('events')));
+        Http::fake([
+            'dane.biznes.gov.pl/*' => fn (\Illuminate\Http\Client\Request $r) => str_contains($r->url(), 'page=0')
+                ? Http::response(['firmy' => [[
+                    'id' => 'E7854341', 'nazwa' => 'Instalacje Ziemne Konrad Pietrzyk', 'status' => 'AKTYWNY',
+                    'adresDzialalnosci' => ['ulica' => 'ul. Rubinowa', 'budynek' => '18', 'miasto' => 'Sadków', 'wojewodztwo' => 'MAZOWIECKIE', 'kod' => '26-613'],
+                    'wlasciciel' => ['imie' => 'Konrad', 'nazwisko' => 'Pietrzyk', 'nip' => '7962648883', 'regon' => ''],
+                ]], 'count' => 1], 200)
+                : Http::response(['firmy' => [], 'count' => 1], 200),
+            'nominatim.openstreetmap.org/*' => Http::response([], 200),
+            '*' => Http::response([], 200),
+        ]);
+
+        $this->get(route('fachora.admin.providers'))->assertOk()->assertInertia(fn (Assert $page) => $page->where('ceidg', true)->has('pkdOptions'));
+        $this->post(route('fachora.admin.ceidg'), ['pkd' => '43.22.Z', 'wojewodztwo' => 'mazowieckie', 'pages' => 2])->assertRedirect()->assertSessionHas('flash');
+
+        $imported = Provider::where('nip', '7962648883')->firstOrFail();
+        $this->assertSame('unclaimed', $imported->status);
+        $this->assertSame('ceidg', $imported->source);
+        $this->assertNull($imported->regon);
+        $this->assertContains('hydraulik', $imported->categories(), 'Categorie uit de gezochte PKD-code, want de lijst geeft er geen');
+        Http::assertSent(fn (\Illuminate\Http\Client\Request $r) => str_contains($r->url(), '/api/ceidg/v3/firmy') && str_contains($r->url(), 'pkd=4322Z') && str_contains($r->url(), 'wojewodztwo=mazowieckie') && str_contains($r->url(), 'page=0'));
+
+        $this->post(route('fachora.admin.ceidg'), ['pkd' => 'abc'])->assertSessionHasErrors('pkd');
+    }
+
     public function test_the_admin_pages_are_for_the_owner_only(): void
     {
         config(['services.marketing_stats.emails' => 'eigenaar@example.com']);
@@ -97,6 +128,7 @@ class FachoraAdminTest extends TestCase
         $this->get(route('fachora.admin.jobs.show', $job))->assertForbidden();
         $this->get(route('fachora.admin.letters'))->assertForbidden();
         $this->post(route('fachora.admin.import'), ['text' => 'x'])->assertForbidden();
+        $this->post(route('fachora.admin.ceidg'), ['pkd' => '43.22.Z'])->assertForbidden();
         $this->post(route('fachora.admin.providers.approve', $provider))->assertForbidden();
         $this->post(route('fachora.admin.jobs.cancel', $job))->assertForbidden();
         $this->assertSame('open', $job->fresh()->status);
