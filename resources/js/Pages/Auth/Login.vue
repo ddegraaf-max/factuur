@@ -3,6 +3,7 @@ import { useForm, Head, usePage } from '@inertiajs/vue3';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import Turnstile from '@/Components/Turnstile.vue';
 import LopraAuthHero from '@/Components/LopraAuthHero.vue';
+import FachoraAuthHero from '@/Components/FachoraAuthHero.vue';
 
 // De sleutel komt van de server; VITE_TURNSTILE_SITEKEY blijft werken als
 // terugval. Alleen op de bouwwaarde vertrouwen betekende dat het instellen
@@ -35,7 +36,8 @@ const submit = () => {
   <AuthLayout>
     <template #hero>
       <!-- Lopra heeft een eigen, korte hero met visual; EasyInvoice houdt de uitgebreide SEO-tekst. -->
-      <LopraAuthHero v-if="brand.key === 'lopra' || brand.key === 'lopra_pl'" mode="login" />
+      <FachoraAuthHero v-if="brand.key === 'fachora'" mode="login" />
+      <LopraAuthHero v-else-if="brand.key === 'lopra' || brand.key === 'lopra_pl'" mode="login" />
       <div v-else class="auth-copy">
         <h1 class="auth-h1">{{ $t('Inloggen bij :brand', { brand: brand.name }) }}</h1>
         <p>{{ $t("Welkom terug. Log in en ga verder waar je gebleven was: je facturen, offertes, klanten en het btw-overzicht staan klaar. :brand is het Nederlandse facturatieprogramma voor zzp'ers en mkb — facturatie zonder gedoe, vanaf € 12,10 per maand (incl. 21% btw) en maandelijks opzegbaar.", { brand: brand.name }) }}</p>
@@ -99,7 +101,8 @@ const submit = () => {
       </form>
 
       <div class="login-bottom">
-        {{ $t('Nog geen account?') }} <a :href="route('register')">{{ $t('Registreer hier') }}</a>
+        <template v-if="brand.key === 'fachora'">{{ $t('Nog geen profiel?') }} <a :href="route('fachora.claim')">{{ $t('Profiel overnemen') }}</a></template>
+        <template v-else>{{ $t('Nog geen account?') }} <a :href="route('register')">{{ $t('Registreer hier') }}</a></template>
       </div>
     </div>
   </AuthLayout>

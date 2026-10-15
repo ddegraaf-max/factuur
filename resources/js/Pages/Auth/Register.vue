@@ -5,6 +5,7 @@ import axios from 'axios';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import Turnstile from '@/Components/Turnstile.vue';
 import LopraAuthHero from '@/Components/LopraAuthHero.vue';
+import FachoraAuthHero from '@/Components/FachoraAuthHero.vue';
 import { t } from '@/i18n';
 
 const props = defineProps({
@@ -119,7 +120,8 @@ const submit = () => {
   <AuthLayout>
     <template #hero>
       <!-- Lopra heeft een eigen, korte hero met visual; EasyInvoice houdt de uitgebreide SEO-tekst. -->
-      <LopraAuthHero v-if="brand.key === 'lopra' || brand.key === 'lopra_pl'" mode="register" />
+      <FachoraAuthHero v-if="brand.key === 'fachora'" mode="register" />
+      <LopraAuthHero v-else-if="brand.key === 'lopra' || brand.key === 'lopra_pl'" mode="register" />
       <div v-else class="auth-copy">
         <h1 class="auth-h1">{{ $t('Maak gratis een :brand-account aan', { brand: brand.name }) }}</h1>
         <p>{{ $t('Begin vandaag met je administratie: je maakt in één minuut een account aan en verstuurt binnen vijf minuten je eerste professionele factuur. De eerste 14 dagen zijn gratis, zonder creditcard en zonder verplichtingen — daarna vanaf € 12,10 per maand (incl. 21% btw), maandelijks opzegbaar.') }}</p>
@@ -207,7 +209,7 @@ const submit = () => {
         <div v-if="form.errors['cf-turnstile-response']" class="field-error">{{ form.errors['cf-turnstile-response'] }}</div>
 
         <button class="btn btn-primary btn-block" type="submit" :disabled="form.processing">
-          {{ form.processing ? $t('Bezig…') : $t('Start 14 dagen gratis') }}
+          {{ form.processing ? $t('Bezig…') : (brand.key === 'fachora' ? $t('Account aanmaken') : $t('Start 14 dagen gratis')) }}
         </button>
         <p class="reg-note">{{ $t('Geen betaalgegevens nodig. Je KvK-nummer en adres vul je daarna in.') }}</p>
       </form>
