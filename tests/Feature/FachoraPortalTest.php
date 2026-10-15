@@ -40,6 +40,16 @@ class FachoraPortalTest extends TestCase
         }
     }
 
+    public function test_hidden_parts_give_404_even_before_logging_in(): void
+    {
+        config(['brand.active' => 'fachora']);
+
+        $this->get(route('hours.index'))->assertNotFound();
+        $this->get(route('billing.show'))->assertNotFound();
+        // Een bestaand onderdeel stuurt een bezoeker zonder account gewoon naar het inlogscherm.
+        $this->get(route('invoices.index'))->assertRedirect(route('login'));
+    }
+
     public function test_the_kept_parts_still_render_under_fachora(): void
     {
         config(['brand.active' => 'fachora']);

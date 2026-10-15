@@ -76,6 +76,11 @@ return Application::configure(basePath: dirname(__DIR__))
             TrackPageView::class,
         ]);
 
+        // Verborgen portaalonderdelen geven 404 vóór de inlogcontrole: ook een bezoeker
+        // zonder account ziet dan geen omleiding naar het inlogscherm voor iets dat niet bestaat.
+        // (De prioriteitslijst van Laravel noemt de inlogcontrole bij haar interface, niet bij de klasse.)
+        $middleware->prependToPriorityList(\Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class, \App\Http\Middleware\PortalScope::class);
+
         $middleware->alias([
             'owner' => \App\Http\Middleware\EnsureOwner::class,
             'market' => \App\Http\Middleware\EnsureMarket::class,
