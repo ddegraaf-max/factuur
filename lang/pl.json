@@ -1998,5 +1998,6 @@
   "Uw polis is geldig tot :date. Upload de nieuwe polis in uw panel; zonder geldige polis verdwijnt het vinkje \"ubezpieczony\" van uw profiel.": "Państwa polisa jest ważna do :date. Prosimy wgrać nową polisę w panelu; bez ważnej polisy z profilu znika oznaczenie „ubezpieczony”.",
   "Het bedrijf houdt de voorrijkosten (:amount) omdat je binnen :hours uur voor de afspraak annuleerde; de rest gaat terug naar je rekening.": "Firma zatrzymuje koszt dojazdu (:amount), ponieważ zlecenie zostało odwołane na mniej niż :hours godzin przed terminem; reszta wraca na Twoje konto.",
   "Voorrijkosten ingehouden: :amount (annulering binnen :hours uur)": "Potrącono koszt dojazdu: :amount (odwołanie na mniej niż :hours godz. przed terminem)",
-  "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Zaznacz, że żądasz wykonania usługi przed upływem terminu odstąpienia."
+  "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Zaznacz, że żądasz wykonania usługi przed upływem terminu odstąpienia.",
+  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "Nie udało się teraz wysłać e-maila. Spróbuj ponownie za minutę lub skontaktuj się z nami."
 }

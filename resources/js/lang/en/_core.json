@@ -100,5 +100,8 @@
   ":done van :total gedaan": ":done of :total done",
   "KOR · omzet :year": "KOR · turnover :year",
   "boven de grens van :limit": "above the limit of :limit",
-  "van :limit · geen btw-aangifte": "of :limit · no VAT return"
+  "van :limit · geen btw-aangifte": "of :limit · no VAT return",
+  "Het voorvoegsel komt letterlijk vóór het nummer te staan.": "The prefix is placed literally in front of the number.",
+  ":p% betaald, de rest staat nog open": ":p% paid, the rest is still outstanding",
+  "Je account is aangemaakt, maar de e-mail met de code kon niet worden verstuurd. Vraag hieronder een nieuwe code aan; lukt dat ook niet, neem dan contact met ons op.": "Your account has been created, but the e-mail with the code could not be sent. Request a new code below; if that fails too, contact us."
 }

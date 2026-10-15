@@ -1998,5 +1998,6 @@
   "Uw polis is geldig tot :date. Upload de nieuwe polis in uw panel; zonder geldige polis verdwijnt het vinkje \"ubezpieczony\" van uw profiel.": "Your policy is valid until :date. Upload the new policy in your panel; without a valid policy the \"insured\" mark disappears from your profile.",
   "Het bedrijf houdt de voorrijkosten (:amount) omdat je binnen :hours uur voor de afspraak annuleerde; de rest gaat terug naar je rekening.": "The company keeps the call-out fee (:amount) because the job was cancelled less than :hours hours before the appointment; the rest goes back to your account.",
   "Voorrijkosten ingehouden: :amount (annulering binnen :hours uur)": "Call-out fee retained: :amount (cancellation within :hours hours)",
-  "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Tick the box to request performance before the withdrawal period ends."
+  "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Tick the box to request performance before the withdrawal period ends.",
+  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "We could not send the e-mail right now. Try again in a minute or contact us."
 }

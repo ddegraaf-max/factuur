@@ -48,9 +48,7 @@ const submit = () => router.patch(route('settings.numbering.update'), { numberin
     <div class="card">
       <div class="card-body">
         <div class="numbering-hint">
-          {{ $t('Je kunt automatisch het jaartal of de maand in het voorvoegsel gebruiken. Gebruik hiervoor:') }}
-          <code>{jaar}</code> {{ $t('of') }} <code>{maand}</code>.
-          <br>
+          {{ $t('Het voorvoegsel komt letterlijk vóór het nummer te staan.') }}
           {{ $t('Het volledige factuurnummer-formaat (bijv. :example) stel je in bij Instellingen → Bedrijfsgegevens.', { example: formatExample }) }}
         </div>
         <table class="numbering-table stacked-table">

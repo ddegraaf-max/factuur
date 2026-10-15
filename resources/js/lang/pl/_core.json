@@ -100,5 +100,8 @@
   ":done van :total gedaan": "Zrobione: :done z :total",
   "KOR · omzet :year": "KOR · obrót :year",
   "boven de grens van :limit": "powyżej limitu :limit",
-  "van :limit · geen btw-aangifte": "z :limit · bez deklaracji VAT"
+  "van :limit · geen btw-aangifte": "z :limit · bez deklaracji VAT",
+  "Het voorvoegsel komt letterlijk vóór het nummer te staan.": "Prefiks jest dodawany dosłownie przed numerem.",
+  ":p% betaald, de rest staat nog open": "Zapłacono :p%, reszta pozostaje do zapłaty",
+  "Je account is aangemaakt, maar de e-mail met de code kon niet worden verstuurd. Vraag hieronder een nieuwe code aan; lukt dat ook niet, neem dan contact met ons op.": "Konto zostało utworzone, ale nie udało się wysłać e-maila z kodem. Poproś poniżej o nowy kod; jeśli to również się nie uda, skontaktuj się z nami."
 }
