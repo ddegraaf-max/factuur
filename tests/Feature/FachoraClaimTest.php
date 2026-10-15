@@ -72,7 +72,7 @@ class FachoraClaimTest extends TestCase
         $provider = $this->provider('Hydro-Max', ['claim_code' => 'ABCD2345']);
         $claimed = $this->provider('Al Geclaimd', ['status' => 'claimed', 'claimed_at' => now()->subDay()]);
 
-        $this->get(route('fachora.claim'))->assertOk()->assertInertia(fn (Assert $p) => $p->component('Fachora/Claim')->where('mode', 'start')->where('provider', null)->where('codeInvalid', false)->has('categories', 10));
+        $this->get(route('fachora.claim'))->assertOk()->assertInertia(fn (Assert $p) => $p->component('Fachora/Claim')->where('mode', 'start')->where('provider', null)->where('codeInvalid', false)->has('categories', count(config('fachora.categories'))));
         $this->get(route('fachora.claim', ['firma' => $provider->slug]))->assertInertia(fn (Assert $p) => $p->where('provider.id', $provider->id)->where('provider.name', 'Hydro-Max')->where('alreadyClaimed', false));
         $this->get(route('fachora.claim', ['firma' => $claimed->slug]))->assertInertia(fn (Assert $p) => $p->where('provider.id', $claimed->id)->where('alreadyClaimed', true));
         $this->get(route('fachora.claim', ['firma' => 'bestaat-niet']))->assertInertia(fn (Assert $p) => $p->where('provider', null));
