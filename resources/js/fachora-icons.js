@@ -15,6 +15,8 @@ const paths = {
   washer: '<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><circle cx="7.5" cy="6.5" r="1"/><path d="M11 6.5h6"/>',
   car: '<path d="M5 16 6.5 10.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 16"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
   tools: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.2 2.2-2.1-2.1 2.3-2.1z"/>',
+  mower: '<rect x="3" y="13" width="11" height="5" rx="1.5"/><circle cx="6" cy="20" r="1.5"/><circle cx="13" cy="20" r="1.5"/><path d="M14 14l3-7h4"/><path d="M8 13V9"/>',
+  bug: '<ellipse cx="12" cy="13.5" rx="5" ry="6"/><path d="M12 7.5v12M7.5 10.5 4 8.5M16.5 10.5 20 8.5M7 14H3M21 14h-4M7.5 17.5 5 20M16.5 17.5 19 20"/><path d="M9 7.5a3 3 0 0 1 6 0"/>',
   shield: '<path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/>',
   check: '<path d="m5 12 4 4L19 6"/>',
   pin: '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',

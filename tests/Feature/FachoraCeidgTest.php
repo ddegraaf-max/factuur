@@ -95,7 +95,7 @@ class FachoraCeidgTest extends TestCase
     {
         $this->assertSame(['elektryk'], CeidgClient::categoriesForPkd(['43.21.z']));
         $this->assertSame(['elektryk'], CeidgClient::categoriesForPkd(['4321Z', '43 21 Z']));
-        $this->assertSame(['hydraulik', 'ogrzewanie', 'klimatyzacja', 'agd'], CeidgClient::categoriesForPkd(['95.22.Z', '4322Z']));
+        $this->assertSame(['hydraulik', 'ogrzewanie', 'klimatyzacja', 'agd', 'ogrod'], CeidgClient::categoriesForPkd(['95.22.Z', '4322Z']));
         $this->assertSame(['slusarz', 'okna-drzwi'], CeidgClient::categoriesForPkd(['43.32.Z']));
         $this->assertSame(['remont'], CeidgClient::categoriesForPkd(['43.31.Z', '43.39.Z']));
         $this->assertSame([], CeidgClient::categoriesForPkd(['99.99.Z']));

@@ -88,7 +88,7 @@ class FachoraBrandTest extends TestCase
     {
         $this->get(route('fachora.intake'))->assertOk()->assertInertia(fn (Assert $p) => $p
             ->component('Fachora/Intake')
-            ->has('categories', 10)
+            ->has('categories', count(config('fachora.categories')))
             ->where('categories.0.key', 'hydraulik')
             ->where('categories.0.name', 'Hydraulik')
             ->has('languages', 5)

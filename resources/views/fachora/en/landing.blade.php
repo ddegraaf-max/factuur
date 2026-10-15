@@ -65,7 +65,7 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Services</div>
       <h2>What do you need?</h2>
-      <p>Ten categories in which Fachora Verified companies work. Pick yours and the job form is already filled in.</p>
+      <p>{{ count(config('fachora.categories')) }} categories in which Fachora Verified companies work. Pick yours and the job form is already filled in.</p>
     </div>
     <div class="fh-cats">
       @foreach(config('fachora.categories') as $key => $cat)

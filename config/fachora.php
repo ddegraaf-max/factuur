@@ -67,6 +67,10 @@ return [
             'examples' => ['pl' => 'pralka, zmywarka, lodówka, piekarnik', 'en' => 'washing machine, dishwasher, fridge, oven']],
         'mechanik' => ['pl' => 'Mechanik', 'en' => 'Car mechanic', 'icon' => 'car', 'pkd' => ['45.20.Z'],
             'examples' => ['pl' => 'przegląd, hamulce, opony, diagnostyka', 'en' => 'service, brakes, tyres, diagnostics']],
+        'ogrod' => ['pl' => 'Sprzęt ogrodniczy', 'en' => 'Garden equipment', 'icon' => 'mower', 'pkd' => ['95.22.Z', '33.12.Z'],
+            'examples' => ['pl' => 'kosiarka, piła, nożyce, serwis i ostrzenie', 'en' => 'lawn mower, chainsaw, hedge trimmer, service and sharpening']],
+        'szkodniki' => ['pl' => 'Szkodniki', 'en' => 'Pest control', 'icon' => 'bug', 'pkd' => ['81.29.Z'],
+            'examples' => ['pl' => 'myszy, szczury, muchy, komary, osy, dezynsekcja', 'en' => 'mice, rats, flies, mosquitoes, wasps, fumigation']],
     ],
 
     // Talen die een bedrijf kan spreken (harde filter voor de klant) en de niveaus.
