@@ -51,8 +51,12 @@ class AdminController extends Controller
         $providers = Provider::query()
             ->when($status !== 'all' && in_array($status, Provider::STATUSES, true), fn ($b) => $b->where('status', $status))
             ->when(Fachora::hasCategory($category), fn ($b) => $b->inCategory($category))
-            ->when($q !== '', fn ($b) => $b->where(fn ($w) => $w->where('display_name', 'like', "%{$q}%")->orWhere('legal_name', 'like', "%{$q}%")
-                ->orWhere('city', 'like', "%{$q}%")->orWhere('nip', 'like', "%{$q}%")->orWhere('email', 'like', "%{$q}%")))
+            // LOWER() aan beide kanten: LIKE is op Postgres hoofdlettergevoelig, op sqlite niet.
+            ->when($q !== '', function ($b) use ($q) {
+                $needle = '%' . mb_strtolower($q) . '%';
+                $b->where(fn ($w) => $w->whereRaw('LOWER(display_name) LIKE ?', [$needle])->orWhereRaw('LOWER(legal_name) LIKE ?', [$needle])
+                    ->orWhereRaw('LOWER(city) LIKE ?', [$needle])->orWhereRaw('LOWER(nip) LIKE ?', [$needle])->orWhereRaw('LOWER(email) LIKE ?', [$needle]));
+            })
             ->orderByRaw("CASE status WHEN 'pending' THEN 0 WHEN 'claimed' THEN 1 WHEN 'verified' THEN 2 WHEN 'suspended' THEN 3 WHEN 'unclaimed' THEN 4 ELSE 5 END")
             ->orderByDesc('updated_at')
             ->paginate(50)->withQueryString()

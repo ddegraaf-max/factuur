@@ -67,8 +67,7 @@ class JobService
         $coords = $this->geo->lookup($data['postal_code'] ?? null, $data['city'] ?? null);
         $locale = app()->getLocale() === 'en' ? 'en' : 'pl';
 
-        $job = ServiceJob::create([
-            'reference' => ServiceJob::nextReference(),
+        $attrs = [
             'token' => bin2hex(random_bytes(32)),
             'status' => 'pending',
             'category' => $data['category'],
@@ -87,7 +86,20 @@ class JobService
             'lat' => $coords['lat'] ?? null,
             'lng' => $coords['lng'] ?? null,
             'creator_ip' => $request->ip(),
-        ]);
+        ];
+
+        // Het kenmerk is uniek; twee gelijktijdige aanvragen kunnen hetzelfde volgnummer
+        // berekenen, dan krijgt de tweede gewoon het volgende.
+        $job = null;
+        for ($attempt = 0; $attempt < 3 && $job === null; $attempt++) {
+            try {
+                $job = ServiceJob::create($attrs + ['reference' => ServiceJob::nextReference()]);
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                if ($attempt === 2) {
+                    throw $e;
+                }
+            }
+        }
 
         foreach ($files as $file) {
             FachoraFile::fromUpload('job', $job->id, 'photo', $file);

@@ -425,9 +425,11 @@ class ProviderService
      */
     public function match(ServiceJob $job, int $limit, array $exclude = [], bool $requireLanguage = true): Collection
     {
+        // orderBy('id'): bij gelijke beoordeling blijft de volgorde voorspelbaar (Postgres geeft anders willekeur).
         $query = Provider::query()->verified()->inCategory($job->category)
             ->whereNotNull('email')->whereNull('email_blocked_at')
-            ->when($exclude, fn ($q) => $q->whereNotIn('id', $exclude));
+            ->when($exclude, fn ($q) => $q->whereNotIn('id', $exclude))
+            ->orderBy('id');
 
         if ($job->lat !== null && $job->lng !== null) {
             // Grof vangnet van ±1,8° (± 200 km); de echte afstand rekenen we hieronder uit.

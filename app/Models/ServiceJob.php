@@ -152,12 +152,16 @@ class ServiceJob extends Model
         return route('fachora.job.confirm.show', $this->token);
     }
 
-    /** Volgend kenmerk: FA-10001, FA-10002 … */
+    /**
+     * Volgend kenmerk: FA-10001, FA-10002 … Uit het hoogste bestaande kenmerk,
+     * niet uit het id: een Postgres-sequence springt na een teruggedraaide
+     * transactie, en dan zou het kenmerk gaten vertonen.
+     */
     public static function nextReference(): string
     {
-        $last = (int) static::query()->max('id');
+        $last = (int) static::query()->selectRaw('MAX(CAST(SUBSTR(reference, 4) AS INTEGER)) as n')->value('n');
 
-        return 'FA-' . (10000 + $last + 1);
+        return 'FA-' . max(10001, $last + 1);
     }
 
     public function categoryName(?string $locale = null): string
