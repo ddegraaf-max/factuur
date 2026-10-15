@@ -67,6 +67,8 @@ return [
             'examples' => ['pl' => 'pralka, zmywarka, lodówka, piekarnik', 'en' => 'washing machine, dishwasher, fridge, oven']],
         'mechanik' => ['pl' => 'Mechanik', 'en' => 'Car mechanic', 'icon' => 'car', 'pkd' => ['45.20.Z'],
             'examples' => ['pl' => 'przegląd, hamulce, opony, diagnostyka', 'en' => 'service, brakes, tyres, diagnostics']],
+        'ogrodnik' => ['pl' => 'Ogrodnik i drzewa', 'en' => 'Gardener and tree care', 'icon' => 'tree', 'pkd' => ['81.30.Z', '02.40.Z'],
+            'examples' => ['pl' => 'koszenie, żywopłot, przycinanie i wycinka drzew, zakładanie trawnika', 'en' => 'mowing, hedges, tree pruning and felling, lawn laying']],
         'ogrod' => ['pl' => 'Sprzęt ogrodniczy', 'en' => 'Garden equipment', 'icon' => 'mower', 'pkd' => ['95.22.Z', '33.12.Z'],
             'examples' => ['pl' => 'kosiarka, piła, nożyce, serwis i ostrzenie', 'en' => 'lawn mower, chainsaw, hedge trimmer, service and sharpening']],
         'szkodniki' => ['pl' => 'Szkodniki', 'en' => 'Pest control', 'icon' => 'bug', 'pkd' => ['81.29.Z'],

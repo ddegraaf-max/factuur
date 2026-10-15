@@ -332,7 +332,7 @@ return [
                     'settings.company', 'settings.brand', 'settings.numbering', 'settings.emails', 'settings.team', 'settings.security',
                     'marketing.inzichten', 'owner.companies.index', 'fachora.admin.providers', 'fachora.admin.jobs',
                 ],
-                'hidden' => [
+                'hidden' => ['demo', // de Lopra-demo (facturen) hoort niet bij Fachora
                     'hours.', 'trips.', 'recurring.', 'projects.', 'direct-debit.', 'incasso.', 'windykacja.', 'wykup.',
                     'purchases.', 'tenders.', 'bank.', 'ledger.', 'stats.', 'yearreport.', 'cashflow.', 'aging.', 'mollie.',
                     'export.', 'import.', 'billing.', 'brand.', 'demands.', 'peppol.',
