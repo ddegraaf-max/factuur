@@ -82,7 +82,7 @@
 
         <div class="foot">
             Fachora jest usługą Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, NIP 7010869430 · {{ $domain }} · Dane firmy pochodzą z publicznych rejestrów (CEIDG/KRS).
-            Jeśli nie życzą sobie Państwo dalszej korespondencji, prosimy o wiadomość na kontakt@{{ $domain }} — usuniemy wpis.
+            Jeśli nie życzą sobie Państwo dalszej korespondencji, prosimy o wiadomość na {{ $email }} — usuniemy wpis.
         </div>
     </div>
 @endforeach

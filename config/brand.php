@@ -250,7 +250,7 @@ return [
             'assistant' => 'Fa',
             'positioning' => 'Zaufani fachowcy w całej Polsce: jasna cena, pewny termin, gwarancja',
             'domain' => 'fachora.pl',
-            'email' => 'kontakt@fachora.pl',
+            'email' => 'czesc@fachora.pl',
             'contact_inbox' => null,
 
             // Nachtblauw voor navigatie en koppen, oranje alleen voor de belangrijkste actie.

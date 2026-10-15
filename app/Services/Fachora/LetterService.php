@@ -37,6 +37,7 @@ class LetterService
             'letters' => $letters,
             'date' => now()->format('d.m.Y'),
             'domain' => brand('domain'),
+            'email' => brand('email'),
         ])->setPaper('a4')->output();
     }
 

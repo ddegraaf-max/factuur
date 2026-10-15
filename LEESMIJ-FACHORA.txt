@@ -80,7 +80,7 @@ Domein: https://fachora-production.up.railway.app (fachora.pl volgt zodra het do
 railway domain fachora.pl --service fachora, dan APP_URL en BRAND_DOMAIN aanpassen).
 Gezet: APP_BRAND=fachora, APP_NAME=Fachora, APP_LOCALE=pl, APP_TIMEZONE=Europe/Warsaw, APP_KEY,
 APP_URL, DB_URL=${{Postgres.DATABASE_URL}}, MAIL_* (Resend, afzender noreply@easyinvoice.nl,
-naam Fachora; na verificatie van fachora.pl in Resend: MAIL_FROM_ADDRESS=kontakt@fachora.pl),
+naam Fachora; na verificatie van fachora.pl in Resend: MAIL_FROM_ADDRESS=czesc@fachora.pl),
 BRAND_EMAIL/BRAND_CONTACT_INBOX=hallo@easyinvoice.nl, BRAND_DOMAIN, MARKETING_STATS_EMAILS
 (d.degraaf@creditline.nl: registreer met dat adres op /register, dan is dat account eigenaar),
 ANTHROPIC_API_KEY/MODEL, SMSTOOLS_CLIENT_ID/SECRET, STRIPE_SECRET, FACHORA_PROTECT=false.

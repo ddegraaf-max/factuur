@@ -18,7 +18,7 @@ return [
     'ceidg_token' => env('CEIDG_TOKEN'),                          // JWT van dane.biznes.gov.pl (CEIDG API v3)
     'ceidg_url' => rtrim(env('CEIDG_URL', 'https://dane.biznes.gov.pl/api/ceidg/v3'), '/'),
     'geocode_url' => rtrim(env('FACHORA_GEOCODE_URL', 'https://nominatim.openstreetmap.org'), '/'),
-    'geocode_contact' => env('FACHORA_GEOCODE_CONTACT', 'kontakt@fachora.pl'),
+    'geocode_contact' => env('FACHORA_GEOCODE_CONTACT', 'czesc@fachora.pl'),
 
     // Platformfee over een uitgevoerde opdracht (percentage van het brutobedrag).
     'fee_percent' => (float) env('FACHORA_FEE_PERCENT', 10),
