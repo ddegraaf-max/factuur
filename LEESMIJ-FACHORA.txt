@@ -72,18 +72,23 @@ in_progress → done → accepted | disputed → (owner beslist) ; cancelled | e
 - Bij akkoord: transfer naar het Connect-account (bedrag − fee), conceptfactuur in de
   administratie van het bedrijf (23% btw, bruto), jobs_done +1, review-verzoek.
 
-DEPLOY (handwerk, zoals bij Lopra)
-----------------------------------
-1. Railway: nieuw project "Fachora" met service + Postgres in DEZELFDE regio (Amsterdam/EU West).
-   Variabelen: APP_BRAND=fachora, APP_NAME=Fachora, APP_LOCALE=pl, APP_TIMEZONE=Europe/Warsaw,
-   APP_URL=https://fachora.pl, APP_KEY, DB_URL=${{Postgres.DATABASE_URL}}, MAIL_* (Resend),
-   MAIL_FROM_ADDRESS=kontakt@fachora.pl (na domeinverificatie in Resend), BRAND_CONTACT_INBOX,
-   MARKETING_STATS_EMAILS (eigenaar; anders werkt het eigenaarsmenu niet), ANTHROPIC_API_KEY
-   (intake-verrijking en vertaling), TURNSTILE_SITEKEY/SECRET, STRIPE_SECRET + STRIPE_WEBHOOK_SECRET.
-   Optioneel: FACHORA_PROTECT=false (dan geen Protect), FACHORA_FEE_PERCENT, CEIDG_TOKEN,
-   SMSTOOLS_CLIENT_ID/SECRET (sms-code bij telefooncontrole; anders belt de eigenaar),
-   FACHORA_GEOCODE_CONTACT (User-Agent voor Nominatim).
-   Repo koppelen, domein fachora.pl, Pre-Deploy Command php artisan migrate --force.
+DEPLOY — STAND 16 OKT 2026 (live op Railway)
+--------------------------------------------
+Railway-project "Fachora" (workspace My Projects): services fachora (GitHub ddegraaf-max/factuur,
+main, deployt bij elke push) en Postgres, beide in europe-west4-drams3a (Amsterdam).
+Domein: https://fachora-production.up.railway.app (fachora.pl volgt zodra het domein er is:
+railway domain fachora.pl --service fachora, dan APP_URL en BRAND_DOMAIN aanpassen).
+Gezet: APP_BRAND=fachora, APP_NAME=Fachora, APP_LOCALE=pl, APP_TIMEZONE=Europe/Warsaw, APP_KEY,
+APP_URL, DB_URL=${{Postgres.DATABASE_URL}}, MAIL_* (Resend, afzender noreply@easyinvoice.nl,
+naam Fachora; na verificatie van fachora.pl in Resend: MAIL_FROM_ADDRESS=kontakt@fachora.pl),
+BRAND_EMAIL/BRAND_CONTACT_INBOX=hallo@easyinvoice.nl, BRAND_DOMAIN, MARKETING_STATS_EMAILS
+(d.degraaf@creditline.nl: registreer met dat adres op /register, dan is dat account eigenaar),
+ANTHROPIC_API_KEY/MODEL, SMSTOOLS_CLIENT_ID/SECRET, STRIPE_SECRET, FACHORA_PROTECT=false.
+Nog niet gezet (bewust): STRIPE_WEBHOOK_SECRET (eerst in Stripe een webhook op
+https://<domein>/stripe/webhook met checkout.session.completed en account.updated),
+TURNSTILE_SITEKEY/SECRET (sleutel is domeingebonden; zonder sleutels laat de app formulieren door),
+CEIDG_TOKEN, FACHORA_GEOCODE_CONTACT (User-Agent voor Nominatim), FACHORA_FEE_PERCENT.
+Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:work).
 2. Stripe: Connect inschakelen op het account (platform in NL, bedrijven in PL), webhook op
    https://fachora.pl/stripe/webhook met events checkout.session.completed en account.updated.
    Laten bevestigen door Stripe: separate charges & transfers NL→PL in PLN, BLIK/P24 in Checkout,
