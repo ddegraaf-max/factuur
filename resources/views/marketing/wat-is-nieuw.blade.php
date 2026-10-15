@@ -31,6 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 oktober 2026 · {{ brand('version_prefix') }} 1.82.0</div>
+        <h2>Fachora: een marktplaats voor gecontroleerde vakmannen op dezelfde motor</h2>
+        <ul class="tl-list">
+          <li><b>Vierde merk</b> — naast EasyInvoice, Lopra en EasyBookkeeper draait nu ook Fachora (Polen) op deze code: een klant beschrijft een klus, Fachora biedt hem aan bij gecontroleerde bedrijven, de prijs ligt vooraf vast en via Fachora Protect wordt het bedrag pas uitbetaald als de klant het werk goedkeurt. Ieder aangesloten bedrijf krijgt daarbij zijn eigen administratie met KSeF-facturen.</li>
+          <li><b>Hergebruik</b> — de uitvraagmotor (tokenlinks, herinneringen, keuze), de online aanmaning zonder account (bevestigen per e-mail) en de NIP-controle zijn de bouwstenen; nieuw zijn de bedrijvendatabase, het keurmerk Fachora Verified, de opdrachtcyclus en Stripe Connect.</li>
+          <li><b>Zonder ongevraagde e-mail</b> — bedrijven uit openbare registers krijgen nooit een mail of sms van Fachora; ze claimen hun profiel via een brief met code, hun openbare profiel of het aanmeldformulier.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.81.0</div>
         <h2>Mollie-betalingen: welke facturen zitten in die uitbetaling?</h2>
         <ul class="tl-list">

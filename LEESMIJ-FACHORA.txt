@@ -1,0 +1,114 @@
+FACHORA — marktplaats voor gecontroleerde vakmannen in Polen (Easy 1.82.0)
+==========================================================================
+
+Fachora is het vierde merk op deze code (APP_BRAND=fachora, markt pl). Geen
+factuurprogramma met een ander jasje, maar een marktplaats: de klant beschrijft
+een klus, Fachora biedt haar aan bij Verified bedrijven, de klant kiest, de prijs
+ligt vast, en via Fachora Protect (Stripe Connect) wordt pas uitbetaald als de
+klant het werk goedkeurt. Elk aangesloten bedrijf krijgt een eigen administratie
+in de markt pl (KSeF-facturen, offertes, planning). Het concept staat in
+Downloads\Fachora\Fachora_concept.md.
+
+DE ENE REGEL: GEEN ONGEVRAAGDE E-MAIL OF SMS
+---------------------------------------------
+De Poolse wet op elektronische communicatie (PKE) verbiedt elektronische direct
+marketing zonder toestemming, ook richting bedrijven. Daarom:
+- Bedrijven uit openbare registers (CEIDG/KRS) staan als 'unclaimed' in de
+  database en krijgen NOOIT mail of sms van Fachora. App\Services\Fachora\
+  ConsentPolicy bewaakt dat in de code; de Notifier weigert zonder toestemming.
+- Een bedrijf hoort pas iets van ons nadat het zelf zijn profiel claimde
+  (claimed_at) of op een gekochte opt-in-lijst staat met vastgelegde
+  toestemming (consent_at + consent_source; import met kolom zgoda=tak).
+- Afmelden kan via de link onderaan elke mail (email_blocked_at wint altijd).
+- Werven zonder e-mail: (1) brieven per post met een persoonlijke claimcode en
+  QR (Eigenaar → Fachora: bedrijven → Listy do wysyłki PDF), (2) het openbare
+  profiel met "Jesteś właścicielem? Przejmij profil", (3) de pagina /dla-firm
+  en het aanmeldformulier /dla-firm/zglos, (4) opt-in-lijsten (import met
+  zgoda=tak → knop "Wyślij zaproszenie"), (5) bellen vanaf de bellijst bij een
+  opdracht zonder Verified bedrijf (eigen keuze; de app mailt die bedrijven niet).
+
+WAT ER IS GEBOUWD
+-----------------
+config/fachora.php          categorieën (met PKD-codes), talen, fee, termijnen, stadstabel
+config/brand.php            merk 'fachora' (kleuren, logo's, SEO-teksten pl/en)
+config/marketing.php        navigatie/footer 'fachora' en 'fachora_en'
+routes/fachora.php          alle routes (openbaar, panel, eigenaar), via bootstrap/app.php
+app/Http/Middleware/EnsureBrand.php   alias 'brand:fachora'
+database/migrations/2026_10_16_000001_create_fachora_tables.php
+  providers, provider_category, provider_checks, service_jobs, service_job_offers,
+  service_job_events, service_job_extras, service_reviews, fachora_files
+app/Models/Provider, ProviderCheck, ServiceJob, ServiceJobOffer, ServiceJobEvent,
+  ServiceJobExtra, ServiceReview, FachoraFile
+app/Services/Fachora/
+  JobService          de opdrachtcyclus (aanvraag → bevestigen → aanbieden → kiezen →
+                      Protect → uitvoeren → meerwerk → klaar → akkoord/geschil → review)
+  ProviderService     import (plaklijst/CSV/CEIDG), claimen (code of profiel), profiel, matching
+  VerificationService Fachora Verified: register/btw (biała lista), e-mail, telefoon (sms),
+                      voorwaarden, bank/identiteit (Stripe Connect), verzekering; goedkeuren
+  ProtectService      Stripe Connect: account + onboarding, Checkout (PLN), transfer na akkoord, refund
+  ConsentPolicy       mag dit bedrijf gemaild worden?
+  Notifier            alle mail (klant in pl/en, bedrijf in pl/en, eigenaar in nl)
+  LetterService       brieven-pdf met claimcode en QR
+  CeidgClient         CEIDG API v3 (CEIDG_TOKEN)
+  GeocodeService      Nominatim + stadstabel als vangnet
+  Presenter           wat elke rol van een opdracht ziet
+app/Mail/FachoraMail.php + resources/views/emails/fachora(.text).blade.php
+app/Http/Controllers/Fachora/  Intake, Job (klantpagina), Offer (tokenpagina bedrijf),
+  Claim, Public (profiel/categorie), Provider (panel), Admin (eigenaar)
+app/Console/Commands/FachoraTick (elk uur), FachoraChecks (maandag), FachoraImportCeidg
+resources/js/Pages/Fachora/**  Vue-schermen; resources/views/fachora/**  marketing (pl + en)
+resources/js/lang/{pl,en}/fachora-*.json en lang/{pl,en}.json  vertalingen
+tests/Feature/Fachora*Test.php
+
+OPDRACHTCYCLUS (statussen van service_jobs)
+-------------------------------------------
+pending → open → quoted → agreed (Protect: wacht op reservering) → scheduled →
+in_progress → done → accepted | disputed → (owner beslist) ; cancelled | expired | no_match
+- Aanbieden: max_offers (5) Verified bedrijven in de categorie, binnen hun eigen straal,
+  bij voorkeur in de taal van de klant; reageren binnen offer_hours (48), één herinnering na
+  remind_hours (24), daarna een tweede ronde; zonder reactie: no_match + mail aan de eigenaar.
+- Stilzwijgend akkoord na auto_accept_days (5). Geschil: bedrijf reageert binnen dispute_hours (48).
+- Fee: fee_percent (10%), intro_fee_percent (5%) de eerste intro_days (90) na verificatie.
+- Bij akkoord: transfer naar het Connect-account (bedrag − fee), conceptfactuur in de
+  administratie van het bedrijf (23% btw, bruto), jobs_done +1, review-verzoek.
+
+DEPLOY (handwerk, zoals bij Lopra)
+----------------------------------
+1. Railway: nieuw project "Fachora" met service + Postgres in DEZELFDE regio (Amsterdam/EU West).
+   Variabelen: APP_BRAND=fachora, APP_NAME=Fachora, APP_LOCALE=pl, APP_TIMEZONE=Europe/Warsaw,
+   APP_URL=https://fachora.pl, APP_KEY, DB_URL=${{Postgres.DATABASE_URL}}, MAIL_* (Resend),
+   MAIL_FROM_ADDRESS=kontakt@fachora.pl (na domeinverificatie in Resend), BRAND_CONTACT_INBOX,
+   MARKETING_STATS_EMAILS (eigenaar; anders werkt het eigenaarsmenu niet), ANTHROPIC_API_KEY
+   (intake-verrijking en vertaling), TURNSTILE_SITEKEY/SECRET, STRIPE_SECRET + STRIPE_WEBHOOK_SECRET.
+   Optioneel: FACHORA_PROTECT=false (dan geen Protect), FACHORA_FEE_PERCENT, CEIDG_TOKEN,
+   SMSTOOLS_CLIENT_ID/SECRET (sms-code bij telefooncontrole; anders belt de eigenaar),
+   FACHORA_GEOCODE_CONTACT (User-Agent voor Nominatim).
+   Repo koppelen, domein fachora.pl, Pre-Deploy Command php artisan migrate --force.
+2. Stripe: Connect inschakelen op het account (platform in NL, bedrijven in PL), webhook op
+   https://fachora.pl/stripe/webhook met events checkout.session.completed en account.updated.
+   Laten bevestigen door Stripe: separate charges & transfers NL→PL in PLN, BLIK/P24 in Checkout,
+   refunds bij geschil. Zonder bevestiging: FACHORA_PROTECT=false en de Protect-belofte van de site halen.
+3. CEIDG: token aanvragen op dane.biznes.gov.pl; daarna
+   php artisan fachora:import-ceidg 43.22.Z 43.21.Z --wojewodztwo=łódzkie
+   (veldnamen van de API zijn volgens de documentatie; bij afwijking CeidgClient::normalize aanpassen).
+4. Eerste bedrijven: Eigenaar → Fachora: bedrijven → Importuj (plaklijst) of CEIDG; dan brieven
+   printen (PDF per 100) en posten. Geclaimde bedrijven verschijnen onder status 'claimed';
+   na hun aanvraag 'pending' → controles nalopen → Zatwierdź.
+5. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
+   laten nakijken), PKE-toets op de uitnodigingsmail voor opt-in-lijsten, DSA-contactpunt,
+   merknaam Fachora bij UPRP/EUIPO, domeinen fachora.pl/.com.
+
+TESTEN LOKAAL
+-------------
+bash <kladblok>/run-tests.sh --filter Fachora      (draagbare PHP, sqlite)
+Preview met APP_BRAND=fachora via preview-env (zie lokale-php-tests in het geheugen).
+
+BEKENDE BEPERKINGEN / LATER
+---------------------------
+- Meerwerk bij Protect wordt niet apart gereserveerd: het staat op de factuur en wordt
+  rechtstreeks met het bedrijf afgerekend.
+- De fee aan bedrijven wordt alleen vastgelegd (fee_amount), nog niet gefactureerd.
+- Talen DE/NL/UA zijn een filter op bedrijven; de interface is pl/en.
+- Geen aparte garantiereserve; "Fachora-garantie" = bemiddeling (zie regulamin).
+- De conceptfactuur bij akkoord wordt niet gemaakt als de eigenaar zelf (ingelogd in een andere
+  administratie) goedkeurt; bij akkoord door de klant of automatisch wel.

@@ -228,6 +228,93 @@ return [
         ],
 
         /*
+         * Fachora — platform voor gecontroleerde vakmannen in Polen.
+         *
+         * Geen factuurprogramma met een ander jasje, maar een marktplaats op
+         * dezelfde motor: de klant beschrijft een klus, Fachora biedt haar aan
+         * bij gecontroleerde bedrijven (Fachora Verified), de prijs wordt
+         * vooraf vastgelegd en via Fachora Protect betaald. Elk aangesloten
+         * bedrijf krijgt daarbij een eigen administratie in de markt pl (de
+         * Lopra-motor: KSeF-facturen, offertes, planning).
+         *
+         * Zet APP_BRAND=fachora op de Railway-service die op fachora.pl draait.
+         * Routes, teksten en regels: routes/web.php (blok FACHORA),
+         * config/fachora.php en App\Services\Fachora.
+         */
+        'fachora' => [
+            'name' => 'Fachora',
+            'market' => 'pl',
+            'home_view' => 'fachora.landing',
+            'version_prefix' => 'Fachora',
+            'tagline' => 'Sprawdzone firmy. Bezpieczne usługi.',
+            'assistant' => 'Fa',
+            'positioning' => 'Zaufani fachowcy w całej Polsce: jasna cena, pewny termin, gwarancja',
+            'domain' => 'fachora.pl',
+            'email' => 'kontakt@fachora.pl',
+            'contact_inbox' => null,
+
+            // Nachtblauw voor navigatie en koppen, oranje alleen voor de belangrijkste actie.
+            'color' => '#0B2545',
+            'color_dark' => '#071A33',
+            'accent' => '#F4781F',
+            'background' => '#F6F8FB',
+            'fonts_url' => null,
+            'theme_css' => '/brand/fachora/theme.css',
+
+            'mark' => '/brand/fachora/fachora-mark.svg',
+            'email_mark' => '/brand/fachora/fachora-icon-180.png',
+            'sidebar_mark' => '/brand/fachora/fachora-mark-white.svg',
+            'dark_sidebar' => true,
+            'icon' => '/brand/fachora/fachora-icon-512.png',
+            'favicon_32' => '/brand/fachora/fachora-icon-32.png',
+            'favicon_512' => '/brand/fachora/fachora-icon-512.png',
+            'favicon_svg' => '/brand/fachora/favicon.svg',
+            'favicon_ico' => null,
+            'apple_touch' => '/brand/fachora/fachora-icon-180.png',
+            'og_image' => '/brand/fachora/og-fachora.png',
+            // Nog geen eigen merkbestanden in Stripe: de Checkout toont dan de standaardhuisstijl van het account.
+            'stripe_icon' => null,
+            'stripe_logo' => null,
+            'wordmark' => '/brand/fachora/fachora-logo.svg',
+            'wordmark_dark' => '/brand/fachora/fachora-logo-dark.svg',
+
+            'seo_title' => 'Fachora — sprawdzeni fachowcy: jasna cena, pewny termin, gwarancja',
+            'seo_description' => 'Fachora łączy klientów ze zweryfikowanymi firmami w Polsce: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Cena ustalona z góry, bezpieczna płatność Fachora Protect, faktura i gwarancja. Obsługa po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
+            'og_description' => 'Sprawdzone firmy. Bezpieczne usługi. Jasna cena, pewny termin, gwarancja.',
+            'app_description' => 'Platforma zweryfikowanych fachowców w Polsce: zlecenie online, oferty od firm Fachora Verified, bezpieczna płatność Fachora Protect, faktura i 12 miesięcy gwarancji.',
+            'pwa_description' => 'Sprawdzone firmy. Bezpieczne usługi.',
+            'footer_description' => 'Fachora: zweryfikowani fachowcy, jasna cena ustalona z góry, bezpieczna płatność i gwarancja. Dla klientów bezpłatnie.',
+            'auth_title' => 'Panel firmy Fachora',
+            'auth_subtitle' => 'Zlecenia, profil, weryfikacja i faktury — w jednym miejscu.',
+            'login_seo_title' => 'Logowanie do Fachora — panel firmy',
+            'login_seo_description' => 'Zaloguj się do panelu firmy Fachora: nowe zlecenia, profil, weryfikacja i faktury.',
+            'register_seo_title' => 'Zostań firmą Fachora Verified',
+            'register_seo_description' => 'Przejmij profil swojej firmy, przejdź weryfikację i odbieraj zlecenia od klientów w Twojej okolicy. 0 zł abonamentu, prowizja tylko od wykonanych zleceń.',
+
+            'i18n' => [
+                'en' => [
+                    'tagline' => 'Verified companies. Safe services.',
+                    'positioning' => 'Trusted tradespeople across Poland: clear price, reliable appointment, guarantee',
+                    'seo_title' => 'Fachora — verified tradespeople in Poland: clear price, reliable appointment, guarantee',
+                    'seo_description' => 'Fachora connects you with verified companies in Poland: plumber, electrician, heating, air conditioning, locksmith, roofing, renovation, appliances, car mechanic. Price agreed up front, secure Fachora Protect payment, invoice and guarantee. Service in English, Polish, German, Dutch and Ukrainian.',
+                    'og_description' => 'Verified companies. Safe services. Clear price, reliable appointment, guarantee.',
+                    'app_description' => 'Platform of verified tradespeople in Poland: request online, offers from Fachora Verified companies, secure Fachora Protect payment, invoice and 12-month guarantee.',
+                    'pwa_description' => 'Verified companies. Safe services.',
+                    'footer_description' => 'Fachora: verified tradespeople, a clear price agreed up front, secure payment and a guarantee. Free for customers.',
+                    'auth_title' => 'Fachora company panel',
+                    'auth_subtitle' => 'Jobs, profile, verification and invoices in one place.',
+                    'login_seo_title' => 'Log in to Fachora — company panel',
+                    'login_seo_description' => 'Log in to the Fachora company panel: new jobs, profile, verification and invoices.',
+                    'register_seo_title' => 'Become a Fachora Verified company',
+                    'register_seo_description' => 'Claim your company profile, pass verification and receive jobs from customers near you. No subscription, commission only on completed jobs.',
+                ],
+            ],
+            'registered' => false,
+            'trademark' => null,
+            'brand_watch' => false,
+        ],
+
+        /*
          * EasyBookkeeper — boekhouden, niet alleen factureren.
          *
          * Draait op dezelfde motor als EasyInvoice; het verschil is waar het

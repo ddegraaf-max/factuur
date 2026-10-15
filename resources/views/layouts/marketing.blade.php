@@ -532,7 +532,7 @@
       </div>
       @endif
       <a href="{{ route('login') }}" class="btn btn-ghost">{{ $mk['login'] }}</a>
-      <a href="{{ route('register') }}" class="btn btn-primary">{{ $mk['cta'] }}</a>
+      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary">{{ $mk['cta'] }}</a>
     </div>
     <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
   </div>
@@ -550,7 +550,7 @@
       </div>
       @endif
       <a href="{{ route('login') }}" class="btn btn-secondary btn-block">{{ $mk['login'] }}</a>
-      <a href="{{ route('register') }}" class="btn btn-primary btn-block">{{ $mk['cta'] }}</a>
+      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary btn-block">{{ $mk['cta'] }}</a>
     </div>
   </div>
 </header>

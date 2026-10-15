@@ -29,6 +29,15 @@ const rawNav = [
     ],
   },
   {
+    // Fachora: het panel van een aangesloten bedrijf (alleen onder dat merk).
+    title: 'Fachora',
+    items: [
+      { name: 'Opdrachten', route: 'fachora.dashboard', icon: 'list', brand: 'fachora', badge: page.props.fachora?.open_offers ? String(page.props.fachora.open_offers) : null },
+      { name: 'Fachora-profiel', route: 'fachora.profile', icon: 'globe', brand: 'fachora' },
+      { name: 'Verificatie', route: 'fachora.verification', icon: 'shield', brand: 'fachora', badge: page.props.fachora?.status === 'verified' ? null : 'Nieuw' },
+    ],
+  },
+  {
     title: 'Verkoop',
     items: [
       { name: 'Offertes', route: 'quotes.index', icon: 'quote' },
@@ -121,6 +130,9 @@ const rawNav = [
       // Merkbewaking hoort bij het geregistreerde merk EasyInvoice; onder Lopra verborgen.
       { name: 'Merkbewaking', route: 'brand.index', icon: 'shield', can: 'platform', brand: 'easyinvoice' },
       { name: 'Administraties', route: 'owner.companies.index', icon: 'users', can: 'platform' },
+      // Fachora: de bedrijvendatabase en de opdrachten (alleen onder dat merk).
+      { name: 'Fachora: bedrijven', route: 'fachora.admin.providers', icon: 'shield', can: 'platform', brand: 'fachora', badge: page.props.fachora?.pending_providers ? String(page.props.fachora.pending_providers) : null },
+      { name: 'Fachora: opdrachten', route: 'fachora.admin.jobs', icon: 'list', can: 'platform', brand: 'fachora' },
     ],
   },
 ];

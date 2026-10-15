@@ -86,6 +86,19 @@ class HandleInertiaRequests extends Middleware
             $shared['easy_data'] = fn () => app(EasyInsightsService::class)->data();
             $shared['subscription'] = fn () => $request->user()->company?->subscriptionSummary();
             $shared['demo'] = (bool) $request->user()->company?->is_demo;
+
+            // Fachora: het bedrijf van deze gebruiker (status, open aanbiedingen) voor het menu.
+            if (\App\Support\Brand::is('fachora')) {
+                $shared['fachora'] = function () use ($request) {
+                    $provider = \App\Http\Controllers\Fachora\ProviderController::providerFor($request);
+
+                    return $provider ? [
+                        'status' => $provider->status,
+                        'open_offers' => $provider->offers()->whereIn('status', ['sent'])->whereHas('job', fn ($q) => $q->whereIn('status', ['open', 'quoted']))->count(),
+                        'pending_providers' => \App\Support\OwnerAccess::allows($request->user()) ? \App\Models\Provider::query()->where('status', 'pending')->count() : 0,
+                    ] : ['status' => null, 'open_offers' => 0, 'pending_providers' => \App\Support\OwnerAccess::allows($request->user()) ? \App\Models\Provider::query()->where('status', 'pending')->count() : 0];
+                };
+            }
         }
 
         return $shared;

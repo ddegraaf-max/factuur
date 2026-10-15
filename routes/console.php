@@ -131,3 +131,13 @@ Schedule::command('ponto:sync')
 
 // Zoekmachines (Bing en partners) de sitemap laten weten na een nieuwe versie.
 Schedule::command('seo:indexnow')->dailyAt('06:40');
+
+// Fachora (alleen onder dat merk): elk uur herinneringen, verlopen rondes, stilzwijgende
+// goedkeuring, opruimen en geocoderen; op maandag de hercontrole van Verified bedrijven.
+Schedule::command('fachora:tick')
+    ->hourlyAt(20)
+    ->withoutOverlapping(50);
+
+Schedule::command('fachora:checks')
+    ->weeklyOn(1, '06:10')
+    ->timezone('Europe/Warsaw');

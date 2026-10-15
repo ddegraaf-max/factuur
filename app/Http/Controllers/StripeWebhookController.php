@@ -49,6 +49,11 @@ class StripeWebhookController extends Controller
                 case 'invoice.paid':
                     $this->onInvoicePaid($object);
                     break;
+
+                // Fachora Protect: het Connect-account van een bedrijf is bijgewerkt (KYC, uitbetalingen).
+                case 'account.updated':
+                    app(\App\Services\Fachora\ProtectService::class)->handleAccountUpdated($object);
+                    break;
             }
         } catch (\Throwable $e) {
             Log::error('Stripe webhook verwerken mislukt', ['type' => $type, 'error' => $e->getMessage()]);
@@ -61,6 +66,16 @@ class StripeWebhookController extends Controller
 
     private function onCheckoutCompleted(array $session): void
     {
+        // Fachora Protect: de klant reserveerde het afgesproken bedrag voor een opdracht.
+        if (($session['metadata']['kind'] ?? null) === 'fachora_job') {
+            $job = app(\App\Services\Fachora\ProtectService::class)->completeSession($session);
+            if ($job) {
+                app(\App\Services\Fachora\JobService::class)->markPaid($job);
+            }
+
+            return;
+        }
+
         // Sms-tegoed is een losse betaling: tegoed bijboeken, en verder niets
         // (geen abonnement, en de mails van de proefperiode lopen gewoon door).
         if (($session['metadata']['kind'] ?? null) === 'sms_credits') {

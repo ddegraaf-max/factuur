@@ -176,9 +176,102 @@ $plEn = [
     ],
 ];
 
+// Fachora (markt pl): een marktplaats, geen abonnement — de knop leidt naar het aanvraagformulier.
+$fachora = [
+    'login' => 'Panel firmy',
+    'cta' => 'Znajdź fachowca →',
+    'cta_route' => 'fachora.intake',
+    'nav' => [
+        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Usługi'],
+        ['route' => 'fachora.how', 'label' => 'Jak to działa'],
+        ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
+        ['route' => 'fachora.for-companies', 'label' => 'Dla firm'],
+        ['route' => 'pl.o-nas', 'label' => 'O nas'],
+    ],
+    'footer' => [
+        ['title' => 'Dla klientów', 'links' => [
+            ['route' => 'fachora.intake', 'label' => 'Znajdź fachowca'],
+            ['route' => 'fachora.how', 'label' => 'Jak to działa'],
+            ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
+            ['route' => 'fachora.standard', 'label' => 'Standard Fachora'],
+        ]],
+        ['title' => 'Dla firm', 'links' => [
+            ['route' => 'fachora.for-companies', 'label' => 'Zostań firmą Verified'],
+            ['route' => 'fachora.claim', 'label' => 'Przejmij profil firmy'],
+            ['route' => 'fachora.apply', 'label' => 'Zgłoś firmę'],
+            ['route' => 'login', 'label' => 'Panel firmy'],
+        ]],
+        ['title' => 'Firma', 'links' => [
+            ['route' => 'pl.o-nas', 'label' => 'O nas'],
+            ['route' => 'pl.kontakt', 'label' => 'Kontakt'],
+        ]],
+        ['title' => 'Pomoc', 'links' => [
+            ['route' => 'pl.faq', 'label' => 'Najczęstsze pytania'],
+            ['mailto' => true, 'label' => 'Napisz do nas'],
+            ['route' => 'status', 'label' => 'Status systemu'],
+        ]],
+    ],
+    'legal' => [
+        ['route' => 'pl.regulamin', 'label' => 'Regulamin'],
+        ['route' => 'pl.prywatnosc', 'label' => 'Polityka prywatności'],
+    ],
+    'company_line' => 'Fachora jest usługą Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · Holandia',
+    'copyright' => '© :year Creditline B.V. · KvK 59683198 · VAT NL853603108B01',
+    'trademark_line' => '',
+    'trademark_link' => '',
+    'offers' => [],
+];
+
+$fachoraEn = [
+    'login' => 'Company panel',
+    'cta' => 'Find a tradesperson →',
+    'cta_route' => 'fachora.intake',
+    'nav' => [
+        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Services'],
+        ['route' => 'fachora.how', 'label' => 'How it works'],
+        ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
+        ['route' => 'fachora.for-companies', 'label' => 'For companies'],
+        ['route' => 'pl.o-nas', 'label' => 'About'],
+    ],
+    'footer' => [
+        ['title' => 'For customers', 'links' => [
+            ['route' => 'fachora.intake', 'label' => 'Find a tradesperson'],
+            ['route' => 'fachora.how', 'label' => 'How it works'],
+            ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
+            ['route' => 'fachora.standard', 'label' => 'Fachora Standard'],
+        ]],
+        ['title' => 'For companies', 'links' => [
+            ['route' => 'fachora.for-companies', 'label' => 'Become Verified'],
+            ['route' => 'fachora.claim', 'label' => 'Claim your profile'],
+            ['route' => 'fachora.apply', 'label' => 'Register a company'],
+            ['route' => 'login', 'label' => 'Company panel'],
+        ]],
+        ['title' => 'Company', 'links' => [
+            ['route' => 'pl.o-nas', 'label' => 'About us'],
+            ['route' => 'pl.kontakt', 'label' => 'Contact'],
+        ]],
+        ['title' => 'Help', 'links' => [
+            ['route' => 'pl.faq', 'label' => 'Frequently asked questions'],
+            ['mailto' => true, 'label' => 'E-mail us'],
+            ['route' => 'status', 'label' => 'System status'],
+        ]],
+    ],
+    'legal' => [
+        ['route' => 'pl.regulamin', 'label' => 'Terms of service'],
+        ['route' => 'pl.prywatnosc', 'label' => 'Privacy policy'],
+    ],
+    'company_line' => 'Fachora is a service of Creditline B.V. · Torenlaan 5B · 1402 AT Bussum · the Netherlands',
+    'copyright' => '© :year Creditline B.V. · KvK 59683198 · VAT NL853603108B01',
+    'trademark_line' => '',
+    'trademark_link' => '',
+    'offers' => [],
+];
+
 return [
     'easyinvoice' => $nl,
     'lopra' => $nl,
     'lopra_pl' => $pl,
     'lopra_pl_en' => $plEn,
+    'fachora' => $fachora,
+    'fachora_en' => $fachoraEn,
 ];

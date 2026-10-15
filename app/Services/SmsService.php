@@ -215,6 +215,40 @@ class SmsService
     }
 
     /**
+     * Eén sms namens het platform zelf, buiten administratie en tegoed om:
+     * de verificatiecode van een Fachora-bedrijf. Geen markt- of demoregel,
+     * wel de sleutels en een mobiel nummer. Geeft terug of het gelukt is.
+     */
+    public function platform(?string $to, string $body, string $sender = 'Fachora'): bool
+    {
+        $number = PhoneNumber::mobile($to);
+        if (! $this->configured() || $number === null) {
+            return false;
+        }
+
+        try {
+            $response = Http::baseUrl(rtrim((string) config('services.smstools.url'), '/'))
+                ->withHeaders([
+                    'X-Client-Id' => (string) config('services.smstools.client_id'),
+                    'X-Client-Secret' => (string) config('services.smstools.client_secret'),
+                ])
+                ->acceptJson()->asJson()->timeout(15)
+                ->post('/message/send', [
+                    'message' => $this->plain($body),
+                    'to' => $number,
+                    'sender' => mb_substr(preg_replace('/[^A-Za-z0-9]/', '', (string) (config('services.smstools.sender') ?: $sender)) ?: 'Fachora', 0, 11),
+                    'reference' => 'platform',
+                ]);
+        } catch (\Throwable $e) {
+            Log::error('Platform-sms mislukt', ['error' => $e->getMessage()]);
+
+            return false;
+        }
+
+        return $response->successful() && filled($response->json('messageid'));
+    }
+
+    /**
      * Is het tegoed bij Smstools zelf op, dan kan geen enkele klant nog
      * versturen: de eigenaar krijgt daar bericht van, hooguit eens per zes uur.
      */

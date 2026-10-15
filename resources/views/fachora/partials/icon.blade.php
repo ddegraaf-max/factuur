@@ -1,0 +1,27 @@
+{{-- Fachora-categorie-icoon als inline SVG. Gebruik: @include('fachora.partials.icon', ['name' => 'tap', 'size' => 28]) --}}
+@php
+    $size = $size ?? 24;
+    $paths = [
+        'tap' => '<path d="M4 10h9a4 4 0 0 1 4 4v2"/><path d="M8 10V6a2 2 0 0 1 2-2h2"/><circle cx="12" cy="4" r="1.5"/><path d="M17 16v3"/><path d="M15 21h4"/><path d="M4 10v4"/>',
+        'bolt' => '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>',
+        'radiator' => '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 6v12M11 6v12M15 6v12M3 10h18M3 14h18"/>',
+        'snow' => '<path d="M12 2v20M2 12h20M5 5l14 14M19 5 5 19"/><path d="M12 2l-2 2M12 2l2 2M12 22l-2-2M12 22l2-2"/>',
+        'key' => '<circle cx="8" cy="12" r="4"/><path d="M12 12h9M18 12v3M21 12v3"/>',
+        'window' => '<rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M12 3v18M4 12h16"/>',
+        'roof' => '<path d="M3 13 12 4l9 9"/><path d="M6 11v9h12v-9"/><path d="M15 6h3v4"/>',
+        'roller' => '<rect x="3" y="4" width="14" height="6" rx="1.5"/><path d="M17 7h3v4H11v3"/><rect x="9.5" y="14" width="3" height="7" rx="1"/>',
+        'washer' => '<rect x="4" y="3" width="16" height="18" rx="2"/><circle cx="12" cy="13" r="4.5"/><circle cx="7.5" cy="6.5" r="1"/><path d="M11 6.5h6"/>',
+        'car' => '<path d="M5 16 6.5 10.5A2 2 0 0 1 8.4 9h7.2a2 2 0 0 1 1.9 1.5L19 16"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>',
+        'tools' => '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.2 2.2-2.1-2.1 2.3-2.1z"/>',
+        'shield' => '<path d="M12 3 4 6v6c0 5 3.4 8.3 8 9 4.6-.7 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/>',
+        'check' => '<path d="m5 12 4 4L19 6"/>',
+        'pin' => '<path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+        'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+        'star' => '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9L12 3z"/>',
+        'card' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
+        'invoice' => '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h6M9 16h6"/>',
+        'lang' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+    ];
+    $d = $paths[$name ?? 'tools'] ?? $paths['tools'];
+@endphp
+<svg xmlns="http://www.w3.org/2000/svg" width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{!! $d !!}</svg>

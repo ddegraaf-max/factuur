@@ -256,26 +256,32 @@ Route::middleware(['auth', 'owner'])->prefix('merkbewaking')->name('brand.')->gr
 
 // ---------- LOPRA POLSKA: Poolse marketingpagina's (alleen in markt pl) ----------
 Route::middleware('market:pl')->name('pl.')->group(function () {
-    // Market::view() kiest de Engelse tegenhanger (lopra-pl/en/…) als de bezoeker EN koos.
-    Route::get('/faq', fn () => view(\App\Support\Market::view('lopra-pl.faq')))->name('faq');
-    Route::get('/kontakt', fn () => view(\App\Support\Market::view('lopra-pl.kontakt')))->name('kontakt');
-    Route::get('/o-nas', fn () => view(\App\Support\Market::view('lopra-pl.o-nas')))->name('o-nas');
-    Route::get('/regulamin', fn () => view(\App\Support\Market::view('lopra-pl.regulamin')))->name('regulamin');
-    Route::get('/polityka-prywatnosci', fn () => view(\App\Support\Market::view('lopra-pl.prywatnosc')))->name('prywatnosc');
-    // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én sprzedamfakture.pl.
-    Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
-    // Wettelijke rente per periode + NBP-koers voor de vervaldatum (JSON voor de calculator).
-    Route::get('/kalkulator-odsetek/stawki', [\App\Http\Controllers\WindykacjaController::class, 'rates'])->middleware('throttle:60,1')->name('kalkulator.stawki');
-    // Skup starych wyroków (tytuły wykonawcze): pagina + aanmeldformulier — leads voor de factuurkoper.
-    Route::get('/skup-wyrokow', fn () => view(\App\Support\Market::view('lopra-pl.skup-wyrokow')))->name('skup-wyrokow');
-    Route::post('/skup-wyrokow', [\App\Http\Controllers\WindykacjaController::class, 'wyrokLead'])->middleware('throttle:10,1')->name('skup-wyrokow.send');
-    // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
-    Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
-        $packages = config('przenies.packages', []);
-        abort_unless(isset($packages[$pakiet]), 404);
+    // Market::view() kiest de Engelse tegenhanger (…/en/…) als de bezoeker EN koos.
+    // Deze adressen deelt Lopra Polska met Fachora (zelfde markt): elk merk zijn eigen view.
+    $brandView = fn (string $leaf) => fn () => view(\App\Support\Market::view((\App\Support\Brand::is('fachora') ? 'fachora.' : 'lopra-pl.') . $leaf));
+    Route::get('/faq', $brandView('faq'))->name('faq');
+    Route::get('/kontakt', $brandView('kontakt'))->name('kontakt');
+    Route::get('/o-nas', $brandView('o-nas'))->name('o-nas');
+    Route::get('/regulamin', $brandView('regulamin'))->name('regulamin');
+    Route::get('/polityka-prywatnosci', $brandView('prywatnosc'))->name('prywatnosc');
 
-        return view(\App\Support\Market::view('lopra-pl.przenies'), ['slug' => $pakiet, 'pkg' => $packages[$pakiet], 'packages' => $packages]);
-    })->name('przenies');
+    // Alleen Lopra Polska (onder Fachora bestaan deze pagina's niet).
+    Route::middleware('brand:lopra_pl')->group(function () {
+        // Publieke kalkulator odsetek + wezwanie do zapłaty: leadmagnet voor Lopra én sprzedamfakture.pl.
+        Route::get('/kalkulator-odsetek', fn () => view(\App\Support\Market::view('lopra-pl.kalkulator')))->name('kalkulator');
+        // Wettelijke rente per periode + NBP-koers voor de vervaldatum (JSON voor de calculator).
+        Route::get('/kalkulator-odsetek/stawki', [\App\Http\Controllers\WindykacjaController::class, 'rates'])->middleware('throttle:60,1')->name('kalkulator.stawki');
+        // Skup starych wyroków (tytuły wykonawcze): pagina + aanmeldformulier — leads voor de factuurkoper.
+        Route::get('/skup-wyrokow', fn () => view(\App\Support\Market::view('lopra-pl.skup-wyrokow')))->name('skup-wyrokow');
+        Route::post('/skup-wyrokow', [\App\Http\Controllers\WindykacjaController::class, 'wyrokLead'])->middleware('throttle:10,1')->name('skup-wyrokow.send');
+        // Overstappen vanuit Poolse pakketten (Fakturownia, iFirma, wFirma, inFakt) — zie config/przenies.php.
+        Route::get('/przenies-sie-z/{pakiet}', function (string $pakiet) {
+            $packages = config('przenies.packages', []);
+            abort_unless(isset($packages[$pakiet]), 404);
+
+            return view(\App\Support\Market::view('lopra-pl.przenies'), ['slug' => $pakiet, 'pkg' => $packages[$pakiet], 'packages' => $packages]);
+        })->name('przenies');
+    });
 });
 
 // ---------- SITEMAPS (voor zoekmachines) ----------

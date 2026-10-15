@@ -1,0 +1,174 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+/**
+ * Een opdracht (zlecenie) van een klant: van aanvraag tot uitvoering,
+ * akkoord, uitbetaling en beoordeling. De klant volgt alles via de geheime
+ * link met het token; het bedrijf via zijn aanbieding (ServiceJobOffer).
+ */
+class ServiceJob extends Model
+{
+    public const STATUSES = [
+        'pending' => 'Wacht op bevestiging', 'open' => 'Aangeboden', 'quoted' => 'Prijs ontvangen', 'no_match' => 'Geen bedrijf gevonden',
+        'agreed' => 'Bedrijf gekozen', 'scheduled' => 'Ingepland', 'in_progress' => 'In uitvoering', 'done' => 'Klaar',
+        'accepted' => 'Afgerond', 'disputed' => 'Geschil', 'cancelled' => 'Geannuleerd', 'expired' => 'Verlopen zonder reactie',
+    ];
+
+    /** Vanaf hier is er een bedrijf aan de opdracht verbonden. */
+    public const WITH_PROVIDER = ['agreed', 'scheduled', 'in_progress', 'done', 'accepted', 'disputed'];
+
+    public const CLOSED = ['accepted', 'cancelled', 'expired'];
+
+    protected $fillable = [
+        'reference', 'token', 'status', 'category', 'title', 'description', 'description_pl', 'ai', 'urgency', 'wanted_date', 'time_window',
+        'language', 'customer_name', 'customer_email', 'customer_phone', 'customer_locale', 'postal_code', 'city', 'address_line', 'lat', 'lng',
+        'creator_ip', 'confirmed_at', 'confirm_mails', 'estimate_low', 'estimate_high',
+        'offered_at', 'offers_deadline_at', 'waves', 'chosen_offer_id', 'provider_id', 'agreed_amount', 'agreed_type', 'agreed_scope', 'agreed_at',
+        'scheduled_at', 'scheduled_window', 'warranty_months',
+        'protect', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id',
+        'paid_at', 'payout_at', 'refunded_at', 'fee_percent', 'fee_amount', 'payout_amount',
+        'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
+        'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
+    ];
+
+    protected $casts = [
+        'ai' => 'array',
+        'wanted_date' => 'date:Y-m-d',
+        'lat' => 'float',
+        'lng' => 'float',
+        'confirmed_at' => 'datetime',
+        'estimate_low' => 'float',
+        'estimate_high' => 'float',
+        'offered_at' => 'datetime',
+        'offers_deadline_at' => 'datetime',
+        'agreed_amount' => 'float',
+        'agreed_at' => 'datetime',
+        'scheduled_at' => 'datetime',
+        'protect' => 'boolean',
+        'paid_at' => 'datetime',
+        'payout_at' => 'datetime',
+        'refunded_at' => 'datetime',
+        'fee_percent' => 'float',
+        'fee_amount' => 'float',
+        'payout_amount' => 'float',
+        'started_at' => 'datetime',
+        'done_at' => 'datetime',
+        'accepted_at' => 'datetime',
+        'dispute_opened_at' => 'datetime',
+        'dispute_replied_at' => 'datetime',
+        'resolved_at' => 'datetime',
+        'cancelled_at' => 'datetime',
+        'reviewed_at' => 'datetime',
+        'owner_notified_at' => 'datetime',
+    ];
+
+    protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id'];
+
+    public function provider(): BelongsTo
+    {
+        return $this->belongsTo(Provider::class);
+    }
+
+    public function offers(): HasMany
+    {
+        return $this->hasMany(ServiceJobOffer::class)->orderBy('id');
+    }
+
+    public function chosenOffer(): BelongsTo
+    {
+        return $this->belongsTo(ServiceJobOffer::class, 'chosen_offer_id');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(ServiceJobEvent::class)->orderBy('id');
+    }
+
+    public function extras(): HasMany
+    {
+        return $this->hasMany(ServiceJobExtra::class)->orderBy('id');
+    }
+
+    public function review(): HasOne
+    {
+        return $this->hasOne(ServiceReview::class);
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(FachoraFile::class, 'owner_id')->where('owner_type', 'job')->orderBy('id');
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class)->withoutGlobalScope('company');
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isClosed(): bool
+    {
+        return in_array($this->status, self::CLOSED, true);
+    }
+
+    public function hasProvider(): bool
+    {
+        return in_array($this->status, self::WITH_PROVIDER, true) && $this->provider_id !== null;
+    }
+
+    /** Kan de klant nog een bedrijf kiezen? */
+    public function canChoose(): bool
+    {
+        return in_array($this->status, ['open', 'quoted'], true);
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->paid_at !== null && $this->refunded_at === null;
+    }
+
+    /** Totaal incl. goedgekeurd meerwerk. */
+    public function totalAmount(): float
+    {
+        return (float) $this->agreed_amount + (float) $this->extras()->where('status', 'approved')->sum('amount');
+    }
+
+    public function url(): string
+    {
+        return route('fachora.job.show', $this->token);
+    }
+
+    public function confirmUrl(): string
+    {
+        return route('fachora.job.confirm.show', $this->token);
+    }
+
+    /** Volgend kenmerk: FA-10001, FA-10002 … */
+    public static function nextReference(): string
+    {
+        $last = (int) static::query()->max('id');
+
+        return 'FA-' . (10000 + $last + 1);
+    }
+
+    public function categoryName(?string $locale = null): string
+    {
+        $locale = $locale ?: (app()->getLocale() === 'en' ? 'en' : 'pl');
+
+        return (string) config("fachora.categories.{$this->category}.{$locale}", $this->category);
+    }
+
+    public function statusLabel(): string
+    {
+        return __(self::STATUSES[$this->status] ?? $this->status);
+    }
+}

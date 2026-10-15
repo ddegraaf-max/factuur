@@ -24,6 +24,18 @@ class SitemapService
      */
     public function sections(): array
     {
+        if (Brand::is('fachora')) {
+            $categories = array_keys((array) config('fachora.categories', []));
+
+            return [
+                'strony' => fn () => $this->plain(['/', '/zlecenie/nowe', '/jak-to-dziala', '/fachora-protect', '/standard', '/dla-firm', '/dla-firm/zglos',
+                    '/przejmij', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/status', '/login']),
+                'uslugi' => fn () => $this->plain(array_map(fn ($c) => '/uslugi/' . $c, $categories)),
+                'miasta' => fn () => $this->categoryCityPages(),
+                'firmy' => fn () => $this->providerPages(),
+            ];
+        }
+
         if (Market::isPl()) {
             return [
                 'strony' => fn () => $this->plain(['/', '/demo', '/faq', '/kontakt', '/o-nas', '/skup-wyrokow',
@@ -94,6 +106,40 @@ class SitemapService
         }
 
         return $pages;
+    }
+
+    /**
+     * Fachora: categoriepagina's per stad, alleen waar Verified bedrijven zijn
+     * (anders zijn het lege doorway-pagina's).
+     *
+     * @return list<array{0: string, 1: Carbon|null}>
+     */
+    private function categoryCityPages(): array
+    {
+        $rows = \Illuminate\Support\Facades\DB::table('providers')
+            ->join('provider_category', 'provider_category.provider_id', '=', 'providers.id')
+            ->where('providers.status', 'verified')->whereNotNull('providers.city')
+            ->selectRaw('provider_category.category as category, providers.city as city, MAX(providers.updated_at) as updated')
+            ->groupBy('provider_category.category', 'providers.city')
+            ->get();
+
+        $pages = [];
+        foreach ($rows as $row) {
+            $pages[] = ['/uslugi/' . $row->category . '/' . \Illuminate\Support\Str::slug(\Illuminate\Support\Str::ascii((string) $row->city)), $row->updated ? Carbon::parse($row->updated) : null];
+        }
+
+        return $pages;
+    }
+
+    /**
+     * Fachora: de profielen van Verified bedrijven.
+     *
+     * @return list<array{0: string, 1: Carbon|null}>
+     */
+    private function providerPages(): array
+    {
+        return \App\Models\Provider::query()->verified()->orderBy('id')->get(['slug', 'updated_at'])
+            ->map(fn ($p) => ['/firma/' . $p->slug, $p->updated_at])->all();
     }
 
     /**
