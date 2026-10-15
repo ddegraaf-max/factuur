@@ -23,9 +23,7 @@
 @section('content')
 <section class="page-hero" style="padding-bottom:8px;">
   <div class="container">
-    <div class="breadcrumb" style="text-align:center;">
-      <a href="{{ route('kennisbank') }}">Kennisbank</a> &nbsp;›&nbsp; {{ $article['category'] }}
-    </div>
+    @include('marketing.partials.breadcrumbs', ['crumbs' => [['Kennisbank', route('kennisbank')], [$article['category'], null], [$article['title'], null]]])
     <div class="page-hero-inner">
       <h1>{{ $article['title'] }}</h1>
       <p class="lead">{{ $article['intro'] }}</p>
@@ -48,6 +46,10 @@
       <a class="side-link" href="{{ route('btw-calculator') }}">Btw-calculator</a>
       <a class="side-link" href="{{ route('uurtarief-calculator') }}">Uurtarief-calculator</a>
       <a class="side-link" href="{{ route('incassokosten-calculator') }}">Incassokosten berekenen</a>
+      <div class="side-cat">Meer</div>
+      <a class="side-link" href="{{ route('begrippen') }}">Begrippenlijst</a>
+      <a class="side-link" href="{{ route('voorbeelden') }}">Voorbeeldfacturen</a>
+      <a class="side-link" href="{{ route('beroepen') }}">Factureren in jouw vak</a>
     </aside>
 
     <article class="prose" style="margin:0;">

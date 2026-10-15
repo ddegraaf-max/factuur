@@ -39,11 +39,16 @@ class SitemapService
                 '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum', '/kennisbank',
                 '/facturatie-met-ai', '/boekhouders', '/factuurprogramma-bouw', '/roadmap', '/wat-is-nieuw', '/status',
                 '/privacy', '/voorwaarden', '/cookies', '/verwerkersovereenkomst', '/login', '/register',
+                '/begrippen', '/factuurprogramma-voor', '/voorbeelden', '/overzicht',
             ], Brand::watchesTrademark() ? ['/zocht-u-een-ander-easyinvoice'] : [])),
             'tools' => fn () => $this->plain(['/gratis-factuur-maken', '/btw-calculator', '/uurtarief-calculator', '/incassokosten-berekenen', '/online-aanmaning']),
             'overstappen' => fn () => $this->plain(['/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden']),
             'helpcentrum' => fn () => $this->articles('/helpcentrum/', config('help.articles', [])),
             'kennisbank' => fn () => $this->articles('/kennisbank/', config('kennisbank.articles', [])),
+            // Inhoud uit configuratie, elk met een eigen deelsitemap (1.80.0).
+            'begrippen' => fn () => $this->articles('/begrippen/', config('begrippen.terms', [])),
+            'beroepen' => fn () => $this->articles('/factuurprogramma-voor/', config('beroepen.professions', [])),
+            'voorbeelden' => fn () => $this->articles('/voorbeelden/', config('voorbeelden.examples', [])),
             'bedrijven' => fn () => $this->companyPages(),
         ];
     }

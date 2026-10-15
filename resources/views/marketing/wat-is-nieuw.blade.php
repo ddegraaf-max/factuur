@@ -31,7 +31,19 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.79.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.80.0</div>
+        <h2>Begrippenlijst, pagina's per beroep en voorbeeldfacturen</h2>
+        <ul class="tl-list">
+          <li><b>Begrippenlijst</b> — 36 begrippen uit de praktijk van factureren, btw en betaald krijgen, elk op een eigen pagina met uitleg en verwijzingen: van btw verlegd en de KOR tot creditnota, Peppol, G-rekening en wettelijke rente. Te vinden onder <a href="{{ route('begrippen') }}">Begrippenlijst</a>.</li>
+          <li><b>Factureren in jouw vak</b> — twaalf pagina's die per beroep uitleggen waar je bij factureren op let: schilders, timmerlieden, elektriciens, installateurs, stukadoors, hoveniers, klusbedrijven, dakdekkers, fotografen, webdesigners, consultants en zzp'ers in het algemeen. Elk met eigen vragen en antwoorden. Zie <a href="{{ route('beroepen') }}">Factuurprogramma per beroep</a>.</li>
+          <li><b>Voorbeeldfacturen</b> — vier echte pdf's om te bekijken en te downloaden: een zzp-factuur, een factuur met btw verlegd, een factuur zonder btw onder de KOR en een urenfactuur, met uitleg van elk onderdeel. Zie <a href="{{ route('voorbeelden') }}">Voorbeeldfacturen</a>.</li>
+          <li><b>Beter vindbaar</b> — elke nieuwe sectie heeft een eigen deelsitemap in de sitemap-index, alle inhoudspagina's dragen een kruimelpad met structured data, en op <a href="{{ route('overzicht') }}">Alle pagina's</a> staat elke openbare pagina op een rij.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">15 oktober 2026 · {{ brand('version_prefix') }} 1.79.0</div>
         <h2>Claude hangt nu ook een eigen pdf aan je offerte</h2>
         <ul class="tl-list">
           <li><b>Bijlage uploaden via de Claude-koppeling</b> — schreef Claude een uitgewerkte offerte of urenstaat als pdf? Met de nieuwe tool bijlage_uploaden hangt Claude dat bestand aan de concept-offerte of -factuur: via een openbare link die {{ brand('name') }} zelf ophaalt, of via een eenmalige upload-link (een uur geldig) waar Claude het bestand rechtstreeks naartoe stuurt. De bijlage gaat mee met de mail naar de klant. Ook bij het aanmaken kun je nu een link naar een bestand meegeven; de koppeling haalt alleen bestanden op van openbare adressen.</li>

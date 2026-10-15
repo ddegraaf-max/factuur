@@ -212,6 +212,18 @@ Route::get('/kennisbank/{slug}', function (string $slug) {
     ]);
 })->name('kennisbank.artikel')->middleware('market:nl');
 
+// ---------- BEGRIPPEN, BEROEPEN, VOORBEELDEN, OVERZICHT (inhoud uit config, eigen deelsitemaps) ----------
+Route::middleware('market:nl')->controller(\App\Http\Controllers\MarketingContentController::class)->group(function () {
+    Route::get('/begrippen', 'begrippen')->name('begrippen');
+    Route::get('/begrippen/{slug}', 'begrip')->where('slug', '[a-z0-9-]+')->name('begrippen.term');
+    Route::get('/factuurprogramma-voor', 'beroepen')->name('beroepen');
+    Route::get('/factuurprogramma-voor/{slug}', 'beroep')->where('slug', '[a-z0-9-]+')->name('beroepen.beroep');
+    Route::get('/voorbeelden', 'voorbeelden')->name('voorbeelden');
+    Route::get('/voorbeelden/{slug}.pdf', 'voorbeeldPdf')->where('slug', '[a-z0-9-]+')->name('voorbeelden.pdf');
+    Route::get('/voorbeelden/{slug}', 'voorbeeld')->where('slug', '[a-z0-9-]+')->name('voorbeelden.voorbeeld');
+    Route::get('/overzicht', 'overzicht')->name('overzicht');
+});
+
 // ---------- MARKETING-INZICHTEN (intern) ----------
 // Bezoekersstatistieken van de publieke pagina's; alleen voor de eigenaar
 // (zie MarketingStatsController voor de toegangscheck).

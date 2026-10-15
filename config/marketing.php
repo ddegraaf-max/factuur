@@ -32,7 +32,9 @@ $nl = [
             ['route' => 'uurtarief-calculator', 'label' => 'Uurtarief-calculator'],
             ['route' => 'incassokosten-calculator', 'label' => 'Incassokosten berekenen'],
             ['route' => 'aanmaning', 'label' => 'Gratis online aanmaning'],
+            ['route' => 'voorbeelden', 'label' => 'Voorbeeldfacturen'],
             ['route' => 'kennisbank', 'label' => 'Kennisbank'],
+            ['route' => 'begrippen', 'label' => 'Begrippenlijst'],
             ['route' => 'overstappen.van', 'params' => ['wefact'], 'label' => 'Overstappen van WeFact'],
             ['route' => 'overstappen.van', 'params' => ['moneybird'], 'label' => 'Overstappen van Moneybird'],
             ['route' => 'overstappen.van', 'params' => ['e-boekhouden'], 'label' => 'Overstappen van e-Boekhouden'],
@@ -41,6 +43,7 @@ $nl = [
             ['route' => 'over', 'label' => 'Over ons'],
             ['route' => 'boekhouders', 'label' => 'Voor boekhouders'],
             ['route' => 'bouw', 'label' => 'Voor de bouw'],
+            ['route' => 'beroepen', 'label' => 'Voor jouw beroep'],
             ['route' => 'contact', 'label' => 'Contact'],
         ]],
         ['title' => 'Hulp', 'links' => [
@@ -49,6 +52,7 @@ $nl = [
             ['route' => 'faq', 'label' => 'Veelgestelde vragen'],
             ['mailto' => true, 'label' => 'E-mail support'],
             ['route' => 'status', 'label' => 'Status'],
+            ['route' => 'overzicht', 'label' => 'Alle pagina\'s'],
         ]],
     ],
     'legal' => [

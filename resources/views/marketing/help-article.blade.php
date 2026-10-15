@@ -20,9 +20,7 @@
 @section('content')
 <section class="page-hero" style="padding-bottom:8px;">
   <div class="container">
-    <div class="breadcrumb" style="text-align:center;">
-      <a href="{{ route('helpcentrum') }}">Helpcentrum</a> &nbsp;›&nbsp; {{ $article['category'] }}
-    </div>
+    @include('marketing.partials.breadcrumbs', ['crumbs' => [['Helpcentrum', route('helpcentrum')], [$article['category'], null], [$article['title'], null]]])
     <div class="page-hero-inner">
       <h1>{{ $article['title'] }}</h1>
       <p class="lead">{{ $article['intro'] }}</p>

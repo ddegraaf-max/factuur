@@ -21,6 +21,7 @@ class SeoMetaTest extends TestCase
         '/gratis-factuur-maken', '/incassokosten-berekenen', '/cookies', '/verwerkersovereenkomst',
         '/overstappen-van/wefact', '/overstappen-van/moneybird', '/overstappen-van/e-boekhouden',
         '/factuurprogramma-bouw', '/online-aanmaning',
+        '/begrippen', '/factuurprogramma-voor', '/voorbeelden', '/overzicht',
     ];
 
     private function meta(string $html, string $pattern): string
@@ -53,6 +54,9 @@ class SeoMetaTest extends TestCase
         $paths = array_merge(
             array_map(fn ($slug) => '/kennisbank/' . $slug, array_keys(config('kennisbank.articles'))),
             array_map(fn ($slug) => '/helpcentrum/' . $slug, array_keys(config('help.articles'))),
+            array_map(fn ($slug) => '/begrippen/' . $slug, array_keys(config('begrippen.terms'))),
+            array_map(fn ($slug) => '/factuurprogramma-voor/' . $slug, array_keys(config('beroepen.professions'))),
+            array_map(fn ($slug) => '/voorbeelden/' . $slug, array_keys(config('voorbeelden.examples'))),
         );
 
         $titles = [];

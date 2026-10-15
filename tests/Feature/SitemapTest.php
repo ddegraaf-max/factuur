@@ -22,24 +22,34 @@ class SitemapTest extends TestCase
         $index = (string) $this->get('/sitemap.xml')->assertOk()
             ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')->getContent();
         $this->assertStringContainsString('<sitemapindex', $index);
-        foreach (['paginas', 'tools', 'overstappen', 'helpcentrum', 'kennisbank'] as $name) {
+        foreach (['paginas', 'tools', 'overstappen', 'helpcentrum', 'kennisbank', 'begrippen', 'beroepen', 'voorbeelden'] as $name) {
             $this->assertStringContainsString(url("/sitemap-{$name}.xml"), $index);
         }
         // Zonder gepubliceerde bedrijfspagina's staat die deelsitemap niet in de index.
         $this->assertStringNotContainsString('sitemap-bedrijven', $index);
 
-        $help = (string) $this->get('/sitemap-helpcentrum.xml')->assertOk()->getContent();
-        foreach (array_keys(config('help.articles')) as $slug) {
-            $this->assertStringContainsString(url('/helpcentrum/' . $slug), $help);
-        }
-        $kennisbank = (string) $this->get('/sitemap-kennisbank.xml')->assertOk()->getContent();
-        foreach (array_keys(config('kennisbank.articles')) as $slug) {
-            $this->assertStringContainsString(url('/kennisbank/' . $slug), $kennisbank);
+        // Elke deelsitemap uit configuratie bevat élk artikel, met de 'updated'-datum als lastmod.
+        foreach ([
+            'helpcentrum' => ['/helpcentrum/', 'help.articles'],
+            'kennisbank' => ['/kennisbank/', 'kennisbank.articles'],
+            'begrippen' => ['/begrippen/', 'begrippen.terms'],
+            'beroepen' => ['/factuurprogramma-voor/', 'beroepen.professions'],
+            'voorbeelden' => ['/voorbeelden/', 'voorbeelden.examples'],
+        ] as $name => [$prefix, $config]) {
+            $xml = (string) $this->get("/sitemap-{$name}.xml")->assertOk()->getContent();
+            $this->assertNotEmpty(config($config), "{$config} is leeg");
+            foreach (config($config) as $slug => $item) {
+                $this->assertStringContainsString('<loc>' . url($prefix . $slug) . '</loc>'
+                    . (isset($item['updated']) ? '<lastmod>' . $item['updated'] . '</lastmod>' : ''), $xml);
+            }
         }
 
         $paginas = (string) $this->get('/sitemap-paginas.xml')->assertOk()->getContent();
         $this->assertStringContainsString(url('/zocht-u-een-ander-easyinvoice'), $paginas);
         $this->assertStringContainsString(url('/register'), $paginas);
+        foreach (['/begrippen', '/factuurprogramma-voor', '/voorbeelden', '/overzicht'] as $path) {
+            $this->assertStringContainsString('<loc>' . url($path) . '</loc>', $paginas);
+        }
 
         $this->get('/sitemap-bestaatniet.xml')->assertNotFound();
         $this->get('/robots.txt')->assertOk()->assertSee('Disallow: /lang/')->assertSee('/sitemap.xml');

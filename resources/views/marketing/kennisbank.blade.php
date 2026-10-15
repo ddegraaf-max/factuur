@@ -28,6 +28,25 @@
       </div>
     @endforeach
 
+    <h2 style="font-size:22px;margin:34px 0 16px;">Meer uitleg</h2>
+    <div class="card-grid">
+      <a href="{{ route('begrippen') }}" class="info-card" style="display:block;">
+        <h3>Begrippenlijst</h3>
+        <p>Korte uitleg van {{ count(config('begrippen.terms', [])) }} begrippen: van btw verlegd en KOR tot creditnota, Peppol en G-rekening.</p>
+        <p style="margin-top:12px;color:var(--brand);font-weight:600;font-size:14px;">Naar de begrippen →</p>
+      </a>
+      <a href="{{ route('voorbeelden') }}" class="info-card" style="display:block;">
+        <h3>Voorbeeldfacturen</h3>
+        <p>Echte pdf's van een zzp-factuur, een factuur met btw verlegd, een KOR-factuur en een urenfactuur, met uitleg per onderdeel.</p>
+        <p style="margin-top:12px;color:var(--brand);font-weight:600;font-size:14px;">Bekijk de voorbeelden →</p>
+      </a>
+      <a href="{{ route('beroepen') }}" class="info-card" style="display:block;">
+        <h3>Factureren in jouw vak</h3>
+        <p>Per beroep wat er bij factureren komt kijken: schilders, installateurs, hoveniers, fotografen, consultants en meer.</p>
+        <p style="margin-top:12px;color:var(--brand);font-weight:600;font-size:14px;">Kies je beroep →</p>
+      </a>
+    </div>
+
     <div style="max-width:760px;margin:56px auto 0;background:var(--brand-tint);border:1px solid var(--brand-border);border-radius:16px;padding:28px;text-align:center;">
       <h3 style="font-size:20px;margin-bottom:8px;">Liever meteen aan de slag?</h3>
       <p style="color:var(--text-2);margin:0 0 18px;">Maak <a href="{{ route('gratis-factuur') }}" style="color:var(--brand);font-weight:600;">gratis een factuur</a> zonder account, of reken je <a href="{{ route('uurtarief-calculator') }}" style="color:var(--brand);font-weight:600;">uurtarief</a>, <a href="{{ route('btw-calculator') }}" style="color:var(--brand);font-weight:600;">btw</a> of <a href="{{ route('incassokosten-calculator') }}" style="color:var(--brand);font-weight:600;">incassokosten en rente</a> uit met onze gratis tools.</p>

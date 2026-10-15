@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Services\FreeInvoiceImport;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -99,43 +98,9 @@ class FreeInvoiceController extends Controller
     /** @param  array<string, mixed>  $data */
     protected function pdf(array $data)
     {
-        // Totalen altijd server-side berekenen; bij verlegd/vrijgesteld telt
-        // geen enkele regel btw.
-        $subtotal = 0.0;
-        $vatByRate = [];
-        $rows = [];
-
-        foreach ($data['regels'] as $line) {
-            $rate = $data['btw_type'] === 'normaal' ? (int) $line['btw'] : 0;
-            $amount = round((float) $line['aantal'] * (float) $line['prijs'], 2);
-            $subtotal += $amount;
-            if ($data['btw_type'] === 'normaal') {
-                $vatByRate[$rate] = ($vatByRate[$rate] ?? 0.0) + $amount;
-            }
-
-            $rows[] = [
-                'omschrijving' => $line['omschrijving'],
-                'aantal' => (float) $line['aantal'],
-                'prijs' => (float) $line['prijs'],
-                'btw' => $rate,
-                'bedrag' => $amount,
-            ];
-        }
-
-        $vatTotals = [];
-        foreach ($vatByRate as $rate => $base) {
-            if ($rate > 0) {
-                $vatTotals[$rate] = round($base * $rate / 100, 2);
-            }
-        }
-
-        $pdf = Pdf::loadView('pdf.gratis-factuur', [
-            'data' => $data,
-            'rows' => $rows,
-            'subtotal' => round($subtotal, 2),
-            'vatTotals' => $vatTotals,
-            'total' => round($subtotal + array_sum($vatTotals), 2),
-        ]);
+        // Dezelfde generator als de voorbeeldfacturen op /voorbeelden; de
+        // totalen worden daar server-side berekend.
+        $pdf = \App\Support\FreeInvoicePdf::make($data);
 
         $filename = 'factuur-'.Str::slug($data['factuurnummer'], '-');
 
