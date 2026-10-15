@@ -58,6 +58,15 @@ const displayPrice = (line) => {
 
 const today = todayLocal();
 
+// Een concept opent op de dag van vandaag, niet op de dag van aanmaken: wie een
+// factuur weken als concept laat staan, verstuurt hem anders met een oude datum
+// (en een al verstreken betaaltermijn). Een bewust in de toekomst gezette datum
+// blijft staan. De server geeft jjjj-mm-dd (soms met tijd erachter).
+const draftDate = (stored) => {
+  const d = stored?.slice(0, 10);
+  return d && d > today ? d : today;
+};
+
 // Taal van PDF en e-mail: standaard die van de klant (Klanten → bewerken),
 // per factuur te wijzigen.
 const customerLanguage = (id) => props.customers.find(c => c.id === Number(id))?.language || props.default_language;
@@ -71,8 +80,7 @@ const form = useForm({
   // je per factuur hoe je prijzen intypt (de server slaat altijd netto op).
   price_mode: props.price_mode === 'incl' ? 'incl' : 'excl',
   brand_profile_id: props.invoice?.brand_profile_id ?? null,
-  // De server geeft een volledige tijdstempel; het datumveld wil alleen jjjj-mm-dd.
-  invoice_date: props.invoice?.invoice_date?.slice(0, 10) ?? today,
+  invoice_date: draftDate(props.invoice?.invoice_date),
   // Standaardtermijn uit Instellingen → Bedrijfsgegevens (klant kan afwijken).
   payment_terms: props.invoice?.payment_terms ?? props.default_payment_terms ?? 30,
   reference: props.invoice?.reference ?? '',

@@ -51,6 +51,54 @@ class DocumentDateTest extends TestCase
         $this->assertSame('2026-10-12', $invoice->fresh()->due_date->toDateString());
     }
 
+    /**
+     * De factuurdatum is de dag van uitreiken. Een concept dat weken heeft
+     * gewacht, krijgt bij het versturen de dag van vandaag en een verse
+     * vervaldatum (15 oktober 2026: een concept van 27 augustus ging anders
+     * met die oude datum en een al verstreken betaaltermijn de deur uit).
+     */
+    public function test_an_old_draft_gets_todays_date_when_sent(): void
+    {
+        $this->actingAs($this->demoUser());
+        $customer = Customer::orderBy('id')->firstOrFail();
+        $created = now()->subDays(49)->toDateString();
+
+        $this->post(route('invoices.store'), [
+            'customer_id' => $customer->id, 'invoice_date' => $created, 'payment_terms' => 14,
+            'reference' => 'Oud concept', 'lines' => $this->lines(), 'action' => 'draft',
+        ])->assertRedirect();
+        $invoice = Invoice::where('reference', 'Oud concept')->firstOrFail();
+        $this->assertSame($created, $invoice->invoice_date->toDateString());
+
+        $this->post(route('invoices.send', $invoice))->assertRedirect();
+
+        $invoice->refresh();
+        $this->assertSame('sent', $invoice->status);
+        $this->assertSame(now()->toDateString(), $invoice->invoice_date->toDateString());
+        $this->assertSame(now()->addDays(14)->toDateString(), $invoice->due_date->toDateString());
+        $this->assertStringStartsWith(now()->format('Y'), $invoice->number);
+    }
+
+    /** Een bewust in de toekomst gezette datum blijft bij het versturen staan. */
+    public function test_a_draft_dated_in_the_future_keeps_that_date_when_sent(): void
+    {
+        $this->actingAs($this->demoUser());
+        $customer = Customer::orderBy('id')->firstOrFail();
+        $future = now()->addDays(5)->toDateString();
+
+        $this->post(route('invoices.store'), [
+            'customer_id' => $customer->id, 'invoice_date' => $future, 'payment_terms' => 14,
+            'reference' => 'Vooruit gedateerd', 'lines' => $this->lines(), 'action' => 'draft',
+        ])->assertRedirect();
+        $invoice = Invoice::where('reference', 'Vooruit gedateerd')->firstOrFail();
+
+        $this->post(route('invoices.send', $invoice))->assertRedirect();
+
+        $invoice->refresh();
+        $this->assertSame($future, $invoice->invoice_date->toDateString());
+        $this->assertSame(now()->addDays(19)->toDateString(), $invoice->due_date->toDateString());
+    }
+
     public function test_a_quote_keeps_its_date_when_edited(): void
     {
         $this->actingAs($this->demoUser());

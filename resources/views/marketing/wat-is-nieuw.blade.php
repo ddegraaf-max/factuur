@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 14 oktober 2026 · {{ brand('version_prefix') }} 1.78.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.78.2</div>
+        <h2>Een concept krijgt de datum van vandaag</h2>
+        <ul class="tl-list">
+          <li><b>Geen oude datum meer op een laat verstuurde factuur</b> — een concept dat je een tijd hebt laten staan, opent in het bewerkscherm nu op de dag van vandaag in plaats van de dag van aanmaken, met een vervaldatum die daarbij past. Verstuur je een concept zonder het te openen (ook ingepland of terugkerend), dan krijgt het op dat moment de datum van die dag. Zet je de datum bewust in de toekomst, dan blijft die staan.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">14 oktober 2026 · {{ brand('version_prefix') }} 1.78.0</div>
         <h2>Een offerte laten vervallen — en de klant netjes informeren</h2>
         <ul class="tl-list">
           <li><b>Nieuwe offerte in plaats van de oude?</b> — bij een verstuurde of verlopen offerte staat nu de knop "Vervallen". Kies welke offerte hem vervangt (standaard de nieuwste voor dezelfde klant), zet er desgewenst een toelichting bij, en de klant krijgt een korte mail: de oude offerte geldt niet meer, dit is de nieuwe. Zo lijken twee offertes nooit dubbel. De oude blijft met zijn nummer bewaard, krijgt het stempel VERVALLEN op de PDF en telt niet meer mee als openstaand voorstel.</li>

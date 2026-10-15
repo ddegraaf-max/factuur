@@ -228,6 +228,21 @@ class InvoiceManager
              */
             $invoice->refresh();
 
+            /*
+             * De factuurdatum is de dag van uitreiken. Een concept dat weken
+             * heeft gewacht (of een ingeplande of terugkerende factuur die
+             * later de deur uitgaat) krijgt bij het versturen de datum van
+             * vandaag en een verse vervaldatum; een bewust in de toekomst
+             * gezette datum blijft staan. Dit gaat vóór het nummer: dat
+             * volgt het jaar van de factuurdatum.
+             */
+            if ($invoice->invoice_date->lt(today())) {
+                $invoice->invoice_date = today();
+                $invoice->due_date = $invoice->is_credit
+                    ? today()
+                    : today()->addDays((int) $invoice->payment_terms);
+            }
+
             if (! $invoice->number) {
                 // Creditnota's hebben hun eigen reeks (C-jaar-volgnummer).
                 $invoice->number = $invoice->is_credit
