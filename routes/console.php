@@ -60,6 +60,12 @@ Schedule::command('purchases:generate-recurring')
     ->dailyAt('07:10')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: haal bij Mollie op in welke uitbetaling elke online betaling zit
+// (rapport Mollie-betalingen). Mollie keert 's nachts uit, dus in de ochtend is het bekend.
+Schedule::command('mollie:settlements')
+    ->dailyAt('07:20')
+    ->timezone('Europe/Amsterdam');
+
 // Dagelijks: verstuur concept-facturen die voor vandaag zijn ingepland.
 Schedule::command('invoices:send-scheduled')
     ->dailyAt('07:30')

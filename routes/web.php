@@ -834,6 +834,14 @@ Route::middleware(['auth', 'readonly'])->group(function () {
         // Ouderdomsanalyse debiteuren: wie staat er hoe lang open
         Route::get('debiteuren', [\App\Http\Controllers\DebtorAgingController::class, 'index'])->name('aging.index');
 
+        // Mollie-betalingen: online betaalde facturen per uitbetaling van Mollie (1.81.0)
+        Route::get('mollie-betalingen', [\App\Http\Controllers\MolliePayoutController::class, 'index'])->name('mollie.index');
+        Route::post('mollie-betalingen/ophalen', [\App\Http\Controllers\MolliePayoutController::class, 'refresh'])->middleware('throttle:10,1')->name('mollie.refresh');
+        Route::get('mollie-betalingen/pdf', [\App\Http\Controllers\MolliePayoutController::class, 'pdf'])->name('mollie.pdf');
+        Route::get('mollie-betalingen/csv', [\App\Http\Controllers\MolliePayoutController::class, 'csv'])->name('mollie.csv');
+        Route::get('mollie-betalingen/uitbetaling/{settlement}/pdf', [\App\Http\Controllers\MolliePayoutController::class, 'payoutPdf'])
+            ->where('settlement', '[A-Za-z0-9_-]+')->name('mollie.payout.pdf');
+
         /*
          * Het grootboek (1.72.0). Inzien mag de boekhouder ook — dat is precies
          * waar hij voor is ingehuurd. Boeken en vaststellen niet; dat staat in de

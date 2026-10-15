@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.80.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.81.0</div>
+        <h2>Mollie-betalingen: welke facturen zitten in die uitbetaling?</h2>
+        <ul class="tl-list">
+          <li><b>Nieuw rapport voor je boekhouder</b> — Mollie maakt iDEAL-betalingen gebundeld over, minus kosten, en je boekhouder ziet één bedrag op het bankafschrift. Onder Rapporten → Mollie-betalingen staat per maand welke facturen online zijn betaald, gegroepeerd per uitbetaling van Mollie: kenmerk zoals het op het afschrift staat, datum, het overgemaakte bedrag en het verschil (de kosten van Mollie). Als pdf en csv, en per uitbetaling een eigen pdf.</li>
+          <li><b>Automatisch bijgewerkt</b> — elke ochtend vraagt {{ brand('name') }} bij Mollie na welke betalingen in een uitbetaling zitten; met "Ophalen bij Mollie" doe je dat direct.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">15 oktober 2026 · {{ brand('version_prefix') }} 1.80.0</div>
         <h2>Begrippenlijst, pagina's per beroep en voorbeeldfacturen</h2>
         <ul class="tl-list">
           <li><b>Begrippenlijst</b> — 38 begrippen uit de praktijk van factureren, btw en betaald krijgen, elk op een eigen pagina met uitleg en verwijzingen: van btw verlegd en de KOR tot creditnota, Peppol, G-rekening en wettelijke rente. Te vinden onder <a href="{{ route('begrippen') }}">Begrippenlijst</a>.</li>

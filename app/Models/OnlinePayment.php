@@ -15,11 +15,16 @@ class OnlinePayment extends Model
     protected $fillable = [
         'company_id', 'invoice_id', 'payment_id',
         'mollie_id', 'checkout_url', 'amount', 'status', 'method', 'paid_at',
+        // In welke uitbetaling van Mollie zit deze betaling (rapport Mollie-betalingen).
+        'settlement_id', 'settlement_reference', 'settlement_status', 'settled_on', 'settlement_total', 'settlement_checked_at',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
+        'settled_on' => 'date:Y-m-d',
+        'settlement_total' => 'decimal:2',
+        'settlement_checked_at' => 'datetime',
     ];
 
     public function company(): BelongsTo { return $this->belongsTo(Company::class); }
