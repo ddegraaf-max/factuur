@@ -13,7 +13,7 @@
 @endphp
 
 @section('title', 'Fachora platform terms of service')
-@section('description', 'Terms of service of the Fachora platform (Creditline B.V.): Fachora as an intermediary, requests and offers, the contract between Customer and Company, Fachora Protect and payments through Stripe, disputes, cancellations, warranty, consumer rights, the commission charged to Companies, reviews, DSA rules, liability, governing law.')
+@section('description', 'Terms of service of the Fachora platform (Budomatch): Fachora as an intermediary, requests and offers, the contract between Customer and Company, Fachora Protect and payments through Stripe, disputes, cancellations, warranty, consumer rights, the commission charged to Companies, reviews, DSA rules, liability, governing law.')
 
 @push('styles')
 <style>
@@ -49,9 +49,9 @@
 
     <div class="entity">
       Platform operator (Service Provider):<br>
-      <strong>Creditline B.V.</strong>, operating the platform under the <strong>Fachora</strong> brand (fachora.pl)<br>
-      Torenlaan 5B · 1402 AT Bussum · the Netherlands<br>
-      Dutch Chamber of Commerce (KvK) 59683198 · VAT NL853603108B01<br>
+      <strong>Budomatch Daniël de Graaf</strong>, operating the platform under the <strong>Fachora</strong> brand (fachora.pl)<br>
+      Białka 15 · 09-550 Białka · Poland<br>
+      NIP 7010869430 · REGON 381430120 · sole proprietorship registered in CEIDG<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (also the point of contact referred to in § 15)
     </div>
 
@@ -82,7 +82,7 @@
     <h2 id="p1">§ 1. Definitions</h2>
     <ul>
       <li><strong>Fachora</strong> or <strong>Platform</strong> — the website at fachora.pl, operated by the Service Provider, which lets Customers submit Requests and Companies submit Offers and carry out Jobs.</li>
-      <li><strong>Service Provider</strong> — Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands, KvK 59683198, VAT NL853603108B01.</li>
+      <li><strong>Service Provider</strong> — Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland, NIP 7010869430, REGON 381430120 (sole proprietorship registered in CEIDG).</li>
       <li><strong>Customer</strong> — a person who submits a Request through the Platform: a consumer (a natural person acting for purposes outside their trade or business) or a business.</li>
       <li><strong>Company</strong> — a business (sole trader, company or other entity) entered in the relevant register, holding a Company Account on the Platform.</li>
       <li><strong>Fachora Verified Company</strong> (<strong>Verified</strong>) — a Company that has passed the verification described in § 4 and has been given the "Fachora Verified" mark by the Service Provider. Only Verified Companies receive Requests.</li>
@@ -127,7 +127,7 @@
     <p>The information collected in this way corresponds to the trader traceability obligation of Article 30 DSA. The Company updates its data without delay when they change.</p>
     <p>4. <strong>Decision.</strong> Granting, refusing, suspending and withdrawing the Fachora Verified mark is a decision of the Service Provider, taken on the basis of the verification results, the Fachora Standard and the cooperation so far. The Service Provider informs the Company of the decision and its reasons; the Company may appeal to {{ brand('email') }} within 14 days and the Service Provider decides on the appeal within 14 days. A Company has no claim to be granted the mark.</p>
     <p>5. <strong>Account.</strong> The Company is responsible for the confidentiality of its login details and for the actions of persons it gives access to the Company Panel. The Company may delete its Account at any time, subject to completing Jobs in progress and settling commission; deleting the Account does not remove reviews or data required by law (§ 17).</p>
-    <p>6. With its Account the Company receives free access to an invoicing tool (Lopra) to the extent needed to settle Jobs. Wider use of it may be subject to separate terms.</p>
+    <p>6. With its Account the Company receives free access to an invoicing tool to the extent needed to settle Jobs. Wider use of it may be subject to separate terms.</p>
 
     <h2 id="p5">§ 5. Fachora Standard</h2>
     <p>1. A Verified Company undertakes to follow the Fachora Standard:</p>
@@ -210,7 +210,7 @@
     <p>1. The Platform is free for Customers. A Company pays no subscription, no registration fee and no fees for Requests received or Offers submitted.</p>
     <p>2. <strong>Commission.</strong> For every Job completed and approved (expressly or silently) the Company pays the Service Provider a commission of <strong>{{ $fee }}%</strong> of the gross Job amount, including approved extra work. During the first <strong>{{ (int) config('fachora.intro_days') }} days</strong> after the Fachora Verified mark is granted, the commission is <strong>{{ $introFee }}%</strong>. The rate applicable to a Company is shown in the Company Panel and in every Offer before it is submitted.</p>
     <p>3. For Jobs with Protect the commission is deducted from the payout by the payment provider. For Jobs without Protect the Service Provider invoices the Company for the commission with a 14-day payment term; the Company reports the completion of the Job and the final amount on the Platform.</p>
-    <p>4. The commission is a net amount; the Service Provider issues invoices as an entity established in the Netherlands — for services to a VAT-registered business in Poland the Company accounts for VAT under the reverse-charge mechanism (import of services). The Company agrees to receive invoices electronically.</p>
+    <p>4. The commission is a net amount to which the Service Provider adds VAT at the rate applicable in Poland (currently 23%). The Company agrees to receive invoices electronically.</p>
     <p>5. If a Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company. No commission is charged on a call-out fee after a cancellation.</p>
     <p>6. <strong>No circumvention.</strong> If a Company performs work for a Customer that the Customer requested through the Platform but settles it outside the Platform, the commission is due to the Service Provider in full on the Offer amount, irrespective of the sanctions in § 5(4). This does not apply to Jobs the Customer cancelled and then — more than 6 months later — commissioned from the Company outside the Platform.</p>
     <p>7. The Service Provider may change the commission rate with 30 days' notice, informing the Company by e-mail and in the Company Panel. The new rate applies to Offers submitted after it takes effect. A Company that does not accept the change may delete its Account before that date.</p>
@@ -264,7 +264,7 @@
     <p>1. These Terms are available free of charge at fachora.pl/regulamin in a form that allows them to be downloaded, stored and printed. The Polish version is binding; the English translation is for convenience.</p>
     <p>2. If any provision of these Terms proves invalid or ineffective, the remaining provisions remain in force.</p>
     <p>3. The <a href="{{ route('fachora.standard') }}">Fachora Standard</a> (summarised in § 5), the description of <a href="{{ route('fachora.protect') }}">Fachora Protect</a> and the <a href="{{ route('pl.prywatnosc') }}">Privacy Policy</a> form an integral part of these Terms. In case of discrepancy these Terms prevail.</p>
-    <p>4. Contact with the Service Provider: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, the <a href="{{ route('pl.kontakt') }}">contact form</a>, or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands.</p>
+    <p>4. Contact with the Service Provider: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, the <a href="{{ route('pl.kontakt') }}">contact form</a>, or by post: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland.</p>
     <p>5. Version {{ config('fachora.terms_version') }} of these Terms takes effect on 16 October 2026.</p>
 
     <div class="disclaimer">Draft pending legal review. Remarks: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>

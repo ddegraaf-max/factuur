@@ -2,14 +2,14 @@
 
 {{--
   WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
-  Polityka prywatności Fachora (RODO). Administrator: Creditline B.V. Obejmuje Klientów, Firmy
+  Polityka prywatności Fachora (RODO). Administrator: Budomatch Daniël de Graaf Obejmuje Klientów, Firmy
   (dane z rejestrów na podstawie art. 6 ust. 1 lit. f, przejęty profil na podstawie lit. b, weryfikację,
   Stripe Connect jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających.
   Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
 
 @section('title', 'Polityka prywatności Fachora')
-@section('description', 'Jak Fachora (Creditline B.V.) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Stripe, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
+@section('description', 'Jak Fachora (Budomatch) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Stripe, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
 
 @push('styles')
 <style>
@@ -49,9 +49,9 @@
 
     <div class="entity">
       Administrator danych osobowych:<br>
-      <strong>Creditline B.V.</strong>, prowadząca platformę <strong>Fachora</strong> (fachora.pl)<br>
-      Torenlaan 5B · 1402 AT Bussum · Holandia<br>
-      Holenderski rejestr handlowy (KvK) 59683198 · VAT NL853603108B01<br>
+      <strong>Budomatch Daniël de Graaf</strong>, prowadzący platformę <strong>Fachora</strong> (fachora.pl)<br>
+      Białka 15 · 09-550 Białka · Polska<br>
+      NIP 7010869430 · REGON 381430120 · działalność gospodarcza wpisana do CEIDG<br>
       Kontakt w sprawach danych osobowych: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
@@ -176,7 +176,7 @@
     <h2 id="s10">10. Twoje prawa</h2>
     <p>Masz prawo do: <strong>dostępu</strong> do swoich danych i otrzymania ich kopii; <strong>sprostowania</strong> danych nieprawidłowych; <strong>usunięcia</strong> danych („prawo do bycia zapomnianym”) — z wyjątkiem danych, które musimy zachować z mocy prawa lub do obrony roszczeń; <strong>ograniczenia przetwarzania</strong>; <strong>przenoszenia danych</strong>, które przetwarzamy na podstawie umowy w sposób zautomatyzowany (otrzymasz je w formacie nadającym się do odczytu maszynowego); <strong>sprzeciwu</strong> wobec przetwarzania opartego na prawnie uzasadnionym interesie — w tym wobec profilu z rejestru publicznego (pkt 4) i wobec marketingu, który w razie sprzeciwu zawsze zaprzestajemy; oraz <strong>cofnięcia zgody</strong> w dowolnym momencie, jeżeli przetwarzanie opiera się na zgodzie, bez wpływu na zgodność z prawem wcześniejszego przetwarzania.</p>
     <p>Aby skorzystać z tych praw, napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (firma: najlepiej z adresu przypisanego do konta; klient: z adresu, na który przyszło potwierdzenie zlecenia). Odpowiadamy najpóźniej w ciągu miesiąca; w skomplikowanych sprawach możemy przedłużyć ten termin o kolejne dwa miesiące, o czym Cię poinformujemy. Możemy poprosić o potwierdzenie tożsamości, jeżeli żądanie przychodzi z innego adresu.</p>
-    <p>Masz też prawo wnieść <strong>skargę do organu nadzorczego</strong>: w Polsce jest to Prezes Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>), a w Holandii — Autoriteit Persoonsgegevens (<a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">autoriteitpersoonsgegevens.nl</a>).</p>
+    <p>Masz też prawo wnieść <strong>skargę do organu nadzorczego</strong>: w Polsce jest to Prezes Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>).</p>
 
     <h2 id="s11">11. Bezpieczeństwo</h2>
     <p>Połączenia są szyfrowane (TLS). Hasła przechowujemy wyłącznie w postaci skrótu (hash). Linki do stron zleceń i ofert są długimi, losowymi tokenami, których nie da się odgadnąć; formularze mają limity liczby prób i zabezpieczenie antyspamowe. Dostęp do systemów produkcyjnych jest ograniczony do niezbędnych osób i rejestrowany. Zdjęcia i dokumenty przechowujemy w bazie danych, nie na publicznie dostępnych adresach. Codziennie wykonujemy kopie zapasowe. Dane kart i dokumenty tożsamości nigdy nie trafiają do naszych systemów — obsługuje je operator płatności. O naruszeniu ochrony danych, które może powodować wysokie ryzyko dla Twoich praw, poinformujemy Cię bez zbędnej zwłoki.</p>
@@ -185,7 +185,7 @@
     <p>Aktualizujemy tę politykę, gdy zmieniają się przepisy, nasi dostawcy lub działanie platformy. O istotnych zmianach informujemy firmy e-mailem i w panelu, a klientów — w wiadomościach dotyczących zlecenia. Aktualna wersja z datą jest zawsze dostępna pod adresem fachora.pl/polityka-prywatnosci; poprzednie wersje udostępniamy na żądanie.</p>
 
     <h2 id="s13">13. Kontakt</h2>
-    <p>W sprawach danych osobowych napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (w temacie „RODO”) albo listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia. Zasady korzystania z platformy opisuje <a href="{{ route('pl.regulamin') }}">regulamin</a>.</p>
+    <p>W sprawach danych osobowych napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (w temacie „RODO”) albo listownie: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka. Zasady korzystania z platformy opisuje <a href="{{ route('pl.regulamin') }}">regulamin</a>.</p>
 
     <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Pytania dotyczące prywatności: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

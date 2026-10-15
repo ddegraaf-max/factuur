@@ -14,8 +14,14 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(VatService $vat): Response
+    public function index(VatService $vat): Response|\Illuminate\Http\RedirectResponse
     {
+        // Een beperkt portaal (Fachora) heeft een eigen startpagina: de opdrachten van het bedrijf.
+        $home = (string) \App\Support\Brand::get('portal.home', '');
+        if ($home !== '' && $home !== 'dashboard') {
+            return redirect()->route($home);
+        }
+
         // Eerst achterstallig markeren (creditnota's en incasso blijven buiten schot).
         Invoice::markOverdue();
 

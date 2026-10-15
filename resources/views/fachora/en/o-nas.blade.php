@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- About — Fachora, English edition: why it exists, the promise, who is behind it (Creditline B.V., maker of the EasyInvoice and Lopra invoicing software), principles. No invented numbers or people. --}}
+{{-- About — Fachora, English edition: why it exists, the promise, who is behind it (Budomatch, a Polish company that connects customers with tradespeople), principles. No invented numbers or people. --}}
 
-@section('title', 'About us — Fachora, a Creditline B.V. service')
-@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Creditline B.V., maker of the EasyInvoice and Lopra invoicing software) and the principles we keep: not every company gets on Fachora, no cold e-mails, price up front, money kept safe.')
+@section('title', 'About us — Fachora, a Budomatch service')
+@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Budomatch, a Polish company that connects customers with tradespeople) and the principles we keep: not every company gets on Fachora, no cold e-mails, price up front, money kept safe.')
 
 @push('styles')
 <style>
@@ -57,12 +57,12 @@
   <div class="container">
     <div class="section-header" style="margin-bottom:32px;">
       <h2>Who is behind it</h2>
-      <p>Fachora is a service of Creditline B.V. from Bussum, the Netherlands — a company that has worked in receivables management for over 25 years and builds software for small businesses.</p>
+      <p>Fachora is a service of Budomatch — a Polish company from Białka in Mazovia that connects customers with tradespeople and builds tools for small businesses.</p>
     </div>
     <div class="about-who">
-      <div><b>Creditline B.V.</b>Platform operator. Torenlaan 5B, 1402 AT Bussum, the Netherlands · KvK 59683198 · VAT NL853603108B01. Debt collection taught us one thing: the most expensive agreements are the ones nobody wrote down.</div>
-      <div><b>EasyInvoice and Lopra</b>Our invoicing software: EasyInvoice in the Netherlands and <a href="https://lopra.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">Lopra</a> in Poland. Fachora Verified companies issue their invoices and settle jobs on the same engine — ready for KSeF, the Polish e-invoicing system.</div>
-      <div><b>Fachora</b>The third step: the same technology that makes sure an invoice gets paid now makes sure a service is delivered as agreed. A Polish brand, service in five languages.</div>
+      <div><b>Budomatch</b>Platform operator. Budomatch Daniël de Graaf · Białka 15, 09-550 Białka, Poland · NIP 7010869430 · REGON 381430120. Years of working with tradespeople taught us one thing: the most expensive agreements are the ones nobody wrote down.</div>
+      <div><b>Invoicing software included</b>Fachora Verified companies issue their invoices and settle jobs in the software they get together with their profile — ready for KSeF, the Polish e-invoicing system.</div>
+      <div><b>Fachora</b>The same technology that makes sure an invoice gets paid now makes sure a service is delivered as agreed. A Polish brand, service in five languages.</div>
     </div>
   </div>
 </section>

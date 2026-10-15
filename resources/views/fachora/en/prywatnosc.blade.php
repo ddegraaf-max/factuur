@@ -3,13 +3,13 @@
 {{--
   DRAFT — PENDING LEGAL REVIEW.
   Fachora privacy policy (GDPR), English edition (convenience translation; the Polish text is binding).
-  Controller: Creditline B.V. Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
+  Controller: Budomatch Daniël de Graaf Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
   verification, Stripe Connect as an independent controller), companies' representatives and visitors.
   The "draft" marker is deliberately discreet, at the bottom.
 --}}
 
 @section('title', 'Fachora privacy policy')
-@section('description', 'How Fachora (Creditline B.V.) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Stripe, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
+@section('description', 'How Fachora (Budomatch) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Stripe, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
 
 @push('styles')
 <style>
@@ -52,9 +52,9 @@
 
     <div class="entity">
       Data controller:<br>
-      <strong>Creditline B.V.</strong>, operating the <strong>Fachora</strong> platform (fachora.pl)<br>
-      Torenlaan 5B · 1402 AT Bussum · the Netherlands<br>
-      Dutch Chamber of Commerce (KvK) 59683198 · VAT NL853603108B01<br>
+      <strong>Budomatch Daniël de Graaf</strong>, operating the platform the <strong>Fachora</strong> platform (fachora.pl)<br>
+      Białka 15 · 09-550 Białka · Poland<br>
+      NIP 7010869430 · REGON 381430120 · sole proprietorship registered in CEIDG<br>
       Contact for data protection matters: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
@@ -179,7 +179,7 @@
     <h2 id="s10">10. Your rights</h2>
     <p>You have the right to: <strong>access</strong> your data and receive a copy; <strong>rectification</strong> of inaccurate data; <strong>erasure</strong> ("right to be forgotten") — except for data we must keep by law or to defend claims; <strong>restriction of processing</strong>; <strong>data portability</strong> of data we process under a contract by automated means (you receive them in a machine-readable format); <strong>objection</strong> to processing based on legitimate interest — including the profile from a public register (section 4) and marketing, which we always stop on objection; and <strong>withdrawal of consent</strong> at any time where processing is based on consent, without affecting the lawfulness of earlier processing.</p>
     <p>To exercise these rights, write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (company: preferably from the address linked to the account; customer: from the address that received the job confirmation). We reply within one month at the latest; in complex cases we may extend this by a further two months, and will tell you if so. We may ask you to confirm your identity if the request comes from another address.</p>
-    <p>You also have the right to <strong>lodge a complaint with a supervisory authority</strong>: in Poland the President of the Personal Data Protection Office (Prezes UODO, ul. Stawki 2, 00-193 Warsaw, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>), and in the Netherlands the Autoriteit Persoonsgegevens (<a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">autoriteitpersoonsgegevens.nl</a>).</p>
+    <p>You also have the right to <strong>lodge a complaint with a supervisory authority</strong>: in Poland the President of the Personal Data Protection Office (Prezes UODO, ul. Stawki 2, 00-193 Warsaw, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>).</p>
 
     <h2 id="s11">11. Security</h2>
     <p>Connections are encrypted (TLS). Passwords are stored only as hashes. Links to job and offer pages are long random tokens that cannot be guessed; forms have attempt limits and anti-spam protection. Access to production systems is limited to the people who need it and is logged. Photos and documents are stored in the database, not at publicly reachable addresses. We make daily backups. Card data and identity documents never enter our systems — they are handled by the payment provider. If a data breach is likely to result in a high risk to your rights, we will inform you without undue delay.</p>
@@ -188,7 +188,7 @@
     <p>We update this policy when the law, our providers or the way the platform works change. We inform companies of significant changes by e-mail and in the panel, and customers in messages about their job. The current dated version is always available at fachora.pl/polityka-prywatnosci; previous versions are available on request.</p>
 
     <h2 id="s13">13. Contact</h2>
-    <p>For data protection matters write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (subject "GDPR") or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands. The rules for using the platform are in the <a href="{{ route('pl.regulamin') }}">terms of service</a>.</p>
+    <p>For data protection matters write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (subject "GDPR") or by post: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland. The rules for using the platform are in the <a href="{{ route('pl.regulamin') }}">terms of service</a>.</p>
 
     <div class="disclaimer">Draft pending legal review. Privacy questions: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

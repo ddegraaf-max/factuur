@@ -99,7 +99,9 @@ Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:
 4. Eerste bedrijven: Eigenaar → Fachora: bedrijven → Importuj (plaklijst) of CEIDG; dan brieven
    printen (PDF per 100) en posten. Geclaimde bedrijven verschijnen onder status 'claimed';
    na hun aanvraag 'pending' → controles nalopen → Zatwierdź.
-5. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
+5. Aanbieder van Fachora is Budomatch Daniël de Graaf (Białka 15, 09-550 Białka, NIP 7010869430,
+   REGON 381430120), niet Creditline B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
+   en alle Fachora-pagina's. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
    laten nakijken), PKE-toets op de uitnodigingsmail voor opt-in-lijsten, DSA-contactpunt,
    merknaam Fachora bij UPRP/EUIPO, domeinen fachora.pl/.com.
 

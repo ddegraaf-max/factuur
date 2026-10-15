@@ -36,7 +36,7 @@
       "description": "{{ brand('app_description') }}",
       "image": "{{ \App\Support\Brand::asset('og_image') }}",
       "offers": {!! json_encode(array_map(fn ($o) => ['@type' => 'Offer'] + $o, config('marketing.' . \App\Support\Brand::key() . '.offers', config('marketing.easyinvoice.offers', []))), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!},
-      "publisher": { "@@type": "Organization", "name": "Creditline B.V." }
+      "publisher": { "@@type": "Organization", "name": "{{ brand('owner_name', 'Creditline B.V.') }}" }
     },
     {
       "@@type": "Organization",
@@ -44,7 +44,7 @@
       "url": "{{ url('/') }}",
       "logo": "{{ \App\Support\Brand::asset('favicon_512') }}",
       "email": "{{ brand('email') }}",
-      "address": { "@@type": "PostalAddress", "addressLocality": "Bussum", "addressCountry": "NL" },
+      "address": { "@@type": "PostalAddress", "addressLocality": "{{ brand('owner_city', 'Bussum') }}", "addressCountry": "{{ brand('owner_country', 'NL') }}" },
       "areaServed": "{{ market('country') }}"
     }
   ]

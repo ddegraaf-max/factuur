@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- O nas — Fachora: skąd się wzięła, co obiecuje, kto za nią stoi (Creditline B.V., twórca EasyInvoice i Lopra), zasady. Bez zmyślonych liczb i osób. --}}
+{{-- O nas — Fachora: skąd się wzięła, co obiecuje, kto za nią stoi (Budomatch), zasady. Bez zmyślonych liczb i osób. --}}
 
-@section('title', 'O nas — Fachora, usługa Creditline B.V.')
-@section('description', 'Dlaczego powstała Fachora: dla obcokrajowców w Polsce i dla Polaków, którzy mają dość „przyjdę jutro”. Kto za nią stoi (Creditline B.V., twórca oprogramowania do faktur EasyInvoice i Lopra) i jakich zasad się trzymamy: nie każda firma trafia na Fachora, zero zimnych e-maili, cena z góry, pieniądze bezpieczne.')
+@section('title', 'O nas — Fachora, usługa Budomatch')
+@section('description', 'Dlaczego powstała Fachora: dla obcokrajowców w Polsce i dla Polaków, którzy mają dość „przyjdę jutro”. Kto za nią stoi (Budomatch, polska firma, która łączy klientów z wykonawcami) i jakich zasad się trzymamy: nie każda firma trafia na Fachora, zero zimnych e-maili, cena z góry, pieniądze bezpieczne.')
 
 @push('styles')
 <style>
@@ -57,12 +57,12 @@
   <div class="container">
     <div class="section-header" style="margin-bottom:32px;">
       <h2>Kto za tym stoi</h2>
-      <p>Fachora jest usługą Creditline B.V. z Bussum w Holandii — firmy, która od ponad 25 lat zajmuje się zarządzaniem należnościami i tworzy oprogramowanie dla małych firm.</p>
+      <p>Fachora jest usługą Budomatch — polskiej firmy z Białki na Mazowszu, która łączy klientów z wykonawcami i buduje narzędzia dla małych firm.</p>
     </div>
     <div class="about-who">
-      <div><b>Creditline B.V.</b>Operator platformy. Torenlaan 5B, 1402 AT Bussum, Holandia · KvK 59683198 · VAT NL853603108B01. Doświadczenie z windykacji nauczyło nas jednego: najdroższe są ustalenia, których nikt nie spisał.</div>
-      <div><b>EasyInvoice i Lopra</b>Nasze programy do faktur: EasyInvoice w Holandii i <a href="https://lopra.pl" target="_blank" rel="noopener" style="color:var(--brand);font-weight:500;">Lopra</a> w Polsce. Firmy Fachora Verified wystawiają faktury i rozliczają zlecenia na tym samym silniku — gotowym na KSeF.</div>
-      <div><b>Fachora</b>Trzeci krok: ta sama technologia, która pilnuje, żeby faktura została zapłacona, pilnuje teraz, żeby usługa została wykonana tak, jak ustalono. Marka polska, obsługa w pięciu językach.</div>
+      <div><b>Budomatch</b>Operator platformy. Budomatch Daniël de Graaf · Białka 15, 09-550 Białka · NIP 7010869430 · REGON 381430120. Lata pracy z wykonawcami nauczyły nas jednego: najdroższe są ustalenia, których nikt nie spisał.</div>
+      <div><b>Program do faktur w zestawie</b>Firmy Fachora Verified wystawiają faktury i rozliczają zlecenia w programie, który dostają razem z profilem — gotowym na KSeF.</div>
+      <div><b>Fachora</b>Ta sama technologia, która pilnuje, żeby faktura została zapłacona, pilnuje teraz, żeby usługa została wykonana tak, jak ustalono. Marka polska, obsługa w pięciu językach.</div>
     </div>
   </div>
 </section>

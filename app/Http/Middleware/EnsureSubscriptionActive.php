@@ -46,7 +46,8 @@ class EnsureSubscriptionActive
 
         $company = $user?->company;
 
-        if ($company && ! $company->hasAccess()) {
+        // Een merk zonder abonnement (Fachora: de administratie hoort bij het profiel) kent geen proefperiode.
+        if ($company && ! \App\Support\Brand::get('portal.free') && ! $company->hasAccess()) {
             return redirect()->route('billing.show')
                 ->with('error', 'Je proefperiode is verlopen. Sluit een abonnement af om verder te gaan.');
         }

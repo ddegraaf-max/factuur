@@ -212,6 +212,12 @@ class Brand
             'auth_title' => (string) static::get('auth_title', ''),
             'auth_subtitle' => (string) static::get('auth_subtitle', ''),
             'registered' => (bool) static::get('registered', false),
+            // Beperkt portaal (Fachora): welke routes in het menu staan en of er een abonnement is.
+            'portal' => is_array(static::get('portal')) ? [
+                'home' => (string) static::get('portal.home', 'dashboard'),
+                'free' => (bool) static::get('portal.free', false),
+                'menu' => array_values((array) static::get('portal.menu', [])),
+            ] : null,
         ];
     }
 

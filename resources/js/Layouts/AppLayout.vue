@@ -138,12 +138,15 @@ const rawNav = [
 ];
 
 const can = computed(() => page.props.auth.can || {});
+// Beperkt portaal (Fachora): alleen de routes uit config/brand.php 'portal.menu'.
+const portalMenu = computed(() => page.props.brand?.portal?.menu || null);
 const nav = computed(() =>
   rawNav
     .map(section => ({
       ...section,
       items: section.items.filter(item =>
         (!item.can || can.value[item.can])
+        && (!portalMenu.value || portalMenu.value.includes(item.route))
         && (!item.brand || item.brand === page.props.brand?.key)
         // Onderdelen die op één markt berusten (het grootboek op RGS, XAF en de
         // Nederlandse btw-rubrieken) horen elders niet in het menu.
@@ -155,7 +158,7 @@ const nav = computed(() =>
 const subscription = computed(() => page.props.subscription || {});
 const isDemo = computed(() => !!page.props.demo);
 // In de demo is de proefperiode-balk alleen ruis; de demobalk staat er al.
-const showTrialBanner = computed(() => !isDemo.value && subscription.value.status === 'trialing');
+const showTrialBanner = computed(() => !isDemo.value && !page.props.brand?.portal?.free && subscription.value.status === 'trialing');
 
 // De demo verlaten gaat via een gewoon formulier (dus een volledige
 // paginanavigatie): we landen op de marketingsite of het registratieformulier,

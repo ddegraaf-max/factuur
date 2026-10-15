@@ -115,7 +115,7 @@
       <div class="fh-time"><div class="v">{{ $warranty }} mies.</div><span>standardowa gwarancja na wykonaną pracę</span></div>
     </div>
     <div class="fh-note" style="max-width:860px;margin:28px auto 0;">
-      <b>Uczciwie o tym, kto trzyma pieniądze.</b> Fachora jest usługą Creditline B.V. (Bussum, Holandia) i nie jest instytucją płatniczą. Rezerwację, przechowanie i wypłatę obsługuje Stripe, działający na podstawie europejskiej licencji płatniczej. Fachora widzi status płatności i decyduje, kiedy Stripe ma ją wypłacić albo zwrócić, ale nigdy nie ma Twoich pieniędzy na własnym koncie.
+      <b>Uczciwie o tym, kto trzyma pieniądze.</b> Fachora jest usługą Budomatch (Białka, Polska) i nie jest instytucją płatniczą. Rezerwację, przechowanie i wypłatę obsługuje Stripe, działający na podstawie europejskiej licencji płatniczej. Fachora widzi status płatności i decyduje, kiedy Stripe ma ją wypłacić albo zwrócić, ale nigdy nie ma Twoich pieniędzy na własnym koncie.
     </div>
   </div>
 </section>

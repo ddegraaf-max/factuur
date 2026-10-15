@@ -114,7 +114,7 @@
       <div class="fh-time"><div class="v">{{ $warranty }} mo.</div><span>standard warranty on the finished work</span></div>
     </div>
     <div class="fh-note" style="max-width:860px;margin:28px auto 0;">
-      <b>Honestly, about who holds the money.</b> Fachora is a service of Creditline B.V. (Bussum, the Netherlands) and is not a payment institution. Reservation, safekeeping and payout are handled by Stripe under its European payment licence. Fachora sees the payment status and tells Stripe when to pay out or refund, but never has your money in an account of its own.
+      <b>Honestly, about who holds the money.</b> Fachora is a service of Budomatch (Białka, Poland) and is not a payment institution. Reservation, safekeeping and payout are handled by Stripe under its European payment licence. Fachora sees the payment status and tells Stripe when to pay out or refund, but never has your money in an account of its own.
     </div>
   </div>
 </section>

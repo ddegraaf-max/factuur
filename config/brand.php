@@ -309,6 +309,37 @@ return [
                     'register_seo_description' => 'Claim your company profile, pass verification and receive jobs from customers near you. No subscription, commission only on completed jobs.',
                 ],
             ],
+            // De aanbieder van Fachora is Budomatch (Pools, CEIDG), niet Creditline B.V.
+            'owner_name' => 'Budomatch Daniël de Graaf',
+            'owner_city' => 'Białka',
+            'owner_country' => 'PL',
+
+            /*
+             * Het portaal voor een Pools bedrijf: alleen wat een fachowiec gebruikt.
+             * 'menu' zijn de routes die in de zijbalk staan (de rest verdwijnt),
+             * 'hidden' de routenaam-voorvoegsels die onder dit merk 404 geven
+             * (App\Http\Middleware\PortalScope), 'home' waar /dashboard heen gaat en
+             * 'free' dat er geen proefperiode of abonnement is (de administratie hoort
+             * bij het profiel op Fachora).
+             */
+            'portal' => [
+                'home' => 'fachora.dashboard',
+                'free' => true,
+                'menu' => [
+                    'fachora.dashboard', 'fachora.profile', 'fachora.verification',
+                    'quotes.index', 'invoices.index', 'customers.index', 'products.index',
+                    'vat.index',
+                    'settings.company', 'settings.brand', 'settings.numbering', 'settings.emails', 'settings.team', 'settings.security',
+                    'marketing.inzichten', 'owner.companies.index', 'fachora.admin.providers', 'fachora.admin.jobs',
+                ],
+                'hidden' => [
+                    'hours.', 'trips.', 'recurring.', 'projects.', 'direct-debit.', 'incasso.', 'windykacja.', 'wykup.',
+                    'purchases.', 'tenders.', 'bank.', 'ledger.', 'stats.', 'yearreport.', 'cashflow.', 'aging.', 'mollie.',
+                    'export.', 'import.', 'billing.', 'brand.', 'demands.', 'peppol.',
+                    'settings.brands', 'settings.card', 'settings.site', 'settings.reminders', 'settings.sms', 'settings.integrations', 'settings.activity',
+                    'customers.ccbr', 'customers.peppol', 'customers.score', 'invoices.peppol',
+                ],
+            ],
             'registered' => false,
             'trademark' => null,
             'brand_watch' => false,

@@ -31,6 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 oktober 2026 · {{ brand('version_prefix') }} 1.83.0</div>
+        <h2>Beperkt portaal per merk</h2>
+        <ul class="tl-list">
+          <li><b>Alleen wat je gebruikt</b> — een merk kan nu een eigen, kleiner portaal hebben: welke onderdelen in het menu staan, waar de startpagina heen gaat en of er een abonnement is. Fachora gebruikt dat voor Poolse vakmannen: opdrachten, profiel, verificatie, facturen, offertes, klanten, producten, btw en de basisinstellingen; de Nederlandse onderdelen bestaan daar niet.</li>
+          <li><b>Aanbieder per merk</b> — de bedrijfsgegevens in de voet en in de gestructureerde data komen uit de merkdefinitie; voor Fachora is dat Budomatch.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 oktober 2026 · {{ brand('version_prefix') }} 1.82.0</div>
         <h2>Fachora: een marktplaats voor gecontroleerde vakmannen op dezelfde motor</h2>
         <ul class="tl-list">

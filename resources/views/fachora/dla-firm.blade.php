@@ -126,7 +126,7 @@
       <details class="faq-item"><summary>Co, gdy na miejscu okaże się, że jest więcej pracy?{!! $chev !!}</summary><div class="faq-content">Dodajesz pozycję „prace dodatkowe” z ceną i opisem. Klient zatwierdza ją na swojej stronie zlecenia, a przy Protect od razu ją dopłaca. Bez zatwierdzenia nie wykonujesz tej pracy, bo nikt Ci za nią nie zapłaci.</div></details>
       <details class="faq-item"><summary>Czy muszę mieć ubezpieczenie OC?{!! $chev !!}</summary><div class="faq-content">Nie jest obowiązkowe. Jeśli je masz, dodajesz polisę do profilu i klient widzi znak „ubezpieczony”, co w praktyce pomaga wygrać zlecenie. Przed wygaśnięciem polisy dostajesz przypomnienie.</div></details>
       <details class="faq-item"><summary>Czy mogę używać programu do faktur poza zleceniami z Fachory?{!! $chev !!}</summary><div class="faq-content">Tak, do wszystkich klientów. Faktury, oferty, kontrahenci z weryfikacją NIP, XML dla KSeF. Program jest bezpłatny, dopóki Twoja firma ma status Verified.</div></details>
-      <details class="faq-item"><summary>Jak wygląda faktura za prowizję?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Creditline B.V. z Holandii. Prowizję fakturujemy jako usługę między firmami w Unii Europejskiej, z odwrotnym obciążeniem VAT. Fakturę dostajesz e-mailem.</div></details>
+      <details class="faq-item"><summary>Jak wygląda faktura za prowizję?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Budomatch — polskiej firmy. Prowizję fakturujemy polską fakturą VAT (23%). Fakturę dostajesz e-mailem.</div></details>
     </div>
   </div>
 </section>

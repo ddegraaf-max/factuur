@@ -125,7 +125,7 @@
       <details class="faq-item"><summary>What if there turns out to be more work on site?{!! $chev !!}</summary><div class="faq-content">You add an "extra work" line with a price and description. The customer approves it on their job page and, with Protect, pays for it straight away. Without approval you do not do that work, because nobody will pay you for it.</div></details>
       <details class="faq-item"><summary>Do I need liability insurance?{!! $chev !!}</summary><div class="faq-content">It is not compulsory. If you have it, you add the policy to your profile and the customer sees an "insured" mark, which in practice helps win jobs. You get a reminder before the policy expires.</div></details>
       <details class="faq-item"><summary>Can I use the invoicing software for customers outside Fachora?{!! $chev !!}</summary><div class="faq-content">Yes, for all your customers. Invoices, quotes, contacts with NIP verification, XML for KSeF. The software is free for as long as your company has Verified status.</div></details>
-      <details class="faq-item"><summary>What does the commission invoice look like?{!! $chev !!}</summary><div class="faq-content">Fachora is a service of Creditline B.V. in the Netherlands. We invoice the commission as a business-to-business service within the European Union, with VAT reverse-charged. You receive the invoices by e-mail.</div></details>
+      <details class="faq-item"><summary>What does the commission invoice look like?{!! $chev !!}</summary><div class="faq-content">Fachora is a service of Budomatch, a Polish company. We invoice the commission with a Polish VAT invoice (23%). You receive the invoices by e-mail.</div></details>
     </div>
   </div>
 </section>

@@ -14,7 +14,7 @@
 @endphp
 
 @section('title', 'Regulamin platformy Fachora')
-@section('description', 'Regulamin platformy Fachora (Creditline B.V.): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, Fachora Protect i płatności przez Stripe, spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
+@section('description', 'Regulamin platformy Fachora (Budomatch): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, Fachora Protect i płatności przez Stripe, spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
 
 @push('styles')
 <style>
@@ -49,9 +49,9 @@
 
     <div class="entity">
       Operator platformy (Usługodawca):<br>
-      <strong>Creditline B.V.</strong>, prowadząca platformę pod marką <strong>Fachora</strong> (fachora.pl)<br>
-      Torenlaan 5B · 1402 AT Bussum · Holandia<br>
-      Holenderski rejestr handlowy (KvK) 59683198 · VAT NL853603108B01<br>
+      <strong>Budomatch Daniël de Graaf</strong>, prowadzący platformę pod marką <strong>Fachora</strong> (fachora.pl)<br>
+      Białka 15 · 09-550 Białka · Polska<br>
+      NIP 7010869430 · REGON 381430120 · działalność gospodarcza wpisana do CEIDG<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (także punkt kontaktowy, o którym mowa w § 15)
     </div>
 
@@ -82,7 +82,7 @@
     <h2 id="p1">§ 1. Definicje</h2>
     <ul>
       <li><strong>Fachora</strong> lub <strong>Platforma</strong> — serwis internetowy dostępny pod adresem fachora.pl, prowadzony przez Usługodawcę, który umożliwia Klientom składanie Zleceń, a Firmom składanie Ofert i wykonywanie Zleceń.</li>
-      <li><strong>Usługodawca</strong> — Creditline B.V. z siedzibą w Bussum (Holandia), Torenlaan 5B, 1402 AT Bussum, KvK 59683198, VAT NL853603108B01.</li>
+      <li><strong>Usługodawca</strong> — Budomatch Daniël de Graaf z siedzibą w Białce, Białka 15, 09-550 Białka, NIP 7010869430, REGON 381430120 (działalność gospodarcza wpisana do CEIDG).</li>
       <li><strong>Klient</strong> — osoba, która składa Zlecenie przez Platformę: konsument (osoba fizyczna działająca w celach niezwiązanych z działalnością gospodarczą) albo przedsiębiorca.</li>
       <li><strong>Firma</strong> — przedsiębiorca (jednoosobowa działalność gospodarcza, spółka lub inny podmiot) wpisany do właściwego rejestru, który posiada Konto Firmy na Platformie.</li>
       <li><strong>Firma Fachora Verified</strong> (<strong>Verified</strong>) — Firma, która przeszła weryfikację opisaną w § 4 i otrzymała od Usługodawcy oznaczenie „Fachora Verified”. Tylko Firmy Verified otrzymują Zlecenia.</li>
@@ -127,7 +127,7 @@
     <p>Zbierane w ten sposób informacje odpowiadają obowiązkowi identyfikowalności przedsiębiorców z art. 30 DSA. Firma aktualizuje dane niezwłocznie, gdy ulegną zmianie.</p>
     <p>4. <strong>Decyzja.</strong> Nadanie, odmowa nadania, zawieszenie i cofnięcie oznaczenia Fachora Verified jest decyzją Usługodawcy, podejmowaną na podstawie wyników weryfikacji, Standardu Fachora i dotychczasowej współpracy. Usługodawca informuje Firmę o decyzji i jej powodach; Firma może odwołać się na adres {{ brand('email') }} w ciągu 14 dni, a Usługodawca rozpatruje odwołanie w ciągu 14 dni. Firma nie ma roszczenia o nadanie oznaczenia.</p>
     <p>5. <strong>Konto.</strong> Firma odpowiada za poufność danych logowania i za działania osób, którym udostępniła Panel Firmy. Firma może usunąć Konto w każdej chwili, z zastrzeżeniem zakończenia Zleceń w toku i rozliczenia prowizji; usunięcie Konta nie usuwa opinii ani danych wymaganych przepisami (§ 17).</p>
-    <p>6. Wraz z Kontem Firma otrzymuje bezpłatny dostęp do narzędzia do wystawiania faktur (Lopra) w zakresie potrzebnym do rozliczania Zleceń. Korzystanie z niego w szerszym zakresie może podlegać odrębnemu regulaminowi.</p>
+    <p>6. Wraz z Kontem Firma otrzymuje bezpłatny dostęp do narzędzia do wystawiania faktur w zakresie potrzebnym do rozliczania Zleceń. Korzystanie z niego w szerszym zakresie może podlegać odrębnemu regulaminowi.</p>
 
     <h2 id="p5">§ 5. Standard Fachora</h2>
     <p>1. Firma Verified zobowiązuje się przestrzegać Standardu Fachora:</p>
@@ -210,7 +210,7 @@
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu, opłaty rejestracyjnej ani opłat za otrzymane Zlecenia lub złożone Oferty.</p>
     <p>2. <strong>Prowizja.</strong> Za każde Zlecenie wykonane i zaakceptowane (wyraźnie lub milcząco) Firma płaci Usługodawcy prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. W okresie <strong>{{ (int) config('fachora.intro_days') }} dni</strong> od nadania oznaczenia Fachora Verified prowizja wynosi <strong>{{ $introFee }}%</strong>. Stawka obowiązująca Firmę jest widoczna w Panelu Firmy i w każdej Ofercie przed jej złożeniem.</p>
     <p>3. Przy Zleceniach z Protect prowizja jest potrącana z wypłaty przez Operatora płatności. Przy Zleceniach bez Protect Usługodawca wystawia Firmie fakturę za prowizję z terminem płatności 14 dni; Firma zgłasza na Platformie wykonanie Zlecenia i ostateczną kwotę.</p>
-    <p>4. Prowizja jest kwotą netto; Usługodawca wystawia faktury jako podmiot z siedzibą w Holandii — przy usługach na rzecz podatnika VAT z Polski podatek rozlicza Firma w ramach odwrotnego obciążenia (import usług). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną.</p>
+    <p>4. Prowizja jest kwotą netto, do której Usługodawca dolicza podatek VAT według stawki obowiązującej w Polsce (obecnie 23%). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną.</p>
     <p>5. Jeżeli Zlecenie zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie. Przy odwołaniu Zlecenia prowizja od opłaty za dojazd nie jest pobierana.</p>
     <p>6. <strong>Zakaz omijania.</strong> Jeżeli Firma wykona dla Klienta pracę, o którą Klient zwrócił się przez Platformę, rozliczając ją poza Platformą, prowizja należy się Usługodawcy w pełnej wysokości od kwoty Oferty, niezależnie od sankcji z § 5 ust. 4. Nie dotyczy to Zleceń, które Klient odwołał, a następnie — po upływie 6 miesięcy — zlecił Firmie poza Platformą.</p>
     <p>7. Usługodawca może zmienić wysokość prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowa stawka dotyczy Ofert złożonych po jej wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
@@ -264,7 +264,7 @@
     <p>1. Regulamin jest dostępny bezpłatnie pod adresem fachora.pl/regulamin w formie umożliwiającej jego pobranie, utrwalenie i wydrukowanie. Wersja polska jest wiążąca; tłumaczenie angielskie służy wygodzie.</p>
     <p>2. Jeżeli którekolwiek postanowienie Regulaminu okaże się nieważne lub bezskuteczne, pozostałe postanowienia pozostają w mocy.</p>
     <p>3. Integralną częścią Regulaminu są: <a href="{{ route('fachora.standard') }}">Standard Fachora</a> (streszczony w § 5), opis <a href="{{ route('fachora.protect') }}">Fachora Protect</a> i <a href="{{ route('pl.prywatnosc') }}">Polityka prywatności</a>. W razie rozbieżności pierwszeństwo ma Regulamin.</p>
-    <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia.</p>
+    <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka.</p>
     <p>5. Regulamin w wersji {{ config('fachora.terms_version') }} wchodzi w życie 16 października 2026 r.</p>
 
     <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Uwagi: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>

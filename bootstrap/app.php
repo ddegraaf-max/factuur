@@ -64,6 +64,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             // Interfacetaal (markttaal, of de PL/EN-keuze van de bezoeker/gebruiker).
             \App\Http\Middleware\SetLocale::class,
+            // Beperkt portaal per merk (Fachora): verborgen onderdelen geven 404.
+            \App\Http\Middleware\PortalScope::class,
             // Vóór Inertia: zet de demo-omgeving in veilige modus (geen echte
             // e-mail, geen betaalroutes) voordat er iets wordt afgehandeld.
             DemoMode::class,

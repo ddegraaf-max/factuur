@@ -58,7 +58,7 @@ const year = new Date().getFullYear();
           <a :href="route('pl.prywatnosc')">{{ $t('Privacy') }}</a>
           <a v-if="brand.email" :href="'mailto:' + brand.email">{{ brand.email }}</a>
         </div>
-        <div class="fa-foot-note">{{ brand.tagline }} · {{ $t('Fachora is een dienst van Creditline B.V.') }} · {{ year }}</div>
+        <div class="fa-foot-note">{{ brand.tagline }} · {{ $t('Fachora is een dienst van Budomatch.') }} · {{ year }}</div>
       </div>
     </footer>
   </div>
