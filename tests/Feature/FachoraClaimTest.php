@@ -225,7 +225,7 @@ class FachoraClaimTest extends TestCase
             'categories' => ['hydraulik', 'ogrzewanie'], 'name' => 'Jan Nowak', 'email' => 'jan@hydromax.pl', 'phone' => '600100200', 'site' => 'hydromax.pl',
         ];
         $this->post(route('fachora.apply.store'), ['nip' => '1234567890'] + $data)->assertSessionHasErrors(['nip']);
-        $this->post(route('fachora.apply.store'), ['categories' => ['kominiarz']] + $data)->assertSessionHasErrors(['categories.0']);
+        $this->post(route('fachora.apply.store'), ['categories' => ['astronauta']] + $data)->assertSessionHasErrors(['categories.0']);
         $this->post(route('fachora.apply.store'), ['website' => 'spam'] + $data)->assertRedirect(route('fachora.apply'));
         $this->assertSame(0, Provider::count());
 

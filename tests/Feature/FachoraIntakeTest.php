@@ -126,7 +126,7 @@ class FachoraIntakeTest extends TestCase
         $this->post(route('fachora.intake.store'), $this->form([
             'postal_code' => '90001',
             'description' => 'krótko',
-            'category' => 'kominiarz',
+            'category' => 'astronauta',
             'language' => 'xx',
             'urgency' => 'yesterday',
             'customer_email' => 'geen-adres',

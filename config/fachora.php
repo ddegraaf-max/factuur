@@ -71,6 +71,8 @@ return [
             'examples' => ['pl' => 'kosiarka, piła, nożyce, serwis i ostrzenie', 'en' => 'lawn mower, chainsaw, hedge trimmer, service and sharpening']],
         'szkodniki' => ['pl' => 'Szkodniki', 'en' => 'Pest control', 'icon' => 'bug', 'pkd' => ['81.29.Z'],
             'examples' => ['pl' => 'myszy, szczury, muchy, komary, osy, dezynsekcja', 'en' => 'mice, rats, flies, mosquitoes, wasps, fumigation']],
+        'kominiarz' => ['pl' => 'Kominiarz i kominki', 'en' => 'Chimney and fireplace', 'icon' => 'fireplace', 'pkd' => ['81.22.Z', '43.29.Z'],
+            'examples' => ['pl' => 'przegląd i czyszczenie komina, serwis kominka, wkład, piec', 'en' => 'chimney inspection and sweeping, fireplace service, insert, stove']],
     ],
 
     // Talen die een bedrijf kan spreken (harde filter voor de klant) en de niveaus.

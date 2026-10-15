@@ -32,9 +32,9 @@
       <article class="tl-item">
         <div class="tl-dot"></div>
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 oktober 2026 · {{ brand('version_prefix') }} 1.84.0</div>
-        <h2>Fachora: twaalf categorieën</h2>
+        <h2>Fachora: dertien categorieën</h2>
         <ul class="tl-list">
-          <li><b>Twee categorieën erbij</b> — onderhoud van tuingereedschap (maaiers, kettingzagen, heggenscharen) en ongediertebestrijding (muizen, ratten, vliegen, muggen, wespen), elk met een eigen icoon. De categorieën staan in één configuratiebestand; de aanvraag, de pagina's en de import uit het Poolse register volgen vanzelf.</li>
+          <li><b>Drie categorieën erbij</b> — onderhoud van tuingereedschap (maaiers, kettingzagen, heggenscharen), ongediertebestrijding (muizen, ratten, vliegen, muggen, wespen) en schoorsteen en open haard (vegen, inspectie, onderhoud van haard en kachel), elk met een eigen icoon. De categorieën staan in één configuratiebestand; de aanvraag, de pagina's en de import uit het Poolse register volgen vanzelf.</li>
         </ul>
       </article>
 

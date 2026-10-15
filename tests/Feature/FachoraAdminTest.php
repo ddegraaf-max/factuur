@@ -131,7 +131,7 @@ class FachoraAdminTest extends TestCase
         $this->get(route('fachora.admin.providers', ['q' => self::NIP]))->assertInertia(fn (Assert $p) => $p->has('providers.data', 1)->where('providers.data.0.nip', self::NIP));
         $this->get(route('fachora.admin.providers', ['q' => 'Kraków']))->assertInertia(fn (Assert $p) => $p->has('providers.data', 1)->where('providers.data.0.city', 'Kraków'));
         $this->get(route('fachora.admin.providers', ['categorie' => 'elektryk']))->assertInertia(fn (Assert $p) => $p->has('providers.data', 1)->where('providers.data.0.categories', ['elektryk']));
-        $this->get(route('fachora.admin.providers', ['categorie' => 'kominiarz', 'status' => 'onbekend']))->assertInertia(fn (Assert $p) => $p->has('providers.data', 3));
+        $this->get(route('fachora.admin.providers', ['categorie' => 'astronauta', 'status' => 'onbekend']))->assertInertia(fn (Assert $p) => $p->has('providers.data', 3));
         $this->get(route('fachora.admin.providers', ['q' => 'niets-hiervan']))->assertInertia(fn (Assert $p) => $p->has('providers.data', 0));
     }
 
@@ -144,7 +144,7 @@ class FachoraAdminTest extends TestCase
             'Hydro-Max Bis;1234563218;;;Łódź;;hydraulik;nie',
             'Elektro Nowak;1234567890;geen-adres;;Kraków;30-001;Elektryk;',
             '',
-            'Bez Kategorii;;;;Warszawa;;Kominiarz;nie',
+            'Bez Kategorii;;;;Warszawa;;Astronauta;nie',
         ]);
 
         $this->post(route('fachora.admin.import'), ['text' => '   '])->assertSessionHasErrors(['text']);
