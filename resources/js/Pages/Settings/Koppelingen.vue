@@ -239,7 +239,7 @@ const copyUrl = async () => {
             </div>
             <p class="kop-desc">
               {{ $t('Schrijf je offertes in een gesprek met Claude en zeg simpelweg') }} <i>"{{ $t('zet deze offerte in :brand', { brand: brand.name }) }}"</i> —
-              {{ $t('Claude maakt het concept direct in je administratie aan. Claude kan klanten opzoeken, concept-offertes en concept-facturen aanmaken en je openstaande facturen opvragen.') }} <b>{{ $t('Versturen doe je altijd zelf') }}</b> {{ $t('in') }} {{ brand.name }}.
+              {{ $t('Claude maakt het concept direct in je administratie aan. Claude kan klanten opzoeken, concept-offertes en concept-facturen aanmaken en je openstaande facturen opvragen.') }} {{ $t('Een zelfgemaakte pdf (bijvoorbeeld de uitgewerkte offerte) kan Claude als bijlage meesturen.') }} <b>{{ $t('Versturen doe je altijd zelf') }}</b> {{ $t('in') }} {{ brand.name }}.
             </p>
           </div>
         </div>

@@ -424,6 +424,9 @@ Route::post('/webhooks/inbound-mail/{secret}', [\App\Http\Controllers\InboundMai
 // ---------- CLAUDE-KOPPELING (MCP, publiek, geen CSRF, geheim in de URL) ----------
 Route::match(['get', 'post', 'delete'], '/mcp/{token}', [\App\Http\Controllers\McpController::class, 'handle'])
     ->middleware('throttle:120,1')->name('mcp');
+// Eenmalige, ondertekende upload-link uit de tool bijlage_uploaden (een uur geldig).
+Route::match(['put', 'post'], '/mcp/upload/{nonce}', [\App\Http\Controllers\McpController::class, 'upload'])
+    ->middleware('throttle:30,1')->name('mcp.upload');
 
 // ---------- GUEST AUTH ----------
 // Reactie van een onderaannemer op een prijsaanvraag: geheime tokenlink uit de

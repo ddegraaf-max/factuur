@@ -28,6 +28,10 @@ RUN { \
         echo 'opcache.validate_timestamps=0'; \
         echo 'realpath_cache_size=4096K'; \
         echo 'realpath_cache_ttl=600'; \
+        # Bijlagen tot 10 MB (uploadscherm én de upload-link van de Claude-koppeling);
+        # zonder deze regels houdt PHP het op 2 MB en komt een grotere pdf nooit aan.
+        echo 'upload_max_filesize=12M'; \
+        echo 'post_max_size=12M'; \
     } > "${PHP_INI_DIR:-/usr/local/etc/php}/conf.d/zz-production.ini"
 
 # ----- System tools + Node.js for frontend build -----

@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.78.2</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 15 oktober 2026 · {{ brand('version_prefix') }} 1.79.0</div>
+        <h2>Claude hangt nu ook een eigen pdf aan je offerte</h2>
+        <ul class="tl-list">
+          <li><b>Bijlage uploaden via de Claude-koppeling</b> — schreef Claude een uitgewerkte offerte of urenstaat als pdf? Met de nieuwe tool bijlage_uploaden hangt Claude dat bestand aan de concept-offerte of -factuur: via een openbare link die {{ brand('name') }} zelf ophaalt, of via een eenmalige upload-link (een uur geldig) waar Claude het bestand rechtstreeks naartoe stuurt. De bijlage gaat mee met de mail naar de klant. Ook bij het aanmaken kun je nu een link naar een bestand meegeven; de koppeling haalt alleen bestanden op van openbare adressen.</li>
+          <li><b>Bijlagen tot 10 MB</b> — de servergrens voor uploads is gelijkgetrokken met de 10 MB uit het uploadscherm.</li>
+        </ul>
+      </article>
+
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">15 oktober 2026 · {{ brand('version_prefix') }} 1.78.2</div>
         <h2>Een concept krijgt de datum van vandaag</h2>
         <ul class="tl-list">
           <li><b>Geen oude datum meer op een laat verstuurde factuur</b> — een concept dat je een tijd hebt laten staan, opent in het bewerkscherm nu op de dag van vandaag in plaats van de dag van aanmaken, met een vervaldatum die daarbij past. Verstuur je een concept zonder het te openen (ook ingepland of terugkerend), dan krijgt het op dat moment de datum van die dag. Zet je de datum bewust in de toekomst, dan blijft die staan.</li>
