@@ -23,6 +23,9 @@ class ServiceJob extends Model
     /** Vanaf hier is er een bedrijf aan de opdracht verbonden. */
     public const WITH_PROVIDER = ['agreed', 'scheduled', 'in_progress', 'done', 'accepted', 'disputed'];
 
+    /** Domein van de klant-e-mails in de demo-omgeving (App\Services\Fachora\DemoBuilder): daar gaat nooit mail of sms heen. */
+    public const DEMO_DOMAIN = 'demo.fachora.pl';
+
     public const CLOSED = ['accepted', 'cancelled', 'expired'];
 
     protected $fillable = [
@@ -157,6 +160,12 @@ class ServiceJob extends Model
      * niet uit het id: een Postgres-sequence springt na een teruggedraaide
      * transactie, en dan zou het kenmerk gaten vertonen.
      */
+    /** Demo-zaak: de klant bestaat niet, dus geen mail, sms of eigenaarsbericht (zie Notifier). */
+    public function isDemo(): bool
+    {
+        return str_ends_with(mb_strtolower((string) $this->customer_email), '@' . self::DEMO_DOMAIN);
+    }
+
     public static function nextReference(): string
     {
         $last = (int) static::query()->selectRaw('MAX(CAST(SUBSTR(reference, 4) AS INTEGER)) as n')->value('n');

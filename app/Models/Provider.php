@@ -81,6 +81,12 @@ class Provider extends Model
         return $this->belongsTo(User::class);
     }
 
+    /** Demo-bedrijf (demo-administratie van App\Services\Fachora\DemoBuilder): geen mail en geen eigenaarsberichten. */
+    public function isDemo(): bool
+    {
+        return (bool) $this->company?->is_demo;
+    }
+
     public function checks(): HasMany
     {
         return $this->hasMany(ProviderCheck::class);

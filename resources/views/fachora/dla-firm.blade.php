@@ -34,7 +34,7 @@
       <a href="{{ route('fachora.apply') }}" class="btn btn-primary btn-lg">Zgłoś firmę</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-secondary btn-lg">Mam kod z listu: przejmij profil</a>
     </div>
-    <div class="hero-trust">Masz już konto? <a href="{{ route('login') }}" style="color:var(--brand);font-weight:600;">Zaloguj się do panelu firmy</a></div>
+    <div class="hero-trust">Masz już konto? <a href="{{ route('login') }}" style="color:var(--brand);font-weight:600;">Zaloguj się do panelu firmy</a> · Chcesz najpierw zobaczyć panel? <a href="{{ route('demo') }}" style="color:var(--brand);font-weight:600;">Uruchom demo</a></div>
   </div>
 </section>
 

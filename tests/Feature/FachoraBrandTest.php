@@ -164,7 +164,7 @@ class FachoraBrandTest extends TestCase
         $this->assertContains(url('/firma/'.$verified->slug), $urls);
         $this->assertNotContains(url('/firma/'.$unclaimed->slug), $urls, 'Onbevestigde profielen horen niet in de sitemap');
         $this->assertNotContains(url('/uslugi/elektryk/lodz'), $urls);
-        $this->assertNotContains(url('/demo'), $urls);
+        $this->assertContains(url('/demo'), $urls, 'De demo van het bedrijvenpanel staat in de sitemap');
         $this->assertNotContains(url('/kalkulator-odsetek'), $urls);
 
         config(['brand.active' => 'easyinvoice']);

@@ -328,7 +328,7 @@ const logout = () => {
           <form method="POST" :action="route('demo.stop')">
             <input type="hidden" name="_token" :value="csrfToken">
             <input type="hidden" name="to" value="register">
-            <button type="submit" class="demo-cta">{{ $t('Start 14 dagen gratis') }}</button>
+            <button type="submit" class="demo-cta">{{ brand.key === 'fachora' ? $t('Eigen bedrijfsaccount aanmaken') : $t('Start 14 dagen gratis') }}</button>
           </form>
         </div>
       </div>

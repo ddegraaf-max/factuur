@@ -199,6 +199,7 @@ $fachora = [
             ['route' => 'fachora.for-companies', 'label' => 'Zostań firmą Verified'],
             ['route' => 'fachora.claim', 'label' => 'Przejmij profil firmy'],
             ['route' => 'fachora.apply', 'label' => 'Zgłoś firmę'],
+            ['route' => 'demo', 'label' => 'Demo panelu'],
             ['route' => 'login', 'label' => 'Panel firmy'],
         ]],
         ['title' => 'Firma', 'links' => [
@@ -244,6 +245,7 @@ $fachoraEn = [
             ['route' => 'fachora.for-companies', 'label' => 'Become Verified'],
             ['route' => 'fachora.claim', 'label' => 'Claim your profile'],
             ['route' => 'fachora.apply', 'label' => 'Register a company'],
+            ['route' => 'demo', 'label' => 'Panel demo'],
             ['route' => 'login', 'label' => 'Company panel'],
         ]],
         ['title' => 'Company', 'links' => [

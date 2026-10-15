@@ -23,6 +23,9 @@ class DemoCleaner
         // echte administraties via de eigenaarpagina); de oude, handmatige
         // volgorde hieronder blijft als referentie staan maar wordt niet meer
         // aangeroepen.
+        // Fachora-demo: eerst het demo-bedrijf met zijn zaken (platformtabellen zonder company-scope).
+        \App\Services\Fachora\DemoBuilder::cleanup($company);
+
         app(CompanyPurger::class)->purge($company);
     }
 

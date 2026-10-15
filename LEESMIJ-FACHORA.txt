@@ -126,3 +126,16 @@ BEKENDE BEPERKINGEN / LATER
 - Geen aparte garantiereserve; "Fachora-garantie" = bemiddeling (zie regulamin).
 - De conceptfactuur bij akkoord wordt niet gemaakt als de eigenaar zelf (ingelogd in een andere
   administratie) goedkeurt; bij akkoord door de klant of automatisch wel.
+
+
+DEMO VAN HET BEDRIJVENPANEL (1.85.0)
+- fachora.pl/demo: DemoController kiest onder het merk fachora de pagina resources/views/fachora/demo.blade.php
+  (+ en/) en de bouwer App\Services\Fachora\DemoBuilder (erft van DemoDataBuilder: demo-administratie met
+  is_demo en 24 uur levensduur). Fictief bedrijf Hydro-Serwis Nowak (Warszawa, hydraulik/ogrzewanie/klimatyzacja,
+  Verified met alle checks) en dertien zaken: 2x aangeboden, 1x geprijsd, gepland, in uitvoering (+ meerwerk),
+  gereed, 6x geaccepteerd (4 met beoordeling), 1x afgezegd.
+- Klant-e-mails staan op ServiceJob::DEMO_DOMAIN (demo.fachora.pl); Notifier slaat demo-zaken en demo-bedrijven
+  over (klant, bedrijf, eigenaar), dus ook de planner (fachora:tick) mailt er nooit over. DemoMode zet mail op log.
+- Opruimen: DemoCleaner::delete roept DemoBuilder::cleanup aan (demo-zaken + bestanden + profiel), daarna CompanyPurger.
+- Demobalk (AppLayout) toont onder Fachora de knop "Załóż konto swojej firmy" (naar registreren).
+- Turnstile: TURNSTILE_SITEKEY en TURNSTILE_SECRET staan op Railway (widget "napoleonvvesoftware.nl (Spin)", hostnaam fachora.pl).

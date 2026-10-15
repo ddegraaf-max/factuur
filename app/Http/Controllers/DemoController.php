@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\PageView;
 use App\Services\DemoDataBuilder;
+use App\Services\Fachora\DemoBuilder as FachoraDemoBuilder;
+use App\Support\Brand;
+use App\Support\Market;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,8 +22,12 @@ class DemoController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // Demo-uitleg per markt: Poolse pagina onder Lopra Polska.
-        return view(\App\Support\Market::view(\App\Support\Market::isPl() ? 'lopra-pl.demo' : 'marketing.demo'));
+        // Fachora: demo van het bedrijvenpanel (pl/en); anders de demo-uitleg per markt.
+        if (Brand::is('fachora')) {
+            return view(Market::view('fachora.demo'));
+        }
+
+        return view(Market::view(Market::isPl() ? 'lopra-pl.demo' : 'marketing.demo'));
     }
 
     /** Bouw een verse demo-omgeving en log de bezoeker in. */
@@ -36,7 +43,7 @@ class DemoController extends Controller
         }
 
         try {
-            $user = $builder->build();
+            $user = Brand::is('fachora') ? app(FachoraDemoBuilder::class)->build() : $builder->build();
         } catch (\Throwable $e) {
             Log::error('Demo-omgeving aanmaken mislukt', ['error' => $e->getMessage()]);
 

@@ -33,7 +33,7 @@
       <a href="{{ route('fachora.apply') }}" class="btn btn-primary btn-lg">Register your company</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-secondary btn-lg">I have a letter code: claim profile</a>
     </div>
-    <div class="hero-trust">Already have an account? <a href="{{ route('login') }}" style="color:var(--brand);font-weight:600;">Log in to the company panel</a></div>
+    <div class="hero-trust">Already have an account? <a href="{{ route('login') }}" style="color:var(--brand);font-weight:600;">Log in to the company panel</a> · Want to see the panel first? <a href="{{ route('demo') }}" style="color:var(--brand);font-weight:600;">Run the demo</a></div>
   </div>
 </section>
 

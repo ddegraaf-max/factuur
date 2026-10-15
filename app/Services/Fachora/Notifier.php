@@ -20,12 +20,20 @@ class Notifier
 {
     public function customer(ServiceJob $job, string $kind, array $extra = []): bool
     {
+        if ($job->isDemo()) {
+            return false; // demo-klanten bestaan niet
+        }
+
         return $this->send($job->customer_email, $this->customerLocale($job), new FachoraMail($kind, 'customer', $job, null, $job->provider, $extra));
     }
 
     /** Aan een bedrijf: alleen als het zelf om berichten heeft gevraagd (geclaimd of opt-in). */
     public function provider(Provider $provider, string $kind, array $extra = [], ?ServiceJob $job = null, ?ServiceJobOffer $offer = null): bool
     {
+        if ($provider->isDemo() || $job?->isDemo()) {
+            return false;
+        }
+
         if (! ConsentPolicy::mayEmail($provider)) {
             Log::info('Fachora: geen mail aan bedrijf zonder toestemming', ['provider' => $provider->id, 'kind' => $kind]);
 
@@ -47,6 +55,10 @@ class Notifier
 
     public function owner(string $kind, array $extra = [], ?ServiceJob $job = null, ?Provider $provider = null): bool
     {
+        if ($job?->isDemo() || $provider?->isDemo()) {
+            return false; // geen demo-ruis in de inbox van de eigenaar
+        }
+
         $sent = false;
         foreach (OwnerAccess::emails() as $email) {
             $sent = $this->send($email, 'nl', new FachoraMail($kind, 'owner', $job, null, $provider, $extra)) || $sent;
