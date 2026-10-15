@@ -220,6 +220,7 @@ Route::middleware('market:nl')->controller(\App\Http\Controllers\MarketingConten
     Route::get('/factuurprogramma-voor/{slug}', 'beroep')->where('slug', '[a-z0-9-]+')->name('beroepen.beroep');
     Route::get('/voorbeelden', 'voorbeelden')->name('voorbeelden');
     Route::get('/voorbeelden/{slug}.pdf', 'voorbeeldPdf')->where('slug', '[a-z0-9-]+')->name('voorbeelden.pdf');
+    Route::get('/voorbeelden/{slug}/weergave', 'voorbeeldHtml')->where('slug', '[a-z0-9-]+')->name('voorbeelden.html');
     Route::get('/voorbeelden/{slug}', 'voorbeeld')->where('slug', '[a-z0-9-]+')->name('voorbeelden.voorbeeld');
     Route::get('/overzicht', 'overzicht')->name('overzicht');
 });

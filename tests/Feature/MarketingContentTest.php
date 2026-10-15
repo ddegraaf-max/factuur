@@ -86,6 +86,12 @@ class MarketingContentTest extends TestCase
                 ->assertHeader('Content-Type', 'application/pdf');
             $this->assertStringStartsWith('%PDF', (string) $pdf->getContent(), $slug);
             $this->assertStringContainsString('inline', (string) $pdf->headers->get('Content-Disposition'));
+
+            // De html-weergave voor het iframe: zelfde factuur, niet apart te indexeren.
+            $this->get('/voorbeelden/' . $slug . '/weergave')->assertOk()
+                ->assertHeader('X-Robots-Tag', 'noindex')
+                ->assertSee($example['data']['van_bedrijf'])
+                ->assertSee($example['data']['factuurnummer']);
         }
 
         $download = $this->get('/voorbeelden/factuur.pdf?download=1')->assertOk();

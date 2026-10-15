@@ -36,7 +36,7 @@
         <ul class="tl-list">
           <li><b>Begrippenlijst</b> — 38 begrippen uit de praktijk van factureren, btw en betaald krijgen, elk op een eigen pagina met uitleg en verwijzingen: van btw verlegd en de KOR tot creditnota, Peppol, G-rekening en wettelijke rente. Te vinden onder <a href="{{ route('begrippen') }}">Begrippenlijst</a>.</li>
           <li><b>Factureren in jouw vak</b> — twaalf pagina's die per beroep uitleggen waar je bij factureren op let: schilders, timmerlieden, elektriciens, installateurs, stukadoors, hoveniers, klusbedrijven, dakdekkers, fotografen, webdesigners, consultants en zzp'ers in het algemeen. Elk met eigen vragen en antwoorden. Zie <a href="{{ route('beroepen') }}">Factuurprogramma per beroep</a>.</li>
-          <li><b>Voorbeeldfacturen</b> — vier echte pdf's om te bekijken en te downloaden: een zzp-factuur, een factuur met btw verlegd, een factuur zonder btw onder de KOR en een urenfactuur, met uitleg van elk onderdeel. Zie <a href="{{ route('voorbeelden') }}">Voorbeeldfacturen</a>.</li>
+          <li><b>Voorbeeldfacturen</b> — vier echte pdf's om te bekijken en te downloaden: een zzp-factuur, een factuur met btw verlegd, een factuur zonder btw onder de KOR en een urenfactuur, met uitleg van elk onderdeel. Sinds 1.80.1 staat de factuur zelf in de pagina (ook op je telefoon), met de pdf als download. Zie <a href="{{ route('voorbeelden') }}">Voorbeeldfacturen</a>.</li>
           <li><b>Beter vindbaar</b> — elke nieuwe sectie heeft een eigen deelsitemap in de sitemap-index, alle inhoudspagina's dragen een kruimelpad met structured data, en op <a href="{{ route('overzicht') }}">Alle pagina's</a> staat elke openbare pagina op een rij.</li>
         </ul>
       </article>

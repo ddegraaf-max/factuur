@@ -37,8 +37,8 @@
 <section class="section" style="padding-top:40px;">
   <div class="container ex-layout">
     <div class="ex-pdf">
-      <iframe src="{{ route('voorbeelden.pdf', $slug) }}" title="{{ $example['title'] }}" loading="lazy"></iframe>
-      <p style="font-size:13px;color:var(--text-3);margin:10px 0 0;">Wordt de pdf niet getoond? <a href="{{ route('voorbeelden.pdf', $slug) }}" target="_blank" rel="noopener" style="color:var(--brand);">Open hem in een nieuw tabblad</a>. De bedrijven in het voorbeeld zijn verzonnen.</p>
+      <iframe src="{{ route('voorbeelden.html', $slug) }}" title="{{ $example['title'] }}" loading="lazy"></iframe>
+      <p style="font-size:13px;color:var(--text-3);margin:10px 0 0;">Dit is de factuur zoals hij in de pdf staat. <a href="{{ route('voorbeelden.pdf', $slug) }}" target="_blank" rel="noopener" style="color:var(--brand);">Open de pdf in een nieuw tabblad</a>. De bedrijven in het voorbeeld zijn verzonnen.</p>
     </div>
 
     <div>

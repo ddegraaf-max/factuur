@@ -93,6 +93,27 @@ class MarketingContentController extends Controller
     }
 
     /**
+     * Dezelfde factuur als html, voor het iframe op de voorbeeldpagina: een pdf
+     * in een iframe blijft op telefoons (en in headless browsers) leeg. Geen
+     * eigen pagina voor zoekmachines; de pdf blijft de download.
+     */
+    public function voorbeeldHtml(string $slug)
+    {
+        $examples = config('voorbeelden.examples', []);
+        abort_unless(isset($examples[$slug]), 404);
+
+        $html = view('pdf.gratis-factuur', FreeInvoicePdf::viewData($examples[$slug]['data']))->render();
+        // Het sjabloon rekent op @page-marges en een vaste voet; in de browser krijgt het een eigen kader.
+        $html = str_replace('</head>', '<style>body{margin:0;padding:32px 36px 40px;background:#fff;max-width:720px}.credit{position:static;margin-top:36px}</style></head>', $html);
+
+        return response($html, 200, [
+            'Content-Type' => 'text/html; charset=UTF-8',
+            'X-Robots-Tag' => 'noindex',
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
+    }
+
+    /**
      * Overzicht van alle openbare pagina's voor bezoekers én zoekmachines:
      * dezelfde bron als de sitemaps, met een leesbare naam per pagina.
      */

@@ -17,6 +17,19 @@ class FreeInvoicePdf
      */
     public static function make(array $data): \Barryvdh\DomPDF\PDF
     {
+        return Pdf::loadView('pdf.gratis-factuur', self::viewData($data));
+    }
+
+    /**
+     * De gegevens voor het factuursjabloon (pdf.gratis-factuur), met de
+     * totalen server-side berekend. Ook los bruikbaar om dezelfde factuur
+     * als html te tonen (voorbeeldfacturen in de browser).
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function viewData(array $data): array
+    {
         $subtotal = 0.0;
         $vatByRate = [];
         $rows = [];
@@ -45,12 +58,12 @@ class FreeInvoicePdf
             }
         }
 
-        return Pdf::loadView('pdf.gratis-factuur', [
+        return [
             'data' => $data,
             'rows' => $rows,
             'subtotal' => round($subtotal, 2),
             'vatTotals' => $vatTotals,
             'total' => round($subtotal + array_sum($vatTotals), 2),
-        ]);
+        ];
     }
 }
