@@ -2,7 +2,10 @@
 # Based on FrankenPHP (same as Railway's Railpack default) but with full control
 # over PHP extensions. Adds GD which DomPDF needs for rendering logos.
 
-FROM dunglas/frankenphp:php8.2-bookworm
+# Pinned to FrankenPHP 1.13.2 (PHP 8.2.35): fixes PHP2Shell
+# (CVE-2026-109618, CVE-2026-109619). Do not go back to the floating tag
+# without checking it carries the patched PHP version.
+FROM dunglas/frankenphp:1.13.2-php8.2-bookworm
 
 # ----- PHP extensions -----
 # install-php-extensions is bundled in the FrankenPHP image and handles
