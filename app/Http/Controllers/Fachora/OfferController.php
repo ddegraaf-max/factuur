@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FachoraFile;
 use App\Models\ServiceJobOffer;
 use App\Services\Fachora\JobService;
+use App\Services\Fachora\LeadService;
 use App\Services\Fachora\Presenter;
 use App\Services\Fachora\ProtectService;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +23,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
  */
 class OfferController extends Controller
 {
-    public function __construct(private JobService $jobs, private Presenter $presenter, private ProtectService $protect) {}
+    public function __construct(private JobService $jobs, private Presenter $presenter, private ProtectService $protect, private LeadService $leads) {}
 
     public function show(string $token): Response
     {
@@ -44,8 +45,43 @@ class OfferController extends Controller
             'protect' => $this->protect->enabled() && $offer->provider->protectReady(),
             'fee_percent' => $offer->provider->feePercent(),
             'panel_url' => $offer->provider->user_id ? route('fachora.dashboard') : null,
-            'needs_terms' => $offer->provider->claimed_at === null && $offer->provider->terms_accepted_at === null,
+            'needs_terms' => $this->jobs->needsTerms($offer),
+            'lead' => $this->leads->summary($offer),
+            'unlock_url' => route('fachora.offer.unlock', $token),
         ]);
+    }
+
+    /** Ontgrendelen (1.87): gratis welkomstlead meteen, anders via Stripe Checkout. */
+    public function unlock(Request $request, string $token)
+    {
+        $offer = $this->jobs->findOfferByToken($token);
+        abort_unless($offer, 404);
+        $data = $request->validate(['accept_terms' => ['nullable', 'boolean']]);
+
+        try {
+            $this->jobs->acceptTerms($offer, (bool) ($data['accept_terms'] ?? false));
+            $url = $this->leads->unlock($offer);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['offer' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return back()->with('error', __('De betaling kon niet worden gestart. Probeer het zo opnieuw.'));
+        }
+
+        return $url ? Inertia::location($url) : back()->with('flash', __('Aanvraag ontgrendeld. Geef hieronder uw prijs door.'));
+    }
+
+    /** Terug van Stripe na het ontgrendelen. */
+    public function unlocked(string $token): RedirectResponse
+    {
+        $offer = $this->jobs->findOfferByToken($token);
+        abort_unless($offer, 404);
+        $ok = $this->leads->syncPayment($offer);
+
+        return redirect($offer->url())->with('flash', $ok
+            ? __('Bedankt! De aanvraag is ontgrendeld. Geef hieronder uw prijs door.')
+            : __('We wachten nog op de bevestiging van de betaling; dit kan een minuut duren.'));
     }
 
     public function respond(Request $request, string $token): RedirectResponse

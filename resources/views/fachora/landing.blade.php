@@ -6,6 +6,7 @@
 @php
   $fee = config('fachora.fee_percent');
   $intro = config('fachora.intro_fee_percent');
+  $lead = (bool) config('fachora.lead_pricing');
   $introDays = config('fachora.intro_days');
   $warranty = config('fachora.default_warranty_months');
   $maxOffers = config('fachora.max_offers');
@@ -135,7 +136,7 @@
         </div>
         <div class="fh-flow-item">
           <div class="nr">4</div>
-          <div><b>Firma dostaje wypłatę</b><p>Dopiero po Twojej akceptacji. Prowizję Fachory płaci firma, nie Ty.</p></div>
+          <div><b>Firma dostaje wypłatę</b><p>Dopiero po Twojej akceptacji. Opłaty Fachory płaci firma, nie Ty.</p></div>
         </div>
       </div>
       <div>
@@ -247,8 +248,13 @@
     <div class="fh-split">
       <div>
         <div class="eyebrow">Dla firm</div>
+        @if ($lead)
+        <h2>Nowi klienci w Twojej okolicy. Bez abonamentu.</h2>
+        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł, zależnie od wielkości pracy. Pierwsze gratis. Do tego darmowy program do faktur gotowy na KSeF i profil z opiniami od prawdziwych klientów.</p>
+        @else
         <h2>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h2>
         <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego darmowy program do faktur gotowy na KSeF i profil z opiniami od prawdziwych klientów.</p>
+        @endif
         <div class="fh-cta-row" style="justify-content:flex-start;">
           <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary">Zobacz ofertę dla firm</a>
           <a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Przejmij profil firmy</a>
@@ -256,8 +262,13 @@
       </div>
       <div class="fh-prices" style="grid-template-columns:1fr 1fr;">
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>abonament</b><span>bez miesięcznej opłaty</span></div>
+        @if ($lead)
+        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>podgląd zlecenia</b><span>opis, zdjęcia i termin za darmo</span></div>
+        <div class="fh-price hl"><div class="v">{{ (int) config('fachora.lead_min') }}–{{ (int) config('fachora.lead_max') }}<small> zł</small></div><b>za odblokowanie</b><span>pierwsze zapytanie gratis</span></div>
+        @else
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>za zlecenie</b><span>nie płacisz za kontakt ani za ofertę</span></div>
         <div class="fh-price hl"><div class="v">{{ $fee }}<small>%</small></div><b>od wykonanej pracy</b><span>przez pierwsze {{ $introDays }} dni {{ $intro }}%</span></div>
+        @endif
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>program do faktur</b><span>faktury gotowe na KSeF, dopóki jesteś Verified</span></div>
       </div>
     </div>
@@ -290,7 +301,7 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>Ile to kosztuje?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, oferty ani za Fachora Protect. Płacisz tylko cenę ustaloną z firmą. Prowizję od wykonanego zlecenia ponosi firma.</div>
+        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, oferty ani za Fachora Protect. Płacisz tylko cenę ustaloną z firmą. Opłaty Fachory ponosi firma.</div>
       </details>
       <details class="faq-item">
         <summary>Czy dostanę numer telefonu firmy?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>

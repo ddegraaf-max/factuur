@@ -73,6 +73,9 @@ class JobController extends Controller
                 'max' => (int) config('fachora.max_offers', 5),
                 'fee' => $this->jobs->requestFee(),
                 'selected' => array_map('intval', (array) $job->selected_providers),
+                'sms_required' => $this->jobs->smsRequired($job),
+                'phone' => $job->customer_phone,
+                'code_sent' => $job->phone_code_sent_at !== null && $job->phone_verified_at === null,
             ] : null,
         ]);
     }
@@ -102,6 +105,35 @@ class JobController extends Controller
         }
 
         return $url ? Inertia::location($url) : redirect($job->url())->with('flash', __('Je aanvraag is verstuurd naar de gekozen bedrijven.'));
+    }
+
+    /** Sms-code naar de klant (1.87). */
+    public function smsSend(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $data = $request->validate(['phone' => ['required', 'string', 'max:40']], ['phone.required' => __('Vul je mobiele nummer in.')]);
+
+        try {
+            $sent = $this->jobs->sendPhoneCode($job, $data['phone']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['phone' => $e->getMessage()]);
+        }
+
+        return $sent ? back()->with('flash', __('Code verstuurd per sms.')) : back()->withErrors(['phone' => __('De sms kon niet worden verstuurd. Controleer het nummer.')]);
+    }
+
+    public function smsVerify(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $data = $request->validate(['code' => ['required', 'string', 'max:12']]);
+
+        try {
+            $ok = $this->jobs->verifyPhone($job, $data['code']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['code' => $e->getMessage()]);
+        }
+
+        return $ok ? back()->with('flash', __('Telefoonnummer bevestigd. Kies nu de bedrijven.')) : back()->withErrors(['code' => __('Deze code klopt niet.')]);
     }
 
     /** Terug van Stripe na de bijdrage voor de aanvraag. */

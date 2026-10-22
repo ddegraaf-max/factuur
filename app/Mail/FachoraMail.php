@@ -197,7 +197,8 @@ class FachoraMail extends Mailable
                 case 'reminder':
                     $title = $job?->ai['title_pl'] ?? $job?->title ?? '';
                     $set($this->kind === 'reminder' ? __('Herinnering: zlecenie :ref wacht op uw prijs', ['ref' => $ref]) : __('Nowe zlecenie: :title (:city)', ['title' => $title, 'city' => $job?->city]), $title, array_values(array_filter([
-                        $request ? __('Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. Reageren is vrijblijvend; alleen over een opdracht die u krijgt, betaalt u na akkoord met de voorwaarden een provisie. U krijgt van ons alleen berichten over aanvragen van klanten.', ['city' => $job?->city]) : null,
+                        $request ? __('Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. U krijgt van ons alleen berichten over aanvragen van klanten.', ['city' => $job?->city]) : null,
+                        $this->offer && app(\App\Services\Fachora\LeadService::class)->enabled() ? $this->leadLine() : null,
                         __('Een klant in :city zoekt een :category. De prijs die u opgeeft, is de prijs voor de klant; het adres krijgt u zodra de klant u kiest.', ['city' => $job?->city, 'category' => $job?->categoryName('pl')]),
                         $job?->description_pl ?: $job?->description,
                         $job?->protect || ($this->offer?->provider?->protectReady()) ? __('Betaling via Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na goedkeuring.') : null,
@@ -269,7 +270,9 @@ class FachoraMail extends Mailable
                 case 'verified':
                     $set(__('Gefeliciteerd: :name is Fachora Verified', ['name' => $name]), __('U bent Fachora Verified'), [
                         __('Vanaf nu ontvangt u opdrachten uit uw werkgebied (:radius km rond :city) per e-mail. Reageer snel: klanten kiezen vaak binnen een dag.', ['radius' => $provider->radius_km, 'city' => $provider->city]),
-                        __('Fee: :fee% over uitgevoerde opdrachten; de eerste :days dagen :intro%. Geen abonnement, geen kosten per aanvraag.', ['fee' => config('fachora.fee_percent'), 'days' => config('fachora.intro_days'), 'intro' => config('fachora.intro_fee_percent')]),
+                        config('fachora.lead_pricing')
+                            ? __('Geen abonnement. Bekijken is gratis; u betaalt alleen voor een aanvraag die u ontgrendelt om te reageren (:min tot :max, naar grootte van de klus). De eerste is gratis.', ['min' => Fachora::money(config('fachora.lead_min')), 'max' => Fachora::money(config('fachora.lead_max'))])
+                            : __('Fee: :fee% over uitgevoerde opdrachten; de eerste :days dagen :intro%. Geen abonnement, geen kosten per aanvraag.', ['fee' => config('fachora.fee_percent'), 'days' => config('fachora.intro_days'), 'intro' => config('fachora.intro_fee_percent')]),
                     ], ['label' => __('Naar het panel'), 'url' => $panel]);
                     break;
                 case 'suspended':
@@ -287,8 +290,10 @@ class FachoraMail extends Mailable
                     ], ['label' => __('Naar de verificatie'), 'url' => route('fachora.verification')]);
                     break;
                 case 'invite':
-                    $set(__('Nieuwe klanten in uw regio, betaal alleen voor uitgevoerde opdrachten'), __('Nieuwe klanten in uw regio'), [
-                        __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement, 0 zł per aanvraag; alleen :fee% over een uitgevoerde opdracht.', ['fee' => config('fachora.fee_percent')]),
+                    $set((config('fachora.lead_pricing') ? __('Nieuwe klanten in uw regio, geen abonnement') : __('Nieuwe klanten in uw regio, betaal alleen voor uitgevoerde opdrachten')), __('Nieuwe klanten in uw regio'), [
+                        config('fachora.lead_pricing')
+                            ? __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.', ['min' => Fachora::money(config('fachora.lead_min')), 'max' => Fachora::money(config('fachora.lead_max'))])
+                            : __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement, 0 zł per aanvraag; alleen :fee% over een uitgevoerde opdracht.', ['fee' => config('fachora.fee_percent')]),
                         __('Uw bedrijf staat al in onze database. Neem het profiel over, vul werkgebied en talen in en vraag het keurmerk Fachora Verified aan.'),
                         __('U ontvangt deze mail omdat u toestemming gaf voor informatie van partners (:source).', ['source' => $provider->consent_source ?: '-']),
                     ], ['label' => __('Profiel overnemen'), 'url' => route('fachora.claim', ['firma' => $provider->slug])]);
@@ -402,5 +407,19 @@ class FachoraMail extends Mailable
             'split' => __('Fachora besliste op een deling: :amount gaat naar het bedrijf, de rest terug naar de klant.', ['amount' => Fachora::money(($job?->payout_amount ?? 0) + ($job?->fee_amount ?? 0))]),
             default => null,
         };
+    }
+
+    /** Wat reageren op deze aanvraag kost (1.87): de welkomstlead gratis, daarna de prijs van de lead. */
+    private function leadLine(): ?string
+    {
+        $leads = app(\App\Services\Fachora\LeadService::class);
+        $fee = $leads->feeFor($this->offer);
+        if ($fee <= 0 && $leads->isFree($this->offer)) {
+            return __('Deze aanvraag is voor u gratis (welkomstlead). Bekijken kost nooit iets; u betaalt pas als u een aanvraag ontgrendelt om te reageren.');
+        }
+
+        return $fee > 0
+            ? __('Bekijken is gratis. Wilt u reageren, dan ontgrendelt u de aanvraag voor :amount. Geen abonnement, geen provisie over uw rekening aan de klant.', ['amount' => Fachora::money($fee)])
+            : null;
     }
 }

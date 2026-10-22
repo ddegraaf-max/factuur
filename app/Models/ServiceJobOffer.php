@@ -20,6 +20,7 @@ class ServiceJobOffer extends Model
     protected $fillable = [
         'service_job_id', 'provider_id', 'token', 'status', 'wave', 'sent_at', 'reminded_at', 'opened_at', 'responded_at',
         'price', 'price_type', 'callout', 'hourly', 'available_at', 'available_note', 'remarks', 'decline_reason',
+        'lead_fee', 'lead_free', 'lead_session_id', 'unlocked_at',
     ];
 
     protected $casts = [
@@ -31,9 +32,12 @@ class ServiceJobOffer extends Model
         'price' => 'float',
         'callout' => 'float',
         'hourly' => 'float',
+        'lead_fee' => 'float',
+        'lead_free' => 'boolean',
+        'unlocked_at' => 'datetime',
     ];
 
-    protected $hidden = ['token'];
+    protected $hidden = ['token', 'lead_session_id'];
 
     public function job(): BelongsTo
     {
@@ -59,6 +63,11 @@ class ServiceJobOffer extends Model
     public function isOpen(): bool
     {
         return in_array($this->status, ['sent', 'responded'], true) && $this->job?->canChoose();
+    }
+
+    public function isUnlocked(): bool
+    {
+        return $this->unlocked_at !== null;
     }
 
     public function statusLabel(): string

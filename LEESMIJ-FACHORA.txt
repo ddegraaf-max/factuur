@@ -150,6 +150,20 @@ CEIDG (1.85.1, sleutel sinds 16 okt 2026)
   (route fachora.admin.ceidg → AdminController::importCeidg → CeidgClient::import). Categorie uit de gezochte PKD-code.
 
 
+GRATIS VOOR DE KLANT, BEDRIJF BETAALT PER LEAD (1.87.0, 22 okt 2026)
+- Klant: gratis (FACHORA_REQUEST_FEE standaard 0). Voor het versturen bevestigt de klant zijn
+  mobiele nummer met een sms-code (FACHORA_CUSTOMER_SMS, alleen als Smstools is gekoppeld).
+- Bedrijf: bekijken gratis, reageren na "ontgrendelen" (/oferta/{token}/odblokuj). Prijs:
+  FACHORA_LEAD_PERCENT (5) % van het midden van de AI-schatting, tussen FACHORA_LEAD_MIN (15) en
+  FACHORA_LEAD_MAX (150) zł; zonder schatting FACHORA_LEAD_DEFAULT (30). De eerste
+  FACHORA_LEAD_FREE (1) lead per bedrijf is gratis. Betaling via Stripe Checkout (metadata
+  kind=fachora_lead), webhook en terugkeer-URL ontgrendelen. Zonder Stripe-sleutel alles gratis.
+- Provisie alleen nog via Protect; rechtstreeks betaalde klussen: fee 0.
+  FACHORA_LEAD_PRICING=false zet het oude provisiemodel terug (ook de teksten).
+- Regulamin § 13, dla-firm en landing aangepast; terms_version 2026-10-22 (bedrijven accepteren
+  opnieuw). Valse aanvraag binnen 7 dagen melden = terugbetalen: handmatig via Stripe.
+- Engelse marketingpagina's (resources/views/fachora/en/*) noemen nog het provisiemodel.
+
 KLANT KIEST ZELF, BIJDRAGE PER AANVRAAG, REGIO-IMPORT (1.86.0, 22 okt 2026)
 ---------------------------------------------------------------------------
 Besluit van Daniël (22 okt 2026): de klant kiest zelf tot vijf bedrijven en betaalt

@@ -77,6 +77,18 @@ class StripeWebhookController extends Controller
         }
 
         // Fachora 1.86: de bijdrage van de klant voor een aanvraag; daarna gaat die naar de gekozen bedrijven.
+        if (($session['metadata']['kind'] ?? null) === 'fachora_lead') {
+            $offer = \App\Models\ServiceJobOffer::query()->find((int) ($session['metadata']['offer_id'] ?? 0));
+            if ($offer && ($session['payment_status'] ?? null) === 'paid') {
+                if (blank($offer->lead_session_id)) {
+                    $offer->forceFill(['lead_session_id' => $session['id'] ?? null])->save();
+                }
+                app(\App\Services\Fachora\LeadService::class)->syncPayment($offer);
+            }
+
+            return;
+        }
+
         if (($session['metadata']['kind'] ?? null) === 'fachora_request') {
             $job = \App\Models\ServiceJob::query()->find((int) ($session['metadata']['job_id'] ?? 0));
             if ($job && ($session['payment_status'] ?? null) === 'paid') {

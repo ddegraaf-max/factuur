@@ -84,6 +84,12 @@ const sendSelection = () => {
   router.post(route('fachora.job.select', props.token), { providers: picked.value, express: selectExpress.value ? 1 : 0 }, { preserveScroll: true, onFinish: () => { selecting.value = false; } });
 };
 
+/* ---------- sms-code (1.87) ---------- */
+const smsForm = useForm({ phone: props.choice?.phone || props.job.customer_phone || '' });
+const codeForm = useForm({ code: '' });
+const sendSms = () => smsForm.post(route('fachora.job.sms.send', props.token), { preserveScroll: true });
+const verifySms = () => codeForm.post(route('fachora.job.sms.verify', props.token), { preserveScroll: true, onSuccess: () => codeForm.reset() });
+
 /* ---------- Fachora Protect ---------- */
 const paying = ref(false);
 // Consumentenrecht: de klant vraagt uitdrukkelijk om uitvoering binnen de bedenktermijn.
@@ -201,7 +207,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       </article>
 
       <div class="fa-card">
-        <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }}</p>
+        <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }} <template v-if="!(choice.fee > 0)"><strong>{{ $t('Gratis voor jou.') }}</strong></template></p>
         <template v-if="choice.fee > 0">
           <p class="fa-small"><strong>{{ $t('Kosten: :amount per aanvraag', { amount: money(choice.fee) }) }}</strong> · {{ $t('betalen met BLIK, Przelewy24 of kaart') }}</p>
           <label class="fa-check">
@@ -209,9 +215,26 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <span>{{ $t('Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.') }}</span>
           </label>
         </template>
+        <div v-if="choice.sms_required" class="jb-sms">
+          <p class="fa-small"><strong>{{ $t('Bevestig je telefoonnummer') }}</strong> · {{ $t('Zo weten de bedrijven dat je aanvraag echt is. Je nummer zien ze pas als je een bedrijf kiest.') }}</p>
+          <div class="fa-row">
+            <div class="fa-field">
+              <input type="tel" v-model="smsForm.phone" :placeholder="$t('bijv. +48 600 000 000')" autocomplete="tel">
+              <div v-if="smsForm.errors.phone" class="fa-err">{{ smsForm.errors.phone }}</div>
+            </div>
+            <button type="button" class="fa-btn fa-btn--secondary" :disabled="smsForm.processing || !smsForm.phone" @click="sendSms">{{ choice.code_sent ? $t('Nieuwe code') : $t('Stuur code') }}</button>
+          </div>
+          <div v-if="choice.code_sent" class="fa-row">
+            <div class="fa-field">
+              <input type="text" inputmode="numeric" maxlength="6" v-model="codeForm.code" :placeholder="$t('Code uit de sms')" autocomplete="one-time-code">
+              <div v-if="codeForm.errors.code" class="fa-err">{{ codeForm.errors.code }}</div>
+            </div>
+            <button type="button" class="fa-btn" :disabled="codeForm.processing || codeForm.code.length < 6" @click="verifySms">{{ $t('Bevestigen') }}</button>
+          </div>
+        </div>
         <div v-if="selectError" class="fa-err">{{ selectError }}</div>
         <div class="fa-actions">
-          <button type="button" class="fa-btn" :disabled="selecting || !picked.length || (choice.fee > 0 && !selectExpress)" @click="sendSelection">
+          <button type="button" class="fa-btn" :disabled="selecting || !picked.length || choice.sms_required || (choice.fee > 0 && !selectExpress)" @click="sendSelection">
             {{ choice.fee > 0 ? $t('Betalen en versturen (:amount)', { amount: money(choice.fee) }) : $t('Aanvraag versturen') }}
           </button>
         </div>
@@ -560,4 +583,6 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-cancel form { text-align: left; }
 .jb-express { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.5; margin: 6px 0 12px; }
 .jb-express input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+.jb-sms { margin: 12px 0; display: grid; gap: 8px; }
+.jb-sms .fa-row { align-items: flex-start; }
 </style>

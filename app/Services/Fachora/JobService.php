@@ -168,7 +168,7 @@ class JobService
     /** De bijdrage per aanvraag in złoty (0 = gratis, of geen Stripe: dan ook gratis). */
     public function requestFee(): float
     {
-        $fee = max(0, (float) config('fachora.request_fee', 10));
+        $fee = max(0, (float) config('fachora.request_fee', 0));
 
         return $fee > 0 && $this->protect->stripeConfigured() ? round($fee, 2) : 0.0;
     }
@@ -184,6 +184,9 @@ class JobService
     {
         if (! $job->isSelecting()) {
             throw new \DomainException(__('Voor deze opdracht kun je geen bedrijven (meer) kiezen.'));
+        }
+        if ($this->smsRequired($job)) {
+            throw new \DomainException(__('Bevestig eerst je telefoonnummer met de sms-code.'));
         }
         $max = (int) config('fachora.max_offers', 5);
         $allowed = $this->providers->choiceCandidates($job)->pluck('id')->all();
@@ -213,6 +216,59 @@ class JobService
         }
 
         return $this->protect->requestCheckoutUrl($job, $fee, route('fachora.job.request.paid', $job->token), $job->url());
+    }
+
+    /* ---------- sms-code voor de klant (1.87) ---------- */
+
+    /** Moet de klant zijn telefoonnummer bevestigen voordat de aanvraag weggaat? */
+    public function smsRequired(ServiceJob $job): bool
+    {
+        return (bool) config('fachora.customer_sms', true)
+            && $job->phone_verified_at === null
+            && ! $job->isDemo()
+            && app(\App\Services\SmsService::class)->configured();
+    }
+
+    public function sendPhoneCode(ServiceJob $job, string $phone): bool
+    {
+        if (! $job->isSelecting()) {
+            throw new \DomainException(__('Voor deze opdracht kun je geen bedrijven (meer) kiezen.'));
+        }
+        if (\App\Support\PhoneNumber::mobile($phone) === null) {
+            throw new \DomainException(__('Vul een geldig mobiel nummer in.'));
+        }
+        if ($job->phone_code_sent_at && $job->phone_code_sent_at->gt(now()->subMinute())) {
+            throw new \DomainException(__('Er is net een code verstuurd. Wacht een minuut.'));
+        }
+        if (ServiceJob::query()->whereKey($job->id)->value('confirm_mails') > 10) {
+            throw new \DomainException(__('Te veel pogingen.'));
+        }
+        $code = (string) random_int(100000, 999999);
+        $job->forceFill(['customer_phone' => $phone, 'phone_code' => $code, 'phone_code_sent_at' => now(), 'phone_code_attempts' => 0])->save();
+        $job->increment('confirm_mails');
+
+        return app(\App\Services\SmsService::class)->platform($phone, __('Fachora: Twój kod to :code', ['code' => $code]));
+    }
+
+    public function verifyPhone(ServiceJob $job, string $code): bool
+    {
+        if ($job->phone_verified_at !== null) {
+            return true;
+        }
+        if ($job->phone_code_attempts >= 5) {
+            throw new \DomainException(__('Te veel pogingen. Vraag een nieuwe code aan.'));
+        }
+        $ok = filled($job->phone_code) && hash_equals((string) $job->phone_code, trim($code))
+            && $job->phone_code_sent_at && $job->phone_code_sent_at->gt(now()->subMinutes(30));
+        if (! $ok) {
+            $job->increment('phone_code_attempts');
+
+            return false;
+        }
+        $job->forceFill(['phone_verified_at' => now(), 'phone_code' => null])->save();
+        $this->log($job, 'phone_verified', 'customer', __('Telefoonnummer bevestigd per sms'));
+
+        return true;
     }
 
     /** Terug van Stripe (of via de planner): betaald? Dan gaat de aanvraag weg. */
@@ -403,6 +459,30 @@ class JobService
         }
     }
 
+    /** Een bedrijf zonder profiel gaat eerst akkoord met de voorwaarden (voor ontgrendelen of reageren). */
+    public function needsTerms(ServiceJobOffer $offer): bool
+    {
+        return $offer->provider->claimed_at === null && $offer->provider->terms_accepted_at === null;
+    }
+
+    public function acceptTerms(ServiceJobOffer $offer, bool $accepted): void
+    {
+        if (! $this->needsTerms($offer)) {
+            return;
+        }
+        if (! $accepted) {
+            throw new \DomainException(__('Ga eerst akkoord met de voorwaarden van Fachora.'));
+        }
+        $provider = $offer->provider;
+        // Akkoord op de tokenpagina: vanaf nu mag Fachora dit bedrijf over deze opdracht mailen.
+        // Geen toestemming voor reclame: alleen berichten over opdrachten (ConsentPolicy::mayEmail via terms_accepted_at).
+        $provider->forceFill([
+            'terms_accepted_at' => now(),
+            'terms_version' => (string) config('fachora.terms_version'),
+        ])->save();
+        $this->log($offer->job, 'terms_accepted', 'provider', __(':provider ging akkoord met de voorwaarden', ['provider' => $provider->display_name]));
+    }
+
     /** Het bedrijf geeft prijs en moment door. @param  array<string, mixed>  $data */
     public function respond(ServiceJobOffer $offer, array $data): void
     {
@@ -410,19 +490,9 @@ class JobService
         if (! $job->canChoose() || ! in_array($offer->status, ['sent', 'responded'], true)) {
             throw new \DomainException(__('Deze aanbieding is niet meer open.'));
         }
-        $provider = $offer->provider;
-        if ($provider->claimed_at === null && $provider->terms_accepted_at === null) {
-            if (! filter_var($data['accept_terms'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-                throw new \DomainException(__('Ga eerst akkoord met de voorwaarden van Fachora.'));
-            }
-            // Akkoord op de tokenpagina: vanaf nu mag Fachora dit bedrijf over deze opdracht mailen.
-            // Geen toestemming voor reclame: alleen berichten over opdrachten (ConsentPolicy::mayEmail via terms_accepted_at).
-            $provider->forceFill([
-                'terms_accepted_at' => now(),
-                'terms_version' => (string) config('fachora.terms_version'),
-            ])->save();
-            $this->log($job, 'terms_accepted', 'provider', __(':provider ging akkoord met de voorwaarden', ['provider' => $provider->display_name]));
-        }
+        $this->acceptTerms($offer, filter_var($data['accept_terms'] ?? false, FILTER_VALIDATE_BOOLEAN));
+        // 1.87: eerst ontgrendelen (de welkomstlead gaat vanzelf open).
+        app(LeadService::class)->ensureUnlocked($offer);
 
         $first = $offer->responded_at === null;
         $offer->forceFill([
@@ -599,7 +669,8 @@ class JobService
             throw new \DomainException(__('Deze opdracht kan niet worden goedgekeurd.'));
         }
         $provider = $job->provider;
-        $feePercent = $provider->feePercent();
+        // 1.87: met betalen per lead geen provisie meer over rechtstreeks betaalde klussen; alleen via Protect.
+        $feePercent = $job->isPaid() || ! app(LeadService::class)->enabled() ? $provider->feePercent() : 0.0;
         $base = $job->isPaid() ? (float) $job->agreed_amount : $job->totalAmount();
         $fee = round($base * $feePercent / 100, 2);
 

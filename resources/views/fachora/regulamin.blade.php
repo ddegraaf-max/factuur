@@ -11,6 +11,8 @@
     $fee = rtrim(rtrim(number_format((float) config('fachora.fee_percent'), 1, ',', ''), '0'), ',');
     $introFee = rtrim(rtrim(number_format((float) config('fachora.intro_fee_percent'), 1, ',', ''), '0'), ',');
     $minRating = number_format((float) config('fachora.min_rating'), 1, ',', '');
+    $lead = (bool) config('fachora.lead_pricing');
+    $leadPct = rtrim(rtrim(number_format((float) config('fachora.lead_percent'), 1, ',', ''), '0'), ',');
 @endphp
 
 @section('title', 'Regulamin platformy Fachora')
@@ -207,6 +209,14 @@
     <p>6. Żadne postanowienie Regulaminu nie wyłącza ani nie ogranicza praw konsumenta wynikających z bezwzględnie obowiązujących przepisów prawa; w razie sprzeczności pierwszeństwo mają przepisy.</p>
 
     <h2 id="p13">§ 13. Opłaty i prowizja</h2>
+    @if ($lead)
+    <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu ani opłaty rejestracyjnej. Podgląd Zlecenia (opis, zdjęcia, termin, miejscowość) jest bezpłatny.</p>
+    <p>2. <strong>Opłata za odblokowanie.</strong> Aby złożyć Ofertę, Firma odblokowuje Zlecenie. Opłata wynosi {{ $leadPct }}% szacowanej wartości Zlecenia określonej przez Platformę, nie mniej niż {{ (int) config('fachora.lead_min') }} zł i nie więcej niż {{ (int) config('fachora.lead_max') }} zł brutto (z VAT 23%). Kwota jest widoczna przed odblokowaniem. Pierwsze odblokowanie każdej Firmy jest bezpłatne. Odblokowane Zlecenie pozostaje odblokowane: zmiana lub wycofanie Oferty nie kosztuje nic.</p>
+    <p>3. Opłata za odblokowanie należy się niezależnie od tego, czy Klient wybierze Ofertę Firmy. Jeżeli Zlecenie okaże się nieprawdziwe (np. fałszywe dane Klienta albo zlecenie zgłoszone wyłącznie w celu pozyskania ofert przez konkurencję), Firma może to zgłosić w ciągu 7 dni od odblokowania; po weryfikacji Usługodawca zwraca opłatę.</p>
+    <p>4. <strong>Prowizja przy Fachora Protect.</strong> Za Zlecenie opłacone przez Fachora Protect i zaakceptowane (wyraźnie lub milcząco) Usługodawca potrąca z wypłaty prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. Przy Zleceniach rozliczanych bezpośrednio między Klientem a Firmą prowizja nie jest pobierana.</p>
+    <p>5. Prowizja jest kwotą netto, do której Usługodawca dolicza podatek VAT według stawki obowiązującej w Polsce (obecnie 23%). Na opłaty i prowizję Usługodawca wystawia fakturę; Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną. Jeżeli Zlecenie z Protect zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie.</p>
+    <p>6. Usługodawca może zmienić wysokość opłat i prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowe stawki dotyczą Zleceń odblokowanych po ich wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
+    @else
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu, opłaty rejestracyjnej ani opłat za otrzymane Zlecenia lub złożone Oferty.</p>
     <p>2. <strong>Prowizja.</strong> Za każde Zlecenie wykonane i zaakceptowane (wyraźnie lub milcząco) Firma płaci Usługodawcy prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. W okresie <strong>{{ (int) config('fachora.intro_days') }} dni</strong> od nadania oznaczenia Fachora Verified prowizja wynosi <strong>{{ $introFee }}%</strong>. Stawka obowiązująca Firmę jest widoczna w Panelu Firmy i w każdej Ofercie przed jej złożeniem.</p>
     <p>3. Przy Zleceniach z Protect prowizja jest potrącana z wypłaty przez Operatora płatności. Przy Zleceniach bez Protect Usługodawca wystawia Firmie fakturę za prowizję z terminem płatności 14 dni; Firma zgłasza na Platformie wykonanie Zlecenia i ostateczną kwotę.</p>
@@ -214,6 +224,7 @@
     <p>5. Jeżeli Zlecenie zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie. Przy odwołaniu Zlecenia prowizja od opłaty za dojazd nie jest pobierana.</p>
     <p>6. <strong>Zakaz omijania.</strong> Jeżeli Firma wykona dla Klienta pracę, o którą Klient zwrócił się przez Platformę, rozliczając ją poza Platformą, prowizja należy się Usługodawcy w pełnej wysokości od kwoty Oferty, niezależnie od sankcji z § 5 ust. 4. Nie dotyczy to Zleceń, które Klient odwołał, a następnie — po upływie 6 miesięcy — zlecił Firmie poza Platformą.</p>
     <p>7. Usługodawca może zmienić wysokość prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowa stawka dotyczy Ofert złożonych po jej wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
+    @endif
     <p>8. Usługi dodatkowe dla Firm (np. pakiet SMS, usługi promowane), jeżeli zostaną wprowadzone, są płatne według cennika widocznego w Panelu Firmy przed ich zamówieniem.</p>
 
     <h2 id="p14">§ 14. Opinie</h2>

@@ -13,11 +13,17 @@
   $acceptDays = config('fachora.auto_accept_days');
   $disputeHours = config('fachora.dispute_hours');
   $zl = fn ($n) => number_format($n, 0, ',', ' ') . ' zł';
+  $lead = (bool) config('fachora.lead_pricing');
+  $leadMin = (int) config('fachora.lead_min');
+  $leadMax = (int) config('fachora.lead_max');
+  $leadPct = rtrim(rtrim(number_format((float) config('fachora.lead_percent'), 1, ',', ''), '0'), ',');
   $chev = '<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
 @endphp
 
-@section('title', 'Fachora dla firm — nowi klienci w Twojej okolicy, płacisz tylko za zrealizowane zlecenia')
-@section('description', 'Zlecenia z opisem, zdjęciami i terminem na e-mail, Twoja cena, adres po wyborze przez klienta, pewna zapłata przez Fachora Protect, darmowy program do faktur gotowy na KSeF, profil z opiniami. 0 zł abonamentu, 0 zł za zlecenie, prowizja ' . $fee . '% od wykonanej pracy, przez pierwsze ' . $introDays . ' dni ' . $intro . '%.')
+@section('title', $lead ? 'Fachora dla firm — klienci sami wybierają Twoją firmę, płacisz tylko za zlecenia, na które odpowiadasz' : 'Fachora dla firm — nowi klienci w Twojej okolicy, płacisz tylko za zrealizowane zlecenia')
+@section('description', $lead
+  ? 'Klient sam wybiera Twoją firmę i wysyła zapytanie. Podgląd zlecenia za darmo, odblokowanie od ' . $leadMin . ' do ' . $leadMax . ' zł zależnie od wielkości pracy, pierwsze zapytanie gratis. 0 zł abonamentu, bez prowizji od zapłaty bezpośredniej, darmowy program do faktur gotowy na KSeF.'
+  : 'Zlecenia z opisem, zdjęciami i terminem na e-mail, Twoja cena, adres po wyborze przez klienta, pewna zapłata przez Fachora Protect, darmowy program do faktur gotowy na KSeF, profil z opiniami. 0 zł abonamentu, 0 zł za zlecenie, prowizja ' . $fee . '% od wykonanej pracy, przez pierwsze ' . $introDays . ' dni ' . $intro . '%.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -29,7 +35,7 @@
   <div class="container hero-inner">
     <div class="eyebrow">Dla firm</div>
     <h1>Nowi klienci w Twojej okolicy. <span class="accent">Płacisz tylko za zrealizowane zlecenia.</span></h1>
-    <p class="hero-sub">Klient opisuje zlecenie, Ty podajesz cenę i termin. Jeśli Cię wybierze, kwota jest zarezerwowana, zanim wyjedziesz. Żadnych opłat za kontakt, żadnego abonamentu.</p>
+    <p class="hero-sub">{{ $lead ? 'Klient sam wybiera Twoją firmę i opisuje zlecenie, Ty podajesz cenę i termin. Bez abonamentu: płacisz tylko za zapytanie, na które odpowiadasz, a pierwsze jest gratis.' : 'Klient opisuje zlecenie, Ty podajesz cenę i termin. Jeśli Cię wybierze, kwota jest zarezerwowana, zanim wyjedziesz. Żadnych opłat za kontakt, żadnego abonamentu.' }}</p>
     <div class="hero-ctas">
       <a href="{{ route('fachora.apply') }}" class="btn btn-primary btn-lg">Zgłoś firmę</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-secondary btn-lg">Mam kod z listu: przejmij profil</a>
@@ -60,6 +66,20 @@
   <div class="container">
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Ile to kosztuje</div>
+      @if ($lead)
+      <h2>Bez abonamentu. Płacisz tylko za zapytanie, na które chcesz odpowiedzieć</h2>
+      <p>Klient sam wybiera do pięciu firm. Zlecenie oglądasz za darmo; jeśli chcesz podać cenę, odblokowujesz je jednym kliknięciem (BLIK, Przelewy24, karta) i dostajesz fakturę.</p>
+    </div>
+    <div class="fh-prices">
+      <div class="fh-price"><div class="v">0 <small>zł</small></div><b>abonament</b><span>bez miesięcznej opłaty i bez pakietów punktów</span></div>
+      <div class="fh-price"><div class="v">0 <small>zł</small></div><b>podgląd zlecenia</b><span>opis, zdjęcia, termin i miasto widzisz zawsze za darmo</span></div>
+      <div class="fh-price hl"><div class="v">{{ $leadMin }}–{{ $leadMax }}<small> zł</small></div><b>za odblokowanie</b><span>{{ $leadPct }}% szacowanej wartości pracy; pierwsze zapytanie gratis</span></div>
+      <div class="fh-price"><div class="v">0 <small>%</small></div><b>prowizji przy płatności bezpośredniej</b><span>przy Fachora Protect: {{ $fee }}% potrącane przy wypłacie</span></div>
+    </div>
+    <div class="fh-note" style="max-width:760px;margin:24px auto 0;">
+      <b>Przykład:</b> wymiana gniazdka (szacunek {{ $zl(200) }}) kosztuje {{ $zl($leadMin) }}. Montaż drzwi (szacunek {{ $zl(1200) }}) to {{ $zl(max($leadMin, min($leadMax, round(1200 * (float) config('fachora.lead_percent') / 100)))) }}. Remont łazienki (szacunek {{ $zl(20000) }}) to maksymalnie {{ $zl($leadMax) }}. Cenę widzisz przed odblokowaniem. Fałszywe zapytanie? Zgłoś je w ciągu 7 dni, a zwrócimy opłatę.
+    </div>
+      @else
       <h2>Zero, zero, zero i prowizja od wykonanej pracy</h2>
       <p>Zarabiamy tylko wtedy, gdy Ty zarabiasz. Prowizja jest potrącana przy wypłacie i dostajesz na nią fakturę.</p>
     </div>
@@ -72,6 +92,7 @@
     <div class="fh-note" style="max-width:760px;margin:24px auto 0;">
       <b>Przykład:</b> zlecenie za {{ $zl(500) }} brutto. Prowizja {{ $fee }}% to {{ $zl(500 * $fee / 100) }}, na Twoje konto trafia {{ $zl(500 - 500 * $fee / 100) }}. Przez pierwsze {{ $introDays }} dni prowizja wynosi {{ $zl(500 * $intro / 100) }}. Zlecenie, które nie doszło do skutku, nie kosztuje nic.
     </div>
+      @endif
   </div>
 </section>
 
@@ -122,11 +143,11 @@
     </div>
     <div class="faq-list">
       <details class="faq-item"><summary>Czy muszę odpowiadać na każde zlecenie?{!! $chev !!}</summary><div class="faq-content">Nie. Odpowiadasz na te, które Ci pasują; przy innych klikasz „nie tym razem”, najlepiej z krótkim powodem. Liczy się czas reakcji, nie liczba ofert. Zlecenie, na które nie odpowiesz w {{ $offerHours }} godzin, po prostu wygasa.</div></details>
-      <details class="faq-item"><summary>Kiedy dostaję pieniądze?{!! $chev !!}</summary><div class="faq-content">Przy Fachora Protect: po akceptacji klienta albo po {{ $acceptDays }} dniach od Twojego zgłoszenia „gotowe”, jeśli klient nie zareaguje. Stripe przelewa kwotę pomniejszoną o prowizję na rachunek firmy podany przy onboardingu. Bez Protect klient płaci Ci bezpośrednio, a prowizję rozliczamy osobno.</div></details>
+      <details class="faq-item"><summary>Kiedy dostaję pieniądze?{!! $chev !!}</summary><div class="faq-content">Przy Fachora Protect: po akceptacji klienta albo po {{ $acceptDays }} dniach od Twojego zgłoszenia „gotowe”, jeśli klient nie zareaguje. Stripe przelewa kwotę pomniejszoną o prowizję na rachunek firmy podany przy onboardingu. Bez Protect klient płaci Ci bezpośrednio{{ $lead ? ', bez żadnej prowizji.' : ', a prowizję rozliczamy osobno.' }}</div></details>
       <details class="faq-item"><summary>Co, gdy na miejscu okaże się, że jest więcej pracy?{!! $chev !!}</summary><div class="faq-content">Dodajesz pozycję „prace dodatkowe” z ceną i opisem. Klient zatwierdza ją na swojej stronie zlecenia, a przy Protect od razu ją dopłaca. Bez zatwierdzenia nie wykonujesz tej pracy, bo nikt Ci za nią nie zapłaci.</div></details>
       <details class="faq-item"><summary>Czy muszę mieć ubezpieczenie OC?{!! $chev !!}</summary><div class="faq-content">Nie jest obowiązkowe. Jeśli je masz, dodajesz polisę do profilu i klient widzi znak „ubezpieczony”, co w praktyce pomaga wygrać zlecenie. Przed wygaśnięciem polisy dostajesz przypomnienie.</div></details>
       <details class="faq-item"><summary>Czy mogę używać programu do faktur poza zleceniami z Fachory?{!! $chev !!}</summary><div class="faq-content">Tak, do wszystkich klientów. Faktury, oferty, kontrahenci z weryfikacją NIP, XML dla KSeF. Program jest bezpłatny, dopóki Twoja firma ma status Verified.</div></details>
-      <details class="faq-item"><summary>Jak wygląda faktura za prowizję?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Budomatch — polskiej firmy. Prowizję fakturujemy polską fakturą VAT (23%). Fakturę dostajesz e-mailem.</div></details>
+      <details class="faq-item"><summary>Jak wygląda faktura?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Budomatch — polskiej firmy. Opłaty za odblokowanie i prowizję fakturujemy polską fakturą VAT (23%). Fakturę dostajesz e-mailem.</div></details>
     </div>
   </div>
 </section>
@@ -134,7 +155,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Pierwszy krok należy do Ciebie.</h2>
-    <p>Przejmij profil albo zgłoś firmę. Weryfikacja jest bezpłatna, a prowizję płacisz dopiero od pierwszego wykonanego zlecenia.</p>
+    <p>Przejmij profil albo zgłoś firmę. Weryfikacja jest bezpłatna, {{ $lead ? 'a pierwsze zapytanie klienta odblokowujesz gratis.' : 'a prowizję płacisz dopiero od pierwszego wykonanego zlecenia.' }}</p>
     <div class="fh-cta-row">
       <a href="{{ route('fachora.apply') }}" class="btn btn-primary btn-lg">Zgłoś firmę</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-white btn-lg">Przejmij profil</a>

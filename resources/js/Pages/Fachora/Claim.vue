@@ -177,7 +177,7 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
       <div class="fa-card cl-why">
         <h2 class="fa-h3">{{ $t('Waarom Fachora?') }}</h2>
         <ul class="fa-ticks">
-          <li>{{ $t('Opdrachten van klanten uit de buurt, in de talen die u spreekt; u betaalt alleen een provisie over uitgevoerd werk.') }}</li>
+          <li>{{ $t('Opdrachten van klanten uit de buurt, in de talen die u spreekt. Geen abonnement: u betaalt alleen voor een aanvraag waarop u reageert, en de eerste is gratis.') }}</li>
           <li>{{ $t('Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na zijn akkoord.') }}</li>
           <li>{{ $t('Het keurmerk Fachora Verified op uw profiel en in elke aanbieding.') }}</li>
           <li>{{ $t('Geen ongevraagde telefoontjes: de klant kiest op zijn pagina, u krijgt zijn gegevens pas daarna.') }}</li>

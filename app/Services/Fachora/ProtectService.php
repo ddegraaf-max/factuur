@@ -4,6 +4,7 @@ namespace App\Services\Fachora;
 
 use App\Models\Provider;
 use App\Models\ServiceJob;
+use App\Models\ServiceJobOffer;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -203,6 +204,56 @@ class ProtectService
         return $session !== null
             && ($session['metadata']['kind'] ?? null) === 'fachora_request'
             && (string) ($session['metadata']['job_id'] ?? '') === (string) $job->id
+            && ($session['payment_status'] ?? null) === 'paid';
+    }
+
+    /**
+     * Checkout voor het ontgrendelen van een lead door een bedrijf (1.87).
+     * Los van Protect; BLIK, Przelewy24 en kaart volgen uit het Stripe-account.
+     */
+    public function leadCheckoutUrl(ServiceJobOffer $offer, float $amount, string $successUrl, string $cancelUrl): string
+    {
+        $cents = (int) round($amount * 100);
+        if ($cents < 200) {
+            throw new RuntimeException('Het bedrag is te laag om online te betalen.');
+        }
+        $job = $offer->job;
+
+        $session = $this->post('/checkout/sessions', array_filter([
+            'mode' => 'payment',
+            'line_items[0][price_data][currency]' => 'pln',
+            'line_items[0][price_data][unit_amount]' => $cents,
+            'line_items[0][price_data][product_data][name]' => 'Fachora · ' . $job->reference,
+            'line_items[0][price_data][product_data][description]' => 'Odblokowanie zapytania klienta',
+            'line_items[0][quantity]' => 1,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'customer_email' => $offer->provider?->email,
+            'client_reference_id' => $job->reference . '-' . $offer->id,
+            'metadata[kind]' => 'fachora_lead',
+            'metadata[offer_id]' => (string) $offer->id,
+            'payment_intent_data[description]' => 'Fachora lead ' . $job->reference,
+            'invoice_creation[enabled]' => 'true',
+            'tax_id_collection[enabled]' => 'true',
+            'locale' => 'pl',
+        ], fn ($v) => $v !== null && $v !== ''));
+
+        $offer->forceFill(['lead_session_id' => $session['id']])->save();
+
+        return (string) $session['url'];
+    }
+
+    /** Is de lead van deze aanbieding betaald (Checkout-sessie nakijken)? */
+    public function leadPaid(ServiceJobOffer $offer): bool
+    {
+        if (blank($offer->lead_session_id)) {
+            return false;
+        }
+        $session = $this->retrieveSession($offer->lead_session_id);
+
+        return $session !== null
+            && ($session['metadata']['kind'] ?? null) === 'fachora_lead'
+            && (string) ($session['metadata']['offer_id'] ?? '') === (string) $offer->id
             && ($session['payment_status'] ?? null) === 'paid';
     }
 

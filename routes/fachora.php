@@ -40,6 +40,8 @@ Route::middleware('brand:fachora')->group(function () {
         Route::post('potwierdz', [JobController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
         Route::get('/', [JobController::class, 'show'])->name('show');
         Route::post('firmy', [JobController::class, 'select'])->middleware('throttle:20,1')->name('select');
+        Route::post('sms', [JobController::class, 'smsSend'])->middleware('throttle:5,1')->name('sms.send');
+        Route::post('sms/kod', [JobController::class, 'smsVerify'])->middleware('throttle:10,1')->name('sms.verify');
         Route::get('oplacono', [JobController::class, 'requestPaid'])->middleware('throttle:20,1')->name('request.paid');
         Route::post('wybierz/{offer}', [JobController::class, 'choose'])->middleware('throttle:20,1')->name('choose');
         Route::post('zaplac', [JobController::class, 'pay'])->middleware('throttle:20,1')->name('pay');
@@ -57,6 +59,8 @@ Route::middleware('brand:fachora')->group(function () {
         Route::get('/', [OfferController::class, 'show'])->name('show');
         Route::post('/', [OfferController::class, 'respond'])->middleware('throttle:20,1')->name('respond');
         Route::post('odrzuc', [OfferController::class, 'decline'])->middleware('throttle:20,1')->name('decline');
+        Route::post('odblokuj', [OfferController::class, 'unlock'])->middleware('throttle:20,1')->name('unlock');
+        Route::get('odblokowano', [OfferController::class, 'unlocked'])->middleware('throttle:20,1')->name('unlocked');
         Route::get('plik/{file}', [OfferController::class, 'file'])->whereNumber('file')->middleware('throttle:120,1')->name('file');
     });
 

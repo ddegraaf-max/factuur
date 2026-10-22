@@ -101,7 +101,7 @@ class FachoraVerificationTest extends TestCase
             ->where('provider.phone_verified', false)
             ->where('sms_available', false)
             ->where('protect_enabled', false)
-            ->where('terms_version', '2026-10')
+            ->where('terms_version', '2026-10-22')
             ->where('fee_percent', fn ($v) => (float) $v === 10.0)
             ->where('intro_fee_percent', fn ($v) => (float) $v === 5.0)
             ->where('intro_days', 90)
@@ -126,7 +126,7 @@ class FachoraVerificationTest extends TestCase
         $this->post(route('fachora.verification.terms'), ['terms' => 1, 'standard' => 1])->assertRedirect()->assertSessionHas('flash');
         $provider->refresh();
         $this->assertNotNull($provider->terms_accepted_at);
-        $this->assertSame('2026-10', $provider->terms_version);
+        $this->assertSame('2026-10-22', $provider->terms_version);
         $this->assertSame('passed', $this->checks($provider)['terms']);
         $this->get(route('fachora.verification'))->assertInertia(fn (Assert $p) => $p->where('provider.terms_accepted', true));
 

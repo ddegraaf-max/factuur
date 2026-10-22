@@ -76,6 +76,8 @@ class ProviderController extends Controller
             'fee_percent' => $provider->feePercent(),
             'panel_url' => route('fachora.dashboard'),
             'needs_terms' => $provider->claimed_at === null && $provider->terms_accepted_at === null,
+            'lead' => app(\App\Services\Fachora\LeadService::class)->summary($offer),
+            'unlock_url' => route('fachora.offer.unlock', $offer->token),
         ]);
     }
 

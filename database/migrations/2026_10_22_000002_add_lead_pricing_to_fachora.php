@@ -1,0 +1,63 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+/*
+ * Fachora 1.87: gratis voor de klant (met sms-code), het bedrijf betaalt per
+ * lead. Het ontgrendelen staat op de aanbieding; de sms-controle op de opdracht.
+ */
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('service_job_offers', function (Blueprint $table) {
+            if (! Schema::hasColumn('service_job_offers', 'lead_fee')) {
+                $table->decimal('lead_fee', 8, 2)->nullable();
+            }
+            if (! Schema::hasColumn('service_job_offers', 'lead_free')) {
+                $table->boolean('lead_free')->default(false);
+            }
+            if (! Schema::hasColumn('service_job_offers', 'lead_session_id')) {
+                $table->string('lead_session_id', 120)->nullable();
+            }
+            if (! Schema::hasColumn('service_job_offers', 'unlocked_at')) {
+                $table->timestamp('unlocked_at')->nullable();
+            }
+        });
+
+        Schema::table('service_jobs', function (Blueprint $table) {
+            if (! Schema::hasColumn('service_jobs', 'phone_code')) {
+                $table->string('phone_code', 12)->nullable();
+            }
+            if (! Schema::hasColumn('service_jobs', 'phone_code_sent_at')) {
+                $table->timestamp('phone_code_sent_at')->nullable();
+            }
+            if (! Schema::hasColumn('service_jobs', 'phone_code_attempts')) {
+                $table->unsignedTinyInteger('phone_code_attempts')->default(0);
+            }
+            if (! Schema::hasColumn('service_jobs', 'phone_verified_at')) {
+                $table->timestamp('phone_verified_at')->nullable();
+            }
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('service_job_offers', function (Blueprint $table) {
+            foreach (['lead_fee', 'lead_free', 'lead_session_id', 'unlocked_at'] as $column) {
+                if (Schema::hasColumn('service_job_offers', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
+        });
+        Schema::table('service_jobs', function (Blueprint $table) {
+            foreach (['phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at'] as $column) {
+                if (Schema::hasColumn('service_jobs', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
+        });
+    }
+};

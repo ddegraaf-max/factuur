@@ -36,11 +36,11 @@ return [
     'cancel_free_hours' => 24,  // tot zoveel uur voor de afspraak kan de klant kosteloos annuleren
     'default_warranty_months' => 12,
     'min_rating' => 4.2,        // Fachora Standard 10: onder dit cijfer (bij ≥ 5 beoordelingen) volgt een signaal
-    'terms_version' => '2026-10',
+    'terms_version' => '2026-10-22',
 
     /*
      * Aanvraagmodel (1.86). De klant kiest zelf tot max_offers bedrijven uit
-     * de buurt en betaalt request_fee złoty per aanvraag (0 = gratis). De
+     * de buurt; request_fee złoty per aanvraag (standaard 0 = gratis). De
      * aanvraag gaat dan per e-mail naar die bedrijven, ook als ze hun profiel
      * nog niet claimden: het is een concreet verzoek van een klant om hun
      * dienst, geen reclame (ConsentPolicy::mayEmailRequest), met afmeldlink en
@@ -48,7 +48,24 @@ return [
      * akkoord met de voorwaarden (incl. de fee) en de keuze van de klant.
      */
     'customer_choice' => (bool) env('FACHORA_CUSTOMER_CHOICE', true),
-    'request_fee' => (float) env('FACHORA_REQUEST_FEE', 10),
+    // 1.87: gratis voor de klant. Zet FACHORA_REQUEST_FEE > 0 om toch een bijdrage te vragen.
+    'request_fee' => (float) env('FACHORA_REQUEST_FEE', 0),
+    // Sms-code voor de klant voordat de aanvraag weggaat (alleen als de sms-koppeling werkt).
+    'customer_sms' => (bool) env('FACHORA_CUSTOMER_SMS', true),
+
+    /*
+     * Betalen per lead (1.87). Het bedrijf ontgrendelt een aanvraag voordat
+     * het een prijs geeft: lead_percent van de geschatte klusprijs (midden van
+     * estimate_low/high), afgerond op hele złoty, tussen lead_min en lead_max.
+     * Zonder schatting: lead_default. De eerste lead_free_count leads per
+     * bedrijf zijn gratis. Zonder Stripe-sleutel is alles gratis.
+     */
+    'lead_pricing' => (bool) env('FACHORA_LEAD_PRICING', true),
+    'lead_percent' => (float) env('FACHORA_LEAD_PERCENT', 5),
+    'lead_min' => (float) env('FACHORA_LEAD_MIN', 15),
+    'lead_max' => (float) env('FACHORA_LEAD_MAX', 150),
+    'lead_default' => (float) env('FACHORA_LEAD_DEFAULT', 30),
+    'lead_free_count' => (int) env('FACHORA_LEAD_FREE', 1),
     'choice_candidates' => 15,  // zoveel bedrijven ziet de klant om uit te kiezen
 
     /*
