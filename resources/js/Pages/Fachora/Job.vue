@@ -219,6 +219,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         </div>
       </article>
 
+      <p v-if="!choice.searching && choice.candidates.length" class="fa-small fa-muted">{{ $t('Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan op beoordeling, dan op afstand. Bedrijven betalen niet voor een plek in deze lijst.') }}</p>
+
       <div v-if="!choice.searching" class="fa-card">
         <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }} <template v-if="!(choice.fee > 0)"><strong>{{ $t('Gratis voor jou.') }}</strong></template></p>
         <template v-if="choice.fee > 0">

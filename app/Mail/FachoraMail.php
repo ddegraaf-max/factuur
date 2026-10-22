@@ -198,7 +198,9 @@ class FachoraMail extends Mailable
                     $title = $job?->ai['title_pl'] ?? $job?->title ?? '';
                     $set($this->kind === 'reminder' ? __('Herinnering: zlecenie :ref wacht op uw prijs', ['ref' => $ref]) : __('Nowe zlecenie: :title (:city)', ['title' => $title, 'city' => $job?->city]), $title, array_values(array_filter([
                         $request ? __('Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. U krijgt van ons alleen berichten over aanvragen van klanten.', ['city' => $job?->city]) : null,
-                        $this->offer && app(\App\Services\Fachora\LeadService::class)->enabled() ? $this->leadLine() : null,
+                        // Eerste bericht aan een bedrijf zonder profiel: alleen de vraag van de klant, geen reclame
+                        // voor Fachora (anders informacja handlowa / art. 398 PKE). De prijs ziet het op de pagina.
+                        $this->offer && ! $request && app(\App\Services\Fachora\LeadService::class)->enabled() ? $this->leadLine() : null,
                         __('Een klant in :city zoekt een :category. De prijs die u opgeeft, is de prijs voor de klant; het adres krijgt u zodra de klant u kiest.', ['city' => $job?->city, 'category' => $job?->categoryName('pl')]),
                         $job?->description_pl ?: $job?->description,
                         $job?->protect || ($this->offer?->provider?->protectReady()) ? __('Betaling via Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na goedkeuring.') : null,
