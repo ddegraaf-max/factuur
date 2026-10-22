@@ -61,6 +61,10 @@ class Notifier
 
             return false;
         }
+        if (blank($provider->optout_token)) {
+            // Zonder afmeldlink geen art. 14-voetnoot: eerst een token.
+            $provider->forceFill(['optout_token' => bin2hex(random_bytes(32))])->save();
+        }
 
         return $this->send($provider->email, 'pl', new FachoraMail('job', 'provider', $job, $offer, $provider, ['request' => true]));
     }

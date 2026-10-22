@@ -169,6 +169,26 @@ class FachoraCustomerChoiceTest extends TestCase
         $this->assertSame([$a->id], $job->offers()->pluck('provider_id')->all());
     }
 
+    public function test_the_customer_gets_a_mail_to_choose_and_chooses_again_when_nobody_is_reachable(): void
+    {
+        $a = $this->registerProvider('Hydro A');
+        $b = $this->registerProvider('Hydro B');
+        $job = $this->pendingJob();
+        app(JobService::class)->confirm($job, request());
+        Mail::assertSent(FachoraMail::class, fn (FachoraMail $m) => $m->kind === 'choose' && $m->hasTo('daan@example.com'));
+
+        // Tussen kiezen en versturen meldt het gekozen bedrijf zich af.
+        $job->refresh()->forceFill(['selected_providers' => [$a->id]])->save();
+        $a->forceFill(['email_blocked_at' => now()])->save();
+        app(JobService::class)->submitSelection($job);
+
+        $job->refresh();
+        $this->assertSame('selecting', $job->status);
+        $this->assertNull($job->selected_providers);
+        $this->assertSame(0, $job->offers()->count());
+        $this->assertSame([$b->id], app(ProviderService::class)->choiceCandidates($job)->pluck('id')->all());
+    }
+
     public function test_an_unclaimed_company_accepts_the_terms_when_it_gives_a_price(): void
     {
         $a = $this->registerProvider('Hydro A');

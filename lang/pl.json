@@ -2016,5 +2016,13 @@
   "Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.": "Adres e-mail potwierdzony. Wybierz teraz firmy, które otrzymają Twoje zapytanie.",
   "Vink aan dat je aanvraag meteen mag worden verstuurd.": "Zaznacz, że zapytanie może zostać wysłane od razu.",
   "Je aanvraag is verstuurd naar de gekozen bedrijven.": "Twoje zapytanie zostało wysłane do wybranych firm.",
-  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Dziękujemy! Twoje zapytanie zostało wysłane do wybranych firm."
+  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Dziękujemy! Twoje zapytanie zostało wysłane do wybranych firm.",
+  "Kies de bedrijven voor je aanvraag :ref": "Wybierz firmy dla zapytania :ref",
+  "Kies je bedrijven": "Wybierz firmy",
+  "De bedrijven die je koos, zijn niet meer bereikbaar. Kies er hieronder opnieuw een paar; een betaalde bijdrage blijft gewoon staan.": "Wybrane firmy nie są już dostępne. Wybierz poniżej kilka innych; opłacona kwota pozostaje ważna.",
+  "Op je opdrachtpagina staan bedrijven uit jouw buurt. Kies er tot :n; alleen zij krijgen je aanvraag en geven een prijs.": "Na stronie zlecenia znajdziesz firmy z okolicy. Wybierz do :n; tylko one otrzymają zapytanie i podadzą cenę.",
+  "Bedrijven kiezen": "Wybierz firmy",
+  "Je aanvraag is verstuurd naar de :n bedrijven die je koos. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs en de beschikbaarheid op je opdrachtpagina.": "Twoje zapytanie trafiło do wybranych firm (:n). Gdy firma poda cenę, dostaniesz e-mail, a cenę i termin zobaczysz na stronie zlecenia.",
+  "Gekozen bedrijven niet bereikbaar; klant kiest opnieuw": "Wybrane firmy niedostępne; klient wybiera ponownie",
+  "Voorwaarden geaccepteerd op een aanbieding (:date): alleen berichten over opdrachten": "Regulamin zaakceptowany przy ofercie (:date): tylko wiadomości o zleceniach"
 }

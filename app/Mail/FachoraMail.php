@@ -88,9 +88,19 @@ class FachoraMail extends Mailable
                         __('Heb je deze aanvraag niet gedaan? Dan hoef je niets te doen; zonder bevestiging verdwijnt ze vanzelf.'),
                     ], ['label' => __('Bevestig mijn aanvraag'), 'url' => $job->confirmUrl()], $facts);
                     break;
+                case 'choose':
+                    // 1.86: de klant kiest zelf de bedrijven; deze mail brengt hem terug als hij de pagina sloot.
+                    $set(__('Kies de bedrijven voor je aanvraag :ref', ['ref' => $ref]), __('Kies je bedrijven'), array_values(array_filter([
+                        ($this->extra['again'] ?? false) ? __('De bedrijven die je koos, zijn niet meer bereikbaar. Kies er hieronder opnieuw een paar; een betaalde bijdrage blijft gewoon staan.') : null,
+                        __('Op je opdrachtpagina staan bedrijven uit jouw buurt. Kies er tot :n; alleen zij krijgen je aanvraag en geven een prijs.', ['n' => (int) config('fachora.max_offers', 5)]),
+                        __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
+                    ])), ['label' => __('Bedrijven kiezen'), 'url' => $jobUrl], $facts);
+                    break;
                 case 'confirmed':
                     $set(__('Je aanvraag :ref staat open', ['ref' => $ref]), __('We zoeken een bedrijf voor je'), [
-                        __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)]),
+                        ! empty($job->selected_providers)
+                            ? __('Je aanvraag is verstuurd naar de :n bedrijven die je koos. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs en de beschikbaarheid op je opdrachtpagina.', ['n' => $job->offers()->count()])
+                            : __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)]),
                         __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
                     ], ['label' => __('Mijn opdracht'), 'url' => $jobUrl], $facts);
                     break;

@@ -137,7 +137,10 @@ class JobService
     /** Stap 2: de klant klikt. Daarna wordt de opdracht verrijkt en aangeboden. */
     public function confirm(ServiceJob $job, Request $request): bool
     {
-        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')->update(['status' => 'open', 'confirmed_at' => now()]) === 1;
+        // 1.86: de klant kiest zelf de bedrijven (als er in de buurt iemand is om uit te kiezen).
+        $choose = (bool) config('fachora.customer_choice', true) && $this->providers->choiceCandidates($job, 1)->isNotEmpty();
+        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')
+            ->update(['status' => $choose ? 'selecting' : 'open', 'confirmed_at' => now()] + ($choose ? ['request_fee' => $this->requestFee()] : [])) === 1;
         if (! $first) {
             return false;
         }
@@ -145,10 +148,9 @@ class JobService
         $this->log($job, 'confirmed', 'customer', __('E-mailadres bevestigd; opdracht actief'));
         $this->enrich($job);
 
-        // 1.86: de klant kiest zelf de bedrijven (als er in de buurt iemand is om uit te kiezen).
-        if ((bool) config('fachora.customer_choice', true) && $this->providers->choiceCandidates($job, 1)->isNotEmpty()) {
-            $job->forceFill(['status' => 'selecting', 'request_fee' => $this->requestFee()])->save();
+        if ($choose) {
             $this->log($job, 'selecting', 'system', __('Klant kiest zelf de bedrijven'));
+            $this->notifier->customer($job, 'choose');
 
             return true;
         }
@@ -194,7 +196,13 @@ class JobService
             throw new \DomainException(__('Kies maximaal :n bedrijven.', ['n' => $max]));
         }
 
-        $fee = $this->requestFee();
+        // Al betaald (bijvoorbeeld in een ander tabblad)? Dan niet nog eens laten betalen.
+        if ($job->request_paid_at === null && filled($job->request_session_id) && $this->protect->requestPaid($job)) {
+            $job->forceFill(['request_paid_at' => now()])->save();
+            $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+        }
+
+        $fee = $job->request_paid_at !== null ? (float) $job->request_fee : $this->requestFee();
         $job->forceFill(['selected_providers' => $ids, 'request_fee' => $fee])->save();
         $this->log($job, 'selected', 'customer', __('Klant koos :n bedrijven', ['n' => count($ids)]));
 
@@ -217,8 +225,11 @@ class JobService
             if (! $this->protect->requestPaid($job)) {
                 return false;
             }
-            $job->forceFill(['request_paid_at' => now()])->save();
-            $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+            $marked = ServiceJob::query()->whereKey($job->id)->whereNull('request_paid_at')->update(['request_paid_at' => now()]) === 1;
+            $job->refresh();
+            if ($marked) {
+                $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+            }
         }
         $this->submitSelection($job);
 
@@ -235,7 +246,16 @@ class JobService
         $job->refresh();
         $sent = $this->dispatch($job, array_map('intval', (array) $job->selected_providers), 'customer');
         $job->refresh();
-        $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
+        if ($job->offers()->count() === 0) {
+            // Geen van de gekozen bedrijven was nog bereikbaar (afgemeld of geblokkeerd): opnieuw kiezen.
+            // Een betaalde bijdrage blijft staan; de volgende keuze kost niets extra.
+            $job->forceFill(['status' => 'selecting', 'selected_providers' => null, 'owner_notified_at' => $job->owner_notified_at])->save();
+            $this->log($job, 'reselect', 'system', __('Gekozen bedrijven niet bereikbaar; klant kiest opnieuw'));
+            $this->notifier->customer($job, 'choose', ['again' => true]);
+
+            return 0;
+        }
+        $this->notifier->customer($job, 'confirmed');
 
         return $sent;
     }
@@ -332,6 +352,9 @@ class JobService
         }
 
         if ($candidates->isEmpty()) {
+            if ($actor === 'customer') {
+                return 0; // submitSelection laat de klant opnieuw kiezen
+            }
             if ($job->offers()->count() === 0) {
                 $job->forceFill(['status' => 'no_match'])->save();
                 $this->log($job, 'no_match', 'system', __('Geen Verified bedrijf in de buurt; de eigenaar is ingelicht'));
@@ -393,12 +416,11 @@ class JobService
                 throw new \DomainException(__('Ga eerst akkoord met de voorwaarden van Fachora.'));
             }
             // Akkoord op de tokenpagina: vanaf nu mag Fachora dit bedrijf over deze opdracht mailen.
-            $provider->forceFill(array_filter([
+            // Geen toestemming voor reclame: alleen berichten over opdrachten (ConsentPolicy::mayEmail via terms_accepted_at).
+            $provider->forceFill([
                 'terms_accepted_at' => now(),
                 'terms_version' => (string) config('fachora.terms_version'),
-                'consent_at' => $provider->consent_at ?? now(),
-                'consent_source' => $provider->consent_source ?? 'offer_terms',
-            ], fn ($v) => $v !== null))->save();
+            ])->save();
             $this->log($job, 'terms_accepted', 'provider', __(':provider ging akkoord met de voorwaarden', ['provider' => $provider->display_name]));
         }
 

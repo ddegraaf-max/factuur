@@ -330,6 +330,7 @@
   "Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.": "Twoje zapytanie trafi e-mailem do wybranych firm. One podadzą cenę; potem spokojnie zdecydujesz, z kim dalej współpracować.",
   "Kosten: :amount per aanvraag": "Koszt: :amount za zapytanie",
   "betalen met BLIK, Przelewy24 of kaart": "płatność BLIK, Przelewy24 lub kartą",
-  "Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.": "Proszę o natychmiastowe wysłanie zapytania. Po jego wysłaniu prawo odstąpienia od tej opłaty wygasa.",
-  "Betalen en versturen (:amount)": "Zapłać i wyślij (:amount)"
+  "Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.": "Żądam natychmiastowego wysłania zapytania i przyjmuję do wiadomości, że po jego wysłaniu tracę prawo odstąpienia od umowy w zakresie tej opłaty.",
+  "Betalen en versturen (:amount)": "Zapłać i wyślij (:amount)",
+  "Deze aanvraag is verlopen: er zijn geen bedrijven gekozen.": "To zapytanie wygasło: nie wybrano żadnych firm."
 }

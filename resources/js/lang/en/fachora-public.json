@@ -331,5 +331,6 @@
   "Kosten: :amount per aanvraag": "Cost: :amount per request",
   "betalen met BLIK, Przelewy24 of kaart": "pay with BLIK, Przelewy24 or card",
   "Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.": "I ask for my request to be sent immediately. After that, the right of withdrawal for this fee lapses.",
-  "Betalen en versturen (:amount)": "Pay and send (:amount)"
+  "Betalen en versturen (:amount)": "Pay and send (:amount)",
+  "Deze aanvraag is verlopen: er zijn geen bedrijven gekozen.": "This request has expired: no companies were chosen."
 }

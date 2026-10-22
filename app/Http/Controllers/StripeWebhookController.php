@@ -76,6 +76,19 @@ class StripeWebhookController extends Controller
             return;
         }
 
+        // Fachora 1.86: de bijdrage van de klant voor een aanvraag; daarna gaat die naar de gekozen bedrijven.
+        if (($session['metadata']['kind'] ?? null) === 'fachora_request') {
+            $job = \App\Models\ServiceJob::query()->find((int) ($session['metadata']['job_id'] ?? 0));
+            if ($job && ($session['payment_status'] ?? null) === 'paid') {
+                if (blank($job->request_session_id)) {
+                    $job->forceFill(['request_session_id' => $session['id'] ?? null])->save();
+                }
+                app(\App\Services\Fachora\JobService::class)->syncRequestPayment($job);
+            }
+
+            return;
+        }
+
         // Sms-tegoed is een losse betaling: tegoed bijboeken, en verder niets
         // (geen abonnement, en de mails van de proefperiode lopen gewoon door).
         if (($session['metadata']['kind'] ?? null) === 'sms_credits') {

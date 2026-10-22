@@ -35,7 +35,7 @@ const disputePhotos = computed(() => props.files.filter((f) => f.kind === 'dispu
 const STEPS = ['offers', 'agreed', 'scheduled', 'in_progress', 'done', 'accepted'];
 // 'Klaar|zlecenie' en 'Afgewezen|meerwerk': dezelfde Nederlandse woorden hebben elders een andere Poolse vorm (zie i18n.js).
 const STEP_LABELS = { offers: 'Aanbiedingen', agreed: 'Bedrijf gekozen', scheduled: 'Ingepland', in_progress: 'In uitvoering', done: 'Klaar|zlecenie', accepted: 'Afgerond' };
-const STEP_INDEX = { open: 0, quoted: 0, agreed: 1, scheduled: 2, in_progress: 3, done: 4, disputed: 4, accepted: 5 };
+const STEP_INDEX = { selecting: 0, open: 0, quoted: 0, agreed: 1, scheduled: 2, in_progress: 3, done: 4, disputed: 4, accepted: 5 };
 const stepIndex = computed(() => STEP_INDEX[status.value] ?? -1);
 const statusChip = computed(() => ({
   accepted: 'fa-chip--ok', done: 'fa-chip--ok', disputed: 'fa-chip--warn', cancelled: 'fa-chip--muted', expired: 'fa-chip--muted', no_match: 'fa-chip--warn',
@@ -171,7 +171,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         <template v-if="job.cancel_reason"> {{ $t('Reden: :reason', { reason: job.cancel_reason }) }}</template>
         <template v-if="job.refunded"> {{ $t('Het gereserveerde bedrag is teruggestort.') }}</template>
       </div>
-      <div v-else-if="status === 'expired'" class="jb-banner fa-note">{{ $t('Deze aanvraag is verlopen zonder reactie van bedrijven.') }} <a :href="route('fachora.intake')">{{ $t('Nieuwe aanvraag beginnen') }}</a></div>
+      <div v-else-if="status === 'expired'" class="jb-banner fa-note">{{ offers.length ? $t('Deze aanvraag is verlopen zonder reactie van bedrijven.') : $t('Deze aanvraag is verlopen: er zijn geen bedrijven gekozen.') }} <a :href="route('fachora.intake')">{{ $t('Nieuwe aanvraag beginnen') }}</a></div>
     </div>
 
     <!-- ===== Zelf bedrijven kiezen (1.86) ===== -->

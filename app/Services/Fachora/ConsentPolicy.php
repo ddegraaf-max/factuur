@@ -25,7 +25,8 @@ class ConsentPolicy
         return $provider !== null
             && filled($provider->email)
             && $provider->email_blocked_at === null
-            && ($provider->claimed_at !== null || $provider->consent_at !== null);
+            // Ook wie op een aanbieding akkoord ging met de voorwaarden: berichten over opdrachten, geen reclame.
+            && ($provider->claimed_at !== null || $provider->consent_at !== null || $provider->terms_accepted_at !== null);
     }
 
     /**
@@ -71,6 +72,9 @@ class ConsentPolicy
         }
         if ($provider->consent_at) {
             return __('Opt-in (:source) op :date', ['source' => $provider->consent_source ?: '?', 'date' => $provider->consent_at->translatedFormat('j F Y')]);
+        }
+        if ($provider->terms_accepted_at) {
+            return __('Voorwaarden geaccepteerd op een aanbieding (:date): alleen berichten over opdrachten', ['date' => $provider->terms_accepted_at->translatedFormat('j F Y')]);
         }
 
         return __('Geen toestemming: alleen per post of via het profiel');

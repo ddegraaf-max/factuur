@@ -219,6 +219,10 @@ class CeidgClient
                 }
             }
             $cursor['p']++;
+            // Laatste pagina (minder dan een volle pagina of het totaal bereikt): door naar de volgende code.
+            if (count($result['firms']) < 25 || ($result['count'] > 0 && $cursor['p'] * 25 >= $result['count'])) {
+                $cursor = ['r' => $cursor['r'], 'c' => $cursor['c'] + 1, 'p' => 0, 'done' => false];
+            }
             usleep(300_000);
         }
 

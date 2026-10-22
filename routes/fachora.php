@@ -40,7 +40,7 @@ Route::middleware('brand:fachora')->group(function () {
         Route::post('potwierdz', [JobController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
         Route::get('/', [JobController::class, 'show'])->name('show');
         Route::post('firmy', [JobController::class, 'select'])->middleware('throttle:20,1')->name('select');
-        Route::get('oplacono', [JobController::class, 'requestPaid'])->name('request.paid');
+        Route::get('oplacono', [JobController::class, 'requestPaid'])->middleware('throttle:20,1')->name('request.paid');
         Route::post('wybierz/{offer}', [JobController::class, 'choose'])->middleware('throttle:20,1')->name('choose');
         Route::post('zaplac', [JobController::class, 'pay'])->middleware('throttle:20,1')->name('pay');
         Route::get('zaplacono', [JobController::class, 'paid'])->name('paid');

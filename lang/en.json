@@ -2016,5 +2016,13 @@
   "Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.": "Your email address is confirmed. Now choose the companies that will receive your request.",
   "Vink aan dat je aanvraag meteen mag worden verstuurd.": "Tick the box to have your request sent right away.",
   "Je aanvraag is verstuurd naar de gekozen bedrijven.": "Your request has been sent to the chosen companies.",
-  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Thank you! Your request has been sent to the chosen companies."
+  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Thank you! Your request has been sent to the chosen companies.",
+  "Kies de bedrijven voor je aanvraag :ref": "Choose the companies for your request :ref",
+  "Kies je bedrijven": "Choose your companies",
+  "De bedrijven die je koos, zijn niet meer bereikbaar. Kies er hieronder opnieuw een paar; een betaalde bijdrage blijft gewoon staan.": "The companies you chose are no longer reachable. Choose a few again below; any fee you paid still stands.",
+  "Op je opdrachtpagina staan bedrijven uit jouw buurt. Kies er tot :n; alleen zij krijgen je aanvraag en geven een prijs.": "Your job page lists companies near you. Choose up to :n; only they receive your request and give a price.",
+  "Bedrijven kiezen": "Choose companies",
+  "Je aanvraag is verstuurd naar de :n bedrijven die je koos. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs en de beschikbaarheid op je opdrachtpagina.": "Your request has been sent to the :n companies you chose. As soon as a company gives a price, you get an email and see the price and availability on your job page.",
+  "Gekozen bedrijven niet bereikbaar; klant kiest opnieuw": "Chosen companies unreachable; customer chooses again",
+  "Voorwaarden geaccepteerd op een aanbieding (:date): alleen berichten over opdrachten": "Terms accepted on an offer (:date): only messages about jobs"
 }
