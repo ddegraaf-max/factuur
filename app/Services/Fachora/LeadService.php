@@ -14,7 +14,7 @@ use App\Support\Fachora;
  */
 class LeadService
 {
-    public function __construct(private ProtectService $protect) {}
+    public function __construct(private FachoraPayments $payments) {}
 
     public function enabled(): bool
     {
@@ -53,7 +53,7 @@ class LeadService
     /** Wat het bedrijf voor deze lead betaalt (0 = gratis). */
     public function feeFor(ServiceJobOffer $offer): float
     {
-        if (! $this->enabled() || ! $this->protect->stripeConfigured() || $offer->job?->isDemo() || $this->isFree($offer)) {
+        if (! $this->enabled() || ! $this->payments->configured() || $offer->job?->isDemo() || $this->isFree($offer)) {
             return 0.0;
         }
 
@@ -103,7 +103,7 @@ class LeadService
             return null;
         }
 
-        return $this->protect->leadCheckoutUrl($offer, $fee, route('fachora.offer.unlocked', $offer->token), $offer->url());
+        return $this->payments->leadCheckoutUrl($offer, $fee, route('fachora.offer.unlocked', $offer->token), $offer->url());
     }
 
     /** Terug van Stripe of via de webhook: betaald? Dan ontgrendeld. */
@@ -112,7 +112,7 @@ class LeadService
         if ($offer->isUnlocked()) {
             return true;
         }
-        if (blank($offer->lead_session_id) || ! $this->protect->leadPaid($offer)) {
+        if (blank($offer->lead_session_id) || ! $this->payments->leadPaid($offer)) {
             return false;
         }
         $this->markUnlocked($offer, $this->price($offer), false);

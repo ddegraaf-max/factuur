@@ -36,7 +36,7 @@ return [
     'cancel_free_hours' => 24,  // tot zoveel uur voor de afspraak kan de klant kosteloos annuleren
     'default_warranty_months' => 12,
     'min_rating' => 4.2,        // Fachora Standard 10: onder dit cijfer (bij ≥ 5 beoordelingen) volgt een signaal
-    'terms_version' => '2026-10-22',
+    'terms_version' => '2026-10-22b',
 
     /*
      * Aanvraagmodel (1.86). De klant kiest zelf tot max_offers bedrijven uit
@@ -60,6 +60,9 @@ return [
      * Zonder schatting: lead_default. De eerste lead_free_count leads per
      * bedrijf zijn gratis. Zonder Stripe-sleutel is alles gratis.
      */
+    // Betalingen van Fachora zelf (leads, bijdrage): Mollie-account van Creditline B.V. Zonder sleutel: Stripe of gratis.
+    'mollie_key' => env('FACHORA_MOLLIE_KEY'),
+    'mollie_methods' => ['blik', 'przelewy24', 'creditcard'],
     'lead_pricing' => (bool) env('FACHORA_LEAD_PRICING', true),
     'lead_percent' => (float) env('FACHORA_LEAD_PERCENT', 5),
     'lead_min' => (float) env('FACHORA_LEAD_MIN', 15),

@@ -185,7 +185,7 @@ class JobService
     {
         $fee = max(0, (float) config('fachora.request_fee', 0));
 
-        return $fee > 0 && $this->protect->stripeConfigured() ? round($fee, 2) : 0.0;
+        return $fee > 0 && app(FachoraPayments::class)->configured() ? round($fee, 2) : 0.0;
     }
 
     /**
@@ -215,7 +215,7 @@ class JobService
         }
 
         // Al betaald (bijvoorbeeld in een ander tabblad)? Dan niet nog eens laten betalen.
-        if ($job->request_paid_at === null && filled($job->request_session_id) && $this->protect->requestPaid($job)) {
+        if ($job->request_paid_at === null && filled($job->request_session_id) && app(FachoraPayments::class)->requestPaid($job)) {
             $job->forceFill(['request_paid_at' => now()])->save();
             $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
         }
@@ -230,7 +230,7 @@ class JobService
             return null;
         }
 
-        return $this->protect->requestCheckoutUrl($job, $fee, route('fachora.job.request.paid', $job->token), $job->url());
+        return app(FachoraPayments::class)->requestCheckoutUrl($job, $fee, route('fachora.job.request.paid', $job->token), $job->url());
     }
 
     /* ---------- sms-code voor de klant (1.87) ---------- */
@@ -369,7 +369,7 @@ class JobService
             return false;
         }
         if ($job->request_paid_at === null) {
-            if (! $this->protect->requestPaid($job)) {
+            if (! app(FachoraPayments::class)->requestPaid($job)) {
                 return false;
             }
             $marked = ServiceJob::query()->whereKey($job->id)->whereNull('request_paid_at')->update(['request_paid_at' => now()]) === 1;

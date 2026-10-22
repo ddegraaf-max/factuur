@@ -191,4 +191,30 @@ class FachoraLeadPricingTest extends TestCase
         $this->assertSame('accepted', $job->status);
         $this->assertSame(0.0, (float) $job->fee_amount);
     }
+
+    public function test_with_mollie_the_lead_is_paid_through_creditlines_mollie_account(): void
+    {
+        config(['fachora.mollie_key' => 'test_abc', 'services.stripe.secret' => null]);
+        $p = $this->provider('Hydro M', ['claimed_at' => now(), 'status' => 'claimed']);
+        $this->post(route('fachora.offer.unlock', $this->offerFor($this->sentJob([$p]), $p)->token)); // welkomstlead
+        $job = $this->sentJob([$p]);
+        $job->forceFill(['estimate_low' => 1000, 'estimate_high' => 1400])->save();
+        $offer = $this->offerFor($job, $p);
+
+        Http::swap(new \Illuminate\Http\Client\Factory());
+        Http::fake([
+            'api.mollie.com/v2/payments/tr_lead1' => Http::response(['id' => 'tr_lead1', 'status' => 'paid', 'metadata' => ['kind' => 'fachora_lead', 'offer_id' => (string) $offer->id]], 200),
+            'api.mollie.com/v2/payments' => Http::response(['id' => 'tr_lead1', 'status' => 'open', '_links' => ['checkout' => ['href' => 'https://www.mollie.com/checkout/test-mode?id=tr_lead1']]], 201),
+            '*' => Http::response([], 200),
+        ]);
+        $this->post(route('fachora.offer.unlock', $offer->token))->assertRedirect('https://www.mollie.com/checkout/test-mode?id=tr_lead1');
+        Http::assertSent(fn ($r) => $r->url() === 'https://api.mollie.com/v2/payments' && $r['amount']['currency'] === 'PLN' && $r['amount']['value'] === '60.00' && $r['metadata']['kind'] === 'fachora_lead');
+        $this->assertNull($offer->fresh()->unlocked_at);
+
+        // De webhook (alleen het id) ontgrendelt; de status komt van Mollie zelf.
+        $this->post(route('fachora.mollie.webhook'), ['id' => 'tr_lead1'])->assertOk();
+        $offer->refresh();
+        $this->assertNotNull($offer->unlocked_at);
+        $this->assertSame(60.0, $offer->lead_fee);
+    }
 }
