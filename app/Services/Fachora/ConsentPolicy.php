@@ -45,9 +45,25 @@ class ConsentPolicy
 
         return $provider !== null
             && (bool) config('fachora.customer_choice', true)
+            && (bool) config('fachora.email_unregistered', false)
             && filled($provider->email)
             && $provider->email_blocked_at === null
             && ! in_array($provider->status, ['blocked', 'suspended'], true);
+    }
+
+    /**
+     * Mag de klant de openbare contactgegevens van dit bedrijf zien om zelf contact op te nemen
+     * (1.87)? Alleen een bedrijf dat de klant zelf koos, dat Fachora niet mag mailen, en dat zich
+     * niet afmeldde of werd geblokkeerd.
+     */
+    public static function mayShowDirectContact(?Provider $provider): bool
+    {
+        return $provider !== null
+            && ! self::mayEmailRequest($provider)
+            && $provider->email_blocked_at === null
+            && $provider->removed_at === null
+            && ! in_array($provider->status, ['blocked', 'suspended'], true)
+            && (filled($provider->email) || filled($provider->phone));
     }
 
     public static function maySms(?Provider $provider): bool

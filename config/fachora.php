@@ -48,6 +48,12 @@ return [
      * akkoord met de voorwaarden (incl. de fee) en de keuze van de klant.
      */
     'customer_choice' => (bool) env('FACHORA_CUSTOMER_CHOICE', true),
+    // 1.87 (veilig): Fachora mailt alleen bedrijven die zich zelf aanmeldden of akkoord gingen.
+    // Kiest de klant een bedrijf uit het register, dan krijgt hij diens openbare contactgegevens
+    // (CEIDG) en neemt hij zelf contact op. Zet dit pas aan na juridisch akkoord (art. 398 PKE).
+    'email_unregistered' => (bool) env('FACHORA_EMAIL_UNREGISTERED', false),
+    // Betalingen alleen via het Mollie-account van Creditline; Stripe (oud account) alleen als je dit expliciet aanzet.
+    'stripe_fallback' => (bool) env('FACHORA_STRIPE_FALLBACK', false),
     // 1.87: gratis voor de klant. Zet FACHORA_REQUEST_FEE > 0 om toch een bijdrage te vragen.
     'request_fee' => (float) env('FACHORA_REQUEST_FEE', 0),
     // Sms-code voor de klant voordat de aanvraag weggaat (alleen als de sms-koppeling werkt).

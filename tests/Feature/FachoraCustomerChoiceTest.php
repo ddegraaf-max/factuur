@@ -36,7 +36,7 @@ class FachoraCustomerChoiceTest extends TestCase
             'brand.active' => 'fachora', 'inertia.testing.ensure_pages_exist' => false,
             'services.anthropic.key' => null, 'services.stripe.secret' => null,
             'services.marketing_stats.emails' => 'eigenaar@example.com',
-            'fachora.customer_choice' => true, 'fachora.request_fee' => 10,
+            'fachora.customer_choice' => true, 'fachora.email_unregistered' => true, 'fachora.request_fee' => 10,
         ]);
         Mail::fake();
         Http::fake([
@@ -139,7 +139,7 @@ class FachoraCustomerChoiceTest extends TestCase
 
     public function test_with_a_fee_the_customer_pays_first_and_then_the_request_goes_out(): void
     {
-        config(['services.stripe.secret' => 'sk_test_x']);
+        config(['services.stripe.secret' => 'sk_test_x', 'fachora.stripe_fallback' => true]);
         $a = $this->registerProvider('Hydro A');
         $job = $this->pendingJob();
         app(JobService::class)->confirm($job, request());
@@ -244,5 +244,22 @@ class FachoraCustomerChoiceTest extends TestCase
         $this->assertNotNull($provider->lat);
         $this->assertSame(1, Provider::query()->count());
         Http::assertNotSent(fn ($request) => str_contains($request->url(), '/firma/far') || str_contains($request->url(), '/firma/young'));
+    }
+
+    public function test_in_safe_mode_the_customer_contacts_register_companies_himself(): void
+    {
+        config(['fachora.email_unregistered' => false]);
+        $a = $this->registerProvider('Kominiarz Płock', ['phone' => '+48600100200']);
+        $job = $this->pendingJob();
+        app(JobService::class)->confirm($job, request());
+        $this->assertSame([$a->id], app(ProviderService::class)->choiceCandidates($job->fresh())->pluck('id')->all());
+
+        $this->post(route('fachora.job.select', $job->token), ['providers' => [$a->id]])->assertRedirect($job->url());
+        $job->refresh();
+        $this->assertSame(0, $job->offers()->count());
+        Mail::assertNotSent(FachoraMail::class, fn (FachoraMail $m) => $m->hasTo($a->email));
+        Mail::assertSent(FachoraMail::class, fn (FachoraMail $m) => $m->kind === 'confirmed' && $m->hasTo('daan@example.com'));
+
+        $this->get($job->url())->assertInertia(fn ($p) => $p->where('direct.0.name', 'Kominiarz Płock')->where('direct.0.email', $a->email)->where('direct.0.phone', '+48600100200'));
     }
 }

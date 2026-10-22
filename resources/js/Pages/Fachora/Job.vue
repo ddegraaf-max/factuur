@@ -23,6 +23,8 @@ const props = defineProps({
   auto_accept_days: { type: Number, default: 5 },
   // 1.86: de klant kiest zelf tot vijf bedrijven ({ candidates, max, fee, selected }) zolang de status 'selecting' is.
   choice: { type: Object, default: null },
+  // 1.87: gekozen bedrijven uit het register; de klant neemt zelf contact op.
+  direct: { type: Array, default: () => [] },
 });
 
 const job = computed(() => props.job);
@@ -92,6 +94,14 @@ onMounted(() => {
   }, 20000);
 });
 onBeforeUnmount(() => clearInterval(searchTimer));
+
+/* ---------- zelf contact opnemen (1.87) ---------- */
+const mailtoFor = (p) => {
+  const j = props.job || {};
+  const subject = t('Zapytanie: :title (:city)', { title: j.title || '', city: j.city || '' });
+  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', j.customer_name || ''].join('\n');
+  return 'mailto:' + p.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+};
 
 /* ---------- sms-code (1.87) ---------- */
 const smsForm = useForm({ phone: props.choice?.phone || props.job.customer_phone || '' });
@@ -256,8 +266,26 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       </div>
     </section>
 
+    <!-- ===== Zelf contact opnemen (1.87) ===== -->
+    <section v-if="direct.length" class="jb-section">
+      <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
+      <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
+      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer">
+        <div class="jb-prov">
+          <div class="jb-prov-main">
+            <div class="jb-prov-name"><strong>{{ p.name }}</strong></div>
+            <div class="fa-small fa-muted">{{ p.city }}</div>
+          </div>
+        </div>
+        <div class="fa-actions">
+          <a v-if="p.email" class="fa-btn" :href="mailtoFor(p)">{{ $t('E-mail sturen') }}</a>
+          <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
+        </div>
+      </article>
+    </section>
+
     <!-- ===== Aanbiedingen ===== -->
-    <section v-if="canChoose" class="jb-section">
+    <section v-if="canChoose && !(direct.length && !offers.length)" class="jb-section">
       <h2 class="fa-h2">{{ $t('Aanbiedingen') }} <span class="fa-muted jb-count">{{ pricesIn }}/{{ offers.length }}</span></h2>
       <p v-if="!offers.length" class="fa-card fa-muted">{{ $t('Nog geen reacties. We laten het je per e-mail weten.') }}</p>
 

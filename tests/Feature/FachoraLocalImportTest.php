@@ -32,7 +32,7 @@ class FachoraLocalImportTest extends TestCase
             'services.anthropic.key' => null, 'services.stripe.secret' => null,
             'services.smstools.client_id' => null, 'services.smstools.client_secret' => null,
             'services.marketing_stats.emails' => 'eigenaar@example.com',
-            'fachora.customer_choice' => true, 'fachora.request_fee' => 0,
+            'fachora.customer_choice' => true, 'fachora.email_unregistered' => true, 'fachora.request_fee' => 0,
             'fachora.ceidg_token' => 'jwt', 'fachora.local_import' => true,
             'fachora.categories' => ['hydraulik' => ['pl' => 'Hydraulik', 'en' => 'Plumber', 'icon' => 'tap', 'pkd' => ['43.22.Z']]],
         ]);

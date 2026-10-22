@@ -98,9 +98,11 @@ class FachoraMail extends Mailable
                     break;
                 case 'confirmed':
                     $set(__('Je aanvraag :ref staat open', ['ref' => $ref]), __('We zoeken een bedrijf voor je'), [
-                        ! empty($job->selected_providers)
+                        ! empty($job->selected_providers) && $job->offers()->count() === 0
+                            ? __('De bedrijven die je koos, staan nog niet op Fachora. Op je opdrachtpagina staan hun e-mailadres en telefoonnummer uit het openbare register: neem zelf contact op en stuur ze de beschrijving van je klus.')
+                            : (! empty($job->selected_providers)
                             ? __('Je aanvraag is verstuurd naar de :n bedrijven die je koos. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs en de beschikbaarheid op je opdrachtpagina.', ['n' => $job->offers()->count()])
-                            : __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)]),
+                            : __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)])),
                         __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
                     ], ['label' => __('Mijn opdracht'), 'url' => $jobUrl], $facts);
                     break;

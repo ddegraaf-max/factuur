@@ -66,6 +66,11 @@ class JobController extends Controller
             'protect_enabled' => $this->protect->enabled(),
             'auto_accept_days' => (int) config('fachora.auto_accept_days', 5),
             // 1.86: de klant kiest zelf de bedrijven en betaalt een kleine bijdrage per aanvraag.
+            // 1.87: gekozen bedrijven uit het register; de klant neemt zelf contact op.
+            'direct' => $job->isSelecting() ? [] : $this->jobs->directContacts($job)->map(fn ($p) => [
+                'id' => $p->id, 'name' => $p->display_name, 'city' => $p->city,
+                'email' => $p->email, 'phone' => $p->phone, 'url' => $p->publicUrl(),
+            ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
                     ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months'])) + ['distance_km' => $p->distance_km])

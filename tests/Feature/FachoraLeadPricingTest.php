@@ -31,7 +31,7 @@ class FachoraLeadPricingTest extends TestCase
             'services.anthropic.key' => null, 'services.stripe.secret' => null,
             'services.smstools.client_id' => null, 'services.smstools.client_secret' => null,
             'services.marketing_stats.emails' => 'eigenaar@example.com',
-            'fachora.customer_choice' => true, 'fachora.request_fee' => 0, 'fachora.lead_pricing' => true,
+            'fachora.customer_choice' => true, 'fachora.email_unregistered' => true, 'fachora.stripe_fallback' => true, 'fachora.request_fee' => 0, 'fachora.lead_pricing' => true,
             'fachora.lead_percent' => 5, 'fachora.lead_min' => 15, 'fachora.lead_max' => 150, 'fachora.lead_default' => 30, 'fachora.lead_free_count' => 1,
         ]);
         Mail::fake();

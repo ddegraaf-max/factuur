@@ -33,7 +33,7 @@ class FachoraPayments
     /** Kan er online worden betaald (Mollie of Stripe)? */
     public function configured(): bool
     {
-        return $this->mollie() || $this->stripe->stripeConfigured();
+        return $this->mollie() || ((bool) config('fachora.stripe_fallback', false) && $this->stripe->stripeConfigured());
     }
 
     /* ---------- lead ontgrendelen ---------- */
@@ -41,6 +41,10 @@ class FachoraPayments
     public function leadCheckoutUrl(ServiceJobOffer $offer, float $amount, string $returnUrl, string $cancelUrl): string
     {
         if (! $this->mollie()) {
+            if (! (bool) config('fachora.stripe_fallback', false)) {
+                throw new RuntimeException('Geen betaalpartij ingesteld (FACHORA_MOLLIE_KEY).');
+            }
+
             return $this->stripe->leadCheckoutUrl($offer, $amount, $returnUrl, $cancelUrl);
         }
         $payment = $this->create($amount, 'Fachora ' . $offer->job->reference . ' · odblokowanie zapytania', $returnUrl, [
@@ -68,6 +72,10 @@ class FachoraPayments
     public function requestCheckoutUrl(ServiceJob $job, float $amount, string $returnUrl, string $cancelUrl): string
     {
         if (! $this->mollie()) {
+            if (! (bool) config('fachora.stripe_fallback', false)) {
+                throw new RuntimeException('Geen betaalpartij ingesteld (FACHORA_MOLLIE_KEY).');
+            }
+
             return $this->stripe->requestCheckoutUrl($job, $amount, $returnUrl, $cancelUrl);
         }
         $payment = $this->create($amount, 'Fachora ' . $job->reference . ' · zapytanie', $returnUrl, [

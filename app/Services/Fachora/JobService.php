@@ -393,6 +393,16 @@ class JobService
         $job->refresh();
         $sent = $this->dispatch($job, array_map('intval', (array) $job->selected_providers), 'customer');
         $job->refresh();
+        $direct = $this->directContacts($job);
+        if ($job->offers()->count() === 0 && $direct->isNotEmpty()) {
+            // 1.87: alleen bedrijven uit het register gekozen. Fachora mailt die niet; de klant krijgt
+            // hun openbare contactgegevens en neemt zelf contact op.
+            $job->forceFill(['offered_at' => now()])->save();
+            $this->log($job, 'direct_contact', 'system', __('Klant neemt zelf contact op met :n bedrijven uit het register', ['n' => $direct->count()]));
+            $this->notifier->customer($job, 'confirmed');
+
+            return 0;
+        }
         if ($job->offers()->count() === 0) {
             // Geen van de gekozen bedrijven was nog bereikbaar (afgemeld of geblokkeerd): opnieuw kiezen.
             // Een betaalde bijdrage blijft staan; de volgende keuze kost niets extra.
@@ -405,6 +415,24 @@ class JobService
         $this->notifier->customer($job, 'confirmed');
 
         return $sent;
+    }
+
+    /**
+     * Gekozen bedrijven die Fachora niet mailt (uit het register, 1.87): de klant ziet hun
+     * openbare contactgegevens uit CEIDG en neemt zelf contact op.
+     *
+     * @return \Illuminate\Support\Collection<int, Provider>
+     */
+    public function directContacts(ServiceJob $job): \Illuminate\Support\Collection
+    {
+        $ids = array_map('intval', (array) $job->selected_providers);
+        if ($ids === []) {
+            return collect();
+        }
+        $offered = $job->offers()->pluck('provider_id')->all();
+
+        return Provider::query()->whereIn('id', $ids)->whereNotIn('id', $offered)->get()
+            ->filter(fn (Provider $p) => ConsentPolicy::mayShowDirectContact($p))->values();
     }
 
     /** Betalingen die via Stripe binnenkwamen terwijl de klant de pagina al had gesloten (planner). */

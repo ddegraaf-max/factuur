@@ -494,7 +494,7 @@ class ProviderService
         $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 2];
 
         return $query->get()->filter(function (Provider $p) use ($job, $radius) {
-            if ($p->isDemo() || ! ConsentPolicy::mayEmailRequest($p)) {
+            if ($p->isDemo() || ! (ConsentPolicy::mayEmailRequest($p) || ConsentPolicy::mayShowDirectContact($p))) {
                 return false;
             }
             if ($job->lat !== null && $p->lat !== null) {
