@@ -158,4 +158,23 @@ class FachoraLocalImportTest extends TestCase
         // De import was klaar en gaat nu verder met de nieuwe stad.
         $this->assertFalse(Cache::get(\App\Services\Fachora\CeidgClient::CURSOR)['done']);
     }
+
+    public function test_register_companies_nobody_chose_are_removed_after_three_weeks(): void
+    {
+        $this->fakeCeidg([['hydro-police', '5260250274']]);
+        $job = $this->confirmedJob();
+        $this->artisan('fachora:local-search')->assertSuccessful();
+        $chosen = Provider::query()->where('nip', '5260250274')->firstOrFail();
+        $slug = 'stary-'.Str::lower(Str::random(4));
+        $unused = Provider::create(['legal_name' => 'Stary', 'display_name' => 'Stary', 'slug' => $slug, 'status' => 'unclaimed',
+            'email' => "$slug@example.com", 'city' => 'Police', 'source' => 'ceidg', 'nip' => '5651043094']);
+        app(JobService::class)->selectProviders($job->fresh(), [$chosen->id]);
+
+        $this->travel(22)->days();
+        $this->artisan('fachora:purge-register --dry-run')->expectsOutputToContain('Zou verwijderen: 1')->assertSuccessful();
+        $this->artisan('fachora:purge-register')->assertSuccessful();
+
+        $this->assertNull(Provider::query()->find($unused->id));
+        $this->assertNotNull(Provider::query()->find($chosen->id), 'Wie een aanvraag kreeg, blijft staan');
+    }
 }

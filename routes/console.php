@@ -139,7 +139,7 @@ Schedule::command('fachora:tick')
     ->withoutOverlapping(50);
 
 // Fachora 1.86: de startregio's uit CEIDG vullen, elke tien minuten een portie (tot alles binnen is).
-if ((bool) config('fachora.region_import', true)) {
+if ((bool) config('fachora.region_import', false)) {
     Schedule::command('fachora:import-regions')
         ->everyTenMinutes()
         ->withoutOverlapping(30);
@@ -154,11 +154,16 @@ if ((bool) config('fachora.register_notices', false)) {
 }
 
 // Fachora 1.87: elke ochtend één grote stad (+50 km) erbij voor de regio-import.
-if ((bool) config('fachora.region_import', true) && (bool) config('fachora.region_expansion', true)) {
+if ((bool) config('fachora.region_import', false) && (bool) config('fachora.region_expansion', false)) {
     Schedule::command('fachora:expand-regions')
         ->dailyAt('05:15')
         ->timezone('Europe/Warsaw');
 }
+
+// Fachora 1.87 (optie 2): registerbedrijven die niemand koos, na register_keep_days weer verwijderen.
+Schedule::command('fachora:purge-register')
+    ->dailyAt('04:40')
+    ->timezone('Europe/Warsaw');
 
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {

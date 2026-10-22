@@ -114,4 +114,37 @@ class RegisterNoticeService
         ])->save();
         $provider->syncCategories([]);
     }
+
+    /**
+     * Optie 2 (1.87): bedrijven uit het register die niemand koos en die nooit
+     * een bericht van ons kregen, bewaren we niet. Ook geen geschiedenis kwijt:
+     * wie een aanbieding of opdracht heeft, blijft staan.
+     */
+    public function unusedRegister(int $days): Builder
+    {
+        return Provider::query()
+            ->whereIn('source', ['ceidg', 'krs', 'import'])
+            ->whereNull('claimed_at')->whereNull('consent_at')->whereNull('terms_accepted_at')
+            ->whereNull('register_notice_at')->whereNull('removed_at')->whereNull('user_id')
+            ->where('created_at', '<', now()->subDays($days))
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('service_job_offers')->whereColumn('service_job_offers.provider_id', 'providers.id'))
+            ->whereNotExists(fn ($q) => $q->selectRaw('1')->from('service_jobs')->whereColumn('service_jobs.provider_id', 'providers.id'));
+    }
+
+    /** @return int  het aantal verwijderde (of bij $dry: te verwijderen) bedrijven */
+    public function purgeUnusedRegister(int $days, bool $dry = false): int
+    {
+        $query = $this->unusedRegister($days);
+        if ($dry) {
+            return $query->count();
+        }
+        $deleted = 0;
+        $query->select('id')->chunkById(500, function ($chunk) use (&$deleted) {
+            $ids = $chunk->pluck('id')->all();
+            \Illuminate\Support\Facades\DB::table('provider_category')->whereIn('provider_id', $ids)->delete();
+            $deleted += Provider::query()->whereIn('id', $ids)->delete();
+        });
+
+        return $deleted;
+    }
 }

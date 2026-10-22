@@ -207,3 +207,14 @@ opdracht die ze krijgen, na akkoord met de voorwaarden.
   vat_status 'none' (na een controle) vallen uit de keuzelijst; ongecontroleerd telt mee.
 - Tests: tests/Feature/FachoraCustomerChoiceTest.php; de oudere Fachora-tests draaien met
   fachora.customer_choice=false.
+
+OPTIE 2: GEEN IMPORT VOORAF (1.87, 22 okt 2026, besluit Daniël)
+- FACHORA_REGION_IMPORT en FACHORA_REGION_EXPANSION staan standaard UIT. Bedrijven komen alleen binnen
+  via de import op aanvraag (fachora:local-search) als er een klant is.
+- Informatiemail art. 14 (fachora:register-notices) staat standaard UIT (FACHORA_REGISTER_NOTICES).
+  Bedrijven die een klantaanvraag krijgen, zijn via die mail geïnformeerd (register_notice_at).
+- fachora:purge-register (dagelijks 04:40): registerbedrijven die niemand koos, niets van ons kregen en
+  geen aanbieding/opdracht hebben, na FACHORA_REGISTER_KEEP_DAYS (21) dagen verwijderen.
+  Oude imports: eerst `php artisan fachora:purge-register --days=0 --dry-run`, dan zonder --dry-run.
+- Afmelden in twee stappen: de link toont een keuze (geen e-mail meer / profiel verwijderen), pas de knop
+  verandert iets (virusscanners openen links automatisch).

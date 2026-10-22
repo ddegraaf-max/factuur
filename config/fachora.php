@@ -87,7 +87,7 @@ return [
      * volgorde (grootste eerst), met dezelfde straal. fachora:expand-regions
      * houdt bij welke al actief zijn (cache, sleutel fachora:extra-regions).
      */
-    'region_expansion' => (bool) env('FACHORA_REGION_EXPANSION', true),
+    'region_expansion' => (bool) env('FACHORA_REGION_EXPANSION', false), // UIT: optie 2, geen import vooraf
     'expansion_regions' => [
         'lodz' => ['name' => 'Łódź', 'voivodeship' => 'łódzkie', 'center' => [51.7592, 19.4560]],
         'poznan' => ['name' => 'Poznań', 'voivodeship' => 'wielkopolskie', 'center' => [52.4064, 16.9252]],
@@ -118,7 +118,9 @@ return [
     // Wat de import binnenhaalt: alleen actieve bedrijven met een e-mailadres die minstens zo lang bestaan.
     'import_min_years' => 1,
     'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),
-    'region_import' => (bool) env('FACHORA_REGION_IMPORT', true),
+    'region_import' => (bool) env('FACHORA_REGION_IMPORT', false), // UIT: optie 2, alleen import op aanvraag
+    // Bedrijven uit het register die niemand koos en die nooit iets van ons kregen: na zoveel dagen weer weg.
+    'register_keep_days' => (int) env('FACHORA_REGISTER_KEEP_DAYS', 21),
     /*
      * Import op aanvraag (1.87): heeft een klant minder dan local_import_min
      * bedrijven om uit te kiezen, dan zoekt de planner (elke minuut) in CEIDG
