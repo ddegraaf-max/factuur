@@ -142,4 +142,20 @@ class FachoraLocalImportTest extends TestCase
         Http::assertNotSent(fn ($r) => str_contains($r->url(), 'dane.biznes.gov.pl'));
         $this->assertSame('selecting', $second->fresh()->status);
     }
+
+    public function test_every_day_one_more_city_joins_the_region_import(): void
+    {
+        $base = count(config('fachora.regions'));
+        Cache::forever(\App\Services\Fachora\CeidgClient::CURSOR, ['r' => $base, 'c' => 0, 'p' => 0, 'done' => true]);
+
+        $this->artisan('fachora:expand-regions')->expectsOutputToContain('Erbij: Łódź')->assertSuccessful();
+        $this->artisan('fachora:expand-regions')->expectsOutputToContain('Erbij: Poznań')->assertSuccessful();
+
+        $regions = \App\Services\Fachora\CeidgClient::regions();
+        $this->assertCount($base + 2, $regions);
+        $this->assertSame('Łódź', $regions[$base]['name']);
+        $this->assertSame('Poznań', $regions[$base + 1]['name']);
+        // De import was klaar en gaat nu verder met de nieuwe stad.
+        $this->assertFalse(Cache::get(\App\Services\Fachora\CeidgClient::CURSOR)['done']);
+    }
 }

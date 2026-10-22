@@ -169,6 +169,9 @@ GRATIS VOOR DE KLANT, BEDRIJF BETAALT PER LEAD (1.87.0, 22 okt 2026)
   daarna de keuzemail; niemand gevonden = gewone route (no_match). Per categorie+plaats eens per
   14 dagen. FACHORA_LOCAL_IMPORT=false zet het uit. Parameters miasto/powiat van /firmy na deploy
   met een echte zoekopdracht nakijken (staat in de log: "Fachora import op aanvraag").
+- Uitbreiding: start met Płock, Szczecin, Warszawa, Kraków, Wrocław, Trójmiasto; elke dag om 05:15
+  komt er één stad uit expansion_regions bij (Łódź, Poznań, Katowice, ...). fachora:expand-regions
+  --list toont de actieve regio's. FACHORA_REGION_EXPANSION=false zet het uit.
 
 KLANT KIEST ZELF, BIJDRAGE PER AANVRAAG, REGIO-IMPORT (1.86.0, 22 okt 2026)
 ---------------------------------------------------------------------------

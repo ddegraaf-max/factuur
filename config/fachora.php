@@ -82,6 +82,39 @@ return [
         'trojmiasto' => ['name' => 'Trójmiasto', 'voivodeship' => 'pomorskie', 'center' => [54.4416, 18.5601]],
     ],
 
+    /*
+     * Uitbreiding (1.87): elke dag één stad uit deze lijst erbij, in deze
+     * volgorde (grootste eerst), met dezelfde straal. fachora:expand-regions
+     * houdt bij welke al actief zijn (cache, sleutel fachora:extra-regions).
+     */
+    'region_expansion' => (bool) env('FACHORA_REGION_EXPANSION', true),
+    'expansion_regions' => [
+        'lodz' => ['name' => 'Łódź', 'voivodeship' => 'łódzkie', 'center' => [51.7592, 19.4560]],
+        'poznan' => ['name' => 'Poznań', 'voivodeship' => 'wielkopolskie', 'center' => [52.4064, 16.9252]],
+        'katowice' => ['name' => 'Katowice', 'voivodeship' => 'śląskie', 'center' => [50.2649, 19.0238]],
+        'lublin' => ['name' => 'Lublin', 'voivodeship' => 'lubelskie', 'center' => [51.2465, 22.5684]],
+        'bydgoszcz' => ['name' => 'Bydgoszcz', 'voivodeship' => 'kujawsko-pomorskie', 'center' => [53.1235, 18.0084]],
+        'bialystok' => ['name' => 'Białystok', 'voivodeship' => 'podlaskie', 'center' => [53.1325, 23.1688]],
+        'rzeszow' => ['name' => 'Rzeszów', 'voivodeship' => 'podkarpackie', 'center' => [50.0412, 21.9991]],
+        'torun' => ['name' => 'Toruń', 'voivodeship' => 'kujawsko-pomorskie', 'center' => [53.0138, 18.5984]],
+        'kielce' => ['name' => 'Kielce', 'voivodeship' => 'świętokrzyskie', 'center' => [50.8661, 20.6286]],
+        'olsztyn' => ['name' => 'Olsztyn', 'voivodeship' => 'warmińsko-mazurskie', 'center' => [53.7784, 20.4801]],
+        'radom' => ['name' => 'Radom', 'voivodeship' => 'mazowieckie', 'center' => [51.4027, 21.1471]],
+        'czestochowa' => ['name' => 'Częstochowa', 'voivodeship' => 'śląskie', 'center' => [50.8118, 19.1203]],
+        'opole' => ['name' => 'Opole', 'voivodeship' => 'opolskie', 'center' => [50.6751, 17.9213]],
+        'zielona-gora' => ['name' => 'Zielona Góra', 'voivodeship' => 'lubuskie', 'center' => [51.9356, 15.5062]],
+        'gorzow' => ['name' => 'Gorzów Wielkopolski', 'voivodeship' => 'lubuskie', 'center' => [52.7368, 15.2288]],
+        'koszalin' => ['name' => 'Koszalin', 'voivodeship' => 'zachodniopomorskie', 'center' => [54.1944, 16.1722]],
+        'kalisz' => ['name' => 'Kalisz', 'voivodeship' => 'wielkopolskie', 'center' => [51.7611, 18.0910]],
+        'tarnow' => ['name' => 'Tarnów', 'voivodeship' => 'małopolskie', 'center' => [50.0121, 20.9858]],
+        'legnica' => ['name' => 'Legnica', 'voivodeship' => 'dolnośląskie', 'center' => [51.2070, 16.1553]],
+        'elblag' => ['name' => 'Elbląg', 'voivodeship' => 'warmińsko-mazurskie', 'center' => [54.1561, 19.4045]],
+        'siedlce' => ['name' => 'Siedlce', 'voivodeship' => 'mazowieckie', 'center' => [52.1676, 22.2902]],
+        'nowy-sacz' => ['name' => 'Nowy Sącz', 'voivodeship' => 'małopolskie', 'center' => [49.6175, 20.7153]],
+        'zamosc' => ['name' => 'Zamość', 'voivodeship' => 'lubelskie', 'center' => [50.7231, 23.2520]],
+        'suwalki' => ['name' => 'Suwałki', 'voivodeship' => 'podlaskie', 'center' => [54.1118, 22.9309]],
+    ],
+
     // Wat de import binnenhaalt: alleen actieve bedrijven met een e-mailadres die minstens zo lang bestaan.
     'import_min_years' => 1,
     'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),

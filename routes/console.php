@@ -145,6 +145,13 @@ if ((bool) config('fachora.region_import', true)) {
         ->withoutOverlapping(30);
 }
 
+// Fachora 1.87: elke ochtend één grote stad (+50 km) erbij voor de regio-import.
+if ((bool) config('fachora.region_import', true) && (bool) config('fachora.region_expansion', true)) {
+    Schedule::command('fachora:expand-regions')
+        ->dailyAt('05:15')
+        ->timezone('Europe/Warsaw');
+}
+
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
     Schedule::command('fachora:local-search')

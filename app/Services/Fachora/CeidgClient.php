@@ -26,6 +26,8 @@ class CeidgClient
 {
     public const CURSOR = 'fachora:region-import';
 
+    public const EXTRA = 'fachora:extra-regions';
+
     public function __construct(private ProviderService $providers, private ?GeocodeService $geo = null)
     {
         $this->geo ??= app(GeocodeService::class);
@@ -156,6 +158,52 @@ class CeidgClient
         return is_array($firm) ? $firm : null;
     }
 
+    /**
+     * Alle actieve regio's in vaste volgorde: de startregio's, daarna de
+     * steden die er dag na dag bij kwamen. Nieuwe komen achteraan, zodat de
+     * cursor van de import blijft kloppen. @return list<array<string, mixed>>
+     */
+    public static function regions(): array
+    {
+        $extra = array_intersect_key((array) config('fachora.expansion_regions', []), array_flip((array) Cache::get(self::EXTRA, [])));
+        $order = array_flip((array) Cache::get(self::EXTRA, []));
+        uksort($extra, fn ($a, $b) => $order[$a] <=> $order[$b]);
+
+        return array_values(array_merge((array) config('fachora.regions', []), $extra));
+    }
+
+    /**
+     * Uitbreiding (1.87): de volgende stad uit expansion_regions erbij. Was
+     * de import klaar, dan gaat hij verder met de nieuwe regio.
+     *
+     * @return array<string, mixed>|null  de nieuwe regio, of null als de lijst op is
+     */
+    public function expandRegions(): ?array
+    {
+        $active = (array) Cache::get(self::EXTRA, []);
+        $next = null;
+        foreach ((array) config('fachora.expansion_regions', []) as $key => $region) {
+            if (! in_array($key, $active, true) && ! array_key_exists($key, (array) config('fachora.regions', []))) {
+                $next = $key;
+                break;
+            }
+        }
+        if ($next === null) {
+            return null;
+        }
+        $active[] = $next;
+        Cache::forever(self::EXTRA, $active);
+
+        $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+        if ($cursor['done'] ?? false) {
+            $cursor['done'] = false;
+            Cache::forever(self::CURSOR, $cursor);
+        }
+        Log::info('Fachora: regio erbij', ['region' => $next]);
+
+        return config('fachora.expansion_regions.' . $next);
+    }
+
     /** Alle PKD-codes van de categorieën, zonder dubbele. @return list<string> */
     public static function allPkdCodes(): array
     {
@@ -174,7 +222,7 @@ class CeidgClient
      */
     public function importRegionsStep(?int $firmBudget = null, int $pageBudget = 12): array
     {
-        $regions = array_values((array) config('fachora.regions', []));
+        $regions = self::regions();
         $codes = self::allPkdCodes();
         $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
         $firmBudget ??= (int) config('fachora.import_firms_per_run', 150);
