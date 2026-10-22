@@ -41,7 +41,9 @@ class JobController extends Controller
             $this->jobs->confirm($job, $request);
         }
 
-        return redirect($job->url())->with('flash', __('Je aanvraag is bevestigd. We bieden hem nu aan bij bedrijven in de buurt.'));
+        return redirect($job->url())->with('flash', $job->fresh()->isSelecting()
+            ? __('Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.')
+            : __('Je aanvraag is bevestigd. We bieden hem nu aan bij bedrijven in de buurt.'));
     }
 
     public function show(string $token)
@@ -63,7 +65,54 @@ class JobController extends Controller
             'files' => $this->presenter->files($job, fn (FachoraFile $f) => route('fachora.job.file', [$token, $f->id])),
             'protect_enabled' => $this->protect->enabled(),
             'auto_accept_days' => (int) config('fachora.auto_accept_days', 5),
+            // 1.86: de klant kiest zelf de bedrijven en betaalt een kleine bijdrage per aanvraag.
+            'choice' => $job->isSelecting() ? [
+                'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
+                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months'])) + ['distance_km' => $p->distance_km])
+                    ->values()->all(),
+                'max' => (int) config('fachora.max_offers', 5),
+                'fee' => $this->jobs->requestFee(),
+                'selected' => array_map('intval', (array) $job->selected_providers),
+            ] : null,
         ]);
+    }
+
+    /** De klant kiest 1 tot vijf bedrijven en betaalt (zo nodig) de bijdrage. */
+    public function select(Request $request, string $token)
+    {
+        $job = $this->find($token);
+        $max = (int) config('fachora.max_offers', 5);
+        $rules = ['providers' => ['required', 'array', 'min:1', 'max:' . $max], 'providers.*' => ['integer']];
+        $messages = ['providers.required' => __('Kies minstens één bedrijf.'), 'providers.max' => __('Kies maximaal :n bedrijven.', ['n' => $max])];
+        if ($this->jobs->requestFee() > 0) {
+            // Consumentenrecht: de aanvraag wordt meteen uitgevoerd; daar vraagt de klant uitdrukkelijk om.
+            $rules['express'] = ['accepted'];
+            $messages['express.accepted'] = __('Vink aan dat je aanvraag meteen mag worden verstuurd.');
+        }
+        $data = $request->validate($rules, $messages);
+
+        try {
+            $url = $this->jobs->selectProviders($job, $data['providers']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['providers' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect($job->url())->with('error', __('De betaling kon niet worden gestart. Probeer het zo opnieuw.'));
+        }
+
+        return $url ? Inertia::location($url) : redirect($job->url())->with('flash', __('Je aanvraag is verstuurd naar de gekozen bedrijven.'));
+    }
+
+    /** Terug van Stripe na de bijdrage voor de aanvraag. */
+    public function requestPaid(string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $sent = $this->jobs->syncRequestPayment($job);
+
+        return redirect($job->url())->with('flash', $sent
+            ? __('Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.')
+            : __('We wachten nog op de bevestiging van de betaling; dit kan een minuut duren.'));
     }
 
     public function choose(Request $request, string $token, ServiceJobOffer $offer): RedirectResponse

@@ -320,5 +320,16 @@
   "Lekkage onder de gootsteen": "Wyciek pod zlewem",
   "Voorbeeld van een profiel en een aanbieding": "Przykład profilu i oferty",
   "Voor bedrijven": "Dla firm",
-  "Nog geen profiel?": "Nie masz jeszcze profilu?"
+  "Nog geen profiel?": "Nie masz jeszcze profilu?",
+  "Ik ga akkoord met de voorwaarden van Fachora, inclusief de provisie van :fee% over een opdracht die de klant mij gunt.": "Akceptuję regulamin Fachora, w tym prowizję :fee% od zlecenia, które klient mi powierzy.",
+  "Voorwaarden": "Regulamin",
+  "Kies hieronder tot :n bedrijven uit jouw buurt. Alleen zij krijgen je aanvraag; je gegevens zien ze pas als jij een bedrijf kiest.": "Wybierz poniżej do :n firm z okolicy. Tylko one otrzymają Twoje zapytanie; Twoje dane zobaczą dopiero, gdy wybierzesz firmę.",
+  "Kies de bedrijven": "Wybierz firmy",
+  ":km km": ":km km",
+  "uit het bedrijvenregister": "z rejestru firm",
+  "Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.": "Twoje zapytanie trafi e-mailem do wybranych firm. One podadzą cenę; potem spokojnie zdecydujesz, z kim dalej współpracować.",
+  "Kosten: :amount per aanvraag": "Koszt: :amount za zapytanie",
+  "betalen met BLIK, Przelewy24 of kaart": "płatność BLIK, Przelewy24 lub kartą",
+  "Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.": "Proszę o natychmiastowe wysłanie zapytania. Po jego wysłaniu prawo odstąpienia od tej opłaty wygasa.",
+  "Betalen en versturen (:amount)": "Zapłać i wyślij (:amount)"
 }

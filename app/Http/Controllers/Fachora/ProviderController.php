@@ -75,6 +75,7 @@ class ProviderController extends Controller
             'protect' => $this->protect->enabled() && $provider->protectReady(),
             'fee_percent' => $provider->feePercent(),
             'panel_url' => route('fachora.dashboard'),
+            'needs_terms' => $provider->claimed_at === null && $provider->terms_accepted_at === null,
         ]);
     }
 

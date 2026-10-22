@@ -144,12 +144,112 @@ class JobService
         $job->refresh();
         $this->log($job, 'confirmed', 'customer', __('E-mailadres bevestigd; opdracht actief'));
         $this->enrich($job);
+
+        // 1.86: de klant kiest zelf de bedrijven (als er in de buurt iemand is om uit te kiezen).
+        if ((bool) config('fachora.customer_choice', true) && $this->providers->choiceCandidates($job, 1)->isNotEmpty()) {
+            $job->forceFill(['status' => 'selecting', 'request_fee' => $this->requestFee()])->save();
+            $this->log($job, 'selecting', 'system', __('Klant kiest zelf de bedrijven'));
+
+            return true;
+        }
+
         $this->dispatch($job);
         // Geen Verified bedrijf in de buurt? Dan zegt de mail dat meteen, in plaats van "we bieden hem aan".
         $job->refresh();
         $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
 
         return true;
+    }
+
+    /* ---------- de klant kiest zelf (1.86) ---------- */
+
+    /** De bijdrage per aanvraag in złoty (0 = gratis, of geen Stripe: dan ook gratis). */
+    public function requestFee(): float
+    {
+        $fee = max(0, (float) config('fachora.request_fee', 10));
+
+        return $fee > 0 && $this->protect->stripeConfigured() ? round($fee, 2) : 0.0;
+    }
+
+    /**
+     * De klant kiest 1 tot max_offers bedrijven uit de lijst. Zonder bijdrage
+     * gaat de aanvraag meteen weg; met bijdrage geeft dit het Checkout-adres.
+     *
+     * @param  list<int>  $providerIds
+     * @return string|null  het betaaladres, of null als de aanvraag al is verstuurd
+     */
+    public function selectProviders(ServiceJob $job, array $providerIds): ?string
+    {
+        if (! $job->isSelecting()) {
+            throw new \DomainException(__('Voor deze opdracht kun je geen bedrijven (meer) kiezen.'));
+        }
+        $max = (int) config('fachora.max_offers', 5);
+        $allowed = $this->providers->choiceCandidates($job)->pluck('id')->all();
+        $ids = array_values(array_unique(array_map('intval', $providerIds)));
+        $ids = array_values(array_filter($ids, fn (int $id) => in_array($id, $allowed, true)));
+        if ($ids === []) {
+            throw new \DomainException(__('Kies minstens één bedrijf.'));
+        }
+        if (count($ids) > $max) {
+            throw new \DomainException(__('Kies maximaal :n bedrijven.', ['n' => $max]));
+        }
+
+        $fee = $this->requestFee();
+        $job->forceFill(['selected_providers' => $ids, 'request_fee' => $fee])->save();
+        $this->log($job, 'selected', 'customer', __('Klant koos :n bedrijven', ['n' => count($ids)]));
+
+        if ($fee <= 0 || $job->request_paid_at !== null) {
+            $this->submitSelection($job);
+
+            return null;
+        }
+
+        return $this->protect->requestCheckoutUrl($job, $fee, route('fachora.job.request.paid', $job->token), $job->url());
+    }
+
+    /** Terug van Stripe (of via de planner): betaald? Dan gaat de aanvraag weg. */
+    public function syncRequestPayment(ServiceJob $job): bool
+    {
+        if (! $job->isSelecting() || empty($job->selected_providers)) {
+            return false;
+        }
+        if ($job->request_paid_at === null) {
+            if (! $this->protect->requestPaid($job)) {
+                return false;
+            }
+            $job->forceFill(['request_paid_at' => now()])->save();
+            $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+        }
+        $this->submitSelection($job);
+
+        return true;
+    }
+
+    /** De gekozen bedrijven krijgen de aanvraag. */
+    public function submitSelection(ServiceJob $job): int
+    {
+        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'selecting')->update(['status' => 'open']) === 1;
+        if (! $first) {
+            return 0;
+        }
+        $job->refresh();
+        $sent = $this->dispatch($job, array_map('intval', (array) $job->selected_providers), 'customer');
+        $job->refresh();
+        $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
+
+        return $sent;
+    }
+
+    /** Betalingen die via Stripe binnenkwamen terwijl de klant de pagina al had gesloten (planner). */
+    public function syncPendingRequests(): int
+    {
+        $done = 0;
+        foreach (ServiceJob::query()->where('status', 'selecting')->whereNotNull('request_session_id')->whereNull('request_paid_at')
+            ->where('updated_at', '>', now()->subDays(2))->limit(50)->get() as $job) {
+            $done += $this->syncRequestPayment($job) ? 1 : 0;
+        }
+
+        return $done;
     }
 
     /** AI: nette Poolse omschrijving voor het bedrijf, een prijsklasse en eventuele vragen. Mag mislukken. */
@@ -213,7 +313,12 @@ class JobService
         }
         $already = $job->offers()->pluck('provider_id')->all();
 
-        if ($providerIds !== null) {
+        if ($providerIds !== null && $actor === 'customer') {
+            // 1.86: door de klant zelf gekozen; ook bedrijven die hun profiel nog niet claimden.
+            $candidates = Provider::query()->whereIn('id', $providerIds)->whereNotIn('id', $already)->get()
+                ->filter(fn (Provider $p) => ConsentPolicy::mayEmailRequest($p) && in_array($p->status, ['unclaimed', 'claimed', 'pending', 'verified'], true))
+                ->take((int) config('fachora.max_offers', 5))->values();
+        } elseif ($providerIds !== null) {
             $candidates = Provider::query()->whereIn('id', $providerIds)->whereNotIn('id', $already)->get()
                 ->filter(fn (Provider $p) => ConsentPolicy::mayEmail($p) && in_array($p->status, ['claimed', 'pending', 'verified'], true))->values();
         } else {
@@ -248,7 +353,10 @@ class JobService
                 'status' => 'sent',
                 'wave' => $wave,
             ]);
-            if ($this->notifier->provider($provider, 'job', [], $job, $offer)) {
+            $notified = $actor === 'customer'
+                ? $this->notifier->providerRequest($provider, $job, $offer)
+                : $this->notifier->provider($provider, 'job', [], $job, $offer);
+            if ($notified) {
                 $offer->forceFill(['sent_at' => now()])->save();
                 $sent++;
             }
@@ -279,6 +387,21 @@ class JobService
         if (! $job->canChoose() || ! in_array($offer->status, ['sent', 'responded'], true)) {
             throw new \DomainException(__('Deze aanbieding is niet meer open.'));
         }
+        $provider = $offer->provider;
+        if ($provider->claimed_at === null && $provider->terms_accepted_at === null) {
+            if (! filter_var($data['accept_terms'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
+                throw new \DomainException(__('Ga eerst akkoord met de voorwaarden van Fachora.'));
+            }
+            // Akkoord op de tokenpagina: vanaf nu mag Fachora dit bedrijf over deze opdracht mailen.
+            $provider->forceFill(array_filter([
+                'terms_accepted_at' => now(),
+                'terms_version' => (string) config('fachora.terms_version'),
+                'consent_at' => $provider->consent_at ?? now(),
+                'consent_source' => $provider->consent_source ?? 'offer_terms',
+            ], fn ($v) => $v !== null))->save();
+            $this->log($job, 'terms_accepted', 'provider', __(':provider ging akkoord met de voorwaarden', ['provider' => $provider->display_name]));
+        }
+
         $first = $offer->responded_at === null;
         $offer->forceFill([
             'status' => 'responded',
@@ -739,6 +862,19 @@ class JobService
         foreach ($old as $job) {
             FachoraFile::query()->where('owner_type', 'job')->where('owner_id', $job->id)->delete();
             $job->delete();
+        }
+
+        return $old->count();
+    }
+
+    /** Aanvragen waarbij de klant na een week nog geen bedrijven koos (of niet betaalde): verlopen. */
+    public function expireSelecting(): int
+    {
+        $old = ServiceJob::query()->where('status', 'selecting')->whereNull('request_paid_at')
+            ->where('updated_at', '<', now()->subDays((int) config('fachora.confirm_days', 7)))->get();
+        foreach ($old as $job) {
+            $job->forceFill(['status' => 'expired'])->save();
+            $this->log($job, 'expired', 'system', __('Geen bedrijven gekozen; aanvraag verlopen'));
         }
 
         return $old->count();

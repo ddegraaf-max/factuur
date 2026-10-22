@@ -75,6 +75,8 @@ class ProviderService
                 'postal_code' => $record['postal_code'] ?? null,
                 'city' => $city,
                 'voivodeship' => $record['voivodeship'] ?? null,
+                'lat' => isset($record['lat']) ? (float) $record['lat'] : null,
+                'lng' => isset($record['lng']) ? (float) $record['lng'] : null,
                 'phone' => $record['phone'] ?? null,
                 'email' => $record['email'] ?? null,
                 'website' => $record['website'] ?? null,
@@ -459,6 +461,53 @@ class ProviderService
         return $candidates->sortBy([
             fn (Provider $a, Provider $b) => ($b->rating_avg ?? 0) <=> ($a->rating_avg ?? 0),
             fn (Provider $a, Provider $b) => ($a->response_minutes ?? PHP_INT_MAX) <=> ($b->response_minutes ?? PHP_INT_MAX),
+            fn (Provider $a, Provider $b) => ($a->distance_km ?? 999) <=> ($b->distance_km ?? 999),
+        ])->take($limit)->values();
+    }
+
+    /**
+     * De bedrijven waaruit de klant zelf kiest (1.86): in de categorie, binnen
+     * region_radius_km (of de eigen werkstraal als die groter is), met een
+     * e-mailadres waarheen een klantaanvraag mag (ConsentPolicy::mayEmailRequest).
+     * Verified eerst, dan geclaimd, dan uit het register; daarbinnen op
+     * beoordeling en afstand. Bedrijven waarvan het register zegt dat ze niet
+     * btw-geregistreerd zijn (vat_status 'none'), vallen af.
+     *
+     * @return Collection<int, Provider>
+     */
+    public function choiceCandidates(ServiceJob $job, ?int $limit = null): Collection
+    {
+        $limit ??= (int) config('fachora.choice_candidates', 15);
+        $radius = (int) config('fachora.region_radius_km', 50);
+        $query = Provider::query()->inCategory($job->category)
+            ->whereIn('status', ['unclaimed', 'claimed', 'pending', 'verified'])
+            ->whereNotNull('email')->whereNull('email_blocked_at')
+            ->where(fn ($q) => $q->whereNull('vat_status')->orWhere('vat_status', '!=', 'none'))
+            ->orderBy('id');
+
+        if ($job->lat !== null && $job->lng !== null) {
+            $query->whereNotNull('lat')->whereBetween('lat', [$job->lat - 1.8, $job->lat + 1.8])->whereBetween('lng', [$job->lng - 2.8, $job->lng + 2.8]);
+        } else {
+            $query->whereRaw('LOWER(city) = ?', [mb_strtolower((string) $job->city)]);
+        }
+
+        $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 2];
+
+        return $query->get()->filter(function (Provider $p) use ($job, $radius) {
+            if ($p->isDemo() || ! ConsentPolicy::mayEmailRequest($p)) {
+                return false;
+            }
+            if ($job->lat !== null && $p->lat !== null) {
+                $p->setAttribute('distance_km', round(Fachora::distanceKm($job->lat, $job->lng, $p->lat, $p->lng), 1));
+
+                return $p->distance_km <= max($radius, (int) $p->radius_km);
+            }
+            $p->setAttribute('distance_km', null);
+
+            return true;
+        })->sortBy([
+            fn (Provider $a, Provider $b) => ($rank[$a->status] ?? 9) <=> ($rank[$b->status] ?? 9),
+            fn (Provider $a, Provider $b) => ($b->rating_avg ?? 0) <=> ($a->rating_avg ?? 0),
             fn (Provider $a, Provider $b) => ($a->distance_km ?? 999) <=> ($b->distance_km ?? 999),
         ])->take($limit)->values();
     }

@@ -149,6 +149,63 @@ class ProtectService
         return (string) $session['url'];
     }
 
+    /** Kan er überhaupt via Stripe worden betaald (los van Protect)? */
+    public function stripeConfigured(): bool
+    {
+        return filled(config('services.stripe.secret'));
+    }
+
+    /**
+     * Checkout voor de aanvraagbijdrage van de klant (1.86): een klein vast
+     * bedrag in złoty, los van Protect en zonder Connect. BLIK, Przelewy24 en
+     * kaart volgen uit de instellingen van het Stripe-account.
+     */
+    public function requestCheckoutUrl(ServiceJob $job, float $amount, string $successUrl, string $cancelUrl): string
+    {
+        $cents = (int) round($amount * 100);
+        if ($cents < 200) {
+            throw new RuntimeException('Het bedrag is te laag om online te betalen.');
+        }
+
+        $session = $this->post('/checkout/sessions', [
+            'mode' => 'payment',
+            'line_items[0][price_data][currency]' => 'pln',
+            'line_items[0][price_data][unit_amount]' => $cents,
+            'line_items[0][price_data][product_data][name]' => 'Fachora · ' . $job->reference,
+            'line_items[0][price_data][product_data][description]' => 'Zapytanie do wybranych firm',
+            'line_items[0][quantity]' => 1,
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'customer_email' => $job->customer_email,
+            'client_reference_id' => $job->reference,
+            'metadata[kind]' => 'fachora_request',
+            'metadata[job_id]' => (string) $job->id,
+            'payment_intent_data[description]' => 'Fachora zapytanie ' . $job->reference,
+            'locale' => $job->customer_locale === 'en' ? 'en' : 'pl',
+        ]);
+
+        $job->forceFill(['request_session_id' => $session['id']])->save();
+
+        return (string) $session['url'];
+    }
+
+    /** Is de aanvraagbijdrage van deze opdracht betaald (Checkout-sessie nakijken)? */
+    public function requestPaid(ServiceJob $job): bool
+    {
+        if ($job->request_paid_at !== null) {
+            return true;
+        }
+        if (blank($job->request_session_id)) {
+            return false;
+        }
+        $session = $this->retrieveSession($job->request_session_id);
+
+        return $session !== null
+            && ($session['metadata']['kind'] ?? null) === 'fachora_request'
+            && (string) ($session['metadata']['job_id'] ?? '') === (string) $job->id
+            && ($session['payment_status'] ?? null) === 'paid';
+    }
+
     /** @return array<string, mixed>|null */
     public function retrieveSession(string $sessionId): ?array
     {

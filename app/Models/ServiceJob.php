@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class ServiceJob extends Model
 {
     public const STATUSES = [
-        'pending' => 'Wacht op bevestiging', 'open' => 'Aangeboden', 'quoted' => 'Prijs ontvangen', 'no_match' => 'Geen bedrijf gevonden',
+        'pending' => 'Wacht op bevestiging', 'selecting' => 'Klant kiest bedrijven', 'open' => 'Aangeboden', 'quoted' => 'Prijs ontvangen', 'no_match' => 'Geen bedrijf gevonden',
         'agreed' => 'Bedrijf gekozen', 'scheduled' => 'Ingepland', 'in_progress' => 'In uitvoering', 'done' => 'Klaar',
         'accepted' => 'Afgerond', 'disputed' => 'Geschil', 'cancelled' => 'Geannuleerd', 'expired' => 'Verlopen zonder reactie',
     ];
@@ -38,6 +38,7 @@ class ServiceJob extends Model
         'paid_at', 'payout_at', 'refunded_at', 'fee_percent', 'fee_amount', 'payout_amount',
         'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
         'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
+        'selected_providers', 'request_fee', 'request_session_id', 'request_paid_at',
     ];
 
     protected $casts = [
@@ -69,9 +70,12 @@ class ServiceJob extends Model
         'cancelled_at' => 'datetime',
         'reviewed_at' => 'datetime',
         'owner_notified_at' => 'datetime',
+        'selected_providers' => 'array',
+        'request_fee' => 'float',
+        'request_paid_at' => 'datetime',
     ];
 
-    protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id'];
+    protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id'];
 
     public function provider(): BelongsTo
     {
@@ -126,6 +130,12 @@ class ServiceJob extends Model
     public function hasProvider(): bool
     {
         return in_array($this->status, self::WITH_PROVIDER, true) && $this->provider_id !== null;
+    }
+
+    /** Wacht de opdracht op de keuze van bedrijven (en de betaling van de aanvraag) door de klant? */
+    public function isSelecting(): bool
+    {
+        return $this->status === 'selecting';
     }
 
     /** Kan de klant nog een bedrijf kiezen? */

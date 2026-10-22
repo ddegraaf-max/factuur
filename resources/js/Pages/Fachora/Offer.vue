@@ -24,6 +24,8 @@ const props = defineProps({
   protect: { type: Boolean, default: false },
   fee_percent: { type: Number, default: 10 },
   panel_url: { type: String, default: null },
+  // 1.86: een bedrijf dat zijn profiel nog niet claimde, gaat eerst akkoord met de voorwaarden.
+  needs_terms: { type: Boolean, default: false },
 });
 
 // De app-layout alleen laden als hij nodig is: de tokenpagina blijft licht.
@@ -55,6 +57,7 @@ const form = useForm({
   available_at: toLocalInput(props.offer?.available_at),
   available_note: props.offer?.available_note || '',
   remarks: props.offer?.remarks || '',
+  accept_terms: false,
 });
 const declineForm = useForm({ reason: '' });
 const showDecline = ref(false);
@@ -233,6 +236,12 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
               <div v-if="protect">{{ $t('De klant reserveert het bedrag via Fachora Protect; de uitbetaling volgt na zijn akkoord op het werk.') }}</div>
             </div>
 
+            <label v-if="needs_terms" class="fa-check of-accept">
+              <input type="checkbox" v-model="form.accept_terms">
+              <span>{{ $t('Ik ga akkoord met de voorwaarden van Fachora, inclusief de provisie van :fee% over een opdracht die de klant mij gunt.', { fee: fee_percent }) }} <a :href="route('pl.regulamin')" target="_blank" rel="noopener">{{ $t('Voorwaarden') }}</a></span>
+            </label>
+            <div v-if="form.errors.accept_terms" class="fa-err">{{ form.errors.accept_terms }}</div>
+
             <div class="fa-actions">
               <button type="submit" class="fa-btn" :disabled="form.processing">{{ answered ? $t('Prijs bijwerken') : $t('Prijs doorgeven') }}</button>
               <button v-if="offer.status !== 'declined'" type="button" class="fa-link fa-link--muted" @click="showDecline = !showDecline">{{ $t('Ik kan deze opdracht niet doen') }}</button>
@@ -284,4 +293,6 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
 .of-types { grid-template-columns: 1fr; }
 .of-terms { margin: 4px 0 8px; display: grid; gap: 6px; font-size: 14px; }
 .of-provider { text-align: center; margin: 4px 0 16px; }
+.of-accept { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0 10px; font-size: 14px; line-height: 1.45; }
+.of-accept input { margin-top: 3px; }
 </style>

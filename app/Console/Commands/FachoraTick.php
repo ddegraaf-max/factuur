@@ -30,6 +30,8 @@ class FachoraTick extends Command
         $this->line('Verlopen rondes: ' . $jobs->expireOffers());
         $this->line('Automatisch goedgekeurd: ' . $jobs->autoAccept());
         $this->line('Opgeruimd (onbevestigd): ' . $jobs->purgeUnconfirmed());
+        $this->line('Aanvragen na betaling verstuurd: ' . $jobs->syncPendingRequests());
+        $this->line('Verlopen (geen keuze): ' . $jobs->expireSelecting());
         $this->line('Gegeocodeerd: ' . $providers->geocodePending(30));
 
         return self::SUCCESS;

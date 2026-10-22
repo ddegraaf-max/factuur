@@ -44,6 +44,28 @@ class Notifier
     }
 
     /**
+     * Een aanvraag die de klant zelf naar dit bedrijf stuurde (1.86). Ook
+     * zonder claim of opt-in (ConsentPolicy::mayEmailRequest): het bericht gaat
+     * over de klus van die klant, met afmeldlink en de art. 14-informatie.
+     */
+    public function providerRequest(Provider $provider, ServiceJob $job, ServiceJobOffer $offer): bool
+    {
+        if ($provider->isDemo() || $job->isDemo()) {
+            return false;
+        }
+        if (ConsentPolicy::mayEmail($provider)) {
+            return $this->provider($provider, 'job', [], $job, $offer);
+        }
+        if (! ConsentPolicy::mayEmailRequest($provider)) {
+            Log::info('Fachora: klantaanvraag niet gemaild (afgemeld of geblokkeerd)', ['provider' => $provider->id, 'job' => $job->id]);
+
+            return false;
+        }
+
+        return $this->send($provider->email, 'pl', new FachoraMail('job', 'provider', $job, $offer, $provider, ['request' => true]));
+    }
+
+    /**
      * Aan wie een profiel claimt of een bedrijf aanmeldt: het adres dat die
      * persoon zelf zojuist invulde. Dat is een antwoord op zijn eigen verzoek,
      * geen marketing.

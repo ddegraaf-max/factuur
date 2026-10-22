@@ -148,3 +148,35 @@ CEIDG (1.85.1, sleutel sinds 16 okt 2026)
   werken), miasto=Warszawa, status=AKTYWNY. Telling okt 2026: 43.22.Z mazowieckie 26 442, Warszawa 7 709.
 - Eigenaar → Fachora: bedrijven → "Importeren uit CEIDG": PKD-keuzelijst, województwo, stad, 1–8 pagina's per klik
   (route fachora.admin.ceidg → AdminController::importCeidg → CeidgClient::import). Categorie uit de gezochte PKD-code.
+
+
+KLANT KIEST ZELF, BIJDRAGE PER AANVRAAG, REGIO-IMPORT (1.86.0, 22 okt 2026)
+---------------------------------------------------------------------------
+Besluit van Daniël (22 okt 2026): de klant kiest zelf tot vijf bedrijven en betaalt
+FACHORA_REQUEST_FEE (standaard 10 zł) per aanvraag; de aanvraag gaat per e-mail ook naar
+bedrijven die hun profiel nog niet claimden. Bedrijven betalen provisie (fee_percent) over een
+opdracht die ze krijgen, na akkoord met de voorwaarden.
+- Stroom: pending → (bevestigen) → selecting → klant kiest 1–5 bedrijven (JobController::select)
+  → Stripe Checkout voor de bijdrage (BLIK/P24/kaart, kind 'fachora_request') → terug op
+  /zlecenie/{token}/oplacono of via de planner (syncPendingRequests) → open → aanbieden aan precies
+  die bedrijven. Zonder Stripe-sleutel of met FACHORA_REQUEST_FEE=0 is de aanvraag gratis.
+  Geen keuze binnen confirm_days: expired (expireSelecting). FACHORA_CUSTOMER_CHOICE=false zet
+  de oude route terug (Fachora biedt zelf aan bij Verified bedrijven).
+- Keuzelijst: ProviderService::choiceCandidates — categorie, binnen region_radius_km (50) of de
+  eigen werkstraal, met e-mail, niet afgemeld/geblokkeerd, niet vat_status 'none'; Verified eerst.
+- E-mail aan een niet-geclaimd bedrijf: ConsentPolicy::mayEmailRequest + Notifier::providerRequest.
+  Grondslag: een concreet verzoek van een klant om hun dienst, geen direct marketing. Elk bericht
+  heeft de afmeldlink en de art. 14 AVG-informatie (bron CEIDG, beheerder, privacyverklaring).
+  Herinneringen en andere mail aan zo'n bedrijf blijven geblokkeerd tot het reageert.
+  LAAT DIT VOOR LIVEGANG DOOR EEN POOLSE JURIST NAKIJKEN (PKE + AVG, regulamin, polityka).
+- Reageren door een niet-geclaimd bedrijf (/oferta/{token}): eerst akkoord met de voorwaarden
+  (accept_terms); dan terms_accepted_at, terms_version en consent_at (bron offer_terms).
+- Regio-import: php artisan fachora:import-regions (planner: elke tien minuten een portie,
+  FACHORA_REGION_IMPORT, FACHORA_IMPORT_PER_RUN). Startregio's in config/fachora.php: Szczecin,
+  Warszawa, Kraków, Wrocław, Trójmiasto, elk 50 km. Per bedrijf: status AKTYWNY, minstens
+  import_min_years (1) oud, binnen de straal, e-mailadres in het CEIDG-detailrecord. Voortgang in
+  de cache (CeidgClient::CURSOR); --status toont hem, --reset begint opnieuw.
+- Btw: de biała lista heeft een daglimiet, dus de import controleert btw niet. Bedrijven met
+  vat_status 'none' (na een controle) vallen uit de keuzelijst; ongecontroleerd telt mee.
+- Tests: tests/Feature/FachoraCustomerChoiceTest.php; de oudere Fachora-tests draaien met
+  fachora.customer_choice=false.

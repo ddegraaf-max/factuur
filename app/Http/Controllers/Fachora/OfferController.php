@@ -44,6 +44,7 @@ class OfferController extends Controller
             'protect' => $this->protect->enabled() && $offer->provider->protectReady(),
             'fee_percent' => $offer->provider->feePercent(),
             'panel_url' => $offer->provider->user_id ? route('fachora.dashboard') : null,
+            'needs_terms' => $offer->provider->claimed_at === null && $offer->provider->terms_accepted_at === null,
         ]);
     }
 
@@ -99,6 +100,7 @@ class OfferController extends Controller
             'available_at' => ['nullable', 'date', 'after:now'],
             'available_note' => ['nullable', 'string', 'max:120'],
             'remarks' => ['nullable', 'string', 'max:2000'],
+            'accept_terms' => ['nullable', 'boolean'],
         ], [
             'price.required' => __('Vul een prijs in (bruto, in złoty).'),
             'available_at.after' => __('Kies een moment in de toekomst.'),

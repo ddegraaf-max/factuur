@@ -1,5 +1,5 @@
 <script setup>
-import { router, useForm } from '@inertiajs/vue3';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import FachoraShell from '@/Components/FachoraShell.vue';
 import FachoraBadge from '@/Components/FachoraBadge.vue';
@@ -21,6 +21,8 @@ const props = defineProps({
   files: { type: Array, default: () => [] },
   protect_enabled: { type: Boolean, default: false },
   auto_accept_days: { type: Number, default: 5 },
+  // 1.86: de klant kiest zelf tot vijf bedrijven ({ candidates, max, fee, selected }) zolang de status 'selecting' is.
+  choice: { type: Object, default: null },
 });
 
 const job = computed(() => props.job);
@@ -64,6 +66,23 @@ const choosing = ref(null);
 const chooseForm = useForm({ address_line: props.job.address_line || '', customer_phone: props.job.customer_phone || '', note: '' });
 const openChoose = (offer) => { chooseForm.clearErrors(); choosing.value = choosing.value === offer.id ? null : offer.id; };
 const choose = () => chooseForm.post(route('fachora.job.choose', [props.token, choosing.value]), { preserveScroll: true });
+
+/* ---------- zelf bedrijven kiezen (1.86) ---------- */
+const picked = ref([...(props.choice?.selected || [])]);
+const pickMax = computed(() => props.choice?.max || 5);
+const togglePick = (id) => {
+  const i = picked.value.indexOf(id);
+  if (i >= 0) picked.value.splice(i, 1);
+  else if (picked.value.length < pickMax.value) picked.value.push(id);
+};
+const selectExpress = ref(false);
+const selecting = ref(false);
+const page = usePage();
+const selectError = computed(() => (page.props.errors || {}).providers || (page.props.errors || {}).express || null);
+const sendSelection = () => {
+  selecting.value = true;
+  router.post(route('fachora.job.select', props.token), { providers: picked.value, express: selectExpress.value ? 1 : 0 }, { preserveScroll: true, onFinish: () => { selecting.value = false; } });
+};
 
 /* ---------- Fachora Protect ---------- */
 const paying = ref(false);
@@ -122,7 +141,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       </ol>
 
       <!-- Wat er nu speelt -->
-      <div v-if="status === 'open'" class="fa-note jb-banner">
+      <div v-if="status === 'selecting'" class="fa-note jb-banner">
+        {{ $t('Kies hieronder tot :n bedrijven uit jouw buurt. Alleen zij krijgen je aanvraag; je gegevens zien ze pas als jij een bedrijf kiest.', { n: pickMax }) }}
+      </div>
+      <div v-else-if="status === 'open'" class="fa-note jb-banner">
         {{ $t('Je aanvraag is aangeboden bij bedrijven in de buurt. De meeste reageren binnen een dag.') }}
         <template v-if="job.offers_deadline"> {{ $t('Reageren kan tot :date.', { date: job.offers_deadline }) }}</template>
         {{ $t('Je krijgt een e-mail bij elke prijs die binnenkomt.') }}
@@ -151,6 +173,50 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       </div>
       <div v-else-if="status === 'expired'" class="jb-banner fa-note">{{ $t('Deze aanvraag is verlopen zonder reactie van bedrijven.') }} <a :href="route('fachora.intake')">{{ $t('Nieuwe aanvraag beginnen') }}</a></div>
     </div>
+
+    <!-- ===== Zelf bedrijven kiezen (1.86) ===== -->
+    <section v-if="status === 'selecting' && choice" class="jb-section">
+      <h2 class="fa-h2">{{ $t('Kies de bedrijven') }} <span class="fa-muted jb-count">{{ picked.length }}/{{ pickMax }}</span></h2>
+      <article v-for="p in choice.candidates" :key="p.id" class="fa-card jb-offer jb-pick" :class="{ 'is-open': picked.includes(p.id) }" @click="togglePick(p.id)">
+        <div class="jb-prov">
+          <label class="jb-pick-box" @click.stop>
+            <input type="checkbox" :checked="picked.includes(p.id)" :disabled="!picked.includes(p.id) && picked.length >= pickMax" @change="togglePick(p.id)">
+          </label>
+          <div class="jb-prov-main">
+            <div class="jb-prov-name">
+              <strong>{{ p.name }}</strong>
+              <FachoraBadge v-if="p.verified" :verified="true" small />
+            </div>
+            <div class="fa-small fa-muted">
+              {{ p.city }}<template v-if="p.distance_km != null"> · {{ $t(':km km', { km: p.distance_km }) }}</template>
+              <template v-if="p.rating_count"> · ★ {{ rating(p.rating) }} ({{ p.rating_count }})</template>
+              <template v-if="!p.verified"> · {{ $t('uit het bedrijvenregister') }}</template>
+            </div>
+            <div class="fa-chips jb-prov-chips">
+              <span v-for="l in p.languages || []" :key="l.code" class="fa-chip fa-chip--muted">{{ l.flag }} {{ l.name }}</span>
+            </div>
+          </div>
+          <a v-if="p.url" :href="p.url" target="_blank" rel="noopener" class="fa-link fa-small jb-prov-link" @click.stop>{{ $t('Bekijk profiel') }}</a>
+        </div>
+      </article>
+
+      <div class="fa-card">
+        <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }}</p>
+        <template v-if="choice.fee > 0">
+          <p class="fa-small"><strong>{{ $t('Kosten: :amount per aanvraag', { amount: money(choice.fee) }) }}</strong> · {{ $t('betalen met BLIK, Przelewy24 of kaart') }}</p>
+          <label class="fa-check">
+            <input type="checkbox" v-model="selectExpress">
+            <span>{{ $t('Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.') }}</span>
+          </label>
+        </template>
+        <div v-if="selectError" class="fa-err">{{ selectError }}</div>
+        <div class="fa-actions">
+          <button type="button" class="fa-btn" :disabled="selecting || !picked.length || (choice.fee > 0 && !selectExpress)" @click="sendSelection">
+            {{ choice.fee > 0 ? $t('Betalen en versturen (:amount)', { amount: money(choice.fee) }) : $t('Aanvraag versturen') }}
+          </button>
+        </div>
+      </div>
+    </section>
 
     <!-- ===== Aanbiedingen ===== -->
     <section v-if="canChoose" class="jb-section">
@@ -452,6 +518,9 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-section .fa-h2 { margin-bottom: 12px; }
 .jb-count { font-size: 14px; font-weight: 500; }
 .jb-offer.is-off { opacity: 0.6; }
+.jb-pick { cursor: pointer; }
+.jb-pick-box { display: flex; align-items: flex-start; padding-top: 2px; }
+.jb-pick-box input { width: 20px; height: 20px; accent-color: #0B2545; }
 .jb-offer.is-open { border-color: #0B2545; box-shadow: 0 0 0 1px #0B2545; }
 .jb-prov { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .jb-prov-main { min-width: 0; flex: 1; }

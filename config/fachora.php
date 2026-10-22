@@ -38,6 +38,37 @@ return [
     'min_rating' => 4.2,        // Fachora Standard 10: onder dit cijfer (bij ≥ 5 beoordelingen) volgt een signaal
     'terms_version' => '2026-10',
 
+    /*
+     * Aanvraagmodel (1.86). De klant kiest zelf tot max_offers bedrijven uit
+     * de buurt en betaalt request_fee złoty per aanvraag (0 = gratis). De
+     * aanvraag gaat dan per e-mail naar die bedrijven, ook als ze hun profiel
+     * nog niet claimden: het is een concreet verzoek van een klant om hun
+     * dienst, geen reclame (ConsentPolicy::mayEmailRequest), met afmeldlink en
+     * de informatie uit art. 14 AVG. Een bedrijf ziet de klantgegevens pas na
+     * akkoord met de voorwaarden (incl. de fee) en de keuze van de klant.
+     */
+    'customer_choice' => (bool) env('FACHORA_CUSTOMER_CHOICE', true),
+    'request_fee' => (float) env('FACHORA_REQUEST_FEE', 10),
+    'choice_candidates' => 15,  // zoveel bedrijven ziet de klant om uit te kiezen
+
+    /*
+     * Startregio's: middelpunt + straal. De import uit CEIDG haalt alleen
+     * bedrijven binnen deze cirkels op; de klant kan overal een aanvraag doen.
+     */
+    'region_radius_km' => 50,
+    'regions' => [
+        'szczecin' => ['name' => 'Szczecin', 'voivodeship' => 'zachodniopomorskie', 'center' => [53.4285, 14.5528]],
+        'warszawa' => ['name' => 'Warszawa', 'voivodeship' => 'mazowieckie', 'center' => [52.2297, 21.0122]],
+        'krakow' => ['name' => 'Kraków', 'voivodeship' => 'małopolskie', 'center' => [50.0647, 19.9450]],
+        'wroclaw' => ['name' => 'Wrocław', 'voivodeship' => 'dolnośląskie', 'center' => [51.1079, 17.0385]],
+        'trojmiasto' => ['name' => 'Trójmiasto', 'voivodeship' => 'pomorskie', 'center' => [54.4416, 18.5601]],
+    ],
+
+    // Wat de import binnenhaalt: alleen actieve bedrijven met een e-mailadres die minstens zo lang bestaan.
+    'import_min_years' => 1,
+    'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),
+    'region_import' => (bool) env('FACHORA_REGION_IMPORT', true),   // planner: elke tien minuten een portie
+
     // Hoeveel brieven per pdf (post naar unclaimed bedrijven: geen elektronische communicatie, dus toegestaan).
     'letters_per_batch' => 100,
 

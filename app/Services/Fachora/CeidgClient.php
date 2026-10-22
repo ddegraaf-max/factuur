@@ -2,6 +2,11 @@
 
 namespace App\Services\Fachora;
 
+use App\Models\Provider;
+use App\Services\NipService;
+use App\Support\Fachora;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +23,12 @@ use Illuminate\Support\Facades\Log;
  */
 class CeidgClient
 {
-    public function __construct(private ProviderService $providers) {}
+    public const CURSOR = 'fachora:region-import';
+
+    public function __construct(private ProviderService $providers, private ?GeocodeService $geo = null)
+    {
+        $this->geo ??= app(GeocodeService::class);
+    }
 
     public function configured(): bool
     {
@@ -125,6 +135,149 @@ class CeidgClient
         }
 
         return compact('created', 'skipped', 'pages');
+    }
+
+    /** Het detailrecord van één bedrijf (met PKD-codes, telefoon en e-mail), of null. @return array<string, mixed>|null */
+    public function detail(string $id): ?array
+    {
+        $response = Http::withToken((string) config('fachora.ceidg_token'))
+            ->acceptJson()->timeout(30)
+            ->get(config('fachora.ceidg_url') . '/firma/' . rawurlencode($id));
+        if (! $response->successful()) {
+            return null;
+        }
+        $json = (array) $response->json();
+        $firm = $json['firma'] ?? $json;
+        if (is_array($firm) && array_is_list($firm)) {
+            $firm = $firm[0] ?? null;
+        }
+
+        return is_array($firm) ? $firm : null;
+    }
+
+    /** Alle PKD-codes van de categorieën, zonder dubbele. @return list<string> */
+    public static function allPkdCodes(): array
+    {
+        return collect((array) config('fachora.categories', []))->flatMap(fn ($c) => (array) ($c['pkd'] ?? []))->unique()->values()->all();
+    }
+
+    /**
+     * Eén portie van de regio-import (1.86, planner): de startregio's uit
+     * config/fachora.php, alle PKD-codes, pagina na pagina. Alleen actieve
+     * bedrijven die minstens import_min_years bestaan, binnen region_radius_km
+     * van het middelpunt en met een e-mailadres in CEIDG. De voortgang staat in
+     * de cache (CURSOR); wie al in de database staat (NIP), wordt overgeslagen
+     * zonder het detailrecord op te halen.
+     *
+     * @return array{created: int, skipped: int, checked: int, done: bool, at: string}
+     */
+    public function importRegionsStep(?int $firmBudget = null, int $pageBudget = 12): array
+    {
+        $regions = array_values((array) config('fachora.regions', []));
+        $codes = self::allPkdCodes();
+        $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+        $firmBudget ??= (int) config('fachora.import_firms_per_run', 150);
+        $radius = (float) config('fachora.region_radius_km', 50);
+        $minStart = now()->subYears((int) config('fachora.import_min_years', 1));
+        $created = $skipped = $checked = 0;
+
+        while (! ($cursor['done'] ?? false) && $firmBudget > 0 && $pageBudget > 0) {
+            $region = $regions[$cursor['r']] ?? null;
+            $pkd = $codes[$cursor['c']] ?? null;
+            if ($region === null) {
+                $cursor['done'] = true;
+                break;
+            }
+            if ($pkd === null) {
+                $cursor = ['r' => $cursor['r'] + 1, 'c' => 0, 'p' => 0, 'done' => false];
+                continue;
+            }
+
+            try {
+                $result = $this->search(['pkd' => str_replace('.', '', $pkd), 'wojewodztwo' => $region['voivodeship'] ?? null, 'status' => 'AKTYWNY'], (int) $cursor['p']);
+            } catch (\Throwable $e) {
+                Log::warning('CEIDG regio-import gepauzeerd', ['region' => $region['name'] ?? '?', 'pkd' => $pkd, 'page' => $cursor['p'], 'error' => $e->getMessage()]);
+                break; // volgende run opnieuw
+            }
+            $pageBudget--;
+
+            if ($result['firms'] === []) {
+                $cursor = ['r' => $cursor['r'], 'c' => $cursor['c'] + 1, 'p' => 0, 'done' => false];
+                continue;
+            }
+
+            foreach ($result['firms'] as $firm) {
+                $outcome = $this->importFirm((array) $firm, $pkd, $region, $radius, $minStart);
+                if ($outcome === 'created') {
+                    $created++;
+                } else {
+                    $skipped++;
+                }
+                if ($outcome !== 'known') {
+                    $checked++;
+                    $firmBudget--;
+                }
+            }
+            $cursor['p']++;
+            usleep(300_000);
+        }
+
+        Cache::forever(self::CURSOR, $cursor);
+        $at = isset($regions[$cursor['r']]) ? ($regions[$cursor['r']]['name'] ?? '?') . ' · ' . ($codes[$cursor['c']] ?? '-') . ' · pagina ' . $cursor['p'] : 'klaar';
+
+        return ['created' => $created, 'skipped' => $skipped, 'checked' => $checked, 'done' => (bool) ($cursor['done'] ?? false), 'at' => $at];
+    }
+
+    /**
+     * Eén bedrijf uit de lijst: filteren en zo nodig toevoegen.
+     *
+     * @param  array<string, mixed>  $firm
+     * @param  array<string, mixed>  $region
+     * @return 'created'|'known'|'old'|'far'|'no_email'|'no_detail'
+     */
+    public function importFirm(array $firm, string $pkd, array $region, float $radius, Carbon $minStart): string
+    {
+        $owner = (array) ($firm['wlasciciel'] ?? []);
+        $nip = NipService::normalize($owner['nip'] ?? $firm['nip'] ?? null) ?: null;
+        if ($nip !== null && Provider::query()->where('nip', $nip)->exists()) {
+            return 'known';
+        }
+
+        // Te jong (of geen startdatum): niet in de eerste lichting.
+        $started = $firm['dataRozpoczecia'] ?? null;
+        try {
+            if (! $started || Carbon::parse($started)->gt($minStart)) {
+                return 'old';
+            }
+        } catch (\Throwable) {
+            return 'old';
+        }
+
+        $address = (array) ($firm['adresDzialalnosci'] ?? []);
+        [$clat, $clng] = $region['center'];
+        $coords = $this->geo->fallback($address['miasto'] ?? null);
+        if ($coords !== null && Fachora::distanceKm($clat, $clng, $coords['lat'], $coords['lng']) > $radius) {
+            return 'far';
+        }
+
+        $detail = filled($firm['id'] ?? null) ? $this->detail((string) $firm['id']) : null;
+        usleep(200_000);
+        if ($detail === null) {
+            return 'no_detail';
+        }
+        $record = $this->normalize(array_merge($firm, $detail), [$pkd]);
+        if (blank($record['email'])) {
+            return 'no_email';
+        }
+
+        $coords ??= $this->geo->lookup($record['postal_code'] ?? null, $record['city'] ?? null);
+        if ($coords === null || Fachora::distanceKm($clat, $clng, $coords['lat'], $coords['lng']) > $radius) {
+            return 'far';
+        }
+
+        $counts = $this->providers->importRecords([$record + ['lat' => $coords['lat'], 'lng' => $coords['lng']]], 'ceidg');
+
+        return $counts['created'] > 0 ? 'created' : 'known';
     }
 
     /** PKD-codes (met of zonder punten) naar Fachora-categorieën. @return list<string> */

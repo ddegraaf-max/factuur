@@ -320,5 +320,16 @@
   "Lekkage onder de gootsteen": "Leak under the sink",
   "Voorbeeld van een profiel en een aanbieding": "Example of a profile and an offer",
   "Voor bedrijven": "For companies",
-  "Nog geen profiel?": "No profile yet?"
+  "Nog geen profiel?": "No profile yet?",
+  "Ik ga akkoord met de voorwaarden van Fachora, inclusief de provisie van :fee% over een opdracht die de klant mij gunt.": "I accept the Fachora terms, including the :fee% commission on a job the customer awards me.",
+  "Voorwaarden": "Terms",
+  "Kies hieronder tot :n bedrijven uit jouw buurt. Alleen zij krijgen je aanvraag; je gegevens zien ze pas als jij een bedrijf kiest.": "Choose up to :n companies near you below. Only they receive your request; they only see your details once you choose a company.",
+  "Kies de bedrijven": "Choose the companies",
+  ":km km": ":km km",
+  "uit het bedrijvenregister": "from the business register",
+  "Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.": "Your request goes by email to the companies you choose. They give a price; then you calmly decide who to continue with.",
+  "Kosten: :amount per aanvraag": "Cost: :amount per request",
+  "betalen met BLIK, Przelewy24 of kaart": "pay with BLIK, Przelewy24 or card",
+  "Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.": "I ask for my request to be sent immediately. After that, the right of withdrawal for this fee lapses.",
+  "Betalen en versturen (:amount)": "Pay and send (:amount)"
 }

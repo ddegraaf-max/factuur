@@ -171,14 +171,23 @@ class FachoraMail extends Mailable
             }
         } elseif ($this->audience === 'provider' && $provider) {
             $panel = route('fachora.dashboard');
-            $out['footnote'] = $provider->optout_token
-                ? __('U ontvangt dit bericht omdat u het profiel van :name op Fachora beheert. Geen berichten meer: :url', ['name' => $name, 'url' => $provider->optoutUrl()])
-                : null;
+            $request = (bool) ($this->extra['request'] ?? false);
+            $out['footnote'] = $request && $provider->optout_token
+                // Klantaanvraag aan een bedrijf zonder profiel (1.86): waarom dit bericht, waar de gegevens vandaan komen, afmelden (art. 14 AVG).
+                ? __('U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Uw bedrijfsgegevens komen uit het openbare register CEIDG; beheerder is :owner. Meer over uw gegevens: :privacy. Geen aanvragen meer: :url', [
+                    'owner' => brand('owner_name') ?: 'Budomatch Daniël de Graaf',
+                    'privacy' => url('/polityka-prywatnosci'),
+                    'url' => $provider->optoutUrl(),
+                ])
+                : ($provider->optout_token
+                    ? __('U ontvangt dit bericht omdat u het profiel van :name op Fachora beheert. Geen berichten meer: :url', ['name' => $name, 'url' => $provider->optoutUrl()])
+                    : null);
             switch ($this->kind) {
                 case 'job':
                 case 'reminder':
                     $title = $job?->ai['title_pl'] ?? $job?->title ?? '';
                     $set($this->kind === 'reminder' ? __('Herinnering: zlecenie :ref wacht op uw prijs', ['ref' => $ref]) : __('Nowe zlecenie: :title (:city)', ['title' => $title, 'city' => $job?->city]), $title, array_values(array_filter([
+                        $request ? __('Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. Reageren is vrijblijvend; alleen over een opdracht die u krijgt, betaalt u na akkoord met de voorwaarden een provisie. U krijgt van ons alleen berichten over aanvragen van klanten.', ['city' => $job?->city]) : null,
                         __('Een klant in :city zoekt een :category. De prijs die u opgeeft, is de prijs voor de klant; het adres krijgt u zodra de klant u kiest.', ['city' => $job?->city, 'category' => $job?->categoryName('pl')]),
                         $job?->description_pl ?: $job?->description,
                         $job?->protect || ($this->offer?->provider?->protectReady()) ? __('Betaling via Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na goedkeuring.') : null,

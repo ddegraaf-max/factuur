@@ -138,6 +138,13 @@ Schedule::command('fachora:tick')
     ->hourlyAt(20)
     ->withoutOverlapping(50);
 
+// Fachora 1.86: de startregio's uit CEIDG vullen, elke tien minuten een portie (tot alles binnen is).
+if ((bool) config('fachora.region_import', true)) {
+    Schedule::command('fachora:import-regions')
+        ->everyTenMinutes()
+        ->withoutOverlapping(30);
+}
+
 Schedule::command('fachora:checks')
     ->weeklyOn(1, '06:10')
     ->timezone('Europe/Warsaw');

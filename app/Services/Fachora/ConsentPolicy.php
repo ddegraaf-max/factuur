@@ -28,6 +28,27 @@ class ConsentPolicy
             && ($provider->claimed_at !== null || $provider->consent_at !== null);
     }
 
+    /**
+     * Mag een concrete aanvraag van een klant naar dit bedrijf (1.86)? Ook
+     * zonder claim of opt-in: de klant koos dit bedrijf zelf voor zijn klus,
+     * en het bericht gaat over die klus, niet over Fachora (geen direct
+     * marketing in de zin van de PKE). Per aanvraag maximaal max_offers
+     * bedrijven; elk bericht draagt de afmeldlink en de art. 14-informatie.
+     * Een afmelding of blokkade wint altijd.
+     */
+    public static function mayEmailRequest(?Provider $provider): bool
+    {
+        if (self::mayEmail($provider)) {
+            return true;
+        }
+
+        return $provider !== null
+            && (bool) config('fachora.customer_choice', true)
+            && filled($provider->email)
+            && $provider->email_blocked_at === null
+            && ! in_array($provider->status, ['blocked', 'suspended'], true);
+    }
+
     public static function maySms(?Provider $provider): bool
     {
         return $provider !== null

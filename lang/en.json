@@ -2001,5 +2001,20 @@
   "Het bedrijf houdt de voorrijkosten (:amount) omdat je binnen :hours uur voor de afspraak annuleerde; de rest gaat terug naar je rekening.": "The company keeps the call-out fee (:amount) because the job was cancelled less than :hours hours before the appointment; the rest goes back to your account.",
   "Voorrijkosten ingehouden: :amount (annulering binnen :hours uur)": "Call-out fee retained: :amount (cancellation within :hours hours)",
   "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Tick the box to request performance before the withdrawal period ends.",
-  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "We could not send the e-mail right now. Try again in a minute or contact us."
+  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "We could not send the e-mail right now. Try again in a minute or contact us.",
+  "Klant kiest bedrijven": "Customer is choosing companies",
+  "Klant kiest zelf de bedrijven": "The customer chooses the companies",
+  "Voor deze opdracht kun je geen bedrijven (meer) kiezen.": "You can no longer choose companies for this job.",
+  "Kies maximaal :n bedrijven.": "Choose at most :n companies.",
+  "Klant koos :n bedrijven": "Customer chose :n companies",
+  "Aanvraag betaald: :amount": "Request paid: :amount",
+  "Ga eerst akkoord met de voorwaarden van Fachora.": "Please accept the Fachora terms first.",
+  ":provider ging akkoord met de voorwaarden": ":provider accepted the terms",
+  "Geen bedrijven gekozen; aanvraag verlopen": "No companies chosen; request expired",
+  "U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Uw bedrijfsgegevens komen uit het openbare register CEIDG; beheerder is :owner. Meer over uw gegevens: :privacy. Geen aanvragen meer: :url": "You receive this message because a customer chose your company on Fachora for this job. Your company details come from the public CEIDG register; the controller is :owner. More about your data: :privacy. No more requests: :url",
+  "Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. Reageren is vrijblijvend; alleen over een opdracht die u krijgt, betaalt u na akkoord met de voorwaarden een provisie. U krijgt van ons alleen berichten over aanvragen van klanten.": "A customer in :city chose your company on Fachora and asks for a price. Replying is free of obligation; you only pay a commission on a job you are awarded, after accepting the terms. You will only receive messages from us about customer requests.",
+  "Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.": "Your email address is confirmed. Now choose the companies that will receive your request.",
+  "Vink aan dat je aanvraag meteen mag worden verstuurd.": "Tick the box to have your request sent right away.",
+  "Je aanvraag is verstuurd naar de gekozen bedrijven.": "Your request has been sent to the chosen companies.",
+  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Thank you! Your request has been sent to the chosen companies."
 }

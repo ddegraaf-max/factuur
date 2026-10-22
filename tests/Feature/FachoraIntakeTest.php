@@ -30,6 +30,8 @@ class FachoraIntakeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        // Deze tests gaan over de klassieke route (Fachora biedt zelf aan); de klantkeuze van 1.86 staat in FachoraCustomerChoiceTest.
+        config(['fachora.customer_choice' => false]);
         config(['brand.active' => 'fachora', 'inertia.testing.ensure_pages_exist' => false, 'services.anthropic.key' => null, 'services.stripe.secret' => null]);
         Mail::fake();
         Http::fake([

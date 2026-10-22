@@ -2001,5 +2001,20 @@
   "Het bedrijf houdt de voorrijkosten (:amount) omdat je binnen :hours uur voor de afspraak annuleerde; de rest gaat terug naar je rekening.": "Firma zatrzymuje koszt dojazdu (:amount), ponieważ zlecenie zostało odwołane na mniej niż :hours godzin przed terminem; reszta wraca na Twoje konto.",
   "Voorrijkosten ingehouden: :amount (annulering binnen :hours uur)": "Potrącono koszt dojazdu: :amount (odwołanie na mniej niż :hours godz. przed terminem)",
   "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Zaznacz, że żądasz wykonania usługi przed upływem terminu odstąpienia.",
-  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "Nie udało się teraz wysłać e-maila. Spróbuj ponownie za minutę lub skontaktuj się z nami."
+  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "Nie udało się teraz wysłać e-maila. Spróbuj ponownie za minutę lub skontaktuj się z nami.",
+  "Klant kiest bedrijven": "Klient wybiera firmy",
+  "Klant kiest zelf de bedrijven": "Klient sam wybiera firmy",
+  "Voor deze opdracht kun je geen bedrijven (meer) kiezen.": "Dla tego zlecenia nie można (już) wybierać firm.",
+  "Kies maximaal :n bedrijven.": "Wybierz maksymalnie :n firm.",
+  "Klant koos :n bedrijven": "Klient wybrał firmy: :n",
+  "Aanvraag betaald: :amount": "Zapytanie opłacone: :amount",
+  "Ga eerst akkoord met de voorwaarden van Fachora.": "Najpierw zaakceptuj regulamin Fachora.",
+  ":provider ging akkoord met de voorwaarden": ":provider zaakceptował regulamin",
+  "Geen bedrijven gekozen; aanvraag verlopen": "Nie wybrano firm; zapytanie wygasło",
+  "U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Uw bedrijfsgegevens komen uit het openbare register CEIDG; beheerder is :owner. Meer over uw gegevens: :privacy. Geen aanvragen meer: :url": "Otrzymują Państwo tę wiadomość, ponieważ klient wybrał Państwa firmę na Fachora do tego zlecenia. Dane firmy pochodzą z publicznego rejestru CEIDG; administratorem danych jest :owner. Więcej o Państwa danych: :privacy. Rezygnacja z zapytań: :url",
+  "Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. Reageren is vrijblijvend; alleen over een opdracht die u krijgt, betaalt u na akkoord met de voorwaarden een provisie. U krijgt van ons alleen berichten over aanvragen van klanten.": "Klient z miejscowości :city wybrał Państwa firmę na Fachora i prosi o wycenę. Odpowiedź jest niezobowiązująca; prowizję płacą Państwo tylko od zlecenia, które Państwo otrzymają, po akceptacji regulaminu. Otrzymują Państwo od nas wyłącznie wiadomości o zapytaniach klientów.",
+  "Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.": "Adres e-mail potwierdzony. Wybierz teraz firmy, które otrzymają Twoje zapytanie.",
+  "Vink aan dat je aanvraag meteen mag worden verstuurd.": "Zaznacz, że zapytanie może zostać wysłane od razu.",
+  "Je aanvraag is verstuurd naar de gekozen bedrijven.": "Twoje zapytanie zostało wysłane do wybranych firm.",
+  "Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.": "Dziękujemy! Twoje zapytanie zostało wysłane do wybranych firm."
 }
