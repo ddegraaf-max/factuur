@@ -74,6 +74,7 @@ return [
      */
     'region_radius_km' => 50,
     'regions' => [
+        'plock' => ['name' => 'Płock', 'voivodeship' => 'mazowieckie', 'center' => [52.5463, 19.7065]],
         'szczecin' => ['name' => 'Szczecin', 'voivodeship' => 'zachodniopomorskie', 'center' => [53.4285, 14.5528]],
         'warszawa' => ['name' => 'Warszawa', 'voivodeship' => 'mazowieckie', 'center' => [52.2297, 21.0122]],
         'krakow' => ['name' => 'Kraków', 'voivodeship' => 'małopolskie', 'center' => [50.0647, 19.9450]],
