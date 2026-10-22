@@ -129,11 +129,11 @@
       <div>
         <div class="fh-note">
           <b>Ile to kosztuje?</b><br>
-          Dla klientów Fachora jest bezpłatna. Nie płacisz za zgłoszenie, za oferty, za Fachora Protect ani za rozstrzygnięcie sporu. Płacisz wyłącznie cenę ustaloną z firmą, taką, jaka jest w potwierdzeniu zlecenia. Prowizję od wykonanego zlecenia ponosi firma.
+          Dla klientów Fachora jest bezpłatna. Nie płacisz za zgłoszenie, za oferty, za Fachora Protect ani za rozstrzygnięcie sporu. Płacisz wyłącznie cenę ustaloną z firmą, taką, jaka jest w potwierdzeniu zlecenia. Opłaty Fachory ponosi firma.
         </div>
         <div class="fh-note warm" style="margin-top:14px;">
-          <b>Nie wysyłamy Twojego zlecenia nikomu poza firmami Verified.</b><br>
-          Jeśli w Twojej okolicy nie ma jeszcze zweryfikowanej firmy w danej kategorii, powiemy Ci to od razu, zamiast obiecywać oferty, których nie będzie.
+          <b>Twoje zlecenie trafia tylko do firm, które sam wybierzesz.</b><br>
+          Wybierasz do {{ config('fachora.max_offers') }} firm z okolicy: zweryfikowane (Fachora Verified) są na górze listy, firmy z rejestru są wyraźnie oznaczone. Jeśli w Twojej okolicy nikogo nie ma, powiemy Ci to od razu, zamiast obiecywać oferty, których nie będzie.
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
 {{-- Dla firm: co firma dostaje, ile to kosztuje (0/0/0 + prowizja), trzy drogi dołączenia (kod z listu, wyszukanie profilu, zgłoszenie),
-     uczciwie o tym, że Fachora nie wysyła firmom niezamówionych wiadomości. Liczby z config/fachora.php. --}}
+     uczciwie o tym, jakie wiadomości Fachora wysyła firmom z rejestru (tylko zapytania klientów). Liczby z config/fachora.php. --}}
 
 @php
   $fee = config('fachora.fee_percent');
@@ -22,8 +22,8 @@
 
 @section('title', $lead ? 'Fachora dla firm — klienci sami wybierają Twoją firmę, płacisz tylko za zlecenia, na które odpowiadasz' : 'Fachora dla firm — nowi klienci w Twojej okolicy, płacisz tylko za zrealizowane zlecenia')
 @section('description', $lead
-  ? 'Klient sam wybiera Twoją firmę i wysyła zapytanie. Podgląd zlecenia za darmo, odblokowanie od ' . $leadMin . ' do ' . $leadMax . ' zł zależnie od wielkości pracy, pierwsze zapytanie gratis. 0 zł abonamentu, bez prowizji od zapłaty bezpośredniej, darmowy program do faktur gotowy na KSeF.'
-  : 'Zlecenia z opisem, zdjęciami i terminem na e-mail, Twoja cena, adres po wyborze przez klienta, pewna zapłata przez Fachora Protect, darmowy program do faktur gotowy na KSeF, profil z opiniami. 0 zł abonamentu, 0 zł za zlecenie, prowizja ' . $fee . '% od wykonanej pracy, przez pierwsze ' . $introDays . ' dni ' . $intro . '%.')
+  ? 'Klient sam wybiera Twoją firmę i wysyła zapytanie. Podgląd zlecenia za darmo, odblokowanie od ' . $leadMin . ' do ' . $leadMax . ' zł zależnie od wielkości pracy, pierwsze zapytanie gratis. 0 zł abonamentu, bez prowizji od zapłaty bezpośredniej, profil z opiniami.'
+  : 'Zlecenia z opisem, zdjęciami i terminem na e-mail, Twoja cena, adres po wyborze przez klienta, pewna zapłata przez Fachora Protect, profil z opiniami. 0 zł abonamentu, 0 zł za zlecenie, prowizja ' . $fee . '% od wykonanej pracy, przez pierwsze ' . $introDays . ' dni ' . $intro . '%.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -56,7 +56,7 @@
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span><h3>Twoja cena</h3><p>Cena stała albo stawka godzinowa z dojazdem. Nie licytujesz się w dół: klient widzi obok ceny Twoją ocenę, języki i gwarancję.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 22])</span><h3>Adres po wyborze</h3><p>Dopiero gdy klient Cię wybierze, dostajesz adres i dane kontaktowe. Konkurencja do {{ $maxOffers }} firm, nie dwudziestu.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Pewna zapłata</h3><p>Z Fachora Protect klient rezerwuje kwotę przed Twoim przyjazdem. Po jego akceptacji (albo po {{ $acceptDays }} dniach bez reakcji) Stripe przelewa pieniądze na Twoje konto.</p></div>
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 22])</span><h3>Darmowe faktury, gotowe na KSeF</h3><p>Każda firma Verified dostaje program do faktur i ofert z plikiem XML dla KSeF. Faktura do zlecenia jest przygotowana z kwoty i opisu zlecenia.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 22])</span><h3>Klient sam Cię wybiera</h3><p>Klient widzi Twój profil, opinie, języki i odległość i sam decyduje, do kogo wysłać zapytanie. Nie ścigasz się z dwudziestoma firmami o każdy telefon.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'lang', 'size' => 22])</span><h3>Profil z opiniami i językami</h3><p>Opinie tylko po zleceniach zrealizowanych przez Fachorę, z Twoją odpowiedzią. Mówisz po angielsku, niemiecku lub ukraińsku? Dostajesz zlecenia od klientów z zagranicy, do których inni nie docierają.</p></div>
     </div>
   </div>
@@ -108,7 +108,7 @@
       <div class="fh-way"><span class="k">Nie ma Cię w bazie</span><h3>Zgłoś firmę</h3><p>Podaj NIP, kategorie, zasięg i języki. Sprawdzimy rejestry, poprosimy o onboarding w Stripe i akceptację Standardu, a potem przyznamy znak Verified.</p><a href="{{ route('fachora.apply') }}" class="btn btn-secondary">Zgłoś firmę</a></div>
     </div>
     <div class="fh-note warm" style="max-width:860px;margin:28px auto 0;">
-      <b>Nie wysyłamy firmom niezamówionych e-maili ani SMS-ów.</b> Jeśli Twoja firma jest w naszej bazie z rejestru publicznego, nie usłyszysz od nas niczego drogą elektroniczną, dopóki sama nie przejmiesz profilu. Dlatego przejęty i zweryfikowany profil to jedyna droga, którą zlecenia mogą do Ciebie trafić.
+      <b>Żadnych reklam ani newsletterów.</b> Jeśli Twoja firma jest w naszej bazie z rejestru publicznego, możesz dostać od nas jedynie zapytanie klienta, który sam wybrał Twoją firmę — z linkiem do rezygnacji. Przejęty i zweryfikowany profil daje więcej: znak Verified, wyższą pozycję na liście i zlecenia z całego Twojego zasięgu.
     </div>
   </div>
 </section>

@@ -99,7 +99,7 @@
         <p>Nie pisz przez formularz — zgłoś firmę bezpośrednio. Sprawdzimy ją w rejestrach, a Ty przejdziesz weryfikację w panelu. Bez abonamentu, prowizja tylko od wykonanych zleceń.</p>
         <a href="{{ route('fachora.apply') }}" class="btn btn-primary" style="margin-right:8px;margin-bottom:8px;">Zgłoś firmę →</a>
         <a href="{{ route('fachora.claim') }}" class="btn btn-secondary" style="margin-bottom:8px;">Mam kod z listu</a>
-        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Dostałeś od nas list? To jedyny sposób, w jaki kontaktujemy się z firmami, które się u nas nie zarejestrowały — nie wysyłamy e-maili ani SMS-ów bez zgody.</p>
+        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Dostałeś od nas list lub zapytanie klienta? Firmom z rejestru nie wysyłamy reklam, newsletterów ani SMS-ów. Jedyny e-mail, jaki taka firma może od nas dostać, to konkretne zapytanie klienta, który sam ją wybrał — z informacją, skąd mamy jej dane, i linkiem do rezygnacji.</p>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">

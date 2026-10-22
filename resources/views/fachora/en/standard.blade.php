@@ -83,7 +83,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Do you run a company that works like this?</h2>
-    <p>0 zł subscription, commission only on completed jobs. We never send companies unsolicited messages, so the first step is yours.</p>
+    <p>{{ config('fachora.lead_pricing') ? '0 zł subscription, you pay only for requests you respond to; the first one is free.' : '0 zł subscription, commission only on completed jobs.' }} We never send companies advertising or newsletters, so the first step is yours.</p>
     <div class="fh-cta-row">
       <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary btn-lg">Offer for companies</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-white btn-lg">Claim your company profile</a>

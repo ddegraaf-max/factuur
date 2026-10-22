@@ -10,6 +10,8 @@
     $fee = rtrim(rtrim(number_format((float) config('fachora.fee_percent'), 1, '.', ''), '0'), '.');
     $introFee = rtrim(rtrim(number_format((float) config('fachora.intro_fee_percent'), 1, '.', ''), '0'), '.');
     $minRating = number_format((float) config('fachora.min_rating'), 1, '.', '');
+    $lead = (bool) config('fachora.lead_pricing');
+    $leadPct = rtrim(rtrim(number_format((float) config('fachora.lead_percent'), 1, '.', ''), '0'), '.');
 @endphp
 
 @section('title', 'Fachora platform terms of service')
@@ -207,6 +209,14 @@
     <p>6. Nothing in these Terms excludes or limits consumer rights arising from mandatory provisions of law; in case of conflict the law prevails.</p>
 
     <h2 id="p13">§ 13. Fees and commission</h2>
+    @if ($lead)
+    <p>1. The Platform is free for Customers. A Company pays no subscription and no registration fee. Viewing a Request (description, photos, date, town) is free.</p>
+    <p>2. <strong>Unlock fee.</strong> To submit an Offer, the Company unlocks the Request. The fee is {{ $leadPct }}% of the estimated value of the Job determined by the Platform, no less than {{ (int) config('fachora.lead_min') }} zł and no more than {{ (int) config('fachora.lead_max') }} zł gross (including 23% VAT). The amount is shown before unlocking. Each Company's first unlock is free. An unlocked Request stays unlocked: changing or withdrawing the Offer costs nothing.</p>
+    <p>3. The unlock fee is due whether or not the Customer chooses the Company's Offer. If a Request turns out to be false (e.g. false Customer details, or a request made only to obtain offers on behalf of a competitor), the Company may report it within 7 days of unlocking; after verification the Service Provider refunds the fee.</p>
+    <p>4. <strong>Commission with Fachora Protect.</strong> For a Job paid through Fachora Protect and approved (expressly or silently) the Service Provider deducts from the payout a commission of <strong>{{ $fee }}%</strong> of the gross Job amount, including approved extra work. No commission is charged on Jobs settled directly between the Customer and the Company.</p>
+    <p>5. The commission is a net amount to which the Service Provider adds VAT at the rate applicable in Poland (currently 23%). The Service Provider issues invoices for fees and commission; the Company agrees to receive invoices electronically. If a Protect Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company.</p>
+    <p>6. The Service Provider may change fees and the commission rate with 30 days' notice, informing the Company by e-mail and in the Company Panel. New rates apply to Requests unlocked after they take effect. A Company that does not accept the change may delete its Account before that date.</p>
+    @else
     <p>1. The Platform is free for Customers. A Company pays no subscription, no registration fee and no fees for Requests received or Offers submitted.</p>
     <p>2. <strong>Commission.</strong> For every Job completed and approved (expressly or silently) the Company pays the Service Provider a commission of <strong>{{ $fee }}%</strong> of the gross Job amount, including approved extra work. During the first <strong>{{ (int) config('fachora.intro_days') }} days</strong> after the Fachora Verified mark is granted, the commission is <strong>{{ $introFee }}%</strong>. The rate applicable to a Company is shown in the Company Panel and in every Offer before it is submitted.</p>
     <p>3. For Jobs with Protect the commission is deducted from the payout by the payment provider. For Jobs without Protect the Service Provider invoices the Company for the commission with a 14-day payment term; the Company reports the completion of the Job and the final amount on the Platform.</p>
@@ -214,6 +224,7 @@
     <p>5. If a Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company. No commission is charged on a call-out fee after a cancellation.</p>
     <p>6. <strong>No circumvention.</strong> If a Company performs work for a Customer that the Customer requested through the Platform but settles it outside the Platform, the commission is due to the Service Provider in full on the Offer amount, irrespective of the sanctions in § 5(4). This does not apply to Jobs the Customer cancelled and then — more than 6 months later — commissioned from the Company outside the Platform.</p>
     <p>7. The Service Provider may change the commission rate with 30 days' notice, informing the Company by e-mail and in the Company Panel. The new rate applies to Offers submitted after it takes effect. A Company that does not accept the change may delete its Account before that date.</p>
+    @endif
     <p>8. Additional services for Companies (e.g. an SMS bundle, promoted listings), if introduced, are charged according to the price list shown in the Company Panel before they are ordered.</p>
 
     <h2 id="p14">§ 14. Reviews</h2>

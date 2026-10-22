@@ -162,7 +162,11 @@ GRATIS VOOR DE KLANT, BEDRIJF BETAALT PER LEAD (1.87.0, 22 okt 2026)
   FACHORA_LEAD_PRICING=false zet het oude provisiemodel terug (ook de teksten).
 - Regulamin § 13, dla-firm en landing aangepast; terms_version 2026-10-22 (bedrijven accepteren
   opnieuw). Valse aanvraag binnen 7 dagen melden = terugbetalen: handmatig via Stripe.
-- Engelse marketingpagina's (resources/views/fachora/en/*) noemen nog het provisiemodel.
+- Engelse pagina's (dla-firm, landing, faq, regulamin § 13) volgen nu ook het lead-model.
+- Het gratis facturatieprogramma is geen verkoopargument meer (alleen nog in de FAQ voor bedrijven).
+- Teksten "we mailen bedrijven uit het register nooit" (privacybeleid, FAQ, o-nas, kontakt, firma,
+  standard, landing, jak-to-dziala; PL en EN) herschreven: alleen een zelfgekozen klantaanvraag,
+  geen reclame of sms, met bron van de gegevens en afmeldlink. Laten toetsen door de jurist.
 - Import op aanvraag: heeft een klant minder dan 5 kandidaten, dan zoekt fachora:local-search
   (planner, elke minuut) in CEIDG op plaats (miasto) en powiat (Nominatim reverse) van de klant.
   Zonder enige kandidaat wacht de klant (provider_search_at, max. 15 min, pagina ververst) en krijgt

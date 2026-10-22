@@ -132,8 +132,8 @@
           For customers Fachora is free. You do not pay for posting a job, for the offers, for Fachora Protect or for dispute resolution. You pay only the price agreed with the company, exactly as it appears in the job confirmation. The commission on a completed job is paid by the company.
         </div>
         <div class="fh-note warm" style="margin-top:14px;">
-          <b>Your job goes to Verified companies only.</b><br>
-          If there is no verified company in your area for that category yet, we tell you straight away instead of promising offers that will not come.
+          <b>Your job goes only to the companies you choose.</b><br>
+          You pick up to {{ config('fachora.max_offers') }} companies near you: Fachora Verified companies are at the top of the list, companies from the register are clearly marked. If there is nobody in your area, we tell you straight away instead of promising offers that will not come.
         </div>
       </div>
     </div>

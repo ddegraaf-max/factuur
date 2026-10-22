@@ -3,7 +3,7 @@
 {{-- About — Fachora, English edition: why it exists, the promise, who is behind it (Budomatch, a Polish company that connects customers with tradespeople), principles. No invented numbers or people. --}}
 
 @section('title', 'About us — Fachora, a Budomatch service')
-@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Budomatch, a Polish company that connects customers with tradespeople) and the principles we keep: not every company gets on Fachora, no cold e-mails, price up front, money kept safe.')
+@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Budomatch, a Polish company that connects customers with tradespeople) and the principles we keep: not every company gets on Fachora, no advertising to companies, price up front, money kept safe.')
 
 @push('styles')
 <style>
@@ -72,7 +72,7 @@
     <div class="section-header" style="margin-bottom:36px;"><h2>The principles we keep</h2></div>
     <div class="about-principles">
       <div class="about-principle"><span class="n">1</span><h3>Not every company gets on Fachora</h3><p>Registers, identity, bank account, the Fachora Standard. A company whose rating drops below {{ number_format((float) config('fachora.min_rating'), 1, '.', '') }} or that collects justified complaints is removed from the list. We would rather have fewer companies than companies we cannot vouch for.</p></div>
-      <div class="about-principle"><span class="n">2</span><h3>No cold e-mails</h3><p>We do not e-mail or text companies without their consent — including those from the public registers. A company hears from us only once it has claimed its profile itself. The only exception is a letter by post with a code to claim the profile.</p></div>
+      <div class="about-principle"><span class="n">2</span><h3>No advertising to companies</h3><p>We never send companies from public registers advertising, newsletters or text messages. A company gets an e-mail from us only when a customer chose it for their job — always with information on where we got its details and an unsubscribe link.</p></div>
       <div class="about-principle"><span class="n">3</span><h3>Price up front</h3><p>You receive an offer with a gross price before anyone arrives. Extra work only as a separate line that you approve on your job page. No surprises on the way out.</p></div>
       <div class="about-principle"><span class="n">4</span><h3>Money kept safe</h3><p>With Fachora Protect you reserve the amount through Stripe. We never hold your money. The company is paid out after your approval, and in a dispute we decide — based on photos, the description and both sides' replies.</p></div>
       <div class="about-principle"><span class="n">5</span><h3>Real reviews</h3><p>Only a customer who completed a job can leave a review. The company can reply but cannot delete it. We do not publish statistics we do not have.</p></div>

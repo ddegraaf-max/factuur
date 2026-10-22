@@ -169,7 +169,7 @@
         <div class="eyebrow">Fachora Verified</div>
         <h2>Nie każda firma trafia na Fachorę.</h2>
         <p>Zanim firma dostanie znak Fachora Verified i pierwsze zlecenie, sprawdzamy ją w rejestrach i u partnera płatniczego. Dopiero wtedy ręczymy za to, co widzisz w jej profilu.</p>
-        <p>Firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil nieaktywny</b>: bez numeru telefonu i bez zleceń. Nie wysyłamy im żadnych e-maili ani SMS-ów. Mogą same przejąć swój profil i przejść weryfikację.</p>
+        <p>Firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil z rejestru</b>, wyraźnie oznaczony i bez numeru telefonu. Możesz wysłać im zapytanie, ale znak Verified mają tylko firmy, które sprawdziliśmy. Każda firma może przejąć swój profil i przejść weryfikację.</p>
         <p><a href="{{ route('fachora.standard') }}" class="btn btn-secondary">Standard Fachora: dziesięć zasad</a></p>
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
@@ -250,10 +250,10 @@
         <div class="eyebrow">Dla firm</div>
         @if ($lead)
         <h2>Nowi klienci w Twojej okolicy. Bez abonamentu.</h2>
-        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł, zależnie od wielkości pracy. Pierwsze gratis. Do tego darmowy program do faktur gotowy na KSeF i profil z opiniami od prawdziwych klientów.</p>
+        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł, zależnie od wielkości pracy. Pierwsze gratis. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
         @else
         <h2>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h2>
-        <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego darmowy program do faktur gotowy na KSeF i profil z opiniami od prawdziwych klientów.</p>
+        <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
         @endif
         <div class="fh-cta-row" style="justify-content:flex-start;">
           <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary">Zobacz ofertę dla firm</a>
@@ -269,7 +269,7 @@
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>za zlecenie</b><span>nie płacisz za kontakt ani za ofertę</span></div>
         <div class="fh-price hl"><div class="v">{{ $fee }}<small>%</small></div><b>od wykonanej pracy</b><span>przez pierwsze {{ $introDays }} dni {{ $intro }}%</span></div>
         @endif
-        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>program do faktur</b><span>faktury gotowe na KSeF, dopóki jesteś Verified</span></div>
+        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>weryfikacja</b><span>znak Fachora Verified bez opłat</span></div>
       </div>
     </div>
   </div>

@@ -99,7 +99,7 @@
         <p>Skip the form — apply directly. We check your company in the registers and you complete verification in the panel. No subscription, a commission only on completed jobs.</p>
         <a href="{{ route('fachora.apply') }}" class="btn btn-primary" style="margin-right:8px;margin-bottom:8px;">Apply as a company →</a>
         <a href="{{ route('fachora.claim') }}" class="btn btn-secondary" style="margin-bottom:8px;">I have a code from a letter</a>
-        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Received a letter from us? That is the only way we contact companies that have not registered with us — we never send e-mails or text messages without consent.</p>
+        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Received a letter or a customer request from us? We never send register companies advertising, newsletters or text messages. The only e-mail such a company can get from us is a concrete request from a customer who chose that company, with information on where we got its details and an unsubscribe link.</p>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">

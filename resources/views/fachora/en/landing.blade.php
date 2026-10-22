@@ -6,6 +6,7 @@
 @php
   $fee = config('fachora.fee_percent');
   $intro = config('fachora.intro_fee_percent');
+  $lead = (bool) config('fachora.lead_pricing');
   $introDays = config('fachora.intro_days');
   $warranty = config('fachora.default_warranty_months');
   $maxOffers = config('fachora.max_offers');
@@ -135,7 +136,7 @@
         </div>
         <div class="fh-flow-item">
           <div class="nr">4</div>
-          <div><b>The company is paid</b><p>Only after your approval. Fachora's commission is paid by the company, not by you.</p></div>
+          <div><b>The company is paid</b><p>Only after your approval. Fachora's fees are paid by the company, not by you.</p></div>
         </div>
       </div>
       <div>
@@ -168,7 +169,7 @@
         <div class="eyebrow">Fachora Verified</div>
         <h2>Not every company gets on Fachora.</h2>
         <p>Before a company receives the Fachora Verified mark and its first job, we check it in the public registers and with our payment partner. Only then do we vouch for what you see in its profile.</p>
-        <p>Companies from public registers that we have not checked yet are shown as an <b>inactive profile</b>: no phone number, no jobs. We never send them e-mails or text messages. They can claim their own profile and go through verification.</p>
+        <p>Companies from public registers that we have not checked yet are shown as a <b>register profile</b>, clearly marked and without a phone number. You can send them a request, but only companies we have checked carry the Verified mark. Every company can claim its own profile and go through verification.</p>
         <p><a href="{{ route('fachora.standard') }}" class="btn btn-secondary">The Fachora Standard: ten rules</a></p>
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
@@ -247,8 +248,13 @@
     <div class="fh-split">
       <div>
         <div class="eyebrow">For companies</div>
+        @if ($lead)
+        <h2>New customers in your area. No subscription.</h2>
+        <p>The customer chooses your company. You view the job for free and pay only for a request you want to answer: {{ (int) config('fachora.lead_min') }} to {{ (int) config('fachora.lead_max') }} zł, depending on the size of the job. The first one is free. Plus a profile with reviews from real customers and the Fachora Verified mark.</p>
+        @else
         <h2>New customers in your area. You pay only for completed jobs.</h2>
-        <p>0 zł subscription, 0 zł to register, 0 zł per job. A {{ $fee }}% commission only on work that is done and approved, and just {{ $intro }}% for your first {{ $introDays }} days. Plus free KSeF-ready invoicing software and a profile with reviews from real customers.</p>
+        <p>0 zł subscription, 0 zł to register, 0 zł per job. A {{ $fee }}% commission only on work that is done and approved, and just {{ $intro }}% for your first {{ $introDays }} days. Plus a profile with reviews from real customers and the Fachora Verified mark.</p>
+        @endif
         <div class="fh-cta-row" style="justify-content:flex-start;">
           <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary">See the offer for companies</a>
           <a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Claim your company profile</a>
@@ -256,9 +262,14 @@
       </div>
       <div class="fh-prices" style="grid-template-columns:1fr 1fr;">
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>subscription</b><span>no monthly fee</span></div>
+        @if ($lead)
+        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>viewing a job</b><span>description, photos and date for free</span></div>
+        <div class="fh-price hl"><div class="v">{{ (int) config('fachora.lead_min') }}–{{ (int) config('fachora.lead_max') }}<small> zł</small></div><b>to unlock</b><span>the first request is free</span></div>
+        @else
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>per job request</b><span>no charge for a lead or an offer</span></div>
         <div class="fh-price hl"><div class="v">{{ $fee }}<small>%</small></div><b>on completed work</b><span>{{ $intro }}% for the first {{ $introDays }} days</span></div>
-        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>invoicing software</b><span>KSeF-ready invoices, free while you are Verified</span></div>
+        @endif
+        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>verification</b><span>the Fachora Verified mark at no cost</span></div>
       </div>
     </div>
   </div>
@@ -290,7 +301,7 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>What does it cost?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">For customers Fachora is free: no charge for posting a job, for the offers or for Fachora Protect. You pay only the price agreed with the company. The commission on a completed job is paid by the company.</div>
+        <div class="faq-content">For customers Fachora is free: no charge for posting a job, for the offers or for Fachora Protect. You pay only the price agreed with the company. Fachora's fees are paid by the company.</div>
       </details>
       <details class="faq-item">
         <summary>Will I get the company's phone number?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>

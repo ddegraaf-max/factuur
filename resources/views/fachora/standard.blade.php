@@ -83,7 +83,7 @@
 <section class="cta-final">
   <div class="container cta-inner">
     <h2>Prowadzisz firmę, która tak pracuje?</h2>
-    <p>0 zł abonamentu, prowizja tylko od wykonanych zleceń. Nie wysyłamy firmom niezamówionych wiadomości, dlatego pierwszy krok należy do Ciebie.</p>
+    <p>{{ config('fachora.lead_pricing') ? '0 zł abonamentu, płacisz tylko za zapytania, na które odpowiadasz; pierwsze gratis.' : '0 zł abonamentu, prowizja tylko od wykonanych zleceń.' }} Nie wysyłamy firmom reklam ani newsletterów, dlatego pierwszy krok należy do Ciebie.</p>
     <div class="fh-cta-row">
       <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary btn-lg">Oferta dla firm</a>
       <a href="{{ route('fachora.claim') }}" class="btn btn-white btn-lg">Przejmij profil firmy</a>
