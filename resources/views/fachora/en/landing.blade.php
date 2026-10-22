@@ -124,7 +124,7 @@
       <div class="fh-flow">
         <div class="fh-flow-item">
           <div class="nr">1</div>
-          <div><b>You reserve the amount</b><p>BLIK, Przelewy24 or card. The payment is processed by Stripe, a licensed payment institution.</p></div>
+          <div><b>You reserve the amount</b><p>BLIK, Przelewy24 or card. The payment is processed by Mollie, a licensed payment institution supervised by De Nederlandsche Bank.</p></div>
         </div>
         <div class="fh-flow-item">
           <div class="nr">2</div>
@@ -153,7 +153,7 @@
           <div class="ex">Example. Amounts and dates are agreed with the company you choose.</div>
         </div>
         <div class="note">
-          <b>A dispute?</b> The money stays blocked until the matter is settled. The company has {{ $disputeHours }} hours to respond; if it does not, the decision goes your way. Fachora never holds your money: the whole payment is handled by Stripe.
+          <b>A dispute?</b> The money stays blocked until the matter is settled. The company has {{ $disputeHours }} hours to respond; if it does not, the decision goes your way. Fachora never holds your money: the whole payment is handled by Mollie.
         </div>
         <div style="margin-top:18px;"><a href="{{ route('fachora.protect') }}" class="btn btn-white">How Fachora Protect works</a></div>
       </div>
@@ -174,7 +174,7 @@
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Register and tax number</b><p>The company exists, is active in CEIDG or KRS, and its NIP and VAT status match.</p></div></div>
-        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Identity and bank account</b><p>The person representing the company and its bank account are verified by Stripe.</p></div></div>
+        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Identity and bank account</b><p>The person representing the company and its bank account are verified by Mollie.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 20])</span><div><b>Phone, e-mail, terms</b><p>Phone number confirmed by SMS code, e-mail by link, the Fachora Standard accepted with date and version.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 20])</span><div><b>Liability insurance: visible</b><p>If the company has a policy, you see it in the profile. When it expires, the mark disappears until it is renewed.</p></div></div>
       </div>
@@ -250,7 +250,7 @@
         <div class="eyebrow">For companies</div>
         @if ($lead)
         <h2>New customers in your area. No subscription.</h2>
-        <p>The customer chooses your company. You view the job for free and pay only for a request you want to answer: {{ (int) config('fachora.lead_min') }} to {{ (int) config('fachora.lead_max') }} zł, depending on the size of the job. The first one is free. Plus a profile with reviews from real customers and the Fachora Verified mark.</p>
+        <p>The customer chooses your company. You view the job for free and pay only for a request you want to answer: {{ (int) config('fachora.lead_min') }} to {{ (int) config('fachora.lead_max') }} zł net, depending on the size of the job. The first one is free. Plus a profile with reviews from real customers and the Fachora Verified mark.</p>
         @else
         <h2>New customers in your area. You pay only for completed jobs.</h2>
         <p>0 zł subscription, 0 zł to register, 0 zł per job. A {{ $fee }}% commission only on work that is done and approved, and just {{ $intro }}% for your first {{ $introDays }} days. Plus a profile with reviews from real customers and the Fachora Verified mark.</p>

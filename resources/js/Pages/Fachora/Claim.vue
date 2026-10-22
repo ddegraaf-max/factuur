@@ -280,7 +280,7 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
           <ul class="fa-ticks cl-steps">
             <li>{{ $t('U bevestigt uw e-mailadres via de link in de mail en kiest een wachtwoord.') }}</li>
             <li>{{ $t('U vult het profiel aan: talen, werkgebied, tarieven, garantie.') }}</li>
-            <li>{{ $t('Fachora controleert de registers, uw telefoonnummer en uw bankrekening (via Stripe). Daarna bent u Fachora Verified en ontvangt u opdrachten.') }}</li>
+            <li>{{ $t('Fachora controleert de registers, uw telefoonnummer en uw bankrekening (via Mollie). Daarna bent u Fachora Verified en ontvangt u opdrachten.') }}</li>
           </ul>
         </div>
 

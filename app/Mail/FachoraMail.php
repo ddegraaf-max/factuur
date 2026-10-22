@@ -186,7 +186,7 @@ class FachoraMail extends Mailable
                 // Klantaanvraag aan een bedrijf zonder profiel (1.86): waarom dit bericht, waar de gegevens vandaan komen, afmelden (art. 14 AVG).
                 // Volledige art. 14-informatie in het eerste bericht (art. 14 lid 3 sub b AVG), kort met verwijzing naar het privacybeleid.
                 ? __('U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Beheerder van uw gegevens: :owner (:email). Bron: het openbare register CEIDG (naam, NIP, adres, PKD, e-mail, telefoon). Doel: aanvragen van klanten doorgeven; grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). Op de site tonen we alleen naam, plaats en soort werk. We bewaren de gegevens zolang u aanvragen kunt krijgen, of tot u bezwaar maakt. U hebt recht op inzage, correctie, beperking en bezwaar, en op een klacht bij de Prezes UODO. Meer: :privacy. Geen aanvragen meer of profiel verwijderen: :url', [
-                    'owner' => brand('owner_name') ?: 'Budomatch Daniël de Graaf',
+                    'owner' => brand('owner_name') ?: 'Creditline B.V.',
                     'email' => brand('email') ?: 'czesc@fachora.pl',
                     'privacy' => url('/polityka-prywatnosci'),
                     'url' => $provider->optoutUrl(),
@@ -299,7 +299,7 @@ class FachoraMail extends Mailable
                         __('Wij zijn verplicht u te laten weten dat de gegevens van uw bedrijf :name in de database van het platform Fachora (:domain) staan. Dit is geen reclame; u hoeft niets te doen.', ['name' => $name, 'domain' => brand('domain')]),
                         __('Bron: het openbare register CEIDG. Welke gegevens: naam, NIP, adres, PKD-codes, e-mailadres en telefoonnummer zoals ze in CEIDG staan. Op Fachora tonen we alleen naam, plaats en soort werk, nooit uw e-mail, telefoon of adres.'),
                         __('Doel: klanten in uw regio kunnen uw bedrijf vinden en zelf kiezen om u een concrete aanvraag te sturen. Grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). We bewaren de gegevens zolang uw bedrijf actief is in CEIDG of tot u bezwaar maakt.'),
-                        __('Uw rechten: inzage, correctie, beperking en bezwaar (art. 15–21 AVG), en een klacht bij de toezichthouder (Prezes UODO). Beheerder: :owner, :email.', ['owner' => brand('owner_name') ?: 'Budomatch Daniël de Graaf', 'email' => brand('email') ?: 'czesc@fachora.pl']),
+                        __('Uw rechten: inzage, correctie, beperking en bezwaar (art. 15–21 AVG), en een klacht bij de toezichthouder (Prezes UODO). Beheerder: :owner, :email.', ['owner' => brand('owner_name') ?: 'Creditline B.V.', 'email' => brand('email') ?: 'czesc@fachora.pl']),
                         __('Wilt u geen aanvragen van klanten per e-mail, of wilt u dat we uw profiel verwijderen? Dat kan met één klik via de link hieronder.'),
                     ], ['label' => __('Geen e-mail meer of profiel verwijderen'), 'url' => $provider->optoutUrl()], array_filter([
                         __('Profiel') => $provider->publicUrl(),

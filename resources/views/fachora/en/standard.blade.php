@@ -30,7 +30,7 @@
   <div class="container">
     <div class="fh-rules">
       <div class="fh-rule"><span class="no">01</span><div><b>Legally registered, active company</b><p>Listed in CEIDG or KRS, a valid tax number (NIP), status active. We check this at verification and again periodically.</p></div></div>
-      <div class="fh-rule"><span class="no">02</span><div><b>Identity of the representative verified</b><p>Identity and bank account confirmed by Stripe. Fachora does not store identity documents.</p></div></div>
+      <div class="fh-rule"><span class="no">02</span><div><b>Identity of the representative verified</b><p>Identity and bank account confirmed by Mollie, the payment provider. Fachora does not store identity documents.</p></div></div>
       <div class="fh-rule"><span class="no">03</span><div><b>Clear prices up front</b><p>An offer contains a fixed price or an hourly rate plus call-out fee. The price in the job confirmation is binding.</p></div></div>
       <div class="fh-rule"><span class="no">04</span><div><b>No extra work without the customer's approval</b><p>Extra work is a separate line the customer approves on their page. Without approval there is no bill.</p></div></div>
       <div class="fh-rule"><span class="no">05</span><div><b>Appointment confirmed, cancellation only with a reason</b><p>The company confirms the appointment and keeps it. Cancelling requires a reason; a no-show after a reservation means removal from the platform.</p></div></div>
@@ -72,7 +72,7 @@
     <div class="fh-steps cols-3">
       <div class="fh-step"><div class="nr">1</div><h3>Claiming the profile</h3><p>The company claims its profile from our database (a code from a letter, finding its profile, or applying) and confirms its e-mail and phone number with an SMS code.</p></div>
       <div class="fh-step"><div class="nr">2</div><h3>Registers</h3><p>Automatic checks in CEIDG or KRS and the VAT taxpayer list: the company is active, the tax number is valid, the business profile matches the category.</p></div>
-      <div class="fh-step"><div class="nr">3</div><h3>Identity and bank account</h3><p>Onboarding with Stripe: the representative's identity and a bank account in the company's name. Fachora receives only the result, not the documents.</p></div>
+      <div class="fh-step"><div class="nr">3</div><h3>Identity and bank account</h3><p>Onboarding with Mollie: the representative's identity and a bank account in the company's name. Fachora receives only the result, not the documents.</p></div>
       <div class="fh-step"><div class="nr">4</div><h3>Standard and terms</h3><p>The company accepts the Fachora Standard and the terms, fills in languages, working area, indicative rates and warranty. It can add its liability policy to the profile.</p></div>
       <div class="fh-step"><div class="nr">5</div><h3>Review by Fachora</h3><p>A member of the Fachora team checks everything and grants the Verified mark. Only then does the company see jobs and appear in results.</p></div>
       <div class="fh-step"><div class="nr">6</div><h3>Ongoing checks</h3><p>Register status, VAT status, insurance validity and the average rating are rechecked periodically. The company is reminded before anything expires.</p></div>

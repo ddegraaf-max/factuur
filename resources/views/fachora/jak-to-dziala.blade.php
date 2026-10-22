@@ -76,7 +76,7 @@
         <div class="nr">5</div>
         <div>
           <h3>Rezerwujesz płatność albo płacisz po</h3>
-          <p>Z <a href="{{ route('fachora.protect') }}">Fachora Protect</a> rezerwujesz ustaloną kwotę przez BLIK, Przelewy24 lub kartę. Płatność obsługuje Stripe; Fachora nie przechowuje Twoich pieniędzy. Firma dostaje je dopiero po Twojej akceptacji.</p>
+          <p>Z <a href="{{ route('fachora.protect') }}">Fachora Protect</a> rezerwujesz ustaloną kwotę przez BLIK, Przelewy24 lub kartę. Płatność obsługuje Mollie, licencjonowana instytucja płatnicza; Fachora nie przechowuje Twoich pieniędzy. Firma dostaje je dopiero po Twojej akceptacji.</p>
           <p style="margin-top:10px;">Możesz też zapłacić firmie bezpośrednio po wykonaniu pracy. Wtedy nie działa blokada pieniędzy ani rozstrzyganie sporu z udziałem płatności, ale weryfikacja firmy, faktura i gwarancja firmy pozostają.</p>
           <span class="tag">Do {{ $cancelHours }} godzin przed terminem odwołasz zlecenie bezpłatnie</span>
         </div>

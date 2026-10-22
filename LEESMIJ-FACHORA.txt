@@ -106,8 +106,8 @@ Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:
 4. Eerste bedrijven: Eigenaar → Fachora: bedrijven → Importuj (plaklijst) of CEIDG; dan brieven
    printen (PDF per 100) en posten. Geclaimde bedrijven verschijnen onder status 'claimed';
    na hun aanvraag 'pending' → controles nalopen → Zatwierdź.
-5. Aanbieder van Fachora is Budomatch Daniël de Graaf (Białka 15, 09-550 Białka, NIP 7010869430,
-   REGON 381430120), niet Creditline B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
+5. Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Torenlaan 5B, 1402 AT Bussum,
+   KvK 59683198, btw NL853603108B01); betalingen via Mollie B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
    en alle Fachora-pagina's. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
    laten nakijken), PKE-toets op de uitnodigingsmail voor opt-in-lijsten, DSA-contactpunt,
    merknaam Fachora bij UPRP/EUIPO, domeinen fachora.pl/.com.
@@ -218,3 +218,14 @@ OPTIE 2: GEEN IMPORT VOORAF (1.87, 22 okt 2026, besluit Daniël)
   Oude imports: eerst `php artisan fachora:purge-register --days=0 --dry-run`, dan zonder --dry-run.
 - Afmelden in twee stappen: de link toont een keuze (geen e-mail meer / profiel verwijderen), pas de knop
   verandert iets (virusscanners openen links automatisch).
+
+EXPLOITANT CREDITLINE B.V. EN MOLLIE (22 okt 2026, besluit Daniël)
+- Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Bussum, KvK 59683198, VAT
+  NL853603108B01). Teksten PL+EN, voorwaarden, privacy, brief en mails omgezet; terms_version 2026-10-22b.
+- Leadbetalingen via het Mollie-account van Creditline: FACHORA_MOLLIE_KEY op Railway zetten (live_...).
+  Webhook: https://fachora.pl/webhooks/mollie-fachora (wordt per betaling meegestuurd). Methoden BLIK,
+  Przelewy24, kaart; bedragen in PLN, netto, btw verlegd (art. 196 btw-richtlijn).
+- Fachora Protect draait in de code nog op Stripe Connect: zet FACHORA_PROTECT uit tot Mollie Connect is
+  ingebouwd. De panelschermen voor bedrijven noemen Stripe nog (hoort bij die ombouw).
+- Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
+  Creditline in EasyInvoice.

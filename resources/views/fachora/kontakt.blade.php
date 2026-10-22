@@ -90,7 +90,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Operator platformy</div><div style="font-weight:600;">Budomatch Daniël de Graaf</div><div style="font-size:13px;color:var(--text-2);">Białka 15, 09-550 Białka, Polska<br>NIP 7010869430 · REGON 381430120</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Operator platformy</div><div style="font-weight:600;">Creditline B.V.</div><div style="font-size:13px;color:var(--text-2);">Torenlaan 5B, 1402 AT Bussum, Holandia<br>KvK 59683198 · VAT NL853603108B01</div></div>
         </div>
       </div>
 
@@ -123,7 +123,7 @@
       </div>
       <div class="contact-card">
         <h3>🔧 Dla firm</h3>
-        <p>Weryfikacja, panel, wypłaty przez Stripe, faktury za prowizję, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
+        <p>Weryfikacja, panel, wypłaty przez Mollie, faktury za prowizję, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
         <ul>
           <li>Chcesz dołączyć? Skorzystaj z <a class="lnk" href="{{ route('fachora.apply') }}">formularza zgłoszenia</a>.</li>
           <li>Nie chcesz figurować na Fachora? Napisz — usuniemy profil z rejestru.</li>

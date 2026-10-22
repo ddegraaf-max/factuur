@@ -15,7 +15,7 @@
 @endphp
 
 @section('title', 'Fachora platform terms of service')
-@section('description', 'Terms of service of the Fachora platform (Budomatch): Fachora as an intermediary, requests and offers, the contract between Customer and Company, Fachora Protect and payments through Stripe, disputes, cancellations, warranty, consumer rights, the commission charged to Companies, reviews, DSA rules, liability, governing law.')
+@section('description', 'Terms of service of the Fachora platform (Creditline B.V.): Fachora as an intermediary, requests and offers, the contract between Customer and Company, Fachora Protect and payments through Mollie, disputes, cancellations, warranty, consumer rights, the commission charged to Companies, reviews, DSA rules, liability, governing law.')
 
 @push('styles')
 <style>
@@ -45,15 +45,15 @@
   <div class="container">
     <div class="eyebrow">Documents</div>
     <h1>Fachora platform terms of service</h1>
-    <div class="meta">Version {{ config('fachora.terms_version') }} · in force from 16 October 2026</div>
+    <div class="meta">Version {{ config('fachora.terms_version') }} · in force from 22 October 2026</div>
 
     <div class="lang">This English text is a convenience translation. The <a href="{{ route('lang', 'pl') }}">Polish version</a> is the legally binding one; in case of any discrepancy the Polish text prevails.</div>
 
     <div class="entity">
       Platform operator (Service Provider):<br>
-      <strong>Budomatch Daniël de Graaf</strong>, operating the platform under the <strong>Fachora</strong> brand (fachora.pl)<br>
-      Białka 15 · 09-550 Białka · Poland<br>
-      NIP 7010869430 · REGON 381430120 · sole proprietorship registered in CEIDG<br>
+      <strong>Creditline B.V.</strong>, operating the platform under the <strong>Fachora</strong> brand (fachora.pl)<br>
+      Torenlaan 5B · 1402 AT Bussum · the Netherlands<br>
+      a Dutch private limited company (B.V.) registered with the Netherlands Chamber of Commerce (KvK) under no. 59683198 · VAT no. NL853603108B01<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (also the point of contact referred to in § 15)
     </div>
 
@@ -84,7 +84,7 @@
     <h2 id="p1">§ 1. Definitions</h2>
     <ul>
       <li><strong>Fachora</strong> or <strong>Platform</strong> — the website at fachora.pl, operated by the Service Provider, which lets Customers submit Requests and Companies submit Offers and carry out Jobs.</li>
-      <li><strong>Service Provider</strong> — Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland, NIP 7010869430, REGON 381430120 (sole proprietorship registered in CEIDG).</li>
+      <li><strong>Service Provider</strong> — Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands, a Dutch private limited company (B.V.) registered with the Netherlands Chamber of Commerce (KvK) under no. 59683198, VAT no. NL853603108B01.</li>
       <li><strong>Customer</strong> — a person who submits a Request through the Platform: a consumer (a natural person acting for purposes outside their trade or business) or a business.</li>
       <li><strong>Company</strong> — a business (sole trader, company or other entity) entered in the relevant register, holding a Company Account on the Platform.</li>
       <li><strong>Fachora Verified Company</strong> (<strong>Verified</strong>) — a Company that has passed the verification described in § 4 and has been given the "Fachora Verified" mark by the Service Provider. Only Verified Companies receive Requests.</li>
@@ -93,7 +93,7 @@
       <li><strong>Offer</strong> — a Company's reply to a Request: price (fixed or by rates), proposed date, warranty period and remarks.</li>
       <li><strong>Service Contract</strong> — the contract between the Customer and the Company for carrying out the Request, concluded when the Customer chooses an Offer (§ 7).</li>
       <li><strong>Fachora Protect</strong> (<strong>Protect</strong>) — the way of paying for a Job described in § 8: the Customer reserves the Offer amount with the payment provider, and the Company is paid out after the completed work is approved.</li>
-      <li><strong>Payment provider</strong> — Stripe Payments Europe, Ltd. (Ireland) and its group companies, providing payment services under their own terms.</li>
+      <li><strong>Payment provider</strong> — Mollie B.V., Keizersgracht 126, Amsterdam, the Netherlands, a payment institution licensed and supervised by De Nederlandsche Bank, providing payment services under its own terms.</li>
       <li><strong>Fachora Standard</strong> — ten rules a Verified Company undertakes to follow (§ 5).</li>
       <li><strong>Job Page</strong> — the Customer's page, reached through a personal link from the e-mail, where the Customer manages the Request (offers, choice, payment, approval, dispute, review).</li>
       <li><strong>Company Panel</strong> — the part of the Platform available to a Company after logging in.</li>
@@ -123,7 +123,7 @@
       <li>a check of VAT status and bank account in the VAT taxpayer list (the "white list"), where applicable;</li>
       <li>confirmation of the e-mail address and phone number;</li>
       <li>acceptance of the Terms and the Fachora Standard, with the date and version recorded;</li>
-      <li>verification of the identity of the person representing the Company and of the bank account, carried out by the payment provider in the Stripe Connect procedure (the Service Provider receives the result, not the documents);</li>
+      <li>verification of the identity of the person representing the Company and of the bank account, carried out by the payment provider in its own onboarding procedure at Mollie (the Service Provider receives the result, not the documents);</li>
       <li>optionally: uploading a liability insurance policy; information about current insurance is shown on the Profile until the policy expires.</li>
     </ul>
     <p>The information collected in this way corresponds to the trader traceability obligation of Article 30 DSA. The Company updates its data without delay when they change.</p>
@@ -168,7 +168,7 @@
 
     <h2 id="p8">§ 8. Fachora Protect — payment</h2>
     <p>1. Fachora Protect is available if the chosen Company has an active account with the payment provider with payouts enabled. Availability of Protect is shown on the Profile and in the Offer. If Protect is not available, the Customer pays the Company directly after the service is performed, on the terms of the Offer, without the Fachora Guarantee.</p>
-    <p>2. <strong>Reservation.</strong> After choosing an Offer with Protect, the Customer pays the Offer amount (gross) through the payment provider's payment page (BLIK, Przelewy24, card or other methods made available). <strong>The funds are held by the payment provider on the platform's account;</strong> the Service Provider does not operate payment accounts and does not hold Customers' funds in its own name. The payment provider's terms (stripe.com/legal) apply to the payment.</p>
+    <p>2. <strong>Reservation.</strong> After choosing an Offer with Protect, the Customer pays the Offer amount (gross) through the payment provider's payment page (BLIK, Przelewy24, card or other methods made available). <strong>The funds are held by the payment provider on the platform's account;</strong> the Service Provider does not operate payment accounts and does not hold Customers' funds in its own name. The payment provider's terms (mollie.com) apply to the payment.</p>
     <p>3. Approved extra work (§ 6(6)) is paid by the Customer in the same way, before it is carried out or immediately after approval.</p>
     <p>4. <strong>Approval.</strong> After the Company reports completion, the Customer checks the work and, on the Job Page, either (a) approves the work or (b) opens a dispute (§ 9). <strong>If the Customer does neither within {{ (int) config('fachora.auto_accept_days') }} days of the completion report, the work is deemed approved</strong> (silent approval). The Service Provider reminds the Customer of this deadline by e-mail.</p>
     <p>5. <strong>Payout.</strong> After approval (express or silent) the payment provider transfers to the Company the Job amount less the Service Provider's commission (§ 13). The Company issues the Customer an invoice for the full Job amount. When the funds reach the Company's account depends on the payment provider.</p>
@@ -211,16 +211,16 @@
     <h2 id="p13">§ 13. Fees and commission</h2>
     @if ($lead)
     <p>1. The Platform is free for Customers. A Company pays no subscription and no registration fee. Viewing a Request (description, photos, date, town) is free.</p>
-    <p>2. <strong>Unlock fee.</strong> To submit an Offer, the Company unlocks the Request. The fee is {{ $leadPct }}% of the estimated value of the Job determined by the Platform, no less than {{ (int) config('fachora.lead_min') }} zł and no more than {{ (int) config('fachora.lead_max') }} zł gross (including 23% VAT). The amount is shown before unlocking. Each Company's first unlock is free. An unlocked Request stays unlocked: changing or withdrawing the Offer costs nothing.</p>
+    <p>2. <strong>Unlock fee.</strong> To submit an Offer, the Company unlocks the Request. The fee is {{ $leadPct }}% of the estimated value of the Job determined by the Platform, no less than {{ (int) config('fachora.lead_min') }} zł and no more than {{ (int) config('fachora.lead_max') }} zł net. The amount is shown before unlocking. Each Company's first unlock is free. An unlocked Request stays unlocked: changing or withdrawing the Offer costs nothing.</p>
     <p>3. The unlock fee is due whether or not the Customer chooses the Company's Offer. If a Request turns out to be false (e.g. false Customer details, or a request made only to obtain offers on behalf of a competitor), the Company may report it within 7 days of unlocking; after verification the Service Provider refunds the fee.</p>
     <p>4. <strong>Commission with Fachora Protect.</strong> For a Job paid through Fachora Protect and approved (expressly or silently) the Service Provider deducts from the payout a commission of <strong>{{ $fee }}%</strong> of the gross Job amount, including approved extra work. No commission is charged on Jobs settled directly between the Customer and the Company.</p>
-    <p>5. The commission is a net amount to which the Service Provider adds VAT at the rate applicable in Poland (currently 23%). The Service Provider issues invoices for fees and commission; the Company agrees to receive invoices electronically. If a Protect Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company.</p>
+    <p>5. Fees and commission are net amounts. The Service Provider is registered for VAT in the Netherlands (NL853603108B01) and invoices them without Polish VAT, marked "reverse charge" (Article 196 of Council Directive 2006/112/EC); the Company, as the recipient of the service, accounts for the VAT due in Poland itself (import of services). The Company agrees to receive invoices electronically. If a Protect Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company.</p>
     <p>6. The Service Provider may change fees and the commission rate with 30 days' notice, informing the Company by e-mail and in the Company Panel. New rates apply to Requests unlocked after they take effect. A Company that does not accept the change may delete its Account before that date.</p>
     @else
     <p>1. The Platform is free for Customers. A Company pays no subscription, no registration fee and no fees for Requests received or Offers submitted.</p>
     <p>2. <strong>Commission.</strong> For every Job completed and approved (expressly or silently) the Company pays the Service Provider a commission of <strong>{{ $fee }}%</strong> of the gross Job amount, including approved extra work. During the first <strong>{{ (int) config('fachora.intro_days') }} days</strong> after the Fachora Verified mark is granted, the commission is <strong>{{ $introFee }}%</strong>. The rate applicable to a Company is shown in the Company Panel and in every Offer before it is submitted.</p>
     <p>3. For Jobs with Protect the commission is deducted from the payout by the payment provider. For Jobs without Protect the Service Provider invoices the Company for the commission with a 14-day payment term; the Company reports the completion of the Job and the final amount on the Platform.</p>
-    <p>4. The commission is a net amount to which the Service Provider adds VAT at the rate applicable in Poland (currently 23%). The Company agrees to receive invoices electronically.</p>
+    <p>4. The commission is a net amount. The Service Provider is registered for VAT in the Netherlands (NL853603108B01) and invoices the commission without Polish VAT, marked "reverse charge" (Article 196 of Council Directive 2006/112/EC); the Company, as the recipient of the service, accounts for the VAT due in Poland itself (import of services). The Company agrees to receive invoices electronically.</p>
     <p>5. If a Job was decided by a refund to the Customer, no commission is due; where the amount is split, the commission is calculated on the part paid out to the Company. No commission is charged on a call-out fee after a cancellation.</p>
     <p>6. <strong>No circumvention.</strong> If a Company performs work for a Customer that the Customer requested through the Platform but settles it outside the Platform, the commission is due to the Service Provider in full on the Offer amount, irrespective of the sanctions in § 5(4). This does not apply to Jobs the Customer cancelled and then — more than 6 months later — commissioned from the Company outside the Platform.</p>
     <p>7. The Service Provider may change the commission rate with 30 days' notice, informing the Company by e-mail and in the Company Panel. The new rate applies to Offers submitted after it takes effect. A Company that does not accept the change may delete its Account before that date.</p>
@@ -275,8 +275,8 @@
     <p>1. These Terms are available free of charge at fachora.pl/regulamin in a form that allows them to be downloaded, stored and printed. The Polish version is binding; the English translation is for convenience.</p>
     <p>2. If any provision of these Terms proves invalid or ineffective, the remaining provisions remain in force.</p>
     <p>3. The <a href="{{ route('fachora.standard') }}">Fachora Standard</a> (summarised in § 5), the description of <a href="{{ route('fachora.protect') }}">Fachora Protect</a> and the <a href="{{ route('pl.prywatnosc') }}">Privacy Policy</a> form an integral part of these Terms. In case of discrepancy these Terms prevail.</p>
-    <p>4. Contact with the Service Provider: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, the <a href="{{ route('pl.kontakt') }}">contact form</a>, or by post: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland.</p>
-    <p>5. Version {{ config('fachora.terms_version') }} of these Terms takes effect on 16 October 2026.</p>
+    <p>4. Contact with the Service Provider: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, the <a href="{{ route('pl.kontakt') }}">contact form</a>, or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands.</p>
+    <p>5. Version {{ config('fachora.terms_version') }} of these Terms takes effect on 22 October 2026.</p>
 
     <div class="disclaimer">Draft pending legal review. Remarks: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

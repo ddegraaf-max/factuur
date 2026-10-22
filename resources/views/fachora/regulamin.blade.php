@@ -2,7 +2,7 @@
 
 {{--
   WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
-  Regulamin platformy Fachora (pośrednictwo między Klientem a Firmą; Fachora Protect przez Stripe;
+  Regulamin platformy Fachora (pośrednictwo między Klientem a Firmą; Fachora Protect przez Mollie;
   prowizja od Firmy; DSA; prawa konsumenta). Liczby (prowizja, terminy) z config/fachora.php.
   Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
@@ -16,7 +16,7 @@
 @endphp
 
 @section('title', 'Regulamin platformy Fachora')
-@section('description', 'Regulamin platformy Fachora (Budomatch): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, Fachora Protect i płatności przez Stripe, spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
+@section('description', 'Regulamin platformy Fachora (Creditline B.V.): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, Fachora Protect i płatności przez Mollie, spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
 
 @push('styles')
 <style>
@@ -47,13 +47,13 @@
   <div class="container">
     <div class="eyebrow">Dokumenty</div>
     <h1>Regulamin platformy Fachora</h1>
-    <div class="meta">Wersja {{ config('fachora.terms_version') }} · obowiązuje od 16 października 2026 r.</div>
+    <div class="meta">Wersja {{ config('fachora.terms_version') }} · obowiązuje od 22 października 2026 r.</div>
 
     <div class="entity">
       Operator platformy (Usługodawca):<br>
-      <strong>Budomatch Daniël de Graaf</strong>, prowadzący platformę pod marką <strong>Fachora</strong> (fachora.pl)<br>
-      Białka 15 · 09-550 Białka · Polska<br>
-      NIP 7010869430 · REGON 381430120 · działalność gospodarcza wpisana do CEIDG<br>
+      <strong>Creditline B.V.</strong>, prowadząca platformę pod marką <strong>Fachora</strong> (fachora.pl)<br>
+      Torenlaan 5B · 1402 AT Bussum · Holandia<br>
+      spółka z ograniczoną odpowiedzialnością prawa holenderskiego (B.V.), wpisana do rejestru handlowego KvK pod nr 59683198 · numer VAT NL853603108B01<br>
       E-mail: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (także punkt kontaktowy, o którym mowa w § 15)
     </div>
 
@@ -84,7 +84,7 @@
     <h2 id="p1">§ 1. Definicje</h2>
     <ul>
       <li><strong>Fachora</strong> lub <strong>Platforma</strong> — serwis internetowy dostępny pod adresem fachora.pl, prowadzony przez Usługodawcę, który umożliwia Klientom składanie Zleceń, a Firmom składanie Ofert i wykonywanie Zleceń.</li>
-      <li><strong>Usługodawca</strong> — Budomatch Daniël de Graaf z siedzibą w Białce, Białka 15, 09-550 Białka, NIP 7010869430, REGON 381430120 (działalność gospodarcza wpisana do CEIDG).</li>
+      <li><strong>Usługodawca</strong> — Creditline B.V. z siedzibą w Bussum, Torenlaan 5B, 1402 AT Bussum, Holandia, spółka z ograniczoną odpowiedzialnością prawa holenderskiego (B.V.), wpisana do rejestru handlowego KvK pod nr 59683198, numer VAT NL853603108B01.</li>
       <li><strong>Klient</strong> — osoba, która składa Zlecenie przez Platformę: konsument (osoba fizyczna działająca w celach niezwiązanych z działalnością gospodarczą) albo przedsiębiorca.</li>
       <li><strong>Firma</strong> — przedsiębiorca (jednoosobowa działalność gospodarcza, spółka lub inny podmiot) wpisany do właściwego rejestru, który posiada Konto Firmy na Platformie.</li>
       <li><strong>Firma Fachora Verified</strong> (<strong>Verified</strong>) — Firma, która przeszła weryfikację opisaną w § 4 i otrzymała od Usługodawcy oznaczenie „Fachora Verified”. Tylko Firmy Verified otrzymują Zlecenia.</li>
@@ -93,7 +93,7 @@
       <li><strong>Oferta</strong> — odpowiedź Firmy na Zlecenie: cena (ryczałtowa albo według stawek), proponowany termin, okres gwarancji i uwagi.</li>
       <li><strong>Umowa o Usługę</strong> — umowa między Klientem a Firmą o wykonanie Zlecenia, zawarta z chwilą wyboru Oferty przez Klienta (§ 7).</li>
       <li><strong>Fachora Protect</strong> (<strong>Protect</strong>) — sposób zapłaty za Zlecenie opisany w § 8: Klient rezerwuje kwotę Oferty u operatora płatności, a Firma otrzymuje wypłatę po akceptacji wykonanej pracy.</li>
-      <li><strong>Operator płatności</strong> — Stripe Payments Europe, Ltd. (Irlandia) i podmioty z jego grupy, świadczące usługi płatnicze na podstawie własnych regulaminów.</li>
+      <li><strong>Operator płatności</strong> — Mollie B.V. z siedzibą w Amsterdamie (Keizersgracht 126, Holandia), instytucja płatnicza posiadająca zezwolenie De Nederlandsche Bank i podlegająca jego nadzorowi, świadcząca usługi płatnicze na podstawie własnych warunków.</li>
       <li><strong>Standard Fachora</strong> — dziesięć zasad, które Firma Verified zobowiązuje się przestrzegać (§ 5).</li>
       <li><strong>Strona Zlecenia</strong> — strona Klienta dostępna przez indywidualny link z e-maila, na której Klient zarządza swoim Zleceniem (oferty, wybór, płatność, akceptacja, spór, opinia).</li>
       <li><strong>Panel Firmy</strong> — część Platformy dostępna po zalogowaniu dla Firmy.</li>
@@ -123,7 +123,7 @@
       <li>sprawdzenie statusu VAT i rachunku bankowego w wykazie podatników VAT (biała lista), o ile dotyczy;</li>
       <li>potwierdzenie adresu e-mail i numeru telefonu;</li>
       <li>akceptację Regulaminu i Standardu Fachora z zapisem daty i wersji;</li>
-      <li>weryfikację tożsamości osoby reprezentującej Firmę i rachunku bankowego, prowadzoną przez Operatora płatności w ramach procedury Stripe Connect (Usługodawca otrzymuje wynik, nie dokumenty);</li>
+      <li>weryfikację tożsamości osoby reprezentującej Firmę i rachunku bankowego, prowadzoną przez Operatora płatności w ramach jego procedury rejestracji (onboardingu) w Mollie (Usługodawca otrzymuje wynik, nie dokumenty);</li>
       <li>opcjonalnie: przesłanie polisy ubezpieczenia odpowiedzialności cywilnej; informacja o aktualnym ubezpieczeniu jest widoczna na Profilu do dnia wygaśnięcia polisy.</li>
     </ul>
     <p>Zbierane w ten sposób informacje odpowiadają obowiązkowi identyfikowalności przedsiębiorców z art. 30 DSA. Firma aktualizuje dane niezwłocznie, gdy ulegną zmianie.</p>
@@ -168,7 +168,7 @@
 
     <h2 id="p8">§ 8. Fachora Protect — płatność</h2>
     <p>1. Fachora Protect jest dostępny, jeżeli wybrana Firma ma aktywne konto u Operatora płatności z włączonymi wypłatami. Informacja o dostępności Protect jest widoczna na Profilu i w Ofercie. Jeżeli Protect nie jest dostępny, Klient płaci Firmie bezpośrednio po wykonaniu usługi, na warunkach Oferty, bez Gwarancji Fachora.</p>
-    <p>2. <strong>Rezerwacja.</strong> Po wyborze Oferty z Protect Klient płaci kwotę Oferty (brutto) przez stronę płatności Operatora płatności (BLIK, Przelewy24, karta lub inne udostępnione metody). <strong>Środki są przechowywane przez Operatora płatności na rachunku platformy;</strong> Usługodawca nie prowadzi rachunków płatniczych ani nie przechowuje środków Klientów we własnym imieniu. Do płatności stosuje się regulaminy Operatora płatności (stripe.com/legal).</p>
+    <p>2. <strong>Rezerwacja.</strong> Po wyborze Oferty z Protect Klient płaci kwotę Oferty (brutto) przez stronę płatności Operatora płatności (BLIK, Przelewy24, karta lub inne udostępnione metody). <strong>Środki są przechowywane przez Operatora płatności na rachunku platformy;</strong> Usługodawca nie prowadzi rachunków płatniczych ani nie przechowuje środków Klientów we własnym imieniu. Do płatności stosuje się warunki Operatora płatności (mollie.com).</p>
     <p>3. Zatwierdzone prace dodatkowe (§ 6 ust. 6) Klient opłaca w ten sam sposób, przed ich wykonaniem albo niezwłocznie po zatwierdzeniu.</p>
     <p>4. <strong>Akceptacja.</strong> Po zgłoszeniu zakończenia pracy przez Firmę Klient sprawdza wykonanie i na Stronie Zlecenia: (a) akceptuje pracę albo (b) zgłasza spór (§ 9). <strong>Jeżeli Klient nie zrobi żadnej z tych rzeczy w ciągu {{ (int) config('fachora.auto_accept_days') }} dni od zgłoszenia zakończenia, pracę uznaje się za zaakceptowaną</strong> (akceptacja milcząca). Usługodawca przypomina Klientowi o tym terminie e-mailem.</p>
     <p>5. <strong>Wypłata.</strong> Po akceptacji (wyraźnej lub milczącej) Operator płatności przekazuje Firmie kwotę Zlecenia pomniejszoną o prowizję Usługodawcy (§ 13). Firma wystawia Klientowi fakturę na pełną kwotę Zlecenia. Termin dotarcia środków na rachunek Firmy zależy od Operatora płatności.</p>
@@ -211,16 +211,16 @@
     <h2 id="p13">§ 13. Opłaty i prowizja</h2>
     @if ($lead)
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu ani opłaty rejestracyjnej. Podgląd Zlecenia (opis, zdjęcia, termin, miejscowość) jest bezpłatny.</p>
-    <p>2. <strong>Opłata za odblokowanie.</strong> Aby złożyć Ofertę, Firma odblokowuje Zlecenie. Opłata wynosi {{ $leadPct }}% szacowanej wartości Zlecenia określonej przez Platformę, nie mniej niż {{ (int) config('fachora.lead_min') }} zł i nie więcej niż {{ (int) config('fachora.lead_max') }} zł brutto (z VAT 23%). Kwota jest widoczna przed odblokowaniem. Pierwsze odblokowanie każdej Firmy jest bezpłatne. Odblokowane Zlecenie pozostaje odblokowane: zmiana lub wycofanie Oferty nie kosztuje nic.</p>
+    <p>2. <strong>Opłata za odblokowanie.</strong> Aby złożyć Ofertę, Firma odblokowuje Zlecenie. Opłata wynosi {{ $leadPct }}% szacowanej wartości Zlecenia określonej przez Platformę, nie mniej niż {{ (int) config('fachora.lead_min') }} zł i nie więcej niż {{ (int) config('fachora.lead_max') }} zł netto. Kwota jest widoczna przed odblokowaniem. Pierwsze odblokowanie każdej Firmy jest bezpłatne. Odblokowane Zlecenie pozostaje odblokowane: zmiana lub wycofanie Oferty nie kosztuje nic.</p>
     <p>3. Opłata za odblokowanie należy się niezależnie od tego, czy Klient wybierze Ofertę Firmy. Jeżeli Zlecenie okaże się nieprawdziwe (np. fałszywe dane Klienta albo zlecenie zgłoszone wyłącznie w celu pozyskania ofert przez konkurencję), Firma może to zgłosić w ciągu 7 dni od odblokowania; po weryfikacji Usługodawca zwraca opłatę.</p>
     <p>4. <strong>Prowizja przy Fachora Protect.</strong> Za Zlecenie opłacone przez Fachora Protect i zaakceptowane (wyraźnie lub milcząco) Usługodawca potrąca z wypłaty prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. Przy Zleceniach rozliczanych bezpośrednio między Klientem a Firmą prowizja nie jest pobierana.</p>
-    <p>5. Prowizja jest kwotą netto, do której Usługodawca dolicza podatek VAT według stawki obowiązującej w Polsce (obecnie 23%). Na opłaty i prowizję Usługodawca wystawia fakturę; Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną. Jeżeli Zlecenie z Protect zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie.</p>
+    <p>5. Opłaty i prowizja są kwotami netto. Usługodawca jest zarejestrowanym podatnikiem VAT w Holandii (NL853603108B01) i wystawia na nie faktury bez polskiego podatku VAT, z adnotacją „odwrotne obciążenie” (art. 196 dyrektywy Rady 2006/112/WE); podatek VAT należny w Polsce rozlicza Firma jako nabywca usługi (import usług). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną. Jeżeli Zlecenie z Protect zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie.</p>
     <p>6. Usługodawca może zmienić wysokość opłat i prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowe stawki dotyczą Zleceń odblokowanych po ich wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
     @else
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu, opłaty rejestracyjnej ani opłat za otrzymane Zlecenia lub złożone Oferty.</p>
     <p>2. <strong>Prowizja.</strong> Za każde Zlecenie wykonane i zaakceptowane (wyraźnie lub milcząco) Firma płaci Usługodawcy prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. W okresie <strong>{{ (int) config('fachora.intro_days') }} dni</strong> od nadania oznaczenia Fachora Verified prowizja wynosi <strong>{{ $introFee }}%</strong>. Stawka obowiązująca Firmę jest widoczna w Panelu Firmy i w każdej Ofercie przed jej złożeniem.</p>
     <p>3. Przy Zleceniach z Protect prowizja jest potrącana z wypłaty przez Operatora płatności. Przy Zleceniach bez Protect Usługodawca wystawia Firmie fakturę za prowizję z terminem płatności 14 dni; Firma zgłasza na Platformie wykonanie Zlecenia i ostateczną kwotę.</p>
-    <p>4. Prowizja jest kwotą netto, do której Usługodawca dolicza podatek VAT według stawki obowiązującej w Polsce (obecnie 23%). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną.</p>
+    <p>4. Prowizja jest kwotą netto. Usługodawca jest zarejestrowanym podatnikiem VAT w Holandii (NL853603108B01) i wystawia faktury za prowizję bez polskiego podatku VAT, z adnotacją „odwrotne obciążenie” (art. 196 dyrektywy Rady 2006/112/WE); podatek VAT należny w Polsce rozlicza Firma jako nabywca usługi (import usług). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną.</p>
     <p>5. Jeżeli Zlecenie zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie. Przy odwołaniu Zlecenia prowizja od opłaty za dojazd nie jest pobierana.</p>
     <p>6. <strong>Zakaz omijania.</strong> Jeżeli Firma wykona dla Klienta pracę, o którą Klient zwrócił się przez Platformę, rozliczając ją poza Platformą, prowizja należy się Usługodawcy w pełnej wysokości od kwoty Oferty, niezależnie od sankcji z § 5 ust. 4. Nie dotyczy to Zleceń, które Klient odwołał, a następnie — po upływie 6 miesięcy — zlecił Firmie poza Platformą.</p>
     <p>7. Usługodawca może zmienić wysokość prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowa stawka dotyczy Ofert złożonych po jej wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
@@ -275,8 +275,8 @@
     <p>1. Regulamin jest dostępny bezpłatnie pod adresem fachora.pl/regulamin w formie umożliwiającej jego pobranie, utrwalenie i wydrukowanie. Wersja polska jest wiążąca; tłumaczenie angielskie służy wygodzie.</p>
     <p>2. Jeżeli którekolwiek postanowienie Regulaminu okaże się nieważne lub bezskuteczne, pozostałe postanowienia pozostają w mocy.</p>
     <p>3. Integralną częścią Regulaminu są: <a href="{{ route('fachora.standard') }}">Standard Fachora</a> (streszczony w § 5), opis <a href="{{ route('fachora.protect') }}">Fachora Protect</a> i <a href="{{ route('pl.prywatnosc') }}">Polityka prywatności</a>. W razie rozbieżności pierwszeństwo ma Regulamin.</p>
-    <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka.</p>
-    <p>5. Regulamin w wersji {{ config('fachora.terms_version') }} wchodzi w życie 16 października 2026 r.</p>
+    <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia.</p>
+    <p>5. Regulamin w wersji {{ config('fachora.terms_version') }} wchodzi w życie 22 października 2026 r.</p>
 
     <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Uwagi: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

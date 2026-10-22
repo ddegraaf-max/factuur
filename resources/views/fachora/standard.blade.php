@@ -30,7 +30,7 @@
   <div class="container">
     <div class="fh-rules">
       <div class="fh-rule"><span class="no">01</span><div><b>Legalnie zarejestrowana, aktywna firma</b><p>Wpis w CEIDG lub KRS, poprawny NIP, status aktywny. Sprawdzamy to przy weryfikacji i potem cyklicznie.</p></div></div>
-      <div class="fh-rule"><span class="no">02</span><div><b>Zweryfikowana tożsamość osoby reprezentującej</b><p>Tożsamość i rachunek bankowy potwierdzone przez Stripe. Fachora nie przechowuje dokumentów tożsamości.</p></div></div>
+      <div class="fh-rule"><span class="no">02</span><div><b>Zweryfikowana tożsamość osoby reprezentującej</b><p>Tożsamość i rachunek bankowy potwierdzone przez Mollie, operatora płatności. Fachora nie przechowuje dokumentów tożsamości.</p></div></div>
       <div class="fh-rule"><span class="no">03</span><div><b>Jasne ceny z góry</b><p>Oferta zawiera cenę stałą albo stawkę godzinową z kosztem dojazdu. Cena z potwierdzenia zlecenia jest wiążąca.</p></div></div>
       <div class="fh-rule"><span class="no">04</span><div><b>Żadnych prac dodatkowych bez zgody klienta</b><p>Dodatkowa praca to osobna pozycja, którą klient zatwierdza na swojej stronie. Bez zatwierdzenia nie ma rachunku.</p></div></div>
       <div class="fh-rule"><span class="no">05</span><div><b>Potwierdzony termin, odwołanie tylko z powodu</b><p>Firma potwierdza termin i go dotrzymuje. Odwołanie wymaga podania powodu; no-show po rezerwacji to usunięcie z platformy.</p></div></div>
@@ -72,7 +72,7 @@
     <div class="fh-steps cols-3">
       <div class="fh-step"><div class="nr">1</div><h3>Przejęcie profilu</h3><p>Firma przejmuje profil z bazy (kod z listu, wyszukanie profilu albo zgłoszenie) i potwierdza e-mail oraz numer telefonu kodem SMS.</p></div>
       <div class="fh-step"><div class="nr">2</div><h3>Rejestry</h3><p>Automatyczna kontrola w CEIDG lub KRS i w Wykazie podatników VAT: firma aktywna, NIP poprawny, profil działalności pasuje do kategorii.</p></div>
-      <div class="fh-step"><div class="nr">3</div><h3>Tożsamość i konto</h3><p>Onboarding w Stripe: tożsamość osoby reprezentującej i rachunek bankowy na firmę. Fachora dostaje tylko wynik, nie dokumenty.</p></div>
+      <div class="fh-step"><div class="nr">3</div><h3>Tożsamość i konto</h3><p>Onboarding w Mollie: tożsamość osoby reprezentującej i rachunek bankowy na firmę. Fachora dostaje tylko wynik, nie dokumenty.</p></div>
       <div class="fh-step"><div class="nr">4</div><h3>Standard i regulamin</h3><p>Firma akceptuje Standard Fachora i regulamin, uzupełnia języki, zasięg, stawki orientacyjne i gwarancję. Polisę OC może dodać do profilu.</p></div>
       <div class="fh-step"><div class="nr">5</div><h3>Ocena przez Fachorę</h3><p>Pracownik Fachory sprawdza całość i przyznaje znak Verified. Dopiero wtedy firma widzi zlecenia i pojawia się w wynikach.</p></div>
       <div class="fh-step"><div class="nr">6</div><h3>Kontrola ciągła</h3><p>Status w rejestrze, status VAT, ważność polisy i średnia ocen są sprawdzane cyklicznie. Firma dostaje przypomnienie, zanim coś wygaśnie.</p></div>

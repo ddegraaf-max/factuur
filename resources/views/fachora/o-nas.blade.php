@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- O nas — Fachora: skąd się wzięła, co obiecuje, kto za nią stoi (Budomatch), zasady. Bez zmyślonych liczb i osób. --}}
+{{-- O nas — Fachora: skąd się wzięła, co obiecuje, kto za nią stoi (Creditline B.V.), zasady. Bez zmyślonych liczb i osób. --}}
 
-@section('title', 'O nas — Fachora, usługa Budomatch')
-@section('description', 'Dlaczego powstała Fachora: dla obcokrajowców w Polsce i dla Polaków, którzy mają dość „przyjdę jutro”. Kto za nią stoi (Budomatch, polska firma, która łączy klientów z wykonawcami) i jakich zasad się trzymamy: nie każda firma trafia na Fachora, zero zimnych e-maili, cena z góry, pieniądze bezpieczne.')
+@section('title', 'O nas — Fachora, usługa Creditline')
+@section('description', 'Dlaczego powstała Fachora: dla obcokrajowców w Polsce i dla Polaków, którzy mają dość „przyjdę jutro”. Kto za nią stoi (Creditline B.V., holenderska firma, która od lat tworzy oprogramowanie dla branży budowlanej i usługowej) i jakich zasad się trzymamy: nie każda firma trafia na Fachora, zero zimnych e-maili, cena z góry, pieniądze bezpieczne.')
 
 @push('styles')
 <style>
@@ -47,7 +47,7 @@
     <div class="about-promise" style="margin-top:40px;">
       <span class="tag">Jasna cena. Pewny termin. Gwarancja.</span>
       <h2>Nie każda firma trafia na Fachora</h2>
-      <p>Firma jest na Fachora dopiero jako <strong>Fachora Verified</strong>: po sprawdzeniu w CEIDG lub KRS i na białej liście VAT, po potwierdzeniu e-maila i telefonu, po weryfikacji tożsamości właściciela i konta bankowego przez Stripe, i po zaakceptowaniu <a href="{{ route('fachora.standard') }}" style="color:#fff;text-decoration:underline;">Standardu Fachora</a> — dziesięciu zasad, których nieprzestrzeganie kończy się zawieszeniem.</p>
+      <p>Firma jest na Fachora dopiero jako <strong>Fachora Verified</strong>: po sprawdzeniu w CEIDG lub KRS i na białej liście VAT, po potwierdzeniu e-maila i telefonu, po weryfikacji tożsamości właściciela i konta bankowego przez Mollie, i po zaakceptowaniu <a href="{{ route('fachora.standard') }}" style="color:#fff;text-decoration:underline;">Standardu Fachora</a> — dziesięciu zasad, których nieprzestrzeganie kończy się zawieszeniem.</p>
       <p>Firmy z rejestrów publicznych, które nie przeszły tej drogi, widać u nas tylko z nazwy i miasta. Nie kierujemy do nich zleceń i nie pokazujemy ich kontaktu.</p>
     </div>
   </div>
@@ -57,10 +57,10 @@
   <div class="container">
     <div class="section-header" style="margin-bottom:32px;">
       <h2>Kto za tym stoi</h2>
-      <p>Fachora jest usługą Budomatch — polskiej firmy z Białki na Mazowszu, która łączy klientów z wykonawcami i buduje narzędzia dla małych firm.</p>
+      <p>Fachora jest usługą Creditline B.V. — holenderskiej firmy z Bussum, która tworzy oprogramowanie dla firm budowlanych i usługowych i od lat współpracuje z wykonawcami. Założyciel mieszka w Polsce, w Płocku.</p>
     </div>
     <div class="about-who">
-      <div><b>Budomatch</b>Operator platformy. Budomatch Daniël de Graaf · Białka 15, 09-550 Białka · NIP 7010869430 · REGON 381430120. Lata pracy z wykonawcami nauczyły nas jednego: najdroższe są ustalenia, których nikt nie spisał.</div>
+      <div><b>Creditline B.V.</b>Operator platformy. Creditline B.V. · Torenlaan 5B, 1402 AT Bussum, Holandia · KvK 59683198 · VAT NL853603108B01. Lata pracy z wykonawcami nauczyły nas jednego: najdroższe są ustalenia, których nikt nie spisał.</div>
       <div><b>Program do faktur w zestawie</b>Firmy Fachora Verified wystawiają faktury i rozliczają zlecenia w programie, który dostają razem z profilem — gotowym na KSeF.</div>
       <div><b>Fachora</b>Ta sama technologia, która pilnuje, żeby faktura została zapłacona, pilnuje teraz, żeby usługa została wykonana tak, jak ustalono. Marka polska, obsługa w pięciu językach.</div>
     </div>
@@ -74,7 +74,7 @@
       <div class="about-principle"><span class="n">1</span><h3>Nie każda firma trafia na Fachora</h3><p>Rejestry, tożsamość, konto bankowe, Standard Fachora. Firma, której ocena spada poniżej {{ number_format((float) config('fachora.min_rating'), 1, ',', '') }} albo która zbiera uzasadnione skargi, znika z listy. Wolimy mieć mniej firm niż firmy, za które nie możemy ręczyć.</p></div>
       <div class="about-principle"><span class="n">2</span><h3>Zero reklam do firm</h3><p>Firmom z rejestrów publicznych nie wysyłamy reklam, newsletterów ani SMS-ów. Firma dostaje od nas e-mail tylko wtedy, gdy klient sam ją wybrał do swojego zlecenia — zawsze z informacją, skąd mamy dane, i linkiem do rezygnacji.</p></div>
       <div class="about-principle"><span class="n">3</span><h3>Cena z góry</h3><p>Ofertę z ceną brutto dostajesz, zanim ktokolwiek przyjdzie. Dodatkowe prace tylko jako osobna pozycja, którą zatwierdzasz na swojej stronie zlecenia. Bez niespodzianek przy wyjściu.</p></div>
-      <div class="about-principle"><span class="n">4</span><h3>Pieniądze bezpieczne</h3><p>Z Fachora Protect rezerwujesz kwotę przez Stripe. My nigdy nie trzymamy Twoich pieniędzy. Firma dostaje wypłatę po Twojej akceptacji, a w razie sporu decydujemy my — na podstawie zdjęć, opisu i odpowiedzi obu stron.</p></div>
+      <div class="about-principle"><span class="n">4</span><h3>Pieniądze bezpieczne</h3><p>Z Fachora Protect rezerwujesz kwotę przez Mollie. My nigdy nie trzymamy Twoich pieniędzy. Firma dostaje wypłatę po Twojej akceptacji, a w razie sporu decydujemy my — na podstawie zdjęć, opisu i odpowiedzi obu stron.</p></div>
       <div class="about-principle"><span class="n">5</span><h3>Prawdziwe opinie</h3><p>Opinię może wystawić tylko klient po zakończonym zleceniu. Firma może odpowiedzieć, ale nie może usunąć. Nie publikujemy statystyk, których nie mamy.</p></div>
       <div class="about-principle"><span class="n">6</span><h3>Dla klientów bezpłatnie</h3><p>Fachora zarabia na prowizji od firmy, i to tylko od wykonanych zleceń. Bez abonamentu, bez opłat za rejestrację, bez płacenia za leady. Firma płaci, gdy zarobiła.</p></div>
     </div>

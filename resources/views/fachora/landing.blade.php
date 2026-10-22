@@ -124,7 +124,7 @@
       <div class="fh-flow">
         <div class="fh-flow-item">
           <div class="nr">1</div>
-          <div><b>Rezerwujesz kwotę</b><p>BLIK, Przelewy24 lub karta. Płatność obsługuje Stripe, licencjonowana instytucja płatnicza.</p></div>
+          <div><b>Rezerwujesz kwotę</b><p>BLIK, Przelewy24 lub karta. Płatność obsługuje Mollie, licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank.</p></div>
         </div>
         <div class="fh-flow-item">
           <div class="nr">2</div>
@@ -153,7 +153,7 @@
           <div class="ex">Przykład. Kwoty i terminy ustalasz z wybraną firmą.</div>
         </div>
         <div class="note">
-          <b>Spór?</b> Pieniądze zostają zablokowane, dopóki sprawa nie zostanie rozstrzygnięta. Firma ma {{ $disputeHours }} godzin na odpowiedź; jeśli jej nie ma, decyzja jest po Twojej stronie. Fachora nie przechowuje Twoich pieniędzy: całą płatnością zajmuje się Stripe.
+          <b>Spór?</b> Pieniądze zostają zablokowane, dopóki sprawa nie zostanie rozstrzygnięta. Firma ma {{ $disputeHours }} godzin na odpowiedź; jeśli jej nie ma, decyzja jest po Twojej stronie. Fachora nie przechowuje Twoich pieniędzy: całą płatnością zajmuje się Mollie.
         </div>
         <div style="margin-top:18px;"><a href="{{ route('fachora.protect') }}" class="btn btn-white">Jak działa Fachora Protect</a></div>
       </div>
@@ -174,7 +174,7 @@
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Rejestr i NIP</b><p>Firma istnieje, jest aktywna w CEIDG lub KRS, NIP i status VAT się zgadzają.</p></div></div>
-        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Tożsamość i konto bankowe</b><p>Osoba reprezentująca firmę i jej rachunek bankowy potwierdzone przez Stripe.</p></div></div>
+        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Tożsamość i konto bankowe</b><p>Osoba reprezentująca firmę i jej rachunek bankowy potwierdzone przez Mollie.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 20])</span><div><b>Telefon, e-mail, regulamin</b><p>Numer potwierdzony kodem SMS, adres linkiem, Standard Fachora zaakceptowany z datą i wersją.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 20])</span><div><b>Ubezpieczenie OC: widoczne</b><p>Jeśli firma ma polisę, zobaczysz to w profilu. Po jej wygaśnięciu znak znika do czasu odnowienia.</p></div></div>
       </div>
@@ -250,7 +250,7 @@
         <div class="eyebrow">Dla firm</div>
         @if ($lead)
         <h2>Nowi klienci w Twojej okolicy. Bez abonamentu.</h2>
-        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł, zależnie od wielkości pracy. Pierwsze gratis. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
+        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł netto, zależnie od wielkości pracy. Pierwsze gratis. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
         @else
         <h2>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h2>
         <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>

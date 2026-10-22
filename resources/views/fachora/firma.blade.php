@@ -200,7 +200,7 @@
             @endif
           </div>
           <div class="fp-note">
-            Firma Fachora Verified: sprawdzona w rejestrach (CEIDG/KRS, biała lista VAT), z potwierdzonym e-mailem i telefonem, tożsamością i kontem bankowym zweryfikowanymi przez Stripe, i z zaakceptowanym <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Standardem Fachora</a>.
+            Firma Fachora Verified: sprawdzona w rejestrach (CEIDG/KRS, biała lista VAT), z potwierdzonym e-mailem i telefonem, tożsamością i kontem bankowym zweryfikowanymi przez Mollie, i z zaakceptowanym <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Standardem Fachora</a>.
             @if($summary['protect']) Z <a href="{{ route('fachora.protect') }}" style="color:var(--brand);font-weight:500;">Fachora Protect</a> płacisz dopiero po zakończeniu pracy — pieniądze czekają u operatora płatności.@endif
           </div>
         </div>

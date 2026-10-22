@@ -22,7 +22,7 @@
 
 @section('title', $lead ? 'Fachora dla firm — klienci sami wybierają Twoją firmę, płacisz tylko za zlecenia, na które odpowiadasz' : 'Fachora dla firm — nowi klienci w Twojej okolicy, płacisz tylko za zrealizowane zlecenia')
 @section('description', $lead
-  ? 'Klient sam wybiera Twoją firmę i wysyła zapytanie. Podgląd zlecenia za darmo, odblokowanie od ' . $leadMin . ' do ' . $leadMax . ' zł zależnie od wielkości pracy, pierwsze zapytanie gratis. 0 zł abonamentu, bez prowizji od zapłaty bezpośredniej, profil z opiniami.'
+  ? 'Klient sam wybiera Twoją firmę i wysyła zapytanie. Podgląd zlecenia za darmo, odblokowanie od ' . $leadMin . ' do ' . $leadMax . ' zł netto zależnie od wielkości pracy, pierwsze zapytanie gratis. 0 zł abonamentu, bez prowizji od zapłaty bezpośredniej, profil z opiniami.'
   : 'Zlecenia z opisem, zdjęciami i terminem na e-mail, Twoja cena, adres po wyborze przez klienta, pewna zapłata przez Fachora Protect, profil z opiniami. 0 zł abonamentu, 0 zł za zlecenie, prowizja ' . $fee . '% od wykonanej pracy, przez pierwsze ' . $introDays . ' dni ' . $intro . '%.')
 
 @push('styles')
@@ -55,7 +55,7 @@
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 22])</span><h3>Zlecenie na e-mail</h3><p>Opis, zdjęcia, termin, język klienta i szacunkowy zakres. Masz {{ $offerHours }} godzin, żeby podać cenę i termin przez link, bez logowania.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span><h3>Twoja cena</h3><p>Cena stała albo stawka godzinowa z dojazdem. Nie licytujesz się w dół: klient widzi obok ceny Twoją ocenę, języki i gwarancję.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 22])</span><h3>Adres po wyborze</h3><p>Dopiero gdy klient Cię wybierze, dostajesz adres i dane kontaktowe. Konkurencja do {{ $maxOffers }} firm, nie dwudziestu.</p></div>
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Pewna zapłata</h3><p>Z Fachora Protect klient rezerwuje kwotę przed Twoim przyjazdem. Po jego akceptacji (albo po {{ $acceptDays }} dniach bez reakcji) Stripe przelewa pieniądze na Twoje konto.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Pewna zapłata</h3><p>Z Fachora Protect klient rezerwuje kwotę przed Twoim przyjazdem. Po jego akceptacji (albo po {{ $acceptDays }} dniach bez reakcji) Mollie przelewa pieniądze na Twoje konto.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 22])</span><h3>Klient sam Cię wybiera</h3><p>Klient widzi Twój profil, opinie, języki i odległość i sam decyduje, do kogo wysłać zapytanie. Nie ścigasz się z dwudziestoma firmami o każdy telefon.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'lang', 'size' => 22])</span><h3>Profil z opiniami i językami</h3><p>Opinie tylko po zleceniach zrealizowanych przez Fachorę, z Twoją odpowiedzią. Mówisz po angielsku, niemiecku lub ukraińsku? Dostajesz zlecenia od klientów z zagranicy, do których inni nie docierają.</p></div>
     </div>
@@ -73,7 +73,7 @@
     <div class="fh-prices">
       <div class="fh-price"><div class="v">0 <small>zł</small></div><b>abonament</b><span>bez miesięcznej opłaty i bez pakietów punktów</span></div>
       <div class="fh-price"><div class="v">0 <small>zł</small></div><b>podgląd zlecenia</b><span>opis, zdjęcia, termin i miasto widzisz zawsze za darmo</span></div>
-      <div class="fh-price hl"><div class="v">{{ $leadMin }}–{{ $leadMax }}<small> zł</small></div><b>za odblokowanie</b><span>{{ $leadPct }}% szacowanej wartości pracy; pierwsze zapytanie gratis</span></div>
+      <div class="fh-price hl"><div class="v">{{ $leadMin }}–{{ $leadMax }}<small> zł</small></div><b>za odblokowanie</b><span>{{ $leadPct }}% szacowanej wartości pracy, kwoty netto; pierwsze zapytanie gratis</span></div>
       <div class="fh-price"><div class="v">0 <small>%</small></div><b>prowizji przy płatności bezpośredniej</b><span>przy Fachora Protect: {{ $fee }}% potrącane przy wypłacie</span></div>
     </div>
     <div class="fh-note" style="max-width:760px;margin:24px auto 0;">
@@ -105,7 +105,7 @@
     <div class="fh-ways">
       <div class="fh-way"><span class="k">Dostałeś list</span><h3>Wpisz kod z listu</h3><p>Firmom z rejestrów publicznych wysyłamy pocztą list z kodem. Kod łączy Cię z Twoim profilem; potwierdzasz e-mail i telefon, i profil jest Twój.</p><a href="{{ route('fachora.claim') }}" class="btn btn-primary">Mam kod z listu</a></div>
       <div class="fh-way"><span class="k">Jesteś w bazie</span><h3>Znajdź swój profil</h3><p>Twoja firma może już być w naszej bazie jako profil nieaktywny, bez telefonu i bez zleceń. Wyszukaj ją po NIP i przejmij profil.</p><a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Znajdź profil po NIP</a></div>
-      <div class="fh-way"><span class="k">Nie ma Cię w bazie</span><h3>Zgłoś firmę</h3><p>Podaj NIP, kategorie, zasięg i języki. Sprawdzimy rejestry, poprosimy o onboarding w Stripe i akceptację Standardu, a potem przyznamy znak Verified.</p><a href="{{ route('fachora.apply') }}" class="btn btn-secondary">Zgłoś firmę</a></div>
+      <div class="fh-way"><span class="k">Nie ma Cię w bazie</span><h3>Zgłoś firmę</h3><p>Podaj NIP, kategorie, zasięg i języki. Sprawdzimy rejestry, poprosimy o onboarding w Mollie i akceptację Standardu, a potem przyznamy znak Verified.</p><a href="{{ route('fachora.apply') }}" class="btn btn-secondary">Zgłoś firmę</a></div>
     </div>
     <div class="fh-note warm" style="max-width:860px;margin:28px auto 0;">
       <b>Żadnych reklam ani newsletterów.</b> Jeśli Twoja firma jest w naszej bazie z rejestru publicznego, możesz dostać od nas jedynie zapytanie klienta, który sam wybrał Twoją firmę — z linkiem do rezygnacji. Przejęty i zweryfikowany profil daje więcej: znak Verified, wyższą pozycję na liście i zlecenia z całego Twojego zasięgu.
@@ -143,11 +143,11 @@
     </div>
     <div class="faq-list">
       <details class="faq-item"><summary>Czy muszę odpowiadać na każde zlecenie?{!! $chev !!}</summary><div class="faq-content">Nie. Odpowiadasz na te, które Ci pasują; przy innych klikasz „nie tym razem”, najlepiej z krótkim powodem. Liczy się czas reakcji, nie liczba ofert. Zlecenie, na które nie odpowiesz w {{ $offerHours }} godzin, po prostu wygasa.</div></details>
-      <details class="faq-item"><summary>Kiedy dostaję pieniądze?{!! $chev !!}</summary><div class="faq-content">Przy Fachora Protect: po akceptacji klienta albo po {{ $acceptDays }} dniach od Twojego zgłoszenia „gotowe”, jeśli klient nie zareaguje. Stripe przelewa kwotę pomniejszoną o prowizję na rachunek firmy podany przy onboardingu. Bez Protect klient płaci Ci bezpośrednio{{ $lead ? ', bez żadnej prowizji.' : ', a prowizję rozliczamy osobno.' }}</div></details>
+      <details class="faq-item"><summary>Kiedy dostaję pieniądze?{!! $chev !!}</summary><div class="faq-content">Przy Fachora Protect: po akceptacji klienta albo po {{ $acceptDays }} dniach od Twojego zgłoszenia „gotowe”, jeśli klient nie zareaguje. Mollie przelewa kwotę pomniejszoną o prowizję na rachunek firmy podany przy onboardingu. Bez Protect klient płaci Ci bezpośrednio{{ $lead ? ', bez żadnej prowizji.' : ', a prowizję rozliczamy osobno.' }}</div></details>
       <details class="faq-item"><summary>Co, gdy na miejscu okaże się, że jest więcej pracy?{!! $chev !!}</summary><div class="faq-content">Dodajesz pozycję „prace dodatkowe” z ceną i opisem. Klient zatwierdza ją na swojej stronie zlecenia, a przy Protect od razu ją dopłaca. Bez zatwierdzenia nie wykonujesz tej pracy, bo nikt Ci za nią nie zapłaci.</div></details>
       <details class="faq-item"><summary>Czy muszę mieć ubezpieczenie OC?{!! $chev !!}</summary><div class="faq-content">Nie jest obowiązkowe. Jeśli je masz, dodajesz polisę do profilu i klient widzi znak „ubezpieczony”, co w praktyce pomaga wygrać zlecenie. Przed wygaśnięciem polisy dostajesz przypomnienie.</div></details>
       <details class="faq-item"><summary>Czy mogę używać programu do faktur poza zleceniami z Fachory?{!! $chev !!}</summary><div class="faq-content">Tak, do wszystkich klientów. Faktury, oferty, kontrahenci z weryfikacją NIP, XML dla KSeF. Program jest bezpłatny, dopóki Twoja firma ma status Verified.</div></details>
-      <details class="faq-item"><summary>Jak wygląda faktura?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Budomatch — polskiej firmy. Opłaty za odblokowanie i prowizję fakturujemy polską fakturą VAT (23%). Fakturę dostajesz e-mailem.</div></details>
+      <details class="faq-item"><summary>Jak wygląda faktura?{!! $chev !!}</summary><div class="faq-content">Fachora jest usługą Creditline B.V. — spółki z siedzibą w Holandii (numer VAT NL853603108B01). Opłaty za odblokowanie i prowizja to kwoty netto: fakturujemy je bez polskiego VAT, z adnotacją „odwrotne obciążenie”, a VAT w Polsce rozliczasz sam jako import usług. Fakturę dostajesz e-mailem.</div></details>
     </div>
   </div>
 </section>

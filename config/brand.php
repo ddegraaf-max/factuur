@@ -309,10 +309,11 @@ return [
                     'register_seo_description' => 'Claim your company profile, pass verification and receive jobs from customers near you. No subscription, commission only on completed jobs.',
                 ],
             ],
-            // De aanbieder van Fachora is Budomatch (Pools, CEIDG), niet Creditline B.V.
-            'owner_name' => 'Budomatch Daniël de Graaf',
-            'owner_city' => 'Białka',
-            'owner_country' => 'PL',
+            // De aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V.
+            // (Torenlaan 5B, 1402 AT Bussum, KvK 59683198, btw NL853603108B01).
+            'owner_name' => 'Creditline B.V.',
+            'owner_city' => 'Bussum',
+            'owner_country' => 'NL',
 
             /*
              * Het portaal voor een Pools bedrijf: alleen wat een fachowiec gebruikt.

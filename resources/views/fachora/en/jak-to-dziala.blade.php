@@ -76,7 +76,7 @@
         <div class="nr">5</div>
         <div>
           <h3>You reserve the payment, or pay afterwards</h3>
-          <p>With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you reserve the agreed amount by BLIK, Przelewy24 or card. The payment is processed by Stripe; Fachora never holds your money. The company receives it only after your approval.</p>
+          <p>With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you reserve the agreed amount by BLIK, Przelewy24 or card. The payment is processed by Mollie, a licensed payment institution; Fachora never holds your money. The company receives it only after your approval.</p>
           <p style="margin-top:10px;">You can also pay the company directly once the work is done. Then there is no blocked payment and no payment-backed dispute resolution, but the company's verification, the invoice and the company's warranty still apply.</p>
           <span class="tag">Up to {{ $cancelHours }} hours before the appointment you can cancel free of charge</span>
         </div>

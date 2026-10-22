@@ -2,14 +2,14 @@
 
 {{--
   WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
-  Polityka prywatności Fachora (RODO). Administrator: Budomatch Daniël de Graaf Obejmuje Klientów, Firmy
+  Polityka prywatności Fachora (RODO). Administrator: Creditline B.V. (Bussum, Holandia). Obejmuje Klientów, Firmy
   (dane z rejestrów na podstawie art. 6 ust. 1 lit. f, przejęty profil na podstawie lit. b, weryfikację,
-  Stripe Connect jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających.
+  Mollie jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających.
   Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
 
 @section('title', 'Polityka prywatności Fachora')
-@section('description', 'Jak Fachora (Budomatch) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Stripe, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
+@section('description', 'Jak Fachora (Creditline B.V.) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Mollie, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
 
 @push('styles')
 <style>
@@ -45,13 +45,13 @@
   <div class="container">
     <div class="eyebrow">Dokumenty</div>
     <h1>Polityka prywatności</h1>
-    <div class="meta">Wersja z dnia 16 października 2026 r.</div>
+    <div class="meta">Wersja z dnia 22 października 2026 r.</div>
 
     <div class="entity">
       Administrator danych osobowych:<br>
-      <strong>Budomatch Daniël de Graaf</strong>, prowadzący platformę <strong>Fachora</strong> (fachora.pl)<br>
-      Białka 15 · 09-550 Białka · Polska<br>
-      NIP 7010869430 · REGON 381430120 · działalność gospodarcza wpisana do CEIDG<br>
+      <strong>Creditline B.V.</strong>, prowadząca platformę <strong>Fachora</strong> (fachora.pl)<br>
+      Torenlaan 5B · 1402 AT Bussum · Holandia<br>
+      spółka z ograniczoną odpowiedzialnością prawa holenderskiego (B.V.), wpisana do rejestru handlowego KvK pod nr 59683198 · numer VAT NL853603108B01<br>
       Kontakt w sprawach danych osobowych: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
@@ -86,7 +86,7 @@
       <li><strong>Dane kontaktowe:</strong> adres e-mail (zawsze), imię i nazwisko oraz numer telefonu (jeżeli je podasz lub są potrzebne do umówienia terminu), preferowany język obsługi.</li>
       <li><strong>Opis zlecenia:</strong> kategoria, opis problemu, zdjęcia, pilność, kod pocztowy lub miejscowość. Zdjęcia mogą przypadkowo zawierać dane osobowe (np. wnętrze mieszkania) — prosimy, żeby fotografować tylko to, co dotyczy usterki.</li>
       <li><strong>Adres wykonania usługi</strong> — podawany dopiero po wyborze firmy i przekazywany tylko tej firmie.</li>
-      <li><strong>Płatność:</strong> status płatności, kwota, identyfikator transakcji u operatora płatności, metoda płatności (np. „BLIK”). <strong>Nie otrzymujemy i nie przechowujemy numerów kart ani danych logowania do banku</strong> — obsługuje je wyłącznie Stripe.</li>
+      <li><strong>Płatność:</strong> status płatności, kwota, identyfikator transakcji u operatora płatności, metoda płatności (np. „BLIK”). <strong>Nie otrzymujemy i nie przechowujemy numerów kart ani danych logowania do banku</strong> — obsługuje je wyłącznie Mollie.</li>
       <li><strong>Przebieg zlecenia:</strong> oferty, wybór, zatwierdzone prace dodatkowe, zgłoszenia zakończenia, spory z opisem i zdjęciami, opinia, korespondencja przez platformę, daty i adresy IP czynności (potwierdzenie, wybór, akceptacja).</li>
     </ul>
     <p>Źródło: Ty, a w zakresie statusu płatności — operator płatności.</p>
@@ -96,7 +96,7 @@
       <li><strong>Dane rejestrowe</strong> (profil nieaktywny): nazwa, imię i nazwisko przedsiębiorcy (przy jednoosobowej działalności są to dane osobowe), NIP, REGON, KRS, forma prawna, adres siedziby, kody PKD, status działalności, status VAT i numery rachunków z wykazu podatników VAT. Źródło: CEIDG (dane.biznes.gov.pl), KRS (Ministerstwo Sprawiedliwości), wykaz podatników VAT (Ministerstwo Finansów). Szczegóły w pkt 4.</li>
       <li><strong>Dane przejętego profilu:</strong> adres e-mail i numer telefonu osoby przejmującej profil, jej imię i nazwisko, kod z listu, nazwa wyświetlana, opis, zdjęcie lub logo, kategorie, języki i ich poziom, zasięg, stawki orientacyjne, okres gwarancji, deklaracja faktury, zgoda na Fachora Protect. Źródło: firma.</li>
       <li><strong>Dane weryfikacji:</strong> wyniki sprawdzeń w rejestrach i wykazie VAT (z datą i treścią odpowiedzi), potwierdzenie e-maila i telefonu (kody, daty), data i wersja zaakceptowanego regulaminu i Standardu Fachora, polisa OC (jeżeli ją prześlesz: plik, ubezpieczyciel, zakres, data ważności), notatki z weryfikacji i z obsługi zgłoszeń.</li>
-      <li><strong>Stripe Connect:</strong> identyfikator konta u operatora płatności, status możliwości przyjmowania płatności i wypłat, lista brakujących wymagań. <strong>Dokumenty tożsamości, dane beneficjentów rzeczywistych i numer rachunku bankowego zbiera i weryfikuje Stripe jako odrębny administrator</strong> (pkt 5); my widzimy tylko wynik.</li>
+      <li><strong>Konto u operatora płatności (Mollie):</strong> identyfikator konta u operatora płatności, status możliwości przyjmowania płatności i wypłat, lista brakujących wymagań. <strong>Dokumenty tożsamości, dane beneficjentów rzeczywistych i numer rachunku bankowego zbiera i weryfikuje Mollie jako odrębny administrator</strong> (pkt 5); my widzimy tylko wynik.</li>
       <li><strong>Działalność na platformie:</strong> otrzymane zlecenia, oferty, zlecenia w toku, zgłoszenia, spory, opinie i odpowiedzi, średnia ocena, liczba zleceń, czas reakcji, naruszenia Standardu Fachora, faktury za prowizję, wypłaty.</li>
       <li><strong>Konto:</strong> login, zaszyfrowane hasło (hash), daty logowania, adresy IP, dziennik czynności.</li>
     </ul>
@@ -117,7 +117,7 @@
         <tr><td>Opinie i ich publikacja, odpowiedzi firm</td><td>ocena, tekst, numer zlecenia, data</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes: rzetelna informacja o firmach dla klientów</td><td>dopóki profil firmy jest na platformie; na żądanie autora tekst można zanonimizować</td></tr>
         <tr><td>Profil nieaktywny z rejestru publicznego</td><td>dane rejestrowe</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (pkt 4)</td><td>do żądania usunięcia albo do 12 miesięcy po wykreśleniu z rejestru; po usunięciu tylko NIP i data żądania</td></tr>
         <tr><td>Przejęcie profilu, prowadzenie konta firmy, panel, komunikacja o zleceniach</td><td>dane przejętego profilu, konto, działalność na platformie</td><td>art. 6 ust. 1 lit. b — umowa o korzystanie z platformy</td><td>czas trwania umowy i 6 lat po jej zakończeniu (przedawnienie roszczeń)</td></tr>
-        <tr><td>Weryfikacja i oznaczenie Fachora Verified, identyfikowalność przedsiębiorcy (art. 30 DSA), egzekwowanie Standardu Fachora</td><td>dane weryfikacji, wynik Stripe Connect, polisa, naruszenia</td><td>art. 6 ust. 1 lit. c — rozporządzenie (UE) 2022/2065; art. 6 ust. 1 lit. f — bezpieczeństwo klientów i platformy</td><td>czas trwania umowy i 6 miesięcy po jej zakończeniu (DSA); informacje o poważnych naruszeniach i zablokowany NIP — 5 lat</td></tr>
+        <tr><td>Weryfikacja i oznaczenie Fachora Verified, identyfikowalność przedsiębiorcy (art. 30 DSA), egzekwowanie Standardu Fachora</td><td>dane weryfikacji, wynik weryfikacji w Mollie, polisa, naruszenia</td><td>art. 6 ust. 1 lit. c — rozporządzenie (UE) 2022/2065; art. 6 ust. 1 lit. f — bezpieczeństwo klientów i platformy</td><td>czas trwania umowy i 6 miesięcy po jej zakończeniu (DSA); informacje o poważnych naruszeniach i zablokowany NIP — 5 lat</td></tr>
         <tr><td>Prowizja: faktury, rozliczenia, windykacja</td><td>dane firmy, kwoty zleceń, faktury</td><td>art. 6 ust. 1 lit. b i lit. c (przepisy podatkowe)</td><td>5 lat od końca roku podatkowego</td></tr>
         <tr><td>Obsługa zgłoszeń, reklamacji, odwołań i zgłoszeń treści (DSA)</td><td>treść zgłoszenia, dane zgłaszającego, decyzja i uzasadnienie</td><td>art. 6 ust. 1 lit. c (DSA, prawa konsumenta); lit. f — obrona przed roszczeniami</td><td>3 lata od zakończenia sprawy</td></tr>
         <tr><td>Formularz kontaktowy</td><td>dane z formularza</td><td>art. 6 ust. 1 lit. f — odpowiedź na Twoją wiadomość</td><td>12 miesięcy od ostatniej wiadomości</td></tr>
@@ -140,7 +140,7 @@
     <div class="tbl-wrap">
       <table class="tbl">
         <tr><th>Odbiorca</th><th>Rola</th><th>Po co</th><th>Gdzie</th></tr>
-        <tr><td>Stripe Payments Europe, Ltd. (Dublin, Irlandia) i spółki grupy Stripe</td><td>operator płatności — <strong>odrębny administrator</strong> w zakresie płatności i weryfikacji (KYC) firm; częściowo podmiot przetwarzający</td><td>Fachora Protect: przyjęcie płatności klienta, przechowanie środków, wypłata firmie, zwroty; Stripe Connect: weryfikacja tożsamości i rachunku firmy. Stripe stosuje własną politykę prywatności (stripe.com/privacy)</td><td>UE; Stripe może przekazywać dane do USA na podstawie standardowych klauzul umownych</td></tr>
+        <tr><td>Mollie B.V. (Amsterdam, Holandia)</td><td>operator płatności — licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank; <strong>odrębny administrator</strong> w zakresie płatności i weryfikacji (KYC) firm; częściowo podmiot przetwarzający</td><td>Fachora Protect: przyjęcie płatności klienta, przechowanie środków, wypłata firmie, zwroty; płatności firm za odblokowanie zleceń; weryfikacja tożsamości i rachunku firmy. Mollie stosuje własną politykę prywatności (mollie.com)</td><td>UE (Holandia)</td></tr>
         <tr><td>Resend, Inc. (USA)</td><td>podmiot przetwarzający</td><td>wysyłka wiadomości e-mail (potwierdzenia, oferty, przypomnienia, faktury) i rejestr doręczeń</td><td>USA — standardowe klauzule umowne</td></tr>
         <tr><td>Railway Corp. (USA)</td><td>podmiot przetwarzający</td><td>hosting aplikacji i bazy danych</td><td>serwery w regionie UE (Amsterdam); dostęp administracyjny z USA możliwy na podstawie standardowych klauzul umownych</td></tr>
         <tr><td>Anthropic, PBC (USA)</td><td>podmiot przetwarzający</td><td>narzędzia AI: porządkowanie i tłumaczenie opisu zlecenia, orientacyjny przedział cen, odczyt danych z polisy OC, streszczenie sporu dla osoby, która go rozstrzyga (pkt 8). Przesyłane treści nie są wykorzystywane do trenowania modeli</td><td>USA — standardowe klauzule umowne</td></tr>
@@ -148,13 +148,13 @@
         <tr><td>Smstools (Belgia)</td><td>podmiot przetwarzający</td><td>wysyłka SMS: kody weryfikacyjne dla klientów i firm, powiadomienia o pilnych zleceniach, przypomnienia o terminie</td><td>UE</td></tr>
         <tr><td>Cloudflare, Inc. (USA) — Turnstile</td><td>podmiot przetwarzający</td><td>zabezpieczenie formularzy przed automatami; przetwarza adres IP i dane przeglądarki przy wysyłce formularza</td><td>UE/USA — standardowe klauzule umowne, Data Privacy Framework</td></tr>
         <tr><td>Biuro rachunkowe, doradca podatkowy, prawnik</td><td>podmioty przetwarzające lub odrębni administratorzy</td><td>księgowość prowizji, obsługa sporów prawnych</td><td>UE</td></tr>
-        <tr><td>Organy publiczne (np. sądy, Policja, UODO, organy państw członkowskich na podstawie DSA)</td><td>odrębni administratorzy</td><td>wyłącznie na żądanie oparte na przepisach prawa</td><td>—</td></tr>
+        <tr><td>Organy publiczne (np. sądy, Policja, UODO, Autoriteit Persoonsgegevens, organy państw członkowskich na podstawie DSA)</td><td>odrębni administratorzy</td><td>wyłącznie na żądanie oparte na przepisach prawa</td><td>—</td></tr>
       </table>
     </div>
     <p>Z podmiotami przetwarzającymi zawieramy umowy powierzenia (art. 28 RODO). Nie sprzedajemy danych i nie udostępniamy ich reklamodawcom.</p>
 
     <h2 id="s6">6. Przekazywanie danych poza Europejski Obszar Gospodarczy</h2>
-    <p>Aplikacja i baza danych działają na serwerach w Unii Europejskiej. Niektórzy dostawcy (Resend, Anthropic, Cloudflare, Railway jako operator infrastruktury, Stripe w zakresie wsparcia) mają siedzibę w USA; przekazanie danych odbywa się na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję Europejską (art. 46 ust. 2 lit. c RODO), a tam, gdzie dostawca jest certyfikowany — na podstawie decyzji o EU-US Data Privacy Framework. Przekazanie do Wielkiej Brytanii (OpenStreetMap) opiera się na decyzji Komisji stwierdzającej odpowiedni stopień ochrony. Kopię stosowanych zabezpieczeń udostępniamy na żądanie.</p>
+    <p>Aplikacja i baza danych działają na serwerach w Unii Europejskiej. Niektórzy dostawcy (Resend, Anthropic, Cloudflare, Railway jako operator infrastruktury) mają siedzibę w USA; przekazanie danych odbywa się na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję Europejską (art. 46 ust. 2 lit. c RODO), a tam, gdzie dostawca jest certyfikowany — na podstawie decyzji o EU-US Data Privacy Framework. Przekazanie do Wielkiej Brytanii (OpenStreetMap) opiera się na decyzji Komisji stwierdzającej odpowiedni stopień ochrony. Kopię stosowanych zabezpieczeń udostępniamy na żądanie.</p>
 
     <h2 id="s7">7. E-maile, SMS-y i marketing</h2>
     <ul>
@@ -176,7 +176,7 @@
     <h2 id="s10">10. Twoje prawa</h2>
     <p>Masz prawo do: <strong>dostępu</strong> do swoich danych i otrzymania ich kopii; <strong>sprostowania</strong> danych nieprawidłowych; <strong>usunięcia</strong> danych („prawo do bycia zapomnianym”) — z wyjątkiem danych, które musimy zachować z mocy prawa lub do obrony roszczeń; <strong>ograniczenia przetwarzania</strong>; <strong>przenoszenia danych</strong>, które przetwarzamy na podstawie umowy w sposób zautomatyzowany (otrzymasz je w formacie nadającym się do odczytu maszynowego); <strong>sprzeciwu</strong> wobec przetwarzania opartego na prawnie uzasadnionym interesie — w tym wobec profilu z rejestru publicznego (pkt 4) i wobec marketingu, który w razie sprzeciwu zawsze zaprzestajemy; oraz <strong>cofnięcia zgody</strong> w dowolnym momencie, jeżeli przetwarzanie opiera się na zgodzie, bez wpływu na zgodność z prawem wcześniejszego przetwarzania.</p>
     <p>Aby skorzystać z tych praw, napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (firma: najlepiej z adresu przypisanego do konta; klient: z adresu, na który przyszło potwierdzenie zlecenia). Odpowiadamy najpóźniej w ciągu miesiąca; w skomplikowanych sprawach możemy przedłużyć ten termin o kolejne dwa miesiące, o czym Cię poinformujemy. Możemy poprosić o potwierdzenie tożsamości, jeżeli żądanie przychodzi z innego adresu.</p>
-    <p>Masz też prawo wnieść <strong>skargę do organu nadzorczego</strong>: w Polsce jest to Prezes Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>).</p>
+    <p>Masz też prawo wnieść <strong>skargę do organu nadzorczego</strong> (art. 77 RODO). W Polsce jest to Prezes Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>). Ponieważ administrator ma siedzibę w Holandii, wiodącym organem nadzorczym jest holenderski urząd ochrony danych — Autoriteit Persoonsgegevens (<a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">autoriteitpersoonsgegevens.nl</a>). Skargę możesz złożyć do każdego z tych organów, także po polsku do Prezesa UODO.</p>
 
     <h2 id="s11">11. Bezpieczeństwo</h2>
     <p>Połączenia są szyfrowane (TLS). Hasła przechowujemy wyłącznie w postaci skrótu (hash). Linki do stron zleceń i ofert są długimi, losowymi tokenami, których nie da się odgadnąć; formularze mają limity liczby prób i zabezpieczenie antyspamowe. Dostęp do systemów produkcyjnych jest ograniczony do niezbędnych osób i rejestrowany. Zdjęcia i dokumenty przechowujemy w bazie danych, nie na publicznie dostępnych adresach. Codziennie wykonujemy kopie zapasowe. Dane kart i dokumenty tożsamości nigdy nie trafiają do naszych systemów — obsługuje je operator płatności. O naruszeniu ochrony danych, które może powodować wysokie ryzyko dla Twoich praw, poinformujemy Cię bez zbędnej zwłoki.</p>
@@ -185,7 +185,7 @@
     <p>Aktualizujemy tę politykę, gdy zmieniają się przepisy, nasi dostawcy lub działanie platformy. O istotnych zmianach informujemy firmy e-mailem i w panelu, a klientów — w wiadomościach dotyczących zlecenia. Aktualna wersja z datą jest zawsze dostępna pod adresem fachora.pl/polityka-prywatnosci; poprzednie wersje udostępniamy na żądanie.</p>
 
     <h2 id="s13">13. Kontakt</h2>
-    <p>W sprawach danych osobowych napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (w temacie „RODO”) albo listownie: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka. Zasady korzystania z platformy opisuje <a href="{{ route('pl.regulamin') }}">regulamin</a>.</p>
+    <p>W sprawach danych osobowych napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (w temacie „RODO”) albo listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia. Zasady korzystania z platformy opisuje <a href="{{ route('pl.regulamin') }}">regulamin</a>.</p>
 
     <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Pytania dotyczące prywatności: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

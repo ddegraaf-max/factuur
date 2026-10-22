@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
-{{-- About — Fachora, English edition: why it exists, the promise, who is behind it (Budomatch, a Polish company that connects customers with tradespeople), principles. No invented numbers or people. --}}
+{{-- About — Fachora, English edition: why it exists, the promise, who is behind it (Creditline B.V., a Dutch company that builds software for construction and service businesses), principles. No invented numbers or people. --}}
 
-@section('title', 'About us — Fachora, a Budomatch service')
-@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Budomatch, a Polish company that connects customers with tradespeople) and the principles we keep: not every company gets on Fachora, no advertising to companies, price up front, money kept safe.')
+@section('title', 'About us — Fachora, a Creditline service')
+@section('description', 'Why Fachora exists: for foreigners in Poland and for Poles who are tired of "I will come tomorrow". Who is behind it (Creditline B.V., a Dutch company that has built software for the construction and service sector for years) and the principles we keep: not every company gets on Fachora, no advertising to companies, price up front, money kept safe.')
 
 @push('styles')
 <style>
@@ -47,7 +47,7 @@
     <div class="about-promise" style="margin-top:40px;">
       <span class="tag">Clear price. Reliable appointment. Warranty.</span>
       <h2>Not every company gets on Fachora</h2>
-      <p>A company is on Fachora only as <strong>Fachora Verified</strong>: after a check in CEIDG or KRS and the VAT white list, after confirming its e-mail and phone, after Stripe has verified the owner's identity and bank account, and after accepting the <a href="{{ route('fachora.standard') }}" style="color:#fff;text-decoration:underline;">Fachora Standard</a> — ten rules whose breach leads to suspension.</p>
+      <p>A company is on Fachora only as <strong>Fachora Verified</strong>: after a check in CEIDG or KRS and the VAT white list, after confirming its e-mail and phone, after Mollie has verified the owner's identity and bank account, and after accepting the <a href="{{ route('fachora.standard') }}" style="color:#fff;text-decoration:underline;">Fachora Standard</a> — ten rules whose breach leads to suspension.</p>
       <p>Companies from the public registers that have not gone through this are shown only by name and town. We do not send them jobs and we do not show their contact details.</p>
     </div>
   </div>
@@ -57,10 +57,10 @@
   <div class="container">
     <div class="section-header" style="margin-bottom:32px;">
       <h2>Who is behind it</h2>
-      <p>Fachora is a service of Budomatch — a Polish company from Białka in Mazovia that connects customers with tradespeople and builds tools for small businesses.</p>
+      <p>Fachora is a service of Creditline B.V. — a Dutch company based in Bussum that builds software for construction and service businesses and has worked with tradespeople for years. Its founder lives in Poland, in Płock.</p>
     </div>
     <div class="about-who">
-      <div><b>Budomatch</b>Platform operator. Budomatch Daniël de Graaf · Białka 15, 09-550 Białka, Poland · NIP 7010869430 · REGON 381430120. Years of working with tradespeople taught us one thing: the most expensive agreements are the ones nobody wrote down.</div>
+      <div><b>Creditline B.V.</b>Platform operator. Creditline B.V. · Torenlaan 5B, 1402 AT Bussum, the Netherlands · KvK 59683198 · VAT NL853603108B01. Years of working with tradespeople taught us one thing: the most expensive agreements are the ones nobody wrote down.</div>
       <div><b>Invoicing software included</b>Fachora Verified companies issue their invoices and settle jobs in the software they get together with their profile — ready for KSeF, the Polish e-invoicing system.</div>
       <div><b>Fachora</b>The same technology that makes sure an invoice gets paid now makes sure a service is delivered as agreed. A Polish brand, service in five languages.</div>
     </div>
@@ -74,7 +74,7 @@
       <div class="about-principle"><span class="n">1</span><h3>Not every company gets on Fachora</h3><p>Registers, identity, bank account, the Fachora Standard. A company whose rating drops below {{ number_format((float) config('fachora.min_rating'), 1, '.', '') }} or that collects justified complaints is removed from the list. We would rather have fewer companies than companies we cannot vouch for.</p></div>
       <div class="about-principle"><span class="n">2</span><h3>No advertising to companies</h3><p>We never send companies from public registers advertising, newsletters or text messages. A company gets an e-mail from us only when a customer chose it for their job — always with information on where we got its details and an unsubscribe link.</p></div>
       <div class="about-principle"><span class="n">3</span><h3>Price up front</h3><p>You receive an offer with a gross price before anyone arrives. Extra work only as a separate line that you approve on your job page. No surprises on the way out.</p></div>
-      <div class="about-principle"><span class="n">4</span><h3>Money kept safe</h3><p>With Fachora Protect you reserve the amount through Stripe. We never hold your money. The company is paid out after your approval, and in a dispute we decide — based on photos, the description and both sides' replies.</p></div>
+      <div class="about-principle"><span class="n">4</span><h3>Money kept safe</h3><p>With Fachora Protect you reserve the amount through Mollie. We never hold your money. The company is paid out after your approval, and in a dispute we decide — based on photos, the description and both sides' replies.</p></div>
       <div class="about-principle"><span class="n">5</span><h3>Real reviews</h3><p>Only a customer who completed a job can leave a review. The company can reply but cannot delete it. We do not publish statistics we do not have.</p></div>
       <div class="about-principle"><span class="n">6</span><h3>Free for customers</h3><p>Fachora earns a commission from the company, and only on completed jobs. No subscription, no registration fee, no paying for leads. A company pays once it has earned.</p></div>
     </div>

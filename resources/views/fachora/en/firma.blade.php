@@ -194,7 +194,7 @@
             @endif
           </div>
           <div class="fp-note">
-            A Fachora Verified company has been checked in the public registers (CEIDG/KRS, VAT white list), has a confirmed e-mail and phone number, identity and bank account verified by Stripe, and has accepted the <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Standard</a>.
+            A Fachora Verified company has been checked in the public registers (CEIDG/KRS, VAT white list), has a confirmed e-mail and phone number, identity and bank account verified by Mollie, and has accepted the <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Standard</a>.
             @if($summary['protect']) With <a href="{{ route('fachora.protect') }}" style="color:var(--brand);font-weight:500;">Fachora Protect</a> you only pay once the work is done — the money waits with the payment provider.@endif
           </div>
         </div>
