@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Schema;
 /*
  * Fachora 1.87: gratis voor de klant (met sms-code), het bedrijf betaalt per
  * lead. Het ontgrendelen staat op de aanbieding; de sms-controle op de opdracht.
+ * Daarnaast import op aanvraag: bedrijven rond een nieuwe klant uit CEIDG halen.
  */
 return new class extends Migration
 {
@@ -40,6 +41,10 @@ return new class extends Migration
             if (! Schema::hasColumn('service_jobs', 'phone_verified_at')) {
                 $table->timestamp('phone_verified_at')->nullable();
             }
+            // Zolang gevuld: Fachora zoekt bedrijven rond deze klant in CEIDG (import op aanvraag).
+            if (! Schema::hasColumn('service_jobs', 'provider_search_at')) {
+                $table->timestamp('provider_search_at')->nullable();
+            }
         });
     }
 
@@ -53,7 +58,7 @@ return new class extends Migration
             }
         });
         Schema::table('service_jobs', function (Blueprint $table) {
-            foreach (['phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at'] as $column) {
+            foreach (['phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at', 'provider_search_at'] as $column) {
                 if (Schema::hasColumn('service_jobs', $column)) {
                     $table->dropColumn($column);
                 }

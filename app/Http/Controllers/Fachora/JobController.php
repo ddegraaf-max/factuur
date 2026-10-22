@@ -74,6 +74,7 @@ class JobController extends Controller
                 'fee' => $this->jobs->requestFee(),
                 'selected' => array_map('intval', (array) $job->selected_providers),
                 'sms_required' => $this->jobs->smsRequired($job),
+                'searching' => $job->provider_search_at !== null,
                 'phone' => $job->customer_phone,
                 'code_sent' => $job->phone_code_sent_at !== null && $job->phone_verified_at === null,
             ] : null,

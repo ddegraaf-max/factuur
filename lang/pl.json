@@ -2044,5 +2044,7 @@
   "Bekijken is gratis. Wilt u reageren, dan ontgrendelt u de aanvraag voor :amount. Geen abonnement, geen provisie over uw rekening aan de klant.": "Podgląd jest bezpłatny. Jeśli chcesz odpowiedzieć, odblokowujesz zapytanie za :amount. Bez abonamentu i bez prowizji od Twojej faktury dla klienta.",
   "Geen abonnement. Bekijken is gratis; u betaalt alleen voor een aanvraag die u ontgrendelt om te reageren (:min tot :max, naar grootte van de klus). De eerste is gratis.": "Bez abonamentu. Podgląd jest bezpłatny; płacisz tylko za zapytanie, które odblokujesz, aby odpowiedzieć (od :min do :max, zależnie od wielkości pracy). Pierwsze jest gratis.",
   "Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.": "Fachora łączy klientów ze sprawdzonymi fachowcami. 0 zł abonamentu; płacisz tylko za zapytanie, na które chcesz odpowiedzieć (od :min do :max), a pierwsze jest gratis.",
-  "Nieuwe klanten in uw regio, geen abonnement": "Nowi klienci w Twojej okolicy, bez abonamentu"
+  "Nieuwe klanten in uw regio, geen abonnement": "Nowi klienci w Twojej okolicy, bez abonamentu",
+  "Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister": "Brak firm w okolicy: szukamy w rejestrze firm",
+  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Wyszukiwanie zakończone: firmy do wyboru: :n"
 }

@@ -80,6 +80,38 @@ class GeocodeService
         return $hit ? ['lat' => (float) $hit[0], 'lng' => (float) $hit[1]] : null;
     }
 
+    /**
+     * De powiat rond een punt (Nominatim reverse), voor de import op aanvraag.
+     * "powiat policki" wordt "policki"; een stad op powiatrechten geeft de stad.
+     */
+    public function county(?float $lat, ?float $lng): ?string
+    {
+        if ($lat === null || $lng === null) {
+            return null;
+        }
+        $key = 'fachora:county:' . round($lat, 3) . ',' . round($lng, 3);
+        if (Cache::has($key)) {
+            return Cache::get($key) ?: null;
+        }
+        $county = null;
+        try {
+            $response = Http::timeout(6)
+                ->withHeaders(['User-Agent' => 'Fachora/1.0 (' . config('fachora.geocode_contact') . ')'])
+                ->acceptJson()
+                ->get(config('fachora.geocode_url') . '/reverse', ['format' => 'jsonv2', 'lat' => $lat, 'lon' => $lng, 'zoom' => 8, 'addressdetails' => 1]);
+            $address = $response->ok() ? (array) ($response->json('address') ?? []) : [];
+            $raw = $address['county'] ?? $address['city'] ?? null;
+            if (is_string($raw) && $raw !== '') {
+                $county = trim(preg_replace('/^powiat\s+/iu', '', $raw));
+            }
+        } catch (\Throwable) {
+            return null; // geen cache: volgende keer opnieuw proberen
+        }
+        Cache::put($key, (string) $county, now()->addDays(90));
+
+        return $county ?: null;
+    }
+
     public static function normalise(?string $city): string
     {
         return trim(mb_strtolower(Str::ascii((string) $city)));

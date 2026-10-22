@@ -2044,5 +2044,7 @@
   "Bekijken is gratis. Wilt u reageren, dan ontgrendelt u de aanvraag voor :amount. Geen abonnement, geen provisie over uw rekening aan de klant.": "Viewing is free. To respond, you unlock the request for :amount. No subscription, no commission on your invoice to the customer.",
   "Geen abonnement. Bekijken is gratis; u betaalt alleen voor een aanvraag die u ontgrendelt om te reageren (:min tot :max, naar grootte van de klus). De eerste is gratis.": "No subscription. Viewing is free; you only pay for a request you unlock to respond (:min to :max, depending on the size of the job). The first one is free.",
   "Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.": "Fachora connects customers with verified tradespeople. 0 zł subscription; you only pay for a request you want to respond to (:min to :max), and the first one is free.",
-  "Nieuwe klanten in uw regio, geen abonnement": "New customers in your area, no subscription"
+  "Nieuwe klanten in uw regio, geen abonnement": "New customers in your area, no subscription",
+  "Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister": "No companies nearby yet: searching the business register",
+  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Search finished: :n companies to choose from"
 }

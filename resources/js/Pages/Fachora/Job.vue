@@ -1,6 +1,6 @@
 <script setup>
 import { router, useForm, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import FachoraShell from '@/Components/FachoraShell.vue';
 import FachoraBadge from '@/Components/FachoraBadge.vue';
 import { icon } from '@/fachora-icons.js';
@@ -83,6 +83,15 @@ const sendSelection = () => {
   selecting.value = true;
   router.post(route('fachora.job.select', props.token), { providers: picked.value, express: selectExpress.value ? 1 : 0 }, { preserveScroll: true, onFinish: () => { selecting.value = false; } });
 };
+
+/* ---------- import op aanvraag (1.87): pagina ververst zolang we zoeken ---------- */
+let searchTimer = null;
+onMounted(() => {
+  searchTimer = setInterval(() => {
+    if (props.choice?.searching) router.reload({ preserveScroll: true });
+  }, 20000);
+});
+onBeforeUnmount(() => clearInterval(searchTimer));
 
 /* ---------- sms-code (1.87) ---------- */
 const smsForm = useForm({ phone: props.choice?.phone || props.job.customer_phone || '' });
@@ -182,7 +191,11 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 
     <!-- ===== Zelf bedrijven kiezen (1.86) ===== -->
     <section v-if="status === 'selecting' && choice" class="jb-section">
-      <h2 class="fa-h2">{{ $t('Kies de bedrijven') }} <span class="fa-muted jb-count">{{ picked.length }}/{{ pickMax }}</span></h2>
+      <div v-if="choice.searching" class="fa-card fa-card--tint jb-searching">
+        <h2 class="fa-h2">{{ $t('We zoeken vakmensen bij jou in de buurt') }}</h2>
+        <p>{{ $t('We kijken in het Poolse bedrijvenregister welke bedrijven rond :city dit werk doen. Dat duurt meestal een paar minuten; je krijgt een e-mail zodra je kunt kiezen. Deze pagina ververst vanzelf.', { city: job.city }) }}</p>
+      </div>
+      <h2 v-else class="fa-h2">{{ $t('Kies de bedrijven') }} <span class="fa-muted jb-count">{{ picked.length }}/{{ pickMax }}</span></h2>
       <article v-for="p in choice.candidates" :key="p.id" class="fa-card jb-offer jb-pick" :class="{ 'is-open': picked.includes(p.id) }" @click="togglePick(p.id)">
         <div class="jb-prov">
           <label class="jb-pick-box" @click.stop>
@@ -206,7 +219,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         </div>
       </article>
 
-      <div class="fa-card">
+      <div v-if="!choice.searching" class="fa-card">
         <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }} <template v-if="!(choice.fee > 0)"><strong>{{ $t('Gratis voor jou.') }}</strong></template></p>
         <template v-if="choice.fee > 0">
           <p class="fa-small"><strong>{{ $t('Kosten: :amount per aanvraag', { amount: money(choice.fee) }) }}</strong> · {{ $t('betalen met BLIK, Przelewy24 of kaart') }}</p>

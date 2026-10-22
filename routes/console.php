@@ -145,6 +145,13 @@ if ((bool) config('fachora.region_import', true)) {
         ->withoutOverlapping(30);
 }
 
+// Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
+if ((bool) config('fachora.local_import', true)) {
+    Schedule::command('fachora:local-search')
+        ->everyMinute()
+        ->withoutOverlapping(10);
+}
+
 Schedule::command('fachora:checks')
     ->weeklyOn(1, '06:10')
     ->timezone('Europe/Warsaw');

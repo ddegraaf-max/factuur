@@ -84,7 +84,20 @@ return [
     // Wat de import binnenhaalt: alleen actieve bedrijven met een e-mailadres die minstens zo lang bestaan.
     'import_min_years' => 1,
     'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),
-    'region_import' => (bool) env('FACHORA_REGION_IMPORT', true),   // planner: elke tien minuten een portie
+    'region_import' => (bool) env('FACHORA_REGION_IMPORT', true),
+    /*
+     * Import op aanvraag (1.87): heeft een klant minder dan local_import_min
+     * bedrijven om uit te kiezen, dan zoekt de planner (elke minuut) in CEIDG
+     * rond zijn plaats en powiat. Zonder enkele kandidaat wacht de klant op
+     * die zoektocht (hooguit local_search_minutes); daarna gaat de aanvraag
+     * de gewone weg. Per categorie en plaats hooguit eens per local_import_days.
+     */
+    'local_import' => (bool) env('FACHORA_LOCAL_IMPORT', true),
+    'local_import_min' => 5,
+    'local_import_target' => 10,
+    'local_import_firms' => 60,
+    'local_import_days' => 14,
+    'local_search_minutes' => 15,   // planner: elke tien minuten een portie
 
     // Hoeveel brieven per pdf (post naar unclaimed bedrijven: geen elektronische communicatie, dus toegestaan).
     'letters_per_batch' => 100,

@@ -3,6 +3,7 @@
 namespace App\Services\Fachora;
 
 use App\Models\Provider;
+use App\Models\ServiceJob;
 use App\Services\NipService;
 use App\Support\Fachora;
 use Illuminate\Support\Carbon;
@@ -282,6 +283,84 @@ class CeidgClient
         $counts = $this->providers->importRecords([$record + ['lat' => $coords['lat'], 'lng' => $coords['lng']]], 'ceidg');
 
         return $counts['created'] > 0 ? 'created' : 'known';
+    }
+
+    /**
+     * Import op aanvraag (1.87): bedrijven in de categorie van deze klus rond
+     * de klant, eerst in zijn plaats, daarna in zijn powiat. Zelfde filters als
+     * de regio-import (actief, oud genoeg, e-mail, binnen region_radius_km van
+     * de klant). Stopt zodra er genoeg kandidaten zijn of het budget op is.
+     * Per categorie en plaats hooguit eens per local_import_days.
+     *
+     * @return array{created: int, checked: int, candidates: int, skipped: ?string}
+     */
+    public function importAround(ServiceJob $job, ?int $target = null, ?int $firmBudget = null, int $pageBudget = 8): array
+    {
+        $target ??= (int) config('fachora.local_import_target', 10);
+        $firmBudget ??= (int) config('fachora.local_import_firms', 60);
+        $count = fn () => $this->providers->choiceCandidates($job, $target)->count();
+        $result = ['created' => 0, 'checked' => 0, 'candidates' => $count(), 'skipped' => null];
+
+        if (! $this->configured()) {
+            return ['skipped' => 'no_token'] + $result;
+        }
+        $codes = (array) (config('fachora.categories.' . $job->category . '.pkd') ?? []);
+        $center = $job->lat !== null && $job->lng !== null ? [(float) $job->lat, (float) $job->lng] : null;
+        if ($codes === [] || $center === null || blank($job->city)) {
+            return ['skipped' => 'no_location'] + $result;
+        }
+        $key = 'fachora:local-import:' . $job->category . ':' . GeocodeService::normalise($job->city);
+        if (Cache::has($key)) {
+            return ['skipped' => 'recent'] + $result;
+        }
+
+        $region = ['name' => $job->city, 'center' => $center];
+        $radius = (float) config('fachora.region_radius_km', 50);
+        $minStart = now()->subYears((int) config('fachora.import_min_years', 1));
+        $areas = [['miasto' => trim((string) $job->city)]];
+        if ($county = $this->geo->county($center[0], $center[1])) {
+            $areas[] = ['powiat' => $county];
+        }
+
+        foreach ($areas as $area) {
+            foreach ($codes as $pkd) {
+                for ($page = 0; $page < 40; $page++) {
+                    if ($firmBudget <= 0 || $pageBudget <= 0 || $result['candidates'] >= $target) {
+                        break 3;
+                    }
+                    try {
+                        $found = $this->search($area + ['pkd' => str_replace('.', '', $pkd), 'status' => 'AKTYWNY'], $page);
+                    } catch (\Throwable $e) {
+                        Log::warning('CEIDG import op aanvraag mislukt', ['job' => $job->id, 'area' => $area, 'pkd' => $pkd, 'error' => $e->getMessage()]);
+                        break 3; // niet als "gedaan" markeren: volgende klant probeert het opnieuw
+                    }
+                    $pageBudget--;
+                    foreach ($found['firms'] as $firm) {
+                        $outcome = $this->importFirm((array) $firm, $pkd, $region, $radius, $minStart);
+                        if ($outcome === 'created') {
+                            $result['created']++;
+                        }
+                        if ($outcome !== 'known') {
+                            $result['checked']++;
+                            $firmBudget--;
+                        }
+                    }
+                    if ($result['created'] > 0) {
+                        $result['candidates'] = $count();
+                    }
+                    if (count($found['firms']) < 25) {
+                        break; // laatste pagina van deze code
+                    }
+                }
+            }
+        }
+
+        if (! isset($e)) {
+            Cache::put($key, true, now()->addDays((int) config('fachora.local_import_days', 14)));
+        }
+        Log::info('Fachora import op aanvraag', ['job' => $job->id, 'city' => $job->city, 'category' => $job->category] + $result);
+
+        return $result;
     }
 
     /** PKD-codes (met of zonder punten) naar Fachora-categorieën. @return list<string> */

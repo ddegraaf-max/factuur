@@ -39,7 +39,7 @@ class ServiceJob extends Model
         'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
         'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
         'selected_providers', 'request_fee', 'request_session_id', 'request_paid_at',
-        'phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at',
+        'phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at', 'provider_search_at',
     ];
 
     protected $casts = [
@@ -76,6 +76,7 @@ class ServiceJob extends Model
         'request_paid_at' => 'datetime',
         'phone_code_sent_at' => 'datetime',
         'phone_verified_at' => 'datetime',
+        'provider_search_at' => 'datetime',
     ];
 
     protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id', 'phone_code'];

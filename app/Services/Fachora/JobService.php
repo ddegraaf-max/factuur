@@ -15,6 +15,7 @@ use App\Services\InvoiceManager;
 use App\Support\Fachora;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -138,9 +139,15 @@ class JobService
     public function confirm(ServiceJob $job, Request $request): bool
     {
         // 1.86: de klant kiest zelf de bedrijven (als er in de buurt iemand is om uit te kiezen).
-        $choose = (bool) config('fachora.customer_choice', true) && $this->providers->choiceCandidates($job, 1)->isNotEmpty();
+        // 1.87: is er (nog) niemand, dan zoeken we eerst in CEIDG rond de klant (import op aanvraag).
+        $customerChoice = (bool) config('fachora.customer_choice', true);
+        $available = $customerChoice ? $this->providers->choiceCandidates($job, (int) config('fachora.local_import_min', 5))->count() : 0;
+        $search = $customerChoice && $available === 0 && $this->localImportAvailable();
+        $choose = $customerChoice && ($available > 0 || $search);
         $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')
-            ->update(['status' => $choose ? 'selecting' : 'open', 'confirmed_at' => now()] + ($choose ? ['request_fee' => $this->requestFee()] : [])) === 1;
+            ->update(['status' => $choose ? 'selecting' : 'open', 'confirmed_at' => now()]
+                + ($choose ? ['request_fee' => $this->requestFee()] : [])
+                + ($search ? ['provider_search_at' => now()] : [])) === 1;
         if (! $first) {
             return false;
         }
@@ -150,7 +157,15 @@ class JobService
 
         if ($choose) {
             $this->log($job, 'selecting', 'system', __('Klant kiest zelf de bedrijven'));
-            $this->notifier->customer($job, 'choose');
+            if ($search) {
+                $this->log($job, 'provider_search', 'system', __('Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister'));
+            } else {
+                // Weinig keus? Op de achtergrond aanvullen; de klant kan nu al kiezen.
+                if ($available < (int) config('fachora.local_import_min', 5) && $this->localImportAvailable()) {
+                    $this->queueLocalImport($job);
+                }
+                $this->notifier->customer($job, 'choose');
+            }
 
             return true;
         }
@@ -269,6 +284,82 @@ class JobService
         $this->log($job, 'phone_verified', 'customer', __('Telefoonnummer bevestigd per sms'));
 
         return true;
+    }
+
+    /* ---------- import op aanvraag (1.87) ---------- */
+
+    private const LOCAL_QUEUE = 'fachora:local-import-queue';
+
+    public function localImportAvailable(): bool
+    {
+        return (bool) config('fachora.local_import', true) && filled(config('fachora.ceidg_token'));
+    }
+
+    /** Aanvullen zonder dat de klant wacht: de planner pakt het binnen een minuut op. */
+    public function queueLocalImport(ServiceJob $job): void
+    {
+        $queue = array_values(array_unique(array_merge((array) Cache::get(self::LOCAL_QUEUE, []), [$job->id])));
+        Cache::put(self::LOCAL_QUEUE, array_slice($queue, -50), now()->addDay());
+    }
+
+    /**
+     * Planner (elke minuut): eerst klanten die wachten (provider_search_at),
+     * dan de aanvullingen. Daarna krijgt de wachtende klant de keuzemail, of,
+     * als er echt niemand is, gaat de aanvraag de gewone weg (dispatch).
+     *
+     * @return array{searched: int, topped_up: int}
+     */
+    public function runLocalSearches(int $max = 3): array
+    {
+        $ceidg = app(CeidgClient::class);
+        $searched = 0;
+        $waiting = ServiceJob::query()->where('status', 'selecting')->whereNotNull('provider_search_at')->orderBy('provider_search_at')->limit($max)->get();
+        foreach ($waiting as $job) {
+            $giveUp = $job->provider_search_at->lt(now()->subMinutes((int) config('fachora.local_search_minutes', 15)));
+            if (! $giveUp && $this->localImportAvailable()) {
+                $ceidg->importAround($job);
+            }
+            $this->finishSearch($job->fresh());
+            $searched++;
+        }
+
+        $topped = 0;
+        $queue = (array) Cache::pull(self::LOCAL_QUEUE, []);
+        foreach (array_slice($queue, 0, max(0, $max - $searched)) as $id) {
+            if ($job = ServiceJob::query()->find($id)) {
+                $ceidg->importAround($job);
+                $topped++;
+            }
+        }
+        if (count($queue) > max(0, $max - $searched)) {
+            Cache::put(self::LOCAL_QUEUE, array_slice($queue, max(0, $max - $searched)), now()->addDay());
+        }
+
+        return ['searched' => $searched, 'topped_up' => $topped];
+    }
+
+    /** De zoektocht is klaar: keuzemail, of zonder kandidaten de gewone route. */
+    public function finishSearch(ServiceJob $job): void
+    {
+        $cleared = ServiceJob::query()->whereKey($job->id)->where('status', 'selecting')->whereNotNull('provider_search_at')
+            ->update(['provider_search_at' => null]) === 1;
+        if (! $cleared) {
+            return;
+        }
+        $job->refresh();
+        $found = $this->providers->choiceCandidates($job)->count();
+        $this->log($job, 'provider_search_done', 'system', __('Zoektocht klaar: :n bedrijven om uit te kiezen', ['n' => $found]));
+        if ($found > 0) {
+            $this->notifier->customer($job, 'choose');
+
+            return;
+        }
+
+        // Niemand gevonden: zoals vroeger aanbieden aan Verified bedrijven (of no_match).
+        $job->forceFill(['status' => 'open', 'request_fee' => null])->save();
+        $this->dispatch($job);
+        $job->refresh();
+        $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
     }
 
     /** Terug van Stripe (of via de planner): betaald? Dan gaat de aanvraag weg. */

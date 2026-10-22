@@ -163,6 +163,12 @@ GRATIS VOOR DE KLANT, BEDRIJF BETAALT PER LEAD (1.87.0, 22 okt 2026)
 - Regulamin § 13, dla-firm en landing aangepast; terms_version 2026-10-22 (bedrijven accepteren
   opnieuw). Valse aanvraag binnen 7 dagen melden = terugbetalen: handmatig via Stripe.
 - Engelse marketingpagina's (resources/views/fachora/en/*) noemen nog het provisiemodel.
+- Import op aanvraag: heeft een klant minder dan 5 kandidaten, dan zoekt fachora:local-search
+  (planner, elke minuut) in CEIDG op plaats (miasto) en powiat (Nominatim reverse) van de klant.
+  Zonder enige kandidaat wacht de klant (provider_search_at, max. 15 min, pagina ververst) en krijgt
+  daarna de keuzemail; niemand gevonden = gewone route (no_match). Per categorie+plaats eens per
+  14 dagen. FACHORA_LOCAL_IMPORT=false zet het uit. Parameters miasto/powiat van /firmy na deploy
+  met een echte zoekopdracht nakijken (staat in de log: "Fachora import op aanvraag").
 
 KLANT KIEST ZELF, BIJDRAGE PER AANVRAAG, REGIO-IMPORT (1.86.0, 22 okt 2026)
 ---------------------------------------------------------------------------
