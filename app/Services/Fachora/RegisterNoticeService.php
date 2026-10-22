@@ -113,6 +113,7 @@ class RegisterNoticeService
             'description' => null, 'photo_data' => null, 'claim_code' => null,
         ])->save();
         $provider->syncCategories([]);
+        self::log('removed_on_request', 1, 'Profiel verwijderd op verzoek van het bedrijf (art. 21 AVG); alleen NIP bewaard tegen herimport.');
     }
 
     /**
@@ -145,6 +146,16 @@ class RegisterNoticeService
             $deleted += Provider::query()->whereIn('id', $ids)->delete();
         });
 
+        self::log('purge_register', $deleted, "Registerbedrijven ouder dan {$days} dagen: niet gekozen, niet gemaild, geen aanbieding of opdracht. Verwijderd (art. 5 lid 1 sub c/e AVG).");
+
         return $deleted;
+    }
+
+    /** Eén regel in het verantwoordingslog, zonder persoonsgegevens. */
+    public static function log(string $action, int $count, string $note): void
+    {
+        if ($count > 0 || $action !== 'purge_register') {
+            \Illuminate\Support\Facades\DB::table('fachora_privacy_log')->insert(['action' => $action, 'count' => $count, 'note' => $note, 'created_at' => now(), 'updated_at' => now()]);
+        }
     }
 }

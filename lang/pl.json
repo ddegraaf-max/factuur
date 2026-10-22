@@ -2046,5 +2046,12 @@
   "Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.": "Fachora łączy klientów ze sprawdzonymi fachowcami. 0 zł abonamentu; płacisz tylko za zapytanie, na które chcesz odpowiedzieć (od :min do :max), a pierwsze jest gratis.",
   "Nieuwe klanten in uw regio, geen abonnement": "Nowi klienci w Twojej okolicy, bez abonamentu",
   "Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister": "Brak firm w okolicy: szukamy w rejestrze firm",
-  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Wyszukiwanie zakończone: firmy do wyboru: :n"
+  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Wyszukiwanie zakończone: firmy do wyboru: :n",
+  "U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Beheerder van uw gegevens: :owner (:email). Bron: het openbare register CEIDG (naam, NIP, adres, PKD, e-mail, telefoon). Doel: aanvragen van klanten doorgeven; grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). Op de site tonen we alleen naam, plaats en soort werk. We bewaren de gegevens zolang u aanvragen kunt krijgen, of tot u bezwaar maakt. U hebt recht op inzage, correctie, beperking en bezwaar, en op een klacht bij de Prezes UODO. Meer: :privacy. Geen aanvragen meer of profiel verwijderen: :url": "Otrzymujesz tę wiadomość, ponieważ klient wybrał Twoją firmę w serwisie Fachora do tego zlecenia. Administrator danych: :owner (:email). Źródło: publiczny rejestr CEIDG (nazwa, NIP, adres, PKD, e-mail, telefon). Cel: przekazywanie zapytań klientów; podstawa: prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO). W serwisie pokazujemy tylko nazwę, miejscowość i rodzaj działalności. Dane przechowujemy, dopóki możesz otrzymywać zapytania, albo do Twojego sprzeciwu. Masz prawo dostępu, sprostowania, ograniczenia i sprzeciwu oraz skargi do Prezesa UODO. Więcej: :privacy. Rezygnacja z zapytań lub usunięcie profilu: :url",
+  "Informatie over de gegevens van :name op Fachora": "Informacja o danych firmy :name w serwisie Fachora",
+  "Informatie over uw gegevens": "Informacja o Twoich danych",
+  "Geen e-mail meer of profiel verwijderen": "Rezygnacja z e-maili lub usunięcie profilu",
+  "Privacybeleid": "Polityka prywatności",
+  "Informatie": "Informacja",
+  "U ontvangt dit eenmalige bericht omdat de wet (art. 14 AVG) ons verplicht u te informeren. U krijgt van ons geen reclame.": "Otrzymujesz tę jednorazową wiadomość, ponieważ prawo (art. 14 RODO) zobowiązuje nas do poinformowania Cię. Nie wysyłamy reklam."
 }

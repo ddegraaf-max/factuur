@@ -184,8 +184,10 @@ class FachoraMail extends Mailable
             $request = (bool) ($this->extra['request'] ?? false);
             $out['footnote'] = $request && $provider->optout_token
                 // Klantaanvraag aan een bedrijf zonder profiel (1.86): waarom dit bericht, waar de gegevens vandaan komen, afmelden (art. 14 AVG).
-                ? __('U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Uw bedrijfsgegevens komen uit het openbare register CEIDG; beheerder is :owner. Meer over uw gegevens: :privacy. Geen aanvragen meer: :url', [
+                // Volledige art. 14-informatie in het eerste bericht (art. 14 lid 3 sub b AVG), kort met verwijzing naar het privacybeleid.
+                ? __('U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Beheerder van uw gegevens: :owner (:email). Bron: het openbare register CEIDG (naam, NIP, adres, PKD, e-mail, telefoon). Doel: aanvragen van klanten doorgeven; grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). Op de site tonen we alleen naam, plaats en soort werk. We bewaren de gegevens zolang u aanvragen kunt krijgen, of tot u bezwaar maakt. U hebt recht op inzage, correctie, beperking en bezwaar, en op een klacht bij de Prezes UODO. Meer: :privacy. Geen aanvragen meer of profiel verwijderen: :url', [
                     'owner' => brand('owner_name') ?: 'Budomatch Daniël de Graaf',
+                    'email' => brand('email') ?: 'czesc@fachora.pl',
                     'privacy' => url('/polityka-prywatnosci'),
                     'url' => $provider->optoutUrl(),
                 ])

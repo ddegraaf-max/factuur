@@ -176,5 +176,6 @@ class FachoraLocalImportTest extends TestCase
 
         $this->assertNull(Provider::query()->find($unused->id));
         $this->assertNotNull(Provider::query()->find($chosen->id), 'Wie een aanvraag kreeg, blijft staan');
+        $this->assertDatabaseHas('fachora_privacy_log', ['action' => 'purge_register', 'count' => 1]);
     }
 }

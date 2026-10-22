@@ -54,6 +54,16 @@ return new class extends Migration
     // Informatieplicht art. 14 AVG (1.87): wanneer het bedrijf uit het register is geïnformeerd, en een verwijderd profiel.
     private function providerColumns(): void
     {
+        // Verantwoording (art. 5 lid 2 AVG): wat er wanneer met registergegevens is gedaan, zonder persoonsgegevens.
+        if (! Schema::hasTable('fachora_privacy_log')) {
+            Schema::create('fachora_privacy_log', function (Blueprint $table) {
+                $table->id();
+                $table->string('action', 40);
+                $table->unsignedInteger('count')->default(0);
+                $table->text('note')->nullable();
+                $table->timestamps();
+            });
+        }
         Schema::table('providers', function (Blueprint $table) {
             if (! Schema::hasColumn('providers', 'register_notice_at')) {
                 $table->timestamp('register_notice_at')->nullable();
@@ -66,6 +76,7 @@ return new class extends Migration
 
     public function down(): void
     {
+        Schema::dropIfExists('fachora_privacy_log');
         Schema::table('providers', function (Blueprint $table) {
             foreach (['register_notice_at', 'removed_at'] as $column) {
                 if (Schema::hasColumn('providers', $column)) {

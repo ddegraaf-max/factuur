@@ -2046,5 +2046,12 @@
   "Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.": "Fachora connects customers with verified tradespeople. 0 zł subscription; you only pay for a request you want to respond to (:min to :max), and the first one is free.",
   "Nieuwe klanten in uw regio, geen abonnement": "New customers in your area, no subscription",
   "Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister": "No companies nearby yet: searching the business register",
-  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Search finished: :n companies to choose from"
+  "Zoektocht klaar: :n bedrijven om uit te kiezen": "Search finished: :n companies to choose from",
+  "U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Beheerder van uw gegevens: :owner (:email). Bron: het openbare register CEIDG (naam, NIP, adres, PKD, e-mail, telefoon). Doel: aanvragen van klanten doorgeven; grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). Op de site tonen we alleen naam, plaats en soort werk. We bewaren de gegevens zolang u aanvragen kunt krijgen, of tot u bezwaar maakt. U hebt recht op inzage, correctie, beperking en bezwaar, en op een klacht bij de Prezes UODO. Meer: :privacy. Geen aanvragen meer of profiel verwijderen: :url": "You are receiving this message because a customer chose your company on Fachora for this job. Controller: :owner (:email). Source: the public CEIDG register (name, NIP, address, PKD, e-mail, phone). Purpose: passing on customer requests; legal basis: legitimate interest (Art. 6(1)(f) GDPR). On the site we show only name, town and type of work. We keep the data for as long as you can receive requests, or until you object. You have the right of access, rectification, restriction and objection, and to complain to the President of UODO. More: :privacy. No more requests or remove your profile: :url",
+  "Informatie over de gegevens van :name op Fachora": "Information about the data of :name on Fachora",
+  "Informatie over uw gegevens": "Information about your data",
+  "Geen e-mail meer of profiel verwijderen": "No more e-mail or remove profile",
+  "Privacybeleid": "Privacy policy",
+  "Informatie": "Information",
+  "U ontvangt dit eenmalige bericht omdat de wet (art. 14 AVG) ons verplicht u te informeren. U krijgt van ons geen reclame.": "You receive this one-off message because the law (Art. 14 GDPR) requires us to inform you. We do not send advertising."
 }

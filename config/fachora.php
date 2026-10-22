@@ -120,7 +120,7 @@ return [
     'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),
     'region_import' => (bool) env('FACHORA_REGION_IMPORT', false), // UIT: optie 2, alleen import op aanvraag
     // Bedrijven uit het register die niemand koos en die nooit iets van ons kregen: na zoveel dagen weer weg.
-    'register_keep_days' => (int) env('FACHORA_REGISTER_KEEP_DAYS', 21),
+    'register_keep_days' => (int) env('FACHORA_REGISTER_KEEP_DAYS', 14),
     /*
      * Import op aanvraag (1.87): heeft een klant minder dan local_import_min
      * bedrijven om uit te kiezen, dan zoekt de planner (elke minuut) in CEIDG
