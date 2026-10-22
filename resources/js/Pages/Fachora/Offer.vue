@@ -194,7 +194,7 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
             <p class="fa-small fa-muted">{{ $t('De prijs hangt af van de grootte van de klus (:min – :max). Geen abonnement. Bij rechtstreekse betaling door de klant geen provisie. Valse aanvraag? Meld het binnen 7 dagen en u krijgt uw geld terug.', { min: money(lead.min), max: money(lead.max) }) }}</p>
             <label v-if="needs_terms" class="fa-check of-accept">
               <input type="checkbox" v-model="unlockForm.accept_terms">
-              <span>{{ $t('Ik ga akkoord met de voorwaarden van Fachora.') }} <a :href="route('pl.regulamin')" target="_blank" rel="noopener">{{ $t('Voorwaarden') }}</a></span>
+              <span>{{ $t('Ik ga akkoord met de voorwaarden van Fachora en wil aanvragen van klanten voortaan per e-mail ontvangen (afmelden kan altijd).') }} <a :href="route('pl.regulamin')" target="_blank" rel="noopener">{{ $t('Voorwaarden') }}</a></span>
             </label>
             <div class="fa-actions">
               <button type="button" class="fa-btn" :disabled="unlockForm.processing || (needs_terms && !unlockForm.accept_terms)" @click="unlock">
