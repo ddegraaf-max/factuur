@@ -291,6 +291,20 @@ class FachoraMail extends Mailable
                         __('Uw polis is geldig tot :date. Upload de nieuwe polis in uw panel; zonder geldige polis verdwijnt het vinkje "ubezpieczony" van uw profiel.', ['date' => $this->extra['until'] ?? '']),
                     ], ['label' => __('Naar de verificatie'), 'url' => route('fachora.verification')]);
                     break;
+                case 'register_notice':
+                    // Art. 14 AVG (1.87): puur informatie, geen reclame. Geen knop naar claimen of prijzen.
+                    $set(__('Informatie over de gegevens van :name op Fachora', ['name' => $name]), __('Informatie over uw gegevens'), [
+                        __('Wij zijn verplicht u te laten weten dat de gegevens van uw bedrijf :name in de database van het platform Fachora (:domain) staan. Dit is geen reclame; u hoeft niets te doen.', ['name' => $name, 'domain' => brand('domain')]),
+                        __('Bron: het openbare register CEIDG. Welke gegevens: naam, NIP, adres, PKD-codes, e-mailadres en telefoonnummer zoals ze in CEIDG staan. Op Fachora tonen we alleen naam, plaats en soort werk, nooit uw e-mail, telefoon of adres.'),
+                        __('Doel: klanten in uw regio kunnen uw bedrijf vinden en zelf kiezen om u een concrete aanvraag te sturen. Grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). We bewaren de gegevens zolang uw bedrijf actief is in CEIDG of tot u bezwaar maakt.'),
+                        __('Uw rechten: inzage, correctie, beperking en bezwaar (art. 15–21 AVG), en een klacht bij de toezichthouder (Prezes UODO). Beheerder: :owner, :email.', ['owner' => brand('owner_name') ?: 'Budomatch Daniël de Graaf', 'email' => brand('email') ?: 'czesc@fachora.pl']),
+                        __('Wilt u geen aanvragen van klanten per e-mail, of wilt u dat we uw profiel verwijderen? Dat kan met één klik via de link hieronder.'),
+                    ], ['label' => __('Geen e-mail meer of profiel verwijderen'), 'url' => $provider->optoutUrl()], array_filter([
+                        __('Profiel') => $provider->publicUrl(),
+                        __('Privacybeleid') => url('/polityka-prywatnosci'),
+                    ]), __('Informatie'));
+                    $out['footnote'] = __('U ontvangt dit eenmalige bericht omdat de wet (art. 14 AVG) ons verplicht u te informeren. U krijgt van ons geen reclame.');
+                    break;
                 case 'invite':
                     $set((config('fachora.lead_pricing') ? __('Nieuwe klanten in uw regio, geen abonnement') : __('Nieuwe klanten in uw regio, betaal alleen voor uitgevoerde opdrachten')), __('Nieuwe klanten in uw regio'), [
                         config('fachora.lead_pricing')

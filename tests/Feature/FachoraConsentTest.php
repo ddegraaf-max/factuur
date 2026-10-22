@@ -139,7 +139,10 @@ class FachoraConsentTest extends TestCase
         $this->assertTrue(app(Notifier::class)->provider($claimed, 'verified'));
 
         $this->get(route('fachora.optout', $claimed->optout_token))->assertOk()
-            ->assertInertia(fn (Assert $p) => $p->component('Fachora/Claim')->where('mode', 'optout')->where('valid', true)->where('provider.name', 'Hydro Claimed'));
+            ->assertInertia(fn (Assert $p) => $p->component('Fachora/Claim')->where('mode', 'optout')->where('valid', true)->where('provider.name', 'Hydro Claimed')->where('done', null));
+        // 1.87: de link alleen (virusscanner) meldt niet af; de knop wel.
+        $this->assertNull($claimed->fresh()->email_blocked_at);
+        $this->post(route('fachora.optout.confirm', $claimed->optout_token), ['action' => 'email'])->assertRedirect(route('fachora.optout', $claimed->optout_token));
 
         $claimed->refresh();
         $this->assertNotNull($claimed->email_blocked_at);
@@ -152,7 +155,8 @@ class FachoraConsentTest extends TestCase
         // Nog eens klikken verandert de datum niet; een onbekend token toont een nette melding.
         $this->travelTo(now()->addDay());
         $blockedAt = $claimed->email_blocked_at;
-        $this->get(route('fachora.optout', $claimed->optout_token))->assertInertia(fn (Assert $p) => $p->where('valid', true));
+        $this->post(route('fachora.optout.confirm', $claimed->optout_token), ['action' => 'email']);
+        $this->get(route('fachora.optout', $claimed->optout_token))->assertInertia(fn (Assert $p) => $p->where('valid', true)->where('done', 'email'));
         $this->assertTrue($blockedAt->equalTo($claimed->fresh()->email_blocked_at));
         $this->get(route('fachora.optout', str_repeat('e', 64)))->assertOk()->assertInertia(fn (Assert $p) => $p->where('valid', false)->where('provider', null));
 

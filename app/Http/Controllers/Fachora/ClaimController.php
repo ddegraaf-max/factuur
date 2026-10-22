@@ -164,11 +164,35 @@ class ClaimController extends Controller
         return redirect()->route('fachora.profile')->with('flash', __('Welkom! Vul je profiel aan en vraag daarna het keurmerk Fachora Verified aan.'));
     }
 
-    /** Afmelden voor e-mail (link onderaan elke mail aan een bedrijf). */
+    /**
+     * Afmelden (link onderaan elke mail aan een bedrijf). 1.87: de link zelf
+     * verandert niets meer, want virusscanners van mailservers openen links
+     * automatisch; het bedrijf kiest op de pagina (POST): geen e-mail meer, of
+     * het profiel verwijderen (bezwaar art. 21 AVG).
+     */
     public function optout(string $token): Response
     {
-        $provider = preg_match('/^[a-f0-9]{64}$/', $token) ? $this->providers->blockEmail($token) : null;
+        $provider = \App\Models\Provider::query()->where('optout_token', $token)->first();
 
-        return Inertia::render('Fachora/Claim', ['mode' => 'optout', 'valid' => $provider !== null, 'provider' => $provider?->publicSummary()]);
+        return Inertia::render('Fachora/Claim', [
+            'mode' => 'optout',
+            'valid' => $provider !== null,
+            'token' => $provider ? $token : null,
+            'provider' => $provider && $provider->removed_at === null ? $provider->publicSummary() : null,
+            'done' => $provider?->removed_at ? 'remove' : ($provider?->email_blocked_at ? 'email' : null),
+            'canRemove' => $provider !== null && $provider->claimed_at === null && $provider->removed_at === null,
+        ]);
+    }
+
+    public function optoutConfirm(Request $request, string $token): \Illuminate\Http\RedirectResponse
+    {
+        $data = $request->validate(['action' => ['required', 'in:email,remove']]);
+        $provider = $this->providers->blockEmail($token);
+        abort_unless($provider, 404);
+        if ($data['action'] === 'remove') {
+            \App\Services\Fachora\RegisterNoticeService::remove($provider);
+        }
+
+        return redirect()->route('fachora.optout', $token);
     }
 }

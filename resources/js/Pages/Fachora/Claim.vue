@@ -27,7 +27,12 @@ const props = defineProps({
   token: { type: String, default: null },
   email: { type: String, default: null },
   existingUser: { type: Boolean, default: false },
+  // 1.87: afmelden in twee stappen (de link verandert niets; de knop wel).
+  done: { type: String, default: null },
+  canRemove: { type: Boolean, default: false },
 });
+const optoutForm = useForm({ action: '' });
+const optoutAction = (action) => { optoutForm.action = action; optoutForm.post(route('fachora.optout.confirm', props.token)); };
 
 const page = usePage();
 const sent = computed(() => /[?&]wyslano=1(&|$)/.test(page.url || (typeof window !== 'undefined' ? window.location.search : '')));
@@ -330,10 +335,24 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
     <!-- ===== OPTOUT ===== -->
     <template v-else-if="mode === 'optout'">
       <div class="fa-card cl-sent">
-        <template v-if="valid">
+        <template v-if="valid && done === 'remove'">
+          <div class="cl-sent-icon"><span class="ic" v-html="icon('check', 28)"></span></div>
+          <h1 class="fa-h1">{{ $t('Profiel verwijderd') }}</h1>
+          <p class="fa-lead">{{ $t('We hebben het profiel en de gegevens van uw bedrijf verwijderd. Alleen het NIP bewaren we, zodat we uw bedrijf niet opnieuw opnemen. U krijgt geen e-mail meer van ons.') }}</p>
+        </template>
+        <template v-else-if="valid && done === 'email'">
           <div class="cl-sent-icon"><span class="ic" v-html="icon('check', 28)"></span></div>
           <h1 class="fa-h1">{{ $t('Afgemeld') }}</h1>
           <p class="fa-lead">{{ $t('We sturen geen e-mail meer aan :name. Verandert u van gedachten, mail ons dan; we zetten het graag weer aan.', { name: provider?.name || '' }) }}</p>
+          <button v-if="canRemove" type="button" class="fa-link" :disabled="optoutForm.processing" @click="optoutAction('remove')">{{ $t('Ook mijn profiel verwijderen') }}</button>
+        </template>
+        <template v-else-if="valid">
+          <h1 class="fa-h1">{{ $t('Wat wilt u?') }}</h1>
+          <p class="fa-lead">{{ provider?.name }}</p>
+          <div class="fa-actions">
+            <button type="button" class="fa-btn" :disabled="optoutForm.processing" @click="optoutAction('email')">{{ $t('Geen e-mail meer van Fachora') }}</button>
+            <button v-if="canRemove" type="button" class="fa-btn fa-btn--secondary" :disabled="optoutForm.processing" @click="optoutAction('remove')">{{ $t('Mijn profiel verwijderen') }}</button>
+          </div>
         </template>
         <template v-else>
           <h1 class="fa-h1">{{ $t('Deze link is niet (meer) geldig') }}</h1>

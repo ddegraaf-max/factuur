@@ -66,7 +66,29 @@ class Notifier
             $provider->forceFill(['optout_token' => bin2hex(random_bytes(32))])->save();
         }
 
-        return $this->send($provider->email, 'pl', new FachoraMail('job', 'provider', $job, $offer, $provider, ['request' => true]));
+        $sent = $this->send($provider->email, 'pl', new FachoraMail('job', 'provider', $job, $offer, $provider, ['request' => true]));
+        if ($sent) {
+            RegisterNoticeService::markInformed($provider); // deze mail bevat de art. 14-informatie al
+        }
+
+        return $sent;
+    }
+
+    /**
+     * Informatiemail art. 14 AVG aan een bedrijf uit het register (1.87). Geen
+     * reclame en geen toestemming nodig: dit is een wettelijke plicht (art. 6
+     * lid 1 sub c AVG). Een afmelding wint wel: wie zich afmeldde, wist het al.
+     */
+    public function registerNotice(Provider $provider): bool
+    {
+        if ($provider->isDemo() || blank($provider->email) || $provider->email_blocked_at !== null) {
+            return false;
+        }
+        if (blank($provider->optout_token)) {
+            $provider->forceFill(['optout_token' => bin2hex(random_bytes(32))])->save();
+        }
+
+        return $this->send($provider->email, 'pl', new FachoraMail('register_notice', 'provider', null, null, $provider));
     }
 
     /**

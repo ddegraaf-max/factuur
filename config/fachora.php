@@ -126,6 +126,17 @@ return [
      * die zoektocht (hooguit local_search_minutes); daarna gaat de aanvraag
      * de gewone weg. Per categorie en plaats hooguit eens per local_import_days.
      */
+    /*
+     * Informatieplicht art. 14 AVG (1.87, zaak Bisnode): elk bedrijf uit het
+     * register met een e-mailadres krijgt binnen een maand één zakelijke
+     * informatiemail, zonder reclame. In porties op werkdagen (08–18 uur),
+     * hooguit notices_per_day per dag. De regio-import pauzeert zolang er meer
+     * dan notice_backlog_max bedrijven op hun informatiemail wachten.
+     */
+    'register_notices' => (bool) env('FACHORA_REGISTER_NOTICES', false), // UIT tot Daniël akkoord geeft
+    'notices_per_day' => (int) env('FACHORA_NOTICES_PER_DAY', 300),
+    'notice_backlog_max' => (int) env('FACHORA_NOTICE_BACKLOG', 3000),
+
     'local_import' => (bool) env('FACHORA_LOCAL_IMPORT', true),
     'local_import_min' => 5,
     'local_import_target' => 10,

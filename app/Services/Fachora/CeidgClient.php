@@ -222,6 +222,12 @@ class CeidgClient
      */
     public function importRegionsStep(?int $firmBudget = null, int $pageBudget = 12): array
     {
+        // Niet sneller importeren dan we bedrijven kunnen informeren (art. 14 AVG: binnen een maand).
+        if (app(RegisterNoticeService::class)->importShouldPause()) {
+            $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+
+            return ['created' => 0, 'skipped' => 0, 'checked' => 0, 'done' => (bool) ($cursor['done'] ?? false), 'at' => 'gepauzeerd: wachtrij informatiemails vol'];
+        }
         $regions = self::regions();
         $codes = self::allPkdCodes();
         $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);

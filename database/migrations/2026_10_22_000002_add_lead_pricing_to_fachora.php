@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Schema;
 /*
  * Fachora 1.87: gratis voor de klant (met sms-code), het bedrijf betaalt per
  * lead. Het ontgrendelen staat op de aanbieding; de sms-controle op de opdracht.
- * Daarnaast import op aanvraag: bedrijven rond een nieuwe klant uit CEIDG halen.
+ * Daarnaast import op aanvraag: bedrijven rond een nieuwe klant uit CEIDG halen,
+ * en de informatiemail (art. 14 AVG) aan bedrijven uit het register.
  */
 return new class extends Migration
 {
@@ -46,10 +47,32 @@ return new class extends Migration
                 $table->timestamp('provider_search_at')->nullable();
             }
         });
+
+        $this->providerColumns();
+    }
+
+    // Informatieplicht art. 14 AVG (1.87): wanneer het bedrijf uit het register is geïnformeerd, en een verwijderd profiel.
+    private function providerColumns(): void
+    {
+        Schema::table('providers', function (Blueprint $table) {
+            if (! Schema::hasColumn('providers', 'register_notice_at')) {
+                $table->timestamp('register_notice_at')->nullable();
+            }
+            if (! Schema::hasColumn('providers', 'removed_at')) {
+                $table->timestamp('removed_at')->nullable();
+            }
+        });
     }
 
     public function down(): void
     {
+        Schema::table('providers', function (Blueprint $table) {
+            foreach (['register_notice_at', 'removed_at'] as $column) {
+                if (Schema::hasColumn('providers', $column)) {
+                    $table->dropColumn($column);
+                }
+            }
+        });
         Schema::table('service_job_offers', function (Blueprint $table) {
             foreach (['lead_fee', 'lead_free', 'lead_session_id', 'unlocked_at'] as $column) {
                 if (Schema::hasColumn('service_job_offers', $column)) {

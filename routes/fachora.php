@@ -77,6 +77,7 @@ Route::middleware('brand:fachora')->group(function () {
     Route::get('/dla-firm/zglos', [ClaimController::class, 'apply'])->name('fachora.apply');
     Route::post('/dla-firm/zglos', [ClaimController::class, 'applyStore'])->middleware(['throttle:10,1', 'turnstile'])->name('fachora.apply.store');
     Route::get('/rezygnacja/{token}', [ClaimController::class, 'optout'])->where('token', '[a-f0-9]{64}')->name('fachora.optout');
+    Route::post('/rezygnacja/{token}', [ClaimController::class, 'optoutConfirm'])->where('token', '[a-f0-9]{64}')->middleware('throttle:10,1')->name('fachora.optout.confirm');
 
     // ---------- bedrijf: panel (ingelogd) ----------
     Route::middleware('auth')->prefix('fachora')->name('fachora.')->group(function () {

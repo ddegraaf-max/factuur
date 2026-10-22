@@ -145,6 +145,14 @@ if ((bool) config('fachora.region_import', true)) {
         ->withoutOverlapping(30);
 }
 
+// Fachora 1.87: informatiemail (art. 14 AVG) aan bedrijven uit het register, rustig in porties op werkdagen.
+if ((bool) config('fachora.register_notices', false)) {
+    Schedule::command('fachora:register-notices')
+        ->cron('5,35 8-17 * * 1-5')
+        ->timezone('Europe/Warsaw')
+        ->withoutOverlapping(25);
+}
+
 // Fachora 1.87: elke ochtend één grote stad (+50 km) erbij voor de regio-import.
 if ((bool) config('fachora.region_import', true) && (bool) config('fachora.region_expansion', true)) {
     Schedule::command('fachora:expand-regions')
