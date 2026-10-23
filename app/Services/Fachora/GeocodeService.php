@@ -94,6 +94,12 @@ class GeocodeService
             return Cache::get($key) ?: null;
         }
         $county = null;
+        // Nominatim vraagt hooguit één verzoek per seconde.
+        static $last = 0.0;
+        if (! app()->runningUnitTests() && ($wait = 1.05 - (microtime(true) - $last)) > 0) {
+            usleep((int) ($wait * 1_000_000));
+        }
+        $last = microtime(true);
         try {
             $response = Http::timeout(6)
                 ->withHeaders(['User-Agent' => 'Fachora/1.0 (' . config('fachora.geocode_contact') . ')'])

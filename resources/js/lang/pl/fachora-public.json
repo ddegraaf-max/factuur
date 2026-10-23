@@ -366,5 +366,20 @@
   "Neem zelf contact op": "Skontaktuj się bezpośrednio",
   "Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.": "Te firmy nie są jeszcze na Fachorze. Ich dane pochodzą z publicznego rejestru firm (CEIDG). Wyślij im wiadomość z opisem zlecenia albo zadzwoń.",
   "E-mail sturen": "Wyślij e-mail",
-  "Bellen: :phone": "Zadzwoń: :phone"
+  "Bellen: :phone": "Zadzwoń: :phone",
+  "Ons advies voor je bevestigt": "Nasza rada, zanim potwierdzisz",
+  "Aanpassen": "Zmień",
+  "Terug naar je aanvraag om iets aan te passen": "Wróć do zapytania, aby coś zmienić",
+  "Aanvraag aanpassen": "Zmień zapytanie",
+  "Postcode": "Kod pocztowy",
+  "Datum": "Data",
+  "Tip: met Pools heb je de meeste keus. Je omschrijving vertalen we toch automatisch.": "Wskazówka: z językiem polskim masz największy wybór. Opis i tak tłumaczymy automatycznie.",
+  "Wijzigingen opslaan": "Zapisz zmiany",
+  "Annuleren": "Anuluj",
+  ":name (:km km)": ":name (:km km)",
+  "We zoeken bedrijven binnen :km km van :city.": "Szukamy firm w promieniu :km km od miejscowości :city.",
+  "Daar vallen ook :towns onder.": "Obejmuje to także: :towns.",
+  "Je kiest zelf maximaal vijf bedrijven. Fachora Verified-bedrijven krijgen je aanvraag van ons; bij andere bedrijven zie je hun openbare gegevens en neem je zelf contact op, met een kant-en-klare Poolse e-mail.": "Sam wybierasz maksymalnie pięć firm. Firmy Fachora Verified otrzymają zapytanie od nas; przy pozostałych zobaczysz ich publiczne dane kontaktowe i skontaktujesz się sam, z gotowym e-mailem po polsku.",
+  "Je omschrijving vertalen we automatisch naar het Pools. Niemand belt je ongevraagd.": "Twój opis automatycznie tłumaczymy na polski. Nikt nie zadzwoni do Ciebie bez pytania.",
+  "Bevestig je niet, dan verdwijnt de aanvraag vanzelf na 7 dagen.": "Jeśli nie potwierdzisz, zapytanie zniknie samo po 7 dniach."
 }

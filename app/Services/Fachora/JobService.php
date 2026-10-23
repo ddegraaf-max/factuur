@@ -447,6 +447,65 @@ class JobService
         return $done;
     }
 
+    /**
+     * De klant past zijn aanvraag aan vóór de bevestiging (terug vanaf de bevestigingspagina).
+     * Andere plaats of postcode: opnieuw de coördinaten opzoeken.
+     */
+    public function updatePending(ServiceJob $job, array $data): ServiceJob
+    {
+        if (! $job->isPending()) {
+            return $job;
+        }
+        $city = mb_substr(trim((string) $data['city']), 0, 120);
+        $postal = ($data['postal_code'] ?? null) ?: null;
+        $attrs = [
+            'category' => $data['category'],
+            'title' => mb_substr(trim((string) ($data['title'] ?? '')) ?: Fachora::categoryName($data['category'], 'pl'), 0, 160),
+            'description' => trim((string) $data['description']),
+            'urgency' => $data['urgency'],
+            'wanted_date' => $data['urgency'] === 'date' ? ($data['wanted_date'] ?? null) : null,
+            'time_window' => $data['time_window'] ?? null,
+            'language' => $data['language'],
+            'postal_code' => $postal,
+            'city' => $city,
+        ];
+        if ($city !== $job->city || $postal !== $job->postal_code) {
+            $coords = $this->geo->lookup($postal, $city);
+            $attrs += ['lat' => $coords['lat'] ?? null, 'lng' => $coords['lng'] ?? null];
+        }
+        $job->forceFill($attrs)->save();
+        $this->log($job, 'edited', 'customer', __('Aanvraag aangepast vóór de bevestiging'));
+
+        return $job->refresh();
+    }
+
+    /**
+     * Advies op de bevestigingspagina: wat de klant nog kan verbeteren voor hij bevestigt.
+     *
+     * @return array{radius: int, towns: list<array{name: string, km: float}>, tips: list<array{key: string, text: string}>}
+     */
+    public function advice(ServiceJob $job): array
+    {
+        $radius = (int) config('fachora.region_radius_km', 50);
+        $towns = $job->lat !== null && $job->lng !== null
+            ? array_slice(CeidgClient::nearbyTowns([(float) $job->lat, (float) $job->lng], $radius), 0, 3) : [];
+        $tips = [];
+        if ($job->language !== 'pl') {
+            $tips[] = ['key' => 'language', 'text' => __('De meeste vakmensen in Polen werken alleen in het Pools. Wij vertalen je omschrijving automatisch naar het Pools, dus met Pools als taal heb je de meeste keus. Kies alleen een andere taal als je de vakman echt in die taal wilt spreken.')];
+        }
+        if (mb_strlen((string) $job->description) < 80) {
+            $tips[] = ['key' => 'description', 'text' => __('Je omschrijving is kort. Vertel wat er moet gebeuren, hoe groot het is, op welke verdieping en of er al materiaal is: dan krijg je betere en snellere prijzen.')];
+        }
+        if (blank($job->postal_code)) {
+            $tips[] = ['key' => 'postal_code', 'text' => __('Vul je postcode in, dan rekenen we de afstand tot de bedrijven precies uit.')];
+        }
+        if ($job->lat === null) {
+            $tips[] = ['key' => 'location', 'text' => __('We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.')];
+        }
+
+        return ['radius' => $radius, 'towns' => $towns, 'tips' => $tips];
+    }
+
     /** AI: nette Poolse omschrijving voor het bedrijf, een prijsklasse en eventuele vragen. Mag mislukken. */
     public function enrich(ServiceJob $job): void
     {

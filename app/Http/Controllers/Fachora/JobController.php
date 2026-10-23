@@ -13,6 +13,8 @@ use App\Services\Fachora\ProtectService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
+use App\Support\Fachora;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -31,7 +33,42 @@ class JobController extends Controller
             return redirect($job->url());
         }
 
-        return Inertia::render('Fachora/Confirm', ['job' => $this->presenter->job($job, 'customer'), 'token' => $token]);
+        return Inertia::render('Fachora/Confirm', [
+            'job' => $this->presenter->job($job, 'customer') + [
+                'wanted_date_value' => $job->wanted_date?->toDateString(),
+            ],
+            'token' => $token,
+            'advice' => $this->jobs->advice($job),
+            'customerChoice' => (bool) config('fachora.customer_choice', false),
+            'categories' => Fachora::categoryList(),
+            'languages' => Fachora::languageList(),
+        ]);
+    }
+
+    /** Terug in de aanvraag: aanpassen vóór de bevestiging. */
+    public function updatePending(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        if (! $job->isPending()) {
+            return redirect($job->url());
+        }
+        $data = $request->validate([
+            'category' => ['required', Rule::in(array_keys(Fachora::categories()))],
+            'title' => ['nullable', 'string', 'max:160'],
+            'description' => ['required', 'string', 'min:10', 'max:3000'],
+            'urgency' => ['required', Rule::in((array) config('fachora.urgencies'))],
+            'wanted_date' => ['nullable', 'required_if:urgency,date', 'date', 'after_or_equal:today'],
+            'time_window' => ['nullable', 'string', 'max:40'],
+            'language' => ['required', Rule::in(array_keys((array) config('fachora.languages')))],
+            'postal_code' => ['nullable', 'regex:/^\d{2}-\d{3}$/'],
+            'city' => ['required', 'string', 'max:120'],
+        ], [
+            'description.min' => __('Beschrijf de klus in minstens een paar woorden.'),
+            'postal_code.regex' => __('Een Poolse postcode ziet eruit als 00-000.'),
+        ]);
+        $this->jobs->updatePending($job, $data);
+
+        return redirect($job->confirmUrl())->with('flash', __('Je aanvraag is aangepast. Controleer hem nog één keer en bevestig.'));
     }
 
     public function confirm(Request $request, string $token): RedirectResponse

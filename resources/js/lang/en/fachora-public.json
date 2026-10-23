@@ -366,5 +366,20 @@
   "Neem zelf contact op": "Contact them directly",
   "Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.": "These companies are not on Fachora yet. Their details come from the public business register (CEIDG). Send them a message with the description of your job, or call them.",
   "E-mail sturen": "Send e-mail",
-  "Bellen: :phone": "Call: :phone"
+  "Bellen: :phone": "Call: :phone",
+  "Ons advies voor je bevestigt": "Our advice before you confirm",
+  "Aanpassen": "Change",
+  "Terug naar je aanvraag om iets aan te passen": "Go back to your request to change something",
+  "Aanvraag aanpassen": "Edit your request",
+  "Postcode": "Postal code",
+  "Datum": "Date",
+  "Tip: met Pools heb je de meeste keus. Je omschrijving vertalen we toch automatisch.": "Tip: with Polish you get the most choice. We translate your description automatically anyway.",
+  "Wijzigingen opslaan": "Save changes",
+  "Annuleren": "Cancel",
+  ":name (:km km)": ":name (:km km)",
+  "We zoeken bedrijven binnen :km km van :city.": "We look for companies within :km km of :city.",
+  "Daar vallen ook :towns onder.": "That also includes :towns.",
+  "Je kiest zelf maximaal vijf bedrijven. Fachora Verified-bedrijven krijgen je aanvraag van ons; bij andere bedrijven zie je hun openbare gegevens en neem je zelf contact op, met een kant-en-klare Poolse e-mail.": "You choose up to five companies yourself. Fachora Verified companies receive your request from us; for other companies you see their public contact details and contact them yourself, with a ready-made e-mail in Polish.",
+  "Je omschrijving vertalen we automatisch naar het Pools. Niemand belt je ongevraagd.": "We translate your description into Polish automatically. Nobody calls you uninvited.",
+  "Bevestig je niet, dan verdwijnt de aanvraag vanzelf na 7 dagen.": "If you don't confirm, the request disappears by itself after 7 days."
 }

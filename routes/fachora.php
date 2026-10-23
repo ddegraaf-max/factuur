@@ -38,6 +38,7 @@ Route::middleware('brand:fachora')->group(function () {
     Route::prefix('zlecenie/{token}')->where(['token' => '[a-f0-9]{64}'])->name('fachora.job.')->group(function () {
         Route::get('potwierdz', [JobController::class, 'confirmShow'])->name('confirm.show');
         Route::post('potwierdz', [JobController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
+        Route::post('potwierdz/zmien', [JobController::class, 'updatePending'])->middleware('throttle:20,1')->name('confirm.update');
         Route::get('/', [JobController::class, 'show'])->name('show');
         Route::post('firmy', [JobController::class, 'select'])->middleware('throttle:20,1')->name('select');
         Route::post('sms', [JobController::class, 'smsSend'])->middleware('throttle:5,1')->name('sms.send');

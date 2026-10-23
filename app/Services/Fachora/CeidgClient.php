@@ -348,7 +348,7 @@ class CeidgClient
      *
      * @return array{created: int, checked: int, candidates: int, skipped: ?string}
      */
-    public function importAround(ServiceJob $job, ?int $target = null, ?int $firmBudget = null, int $pageBudget = 8): array
+    public function importAround(ServiceJob $job, ?int $target = null, ?int $firmBudget = null, int $pageBudget = 14): array
     {
         $target ??= (int) config('fachora.local_import_target', 10);
         $firmBudget ??= (int) config('fachora.local_import_firms', 60);
@@ -371,10 +371,7 @@ class CeidgClient
         $region = ['name' => $job->city, 'center' => $center];
         $radius = (float) config('fachora.region_radius_km', 50);
         $minStart = now()->subYears((int) config('fachora.import_min_years', 1));
-        $areas = [['miasto' => trim((string) $job->city)]];
-        if ($county = $this->geo->county($center[0], $center[1])) {
-            $areas[] = ['powiat' => $county];
-        }
+        $areas = $this->searchAreas($job->city, $center, $radius);
 
         foreach ($areas as $area) {
             foreach ($codes as $pkd) {
@@ -415,6 +412,65 @@ class CeidgClient
         Log::info('Fachora import op aanvraag', ['job' => $job->id, 'city' => $job->city, 'category' => $job->category] + $result);
 
         return $result;
+    }
+
+    /**
+     * Waar zoeken we in het register? Eerst de plaats zelf, dan de grotere steden binnen
+     * de straal (dichtstbij eerst, bijv. Płock bij een dorp in de buurt), dan de powiat
+     * van de plaats en de powiats rondom (vier punten op ruim de halve straal). Zo valt
+     * een stad op 20 km niet weg omdat hij in een andere powiat ligt.
+     *
+     * @param  array{0: float, 1: float}  $center
+     * @return list<array<string, string>>
+     */
+    public function searchAreas(?string $city, array $center, float $radius): array
+    {
+        $areas = [];
+        $seen = [];
+        $add = function (string $key, ?string $value) use (&$areas, &$seen) {
+            $value = trim((string) $value);
+            $norm = $key . ':' . GeocodeService::normalise($value);
+            if ($value !== '' && ! isset($seen[$norm])) {
+                $seen[$norm] = true;
+                $areas[] = [$key => $value];
+            }
+        };
+        $add('miasto', $city);
+        foreach (self::nearbyTowns($center, $radius) as $town) {
+            $add('miasto', $town['name']);
+        }
+        $add('powiat', $this->geo->county($center[0], $center[1]));
+        $step = min(30.0, $radius * 0.6);
+        $dLat = $step / 111.0;
+        $dLng = $step / (111.0 * max(0.2, cos(deg2rad($center[0]))));
+        foreach ([[$dLat, 0], [-$dLat, 0], [0, $dLng], [0, -$dLng]] as [$a, $b]) {
+            $add('powiat', $this->geo->county(round($center[0] + $a, 3), round($center[1] + $b, 3)));
+        }
+
+        return $areas;
+    }
+
+    /**
+     * Grotere steden (uit regions en expansion_regions) binnen de straal, dichtstbij eerst.
+     *
+     * @param  array{0: float, 1: float}  $center
+     * @return list<array{name: string, km: float}>
+     */
+    public static function nearbyTowns(array $center, float $radius): array
+    {
+        $towns = [];
+        foreach (array_merge((array) config('fachora.regions', []), (array) config('fachora.expansion_regions', [])) as $region) {
+            if (empty($region['center']) || $region['name'] === 'Trójmiasto') {
+                continue;
+            }
+            $km = Fachora::distanceKm($center[0], $center[1], (float) $region['center'][0], (float) $region['center'][1]);
+            if ($km <= $radius && $km >= 2) {
+                $towns[] = ['name' => (string) $region['name'], 'km' => round($km)];
+            }
+        }
+        usort($towns, fn ($a, $b) => $a['km'] <=> $b['km']);
+
+        return $towns;
     }
 
     /** PKD-codes (met of zonder punten) naar Fachora-categorieën. @return list<string> */
