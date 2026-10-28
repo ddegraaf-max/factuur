@@ -322,16 +322,20 @@ class InvoiceManager
             'company' => $company,
         ])->setPaper('a4')->output();
 
-        // E-facturatie: UBL-bijlage genereren. Mislukt dit, dan gaat de
-        // factuurmail gewoon (alleen met PDF) de deur uit.
+        // E-facturatie: UBL-bijlage alleen voor zakelijke klanten. Een consument
+        // kan er niets mee, en een extra xml-bijlage van een onbekende afzender
+        // maakt spamfilters (vooral Outlook/Hotmail) achterdochtiger. Mislukt het
+        // genereren, dan gaat de factuurmail gewoon (alleen met PDF) de deur uit.
         $ubl = null;
-        try {
-            $ubl = app(UblGenerator::class)->generate($invoice);
-        } catch (\Throwable $e) {
-            Log::warning('UBL-bijlage genereren mislukt', [
-                'invoice' => $invoice->id,
-                'error' => $e->getMessage(),
-            ]);
+        if (($invoice->customer?->type ?? 'business') !== 'consumer') {
+            try {
+                $ubl = app(UblGenerator::class)->generate($invoice);
+            } catch (\Throwable $e) {
+                Log::warning('UBL-bijlage genereren mislukt', [
+                    'invoice' => $invoice->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         $mail = Mail::to($invoice->customer_email);

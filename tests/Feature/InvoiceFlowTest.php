@@ -85,6 +85,27 @@ class InvoiceFlowTest extends TestCase
             && $mail->hasBcc('boekhouder@example.com'));
     }
 
+    /** Consumenten krijgen alleen de PDF; de UBL-xml gaat alleen naar zakelijke klanten (minder spamverdacht, en zij kunnen er niets mee). */
+    public function test_consumers_get_the_invoice_without_ubl_attachment_and_businesses_with(): void
+    {
+        Mail::fake();
+        $this->actingAs($this->demoUser());
+
+        foreach (['consumer', 'business'] as $type) {
+            $customer = Customer::whereNotNull('email')->orderBy('id')->firstOrFail();
+            $customer->forceFill(['type' => $type])->save();
+            $this->post(route('invoices.store'), [
+                'customer_id' => $customer->id, 'invoice_date' => now()->toDateString(), 'payment_terms' => 14,
+                'lines' => $this->lines(), 'action' => 'draft',
+            ])->assertRedirect();
+            $invoice = Invoice::where('status', 'draft')->latest('id')->firstOrFail();
+            $this->post(route('invoices.send', $invoice))->assertRedirect();
+
+            Mail::assertSent(InvoiceMail::class, fn ($mail) => $mail->invoice->is($invoice)
+                && ($type === 'consumer' ? $mail->ubl === null : is_string($mail->ubl) && str_contains($mail->ubl, '<Invoice')));
+        }
+    }
+
     public function test_duplicate_creates_a_fresh_draft_with_the_same_lines(): void
     {
         $this->actingAs($this->demoUser());

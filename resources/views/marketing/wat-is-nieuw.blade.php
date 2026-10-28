@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 16 oktober 2026 · {{ brand('version_prefix') }} 1.85.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 oktober 2026 · {{ brand('version_prefix') }} 1.85.3</div>
+        <h2>Factuurmail: minder vaak in de spam</h2>
+        <ul class="tl-list">
+          <li><b>Geen xml-bijlage meer naar consumenten</b> — de UBL-e-factuur gaat alleen nog mee naar zakelijke klanten. Een particulier kan er niets mee, en een extra xml-bijlage van een nog onbekende afzender maakt spamfilters (vooral Outlook en Hotmail) achterdochtiger. De pdf gaat altijd mee.</li>
+          <li><b>Gecontroleerd</b> — SPF, DKIM en DMARC van easyinvoice.nl zijn in orde en een onafhankelijke spamtest geeft de factuurmail 9,5 van 10. Belandt een factuur bij een klant toch in de spam, koppel dan je eigen domein (Instellingen → Koppelingen → Eigen afzenderadres): de mail komt dan van jouw adres, dat de klant al kent.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">16 oktober 2026 · {{ brand('version_prefix') }} 1.85.0</div>
         <h2>Fachora: demo van het bedrijvenpanel</h2>
         <ul class="tl-list">
           <li><b>Demo met één klik</b> — op fachora.pl/demo stap je zonder account in het panel van een fictief, geverifieerd bedrijf (Hydro-Serwis Nowak, Warschau) met zaken in elke fase: twee nieuwe aanvragen om te prijzen, een uitgebrachte prijs, een geplande en een lopende klus met voorgesteld meerwerk, een klus die op akkoord wacht, afgeronde klussen met beoordelingen en één afzegging. Pagina in het Pools en Engels, link op de pagina voor bedrijven en in de voettekst.</li>
