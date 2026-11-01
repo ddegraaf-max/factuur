@@ -138,6 +138,11 @@ DEMO VAN HET BEDRIJVENPANEL (1.85.0)
   over (klant, bedrijf, eigenaar), dus ook de planner (fachora:tick) mailt er nooit over. DemoMode zet mail op log.
 - Opruimen: DemoCleaner::delete roept DemoBuilder::cleanup aan (demo-zaken + bestanden + profiel), daarna CompanyPurger.
 - Demobalk (AppLayout) toont onder Fachora de knop "Załóż konto swojej firmy" (naar registreren).
+- 1.86.0: demo op aanvraag (alle merken). De demopagina vraagt naam + e-mail (partial resources/views/demo/request-form,
+  Turnstile); App\Services\DemoAccess legt de aanvraag vast (demo_requests, per merk) en mailt de eigenaar
+  (DemoRequestMail, beoordeellink /demo/beoordelen/{review_token}). Goedkeuren (mail of Eigenaar → Demo-aanvragen)
+  stuurt DemoAccessMail met /demo/start/{token} (14 dagen, vaker te gebruiken); POST op die url bouwt de demo.
+  Zonder goedgekeurde link start er niets. Tests: DemoAccessTest, trait Tests\Support\StartsDemo.
 - Turnstile: TURNSTILE_SITEKEY en TURNSTILE_SECRET staan op Railway (widget "napoleonvvesoftware.nl (Spin)", hostnaam fachora.pl).
 
 CEIDG (1.85.1, sleutel sinds 16 okt 2026)

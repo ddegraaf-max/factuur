@@ -70,9 +70,15 @@ Route::get('/api/nip/{nip}', [\App\Http\Controllers\NipController::class, 'looku
 // ---------- DEMO-OMGEVING ----------
 // Elke bezoeker krijgt een eigen sandbox met voorbeeldgegevens en ziet daarin
 // de échte applicatie. Zie App\Http\Middleware\DemoMode voor de beveiliging.
+// Demo op aanvraag (1.86.0): aanvragen, persoonlijke link (landing + start), beoordelen vanuit de mail aan de eigenaar.
 Route::get('/demo', [DemoController::class, 'show'])->name('demo');
-Route::post('/demo', [DemoController::class, 'start'])
-    ->middleware('throttle:10,1')->name('demo.start');
+Route::post('/demo', [DemoController::class, 'request'])
+    ->middleware(['throttle:5,1', 'turnstile'])->name('demo.request');
+Route::get('/demo/start/{token}', [DemoController::class, 'landing'])->where('token', '[A-Za-z0-9]+')->name('demo.landing');
+Route::post('/demo/start/{token}', [DemoController::class, 'start'])
+    ->where('token', '[A-Za-z0-9]+')->middleware('throttle:10,1')->name('demo.start');
+Route::get('/demo/beoordelen/{reviewToken}', [DemoController::class, 'review'])->where('reviewToken', '[A-Za-z0-9]+')->middleware('throttle:30,1')->name('demo.review');
+Route::post('/demo/beoordelen/{reviewToken}/{decision}', [DemoController::class, 'decide'])->where('reviewToken', '[A-Za-z0-9]+')->middleware('throttle:30,1')->name('demo.decide');
 Route::post('/demo/verlaten', [DemoController::class, 'stop'])->name('demo.stop');
 
 // ---------- PUBLIEKE MARKETINGPAGINA'S ----------
@@ -241,6 +247,12 @@ Route::post('/m/gezien', function (\Illuminate\Http\Request $request) {
 Route::middleware(['auth', 'owner'])->prefix('eigenaar')->name('owner.')->group(function () {
     Route::get('administraties', [\App\Http\Controllers\OwnerAdministrationsController::class, 'index'])->name('companies.index');
     Route::delete('administraties/{company}', [\App\Http\Controllers\OwnerAdministrationsController::class, 'destroy'])->name('companies.destroy');
+    // Demo-aanvragen (1.86.0): goedkeuren, afwijzen, direct uitnodigen.
+    Route::get('demo-aanvragen', [\App\Http\Controllers\OwnerDemoController::class, 'index'])->name('demo.index');
+    Route::post('demo-aanvragen', [\App\Http\Controllers\OwnerDemoController::class, 'invite'])->name('demo.invite');
+    Route::post('demo-aanvragen/{demoRequest}/goedkeuren', [\App\Http\Controllers\OwnerDemoController::class, 'approve'])->name('demo.approve');
+    Route::post('demo-aanvragen/{demoRequest}/afwijzen', [\App\Http\Controllers\OwnerDemoController::class, 'deny'])->name('demo.deny');
+    Route::delete('demo-aanvragen/{demoRequest}', [\App\Http\Controllers\OwnerDemoController::class, 'destroy'])->name('demo.destroy');
 });
 
 // Merkbewaking (alleen eigenaar; check in de controller): verwarringslog + merkgebruik-dossiers.

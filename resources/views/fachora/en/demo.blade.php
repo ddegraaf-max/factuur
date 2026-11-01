@@ -3,7 +3,7 @@
 {{-- Company panel demo, English version: one click into the panel of the fictional company Hydro-Serwis Nowak with jobs in every stage (App\Services\Fachora\DemoBuilder). Nothing is sent; the environment is removed after 24 hours. --}}
 
 @section('title', 'Company panel demo — see Fachora from the inside')
-@section('description', 'One click into the panel of a fictional Fachora Verified company: new jobs to price, a quote waiting for the customer, a visit tomorrow, a job in progress, acceptance and reviews. No account, no card, nothing is sent.')
+@section('description', 'A look inside the panel of a fictional Fachora Verified company: new jobs to price, a quote waiting for the customer, a visit tomorrow, a job in progress, acceptance and reviews. No account, no card, nothing is sent.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -32,26 +32,14 @@
   <div class="container page-hero-inner">
     <div class="eyebrow">Demo</div>
     <h1>The Fachora company panel. The real thing, with sample jobs.</h1>
-    <p class="lead">One click and you are inside the panel of the fictional company <strong>Hydro-Serwis Nowak</strong> from Warsaw: two new jobs are waiting for your price, one quote for the customer's decision, a visit tomorrow at 10:00, one job in progress and one awaiting acceptance. Click around, quote, mark work as done. Nothing reaches real customers.</p>
+    <p class="lead">With your personal link you are inside the panel of the fictional company <strong>Hydro-Serwis Nowak</strong> from Warsaw: two new jobs are waiting for your price, one quote for the customer's decision, a visit tomorrow at 10:00, one job in progress and one awaiting acceptance. Click around, quote, mark work as done. Nothing reaches real customers.</p>
   </div>
 </section>
 
 <section class="section" style="padding-top:24px;">
   <div class="container demo-wrap">
 
-    <div class="demo-start">
-      @if (session('error'))
-        <div style="background:var(--brand-tint);border:1px solid var(--brand-border);color:var(--brand-darker);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px;">
-          {{ session('error') }}
-        </div>
-      @endif
-
-      <form method="POST" action="{{ route('demo.start') }}">
-        @csrf
-        <button type="submit" class="btn btn-primary btn-lg">Run the demo →</button>
-      </form>
-      <div class="demo-note">No account · no card · no e-mails to anyone</div>
-    </div>
+    @include('demo.request-form')
 
     <div class="demo-feats">
       <div class="demo-feat">

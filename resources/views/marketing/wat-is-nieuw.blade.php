@@ -42,6 +42,15 @@
       </article>
       <article class="tl-item">
         <div class="tl-dot"></div>
+        <div class="tl-meta">1 november 2026 · {{ brand('version_prefix') }} 1.86.0</div>
+        <h2>Demo op aanvraag</h2>
+        <ul class="tl-list">
+          <li><b>Even je e-mailadres achterlaten</b> — de demo start niet meer met één klik. Wie wil rondkijken, laat naam en e-mailadres achter (en eventueel waar hij naar wil kijken); wij keuren de aanvraag goed en je krijgt een persoonlijke link. Die werkt twee weken en mag je vaker gebruiken: elke start is een verse voorbeeldomgeving.</li>
+          <li><b>Waarom</b> — zo weten we wie er rondkijkt, kunnen we je helpen als je ergens tegenaan loopt, en blijft de demo een plek voor echte interesse.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
         <div class="tl-meta">16 oktober 2026 · {{ brand('version_prefix') }} 1.84.0</div>
         <h2>Fachora: veertien categorieën</h2>
         <ul class="tl-list">

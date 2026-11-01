@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Testing\AssertableInertia as Assert;
+use Tests\Support\StartsDemo;
 use Tests\TestCase;
 
 /**
@@ -22,7 +23,7 @@ use Tests\TestCase;
  */
 class FachoraDemoTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, StartsDemo;
 
     protected function setUp(): void
     {
@@ -40,15 +41,15 @@ class FachoraDemoTest extends TestCase
     public function test_demo_page_is_the_panel_demo_not_the_invoicing_demo(): void
     {
         $this->get('/demo')->assertOk()
-            ->assertSee('Hydro-Serwis Nowak')->assertSee('Uruchom demo')
+            ->assertSee('Hydro-Serwis Nowak')->assertSee('Poproś o dostęp do demo')
             ->assertDontSee('Lopra')->assertDontSee('fakturę');
 
-        $this->get('/demo?lang=en')->assertOk()->assertSee('Run the demo')->assertSee('Hydro-Serwis Nowak');
+        $this->get('/demo?lang=en')->assertOk()->assertSee('Request access to the demo')->assertSee('Hydro-Serwis Nowak');
     }
 
     public function test_starting_the_demo_builds_a_verified_company_with_jobs_in_every_stage(): void
     {
-        $this->post('/demo')->assertRedirect(route('dashboard'));
+        $this->post($this->demoStartUrl())->assertRedirect(route('dashboard'));
 
         $company = Company::query()->where('is_demo', true)->firstOrFail();
         $provider = Provider::query()->where('company_id', $company->id)->firstOrFail();
@@ -81,7 +82,7 @@ class FachoraDemoTest extends TestCase
 
     public function test_demo_jobs_never_send_mail(): void
     {
-        $this->post('/demo');
+        $this->post($this->demoStartUrl());
         $job = ServiceJob::query()->firstOrFail();
         $provider = Provider::query()->firstOrFail();
         $notifier = app(Notifier::class);
@@ -95,7 +96,7 @@ class FachoraDemoTest extends TestCase
 
     public function test_leaving_the_demo_removes_the_company_its_profile_and_its_jobs(): void
     {
-        $this->post('/demo');
+        $this->post($this->demoStartUrl());
         $this->assertSame(1, Provider::query()->count());
         $this->assertGreaterThan(0, DB::table('service_job_offers')->count());
 

@@ -2061,5 +2061,21 @@
   "De meeste vakmensen in Polen werken alleen in het Pools. Wij vertalen je omschrijving automatisch naar het Pools, dus met Pools als taal heb je de meeste keus. Kies alleen een andere taal als je de vakman echt in die taal wilt spreken.": "Most tradespeople in Poland work in Polish only. We translate your description into Polish automatically, so with Polish as the language you get the most choice. Only choose another language if you really want to speak to the tradesperson in that language.",
   "Je omschrijving is kort. Vertel wat er moet gebeuren, hoe groot het is, op welke verdieping en of er al materiaal is: dan krijg je betere en snellere prijzen.": "Your description is short. Say what needs doing, how big it is, which floor and whether materials are already there: you'll get better and faster prices.",
   "Vul je postcode in, dan rekenen we de afstand tot de bedrijven precies uit.": "Enter your postal code and we'll calculate the distance to companies exactly.",
-  "We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.": "We couldn't find your town on the map. Check the spelling or enter the postal code, otherwise we only search in the town itself."
+  "We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.": "We couldn't find your town on the map. Check the spelling or enter the postal code, otherwise we only search in the town itself.",
+  "Start de demo": "Start the demo",
+  "Je toegang is goedgekeurd · elke start is een verse voorbeeldomgeving · geen creditcard": "Your access is approved · every start is a fresh sample environment · no card",
+  "Bedankt, je aanvraag is binnen.": "Thanks, your request has arrived.",
+  "Je krijgt een e-mail met je persoonlijke link zodra de demo voor je is klaargezet — meestal dezelfde dag.": "You will get an e-mail with your personal link as soon as the demo is ready for you — usually the same day.",
+  "Bedrijf": "Company",
+  "(optioneel)": "(optional)",
+  "Waar wil je naar kijken?": "What would you like to look at?",
+  "Vraag toegang tot de demo": "Request access to the demo",
+  "Persoonlijke toegang: je krijgt een e-mail met je link zodra we je aanvraag hebben goedgekeurd · geen creditcard": "Personal access: you get an e-mail with your link once we have approved your request · no card",
+  "Deze demolink is verlopen of nog niet goedgekeurd. Vraag hieronder opnieuw toegang aan.": "This demo link has expired or has not been approved yet. Request access again below.",
+  "Je demo van :brand staat klaar": "Your :brand demo is ready",
+  "Je demo staat klaar": "Your demo is ready",
+  "Je vroeg toegang tot de demo van :brand. Die is goedgekeurd: met de knop hieronder start je een eigen, afgeschermde voorbeeldomgeving. Alle gegevens zijn voorbeelden en er gaat geen e-mail naar echte ontvangers.": "You asked for access to the :brand demo. It has been approved: the button below starts your own, isolated sample environment. All data is sample data and no e-mail goes to real recipients.",
+  "Werkt de knop niet? Kopieer dan deze link:": "Button not working? Copy this link:",
+  "De link werkt tot :date en mag je vaker gebruiken; elke start is een verse omgeving die na 24 uur vanzelf wordt opgeruimd.": "The link works until :date and you may use it more than once; every start is a fresh environment that cleans itself up after 24 hours.",
+  "Vroeg je geen demo aan? Dan kun je deze e-mail negeren.": "Did you not request a demo? Then you can ignore this e-mail."
 }

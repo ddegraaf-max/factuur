@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Support\Market;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\UsesDemoCompany;
+use Tests\Support\StartsDemo;
 use Tests\TestCase;
 
 /**
@@ -14,7 +15,7 @@ use Tests\TestCase;
  */
 class UiLocaleTest extends TestCase
 {
-    use RefreshDatabase, UsesDemoCompany;
+    use RefreshDatabase, StartsDemo, UsesDemoCompany;
 
     public function test_dutch_market_has_a_single_interface_language(): void
     {
@@ -133,7 +134,7 @@ class UiLocaleTest extends TestCase
         $this->withSession(['ui_locale' => 'en'])->get('/regulamin')->assertSee('legally binding version');
 
         // Demo starten vanaf de Engelse site: Engelse welkomstmelding en Engelse app.
-        $this->withSession(['ui_locale' => 'en'])->post('/demo')->assertRedirect(route('dashboard'));
+        $this->withSession(['ui_locale' => 'en'])->post($this->demoStartUrl())->assertRedirect(route('dashboard'));
         $this->get(route('dashboard'))->assertOk()->assertSee('<html lang="en"', false)->assertSee('Welcome to the demo!');
         auth()->logout();
 

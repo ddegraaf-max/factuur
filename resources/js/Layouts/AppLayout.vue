@@ -130,6 +130,7 @@ const rawNav = [
       // Merkbewaking hoort bij het geregistreerde merk EasyInvoice; onder Lopra verborgen.
       { name: 'Merkbewaking', route: 'brand.index', icon: 'shield', can: 'platform', brand: 'easyinvoice' },
       { name: 'Administraties', route: 'owner.companies.index', icon: 'users', can: 'platform' },
+      { name: 'Demo-aanvragen', route: 'owner.demo.index', icon: 'lock', can: 'platform' },
       // Fachora: de bedrijvendatabase en de opdrachten (alleen onder dat merk).
       { name: 'Fachora: bedrijven', route: 'fachora.admin.providers', icon: 'shield', can: 'platform', brand: 'fachora', badge: page.props.fachora?.pending_providers ? String(page.props.fachora.pending_providers) : null },
       { name: 'Fachora: opdrachten', route: 'fachora.admin.jobs', icon: 'list', can: 'platform', brand: 'fachora' },

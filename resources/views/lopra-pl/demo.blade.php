@@ -38,19 +38,7 @@
 <section class="section" style="padding-top:24px;">
   <div class="container demo-wrap">
 
-    <div class="demo-start">
-      @if (session('error'))
-        <div style="background:var(--brand-tint);border:1px solid var(--brand-border);color:var(--brand-darker);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px;">
-          {{ session('error') }}
-        </div>
-      @endif
-
-      <form method="POST" action="{{ route('demo.start') }}">
-        @csrf
-        <button type="submit" class="btn btn-primary btn-xl">Uruchom demo →</button>
-      </form>
-      <div class="demo-note">Bez konta · bez karty · od razu w środku</div>
-    </div>
+    @include('demo.request-form')
 
     <div class="demo-feats">
       <div class="demo-feat">
