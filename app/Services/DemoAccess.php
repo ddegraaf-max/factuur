@@ -44,16 +44,16 @@ class DemoAccess
      * goedkeuren verlengt de link en stuurt de mail opnieuw. Geeft terug
      * of de mail weg is.
      */
-    public function approve(DemoRequest $request): bool
+    public function approve(DemoRequest $request, int $days = DemoRequest::VALID_DAYS, bool $mail = true): bool
     {
         $request->forceFill([
             'status' => DemoRequest::APPROVED,
             'approved_at' => now(),
             'denied_at' => null,
-            'expires_at' => now()->addDays(DemoRequest::VALID_DAYS),
+            'expires_at' => now()->addDays(max(1, $days)),
         ])->save();
 
-        return $this->sendAccess($request);
+        return $mail ? $this->sendAccess($request) : false;
     }
 
     /** Afwijzen: de link werkt niet (meer); de aanvrager krijgt geen bericht. */
@@ -62,8 +62,11 @@ class DemoAccess
         $request->forceFill(['status' => DemoRequest::DENIED, 'denied_at' => now(), 'expires_at' => null])->save();
     }
 
-    /** De eigenaar nodigt iemand direct uit: meteen goedgekeurd, link per mail. */
-    public function invite(string $email, ?string $name = null, ?string $locale = null): DemoRequest
+    /**
+     * De eigenaar nodigt iemand direct uit: meteen goedgekeurd, link per mail.
+     * Met $mail = false (bijv. een vaste link voor de rookproef) gaat er geen mail.
+     */
+    public function invite(string $email, ?string $name = null, ?string $locale = null, int $days = DemoRequest::VALID_DAYS, bool $mail = true): DemoRequest
     {
         $request = DemoRequest::create([
             'brand' => Brand::key(),
@@ -74,7 +77,7 @@ class DemoAccess
             'review_token' => DemoRequest::newToken(),
             'status' => DemoRequest::PENDING,
         ]);
-        $this->approve($request);
+        $this->approve($request, $days, $mail);
 
         return $request;
     }

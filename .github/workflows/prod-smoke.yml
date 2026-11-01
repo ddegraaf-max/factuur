@@ -28,6 +28,8 @@ jobs:
         run: echo "version=$(grep -oP "version' => 'Easy \K[0-9.]+" config/app.php)" >> "$GITHUB_OUTPUT"
 
       - name: Rookproef live site
+        env:
+          DEMO_SMOKE_TOKEN: ${{ secrets.DEMO_SMOKE_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
             node scripts/smoke.mjs --wait-for-version "${{ steps.version.outputs.version }}"

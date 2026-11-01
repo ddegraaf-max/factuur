@@ -93,15 +93,21 @@ async function waitForVersion(version) {
   console.log('Demo-sandbox');
   const demoHtml = await expectPage('/demo', 'GET /demo');
   const token = demoHtml ? demoHtml.match(/name="_token"\s+value="([^"]+)"/)?.[1] : null;
-  if (!token) {
+  // Sinds 1.86.0 start de demo alleen met een goedgekeurde link. De token voor de rookproef staat in het
+  // GitHub-secret DEMO_SMOKE_TOKEN (maken op de server: php artisan demo:invite rookproef@easyinvoice.nl --days=3650 --no-mail).
+  const demoToken = process.env.DEMO_SMOKE_TOKEN || '';
+  if (!demoToken) {
+    console.log('  … geen DEMO_SMOKE_TOKEN (GitHub-secret): de ingelogde pagina\'s slaan we over');
+  } else if (!token) {
     fail('demo', 'geen CSRF-token gevonden');
   } else {
-    const start = await req('/demo', {
+    const start = await req(`/demo/start/${demoToken}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({ _token: token }).toString(),
     });
-    if (start.status !== 302) fail('POST /demo', `status ${start.status}`); else ok('demo gestart');
+    const landed = start.headers?.get?.('location') || '';
+    if (start.status !== 302 || !landed.includes('/dashboard')) fail('POST /demo/start', `status ${start.status} → ${landed || '-'} (token verlopen of afgewezen?)`); else ok('demo gestart');
 
     const pages = ['/dashboard', '/invoices', '/invoices/create', '/offertes', '/offertes/create', '/customers', '/customers/create',
       '/btw', '/inkoop', '/uren', '/bank', '/stats', '/jaaroverzicht', '/cashflow', '/debiteuren',
