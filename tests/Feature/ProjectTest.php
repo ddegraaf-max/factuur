@@ -91,6 +91,14 @@ class ProjectTest extends TestCase
         $this->assertEqualsWithDelta($figures['invoiced'] - 1400.0, $figures['result'], 0.01);
         $this->assertEqualsWithDelta($figures['agreed'] - 5400.0, $figures['expected'], 0.01);
         $this->assertSame(1, $figures['counts']['rounds']);
+        // Netto, btw en bruto naast elkaar (1.85.4): de factuur en de inkoop met btw, en het btw-saldo.
+        $this->assertEqualsWithDelta((float) $invoice->vat_total, $figures['invoiced_vat'], 0.01);
+        $this->assertEqualsWithDelta((float) $invoice->total, $figures['invoiced_gross'], 0.01);
+        $this->assertGreaterThan(0, $figures['invoiced_vat']);
+        $this->assertEqualsWithDelta(1000.0, $figures['purchases_subtotal'], 0.01);
+        $this->assertEqualsWithDelta(210.0, $figures['purchases_vat'], 0.01);
+        $this->assertEqualsWithDelta(1210.0, $figures['purchases_gross'], 0.01);
+        $this->assertEqualsWithDelta((float) $invoice->vat_total - 210.0, $figures['vat_balance'], 0.01, 'Btw op verkoop min btw op inkoop');
 
         // Komt de factuur van de metselaar binnen op het project, dan telt de gunning niet nog eens mee.
         $this->post(route('purchases.store'), [

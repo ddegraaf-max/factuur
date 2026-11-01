@@ -125,7 +125,7 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
     <div class="kpis">
       <div class="kpi">
         <div class="lbl">{{ $t('Afgesproken') }}</div>
-        <div class="val">{{ figures.agreed ? eur(figures.agreed) : '—' }}</div>
+        <div class="val">{{ figures.agreed ? eur(figures.agreed) : '—' }}<span v-if="figures.agreed" class="pct">{{ $t('excl. btw') }}</span></div>
         <div class="meta">
           <template v-if="project.agreed_price !== null">{{ $t('handmatig ingevuld') }}</template>
           <template v-else-if="figures.counts.quotes">{{ $t('uit :n offertes', { n: figures.counts.quotes }) }}</template>
@@ -134,12 +134,13 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
       </div>
       <div class="kpi">
         <div class="lbl">{{ $t('Gefactureerd') }}</div>
-        <div class="val">{{ eur(figures.invoiced) }}</div>
-        <div class="meta">{{ $t('ontvangen :received', { received: eur(figures.received) }) }}<span v-if="figures.outstanding > 0" class="warn"> · {{ $t('open :open', { open: eur(figures.outstanding) }) }}</span></div>
+        <div class="val">{{ eur(figures.invoiced) }}<span class="pct">{{ $t('excl. btw') }}</span></div>
+        <div class="meta">{{ $t('btw :vat · incl. btw :gross', { vat: eur(figures.invoiced_vat), gross: eur(figures.invoiced_gross) }) }}</div>
+        <div class="meta">{{ $t('ontvangen :received', { received: eur(figures.received) }) }}<span v-if="figures.outstanding > 0" class="warn"> · {{ $t('nog open :open', { open: eur(figures.outstanding) }) }}</span></div>
       </div>
       <div class="kpi">
         <div class="lbl">{{ $t('Kosten') }}</div>
-        <div class="val">{{ eur(figures.costs) }}</div>
+        <div class="val">{{ eur(figures.costs) }}<span class="pct">{{ $t('excl. btw') }}</span></div>
         <div class="meta">{{ $t('inkoop :purchases · uren :hours · ritten :trips', { purchases: eur(figures.actual.material + figures.actual.subcontract + figures.actual.other - figures.trips_amount), hours: eur(figures.hours_amount), trips: eur(figures.trips_amount) }) }}</div>
       </div>
       <div class="kpi" :class="{ alert: figures.result < 0 }">
@@ -156,8 +157,57 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
 
     <div class="pr-grid">
       <div class="pr-main">
+        <!-- Geld en btw: netto, btw en bruto naast elkaar, zodat excl. en incl. niet door elkaar lopen -->
+        <div class="card money">
+          <div class="card-header">
+            <div>
+              <div class="card-title">{{ $t('Geld en btw') }}</div>
+              <div class="card-subtitle">{{ $t('Netto, btw en bruto naast elkaar. Betalingen zijn altijd inclusief btw.') }}</div>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th></th><th class="right">{{ $t('Excl. btw') }}</th><th class="right">{{ $t('Btw') }}</th><th class="right">{{ $t('Incl. btw') }}</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>{{ $t('Gefactureerd') }}</td>
+                <td class="right num">{{ eur(figures.invoiced) }}</td>
+                <td class="right num">{{ eur(figures.invoiced_vat) }}</td>
+                <td class="right num">{{ eur(figures.invoiced_gross) }}</td>
+              </tr>
+              <tr class="indent">
+                <td>{{ $t('waarvan ontvangen') }}</td>
+                <td class="right num dash">—</td><td class="right num dash">—</td>
+                <td class="right num good">{{ eur(figures.received) }}</td>
+              </tr>
+              <tr class="indent">
+                <td>{{ $t('nog te ontvangen') }}</td>
+                <td class="right num dash">—</td><td class="right num dash">—</td>
+                <td class="right num" :class="{ warn: figures.outstanding > 0 }">{{ eur(figures.outstanding) }}</td>
+              </tr>
+              <tr>
+                <td>{{ $t('Inkoopfacturen') }}</td>
+                <td class="right num">{{ eur(figures.purchases_subtotal) }}</td>
+                <td class="right num">{{ eur(figures.purchases_vat) }}</td>
+                <td class="right num">{{ eur(figures.purchases_gross) }}</td>
+              </tr>
+              <tr v-if="figures.hours_amount || figures.trips_amount">
+                <td>{{ $t('Uren en ritten') }}<div class="sub">{{ $t('eigen kosten, zonder btw') }}</div></td>
+                <td class="right num">{{ eur(figures.hours_amount + figures.trips_amount) }}</td>
+                <td class="right num dash">—</td>
+                <td class="right num">{{ eur(figures.hours_amount + figures.trips_amount) }}</td>
+              </tr>
+              <tr class="total">
+                <td>{{ $t('Totaal') }}<div class="sub">{{ $t('gefactureerd min kosten') }}</div></td>
+                <td class="right num" :class="{ good: figures.result > 0, bad: figures.result < 0 }">{{ eur(figures.result) }}<div class="sub">{{ $t('resultaat') }}</div></td>
+                <td class="right num">{{ eur(figures.vat_balance) }}<div class="sub">{{ figures.vat_balance >= 0 ? $t('af te dragen') : $t('terug te vragen') }}</div></td>
+                <td class="right num">{{ eur(figures.result + figures.vat_balance) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         <!-- Calculatie -->
-        <div class="card">
+        <div class="card" style="margin-top:16px;">
           <div class="card-header">
             <div>
               <div class="card-title">{{ $t('Calculatie') }}</div>
@@ -247,7 +297,7 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
               <tr v-for="i in invoices" :key="i.id">
                 <td class="cell-primary"><Link :href="route('invoices.show', i.id)">{{ i.number }}</Link><span v-if="i.is_credit" class="sub"> · {{ $t('creditnota') }}</span><div class="sub">{{ i.date_label }}</div></td>
                 <td><span :class="['pill', statusPill[i.status] || 'pill-draft']">{{ $t(i.status) }}</span></td>
-                <td class="right num">{{ eur(i.subtotal) }} <span class="sub">{{ $t('excl.') }}</span><div v-if="i.remaining > 0 && !i.is_credit" class="sub">{{ $t('open :amount', { amount: eur(i.remaining) }) }}</div></td>
+                <td class="right num">{{ eur(i.subtotal) }} <span class="sub">{{ $t('excl.') }}</span><div class="sub">{{ $t('incl. btw :amount', { amount: eur(i.total) }) }}<template v-if="i.remaining > 0 && !i.is_credit"> · {{ $t('nog open :amount', { amount: eur(i.remaining) }) }}</template></div></td>
                 <td class="right actions"><button v-if="isOpen" class="btn btn-ghost btn-sm" :title="$t('Losmaken')" @click="unlink('invoice', i.id)">✕</button></td>
               </tr>
             </tbody>
@@ -266,7 +316,7 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
               <tr v-for="p in purchases" :key="p.id">
                 <td class="cell-primary"><Link :href="route('purchases.show', p.id)">{{ p.supplier }}</Link><div class="sub">{{ p.date_label }}<template v-if="p.reference"> · {{ p.reference }}</template><template v-if="p.category"> · {{ p.category }}</template></div></td>
                 <td><span :class="['pill', p.status === 'paid' ? 'pill-paid' : 'pill-sent']">{{ p.status === 'paid' ? $t('Betaald') : $t('Open') }}</span></td>
-                <td class="right num">{{ eur(p.subtotal) }} <span class="sub">{{ $t('excl.') }}</span></td>
+                <td class="right num">{{ eur(p.subtotal) }} <span class="sub">{{ $t('excl.') }}</span><div class="sub">{{ $t('incl. btw :amount', { amount: eur(p.total) }) }}</div></td>
                 <td class="right actions"><button v-if="isOpen" class="btn btn-ghost btn-sm" :title="$t('Losmaken')" @click="unlink('purchase', p.id)">✕</button></td>
               </tr>
             </tbody>
@@ -383,6 +433,11 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
 .count { font-size: 12px; color: var(--text-3); font-weight: 500; margin-left: 4px; }
 .actions { white-space: nowrap; }
 .data-table tr.total td { font-weight: 700; background: var(--surface-2); }
+.money tr.indent td { color: var(--text-3); font-size: 13px; }
+.money tr.indent td:first-child { padding-left: 28px; }
+.money .dash { color: var(--border); }
+.money .warn { color: var(--warning, #B45309); }
+.money tr.total .sub { font-weight: 400; }
 .budget-edit input, .budget-edit select { width: 100%; height: 34px; padding: 0 8px; }
 .budget-edit input.right { text-align: right; }
 .budget-lines { border-top: 1px solid var(--border); }

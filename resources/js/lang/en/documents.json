@@ -660,5 +660,19 @@
   "Mailt :email dat offerte :number is vervallen en niet meer geldt.": "E-mails :email that quote :number has been withdrawn and is no longer valid.",
   "Laten vervallen": "Withdraw",
   "Let op: de klant heeft deze offerte al geaccepteerd. Laat je hem vervallen, dan geldt die afspraak niet meer en vragen we de klant in de mail om de nieuwe offerte opnieuw te bevestigen.": "Note: the customer has already accepted this quote. If you withdraw it, that agreement no longer applies and the e-mail asks the customer to confirm the new quote again.",
-  "was geaccepteerd op :date": "was accepted on :date"
+  "was geaccepteerd op :date": "was accepted on :date",
+  "Geld en btw": "Money and VAT",
+  "Netto, btw en bruto naast elkaar. Betalingen zijn altijd inclusief btw.": "Net, VAT and gross side by side. Payments are always including VAT.",
+  "waarvan ontvangen": "of which received",
+  "nog te ontvangen": "still to receive",
+  "Uren en ritten": "Hours and trips",
+  "eigen kosten, zonder btw": "own costs, no VAT",
+  "gefactureerd min kosten": "invoiced minus costs",
+  "resultaat": "result",
+  "af te dragen": "VAT to remit",
+  "terug te vragen": "VAT to reclaim",
+  "btw :vat · incl. btw :gross": "VAT :vat · incl. VAT :gross",
+  "nog open :open": "still open :open",
+  "incl. btw :amount": "incl. VAT :amount",
+  "nog open :amount": "still open :amount"
 }

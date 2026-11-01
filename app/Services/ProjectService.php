@@ -60,6 +60,12 @@ class ProjectService
         $invoiced = round($invoices->sum($signed), 2);
         $received = round($invoices->where('is_credit', false)->sum(fn (Invoice $i) => (float) $i->paid_total), 2);
         $outstanding = round($invoices->where('is_credit', false)->sum(fn (Invoice $i) => max(0, (float) $i->total - (float) $i->paid_total)), 2);
+        // Btw en bruto voor het blok "Geld en btw": een creditnota telt negatief.
+        $invoicedVat = round($invoices->sum(fn (Invoice $i) => ($i->is_credit ? -1 : 1) * (float) $i->vat_total), 2);
+        $invoicedGross = round($invoices->sum(fn (Invoice $i) => ($i->is_credit ? -1 : 1) * (float) $i->total), 2);
+        $purchasesSubtotal = round((float) $purchases->sum('subtotal'), 2);
+        $purchasesVat = round((float) $purchases->sum('vat_total'), 2);
+        $purchasesGross = round((float) $purchases->sum('total'), 2);
 
         // Werkelijke kosten per kostensoort.
         $actual = array_fill_keys(Project::KINDS, 0.0);
@@ -113,6 +119,12 @@ class ProjectService
             'invoiced' => $invoiced,
             'received' => $received,
             'outstanding' => $outstanding,
+            'invoiced_vat' => $invoicedVat,
+            'invoiced_gross' => $invoicedGross,
+            'purchases_subtotal' => $purchasesSubtotal,
+            'purchases_vat' => $purchasesVat,
+            'purchases_gross' => $purchasesGross,
+            'vat_balance' => round($invoicedVat - $purchasesVat, 2),
             'costs' => $costs,
             'actual' => $actual,
             'awarded' => round($awarded, 2),

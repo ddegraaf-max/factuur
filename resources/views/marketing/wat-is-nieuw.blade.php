@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 28 oktober 2026 · {{ brand('version_prefix') }} 1.85.3</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 november 2026 · {{ brand('version_prefix') }} 1.85.4</div>
+        <h2>Project: netto, btw en bruto helder naast elkaar</h2>
+        <ul class="tl-list">
+          <li><b>Nieuw blok Geld en btw</b> — op de projectpagina staan gefactureerd, ontvangen, nog te ontvangen, inkoop en uren nu in drie kolommen: excl. btw, btw en incl. btw. Onderaan het totaal: je resultaat, de btw die je afdraagt (of terugvraagt) en het bruto saldo.</li>
+          <li><b>Geen verwarring meer tussen excl. en incl.</b> — de kaart Gefactureerd noemt nu ook de btw en het bedrag incl. btw. Wat de klant betaald heeft en wat nog open staat, is altijd incl. btw; dat staat er nu bij. Bij elke factuur en inkoopfactuur in het project staat het bedrag incl. btw erbij.</li>
+          <li><b>Afgesproken prijs zonder offerte</b> — is de offerte niet in Easy gemaakt? Klik rechtsboven op Bewerken en vul de afgesproken prijs (excl. btw) in; het verwachte resultaat rekent daarmee.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">28 oktober 2026 · {{ brand('version_prefix') }} 1.85.3</div>
         <h2>Factuurmail: minder vaak in de spam</h2>
         <ul class="tl-list">
           <li><b>Geen xml-bijlage meer naar consumenten</b> — de UBL-e-factuur gaat alleen nog mee naar zakelijke klanten. Een particulier kan er niets mee, en een extra xml-bijlage van een nog onbekende afzender maakt spamfilters (vooral Outlook en Hotmail) achterdochtiger. De pdf gaat altijd mee.</li>
