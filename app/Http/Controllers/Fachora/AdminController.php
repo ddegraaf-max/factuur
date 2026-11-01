@@ -174,7 +174,8 @@ class AdminController extends Controller
         $data = $request->validate(['ids' => ['required', 'array', 'max:200'], 'ids.*' => ['integer']]);
         $sent = $skipped = 0;
         foreach (Provider::query()->whereIn('id', $data['ids'])->where('status', 'unclaimed')->get() as $provider) {
-            if ($this->notifier->provider($provider, 'invite')) {
+            // Een uitnodiging is werving: alleen met echte opt-in (consent_at), niet op grond van een klantaanvraag of voorwaarden.
+            if ($provider->consent_at !== null && $this->notifier->provider($provider, 'invite')) {
                 $sent++;
             } else {
                 $skipped++;
@@ -254,7 +255,7 @@ class AdminController extends Controller
     {
         $status = (string) $request->query('status', 'open');
         $groups = [
-            'open' => ['open', 'quoted', 'no_match', 'pending'],
+            'open' => ['open', 'quoted', 'no_match', 'pending', 'selecting'],
             'active' => ServiceJob::WITH_PROVIDER,
             'disputed' => ['disputed'],
             'closed' => ServiceJob::CLOSED,
@@ -361,7 +362,7 @@ class AdminController extends Controller
         $sum = fn (array $statuses) => (int) array_sum(array_intersect_key($by, array_flip($statuses)));
 
         return [
-            'open' => $sum(['open', 'quoted', 'no_match', 'pending']),
+            'open' => $sum(['open', 'quoted', 'no_match', 'pending', 'selecting']),
             'active' => $sum(ServiceJob::WITH_PROVIDER),
             'disputed' => $sum(['disputed']),
             'closed' => $sum(ServiceJob::CLOSED),

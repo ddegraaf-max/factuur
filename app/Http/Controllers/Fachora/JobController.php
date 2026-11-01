@@ -13,6 +13,8 @@ use App\Services\Fachora\ProtectService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Validation\Rule;
+use App\Support\Fachora;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
@@ -31,7 +33,42 @@ class JobController extends Controller
             return redirect($job->url());
         }
 
-        return Inertia::render('Fachora/Confirm', ['job' => $this->presenter->job($job, 'customer'), 'token' => $token]);
+        return Inertia::render('Fachora/Confirm', [
+            'job' => $this->presenter->job($job, 'customer') + [
+                'wanted_date_value' => $job->wanted_date?->toDateString(),
+            ],
+            'token' => $token,
+            'advice' => $this->jobs->advice($job),
+            'customerChoice' => (bool) config('fachora.customer_choice', false),
+            'categories' => Fachora::categoryList(),
+            'languages' => Fachora::languageList(),
+        ]);
+    }
+
+    /** Terug in de aanvraag: aanpassen vóór de bevestiging. */
+    public function updatePending(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        if (! $job->isPending()) {
+            return redirect($job->url());
+        }
+        $data = $request->validate([
+            'category' => ['required', Rule::in(array_keys(Fachora::categories()))],
+            'title' => ['nullable', 'string', 'max:160'],
+            'description' => ['required', 'string', 'min:10', 'max:3000'],
+            'urgency' => ['required', Rule::in((array) config('fachora.urgencies'))],
+            'wanted_date' => ['nullable', 'required_if:urgency,date', 'date', 'after_or_equal:today'],
+            'time_window' => ['nullable', 'string', 'max:40'],
+            'language' => ['required', Rule::in(array_keys((array) config('fachora.languages')))],
+            'postal_code' => ['nullable', 'regex:/^\d{2}-\d{3}$/'],
+            'city' => ['required', 'string', 'max:120'],
+        ], [
+            'description.min' => __('Beschrijf de klus in minstens een paar woorden.'),
+            'postal_code.regex' => __('Een Poolse postcode ziet eruit als 00-000.'),
+        ]);
+        $this->jobs->updatePending($job, $data);
+
+        return redirect($job->confirmUrl())->with('flash', __('Je aanvraag is aangepast. Controleer hem nog één keer en bevestig.'));
     }
 
     public function confirm(Request $request, string $token): RedirectResponse
@@ -41,7 +78,9 @@ class JobController extends Controller
             $this->jobs->confirm($job, $request);
         }
 
-        return redirect($job->url())->with('flash', __('Je aanvraag is bevestigd. We bieden hem nu aan bij bedrijven in de buurt.'));
+        return redirect($job->url())->with('flash', $job->fresh()->isSelecting()
+            ? __('Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.')
+            : __('Je aanvraag is bevestigd. We bieden hem nu aan bij bedrijven in de buurt.'));
     }
 
     public function show(string $token)
@@ -63,7 +102,92 @@ class JobController extends Controller
             'files' => $this->presenter->files($job, fn (FachoraFile $f) => route('fachora.job.file', [$token, $f->id])),
             'protect_enabled' => $this->protect->enabled(),
             'auto_accept_days' => (int) config('fachora.auto_accept_days', 5),
+            // 1.86: de klant kiest zelf de bedrijven en betaalt een kleine bijdrage per aanvraag.
+            // 1.87: gekozen bedrijven uit het register; de klant neemt zelf contact op.
+            'direct' => $job->isSelecting() ? [] : $this->jobs->directContacts($job)->map(fn ($p) => [
+                'id' => $p->id, 'name' => $p->display_name, 'city' => $p->city,
+                'email' => $p->email, 'phone' => $p->phone, 'url' => $p->publicUrl(),
+            ])->values()->all(),
+            'choice' => $job->isSelecting() ? [
+                'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
+                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months'])) + ['distance_km' => $p->distance_km])
+                    ->values()->all(),
+                'max' => (int) config('fachora.max_offers', 5),
+                'fee' => $this->jobs->requestFee(),
+                'selected' => array_map('intval', (array) $job->selected_providers),
+                'sms_required' => $this->jobs->smsRequired($job),
+                'searching' => $job->provider_search_at !== null,
+                'phone' => $job->customer_phone,
+                'code_sent' => $job->phone_code_sent_at !== null && $job->phone_verified_at === null,
+            ] : null,
         ]);
+    }
+
+    /** De klant kiest 1 tot vijf bedrijven en betaalt (zo nodig) de bijdrage. */
+    public function select(Request $request, string $token)
+    {
+        $job = $this->find($token);
+        $max = (int) config('fachora.max_offers', 5);
+        $rules = ['providers' => ['required', 'array', 'min:1', 'max:' . $max], 'providers.*' => ['integer']];
+        $messages = ['providers.required' => __('Kies minstens één bedrijf.'), 'providers.max' => __('Kies maximaal :n bedrijven.', ['n' => $max])];
+        if ($this->jobs->requestFee() > 0) {
+            // Consumentenrecht: de aanvraag wordt meteen uitgevoerd; daar vraagt de klant uitdrukkelijk om.
+            $rules['express'] = ['accepted'];
+            $messages['express.accepted'] = __('Vink aan dat je aanvraag meteen mag worden verstuurd.');
+        }
+        $data = $request->validate($rules, $messages);
+
+        try {
+            $url = $this->jobs->selectProviders($job, $data['providers']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['providers' => $e->getMessage()]);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect($job->url())->with('error', __('De betaling kon niet worden gestart. Probeer het zo opnieuw.'));
+        }
+
+        return $url ? Inertia::location($url) : redirect($job->url())->with('flash', __('Je aanvraag is verstuurd naar de gekozen bedrijven.'));
+    }
+
+    /** Sms-code naar de klant (1.87). */
+    public function smsSend(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $data = $request->validate(['phone' => ['required', 'string', 'max:40']], ['phone.required' => __('Vul je mobiele nummer in.')]);
+
+        try {
+            $sent = $this->jobs->sendPhoneCode($job, $data['phone']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['phone' => $e->getMessage()]);
+        }
+
+        return $sent ? back()->with('flash', __('Code verstuurd per sms.')) : back()->withErrors(['phone' => __('De sms kon niet worden verstuurd. Controleer het nummer.')]);
+    }
+
+    public function smsVerify(Request $request, string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $data = $request->validate(['code' => ['required', 'string', 'max:12']]);
+
+        try {
+            $ok = $this->jobs->verifyPhone($job, $data['code']);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['code' => $e->getMessage()]);
+        }
+
+        return $ok ? back()->with('flash', __('Telefoonnummer bevestigd. Kies nu de bedrijven.')) : back()->withErrors(['code' => __('Deze code klopt niet.')]);
+    }
+
+    /** Terug van Stripe na de bijdrage voor de aanvraag. */
+    public function requestPaid(string $token): RedirectResponse
+    {
+        $job = $this->find($token);
+        $sent = $this->jobs->syncRequestPayment($job);
+
+        return redirect($job->url())->with('flash', $sent
+            ? __('Bedankt! Je aanvraag is verstuurd naar de gekozen bedrijven.')
+            : __('We wachten nog op de bevestiging van de betaling; dit kan een minuut duren.'));
     }
 
     public function choose(Request $request, string $token, ServiceJobOffer $offer): RedirectResponse

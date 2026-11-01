@@ -36,7 +36,124 @@ return [
     'cancel_free_hours' => 24,  // tot zoveel uur voor de afspraak kan de klant kosteloos annuleren
     'default_warranty_months' => 12,
     'min_rating' => 4.2,        // Fachora Standard 10: onder dit cijfer (bij ≥ 5 beoordelingen) volgt een signaal
-    'terms_version' => '2026-10',
+    'terms_version' => '2026-10-22b',
+
+    /*
+     * Aanvraagmodel (1.86). De klant kiest zelf tot max_offers bedrijven uit
+     * de buurt; request_fee złoty per aanvraag (standaard 0 = gratis). De
+     * aanvraag gaat dan per e-mail naar die bedrijven, ook als ze hun profiel
+     * nog niet claimden: het is een concreet verzoek van een klant om hun
+     * dienst, geen reclame (ConsentPolicy::mayEmailRequest), met afmeldlink en
+     * de informatie uit art. 14 AVG. Een bedrijf ziet de klantgegevens pas na
+     * akkoord met de voorwaarden (incl. de fee) en de keuze van de klant.
+     */
+    'customer_choice' => (bool) env('FACHORA_CUSTOMER_CHOICE', true),
+    // 1.87 (veilig): Fachora mailt alleen bedrijven die zich zelf aanmeldden of akkoord gingen.
+    // Kiest de klant een bedrijf uit het register, dan krijgt hij diens openbare contactgegevens
+    // (CEIDG) en neemt hij zelf contact op. Zet dit pas aan na juridisch akkoord (art. 398 PKE).
+    'email_unregistered' => (bool) env('FACHORA_EMAIL_UNREGISTERED', false),
+    // Betalingen alleen via het Mollie-account van Creditline; Stripe (oud account) alleen als je dit expliciet aanzet.
+    'stripe_fallback' => (bool) env('FACHORA_STRIPE_FALLBACK', false),
+    // 1.87: gratis voor de klant. Zet FACHORA_REQUEST_FEE > 0 om toch een bijdrage te vragen.
+    'request_fee' => (float) env('FACHORA_REQUEST_FEE', 0),
+    // Sms-code voor de klant voordat de aanvraag weggaat (alleen als de sms-koppeling werkt).
+    'customer_sms' => (bool) env('FACHORA_CUSTOMER_SMS', true),
+
+    /*
+     * Betalen per lead (1.87). Het bedrijf ontgrendelt een aanvraag voordat
+     * het een prijs geeft: lead_percent van de geschatte klusprijs (midden van
+     * estimate_low/high), afgerond op hele złoty, tussen lead_min en lead_max.
+     * Zonder schatting: lead_default. De eerste lead_free_count leads per
+     * bedrijf zijn gratis. Zonder Stripe-sleutel is alles gratis.
+     */
+    // Betalingen van Fachora zelf (leads, bijdrage): Mollie-account van Creditline B.V. Zonder sleutel: Stripe of gratis.
+    'mollie_key' => env('FACHORA_MOLLIE_KEY'),
+    'mollie_methods' => ['blik', 'przelewy24', 'creditcard'],
+    'lead_pricing' => (bool) env('FACHORA_LEAD_PRICING', true),
+    'lead_percent' => (float) env('FACHORA_LEAD_PERCENT', 5),
+    'lead_min' => (float) env('FACHORA_LEAD_MIN', 15),
+    'lead_max' => (float) env('FACHORA_LEAD_MAX', 150),
+    'lead_default' => (float) env('FACHORA_LEAD_DEFAULT', 30),
+    'lead_free_count' => (int) env('FACHORA_LEAD_FREE', 1),
+    'choice_candidates' => 15,  // zoveel bedrijven ziet de klant om uit te kiezen
+
+    /*
+     * Startregio's: middelpunt + straal. De import uit CEIDG haalt alleen
+     * bedrijven binnen deze cirkels op; de klant kan overal een aanvraag doen.
+     */
+    'region_radius_km' => 50,
+    'regions' => [
+        'plock' => ['name' => 'Płock', 'voivodeship' => 'mazowieckie', 'center' => [52.5463, 19.7065]],
+        'szczecin' => ['name' => 'Szczecin', 'voivodeship' => 'zachodniopomorskie', 'center' => [53.4285, 14.5528]],
+        'warszawa' => ['name' => 'Warszawa', 'voivodeship' => 'mazowieckie', 'center' => [52.2297, 21.0122]],
+        'krakow' => ['name' => 'Kraków', 'voivodeship' => 'małopolskie', 'center' => [50.0647, 19.9450]],
+        'wroclaw' => ['name' => 'Wrocław', 'voivodeship' => 'dolnośląskie', 'center' => [51.1079, 17.0385]],
+        'trojmiasto' => ['name' => 'Trójmiasto', 'voivodeship' => 'pomorskie', 'center' => [54.4416, 18.5601]],
+    ],
+
+    /*
+     * Uitbreiding (1.87): elke dag één stad uit deze lijst erbij, in deze
+     * volgorde (grootste eerst), met dezelfde straal. fachora:expand-regions
+     * houdt bij welke al actief zijn (cache, sleutel fachora:extra-regions).
+     */
+    'region_expansion' => (bool) env('FACHORA_REGION_EXPANSION', false), // UIT: optie 2, geen import vooraf
+    'expansion_regions' => [
+        'lodz' => ['name' => 'Łódź', 'voivodeship' => 'łódzkie', 'center' => [51.7592, 19.4560]],
+        'poznan' => ['name' => 'Poznań', 'voivodeship' => 'wielkopolskie', 'center' => [52.4064, 16.9252]],
+        'katowice' => ['name' => 'Katowice', 'voivodeship' => 'śląskie', 'center' => [50.2649, 19.0238]],
+        'lublin' => ['name' => 'Lublin', 'voivodeship' => 'lubelskie', 'center' => [51.2465, 22.5684]],
+        'bydgoszcz' => ['name' => 'Bydgoszcz', 'voivodeship' => 'kujawsko-pomorskie', 'center' => [53.1235, 18.0084]],
+        'bialystok' => ['name' => 'Białystok', 'voivodeship' => 'podlaskie', 'center' => [53.1325, 23.1688]],
+        'rzeszow' => ['name' => 'Rzeszów', 'voivodeship' => 'podkarpackie', 'center' => [50.0412, 21.9991]],
+        'torun' => ['name' => 'Toruń', 'voivodeship' => 'kujawsko-pomorskie', 'center' => [53.0138, 18.5984]],
+        'kielce' => ['name' => 'Kielce', 'voivodeship' => 'świętokrzyskie', 'center' => [50.8661, 20.6286]],
+        'olsztyn' => ['name' => 'Olsztyn', 'voivodeship' => 'warmińsko-mazurskie', 'center' => [53.7784, 20.4801]],
+        'radom' => ['name' => 'Radom', 'voivodeship' => 'mazowieckie', 'center' => [51.4027, 21.1471]],
+        'czestochowa' => ['name' => 'Częstochowa', 'voivodeship' => 'śląskie', 'center' => [50.8118, 19.1203]],
+        'opole' => ['name' => 'Opole', 'voivodeship' => 'opolskie', 'center' => [50.6751, 17.9213]],
+        'zielona-gora' => ['name' => 'Zielona Góra', 'voivodeship' => 'lubuskie', 'center' => [51.9356, 15.5062]],
+        'gorzow' => ['name' => 'Gorzów Wielkopolski', 'voivodeship' => 'lubuskie', 'center' => [52.7368, 15.2288]],
+        'koszalin' => ['name' => 'Koszalin', 'voivodeship' => 'zachodniopomorskie', 'center' => [54.1944, 16.1722]],
+        'kalisz' => ['name' => 'Kalisz', 'voivodeship' => 'wielkopolskie', 'center' => [51.7611, 18.0910]],
+        'tarnow' => ['name' => 'Tarnów', 'voivodeship' => 'małopolskie', 'center' => [50.0121, 20.9858]],
+        'legnica' => ['name' => 'Legnica', 'voivodeship' => 'dolnośląskie', 'center' => [51.2070, 16.1553]],
+        'elblag' => ['name' => 'Elbląg', 'voivodeship' => 'warmińsko-mazurskie', 'center' => [54.1561, 19.4045]],
+        'siedlce' => ['name' => 'Siedlce', 'voivodeship' => 'mazowieckie', 'center' => [52.1676, 22.2902]],
+        'nowy-sacz' => ['name' => 'Nowy Sącz', 'voivodeship' => 'małopolskie', 'center' => [49.6175, 20.7153]],
+        'zamosc' => ['name' => 'Zamość', 'voivodeship' => 'lubelskie', 'center' => [50.7231, 23.2520]],
+        'suwalki' => ['name' => 'Suwałki', 'voivodeship' => 'podlaskie', 'center' => [54.1118, 22.9309]],
+    ],
+
+    // Wat de import binnenhaalt: alleen actieve bedrijven met een e-mailadres die minstens zo lang bestaan.
+    'import_min_years' => 1,
+    'import_firms_per_run' => (int) env('FACHORA_IMPORT_PER_RUN', 150),
+    'region_import' => (bool) env('FACHORA_REGION_IMPORT', false), // UIT: optie 2, alleen import op aanvraag
+    // Bedrijven uit het register die niemand koos en die nooit iets van ons kregen: na zoveel dagen weer weg.
+    'register_keep_days' => (int) env('FACHORA_REGISTER_KEEP_DAYS', 14),
+    /*
+     * Import op aanvraag (1.87): heeft een klant minder dan local_import_min
+     * bedrijven om uit te kiezen, dan zoekt de planner (elke minuut) in CEIDG
+     * rond zijn plaats en powiat. Zonder enkele kandidaat wacht de klant op
+     * die zoektocht (hooguit local_search_minutes); daarna gaat de aanvraag
+     * de gewone weg. Per categorie en plaats hooguit eens per local_import_days.
+     */
+    /*
+     * Informatieplicht art. 14 AVG (1.87, zaak Bisnode): elk bedrijf uit het
+     * register met een e-mailadres krijgt binnen een maand één zakelijke
+     * informatiemail, zonder reclame. In porties op werkdagen (08–18 uur),
+     * hooguit notices_per_day per dag. De regio-import pauzeert zolang er meer
+     * dan notice_backlog_max bedrijven op hun informatiemail wachten.
+     */
+    'register_notices' => (bool) env('FACHORA_REGISTER_NOTICES', false), // UIT tot Daniël akkoord geeft
+    'notices_per_day' => (int) env('FACHORA_NOTICES_PER_DAY', 300),
+    'notice_backlog_max' => (int) env('FACHORA_NOTICE_BACKLOG', 3000),
+
+    'local_import' => (bool) env('FACHORA_LOCAL_IMPORT', true),
+    'local_import_min' => 5,
+    'local_import_target' => 10,
+    'local_import_firms' => 60,
+    'local_import_days' => 14,
+    'local_search_minutes' => 15,   // planner: elke tien minuten een portie
 
     // Hoeveel brieven per pdf (post naar unclaimed bedrijven: geen elektronische communicatie, dus toegestaan).
     'letters_per_batch' => 100,

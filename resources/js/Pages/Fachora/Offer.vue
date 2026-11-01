@@ -24,6 +24,11 @@ const props = defineProps({
   protect: { type: Boolean, default: false },
   fee_percent: { type: Number, default: 10 },
   panel_url: { type: String, default: null },
+  // 1.86: een bedrijf dat zijn profiel nog niet claimde, gaat eerst akkoord met de voorwaarden.
+  needs_terms: { type: Boolean, default: false },
+  // 1.87: betalen per lead. Zonder lead-prop (oude omgeving) geldt de aanvraag als ontgrendeld.
+  lead: { type: Object, default: null },
+  unlock_url: { type: String, default: null },
 });
 
 // De app-layout alleen laden als hij nodig is: de tokenpagina blijft licht.
@@ -55,8 +60,12 @@ const form = useForm({
   available_at: toLocalInput(props.offer?.available_at),
   available_note: props.offer?.available_note || '',
   remarks: props.offer?.remarks || '',
+  accept_terms: false,
 });
 const declineForm = useForm({ reason: '' });
+const unlocked = computed(() => !props.lead || props.lead.unlocked);
+const unlockForm = useForm({ accept_terms: false });
+const unlock = () => unlockForm.post(props.unlock_url, { preserveScroll: true });
 const showDecline = ref(false);
 const showOriginal = ref(false);
 
@@ -177,7 +186,26 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
           <div v-if="offer.status === 'declined' && !showDecline" class="fa-note">{{ $t('U heeft deze opdracht afgezegd. Toch beschikbaar? Dan kunt u hieronder alsnog een prijs doorgeven.') }}</div>
           <div v-else-if="answered" class="fa-note">{{ $t('Uw prijs is doorgegeven op :date. Zolang de klant niet heeft gekozen kunt u hem hieronder aanpassen.', { date: offer.responded_at || '' }) }}</div>
 
-          <form @submit.prevent="submit" class="fa-card">
+          <div v-if="!unlocked" class="fa-card of-unlock">
+            <h2 class="fa-h2">{{ lead.free ? $t('Deze aanvraag is voor u gratis') : $t('Aanvraag ontgrendelen') }}</h2>
+            <p>{{ lead.free
+              ? $t('Uw eerste aanvraag op Fachora kost niets. Ontgrendel hem en geef uw prijs door.')
+              : $t('Bekijken is gratis. Om een prijs te geven, ontgrendelt u deze aanvraag voor :amount (incl. btw, u krijgt een factuur).', { amount: lead.fee_label }) }}</p>
+            <p class="fa-small fa-muted">{{ $t('De prijs hangt af van de grootte van de klus (:min – :max). Geen abonnement. Bij rechtstreekse betaling door de klant geen provisie. Valse aanvraag? Meld het binnen 7 dagen en u krijgt uw geld terug.', { min: money(lead.min), max: money(lead.max) }) }}</p>
+            <label v-if="needs_terms" class="fa-check of-accept">
+              <input type="checkbox" v-model="unlockForm.accept_terms">
+              <span>{{ $t('Ik ga akkoord met de voorwaarden van Fachora en wil aanvragen van klanten voortaan per e-mail ontvangen (afmelden kan altijd).') }} <a :href="route('pl.regulamin')" target="_blank" rel="noopener">{{ $t('Voorwaarden') }}</a></span>
+            </label>
+            <div class="fa-actions">
+              <button type="button" class="fa-btn" :disabled="unlockForm.processing || (needs_terms && !unlockForm.accept_terms)" @click="unlock">
+                {{ lead.free ? $t('Gratis ontgrendelen') : $t('Ontgrendelen voor :amount', { amount: lead.fee_label }) }}
+              </button>
+              <button v-if="offer.status !== 'declined'" type="button" class="fa-link fa-link--muted" @click="showDecline = !showDecline">{{ $t('Ik kan deze opdracht niet doen') }}</button>
+            </div>
+            <p v-if="!lead.free" class="fa-small fa-muted">{{ $t('betalen met BLIK, Przelewy24 of kaart') }}</p>
+          </div>
+
+          <form v-else @submit.prevent="submit" class="fa-card">
             <h2 class="fa-h2">{{ answered ? $t('Prijs aanpassen') : $t('Prijs doorgeven') }}</h2>
             <p class="fa-small fa-muted">{{ $t('De klant ziet uw prijs, uw beschikbaarheid, uw beoordelingen en uw talen. Geen telefoonnummer: de klant kiest op deze pagina.') }}</p>
 
@@ -229,9 +257,16 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
             </div>
 
             <div class="fa-note of-terms">
-              <div>{{ $t('Provisie Fachora: :fee% alleen over een uitgevoerde opdracht. Geen abonnement, geen kosten per aanbieding.', { fee: fee_percent }) }}</div>
+              <div v-if="lead">{{ $t('Aanvraag ontgrendeld. Prijs aanpassen of afzeggen kost niets extra. Geen provisie als de klant u rechtstreeks betaalt; via Fachora Protect :fee% bij de uitbetaling.', { fee: fee_percent }) }}</div>
+              <div v-else>{{ $t('Provisie Fachora: :fee% alleen over een uitgevoerde opdracht. Geen abonnement, geen kosten per aanbieding.', { fee: fee_percent }) }}</div>
               <div v-if="protect">{{ $t('De klant reserveert het bedrag via Fachora Protect; de uitbetaling volgt na zijn akkoord op het werk.') }}</div>
             </div>
+
+            <label v-if="needs_terms" class="fa-check of-accept">
+              <input type="checkbox" v-model="form.accept_terms">
+              <span>{{ $t('Ik ga akkoord met de voorwaarden van Fachora, inclusief de provisie van :fee% over een opdracht die de klant mij gunt.', { fee: fee_percent }) }} <a :href="route('pl.regulamin')" target="_blank" rel="noopener">{{ $t('Voorwaarden') }}</a></span>
+            </label>
+            <div v-if="form.errors.accept_terms" class="fa-err">{{ form.errors.accept_terms }}</div>
 
             <div class="fa-actions">
               <button type="submit" class="fa-btn" :disabled="form.processing">{{ answered ? $t('Prijs bijwerken') : $t('Prijs doorgeven') }}</button>
@@ -284,4 +319,6 @@ const claimUrl = computed(() => (props.provider?.slug ? route('fachora.claim', {
 .of-types { grid-template-columns: 1fr; }
 .of-terms { margin: 4px 0 8px; display: grid; gap: 6px; font-size: 14px; }
 .of-provider { text-align: center; margin: 4px 0 16px; }
+.of-accept { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0 10px; font-size: 14px; line-height: 1.45; }
+.of-accept input { margin-top: 3px; }
 </style>

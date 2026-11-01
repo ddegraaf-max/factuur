@@ -90,7 +90,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Platform operator</div><div style="font-weight:600;">Budomatch Daniël de Graaf</div><div style="font-size:13px;color:var(--text-2);">Białka 15, 09-550 Białka, Poland<br>NIP 7010869430 · REGON 381430120</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Platform operator</div><div style="font-weight:600;">Creditline B.V.</div><div style="font-size:13px;color:var(--text-2);">Torenlaan 5B, 1402 AT Bussum, the Netherlands<br>KvK 59683198 · VAT NL853603108B01</div></div>
         </div>
       </div>
 
@@ -99,7 +99,7 @@
         <p>Skip the form — apply directly. We check your company in the registers and you complete verification in the panel. No subscription, a commission only on completed jobs.</p>
         <a href="{{ route('fachora.apply') }}" class="btn btn-primary" style="margin-right:8px;margin-bottom:8px;">Apply as a company →</a>
         <a href="{{ route('fachora.claim') }}" class="btn btn-secondary" style="margin-bottom:8px;">I have a code from a letter</a>
-        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Received a letter from us? That is the only way we contact companies that have not registered with us — we never send e-mails or text messages without consent.</p>
+        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Received a letter or a customer request from us? We never send register companies advertising, newsletters or text messages. The only e-mail such a company can get from us is a concrete request from a customer who chose that company, with information on where we got its details and an unsubscribe link.</p>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">
@@ -123,7 +123,7 @@
       </div>
       <div class="contact-card">
         <h3>🔧 For companies</h3>
-        <p>Verification, the panel, payouts through Stripe, commission invoices, a suspended profile or removal of your register data. <a class="lnk" href="{{ route('login') }}">Log in</a> to check your verification status.</p>
+        <p>Verification, the panel, payouts through Mollie, commission invoices, a suspended profile or removal of your register data. <a class="lnk" href="{{ route('login') }}">Log in</a> to check your verification status.</p>
         <ul>
           <li>Want to join? Use the <a class="lnk" href="{{ route('fachora.apply') }}">application form</a>.</li>
           <li>Do not want to be listed on Fachora? Write to us — we will remove the register profile.</li>

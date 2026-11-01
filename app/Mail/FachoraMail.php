@@ -88,9 +88,21 @@ class FachoraMail extends Mailable
                         __('Heb je deze aanvraag niet gedaan? Dan hoef je niets te doen; zonder bevestiging verdwijnt ze vanzelf.'),
                     ], ['label' => __('Bevestig mijn aanvraag'), 'url' => $job->confirmUrl()], $facts);
                     break;
+                case 'choose':
+                    // 1.86: de klant kiest zelf de bedrijven; deze mail brengt hem terug als hij de pagina sloot.
+                    $set(__('Kies de bedrijven voor je aanvraag :ref', ['ref' => $ref]), __('Kies je bedrijven'), array_values(array_filter([
+                        ($this->extra['again'] ?? false) ? __('De bedrijven die je koos, zijn niet meer bereikbaar. Kies er hieronder opnieuw een paar; een betaalde bijdrage blijft gewoon staan.') : null,
+                        __('Op je opdrachtpagina staan bedrijven uit jouw buurt. Kies er tot :n; alleen zij krijgen je aanvraag en geven een prijs.', ['n' => (int) config('fachora.max_offers', 5)]),
+                        __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
+                    ])), ['label' => __('Bedrijven kiezen'), 'url' => $jobUrl], $facts);
+                    break;
                 case 'confirmed':
                     $set(__('Je aanvraag :ref staat open', ['ref' => $ref]), __('We zoeken een bedrijf voor je'), [
-                        __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)]),
+                        ! empty($job->selected_providers) && $job->offers()->count() === 0
+                            ? __('De bedrijven die je koos, staan nog niet op Fachora. Op je opdrachtpagina staan hun e-mailadres en telefoonnummer uit het openbare register: neem zelf contact op en stuur ze de beschrijving van je klus.')
+                            : (! empty($job->selected_providers)
+                            ? __('Je aanvraag is verstuurd naar de :n bedrijven die je koos. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs en de beschikbaarheid op je opdrachtpagina.', ['n' => $job->offers()->count()])
+                            : __('Je klus wordt nu aangeboden aan maximaal :n Fachora Verified bedrijven in de buurt. Zodra een bedrijf een prijs geeft, krijg je een mail en zie je de prijs, de beschikbaarheid en de beoordelingen op je opdrachtpagina.', ['n' => (int) config('fachora.max_offers', 5)])),
                         __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
                     ], ['label' => __('Mijn opdracht'), 'url' => $jobUrl], $facts);
                     break;
@@ -171,14 +183,28 @@ class FachoraMail extends Mailable
             }
         } elseif ($this->audience === 'provider' && $provider) {
             $panel = route('fachora.dashboard');
-            $out['footnote'] = $provider->optout_token
-                ? __('U ontvangt dit bericht omdat u het profiel van :name op Fachora beheert. Geen berichten meer: :url', ['name' => $name, 'url' => $provider->optoutUrl()])
-                : null;
+            $request = (bool) ($this->extra['request'] ?? false);
+            $out['footnote'] = $request && $provider->optout_token
+                // Klantaanvraag aan een bedrijf zonder profiel (1.86): waarom dit bericht, waar de gegevens vandaan komen, afmelden (art. 14 AVG).
+                // Volledige art. 14-informatie in het eerste bericht (art. 14 lid 3 sub b AVG), kort met verwijzing naar het privacybeleid.
+                ? __('U ontvangt dit bericht omdat een klant uw bedrijf op Fachora koos voor deze opdracht. Beheerder van uw gegevens: :owner (:email). Bron: het openbare register CEIDG (naam, NIP, adres, PKD, e-mail, telefoon). Doel: aanvragen van klanten doorgeven; grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). Op de site tonen we alleen naam, plaats en soort werk. We bewaren de gegevens zolang u aanvragen kunt krijgen, of tot u bezwaar maakt. U hebt recht op inzage, correctie, beperking en bezwaar, en op een klacht bij de Prezes UODO. Meer: :privacy. Geen aanvragen meer of profiel verwijderen: :url', [
+                    'owner' => brand('owner_name') ?: 'Creditline B.V.',
+                    'email' => brand('email') ?: 'czesc@fachora.pl',
+                    'privacy' => url('/polityka-prywatnosci'),
+                    'url' => $provider->optoutUrl(),
+                ])
+                : ($provider->optout_token
+                    ? __('U ontvangt dit bericht omdat u het profiel van :name op Fachora beheert. Geen berichten meer: :url', ['name' => $name, 'url' => $provider->optoutUrl()])
+                    : null);
             switch ($this->kind) {
                 case 'job':
                 case 'reminder':
                     $title = $job?->ai['title_pl'] ?? $job?->title ?? '';
                     $set($this->kind === 'reminder' ? __('Herinnering: zlecenie :ref wacht op uw prijs', ['ref' => $ref]) : __('Nowe zlecenie: :title (:city)', ['title' => $title, 'city' => $job?->city]), $title, array_values(array_filter([
+                        $request ? __('Een klant in :city koos uw bedrijf op Fachora en vraagt u om een prijs. U krijgt van ons alleen berichten over aanvragen van klanten.', ['city' => $job?->city]) : null,
+                        // Eerste bericht aan een bedrijf zonder profiel: alleen de vraag van de klant, geen reclame
+                        // voor Fachora (anders informacja handlowa / art. 398 PKE). De prijs ziet het op de pagina.
+                        $this->offer && ! $request && app(\App\Services\Fachora\LeadService::class)->enabled() ? $this->leadLine() : null,
                         __('Een klant in :city zoekt een :category. De prijs die u opgeeft, is de prijs voor de klant; het adres krijgt u zodra de klant u kiest.', ['city' => $job?->city, 'category' => $job?->categoryName('pl')]),
                         $job?->description_pl ?: $job?->description,
                         $job?->protect || ($this->offer?->provider?->protectReady()) ? __('Betaling via Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na goedkeuring.') : null,
@@ -250,7 +276,9 @@ class FachoraMail extends Mailable
                 case 'verified':
                     $set(__('Gefeliciteerd: :name is Fachora Verified', ['name' => $name]), __('U bent Fachora Verified'), [
                         __('Vanaf nu ontvangt u opdrachten uit uw werkgebied (:radius km rond :city) per e-mail. Reageer snel: klanten kiezen vaak binnen een dag.', ['radius' => $provider->radius_km, 'city' => $provider->city]),
-                        __('Fee: :fee% over uitgevoerde opdrachten; de eerste :days dagen :intro%. Geen abonnement, geen kosten per aanvraag.', ['fee' => config('fachora.fee_percent'), 'days' => config('fachora.intro_days'), 'intro' => config('fachora.intro_fee_percent')]),
+                        config('fachora.lead_pricing')
+                            ? __('Geen abonnement. Bekijken is gratis; u betaalt alleen voor een aanvraag die u ontgrendelt om te reageren (:min tot :max, naar grootte van de klus). De eerste is gratis.', ['min' => Fachora::money(config('fachora.lead_min')), 'max' => Fachora::money(config('fachora.lead_max'))])
+                            : __('Fee: :fee% over uitgevoerde opdrachten; de eerste :days dagen :intro%. Geen abonnement, geen kosten per aanvraag.', ['fee' => config('fachora.fee_percent'), 'days' => config('fachora.intro_days'), 'intro' => config('fachora.intro_fee_percent')]),
                     ], ['label' => __('Naar het panel'), 'url' => $panel]);
                     break;
                 case 'suspended':
@@ -267,9 +295,25 @@ class FachoraMail extends Mailable
                         __('Uw polis is geldig tot :date. Upload de nieuwe polis in uw panel; zonder geldige polis verdwijnt het vinkje "ubezpieczony" van uw profiel.', ['date' => $this->extra['until'] ?? '']),
                     ], ['label' => __('Naar de verificatie'), 'url' => route('fachora.verification')]);
                     break;
+                case 'register_notice':
+                    // Art. 14 AVG (1.87): puur informatie, geen reclame. Geen knop naar claimen of prijzen.
+                    $set(__('Informatie over de gegevens van :name op Fachora', ['name' => $name]), __('Informatie over uw gegevens'), [
+                        __('Wij zijn verplicht u te laten weten dat de gegevens van uw bedrijf :name in de database van het platform Fachora (:domain) staan. Dit is geen reclame; u hoeft niets te doen.', ['name' => $name, 'domain' => brand('domain')]),
+                        __('Bron: het openbare register CEIDG. Welke gegevens: naam, NIP, adres, PKD-codes, e-mailadres en telefoonnummer zoals ze in CEIDG staan. Op Fachora tonen we alleen naam, plaats en soort werk, nooit uw e-mail, telefoon of adres.'),
+                        __('Doel: klanten in uw regio kunnen uw bedrijf vinden en zelf kiezen om u een concrete aanvraag te sturen. Grondslag: gerechtvaardigd belang (art. 6 lid 1 sub f AVG). We bewaren de gegevens zolang uw bedrijf actief is in CEIDG of tot u bezwaar maakt.'),
+                        __('Uw rechten: inzage, correctie, beperking en bezwaar (art. 15–21 AVG), en een klacht bij de toezichthouder (Prezes UODO). Beheerder: :owner, :email.', ['owner' => brand('owner_name') ?: 'Creditline B.V.', 'email' => brand('email') ?: 'czesc@fachora.pl']),
+                        __('Wilt u geen aanvragen van klanten per e-mail, of wilt u dat we uw profiel verwijderen? Dat kan met één klik via de link hieronder.'),
+                    ], ['label' => __('Geen e-mail meer of profiel verwijderen'), 'url' => $provider->optoutUrl()], array_filter([
+                        __('Profiel') => $provider->publicUrl(),
+                        __('Privacybeleid') => url('/polityka-prywatnosci'),
+                    ]), __('Informatie'));
+                    $out['footnote'] = __('U ontvangt dit eenmalige bericht omdat de wet (art. 14 AVG) ons verplicht u te informeren. U krijgt van ons geen reclame.');
+                    break;
                 case 'invite':
-                    $set(__('Nieuwe klanten in uw regio, betaal alleen voor uitgevoerde opdrachten'), __('Nieuwe klanten in uw regio'), [
-                        __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement, 0 zł per aanvraag; alleen :fee% over een uitgevoerde opdracht.', ['fee' => config('fachora.fee_percent')]),
+                    $set((config('fachora.lead_pricing') ? __('Nieuwe klanten in uw regio, geen abonnement') : __('Nieuwe klanten in uw regio, betaal alleen voor uitgevoerde opdrachten')), __('Nieuwe klanten in uw regio'), [
+                        config('fachora.lead_pricing')
+                            ? __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement; u betaalt alleen voor een aanvraag waarop u wilt reageren (:min tot :max), en de eerste is gratis.', ['min' => Fachora::money(config('fachora.lead_min')), 'max' => Fachora::money(config('fachora.lead_max'))])
+                            : __('Fachora brengt klanten in contact met gecontroleerde vakmannen. 0 zł abonnement, 0 zł per aanvraag; alleen :fee% over een uitgevoerde opdracht.', ['fee' => config('fachora.fee_percent')]),
                         __('Uw bedrijf staat al in onze database. Neem het profiel over, vul werkgebied en talen in en vraag het keurmerk Fachora Verified aan.'),
                         __('U ontvangt deze mail omdat u toestemming gaf voor informatie van partners (:source).', ['source' => $provider->consent_source ?: '-']),
                     ], ['label' => __('Profiel overnemen'), 'url' => route('fachora.claim', ['firma' => $provider->slug])]);
@@ -383,5 +427,19 @@ class FachoraMail extends Mailable
             'split' => __('Fachora besliste op een deling: :amount gaat naar het bedrijf, de rest terug naar de klant.', ['amount' => Fachora::money(($job?->payout_amount ?? 0) + ($job?->fee_amount ?? 0))]),
             default => null,
         };
+    }
+
+    /** Wat reageren op deze aanvraag kost (1.87): de welkomstlead gratis, daarna de prijs van de lead. */
+    private function leadLine(): ?string
+    {
+        $leads = app(\App\Services\Fachora\LeadService::class);
+        $fee = $leads->feeFor($this->offer);
+        if ($fee <= 0 && $leads->isFree($this->offer)) {
+            return __('Deze aanvraag is voor u gratis (welkomstlead). Bekijken kost nooit iets; u betaalt pas als u een aanvraag ontgrendelt om te reageren.');
+        }
+
+        return $fee > 0
+            ? __('Bekijken is gratis. Wilt u reageren, dan ontgrendelt u de aanvraag voor :amount. Geen abonnement, geen provisie over uw rekening aan de klant.', ['amount' => Fachora::money($fee)])
+            : null;
     }
 }

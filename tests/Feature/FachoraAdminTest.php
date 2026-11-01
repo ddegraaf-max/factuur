@@ -33,7 +33,7 @@ class FachoraAdminTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        config(['brand.active' => 'fachora', 'inertia.testing.ensure_pages_exist' => false, 'services.anthropic.key' => null, 'services.stripe.secret' => null]);
+        config(['brand.active' => 'fachora', 'inertia.testing.ensure_pages_exist' => false, 'services.anthropic.key' => null, 'services.stripe.secret' => null, 'fachora.lead_pricing' => false]);
         Mail::fake();
         Http::fake([
             'nominatim.openstreetmap.org/*' => Http::response([], 200),

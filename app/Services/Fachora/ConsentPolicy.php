@@ -25,7 +25,45 @@ class ConsentPolicy
         return $provider !== null
             && filled($provider->email)
             && $provider->email_blocked_at === null
-            && ($provider->claimed_at !== null || $provider->consent_at !== null);
+            // Ook wie op een aanbieding akkoord ging met de voorwaarden: berichten over opdrachten, geen reclame.
+            && ($provider->claimed_at !== null || $provider->consent_at !== null || $provider->terms_accepted_at !== null);
+    }
+
+    /**
+     * Mag een concrete aanvraag van een klant naar dit bedrijf (1.86)? Ook
+     * zonder claim of opt-in: de klant koos dit bedrijf zelf voor zijn klus,
+     * en het bericht gaat over die klus, niet over Fachora (geen direct
+     * marketing in de zin van de PKE). Per aanvraag maximaal max_offers
+     * bedrijven; elk bericht draagt de afmeldlink en de art. 14-informatie.
+     * Een afmelding of blokkade wint altijd.
+     */
+    public static function mayEmailRequest(?Provider $provider): bool
+    {
+        if (self::mayEmail($provider)) {
+            return true;
+        }
+
+        return $provider !== null
+            && (bool) config('fachora.customer_choice', true)
+            && (bool) config('fachora.email_unregistered', false)
+            && filled($provider->email)
+            && $provider->email_blocked_at === null
+            && ! in_array($provider->status, ['blocked', 'suspended'], true);
+    }
+
+    /**
+     * Mag de klant de openbare contactgegevens van dit bedrijf zien om zelf contact op te nemen
+     * (1.87)? Alleen een bedrijf dat de klant zelf koos, dat Fachora niet mag mailen, en dat zich
+     * niet afmeldde of werd geblokkeerd.
+     */
+    public static function mayShowDirectContact(?Provider $provider): bool
+    {
+        return $provider !== null
+            && ! self::mayEmailRequest($provider)
+            && $provider->email_blocked_at === null
+            && $provider->removed_at === null
+            && ! in_array($provider->status, ['blocked', 'suspended'], true)
+            && (filled($provider->email) || filled($provider->phone));
     }
 
     public static function maySms(?Provider $provider): bool
@@ -50,6 +88,9 @@ class ConsentPolicy
         }
         if ($provider->consent_at) {
             return __('Opt-in (:source) op :date', ['source' => $provider->consent_source ?: '?', 'date' => $provider->consent_at->translatedFormat('j F Y')]);
+        }
+        if ($provider->terms_accepted_at) {
+            return __('Voorwaarden geaccepteerd op een aanbieding (:date): alleen berichten over opdrachten', ['date' => $provider->terms_accepted_at->translatedFormat('j F Y')]);
         }
 
         return __('Geen toestemming: alleen per post of via het profiel');

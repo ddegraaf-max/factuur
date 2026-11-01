@@ -76,7 +76,7 @@
         <div class="nr">5</div>
         <div>
           <h3>You reserve the payment, or pay afterwards</h3>
-          <p>With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you reserve the agreed amount by BLIK, Przelewy24 or card. The payment is processed by Stripe; Fachora never holds your money. The company receives it only after your approval.</p>
+          <p>With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you reserve the agreed amount by BLIK, Przelewy24 or card. The payment is processed by Mollie, a licensed payment institution; Fachora never holds your money. The company receives it only after your approval.</p>
           <p style="margin-top:10px;">You can also pay the company directly once the work is done. Then there is no blocked payment and no payment-backed dispute resolution, but the company's verification, the invoice and the company's warranty still apply.</p>
           <span class="tag">Up to {{ $cancelHours }} hours before the appointment you can cancel free of charge</span>
         </div>
@@ -132,8 +132,8 @@
           For customers Fachora is free. You do not pay for posting a job, for the offers, for Fachora Protect or for dispute resolution. You pay only the price agreed with the company, exactly as it appears in the job confirmation. The commission on a completed job is paid by the company.
         </div>
         <div class="fh-note warm" style="margin-top:14px;">
-          <b>Your job goes to Verified companies only.</b><br>
-          If there is no verified company in your area for that category yet, we tell you straight away instead of promising offers that will not come.
+          <b>Your job goes only to the companies you choose.</b><br>
+          You pick up to {{ config('fachora.max_offers') }} companies near you: Fachora Verified companies are at the top of the list, companies from the register are clearly marked. If there is nobody in your area, we tell you straight away instead of promising offers that will not come.
         </div>
       </div>
     </div>

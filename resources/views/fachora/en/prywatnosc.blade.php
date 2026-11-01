@@ -3,13 +3,13 @@
 {{--
   DRAFT — PENDING LEGAL REVIEW.
   Fachora privacy policy (GDPR), English edition (convenience translation; the Polish text is binding).
-  Controller: Budomatch Daniël de Graaf Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
-  verification, Stripe Connect as an independent controller), companies' representatives and visitors.
+  Controller: Creditline B.V. (Bussum, the Netherlands). Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
+  verification, Mollie as an independent controller), companies' representatives and visitors.
   The "draft" marker is deliberately discreet, at the bottom.
 --}}
 
 @section('title', 'Fachora privacy policy')
-@section('description', 'How Fachora (Budomatch) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Stripe, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
+@section('description', 'How Fachora (Creditline B.V.) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Mollie, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
 
 @push('styles')
 <style>
@@ -46,15 +46,15 @@
   <div class="container">
     <div class="eyebrow">Documents</div>
     <h1>Privacy policy</h1>
-    <div class="meta">Version of 16 October 2026</div>
+    <div class="meta">Version of 22 October 2026</div>
 
     <div class="lang">This English text is a convenience translation. The <a href="{{ route('lang', 'pl') }}">Polish version</a> is the binding one; in case of any discrepancy the Polish text prevails.</div>
 
     <div class="entity">
       Data controller:<br>
-      <strong>Budomatch Daniël de Graaf</strong>, operating the platform the <strong>Fachora</strong> platform (fachora.pl)<br>
-      Białka 15 · 09-550 Białka · Poland<br>
-      NIP 7010869430 · REGON 381430120 · sole proprietorship registered in CEIDG<br>
+      <strong>Creditline B.V.</strong>, operating the <strong>Fachora</strong> platform (fachora.pl)<br>
+      Torenlaan 5B · 1402 AT Bussum · the Netherlands<br>
+      a Dutch private limited company (B.V.) registered with the Netherlands Chamber of Commerce (KvK) under no. 59683198 · VAT no. NL853603108B01<br>
       Contact for data protection matters: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>
     </div>
 
@@ -89,7 +89,7 @@
       <li><strong>Contact details:</strong> e-mail address (always), name and phone number (if you provide them or they are needed to arrange the appointment), preferred service language.</li>
       <li><strong>Job description:</strong> category, description of the problem, photos, urgency, postal code or town. Photos may incidentally contain personal data (e.g. the inside of a flat) — please photograph only what concerns the fault.</li>
       <li><strong>Address where the service is performed</strong> — given only after a company is chosen and passed only to that company.</li>
-      <li><strong>Payment:</strong> payment status, amount, transaction identifier with the payment provider, payment method (e.g. "BLIK"). <strong>We do not receive or store card numbers or bank login details</strong> — they are handled solely by Stripe.</li>
+      <li><strong>Payment:</strong> payment status, amount, transaction identifier with the payment provider, payment method (e.g. "BLIK"). <strong>We do not receive or store card numbers or bank login details</strong> — they are handled solely by Mollie.</li>
       <li><strong>Course of the job:</strong> offers, choice, approved extra work, completion reports, disputes with description and photos, review, correspondence through the platform, dates and IP addresses of actions (confirmation, choice, approval).</li>
     </ul>
     <p>Source: you, and for payment status, the payment provider.</p>
@@ -99,7 +99,7 @@
       <li><strong>Register data</strong> (inactive profile): name, the trader's full name (for a sole trader these are personal data), NIP, REGON, KRS, legal form, registered address, PKD activity codes, business status, VAT status and account numbers from the VAT taxpayer list. Source: CEIDG (dane.biznes.gov.pl), KRS (Ministry of Justice), the VAT taxpayer list (Ministry of Finance). Details in section 4.</li>
       <li><strong>Claimed-profile data:</strong> e-mail address and phone number of the person claiming the profile, their name, the code from the letter, display name, description, photo or logo, categories, languages and their level, service radius, indicative rates, warranty period, invoice declaration, Fachora Protect opt-in. Source: the company.</li>
       <li><strong>Verification data:</strong> results of checks in the registers and the VAT list (with date and response), e-mail and phone confirmation (codes, dates), date and version of the accepted terms and Fachora Standard, liability insurance policy (if you upload one: file, insurer, scope, expiry date), notes from verification and from handling reports.</li>
-      <li><strong>Stripe Connect:</strong> account identifier with the payment provider, status of the ability to accept payments and payouts, list of outstanding requirements. <strong>Identity documents, beneficial-owner data and the bank account number are collected and verified by Stripe as an independent controller</strong> (section 5); we only see the result.</li>
+      <li><strong>Payment provider account (Mollie):</strong> account identifier with the payment provider, status of the ability to accept payments and payouts, list of outstanding requirements. <strong>Identity documents, beneficial-owner data and the bank account number are collected and verified by Mollie as an independent controller</strong> (section 5); we only see the result.</li>
       <li><strong>Activity on the platform:</strong> requests received, offers, jobs in progress, reports, disputes, reviews and replies, average rating, number of jobs, response time, breaches of the Fachora Standard, commission invoices, payouts.</li>
       <li><strong>Account:</strong> login, hashed password, login dates, IP addresses, activity log.</li>
     </ul>
@@ -120,7 +120,7 @@
         <tr><td>Reviews and their publication, companies' replies</td><td>rating, text, job number, date</td><td>Art. 6(1)(f) — legitimate interest: reliable information about companies for customers</td><td>as long as the company's profile is on the platform; at the author's request the text can be anonymised</td></tr>
         <tr><td>Inactive profile from a public register</td><td>register data</td><td>Art. 6(1)(f) — legitimate interest (section 4)</td><td>until a removal request or up to 12 months after deregistration; after removal only the NIP and the date of the request</td></tr>
         <tr><td>Claiming a profile, running the company account, the panel, communication about jobs</td><td>claimed-profile data, account, activity on the platform</td><td>Art. 6(1)(b) — contract for use of the platform</td><td>duration of the contract and 6 years after it ends (limitation of claims)</td></tr>
-        <tr><td>Verification and the Fachora Verified mark, trader traceability (Art. 30 DSA), enforcing the Fachora Standard</td><td>verification data, Stripe Connect result, policy, breaches</td><td>Art. 6(1)(c) — Regulation (EU) 2022/2065; Art. 6(1)(f) — safety of customers and the platform</td><td>duration of the contract and 6 months after it ends (DSA); records of serious breaches and a blocked NIP — 5 years</td></tr>
+        <tr><td>Verification and the Fachora Verified mark, trader traceability (Art. 30 DSA), enforcing the Fachora Standard</td><td>verification data, Mollie verification result, policy, breaches</td><td>Art. 6(1)(c) — Regulation (EU) 2022/2065; Art. 6(1)(f) — safety of customers and the platform</td><td>duration of the contract and 6 months after it ends (DSA); records of serious breaches and a blocked NIP — 5 years</td></tr>
         <tr><td>Commission: invoices, settlements, debt collection</td><td>company data, job amounts, invoices</td><td>Art. 6(1)(b) and (c) (tax law)</td><td>5 years from the end of the tax year</td></tr>
         <tr><td>Handling reports, complaints, appeals and content notices (DSA)</td><td>content of the report, the reporter's details, decision and reasons</td><td>Art. 6(1)(c) (DSA, consumer law); (f) — defence against claims</td><td>3 years from the closing of the case</td></tr>
         <tr><td>Contact form</td><td>form data</td><td>Art. 6(1)(f) — replying to your message</td><td>12 months from the last message</td></tr>
@@ -131,8 +131,8 @@
     <p>Providing data is voluntary, but without an e-mail address we cannot accept a request, and without verification data a company cannot become Fachora Verified. When the periods expire we delete or anonymise the data; backups are overwritten within 30 days.</p>
 
     <h2 id="s4">4. Companies from public registers — on what basis</h2>
-    <div class="box"><b>In short:</b> a company from a register is shown only by name, town and type of activity. We do not publish its phone number, e-mail or address. We do not send it e-mails or text messages. The only contact from our side is a letter by post with a code for claiming the profile. A company can request removal of its profile at any time.</div>
-    <p>We create inactive profiles of companies in the trades served by Fachora from data made public by CEIDG, KRS and the VAT taxpayer list, so that a customer can check whether a given company is already Fachora Verified and a company can claim its profile. The basis is our legitimate interest (Art. 6(1)(f) GDPR): building a reliable directory of companies and enabling them to join the platform. We have assessed that this interest does not override the traders' rights because: the data are already public for the purposes of business dealings, we publish a minimal set without contact details, we send these companies no electronic communication, and a profile is removed on simple request.</p>
+    <div class="box"><b>In short:</b> a company from a register is shown only by name, town and type of activity. We do not publish its phone number, e-mail or address. We send it no messages at all unless the company itself has created an account and accepted the terms. If a customer chooses a register company for their job, we show that customer the company's e-mail address and phone number from CEIDG so they can contact it directly. We delete such a company's data after 14 days unless it works with us through the platform. Every such message contains an unsubscribe link. A company can request removal of its profile at any time.</div>
+    <p>We create inactive profiles of companies in the trades served by Fachora from data made public by CEIDG, KRS and the VAT taxpayer list, so that a customer can check whether a given company is already Fachora Verified and a company can claim its profile. The basis is our legitimate interest (Art. 6(1)(f) GDPR): building a reliable directory of companies and enabling them to join the platform. We have assessed that this interest does not override the traders' rights because: the data are already public for the purposes of business dealings, we publish a minimal set without contact details, we use the e-mail address from the register only to pass on a request from a customer who chose that company (no advertising, with information on the source of the data and an unsubscribe link), and opting out or removal of the profile happens on simple request.</p>
     <p>We update register data periodically from the same sources. After a removal request we keep only the NIP with the date of the request, so as not to create the profile again on the next import; this gives effect to your objection and is not further processing for the original purpose.</p>
     <p>If you received a letter from us: the postal address comes from the register, and the code in the letter serves only to confirm that the person claiming the profile has access to the company's address. The code expires once used.</p>
 
@@ -143,12 +143,12 @@
     <div class="tbl-wrap">
       <table class="tbl">
         <tr><th>Recipient</th><th>Role</th><th>Purpose</th><th>Where</th></tr>
-        <tr><td>Stripe Payments Europe, Ltd. (Dublin, Ireland) and Stripe group companies</td><td>payment provider — <strong>independent controller</strong> for payments and company verification (KYC); partly a processor</td><td>Fachora Protect: taking the customer's payment, holding the funds, paying out the company, refunds; Stripe Connect: verifying the company's identity and bank account. Stripe applies its own privacy policy (stripe.com/privacy)</td><td>EU; Stripe may transfer data to the USA under standard contractual clauses</td></tr>
+        <tr><td>Mollie B.V. (Amsterdam, the Netherlands)</td><td>payment provider — a licensed payment institution supervised by De Nederlandsche Bank; <strong>independent controller</strong> for payments and company verification (KYC); partly a processor</td><td>Fachora Protect: taking the customer's payment, holding the funds, paying out the company, refunds; companies' payments for unlocking requests; verifying the company's identity and bank account. Mollie applies its own privacy policy (mollie.com)</td><td>EU (the Netherlands)</td></tr>
         <tr><td>Resend, Inc. (USA)</td><td>processor</td><td>sending e-mails (confirmations, offers, reminders, invoices) and delivery logs</td><td>USA — standard contractual clauses</td></tr>
         <tr><td>Railway Corp. (USA)</td><td>processor</td><td>hosting of the application and database</td><td>servers in the EU region (Amsterdam); administrative access from the USA possible under standard contractual clauses</td></tr>
         <tr><td>Anthropic, PBC (USA)</td><td>processor</td><td>AI tools: tidying up and translating the job description, indicative price range, reading data from a liability policy, a dispute summary for the person deciding it (section 8). Submitted content is not used to train models</td><td>USA — standard contractual clauses</td></tr>
         <tr><td>OpenStreetMap Foundation (United Kingdom) — Nominatim service</td><td>processor / service provider</td><td>converting a postal code or town into coordinates to match companies nearby. We send only the postal code or town name, never a name or full address</td><td>United Kingdom — Commission adequacy decision</td></tr>
-        <tr><td>Smstools (Belgium)</td><td>processor</td><td>sending text messages: verification codes for companies, notifications of urgent requests, appointment reminders</td><td>EU</td></tr>
+        <tr><td>Smstools (Belgium)</td><td>processor</td><td>sending text messages: verification codes for customers and companies, notifications of urgent requests, appointment reminders</td><td>EU</td></tr>
         <tr><td>Cloudflare, Inc. (USA) — Turnstile</td><td>processor</td><td>protecting forms against bots; processes the IP address and browser data when a form is submitted</td><td>EU/USA — standard contractual clauses, Data Privacy Framework</td></tr>
         <tr><td>Accountants, tax advisers, lawyers</td><td>processors or independent controllers</td><td>accounting for commission, handling legal disputes</td><td>EU</td></tr>
         <tr><td>Public authorities (e.g. courts, police, data protection authorities, Member State authorities under the DSA)</td><td>independent controllers</td><td>only on a request based on law</td><td>—</td></tr>
@@ -157,13 +157,13 @@
     <p>We conclude data processing agreements with processors (Art. 28 GDPR). We do not sell data and do not share them with advertisers.</p>
 
     <h2 id="s6">6. Transfers outside the European Economic Area</h2>
-    <p>The application and database run on servers in the European Union. Some providers (Resend, Anthropic, Cloudflare, Railway as infrastructure operator, Stripe for support) are based in the USA; data are transferred under standard contractual clauses approved by the European Commission (Art. 46(2)(c) GDPR) and, where the provider is certified, under the EU-US Data Privacy Framework decision. Transfers to the United Kingdom (OpenStreetMap) rely on the Commission's adequacy decision. A copy of the safeguards applied is available on request.</p>
+    <p>The application and database run on servers in the European Union. Some providers (Resend, Anthropic, Cloudflare, Railway as infrastructure operator) are based in the USA; data are transferred under standard contractual clauses approved by the European Commission (Art. 46(2)(c) GDPR) and, where the provider is certified, under the EU-US Data Privacy Framework decision. Transfers to the United Kingdom (OpenStreetMap) rely on the Commission's adequacy decision. A copy of the safeguards applied is available on request.</p>
 
     <h2 id="s7">7. E-mails, text messages and marketing</h2>
     <ul>
       <li><strong>Customers</strong> receive only messages about their job: confirmation, offers, reminders to choose and to approve, payment, dispute, review request, warranty reminder. We do not send customers newsletters without consent.</li>
       <li><strong>Companies that have claimed their profile</strong> receive messages about jobs, verification, payouts, invoices and changes to the terms — these are necessary to perform the contract. News about new features is sent only to companies that opted in in the panel.</li>
-      <li><strong>We do not e-mail or text companies from public registers</strong> — neither marketing nor "informational" messages. The first electronic message from us comes only after the company itself has claimed its profile.</li>
+      <li><strong>Companies from public registers</strong> receive no messages from us at all — no advertising, no requests, no text messages. A customer who chooses such a company contacts it themselves using the CEIDG details. A company receives its first message from us only after it has created an account itself.</li>
       <li><strong>Every e-mail</strong> from Fachora contains a link to opt out of further messages of that kind. Opting out does not cover messages necessary for a job in progress (e.g. information about a dispute).</li>
     </ul>
 
@@ -179,7 +179,7 @@
     <h2 id="s10">10. Your rights</h2>
     <p>You have the right to: <strong>access</strong> your data and receive a copy; <strong>rectification</strong> of inaccurate data; <strong>erasure</strong> ("right to be forgotten") — except for data we must keep by law or to defend claims; <strong>restriction of processing</strong>; <strong>data portability</strong> of data we process under a contract by automated means (you receive them in a machine-readable format); <strong>objection</strong> to processing based on legitimate interest — including the profile from a public register (section 4) and marketing, which we always stop on objection; and <strong>withdrawal of consent</strong> at any time where processing is based on consent, without affecting the lawfulness of earlier processing.</p>
     <p>To exercise these rights, write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (company: preferably from the address linked to the account; customer: from the address that received the job confirmation). We reply within one month at the latest; in complex cases we may extend this by a further two months, and will tell you if so. We may ask you to confirm your identity if the request comes from another address.</p>
-    <p>You also have the right to <strong>lodge a complaint with a supervisory authority</strong>: in Poland the President of the Personal Data Protection Office (Prezes UODO, ul. Stawki 2, 00-193 Warsaw, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>).</p>
+    <p>You also have the right to <strong>lodge a complaint with a supervisory authority</strong> (Art. 77 GDPR). In Poland this is the President of the Personal Data Protection Office (Prezes UODO, ul. Stawki 2, 00-193 Warsaw, <a href="https://uodo.gov.pl" target="_blank" rel="noopener">uodo.gov.pl</a>). Because the controller is established in the Netherlands, the lead supervisory authority is the Dutch Data Protection Authority — Autoriteit Persoonsgegevens (<a href="https://autoriteitpersoonsgegevens.nl" target="_blank" rel="noopener">autoriteitpersoonsgegevens.nl</a>). You may complain to either of them, including in Polish to Prezes UODO.</p>
 
     <h2 id="s11">11. Security</h2>
     <p>Connections are encrypted (TLS). Passwords are stored only as hashes. Links to job and offer pages are long random tokens that cannot be guessed; forms have attempt limits and anti-spam protection. Access to production systems is limited to the people who need it and is logged. Photos and documents are stored in the database, not at publicly reachable addresses. We make daily backups. Card data and identity documents never enter our systems — they are handled by the payment provider. If a data breach is likely to result in a high risk to your rights, we will inform you without undue delay.</p>
@@ -188,7 +188,7 @@
     <p>We update this policy when the law, our providers or the way the platform works change. We inform companies of significant changes by e-mail and in the panel, and customers in messages about their job. The current dated version is always available at fachora.pl/polityka-prywatnosci; previous versions are available on request.</p>
 
     <h2 id="s13">13. Contact</h2>
-    <p>For data protection matters write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (subject "GDPR") or by post: Budomatch Daniël de Graaf, Białka 15, 09-550 Białka, Poland. The rules for using the platform are in the <a href="{{ route('pl.regulamin') }}">terms of service</a>.</p>
+    <p>For data protection matters write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (subject "GDPR") or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands. The rules for using the platform are in the <a href="{{ route('pl.regulamin') }}">terms of service</a>.</p>
 
     <div class="disclaimer">Draft pending legal review. Privacy questions: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>

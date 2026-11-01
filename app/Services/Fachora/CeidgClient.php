@@ -2,6 +2,12 @@
 
 namespace App\Services\Fachora;
 
+use App\Models\Provider;
+use App\Models\ServiceJob;
+use App\Services\NipService;
+use App\Support\Fachora;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +24,14 @@ use Illuminate\Support\Facades\Log;
  */
 class CeidgClient
 {
-    public function __construct(private ProviderService $providers) {}
+    public const CURSOR = 'fachora:region-import';
+
+    public const EXTRA = 'fachora:extra-regions';
+
+    public function __construct(private ProviderService $providers, private ?GeocodeService $geo = null)
+    {
+        $this->geo ??= app(GeocodeService::class);
+    }
 
     public function configured(): bool
     {
@@ -125,6 +138,339 @@ class CeidgClient
         }
 
         return compact('created', 'skipped', 'pages');
+    }
+
+    /** Het detailrecord van één bedrijf (met PKD-codes, telefoon en e-mail), of null. @return array<string, mixed>|null */
+    public function detail(string $id): ?array
+    {
+        $response = Http::withToken((string) config('fachora.ceidg_token'))
+            ->acceptJson()->timeout(30)
+            ->get(config('fachora.ceidg_url') . '/firma/' . rawurlencode($id));
+        if (! $response->successful()) {
+            return null;
+        }
+        $json = (array) $response->json();
+        $firm = $json['firma'] ?? $json;
+        if (is_array($firm) && array_is_list($firm)) {
+            $firm = $firm[0] ?? null;
+        }
+
+        return is_array($firm) ? $firm : null;
+    }
+
+    /**
+     * Alle actieve regio's in vaste volgorde: de startregio's, daarna de
+     * steden die er dag na dag bij kwamen. Nieuwe komen achteraan, zodat de
+     * cursor van de import blijft kloppen. @return list<array<string, mixed>>
+     */
+    public static function regions(): array
+    {
+        $extra = array_intersect_key((array) config('fachora.expansion_regions', []), array_flip((array) Cache::get(self::EXTRA, [])));
+        $order = array_flip((array) Cache::get(self::EXTRA, []));
+        uksort($extra, fn ($a, $b) => $order[$a] <=> $order[$b]);
+
+        return array_values(array_merge((array) config('fachora.regions', []), $extra));
+    }
+
+    /**
+     * Uitbreiding (1.87): de volgende stad uit expansion_regions erbij. Was
+     * de import klaar, dan gaat hij verder met de nieuwe regio.
+     *
+     * @return array<string, mixed>|null  de nieuwe regio, of null als de lijst op is
+     */
+    public function expandRegions(): ?array
+    {
+        $active = (array) Cache::get(self::EXTRA, []);
+        $next = null;
+        foreach ((array) config('fachora.expansion_regions', []) as $key => $region) {
+            if (! in_array($key, $active, true) && ! array_key_exists($key, (array) config('fachora.regions', []))) {
+                $next = $key;
+                break;
+            }
+        }
+        if ($next === null) {
+            return null;
+        }
+        $active[] = $next;
+        Cache::forever(self::EXTRA, $active);
+
+        $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+        if ($cursor['done'] ?? false) {
+            $cursor['done'] = false;
+            Cache::forever(self::CURSOR, $cursor);
+        }
+        Log::info('Fachora: regio erbij', ['region' => $next]);
+
+        return config('fachora.expansion_regions.' . $next);
+    }
+
+    /** Alle PKD-codes van de categorieën, zonder dubbele. @return list<string> */
+    public static function allPkdCodes(): array
+    {
+        return collect((array) config('fachora.categories', []))->flatMap(fn ($c) => (array) ($c['pkd'] ?? []))->unique()->values()->all();
+    }
+
+    /**
+     * Eén portie van de regio-import (1.86, planner): de startregio's uit
+     * config/fachora.php, alle PKD-codes, pagina na pagina. Alleen actieve
+     * bedrijven die minstens import_min_years bestaan, binnen region_radius_km
+     * van het middelpunt en met een e-mailadres in CEIDG. De voortgang staat in
+     * de cache (CURSOR); wie al in de database staat (NIP), wordt overgeslagen
+     * zonder het detailrecord op te halen.
+     *
+     * @return array{created: int, skipped: int, checked: int, done: bool, at: string}
+     */
+    public function importRegionsStep(?int $firmBudget = null, int $pageBudget = 12): array
+    {
+        // Niet sneller importeren dan we bedrijven kunnen informeren (art. 14 AVG: binnen een maand).
+        if (app(RegisterNoticeService::class)->importShouldPause()) {
+            $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+
+            return ['created' => 0, 'skipped' => 0, 'checked' => 0, 'done' => (bool) ($cursor['done'] ?? false), 'at' => 'gepauzeerd: wachtrij informatiemails vol'];
+        }
+        $regions = self::regions();
+        $codes = self::allPkdCodes();
+        $cursor = (array) Cache::get(self::CURSOR, ['r' => 0, 'c' => 0, 'p' => 0, 'done' => false]);
+        $firmBudget ??= (int) config('fachora.import_firms_per_run', 150);
+        $radius = (float) config('fachora.region_radius_km', 50);
+        $minStart = now()->subYears((int) config('fachora.import_min_years', 1));
+        $created = $skipped = $checked = 0;
+
+        while (! ($cursor['done'] ?? false) && $firmBudget > 0 && $pageBudget > 0) {
+            $region = $regions[$cursor['r']] ?? null;
+            $pkd = $codes[$cursor['c']] ?? null;
+            if ($region === null) {
+                $cursor['done'] = true;
+                break;
+            }
+            if ($pkd === null) {
+                $cursor = ['r' => $cursor['r'] + 1, 'c' => 0, 'p' => 0, 'done' => false];
+                continue;
+            }
+
+            try {
+                $result = $this->search(['pkd' => str_replace('.', '', $pkd), 'wojewodztwo' => $region['voivodeship'] ?? null, 'status' => 'AKTYWNY'], (int) $cursor['p']);
+            } catch (\Throwable $e) {
+                Log::warning('CEIDG regio-import gepauzeerd', ['region' => $region['name'] ?? '?', 'pkd' => $pkd, 'page' => $cursor['p'], 'error' => $e->getMessage()]);
+                break; // volgende run opnieuw
+            }
+            $pageBudget--;
+
+            if ($result['firms'] === []) {
+                $cursor = ['r' => $cursor['r'], 'c' => $cursor['c'] + 1, 'p' => 0, 'done' => false];
+                continue;
+            }
+
+            foreach ($result['firms'] as $firm) {
+                $outcome = $this->importFirm((array) $firm, $pkd, $region, $radius, $minStart);
+                if ($outcome === 'created') {
+                    $created++;
+                } else {
+                    $skipped++;
+                }
+                if ($outcome !== 'known') {
+                    $checked++;
+                    $firmBudget--;
+                }
+            }
+            $cursor['p']++;
+            // Laatste pagina (minder dan een volle pagina of het totaal bereikt): door naar de volgende code.
+            if (count($result['firms']) < 25 || ($result['count'] > 0 && $cursor['p'] * 25 >= $result['count'])) {
+                $cursor = ['r' => $cursor['r'], 'c' => $cursor['c'] + 1, 'p' => 0, 'done' => false];
+            }
+            usleep(300_000);
+        }
+
+        Cache::forever(self::CURSOR, $cursor);
+        $at = isset($regions[$cursor['r']]) ? ($regions[$cursor['r']]['name'] ?? '?') . ' · ' . ($codes[$cursor['c']] ?? '-') . ' · pagina ' . $cursor['p'] : 'klaar';
+
+        return ['created' => $created, 'skipped' => $skipped, 'checked' => $checked, 'done' => (bool) ($cursor['done'] ?? false), 'at' => $at];
+    }
+
+    /**
+     * Eén bedrijf uit de lijst: filteren en zo nodig toevoegen.
+     *
+     * @param  array<string, mixed>  $firm
+     * @param  array<string, mixed>  $region
+     * @return 'created'|'known'|'old'|'far'|'no_email'|'no_detail'
+     */
+    public function importFirm(array $firm, string $pkd, array $region, float $radius, Carbon $minStart): string
+    {
+        $owner = (array) ($firm['wlasciciel'] ?? []);
+        $nip = NipService::normalize($owner['nip'] ?? $firm['nip'] ?? null) ?: null;
+        if ($nip !== null && Provider::query()->where('nip', $nip)->exists()) {
+            return 'known';
+        }
+
+        // Te jong (of geen startdatum): niet in de eerste lichting.
+        $started = $firm['dataRozpoczecia'] ?? null;
+        try {
+            if (! $started || Carbon::parse($started)->gt($minStart)) {
+                return 'old';
+            }
+        } catch (\Throwable) {
+            return 'old';
+        }
+
+        $address = (array) ($firm['adresDzialalnosci'] ?? []);
+        [$clat, $clng] = $region['center'];
+        $coords = $this->geo->fallback($address['miasto'] ?? null);
+        if ($coords !== null && Fachora::distanceKm($clat, $clng, $coords['lat'], $coords['lng']) > $radius) {
+            return 'far';
+        }
+
+        $detail = filled($firm['id'] ?? null) ? $this->detail((string) $firm['id']) : null;
+        usleep(200_000);
+        if ($detail === null) {
+            return 'no_detail';
+        }
+        $record = $this->normalize(array_merge($firm, $detail), [$pkd]);
+        if (blank($record['email'])) {
+            return 'no_email';
+        }
+
+        $coords ??= $this->geo->lookup($record['postal_code'] ?? null, $record['city'] ?? null);
+        if ($coords === null || Fachora::distanceKm($clat, $clng, $coords['lat'], $coords['lng']) > $radius) {
+            return 'far';
+        }
+
+        $counts = $this->providers->importRecords([$record + ['lat' => $coords['lat'], 'lng' => $coords['lng']]], 'ceidg');
+
+        return $counts['created'] > 0 ? 'created' : 'known';
+    }
+
+    /**
+     * Import op aanvraag (1.87): bedrijven in de categorie van deze klus rond
+     * de klant, eerst in zijn plaats, daarna in zijn powiat. Zelfde filters als
+     * de regio-import (actief, oud genoeg, e-mail, binnen region_radius_km van
+     * de klant). Stopt zodra er genoeg kandidaten zijn of het budget op is.
+     * Per categorie en plaats hooguit eens per local_import_days.
+     *
+     * @return array{created: int, checked: int, candidates: int, skipped: ?string}
+     */
+    public function importAround(ServiceJob $job, ?int $target = null, ?int $firmBudget = null, int $pageBudget = 14): array
+    {
+        $target ??= (int) config('fachora.local_import_target', 10);
+        $firmBudget ??= (int) config('fachora.local_import_firms', 60);
+        $count = fn () => $this->providers->choiceCandidates($job, $target)->count();
+        $result = ['created' => 0, 'checked' => 0, 'candidates' => $count(), 'skipped' => null];
+
+        if (! $this->configured()) {
+            return ['skipped' => 'no_token'] + $result;
+        }
+        $codes = (array) (config('fachora.categories.' . $job->category . '.pkd') ?? []);
+        $center = $job->lat !== null && $job->lng !== null ? [(float) $job->lat, (float) $job->lng] : null;
+        if ($codes === [] || $center === null || blank($job->city)) {
+            return ['skipped' => 'no_location'] + $result;
+        }
+        $key = 'fachora:local-import:' . $job->category . ':' . GeocodeService::normalise($job->city);
+        if (Cache::has($key)) {
+            return ['skipped' => 'recent'] + $result;
+        }
+
+        $region = ['name' => $job->city, 'center' => $center];
+        $radius = (float) config('fachora.region_radius_km', 50);
+        $minStart = now()->subYears((int) config('fachora.import_min_years', 1));
+        $areas = $this->searchAreas($job->city, $center, $radius);
+
+        foreach ($areas as $area) {
+            foreach ($codes as $pkd) {
+                for ($page = 0; $page < 40; $page++) {
+                    if ($firmBudget <= 0 || $pageBudget <= 0 || $result['candidates'] >= $target) {
+                        break 3;
+                    }
+                    try {
+                        $found = $this->search($area + ['pkd' => str_replace('.', '', $pkd), 'status' => 'AKTYWNY'], $page);
+                    } catch (\Throwable $e) {
+                        Log::warning('CEIDG import op aanvraag mislukt', ['job' => $job->id, 'area' => $area, 'pkd' => $pkd, 'error' => $e->getMessage()]);
+                        break 3; // niet als "gedaan" markeren: volgende klant probeert het opnieuw
+                    }
+                    $pageBudget--;
+                    foreach ($found['firms'] as $firm) {
+                        $outcome = $this->importFirm((array) $firm, $pkd, $region, $radius, $minStart);
+                        if ($outcome === 'created') {
+                            $result['created']++;
+                        }
+                        if ($outcome !== 'known') {
+                            $result['checked']++;
+                            $firmBudget--;
+                        }
+                    }
+                    if ($result['created'] > 0) {
+                        $result['candidates'] = $count();
+                    }
+                    if (count($found['firms']) < 25) {
+                        break; // laatste pagina van deze code
+                    }
+                }
+            }
+        }
+
+        if (! isset($e)) {
+            Cache::put($key, true, now()->addDays((int) config('fachora.local_import_days', 14)));
+        }
+        Log::info('Fachora import op aanvraag', ['job' => $job->id, 'city' => $job->city, 'category' => $job->category] + $result);
+
+        return $result;
+    }
+
+    /**
+     * Waar zoeken we in het register? Eerst de plaats zelf, dan de grotere steden binnen
+     * de straal (dichtstbij eerst, bijv. Płock bij een dorp in de buurt), dan de powiat
+     * van de plaats en de powiats rondom (vier punten op ruim de halve straal). Zo valt
+     * een stad op 20 km niet weg omdat hij in een andere powiat ligt.
+     *
+     * @param  array{0: float, 1: float}  $center
+     * @return list<array<string, string>>
+     */
+    public function searchAreas(?string $city, array $center, float $radius): array
+    {
+        $areas = [];
+        $seen = [];
+        $add = function (string $key, ?string $value) use (&$areas, &$seen) {
+            $value = trim((string) $value);
+            $norm = $key . ':' . GeocodeService::normalise($value);
+            if ($value !== '' && ! isset($seen[$norm])) {
+                $seen[$norm] = true;
+                $areas[] = [$key => $value];
+            }
+        };
+        $add('miasto', $city);
+        foreach (self::nearbyTowns($center, $radius) as $town) {
+            $add('miasto', $town['name']);
+        }
+        $add('powiat', $this->geo->county($center[0], $center[1]));
+        $step = min(30.0, $radius * 0.6);
+        $dLat = $step / 111.0;
+        $dLng = $step / (111.0 * max(0.2, cos(deg2rad($center[0]))));
+        foreach ([[$dLat, 0], [-$dLat, 0], [0, $dLng], [0, -$dLng]] as [$a, $b]) {
+            $add('powiat', $this->geo->county(round($center[0] + $a, 3), round($center[1] + $b, 3)));
+        }
+
+        return $areas;
+    }
+
+    /**
+     * Grotere steden (uit regions en expansion_regions) binnen de straal, dichtstbij eerst.
+     *
+     * @param  array{0: float, 1: float}  $center
+     * @return list<array{name: string, km: float}>
+     */
+    public static function nearbyTowns(array $center, float $radius): array
+    {
+        $towns = [];
+        foreach (array_merge((array) config('fachora.regions', []), (array) config('fachora.expansion_regions', [])) as $region) {
+            if (empty($region['center']) || $region['name'] === 'Trójmiasto') {
+                continue;
+            }
+            $km = Fachora::distanceKm($center[0], $center[1], (float) $region['center'][0], (float) $region['center'][1]);
+            if ($km <= $radius && $km >= 2) {
+                $towns[] = ['name' => (string) $region['name'], 'km' => round($km)];
+            }
+        }
+        usort($towns, fn ($a, $b) => $a['km'] <=> $b['km']);
+
+        return $towns;
     }
 
     /** PKD-codes (met of zonder punten) naar Fachora-categorieën. @return list<string> */

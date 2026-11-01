@@ -106,8 +106,8 @@ Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:
 4. Eerste bedrijven: Eigenaar → Fachora: bedrijven → Importuj (plaklijst) of CEIDG; dan brieven
    printen (PDF per 100) en posten. Geclaimde bedrijven verschijnen onder status 'claimed';
    na hun aanvraag 'pending' → controles nalopen → Zatwierdź.
-5. Aanbieder van Fachora is Budomatch Daniël de Graaf (Białka 15, 09-550 Białka, NIP 7010869430,
-   REGON 381430120), niet Creditline B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
+5. Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Torenlaan 5B, 1402 AT Bussum,
+   KvK 59683198, btw NL853603108B01); betalingen via Mollie B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
    en alle Fachora-pagina's. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
    laten nakijken), PKE-toets op de uitnodigingsmail voor opt-in-lijsten, DSA-contactpunt,
    merknaam Fachora bij UPRP/EUIPO, domeinen fachora.pl/.com.
@@ -153,3 +153,84 @@ CEIDG (1.85.1, sleutel sinds 16 okt 2026)
   werken), miasto=Warszawa, status=AKTYWNY. Telling okt 2026: 43.22.Z mazowieckie 26 442, Warszawa 7 709.
 - Eigenaar → Fachora: bedrijven → "Importeren uit CEIDG": PKD-keuzelijst, województwo, stad, 1–8 pagina's per klik
   (route fachora.admin.ceidg → AdminController::importCeidg → CeidgClient::import). Categorie uit de gezochte PKD-code.
+
+
+GRATIS VOOR DE KLANT, BEDRIJF BETAALT PER LEAD (1.87.0, 22 okt 2026)
+- Klant: gratis (FACHORA_REQUEST_FEE standaard 0). Voor het versturen bevestigt de klant zijn
+  mobiele nummer met een sms-code (FACHORA_CUSTOMER_SMS, alleen als Smstools is gekoppeld).
+- Bedrijf: bekijken gratis, reageren na "ontgrendelen" (/oferta/{token}/odblokuj). Prijs:
+  FACHORA_LEAD_PERCENT (5) % van het midden van de AI-schatting, tussen FACHORA_LEAD_MIN (15) en
+  FACHORA_LEAD_MAX (150) zł; zonder schatting FACHORA_LEAD_DEFAULT (30). De eerste
+  FACHORA_LEAD_FREE (1) lead per bedrijf is gratis. Betaling via Stripe Checkout (metadata
+  kind=fachora_lead), webhook en terugkeer-URL ontgrendelen. Zonder Stripe-sleutel alles gratis.
+- Provisie alleen nog via Protect; rechtstreeks betaalde klussen: fee 0.
+  FACHORA_LEAD_PRICING=false zet het oude provisiemodel terug (ook de teksten).
+- Regulamin § 13, dla-firm en landing aangepast; terms_version 2026-10-22 (bedrijven accepteren
+  opnieuw). Valse aanvraag binnen 7 dagen melden = terugbetalen: handmatig via Stripe.
+- Engelse pagina's (dla-firm, landing, faq, regulamin § 13) volgen nu ook het lead-model.
+- Het gratis facturatieprogramma is geen verkoopargument meer (alleen nog in de FAQ voor bedrijven).
+- Teksten "we mailen bedrijven uit het register nooit" (privacybeleid, FAQ, o-nas, kontakt, firma,
+  standard, landing, jak-to-dziala; PL en EN) herschreven: alleen een zelfgekozen klantaanvraag,
+  geen reclame of sms, met bron van de gegevens en afmeldlink. Laten toetsen door de jurist.
+- Import op aanvraag: heeft een klant minder dan 5 kandidaten, dan zoekt fachora:local-search
+  (planner, elke minuut) in CEIDG op plaats (miasto) en powiat (Nominatim reverse) van de klant.
+  Zonder enige kandidaat wacht de klant (provider_search_at, max. 15 min, pagina ververst) en krijgt
+  daarna de keuzemail; niemand gevonden = gewone route (no_match). Per categorie+plaats eens per
+  14 dagen. FACHORA_LOCAL_IMPORT=false zet het uit. Parameters miasto/powiat van /firmy na deploy
+  met een echte zoekopdracht nakijken (staat in de log: "Fachora import op aanvraag").
+- Uitbreiding: start met Płock, Szczecin, Warszawa, Kraków, Wrocław, Trójmiasto; elke dag om 05:15
+  komt er één stad uit expansion_regions bij (Łódź, Poznań, Katowice, ...). fachora:expand-regions
+  --list toont de actieve regio's. FACHORA_REGION_EXPANSION=false zet het uit.
+
+KLANT KIEST ZELF, BIJDRAGE PER AANVRAAG, REGIO-IMPORT (1.86.0, 22 okt 2026)
+---------------------------------------------------------------------------
+Besluit van Daniël (22 okt 2026): de klant kiest zelf tot vijf bedrijven en betaalt
+FACHORA_REQUEST_FEE (standaard 10 zł) per aanvraag; de aanvraag gaat per e-mail ook naar
+bedrijven die hun profiel nog niet claimden. Bedrijven betalen provisie (fee_percent) over een
+opdracht die ze krijgen, na akkoord met de voorwaarden.
+- Stroom: pending → (bevestigen) → selecting → klant kiest 1–5 bedrijven (JobController::select)
+  → Stripe Checkout voor de bijdrage (BLIK/P24/kaart, kind 'fachora_request') → terug op
+  /zlecenie/{token}/oplacono of via de planner (syncPendingRequests) → open → aanbieden aan precies
+  die bedrijven. Zonder Stripe-sleutel of met FACHORA_REQUEST_FEE=0 is de aanvraag gratis.
+  Geen keuze binnen confirm_days: expired (expireSelecting). FACHORA_CUSTOMER_CHOICE=false zet
+  de oude route terug (Fachora biedt zelf aan bij Verified bedrijven).
+- Keuzelijst: ProviderService::choiceCandidates — categorie, binnen region_radius_km (50) of de
+  eigen werkstraal, met e-mail, niet afgemeld/geblokkeerd, niet vat_status 'none'; Verified eerst.
+- E-mail aan een niet-geclaimd bedrijf: ConsentPolicy::mayEmailRequest + Notifier::providerRequest.
+  Grondslag: een concreet verzoek van een klant om hun dienst, geen direct marketing. Elk bericht
+  heeft de afmeldlink en de art. 14 AVG-informatie (bron CEIDG, beheerder, privacyverklaring).
+  Herinneringen en andere mail aan zo'n bedrijf blijven geblokkeerd tot het reageert.
+  LAAT DIT VOOR LIVEGANG DOOR EEN POOLSE JURIST NAKIJKEN (PKE + AVG, regulamin, polityka).
+- Reageren door een niet-geclaimd bedrijf (/oferta/{token}): eerst akkoord met de voorwaarden
+  (accept_terms); dan terms_accepted_at, terms_version en consent_at (bron offer_terms).
+- Regio-import: php artisan fachora:import-regions (planner: elke tien minuten een portie,
+  FACHORA_REGION_IMPORT, FACHORA_IMPORT_PER_RUN). Startregio's in config/fachora.php: Szczecin,
+  Warszawa, Kraków, Wrocław, Trójmiasto, elk 50 km. Per bedrijf: status AKTYWNY, minstens
+  import_min_years (1) oud, binnen de straal, e-mailadres in het CEIDG-detailrecord. Voortgang in
+  de cache (CeidgClient::CURSOR); --status toont hem, --reset begint opnieuw.
+- Btw: de biała lista heeft een daglimiet, dus de import controleert btw niet. Bedrijven met
+  vat_status 'none' (na een controle) vallen uit de keuzelijst; ongecontroleerd telt mee.
+- Tests: tests/Feature/FachoraCustomerChoiceTest.php; de oudere Fachora-tests draaien met
+  fachora.customer_choice=false.
+
+OPTIE 2: GEEN IMPORT VOORAF (1.87, 22 okt 2026, besluit Daniël)
+- FACHORA_REGION_IMPORT en FACHORA_REGION_EXPANSION staan standaard UIT. Bedrijven komen alleen binnen
+  via de import op aanvraag (fachora:local-search) als er een klant is.
+- Informatiemail art. 14 (fachora:register-notices) staat standaard UIT (FACHORA_REGISTER_NOTICES).
+  Bedrijven die een klantaanvraag krijgen, zijn via die mail geïnformeerd (register_notice_at).
+- fachora:purge-register (dagelijks 04:40): registerbedrijven die niemand koos, niets van ons kregen en
+  geen aanbieding/opdracht hebben, na FACHORA_REGISTER_KEEP_DAYS (21) dagen verwijderen.
+  Oude imports: eerst `php artisan fachora:purge-register --days=0 --dry-run`, dan zonder --dry-run.
+- Afmelden in twee stappen: de link toont een keuze (geen e-mail meer / profiel verwijderen), pas de knop
+  verandert iets (virusscanners openen links automatisch).
+
+EXPLOITANT CREDITLINE B.V. EN MOLLIE (22 okt 2026, besluit Daniël)
+- Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Bussum, KvK 59683198, VAT
+  NL853603108B01). Teksten PL+EN, voorwaarden, privacy, brief en mails omgezet; terms_version 2026-10-22b.
+- Leadbetalingen via het Mollie-account van Creditline: FACHORA_MOLLIE_KEY op Railway zetten (live_...).
+  Webhook: https://fachora.pl/webhooks/mollie-fachora (wordt per betaling meegestuurd). Methoden BLIK,
+  Przelewy24, kaart; bedragen in PLN, netto, btw verlegd (art. 196 btw-richtlijn).
+- Fachora Protect draait in de code nog op Stripe Connect: zet FACHORA_PROTECT uit tot Mollie Connect is
+  ingebouwd. De panelschermen voor bedrijven noemen Stripe nog (hoort bij die ombouw).
+- Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
+  Creditline in EasyInvoice.

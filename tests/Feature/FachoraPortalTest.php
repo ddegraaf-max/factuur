@@ -9,7 +9,7 @@ use Tests\TestCase;
 /**
  * Het beperkte portaal van Fachora (config/brand.php 'portal'): alleen wat een
  * Pools bedrijf gebruikt. Verborgen onderdelen geven 404, /dashboard gaat naar
- * de opdrachten, er is geen proefperiode, en de aanbieder is Budomatch.
+ * de opdrachten, er is geen proefperiode, en de aanbieder is Creditline B.V.
  */
 class FachoraPortalTest extends TestCase
 {
@@ -99,16 +99,16 @@ class FachoraPortalTest extends TestCase
         $this->assertNull(\App\Support\Brand::forClient()['portal']);
     }
 
-    public function test_fachora_names_budomatch_as_the_operator_not_creditline(): void
+    public function test_fachora_names_creditline_bv_as_the_operator(): void
     {
         config(['brand.active' => 'fachora']);
 
         foreach (['/o-nas', '/kontakt', '/regulamin', '/polityka-prywatnosci', '/faq', '/fachora-protect', '/dla-firm', '/'] as $path) {
             foreach (['pl', 'en'] as $lang) {
                 $html = (string) $this->get($path . '?lang=' . $lang)->assertOk()->getContent();
-                $this->assertStringContainsString('Budomatch', $html, "{$path} ({$lang}) noemt Budomatch niet");
-                $this->assertStringNotContainsStringIgnoringCase('Creditline', $html, "{$path} ({$lang}) noemt Creditline nog");
-                $this->assertStringNotContainsStringIgnoringCase('Bussum', $html, "{$path} ({$lang}) noemt Bussum nog");
+                $this->assertStringContainsString('Creditline B.V.', $html, "{$path} ({$lang}) noemt Creditline B.V. niet");
+                $this->assertStringNotContainsStringIgnoringCase('Budomatch', $html, "{$path} ({$lang}) noemt Budomatch nog");
+                $this->assertStringNotContainsString('7010869430', $html, "{$path} ({$lang}) noemt het oude NIP nog");
             }
         }
     }

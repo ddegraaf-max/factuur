@@ -1,6 +1,6 @@
 <script setup>
-import { router, useForm } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { router, useForm, usePage } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import FachoraShell from '@/Components/FachoraShell.vue';
 import FachoraBadge from '@/Components/FachoraBadge.vue';
 import { icon } from '@/fachora-icons.js';
@@ -21,6 +21,10 @@ const props = defineProps({
   files: { type: Array, default: () => [] },
   protect_enabled: { type: Boolean, default: false },
   auto_accept_days: { type: Number, default: 5 },
+  // 1.86: de klant kiest zelf tot vijf bedrijven ({ candidates, max, fee, selected }) zolang de status 'selecting' is.
+  choice: { type: Object, default: null },
+  // 1.87: gekozen bedrijven uit het register; de klant neemt zelf contact op.
+  direct: { type: Array, default: () => [] },
 });
 
 const job = computed(() => props.job);
@@ -33,7 +37,7 @@ const disputePhotos = computed(() => props.files.filter((f) => f.kind === 'dispu
 const STEPS = ['offers', 'agreed', 'scheduled', 'in_progress', 'done', 'accepted'];
 // 'Klaar|zlecenie' en 'Afgewezen|meerwerk': dezelfde Nederlandse woorden hebben elders een andere Poolse vorm (zie i18n.js).
 const STEP_LABELS = { offers: 'Aanbiedingen', agreed: 'Bedrijf gekozen', scheduled: 'Ingepland', in_progress: 'In uitvoering', done: 'Klaar|zlecenie', accepted: 'Afgerond' };
-const STEP_INDEX = { open: 0, quoted: 0, agreed: 1, scheduled: 2, in_progress: 3, done: 4, disputed: 4, accepted: 5 };
+const STEP_INDEX = { selecting: 0, open: 0, quoted: 0, agreed: 1, scheduled: 2, in_progress: 3, done: 4, disputed: 4, accepted: 5 };
 const stepIndex = computed(() => STEP_INDEX[status.value] ?? -1);
 const statusChip = computed(() => ({
   accepted: 'fa-chip--ok', done: 'fa-chip--ok', disputed: 'fa-chip--warn', cancelled: 'fa-chip--muted', expired: 'fa-chip--muted', no_match: 'fa-chip--warn',
@@ -64,6 +68,46 @@ const choosing = ref(null);
 const chooseForm = useForm({ address_line: props.job.address_line || '', customer_phone: props.job.customer_phone || '', note: '' });
 const openChoose = (offer) => { chooseForm.clearErrors(); choosing.value = choosing.value === offer.id ? null : offer.id; };
 const choose = () => chooseForm.post(route('fachora.job.choose', [props.token, choosing.value]), { preserveScroll: true });
+
+/* ---------- zelf bedrijven kiezen (1.86) ---------- */
+const picked = ref([...(props.choice?.selected || [])]);
+const pickMax = computed(() => props.choice?.max || 5);
+const togglePick = (id) => {
+  const i = picked.value.indexOf(id);
+  if (i >= 0) picked.value.splice(i, 1);
+  else if (picked.value.length < pickMax.value) picked.value.push(id);
+};
+const selectExpress = ref(false);
+const selecting = ref(false);
+const page = usePage();
+const selectError = computed(() => (page.props.errors || {}).providers || (page.props.errors || {}).express || null);
+const sendSelection = () => {
+  selecting.value = true;
+  router.post(route('fachora.job.select', props.token), { providers: picked.value, express: selectExpress.value ? 1 : 0 }, { preserveScroll: true, onFinish: () => { selecting.value = false; } });
+};
+
+/* ---------- import op aanvraag (1.87): pagina ververst zolang we zoeken ---------- */
+let searchTimer = null;
+onMounted(() => {
+  searchTimer = setInterval(() => {
+    if (props.choice?.searching) router.reload({ preserveScroll: true });
+  }, 20000);
+});
+onBeforeUnmount(() => clearInterval(searchTimer));
+
+/* ---------- zelf contact opnemen (1.87) ---------- */
+const mailtoFor = (p) => {
+  const j = props.job || {};
+  const subject = t('Zapytanie: :title (:city)', { title: j.title || '', city: j.city || '' });
+  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', j.customer_name || ''].join('\n');
+  return 'mailto:' + p.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+};
+
+/* ---------- sms-code (1.87) ---------- */
+const smsForm = useForm({ phone: props.choice?.phone || props.job.customer_phone || '' });
+const codeForm = useForm({ code: '' });
+const sendSms = () => smsForm.post(route('fachora.job.sms.send', props.token), { preserveScroll: true });
+const verifySms = () => codeForm.post(route('fachora.job.sms.verify', props.token), { preserveScroll: true, onSuccess: () => codeForm.reset() });
 
 /* ---------- Fachora Protect ---------- */
 const paying = ref(false);
@@ -122,7 +166,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       </ol>
 
       <!-- Wat er nu speelt -->
-      <div v-if="status === 'open'" class="fa-note jb-banner">
+      <div v-if="status === 'selecting'" class="fa-note jb-banner">
+        {{ $t('Kies hieronder tot :n bedrijven uit jouw buurt. Alleen zij krijgen je aanvraag; je gegevens zien ze pas als jij een bedrijf kiest.', { n: pickMax }) }}
+      </div>
+      <div v-else-if="status === 'open'" class="fa-note jb-banner">
         {{ $t('Je aanvraag is aangeboden bij bedrijven in de buurt. De meeste reageren binnen een dag.') }}
         <template v-if="job.offers_deadline"> {{ $t('Reageren kan tot :date.', { date: job.offers_deadline }) }}</template>
         {{ $t('Je krijgt een e-mail bij elke prijs die binnenkomt.') }}
@@ -149,11 +196,96 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         <template v-if="job.cancel_reason"> {{ $t('Reden: :reason', { reason: job.cancel_reason }) }}</template>
         <template v-if="job.refunded"> {{ $t('Het gereserveerde bedrag is teruggestort.') }}</template>
       </div>
-      <div v-else-if="status === 'expired'" class="jb-banner fa-note">{{ $t('Deze aanvraag is verlopen zonder reactie van bedrijven.') }} <a :href="route('fachora.intake')">{{ $t('Nieuwe aanvraag beginnen') }}</a></div>
+      <div v-else-if="status === 'expired'" class="jb-banner fa-note">{{ offers.length ? $t('Deze aanvraag is verlopen zonder reactie van bedrijven.') : $t('Deze aanvraag is verlopen: er zijn geen bedrijven gekozen.') }} <a :href="route('fachora.intake')">{{ $t('Nieuwe aanvraag beginnen') }}</a></div>
     </div>
 
+    <!-- ===== Zelf bedrijven kiezen (1.86) ===== -->
+    <section v-if="status === 'selecting' && choice" class="jb-section">
+      <div v-if="choice.searching" class="fa-card fa-card--tint jb-searching">
+        <h2 class="fa-h2">{{ $t('We zoeken vakmensen bij jou in de buurt') }}</h2>
+        <p>{{ $t('We kijken in het Poolse bedrijvenregister welke bedrijven rond :city dit werk doen. Dat duurt meestal een paar minuten; je krijgt een e-mail zodra je kunt kiezen. Deze pagina ververst vanzelf.', { city: job.city }) }}</p>
+      </div>
+      <h2 v-else class="fa-h2">{{ $t('Kies de bedrijven') }} <span class="fa-muted jb-count">{{ picked.length }}/{{ pickMax }}</span></h2>
+      <article v-for="p in choice.candidates" :key="p.id" class="fa-card jb-offer jb-pick" :class="{ 'is-open': picked.includes(p.id) }" @click="togglePick(p.id)">
+        <div class="jb-prov">
+          <label class="jb-pick-box" @click.stop>
+            <input type="checkbox" :checked="picked.includes(p.id)" :disabled="!picked.includes(p.id) && picked.length >= pickMax" @change="togglePick(p.id)">
+          </label>
+          <div class="jb-prov-main">
+            <div class="jb-prov-name">
+              <strong>{{ p.name }}</strong>
+              <FachoraBadge v-if="p.verified" :verified="true" small />
+            </div>
+            <div class="fa-small fa-muted">
+              {{ p.city }}<template v-if="p.distance_km != null"> · {{ $t(':km km', { km: p.distance_km }) }}</template>
+              <template v-if="p.rating_count"> · ★ {{ rating(p.rating) }} ({{ p.rating_count }})</template>
+              <template v-if="!p.verified"> · {{ $t('uit het bedrijvenregister') }}</template>
+            </div>
+            <div class="fa-chips jb-prov-chips">
+              <span v-for="l in p.languages || []" :key="l.code" class="fa-chip fa-chip--muted">{{ l.flag }} {{ l.name }}</span>
+            </div>
+          </div>
+          <a v-if="p.url" :href="p.url" target="_blank" rel="noopener" class="fa-link fa-small jb-prov-link" @click.stop>{{ $t('Bekijk profiel') }}</a>
+        </div>
+      </article>
+
+      <p v-if="!choice.searching && choice.candidates.length" class="fa-small fa-muted">{{ $t('Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan op beoordeling, dan op afstand. Bedrijven betalen niet voor een plek in deze lijst.') }}</p>
+
+      <div v-if="!choice.searching" class="fa-card">
+        <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }} <template v-if="!(choice.fee > 0)"><strong>{{ $t('Gratis voor jou.') }}</strong></template></p>
+        <template v-if="choice.fee > 0">
+          <p class="fa-small"><strong>{{ $t('Kosten: :amount per aanvraag', { amount: money(choice.fee) }) }}</strong> · {{ $t('betalen met BLIK, Przelewy24 of kaart') }}</p>
+          <label class="fa-check">
+            <input type="checkbox" v-model="selectExpress">
+            <span>{{ $t('Ik vraag om mijn aanvraag meteen te versturen. Daarna vervalt het herroepingsrecht voor deze bijdrage.') }}</span>
+          </label>
+        </template>
+        <div v-if="choice.sms_required" class="jb-sms">
+          <p class="fa-small"><strong>{{ $t('Bevestig je telefoonnummer') }}</strong> · {{ $t('Zo weten de bedrijven dat je aanvraag echt is. Je nummer zien ze pas als je een bedrijf kiest.') }}</p>
+          <div class="fa-row">
+            <div class="fa-field">
+              <input type="tel" v-model="smsForm.phone" :placeholder="$t('bijv. +48 600 000 000')" autocomplete="tel">
+              <div v-if="smsForm.errors.phone" class="fa-err">{{ smsForm.errors.phone }}</div>
+            </div>
+            <button type="button" class="fa-btn fa-btn--secondary" :disabled="smsForm.processing || !smsForm.phone" @click="sendSms">{{ choice.code_sent ? $t('Nieuwe code') : $t('Stuur code') }}</button>
+          </div>
+          <div v-if="choice.code_sent" class="fa-row">
+            <div class="fa-field">
+              <input type="text" inputmode="numeric" maxlength="6" v-model="codeForm.code" :placeholder="$t('Code uit de sms')" autocomplete="one-time-code">
+              <div v-if="codeForm.errors.code" class="fa-err">{{ codeForm.errors.code }}</div>
+            </div>
+            <button type="button" class="fa-btn" :disabled="codeForm.processing || codeForm.code.length < 6" @click="verifySms">{{ $t('Bevestigen') }}</button>
+          </div>
+        </div>
+        <div v-if="selectError" class="fa-err">{{ selectError }}</div>
+        <div class="fa-actions">
+          <button type="button" class="fa-btn" :disabled="selecting || !picked.length || choice.sms_required || (choice.fee > 0 && !selectExpress)" @click="sendSelection">
+            {{ choice.fee > 0 ? $t('Betalen en versturen (:amount)', { amount: money(choice.fee) }) : $t('Aanvraag versturen') }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Zelf contact opnemen (1.87) ===== -->
+    <section v-if="direct.length" class="jb-section">
+      <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
+      <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
+      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer">
+        <div class="jb-prov">
+          <div class="jb-prov-main">
+            <div class="jb-prov-name"><strong>{{ p.name }}</strong></div>
+            <div class="fa-small fa-muted">{{ p.city }}</div>
+          </div>
+        </div>
+        <div class="fa-actions">
+          <a v-if="p.email" class="fa-btn" :href="mailtoFor(p)">{{ $t('E-mail sturen') }}</a>
+          <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
+        </div>
+      </article>
+    </section>
+
     <!-- ===== Aanbiedingen ===== -->
-    <section v-if="canChoose" class="jb-section">
+    <section v-if="canChoose && !(direct.length && !offers.length)" class="jb-section">
       <h2 class="fa-h2">{{ $t('Aanbiedingen') }} <span class="fa-muted jb-count">{{ pricesIn }}/{{ offers.length }}</span></h2>
       <p v-if="!offers.length" class="fa-card fa-muted">{{ $t('Nog geen reacties. We laten het je per e-mail weten.') }}</p>
 
@@ -452,6 +584,9 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-section .fa-h2 { margin-bottom: 12px; }
 .jb-count { font-size: 14px; font-weight: 500; }
 .jb-offer.is-off { opacity: 0.6; }
+.jb-pick { cursor: pointer; }
+.jb-pick-box { display: flex; align-items: flex-start; padding-top: 2px; }
+.jb-pick-box input { width: 20px; height: 20px; accent-color: #0B2545; }
 .jb-offer.is-open { border-color: #0B2545; box-shadow: 0 0 0 1px #0B2545; }
 .jb-prov { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .jb-prov-main { min-width: 0; flex: 1; }
@@ -491,4 +626,6 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-cancel form { text-align: left; }
 .jb-express { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.5; margin: 6px 0 12px; }
 .jb-express input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+.jb-sms { margin: 12px 0; display: grid; gap: 8px; }
+.jb-sms .fa-row { align-items: flex-start; }
 </style>

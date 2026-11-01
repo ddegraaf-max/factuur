@@ -15,6 +15,7 @@ use App\Services\InvoiceManager;
 use App\Support\Fachora;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
@@ -137,19 +138,372 @@ class JobService
     /** Stap 2: de klant klikt. Daarna wordt de opdracht verrijkt en aangeboden. */
     public function confirm(ServiceJob $job, Request $request): bool
     {
-        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')->update(['status' => 'open', 'confirmed_at' => now()]) === 1;
+        // 1.86: de klant kiest zelf de bedrijven (als er in de buurt iemand is om uit te kiezen).
+        // 1.87: is er (nog) niemand, dan zoeken we eerst in CEIDG rond de klant (import op aanvraag).
+        $customerChoice = (bool) config('fachora.customer_choice', true);
+        $available = $customerChoice ? $this->providers->choiceCandidates($job, (int) config('fachora.local_import_min', 5))->count() : 0;
+        $search = $customerChoice && $available === 0 && $this->localImportAvailable();
+        $choose = $customerChoice && ($available > 0 || $search);
+        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')
+            ->update(['status' => $choose ? 'selecting' : 'open', 'confirmed_at' => now()]
+                + ($choose ? ['request_fee' => $this->requestFee()] : [])
+                + ($search ? ['provider_search_at' => now()] : [])) === 1;
         if (! $first) {
             return false;
         }
         $job->refresh();
         $this->log($job, 'confirmed', 'customer', __('E-mailadres bevestigd; opdracht actief'));
         $this->enrich($job);
+
+        if ($choose) {
+            $this->log($job, 'selecting', 'system', __('Klant kiest zelf de bedrijven'));
+            if ($search) {
+                $this->log($job, 'provider_search', 'system', __('Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister'));
+            } else {
+                // Weinig keus? Op de achtergrond aanvullen; de klant kan nu al kiezen.
+                if ($available < (int) config('fachora.local_import_min', 5) && $this->localImportAvailable()) {
+                    $this->queueLocalImport($job);
+                }
+                $this->notifier->customer($job, 'choose');
+            }
+
+            return true;
+        }
+
         $this->dispatch($job);
         // Geen Verified bedrijf in de buurt? Dan zegt de mail dat meteen, in plaats van "we bieden hem aan".
         $job->refresh();
         $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
 
         return true;
+    }
+
+    /* ---------- de klant kiest zelf (1.86) ---------- */
+
+    /** De bijdrage per aanvraag in złoty (0 = gratis, of geen Stripe: dan ook gratis). */
+    public function requestFee(): float
+    {
+        $fee = max(0, (float) config('fachora.request_fee', 0));
+
+        return $fee > 0 && app(FachoraPayments::class)->configured() ? round($fee, 2) : 0.0;
+    }
+
+    /**
+     * De klant kiest 1 tot max_offers bedrijven uit de lijst. Zonder bijdrage
+     * gaat de aanvraag meteen weg; met bijdrage geeft dit het Checkout-adres.
+     *
+     * @param  list<int>  $providerIds
+     * @return string|null  het betaaladres, of null als de aanvraag al is verstuurd
+     */
+    public function selectProviders(ServiceJob $job, array $providerIds): ?string
+    {
+        if (! $job->isSelecting()) {
+            throw new \DomainException(__('Voor deze opdracht kun je geen bedrijven (meer) kiezen.'));
+        }
+        if ($this->smsRequired($job)) {
+            throw new \DomainException(__('Bevestig eerst je telefoonnummer met de sms-code.'));
+        }
+        $max = (int) config('fachora.max_offers', 5);
+        $allowed = $this->providers->choiceCandidates($job)->pluck('id')->all();
+        $ids = array_values(array_unique(array_map('intval', $providerIds)));
+        $ids = array_values(array_filter($ids, fn (int $id) => in_array($id, $allowed, true)));
+        if ($ids === []) {
+            throw new \DomainException(__('Kies minstens één bedrijf.'));
+        }
+        if (count($ids) > $max) {
+            throw new \DomainException(__('Kies maximaal :n bedrijven.', ['n' => $max]));
+        }
+
+        // Al betaald (bijvoorbeeld in een ander tabblad)? Dan niet nog eens laten betalen.
+        if ($job->request_paid_at === null && filled($job->request_session_id) && app(FachoraPayments::class)->requestPaid($job)) {
+            $job->forceFill(['request_paid_at' => now()])->save();
+            $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+        }
+
+        $fee = $job->request_paid_at !== null ? (float) $job->request_fee : $this->requestFee();
+        $job->forceFill(['selected_providers' => $ids, 'request_fee' => $fee])->save();
+        $this->log($job, 'selected', 'customer', __('Klant koos :n bedrijven', ['n' => count($ids)]));
+
+        if ($fee <= 0 || $job->request_paid_at !== null) {
+            $this->submitSelection($job);
+
+            return null;
+        }
+
+        return app(FachoraPayments::class)->requestCheckoutUrl($job, $fee, route('fachora.job.request.paid', $job->token), $job->url());
+    }
+
+    /* ---------- sms-code voor de klant (1.87) ---------- */
+
+    /** Moet de klant zijn telefoonnummer bevestigen voordat de aanvraag weggaat? */
+    public function smsRequired(ServiceJob $job): bool
+    {
+        return (bool) config('fachora.customer_sms', true)
+            && $job->phone_verified_at === null
+            && ! $job->isDemo()
+            && app(\App\Services\SmsService::class)->configured();
+    }
+
+    public function sendPhoneCode(ServiceJob $job, string $phone): bool
+    {
+        if (! $job->isSelecting()) {
+            throw new \DomainException(__('Voor deze opdracht kun je geen bedrijven (meer) kiezen.'));
+        }
+        if (\App\Support\PhoneNumber::mobile($phone) === null) {
+            throw new \DomainException(__('Vul een geldig mobiel nummer in.'));
+        }
+        if ($job->phone_code_sent_at && $job->phone_code_sent_at->gt(now()->subMinute())) {
+            throw new \DomainException(__('Er is net een code verstuurd. Wacht een minuut.'));
+        }
+        if (ServiceJob::query()->whereKey($job->id)->value('confirm_mails') > 10) {
+            throw new \DomainException(__('Te veel pogingen.'));
+        }
+        $code = (string) random_int(100000, 999999);
+        $job->forceFill(['customer_phone' => $phone, 'phone_code' => $code, 'phone_code_sent_at' => now(), 'phone_code_attempts' => 0])->save();
+        $job->increment('confirm_mails');
+
+        return app(\App\Services\SmsService::class)->platform($phone, __('Fachora: Twój kod to :code', ['code' => $code]));
+    }
+
+    public function verifyPhone(ServiceJob $job, string $code): bool
+    {
+        if ($job->phone_verified_at !== null) {
+            return true;
+        }
+        if ($job->phone_code_attempts >= 5) {
+            throw new \DomainException(__('Te veel pogingen. Vraag een nieuwe code aan.'));
+        }
+        $ok = filled($job->phone_code) && hash_equals((string) $job->phone_code, trim($code))
+            && $job->phone_code_sent_at && $job->phone_code_sent_at->gt(now()->subMinutes(30));
+        if (! $ok) {
+            $job->increment('phone_code_attempts');
+
+            return false;
+        }
+        $job->forceFill(['phone_verified_at' => now(), 'phone_code' => null])->save();
+        $this->log($job, 'phone_verified', 'customer', __('Telefoonnummer bevestigd per sms'));
+
+        return true;
+    }
+
+    /* ---------- import op aanvraag (1.87) ---------- */
+
+    private const LOCAL_QUEUE = 'fachora:local-import-queue';
+
+    public function localImportAvailable(): bool
+    {
+        return (bool) config('fachora.local_import', true) && filled(config('fachora.ceidg_token'));
+    }
+
+    /** Aanvullen zonder dat de klant wacht: de planner pakt het binnen een minuut op. */
+    public function queueLocalImport(ServiceJob $job): void
+    {
+        $queue = array_values(array_unique(array_merge((array) Cache::get(self::LOCAL_QUEUE, []), [$job->id])));
+        Cache::put(self::LOCAL_QUEUE, array_slice($queue, -50), now()->addDay());
+    }
+
+    /**
+     * Planner (elke minuut): eerst klanten die wachten (provider_search_at),
+     * dan de aanvullingen. Daarna krijgt de wachtende klant de keuzemail, of,
+     * als er echt niemand is, gaat de aanvraag de gewone weg (dispatch).
+     *
+     * @return array{searched: int, topped_up: int}
+     */
+    public function runLocalSearches(int $max = 3): array
+    {
+        $ceidg = app(CeidgClient::class);
+        $searched = 0;
+        $waiting = ServiceJob::query()->where('status', 'selecting')->whereNotNull('provider_search_at')->orderBy('provider_search_at')->limit($max)->get();
+        foreach ($waiting as $job) {
+            $giveUp = $job->provider_search_at->lt(now()->subMinutes((int) config('fachora.local_search_minutes', 15)));
+            if (! $giveUp && $this->localImportAvailable()) {
+                $ceidg->importAround($job);
+            }
+            $this->finishSearch($job->fresh());
+            $searched++;
+        }
+
+        $topped = 0;
+        $queue = (array) Cache::pull(self::LOCAL_QUEUE, []);
+        foreach (array_slice($queue, 0, max(0, $max - $searched)) as $id) {
+            if ($job = ServiceJob::query()->find($id)) {
+                $ceidg->importAround($job);
+                $topped++;
+            }
+        }
+        if (count($queue) > max(0, $max - $searched)) {
+            Cache::put(self::LOCAL_QUEUE, array_slice($queue, max(0, $max - $searched)), now()->addDay());
+        }
+
+        return ['searched' => $searched, 'topped_up' => $topped];
+    }
+
+    /** De zoektocht is klaar: keuzemail, of zonder kandidaten de gewone route. */
+    public function finishSearch(ServiceJob $job): void
+    {
+        $cleared = ServiceJob::query()->whereKey($job->id)->where('status', 'selecting')->whereNotNull('provider_search_at')
+            ->update(['provider_search_at' => null]) === 1;
+        if (! $cleared) {
+            return;
+        }
+        $job->refresh();
+        $found = $this->providers->choiceCandidates($job)->count();
+        $this->log($job, 'provider_search_done', 'system', __('Zoektocht klaar: :n bedrijven om uit te kiezen', ['n' => $found]));
+        if ($found > 0) {
+            $this->notifier->customer($job, 'choose');
+
+            return;
+        }
+
+        // Niemand gevonden: zoals vroeger aanbieden aan Verified bedrijven (of no_match).
+        $job->forceFill(['status' => 'open', 'request_fee' => null])->save();
+        $this->dispatch($job);
+        $job->refresh();
+        $this->notifier->customer($job, $job->status === 'no_match' ? 'no_match' : 'confirmed');
+    }
+
+    /** Terug van Stripe (of via de planner): betaald? Dan gaat de aanvraag weg. */
+    public function syncRequestPayment(ServiceJob $job): bool
+    {
+        if (! $job->isSelecting() || empty($job->selected_providers)) {
+            return false;
+        }
+        if ($job->request_paid_at === null) {
+            if (! app(FachoraPayments::class)->requestPaid($job)) {
+                return false;
+            }
+            $marked = ServiceJob::query()->whereKey($job->id)->whereNull('request_paid_at')->update(['request_paid_at' => now()]) === 1;
+            $job->refresh();
+            if ($marked) {
+                $this->log($job, 'request_paid', 'customer', __('Aanvraag betaald: :amount', ['amount' => Fachora::money($job->request_fee)]));
+            }
+        }
+        $this->submitSelection($job);
+
+        return true;
+    }
+
+    /** De gekozen bedrijven krijgen de aanvraag. */
+    public function submitSelection(ServiceJob $job): int
+    {
+        $first = ServiceJob::query()->whereKey($job->id)->where('status', 'selecting')->update(['status' => 'open']) === 1;
+        if (! $first) {
+            return 0;
+        }
+        $job->refresh();
+        $sent = $this->dispatch($job, array_map('intval', (array) $job->selected_providers), 'customer');
+        $job->refresh();
+        $direct = $this->directContacts($job);
+        if ($job->offers()->count() === 0 && $direct->isNotEmpty()) {
+            // 1.87: alleen bedrijven uit het register gekozen. Fachora mailt die niet; de klant krijgt
+            // hun openbare contactgegevens en neemt zelf contact op.
+            $job->forceFill(['offered_at' => now()])->save();
+            $this->log($job, 'direct_contact', 'system', __('Klant neemt zelf contact op met :n bedrijven uit het register', ['n' => $direct->count()]));
+            $this->notifier->customer($job, 'confirmed');
+
+            return 0;
+        }
+        if ($job->offers()->count() === 0) {
+            // Geen van de gekozen bedrijven was nog bereikbaar (afgemeld of geblokkeerd): opnieuw kiezen.
+            // Een betaalde bijdrage blijft staan; de volgende keuze kost niets extra.
+            $job->forceFill(['status' => 'selecting', 'selected_providers' => null, 'owner_notified_at' => $job->owner_notified_at])->save();
+            $this->log($job, 'reselect', 'system', __('Gekozen bedrijven niet bereikbaar; klant kiest opnieuw'));
+            $this->notifier->customer($job, 'choose', ['again' => true]);
+
+            return 0;
+        }
+        $this->notifier->customer($job, 'confirmed');
+
+        return $sent;
+    }
+
+    /**
+     * Gekozen bedrijven die Fachora niet mailt (uit het register, 1.87): de klant ziet hun
+     * openbare contactgegevens uit CEIDG en neemt zelf contact op.
+     *
+     * @return \Illuminate\Support\Collection<int, Provider>
+     */
+    public function directContacts(ServiceJob $job): \Illuminate\Support\Collection
+    {
+        $ids = array_map('intval', (array) $job->selected_providers);
+        if ($ids === []) {
+            return collect();
+        }
+        $offered = $job->offers()->pluck('provider_id')->all();
+
+        return Provider::query()->whereIn('id', $ids)->whereNotIn('id', $offered)->get()
+            ->filter(fn (Provider $p) => ConsentPolicy::mayShowDirectContact($p))->values();
+    }
+
+    /** Betalingen die via Stripe binnenkwamen terwijl de klant de pagina al had gesloten (planner). */
+    public function syncPendingRequests(): int
+    {
+        $done = 0;
+        foreach (ServiceJob::query()->where('status', 'selecting')->whereNotNull('request_session_id')->whereNull('request_paid_at')
+            ->where('updated_at', '>', now()->subDays(2))->limit(50)->get() as $job) {
+            $done += $this->syncRequestPayment($job) ? 1 : 0;
+        }
+
+        return $done;
+    }
+
+    /**
+     * De klant past zijn aanvraag aan vóór de bevestiging (terug vanaf de bevestigingspagina).
+     * Andere plaats of postcode: opnieuw de coördinaten opzoeken.
+     */
+    public function updatePending(ServiceJob $job, array $data): ServiceJob
+    {
+        if (! $job->isPending()) {
+            return $job;
+        }
+        $city = mb_substr(trim((string) $data['city']), 0, 120);
+        $postal = ($data['postal_code'] ?? null) ?: null;
+        $attrs = [
+            'category' => $data['category'],
+            'title' => mb_substr(trim((string) ($data['title'] ?? '')) ?: Fachora::categoryName($data['category'], 'pl'), 0, 160),
+            'description' => trim((string) $data['description']),
+            'urgency' => $data['urgency'],
+            'wanted_date' => $data['urgency'] === 'date' ? ($data['wanted_date'] ?? null) : null,
+            'time_window' => $data['time_window'] ?? null,
+            'language' => $data['language'],
+            'postal_code' => $postal,
+            'city' => $city,
+        ];
+        if ($city !== $job->city || $postal !== $job->postal_code) {
+            $coords = $this->geo->lookup($postal, $city);
+            $attrs += ['lat' => $coords['lat'] ?? null, 'lng' => $coords['lng'] ?? null];
+        }
+        $job->forceFill($attrs)->save();
+        $this->log($job, 'edited', 'customer', __('Aanvraag aangepast vóór de bevestiging'));
+
+        return $job->refresh();
+    }
+
+    /**
+     * Advies op de bevestigingspagina: wat de klant nog kan verbeteren voor hij bevestigt.
+     *
+     * @return array{radius: int, towns: list<array{name: string, km: float}>, tips: list<array{key: string, text: string}>}
+     */
+    public function advice(ServiceJob $job): array
+    {
+        $radius = (int) config('fachora.region_radius_km', 50);
+        $towns = $job->lat !== null && $job->lng !== null
+            ? array_slice(CeidgClient::nearbyTowns([(float) $job->lat, (float) $job->lng], $radius), 0, 3) : [];
+        $tips = [];
+        if ($job->language !== 'pl') {
+            $tips[] = ['key' => 'language', 'text' => __('De meeste vakmensen in Polen werken alleen in het Pools. Wij vertalen je omschrijving automatisch naar het Pools, dus met Pools als taal heb je de meeste keus. Kies alleen een andere taal als je de vakman echt in die taal wilt spreken.')];
+        }
+        if (mb_strlen((string) $job->description) < 80) {
+            $tips[] = ['key' => 'description', 'text' => __('Je omschrijving is kort. Vertel wat er moet gebeuren, hoe groot het is, op welke verdieping en of er al materiaal is: dan krijg je betere en snellere prijzen.')];
+        }
+        if (blank($job->postal_code)) {
+            $tips[] = ['key' => 'postal_code', 'text' => __('Vul je postcode in, dan rekenen we de afstand tot de bedrijven precies uit.')];
+        }
+        if ($job->lat === null) {
+            $tips[] = ['key' => 'location', 'text' => __('We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.')];
+        }
+
+        return ['radius' => $radius, 'towns' => $towns, 'tips' => $tips];
     }
 
     /** AI: nette Poolse omschrijving voor het bedrijf, een prijsklasse en eventuele vragen. Mag mislukken. */
@@ -213,7 +567,12 @@ class JobService
         }
         $already = $job->offers()->pluck('provider_id')->all();
 
-        if ($providerIds !== null) {
+        if ($providerIds !== null && $actor === 'customer') {
+            // 1.86: door de klant zelf gekozen; ook bedrijven die hun profiel nog niet claimden.
+            $candidates = Provider::query()->whereIn('id', $providerIds)->whereNotIn('id', $already)->get()
+                ->filter(fn (Provider $p) => ConsentPolicy::mayEmailRequest($p) && in_array($p->status, ['unclaimed', 'claimed', 'pending', 'verified'], true))
+                ->take((int) config('fachora.max_offers', 5))->values();
+        } elseif ($providerIds !== null) {
             $candidates = Provider::query()->whereIn('id', $providerIds)->whereNotIn('id', $already)->get()
                 ->filter(fn (Provider $p) => ConsentPolicy::mayEmail($p) && in_array($p->status, ['claimed', 'pending', 'verified'], true))->values();
         } else {
@@ -227,6 +586,9 @@ class JobService
         }
 
         if ($candidates->isEmpty()) {
+            if ($actor === 'customer') {
+                return 0; // submitSelection laat de klant opnieuw kiezen
+            }
             if ($job->offers()->count() === 0) {
                 $job->forceFill(['status' => 'no_match'])->save();
                 $this->log($job, 'no_match', 'system', __('Geen Verified bedrijf in de buurt; de eigenaar is ingelicht'));
@@ -248,7 +610,10 @@ class JobService
                 'status' => 'sent',
                 'wave' => $wave,
             ]);
-            if ($this->notifier->provider($provider, 'job', [], $job, $offer)) {
+            $notified = $actor === 'customer'
+                ? $this->notifier->providerRequest($provider, $job, $offer)
+                : $this->notifier->provider($provider, 'job', [], $job, $offer);
+            if ($notified) {
                 $offer->forceFill(['sent_at' => now()])->save();
                 $sent++;
             }
@@ -272,6 +637,30 @@ class JobService
         }
     }
 
+    /** Een bedrijf zonder profiel gaat eerst akkoord met de voorwaarden (voor ontgrendelen of reageren). */
+    public function needsTerms(ServiceJobOffer $offer): bool
+    {
+        return $offer->provider->claimed_at === null && $offer->provider->terms_accepted_at === null;
+    }
+
+    public function acceptTerms(ServiceJobOffer $offer, bool $accepted): void
+    {
+        if (! $this->needsTerms($offer)) {
+            return;
+        }
+        if (! $accepted) {
+            throw new \DomainException(__('Ga eerst akkoord met de voorwaarden van Fachora.'));
+        }
+        $provider = $offer->provider;
+        // Akkoord op de tokenpagina: vanaf nu mag Fachora dit bedrijf over deze opdracht mailen.
+        // Geen toestemming voor reclame: alleen berichten over opdrachten (ConsentPolicy::mayEmail via terms_accepted_at).
+        $provider->forceFill([
+            'terms_accepted_at' => now(),
+            'terms_version' => (string) config('fachora.terms_version'),
+        ])->save();
+        $this->log($offer->job, 'terms_accepted', 'provider', __(':provider ging akkoord met de voorwaarden', ['provider' => $provider->display_name]));
+    }
+
     /** Het bedrijf geeft prijs en moment door. @param  array<string, mixed>  $data */
     public function respond(ServiceJobOffer $offer, array $data): void
     {
@@ -279,6 +668,10 @@ class JobService
         if (! $job->canChoose() || ! in_array($offer->status, ['sent', 'responded'], true)) {
             throw new \DomainException(__('Deze aanbieding is niet meer open.'));
         }
+        $this->acceptTerms($offer, filter_var($data['accept_terms'] ?? false, FILTER_VALIDATE_BOOLEAN));
+        // 1.87: eerst ontgrendelen (de welkomstlead gaat vanzelf open).
+        app(LeadService::class)->ensureUnlocked($offer);
+
         $first = $offer->responded_at === null;
         $offer->forceFill([
             'status' => 'responded',
@@ -454,7 +847,8 @@ class JobService
             throw new \DomainException(__('Deze opdracht kan niet worden goedgekeurd.'));
         }
         $provider = $job->provider;
-        $feePercent = $provider->feePercent();
+        // 1.87: met betalen per lead geen provisie meer over rechtstreeks betaalde klussen; alleen via Protect.
+        $feePercent = $job->isPaid() || ! app(LeadService::class)->enabled() ? $provider->feePercent() : 0.0;
         $base = $job->isPaid() ? (float) $job->agreed_amount : $job->totalAmount();
         $fee = round($base * $feePercent / 100, 2);
 
@@ -739,6 +1133,19 @@ class JobService
         foreach ($old as $job) {
             FachoraFile::query()->where('owner_type', 'job')->where('owner_id', $job->id)->delete();
             $job->delete();
+        }
+
+        return $old->count();
+    }
+
+    /** Aanvragen waarbij de klant na een week nog geen bedrijven koos (of niet betaalde): verlopen. */
+    public function expireSelecting(): int
+    {
+        $old = ServiceJob::query()->where('status', 'selecting')->whereNull('request_paid_at')
+            ->where('updated_at', '<', now()->subDays((int) config('fachora.confirm_days', 7)))->get();
+        foreach ($old as $job) {
+            $job->forceFill(['status' => 'expired'])->save();
+            $this->log($job, 'expired', 'system', __('Geen bedrijven gekozen; aanvraag verlopen'));
         }
 
         return $old->count();

@@ -90,7 +90,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Operator platformy</div><div style="font-weight:600;">Budomatch Daniël de Graaf</div><div style="font-size:13px;color:var(--text-2);">Białka 15, 09-550 Białka, Polska<br>NIP 7010869430 · REGON 381430120</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Operator platformy</div><div style="font-weight:600;">Creditline B.V.</div><div style="font-size:13px;color:var(--text-2);">Torenlaan 5B, 1402 AT Bussum, Holandia<br>KvK 59683198 · VAT NL853603108B01</div></div>
         </div>
       </div>
 
@@ -99,7 +99,7 @@
         <p>Nie pisz przez formularz — zgłoś firmę bezpośrednio. Sprawdzimy ją w rejestrach, a Ty przejdziesz weryfikację w panelu. Bez abonamentu, prowizja tylko od wykonanych zleceń.</p>
         <a href="{{ route('fachora.apply') }}" class="btn btn-primary" style="margin-right:8px;margin-bottom:8px;">Zgłoś firmę →</a>
         <a href="{{ route('fachora.claim') }}" class="btn btn-secondary" style="margin-bottom:8px;">Mam kod z listu</a>
-        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Dostałeś od nas list? To jedyny sposób, w jaki kontaktujemy się z firmami, które się u nas nie zarejestrowały — nie wysyłamy e-maili ani SMS-ów bez zgody.</p>
+        <p style="margin:8px 0 0;font-size:13px;color:var(--text-3);">Dostałeś od nas list lub zapytanie klienta? Firmom z rejestru nie wysyłamy reklam, newsletterów ani SMS-ów. Jedyny e-mail, jaki taka firma może od nas dostać, to konkretne zapytanie klienta, który sam ją wybrał — z informacją, skąd mamy jej dane, i linkiem do rezygnacji.</p>
       </div>
 
       <div class="contact-card" style="margin-top:16px;">
@@ -123,7 +123,7 @@
       </div>
       <div class="contact-card">
         <h3>🔧 Dla firm</h3>
-        <p>Weryfikacja, panel, wypłaty przez Stripe, faktury za prowizję, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
+        <p>Weryfikacja, panel, wypłaty przez Mollie, faktury za prowizję, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
         <ul>
           <li>Chcesz dołączyć? Skorzystaj z <a class="lnk" href="{{ route('fachora.apply') }}">formularza zgłoszenia</a>.</li>
           <li>Nie chcesz figurować na Fachora? Napisz — usuniemy profil z rejestru.</li>

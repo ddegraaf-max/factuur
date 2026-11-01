@@ -97,6 +97,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'stripe/webhook',
             'webhooks/smstools',
             'webhooks/mollie',
+            'webhooks/mollie-fachora',
             'webhooks/recommand',
             'webhooks/inbound-mail/*',
             'mcp/*',

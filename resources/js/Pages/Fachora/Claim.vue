@@ -27,7 +27,12 @@ const props = defineProps({
   token: { type: String, default: null },
   email: { type: String, default: null },
   existingUser: { type: Boolean, default: false },
+  // 1.87: afmelden in twee stappen (de link verandert niets; de knop wel).
+  done: { type: String, default: null },
+  canRemove: { type: Boolean, default: false },
 });
+const optoutForm = useForm({ action: '' });
+const optoutAction = (action) => { optoutForm.action = action; optoutForm.post(route('fachora.optout.confirm', props.token)); };
 
 const page = usePage();
 const sent = computed(() => /[?&]wyslano=1(&|$)/.test(page.url || (typeof window !== 'undefined' ? window.location.search : '')));
@@ -177,7 +182,7 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
       <div class="fa-card cl-why">
         <h2 class="fa-h3">{{ $t('Waarom Fachora?') }}</h2>
         <ul class="fa-ticks">
-          <li>{{ $t('Opdrachten van klanten uit de buurt, in de talen die u spreekt; u betaalt alleen een provisie over uitgevoerd werk.') }}</li>
+          <li>{{ $t('Opdrachten van klanten uit de buurt, in de talen die u spreekt. Geen abonnement: u betaalt alleen voor een aanvraag waarop u reageert, en de eerste is gratis.') }}</li>
           <li>{{ $t('Fachora Protect: de klant reserveert het bedrag vooraf, u wordt uitbetaald na zijn akkoord.') }}</li>
           <li>{{ $t('Het keurmerk Fachora Verified op uw profiel en in elke aanbieding.') }}</li>
           <li>{{ $t('Geen ongevraagde telefoontjes: de klant kiest op zijn pagina, u krijgt zijn gegevens pas daarna.') }}</li>
@@ -275,7 +280,7 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
           <ul class="fa-ticks cl-steps">
             <li>{{ $t('U bevestigt uw e-mailadres via de link in de mail en kiest een wachtwoord.') }}</li>
             <li>{{ $t('U vult het profiel aan: talen, werkgebied, tarieven, garantie.') }}</li>
-            <li>{{ $t('Fachora controleert de registers, uw telefoonnummer en uw bankrekening (via Stripe). Daarna bent u Fachora Verified en ontvangt u opdrachten.') }}</li>
+            <li>{{ $t('Fachora controleert de registers, uw telefoonnummer en uw bankrekening (via Mollie). Daarna bent u Fachora Verified en ontvangt u opdrachten.') }}</li>
           </ul>
         </div>
 
@@ -330,10 +335,24 @@ const confirmClaim = () => confirmForm.post(route('fachora.claim.confirm', props
     <!-- ===== OPTOUT ===== -->
     <template v-else-if="mode === 'optout'">
       <div class="fa-card cl-sent">
-        <template v-if="valid">
+        <template v-if="valid && done === 'remove'">
+          <div class="cl-sent-icon"><span class="ic" v-html="icon('check', 28)"></span></div>
+          <h1 class="fa-h1">{{ $t('Profiel verwijderd') }}</h1>
+          <p class="fa-lead">{{ $t('We hebben het profiel en de gegevens van uw bedrijf verwijderd. Alleen het NIP bewaren we, zodat we uw bedrijf niet opnieuw opnemen. U krijgt geen e-mail meer van ons.') }}</p>
+        </template>
+        <template v-else-if="valid && done === 'email'">
           <div class="cl-sent-icon"><span class="ic" v-html="icon('check', 28)"></span></div>
           <h1 class="fa-h1">{{ $t('Afgemeld') }}</h1>
           <p class="fa-lead">{{ $t('We sturen geen e-mail meer aan :name. Verandert u van gedachten, mail ons dan; we zetten het graag weer aan.', { name: provider?.name || '' }) }}</p>
+          <button v-if="canRemove" type="button" class="fa-link" :disabled="optoutForm.processing" @click="optoutAction('remove')">{{ $t('Ook mijn profiel verwijderen') }}</button>
+        </template>
+        <template v-else-if="valid">
+          <h1 class="fa-h1">{{ $t('Wat wilt u?') }}</h1>
+          <p class="fa-lead">{{ provider?.name }}</p>
+          <div class="fa-actions">
+            <button type="button" class="fa-btn" :disabled="optoutForm.processing" @click="optoutAction('email')">{{ $t('Geen e-mail meer van Fachora') }}</button>
+            <button v-if="canRemove" type="button" class="fa-btn fa-btn--secondary" :disabled="optoutForm.processing" @click="optoutAction('remove')">{{ $t('Mijn profiel verwijderen') }}</button>
+          </div>
         </template>
         <template v-else>
           <h1 class="fa-h1">{{ $t('Deze link is niet (meer) geldig') }}</h1>

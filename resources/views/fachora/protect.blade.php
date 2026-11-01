@@ -1,7 +1,7 @@
 @extends('layouts.marketing')
 
-{{-- Fachora Protect: po co, jak płyną pieniądze (Stripe, rezerwacja, wypłata po akceptacji, spór), czego nie obejmuje, terminy, FAQ.
-     Uczciwie: płatność obsługuje Stripe, Fachora nie przechowuje pieniędzy klientów. Liczby z config/fachora.php. --}}
+{{-- Fachora Protect: po co, jak płyną pieniądze (Mollie, rezerwacja, wypłata po akceptacji, spór), czego nie obejmuje, terminy, FAQ.
+     Uczciwie: płatność obsługuje Mollie, Fachora nie przechowuje pieniędzy klientów. Liczby z config/fachora.php. --}}
 
 @php
   $fee = config('fachora.fee_percent');
@@ -14,7 +14,7 @@
 @endphp
 
 @section('title', 'Fachora Protect — płacisz dopiero, gdy praca jest wykonana')
-@section('description', 'Fachora Protect: rezerwujesz ustaloną kwotę przez Stripe (BLIK, Przelewy24, karta), firma wykonuje pracę, Ty akceptujesz w ciągu ' . $acceptDays . ' dni, dopiero wtedy firma dostaje wypłatę. W sporze pieniądze pozostają zablokowane. Fachora nie przechowuje Twoich pieniędzy.')
+@section('description', 'Fachora Protect: rezerwujesz ustaloną kwotę przez Mollie (BLIK, Przelewy24, karta), firma wykonuje pracę, Ty akceptujesz w ciągu ' . $acceptDays . ' dni, dopiero wtedy firma dostaje wypłatę. W sporze pieniądze pozostają zablokowane. Fachora nie przechowuje Twoich pieniędzy.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -39,7 +39,7 @@
     <div class="fh-steps cols-3">
       <div class="fh-step"><h3>„Przyjadę jutro”</h3><p>Fachowiec, który nie przyjeżdża. Przy Protect firma wie, że pieniądze są zarezerwowane, a no-show po rezerwacji oznacza usunięcie z platformy.</p></div>
       <div class="fh-step"><h3>Cena, która rośnie na miejscu</h3><p>Kwota w potwierdzeniu zlecenia jest ostateczna. Dodatkowe prace to osobna pozycja, którą zatwierdzasz albo nie. Bez zatwierdzenia nie ma rachunku.</p></div>
-      <div class="fh-step"><h3>Gotówka bez faktury</h3><p>Płatność idzie przez Stripe, więc jest ślad, a firma Verified zawsze wystawia fakturę. To podstawa gwarancji i ewentualnej reklamacji.</p></div>
+      <div class="fh-step"><h3>Gotówka bez faktury</h3><p>Płatność idzie przez Mollie, więc jest ślad, a firma Verified zawsze wystawia fakturę. To podstawa gwarancji i ewentualnej reklamacji.</p></div>
     </div>
   </div>
 </section>
@@ -48,13 +48,13 @@
   <div class="container">
     <div class="eyebrow">Jak płyną pieniądze</div>
     <h2>Cztery kroki, zero niespodzianek</h2>
-    <p class="lead">Płatność obsługuje Stripe, licencjonowana instytucja płatnicza. Fachora nie prowadzi własnego rachunku na pieniądze klientów i nigdy ich nie przechowuje.</p>
+    <p class="lead">Płatność obsługuje Mollie B.V., licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank. Fachora nie prowadzi własnego rachunku na pieniądze klientów i nigdy ich nie przechowuje.</p>
     <div class="fh-band-grid">
       <div class="fh-flow">
-        <div class="fh-flow-item"><div class="nr">1</div><div><b>Rezerwacja</b><p>Po wyborze firmy płacisz kwotę z potwierdzenia zlecenia przez BLIK, Przelewy24 lub kartę. Pieniądze trafiają do Stripe i są oznaczone jako zarezerwowane na to zlecenie.</p></div></div>
+        <div class="fh-flow-item"><div class="nr">1</div><div><b>Rezerwacja</b><p>Po wyborze firmy płacisz kwotę z potwierdzenia zlecenia przez BLIK, Przelewy24 lub kartę. Pieniądze trafiają do Mollie i są oznaczone jako zarezerwowane na to zlecenie.</p></div></div>
         <div class="fh-flow-item"><div class="nr">2</div><div><b>Praca</b><p>Firma potwierdza termin, zgłasza start i koniec. Dodatkowe prace zatwierdzasz na swojej stronie zlecenia; wtedy dopłacasz tylko tę pozycję.</p></div></div>
         <div class="fh-flow-item"><div class="nr">3</div><div><b>Akceptacja</b><p>Masz {{ $acceptDays }} dni od zgłoszenia „gotowe”. Akceptujesz albo otwierasz spór. Brak reakcji po {{ $acceptDays }} dniach to akceptacja automatyczna.</p></div></div>
-        <div class="fh-flow-item"><div class="nr">4</div><div><b>Wypłata</b><p>Stripe przekazuje kwotę firmie, pomniejszoną o prowizję Fachory ({{ $fee }}%), którą płaci firma. Ty płacisz dokładnie tyle, ile ustaliliście.</p></div></div>
+        <div class="fh-flow-item"><div class="nr">4</div><div><b>Wypłata</b><p>Mollie przekazuje kwotę firmie, pomniejszoną o prowizję Fachory ({{ $fee }}%), którą płaci firma. Ty płacisz dokładnie tyle, ile ustaliliście.</p></div></div>
       </div>
       <div>
         <div class="fh-band-card">
@@ -66,7 +66,7 @@
             <tr><td>Prowizja Fachory ({{ $fee }}%)</td><td class="r">płaci firma</td></tr>
             <tr class="tot"><td>Zapłaciłeś</td><td class="r">480,00 zł</td></tr>
           </table>
-          <div class="ex">Przykład. Przy sporze kwota pozostaje w Stripe do rozstrzygnięcia.</div>
+          <div class="ex">Przykład. Przy sporze kwota pozostaje w Mollie do rozstrzygnięcia.</div>
         </div>
         <div class="note">
           <b>Spór:</b> pieniądze nie ruszają się, dopóki Fachora nie rozstrzygnie. Możliwe wyniki: pełna wypłata, częściowa wypłata i zwrot reszty, naprawa w nowym terminie albo pełny zwrot na Twoje konto. Firma ma {{ $disputeHours }} godzin na odpowiedź; bez niej decyzja jest po Twojej stronie.
@@ -115,7 +115,7 @@
       <div class="fh-time"><div class="v">{{ $warranty }} mies.</div><span>standardowa gwarancja na wykonaną pracę</span></div>
     </div>
     <div class="fh-note" style="max-width:860px;margin:28px auto 0;">
-      <b>Uczciwie o tym, kto trzyma pieniądze.</b> Fachora jest usługą Budomatch (Białka, Polska) i nie jest instytucją płatniczą. Rezerwację, przechowanie i wypłatę obsługuje Stripe, działający na podstawie europejskiej licencji płatniczej. Fachora widzi status płatności i decyduje, kiedy Stripe ma ją wypłacić albo zwrócić, ale nigdy nie ma Twoich pieniędzy na własnym koncie.
+      <b>Uczciwie o tym, kto trzyma pieniądze.</b> Fachora jest usługą Creditline B.V. (Bussum, Holandia) i nie jest instytucją płatniczą. Rezerwację, przechowanie i wypłatę obsługuje Mollie B.V. — licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank. Fachora widzi status płatności i decyduje, kiedy Mollie ma ją wypłacić albo zwrócić, ale nigdy nie ma Twoich pieniędzy na własnym koncie.
     </div>
   </div>
 </section>
@@ -128,10 +128,10 @@
     </div>
     <div class="faq-list">
       <details class="faq-item"><summary>Czy Protect kosztuje dodatkowo?{!! $chev !!}</summary><div class="faq-content">Nie. Dla klientów Fachora Protect nie kosztuje nic dodatkowego. Prowizję od wykonanego zlecenia ({{ $fee }}%) płaci firma i jest ona potrącana przy wypłacie.</div></details>
-      <details class="faq-item"><summary>Kiedy pieniądze schodzą z mojego konta?{!! $chev !!}</summary><div class="faq-content">W momencie rezerwacji, czyli po wyborze firmy. BLIK i Przelewy24 nie znają „blokady” jak karty, dlatego kwota jest pobierana i trzymana w Stripe na to zlecenie. Firma nie ma do niej dostępu aż do Twojej akceptacji.</div></details>
+      <details class="faq-item"><summary>Kiedy pieniądze schodzą z mojego konta?{!! $chev !!}</summary><div class="faq-content">W momencie rezerwacji, czyli po wyborze firmy. BLIK i Przelewy24 nie znają „blokady” jak karty, dlatego kwota jest pobierana i trzymana w Mollie na to zlecenie. Firma nie ma do niej dostępu aż do Twojej akceptacji.</div></details>
       <details class="faq-item"><summary>Co się dzieje, gdy odwołam zlecenie?{!! $chev !!}</summary><div class="faq-content">Do {{ $cancelHours }} godzin przed terminem: pełny zwrot. Później firma może zatrzymać koszt dojazdu z oferty, reszta wraca do Ciebie. Jeśli to firma odwołuje bez powodu, dostajesz pełny zwrot, a firma wpis w historii, który bierzemy pod uwagę przy ocenie.</div></details>
       <details class="faq-item"><summary>Nie zdążyłem zaakceptować w {{ $acceptDays }} dni. Co teraz?{!! $chev !!}</summary><div class="faq-content">Zlecenie zostało uznane za przyjęte i firma dostała wypłatę. Gwarancja jednak trwa: w ciągu {{ $warranty }} miesięcy możesz zgłosić reklamację na stronie zlecenia i firma musi odpowiedzieć w {{ $disputeHours }} godzin.</div></details>
-      <details class="faq-item"><summary>Ile trwa zwrot?{!! $chev !!}</summary><div class="faq-content">Zwrot zleca Stripe na ten sam sposób płatności, którym zapłaciłeś. Zwykle pojawia się na koncie w ciągu kilku dni roboczych; przy kartach czasem zależy to od banku wydawcy.</div></details>
+      <details class="faq-item"><summary>Ile trwa zwrot?{!! $chev !!}</summary><div class="faq-content">Zwrot realizuje Mollie na ten sam sposób płatności, którym zapłaciłeś. Zwykle pojawia się na koncie w ciągu kilku dni roboczych; przy kartach czasem zależy to od banku wydawcy.</div></details>
       <details class="faq-item"><summary>Czy mogę zapłacić bez Protect?{!! $chev !!}</summary><div class="faq-content">Tak, bezpośrednio firmie po wykonaniu pracy. Wtedy nie ma blokady pieniędzy ani rozstrzygania sporu z udziałem płatności. Weryfikacja firmy, faktura i gwarancja firmy pozostają.</div></details>
     </div>
     <div class="fh-more"><a href="{{ route('pl.faq') }}">Wszystkie pytania i odpowiedzi →</a></div>

@@ -38,7 +38,12 @@ Route::middleware('brand:fachora')->group(function () {
     Route::prefix('zlecenie/{token}')->where(['token' => '[a-f0-9]{64}'])->name('fachora.job.')->group(function () {
         Route::get('potwierdz', [JobController::class, 'confirmShow'])->name('confirm.show');
         Route::post('potwierdz', [JobController::class, 'confirm'])->middleware('throttle:20,1')->name('confirm');
+        Route::post('potwierdz/zmien', [JobController::class, 'updatePending'])->middleware('throttle:20,1')->name('confirm.update');
         Route::get('/', [JobController::class, 'show'])->name('show');
+        Route::post('firmy', [JobController::class, 'select'])->middleware('throttle:20,1')->name('select');
+        Route::post('sms', [JobController::class, 'smsSend'])->middleware('throttle:5,1')->name('sms.send');
+        Route::post('sms/kod', [JobController::class, 'smsVerify'])->middleware('throttle:10,1')->name('sms.verify');
+        Route::get('oplacono', [JobController::class, 'requestPaid'])->middleware('throttle:20,1')->name('request.paid');
         Route::post('wybierz/{offer}', [JobController::class, 'choose'])->middleware('throttle:20,1')->name('choose');
         Route::post('zaplac', [JobController::class, 'pay'])->middleware('throttle:20,1')->name('pay');
         Route::get('zaplacono', [JobController::class, 'paid'])->name('paid');
@@ -55,6 +60,8 @@ Route::middleware('brand:fachora')->group(function () {
         Route::get('/', [OfferController::class, 'show'])->name('show');
         Route::post('/', [OfferController::class, 'respond'])->middleware('throttle:20,1')->name('respond');
         Route::post('odrzuc', [OfferController::class, 'decline'])->middleware('throttle:20,1')->name('decline');
+        Route::post('odblokuj', [OfferController::class, 'unlock'])->middleware('throttle:20,1')->name('unlock');
+        Route::get('odblokowano', [OfferController::class, 'unlocked'])->middleware('throttle:20,1')->name('unlocked');
         Route::get('plik/{file}', [OfferController::class, 'file'])->whereNumber('file')->middleware('throttle:120,1')->name('file');
     });
 
@@ -71,6 +78,7 @@ Route::middleware('brand:fachora')->group(function () {
     Route::get('/dla-firm/zglos', [ClaimController::class, 'apply'])->name('fachora.apply');
     Route::post('/dla-firm/zglos', [ClaimController::class, 'applyStore'])->middleware(['throttle:10,1', 'turnstile'])->name('fachora.apply.store');
     Route::get('/rezygnacja/{token}', [ClaimController::class, 'optout'])->where('token', '[a-f0-9]{64}')->name('fachora.optout');
+    Route::post('/rezygnacja/{token}', [ClaimController::class, 'optoutConfirm'])->where('token', '[a-f0-9]{64}')->middleware('throttle:10,1')->name('fachora.optout.confirm');
 
     // ---------- bedrijf: panel (ingelogd) ----------
     Route::middleware('auth')->prefix('fachora')->name('fachora.')->group(function () {
