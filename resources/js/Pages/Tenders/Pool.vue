@@ -380,9 +380,9 @@ const hours = (h) => h === null ? '—' : (h < 48 ? t(':n uur', { n: h }) : t(':
             <textarea v-model="importForm.lines" rows="8" placeholder="Jansen Funderingstechniek; info@jansen.nl; 035-1234567; Hilversum; Schroefpalen, Grondwerk"></textarea>
             <div v-if="importForm.errors.lines" class="field-error">{{ importForm.errors.lines }}</div>
           </div>
-          <div class="sub" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.6;">
-            <span>{{ $t('Of kies een bestand met deze regels (.txt of .csv):') }}</span>
-            <input type="file" accept=".txt,.csv,text/plain,text/csv" style="width:auto;height:auto;padding:0;border:0;" @change="loadImportFile">
+          <div class="form-group" style="margin-bottom:0;">
+            <label>{{ $t('Of kies een bestand met deze regels (.txt of .csv):') }}</label>
+            <input type="file" accept=".txt,.csv,text/plain,text/csv" @change="loadImportFile">
           </div>
           <div v-if="importFileError" class="field-error">{{ importFileError }}</div>
         </div>

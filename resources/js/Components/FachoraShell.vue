@@ -132,6 +132,11 @@ const year = new Date().getFullYear();
 .fa-field textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
 .fa-field input:focus, .fa-field textarea:focus, .fa-field select:focus, .fa-input:focus { outline: 2px solid #8FC4F2; outline-offset: 1px; border-color: #8FC4F2; }
 .fa-field input[aria-invalid="true"], .fa-field textarea[aria-invalid="true"] { border-color: #F87171; }
+.fa-field input[type="file"] { width: 100%; min-height: 48px; border: 1px solid #C5CFDC; border-radius: 10px; padding: 6px 14px 6px 6px; line-height: 34px; font-size: 14px; font-family: inherit; color: #64748B; background: #fff; cursor: pointer; }
+.fa-field input[type="file"]::file-selector-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0B2545; background: #EAF2FB; border: 1px solid #8FC4F2; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
+.fa-field input[type="file"]::-webkit-file-upload-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0B2545; background: #EAF2FB; border: 1px solid #8FC4F2; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
+.fa-field input[type="file"]:hover::file-selector-button { background: #D9E8F7; }
+.fa-field input[type="file"]:hover::-webkit-file-upload-button { background: #D9E8F7; }
 .fa-err { color: #B91C1C; font-size: 13px; margin-top: 5px; }
 .fa-row { display: grid; grid-template-columns: 1fr; gap: 0 14px; }
 @media (min-width: 560px) { .fa-row { grid-template-columns: 1fr 1fr; } }

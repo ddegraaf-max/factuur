@@ -199,7 +199,7 @@ const lettersUrl = computed(() => route('fachora.admin.letters', {
           </div>
           <div class="form-group">
             <label>{{ $t('Of een bestand (.txt of .csv)') }}</label>
-            <input type="file" accept=".txt,.csv,text/plain,text/csv" class="fx-file-input" @change="pickImport">
+            <input type="file" accept=".txt,.csv,text/plain,text/csv" @change="pickImport">
             <div v-if="importForm.errors.file" class="field-error">{{ importForm.errors.file }}</div>
           </div>
           <div class="form-row">
@@ -269,7 +269,6 @@ const lettersUrl = computed(() => route('fachora.admin.letters', {
 .fx-dot.off { background: var(--border-strong); }
 .fx-geo { color: var(--success); vertical-align: middle; display: inline-flex; }
 .fx-geo.off { color: var(--text-4); }
-.fx-file-input { width: auto !important; height: auto !important; padding: 0 !important; border: 0 !important; }
 .pagination { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
 .pagination .sub { margin-right: 8px; }
 .page-link { padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 12.5px; color: var(--text-2); background: var(--surface); }

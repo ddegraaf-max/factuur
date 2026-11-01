@@ -260,7 +260,7 @@ const radiusLabel = computed(() => form.radius_km + ' km');
           <div class="card-body fx-photo-row">
             <div class="fx-avatar"><img v-if="preview" :src="preview" alt=""><span v-else v-html="icon('tools', 28)"></span></div>
             <div>
-              <input type="file" accept="image/*" class="fx-file-input" @change="pickPhoto">
+              <input type="file" accept="image/*" @change="pickPhoto">
               <div class="sub">{{ $t('JPG of PNG, maximaal 1 MB.') }}</div>
               <div v-if="form.errors.photo" class="field-error">{{ form.errors.photo }}</div>
             </div>
@@ -335,7 +335,7 @@ const radiusLabel = computed(() => form.radius_km + ' km');
 .fx-avatar { width: 84px; height: 84px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-3); flex: none; }
 .fx-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .fx-avatar--sm { width: 56px; height: 56px; }
-.fx-file-input { width: auto !important; height: auto !important; padding: 0 !important; border: 0 !important; }
+.fx-photo-row > div { flex: 1; min-width: 0; }
 .fx-save { display: flex; align-items: center; gap: 12px; }
 .fx-preview { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
 .fx-preview-name { font-weight: 600; font-size: 15px; }

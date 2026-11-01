@@ -215,7 +215,7 @@ const replyDispute = () => disputeForm.post(route('fachora.jobs.dispute', props.
             </div>
             <div class="form-group">
               <label>{{ $t("Foto's van het resultaat") }} <span class="label-hint">{{ $t('(max. 8)') }}</span></label>
-              <input type="file" accept="image/*" multiple class="fx-file-input" @change="pickPhotos">
+              <input type="file" accept="image/*" multiple @change="pickPhotos">
               <div v-if="doneForm.photos.length" class="sub">{{ $t(':n foto\'s gekozen', { n: doneForm.photos.length }) }}</div>
               <div v-if="doneForm.errors.photos" class="field-error">{{ doneForm.errors.photos }}</div>
             </div>
@@ -385,7 +385,6 @@ const replyDispute = () => disputeForm.post(route('fachora.jobs.dispute', props.
 .fx-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .fx-file { display: flex; align-items: center; justify-content: center; height: 100%; padding: 8px; font-size: 11px; text-align: center; word-break: break-all; color: var(--text-2); }
 .fx-inline-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
-.fx-file-input { width: auto !important; height: auto !important; padding: 0 !important; border: 0 !important; }
 .stars { color: var(--accent, #F4781F); letter-spacing: 1px; }
 .fx-timeline { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
 .fx-timeline li { position: relative; font-size: 13px; }

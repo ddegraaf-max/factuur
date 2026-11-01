@@ -149,6 +149,67 @@ a { color: inherit; text-decoration: none; }
 .field-error { color: var(--brand); font-size: 12px; margin-top: 4px; }
 .muted { color: var(--text-4); font-weight: 400; font-size: 12px; }
 
+/* ---- Bestandsvelden: de kale browserknop ("Bestand kiezen") in de huisstijl ----
+   De knoptekst blijft van de browser (dus vanzelf in de taal van de bezoeker);
+   alleen het uiterlijk is van ons. Pagina's die het veld liever achter een eigen
+   knop verbergen (display:none + ref) blijven zoals ze zijn. */
+input[type="file"],
+.form-group input[type="file"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 42px;
+  padding: 5px 12px 5px 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 30px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type="file"]::file-selector-button {
+  font: inherit;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  height: 30px;
+  padding: 0 12px;
+  margin: 0 10px 0 0;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+input[type="file"]::-webkit-file-upload-button {
+  font: inherit;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  height: 30px;
+  padding: 0 12px;
+  margin: 0 10px 0 0;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+input[type="file"]:hover { border-color: var(--border-strong); }
+input[type="file"]:hover::file-selector-button { background: var(--surface-3); border-color: var(--border-strong); }
+input[type="file"]:hover::-webkit-file-upload-button { background: var(--surface-3); border-color: var(--border-strong); }
+input[type="file"]:focus,
+.form-group input[type="file"]:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+input[type="file"]:disabled { opacity: 0.5; cursor: not-allowed; }
+input[type="file"]:disabled::file-selector-button { cursor: not-allowed; }
+
 /* ============ BUTTONS (shared) ============ */
 .btn {
   display: inline-flex;

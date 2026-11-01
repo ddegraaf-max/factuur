@@ -441,6 +441,12 @@
   }
   .m-field input:focus, .m-field textarea:focus, .m-field select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
   .m-field .m-err { color: var(--brand); font-size: 13px; margin-top: 4px; }
+  /* Bestandsveld: de browserknop ("Bestand kiezen") als pilknop in het veld, zoals .btn-secondary. */
+  .m-field input[type="file"] { padding: 6px 14px 6px 6px; line-height: 32px; font-size: 14px; color: var(--text-3); cursor: pointer; }
+  .m-field input[type="file"]::file-selector-button { font: inherit; font-weight: 600; font-size: 13.5px; line-height: 1; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 100px; height: 32px; padding: 0 16px; margin: 0 12px 0 0; cursor: pointer; transition: all 0.15s; }
+  .m-field input[type="file"]::-webkit-file-upload-button { font: inherit; font-weight: 600; font-size: 13.5px; line-height: 1; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 100px; height: 32px; padding: 0 16px; margin: 0 12px 0 0; cursor: pointer; transition: all 0.15s; }
+  .m-field input[type="file"]:hover::file-selector-button { background: var(--surface-2); border-color: var(--text-4); }
+  .m-field input[type="file"]:hover::-webkit-file-upload-button { background: var(--surface-2); border-color: var(--text-4); }
   .m-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 600px) { .m-row-2 { grid-template-columns: 1fr; } }
   .alert-success { background: var(--success-bg); color: var(--success); border: 1px solid #6EE7B7; padding: 14px 16px; border-radius: 12px; margin-bottom: 18px; font-weight: 600; font-size: 14px; }

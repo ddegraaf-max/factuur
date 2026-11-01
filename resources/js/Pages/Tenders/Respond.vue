@@ -174,6 +174,8 @@ h1 { font-size: 22px; margin: 0 0 8px; letter-spacing: -0.015em; }
 .tr-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; }
 .tr-hint { font-weight: 400; color: #78716C; font-size: 12px; }
 .tr-field input, .tr-field textarea { width: 100%; box-sizing: border-box; border: 1px solid #D6D3D1; border-radius: 8px; padding: 9px 12px; font-size: 14px; font-family: inherit; }
+.tr-field input[type="file"] { padding: 4px 12px 4px 4px; line-height: 28px; font-size: 13px; color: #78716C; }
+.tr-field input[type="file"]::file-selector-button { height: 28px; }
 .tr-money { display: flex; align-items: center; border: 1px solid #D6D3D1; border-radius: 8px; padding-left: 10px; }
 .tr-money span { color: #78716C; }
 .tr-money input { border: 0; }

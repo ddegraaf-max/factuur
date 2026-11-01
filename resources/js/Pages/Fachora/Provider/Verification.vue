@@ -199,7 +199,7 @@ const standard = [
               <li v-for="f in insurance_files" :key="f.id"><a :href="f.url" target="_blank" rel="noopener">{{ f.filename }}</a></li>
             </ul>
             <form class="fx-inline" @submit.prevent="uploadInsurance">
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" class="fx-file-input" @change="pickInsurance">
+              <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" @change="pickInsurance">
               <label class="sub" style="display:flex;align-items:center;gap:6px;">{{ $t('Geldig tot') }} <input type="date" v-model="insuranceForm.until" :min="todayLocal()" style="width:160px;"></label>
               <button type="submit" class="btn btn-secondary btn-sm" :disabled="insuranceForm.processing || !insuranceForm.file">{{ $t('Polis uploaden') }}</button>
             </form>
@@ -274,7 +274,7 @@ const standard = [
 .fx-opt { font-size: 11px; font-weight: 500; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-left: 6px; }
 .fx-inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .fx-inline input[type=text], .fx-inline input[type=date] { height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: 6px; font: inherit; font-size: 13px; }
-.fx-file-input { width: auto !important; height: auto !important; padding: 0 !important; border: 0 !important; }
+.fx-inline input[type=file] { flex: 1 1 260px; width: auto; }
 .fx-link { color: var(--brand); font-weight: 600; }
 .fx-ok { color: var(--success); font-weight: 600; }
 .fx-due { margin: 0 0 10px; padding-left: 18px; font-size: 12.5px; color: var(--warning); font-family: var(--font-mono); }
