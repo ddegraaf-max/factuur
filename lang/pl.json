@@ -2001,5 +2001,21 @@
   "Het bedrijf houdt de voorrijkosten (:amount) omdat je binnen :hours uur voor de afspraak annuleerde; de rest gaat terug naar je rekening.": "Firma zatrzymuje koszt dojazdu (:amount), ponieważ zlecenie zostało odwołane na mniej niż :hours godzin przed terminem; reszta wraca na Twoje konto.",
   "Voorrijkosten ingehouden: :amount (annulering binnen :hours uur)": "Potrącono koszt dojazdu: :amount (odwołanie na mniej niż :hours godz. przed terminem)",
   "Vink aan dat je om uitvoering binnen de bedenktermijn vraagt.": "Zaznacz, że żądasz wykonania usługi przed upływem terminu odstąpienia.",
-  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "Nie udało się teraz wysłać e-maila. Spróbuj ponownie za minutę lub skontaktuj się z nami."
+  "We konden de e-mail nu niet versturen. Probeer het over een minuut nog eens of neem contact met ons op.": "Nie udało się teraz wysłać e-maila. Spróbuj ponownie za minutę lub skontaktuj się z nami.",
+  "Start de demo": "Uruchom demo",
+  "Je toegang is goedgekeurd · elke start is een verse voorbeeldomgeving · geen creditcard": "Dostęp zatwierdzony · każde uruchomienie to świeże środowisko z przykładami · bez karty",
+  "Bedankt, je aanvraag is binnen.": "Dziękujemy, Twoja prośba dotarła.",
+  "Je krijgt een e-mail met je persoonlijke link zodra de demo voor je is klaargezet — meestal dezelfde dag.": "Otrzymasz e-mail z osobistym linkiem, gdy demo będzie dla Ciebie gotowe — zwykle tego samego dnia.",
+  "Bedrijf": "Firma",
+  "(optioneel)": "(opcjonalnie)",
+  "Waar wil je naar kijken?": "Co chcesz zobaczyć?",
+  "Vraag toegang tot de demo": "Poproś o dostęp do demo",
+  "Persoonlijke toegang: je krijgt een e-mail met je link zodra we je aanvraag hebben goedgekeurd · geen creditcard": "Dostęp osobisty: otrzymasz e-mail z linkiem, gdy zatwierdzimy Twoją prośbę · bez karty",
+  "Deze demolink is verlopen of nog niet goedgekeurd. Vraag hieronder opnieuw toegang aan.": "Ten link do demo wygasł lub nie został jeszcze zatwierdzony. Poproś o dostęp ponownie poniżej.",
+  "Je demo van :brand staat klaar": "Twoje demo :brand jest gotowe",
+  "Je demo staat klaar": "Twoje demo jest gotowe",
+  "Je vroeg toegang tot de demo van :brand. Die is goedgekeurd: met de knop hieronder start je een eigen, afgeschermde voorbeeldomgeving. Alle gegevens zijn voorbeelden en er gaat geen e-mail naar echte ontvangers.": "Poprosiłeś(-aś) o dostęp do demo :brand. Prośba została zatwierdzona: przyciskiem poniżej uruchomisz własne, odizolowane środowisko z przykładami. Wszystkie dane są przykładowe i żaden e-mail nie trafia do prawdziwych odbiorców.",
+  "Werkt de knop niet? Kopieer dan deze link:": "Przycisk nie działa? Skopiuj ten link:",
+  "De link werkt tot :date en mag je vaker gebruiken; elke start is een verse omgeving die na 24 uur vanzelf wordt opgeruimd.": "Link działa do :date i możesz go użyć wielokrotnie; każde uruchomienie to świeże środowisko, które po 24 godzinach samo się czyści.",
+  "Vroeg je geen demo aan? Dan kun je deze e-mail negeren.": "Nie prosiłeś(-aś) o demo? Zignoruj tę wiadomość."
 }

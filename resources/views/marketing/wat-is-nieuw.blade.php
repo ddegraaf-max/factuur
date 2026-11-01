@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 november 2026 · {{ brand('version_prefix') }} 1.85.4</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 november 2026 · {{ brand('version_prefix') }} 1.86.0</div>
+        <h2>Demo op aanvraag</h2>
+        <ul class="tl-list">
+          <li><b>Even je e-mailadres achterlaten</b> — de demo start niet meer met één klik. Wie wil rondkijken, laat naam en e-mailadres achter (en eventueel waar hij naar wil kijken); wij keuren de aanvraag goed en je krijgt een persoonlijke link. Die werkt twee weken en mag je vaker gebruiken: elke start is een verse voorbeeldomgeving.</li>
+          <li><b>Waarom</b> — zo weten we wie er rondkijkt, kunnen we je helpen als je ergens tegenaan loopt, en blijft de demo een plek voor echte interesse.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">1 november 2026 · {{ brand('version_prefix') }} 1.85.4</div>
         <h2>Project: netto, btw en bruto helder naast elkaar</h2>
         <ul class="tl-list">
           <li><b>Nieuw blok Geld en btw</b> — op de projectpagina staan gefactureerd, ontvangen, nog te ontvangen, inkoop en uren nu in drie kolommen: excl. btw, btw en incl. btw. Onderaan het totaal: je resultaat, de btw die je afdraagt (of terugvraagt) en het bruto saldo.</li>

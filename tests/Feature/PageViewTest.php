@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Tests\Support\UsesDemoCompany;
+use Tests\Support\StartsDemo;
 use Tests\TestCase;
 
 /**
@@ -16,7 +17,7 @@ use Tests\TestCase;
  */
 class PageViewTest extends TestCase
 {
-    use RefreshDatabase, UsesDemoCompany;
+    use RefreshDatabase, StartsDemo, UsesDemoCompany;
 
     private const BROWSER = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
@@ -78,7 +79,7 @@ class PageViewTest extends TestCase
 
     public function test_starting_the_demo_is_a_milestone(): void
     {
-        $this->withHeaders(['User-Agent' => self::BROWSER])->post('/demo')->assertRedirect();
+        $this->withHeaders(['User-Agent' => self::BROWSER])->post($this->demoStartUrl())->assertRedirect();
 
         $this->assertSame(1, PageView::where('event', PageView::EVENT_DEMO)->count());
     }

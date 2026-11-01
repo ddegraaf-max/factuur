@@ -32,26 +32,14 @@
   <div class="container page-hero-inner">
     <div class="eyebrow">Demo</div>
     <h1>Panel firmy Fachora. Prawdziwy, z przykładowymi zleceniami.</h1>
-    <p class="lead">Jedno kliknięcie i jesteś w panelu fikcyjnej firmy <strong>Hydro-Serwis Nowak</strong> z Warszawy: dwa nowe zlecenia czekają na Twoją cenę, jedna wycena na decyzję klienta, wizyta jutro o 10:00, jedna praca w toku i jedna do odbioru. Klikaj, wyceniaj, oznaczaj jako wykonane. Nic nie trafia do prawdziwych klientów.</p>
+    <p class="lead">Z osobistym linkiem jesteś w panelu fikcyjnej firmy <strong>Hydro-Serwis Nowak</strong> z Warszawy: dwa nowe zlecenia czekają na Twoją cenę, jedna wycena na decyzję klienta, wizyta jutro o 10:00, jedna praca w toku i jedna do odbioru. Klikaj, wyceniaj, oznaczaj jako wykonane. Nic nie trafia do prawdziwych klientów.</p>
   </div>
 </section>
 
 <section class="section" style="padding-top:24px;">
   <div class="container demo-wrap">
 
-    <div class="demo-start">
-      @if (session('error'))
-        <div style="background:var(--brand-tint);border:1px solid var(--brand-border);color:var(--brand-darker);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:14px;">
-          {{ session('error') }}
-        </div>
-      @endif
-
-      <form method="POST" action="{{ route('demo.start') }}">
-        @csrf
-        <button type="submit" class="btn btn-primary btn-lg">Uruchom demo →</button>
-      </form>
-      <div class="demo-note">Bez konta · bez karty · bez e-maili do kogokolwiek</div>
-    </div>
+    @include('demo.request-form')
 
     <div class="demo-feats">
       <div class="demo-feat">
