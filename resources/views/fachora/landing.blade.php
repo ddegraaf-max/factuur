@@ -27,10 +27,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="container hero-inner">
-    <div class="eyebrow">Sprawdzone firmy. Bezpieczne usługi.</div>
-    <h1>Zaufani fachowcy <span class="accent">w całej Polsce.</span></h1>
+    <div class="eyebrow">Fachowcy w całej Polsce. Ty decydujesz.</div>
+    <h1>Sam wybierasz, <span class="accent">kto dostanie zlecenie.</span></h1>
     <p class="hero-sub">
-      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru przedsiębiorców. Sam wybierasz, do kogo trafi zapytanie. Bez konta, bez obdzwaniania po znajomych, bez niechcianych telefonów.
+      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru przedsiębiorców. Zaznaczasz, do kogo ma trafić zapytanie, porównujesz ceny i płacisz dopiero po pracy.
     </p>
     <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Znajdź fachowca">
       <label>
@@ -50,11 +50,16 @@
     </form>
     <ul class="fh-ticks">
       <li>Bezpłatnie dla klientów</li>
-      <li>Ty wybierasz firmy</li>
+      <li>Bez konta i bez obdzwaniania</li>
       <li>Adres tylko dla wybranej firmy</li>
       <li>Faktura i gwarancja {{ $warranty }} mies. od firm Verified</li>
       <li>Obsługa także po angielsku</li>
     </ul>
+    <div class="fh-pick" aria-label="Jak wybierasz firmy">
+      <div><b>do {{ $candidates }}</b><span>firm z Twojej okolicy: Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone.</span></div>
+      <div><b>maks. {{ $maxOffers }}</b><span>zaznaczasz sam i potwierdzasz numer kodem SMS. Tylko one dostają Twoje zapytanie.</span></div>
+      <div><b>1</b><span>wybierasz po porównaniu cen. Dopiero ta firma widzi Twój adres i numer.</span></div>
+    </div>
   </div>
 </section>
 

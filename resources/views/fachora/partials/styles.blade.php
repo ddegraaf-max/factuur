@@ -20,6 +20,12 @@
   .fh-ticks li { display: inline-flex; align-items: center; gap: 7px; }
   .fh-ticks li::before { content: ''; width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; background: var(--success-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='3.5'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center no-repeat; }
   .fh-ticks.left { justify-content: flex-start; }
+  /* Pasek pod wyszukiwarką: „do 15 → maks. 5 → 1”, czyli jak działa wybór firm */
+  .fh-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 880px; margin: 30px auto 0; text-align: left; }
+  @media (max-width: 760px) { .fh-pick { grid-template-columns: 1fr; } }
+  .fh-pick > div { display: flex; gap: 14px; align-items: center; padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .fh-pick b { flex-shrink: 0; font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--brand); line-height: 1; white-space: nowrap; }
+  .fh-pick span { font-size: 13.5px; color: var(--text-2); line-height: 1.45; }
 
   /* ===== Kafelki kategorii ===== */
   .fh-cats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }

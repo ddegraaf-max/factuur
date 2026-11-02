@@ -28,10 +28,10 @@
 <!-- HERO -->
 <section class="hero">
   <div class="container hero-inner">
-    <div class="eyebrow">Verified companies. Safe services.</div>
-    <h1>Trusted tradespeople <span class="accent">across Poland.</span></h1>
+    <div class="eyebrow">Tradespeople across Poland. You decide.</div>
+    <h1>You choose <span class="accent">who gets your job.</span></h1>
     <p class="hero-sub">
-      Describe what needs doing, in English if you like, and we show you companies near you: Fachora Verified companies, checked by us, and companies from the Polish business register. You choose who receives your request. No account, no calling around, no unwanted phone calls.
+      Describe what needs doing, in English if you like, and we show you companies near you: Fachora Verified companies, checked by us, and companies from the Polish business register. You tick who receives your request, compare prices and pay only after the work.
     </p>
     <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Find a tradesperson">
       <label>
@@ -51,11 +51,16 @@
     </form>
     <ul class="fh-ticks">
       <li>Free for customers</li>
-      <li>You pick the companies</li>
+      <li>No account, no calling around</li>
       <li>Your address only for the company you choose</li>
       <li>Invoice and {{ $warranty }}-month warranty from Verified companies</li>
       <li>English-speaking companies</li>
     </ul>
+    <div class="fh-pick" aria-label="How you pick the companies">
+      <div><b>up to {{ $candidates }}</b><span>companies near you: Fachora Verified at the top, register companies clearly marked.</span></div>
+      <div><b>max {{ $maxOffers }}</b><span>you tick yourself and confirm your number with an SMS code. Only they receive your request.</span></div>
+      <div><b>1</b><span>you choose after comparing prices. Only then does that company see your address and number.</span></div>
+    </div>
   </div>
 </section>
 
