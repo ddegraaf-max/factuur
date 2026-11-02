@@ -109,6 +109,11 @@ const mailtoFor = (p) => {
   const m = messageFor(p);
   return 'mailto:' + p.email + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
 };
+// 1.96.4: onthouden dat de klant dit bedrijf benaderde (knoppen blijven groen, ook op een ander apparaat).
+const markContacted = (p, channel) => {
+  router.post(route('fachora.job.direct.contacted', [props.token, p.id]), { channel }, { preserveScroll: true, preserveState: true, only: ['direct'] });
+};
+const done = (p, channel) => !!(p.contacted && p.contacted.channels && p.contacted.channels.includes(channel));
 // 1.96.3: van de lijst halen (en als niemand anders het koos: uit de database).
 const removeDirect = (p) => {
   if (!window.confirm(t('Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.'))) return;
@@ -137,7 +142,7 @@ const copyText = async (key, text, fallbackLabel) => {
     window.prompt(fallbackLabel, text);
   }
 };
-const copyEmail = (p) => copyText(p.id + ':mail', p.email, t('Kopieer het e-mailadres hieronder:'));
+const copyEmail = async (p) => { await copyText(p.id + ':mail', p.email, t('Kopieer het e-mailadres hieronder:')); markContacted(p, 'copy_mail'); };
 const copyMessage = async (p) => {
   const m = messageFor(p);
   const text = m.subject + '\n\n' + m.body;
@@ -154,6 +159,7 @@ const copyMessage = async (p) => {
   } catch (e) {
     window.prompt(t('Kopieer het bericht hieronder:'), text);
   }
+  markContacted(p, 'copy');
 };
 
 /* ---------- sms-code (1.87) ---------- */
@@ -334,10 +340,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
     <section v-if="direct.length" class="jb-section">
       <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
       <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
-      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer">
+      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer" :class="{ 'jb-contacted': p.contacted }">
         <div class="jb-prov">
           <div class="jb-prov-main">
-            <div class="jb-prov-name"><strong>{{ p.name }}</strong></div>
+            <div class="jb-prov-name"><strong>{{ p.name }}</strong><span v-if="p.contacted" class="fa-chip fa-chip--ok jb-contacted-chip">✓ {{ $t('Benaderd op :date', { date: p.contacted.at }) }}</span></div>
             <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template><template v-if="p.phone"> · {{ p.phone }}</template></div>
             <!-- 1.96.2: hoofdactiviteit, zodat de klant ziet welk bedrijf het best past -->
             <div v-if="p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
@@ -346,11 +352,11 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           </div>
         </div>
         <div class="fa-actions">
-          <a v-if="p.email" class="fa-btn" :href="mailtoFor(p)">{{ $t('E-mail sturen') }}</a>
-          <a v-if="p.phone_wa" class="fa-btn jb-wa" :href="whatsappFor(p)" target="_blank" rel="noopener">WhatsApp</a>
-          <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':msg' }" @click="copyMessage(p)">{{ copied === p.id + ':msg' ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
-          <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' }" @click="copyEmail(p)">{{ copied === p.id + ':mail' ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
-          <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
+          <a v-if="p.email" class="fa-btn" :class="{ 'is-copied': done(p, 'mail') }" :href="mailtoFor(p)" @click="markContacted(p, 'mail')">{{ done(p, 'mail') ? '✓ ' : '' }}{{ $t('E-mail sturen') }}</a>
+          <a v-if="p.phone_wa" class="fa-btn jb-wa" :class="{ 'is-copied': done(p, 'whatsapp') }" :href="whatsappFor(p)" target="_blank" rel="noopener" @click="markContacted(p, 'whatsapp')">{{ done(p, 'whatsapp') ? '✓ ' : '' }}WhatsApp</a>
+          <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':msg' || done(p, 'copy') }" @click="copyMessage(p)">{{ copied === p.id + ':msg' || done(p, 'copy') ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
+          <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' || done(p, 'copy_mail') }" @click="copyEmail(p)">{{ copied === p.id + ':mail' || done(p, 'copy_mail') ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
+          <a v-if="p.phone" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'phone') }" :href="'tel:' + p.phone" @click="markContacted(p, 'phone')">{{ done(p, 'phone') ? '✓ ' : '' }}{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
           <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
         <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
@@ -660,6 +666,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-fit-ok { color: #1E7E34; }
 .fa-btn.jb-wa { background: #25D366; color: #fff; }
 .jb-remove { margin-left: auto; color: #8A2A1F; }
+.jb-contacted { border-left: 4px solid #34A853; }
+.jb-contacted-chip { margin-left: 10px; vertical-align: middle; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }

@@ -425,6 +425,44 @@ class JobService
      * @return \Illuminate\Support\Collection<int, Provider>
      */
     /**
+     * 1.96.4: de klant benaderde een gekozen registerbedrijf zelf (mail, kopie van
+     * het bericht of adres, WhatsApp, bellen). Per bedrijf onthouden we de kanalen
+     * en het eerste moment; het opdrachtlogboek krijgt één regel per bedrijf.
+     */
+    public function markDirectContacted(ServiceJob $job, int $providerId, string $channel): bool
+    {
+        if (! in_array($providerId, array_map('intval', (array) $job->selected_providers), true)) {
+            return false;
+        }
+        $all = (array) ($job->direct_contacted ?? []);
+        $entry = (array) ($all[(string) $providerId] ?? []);
+        $first = $entry === [];
+        $channels = array_values(array_unique(array_merge((array) ($entry['channels'] ?? []), [$channel])));
+        $all[(string) $providerId] = ['channels' => $channels, 'at' => $entry['at'] ?? now()->toIso8601String()];
+        $job->forceFill(['direct_contacted' => $all])->save();
+        if ($first) {
+            $name = Provider::query()->find($providerId)?->display_name ?? '#' . $providerId;
+            $this->log($job, 'direct_contacted', 'customer', __('Klant benaderde :name zelf', ['name' => $name]));
+        }
+
+        return true;
+    }
+
+    /** @return array{channels: list<string>, at: string}|null */
+    public function directContacted(ServiceJob $job, int $providerId): ?array
+    {
+        $entry = ((array) ($job->direct_contacted ?? []))[(string) $providerId] ?? null;
+        if (! is_array($entry)) {
+            return null;
+        }
+
+        return [
+            'channels' => array_values((array) ($entry['channels'] ?? [])),
+            'at' => \Illuminate\Support\Carbon::parse($entry['at'] ?? now())->timezone(config('app.timezone'))->translatedFormat('j M H:i'),
+        ];
+    }
+
+    /**
      * 1.96.3: de klant haalt een registerbedrijf van zijn lijst. Het verdwijnt uit
      * selected_providers (met een regel in het opdrachtlogboek) en, als geen andere
      * klant het koos en het nooit een aanbieding kreeg, meteen uit de database

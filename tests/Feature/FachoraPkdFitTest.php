@@ -149,6 +149,27 @@ class FachoraPkdFitTest extends TestCase
         $this->get(route('fachora.job.show', $job->token))->assertOk()->assertInertia(fn ($p) => $p->count('direct', 1)->where('direct.0.id', $sweep->id));
     }
 
+    public function test_the_customer_sees_which_companies_he_already_contacted(): void
+    {
+        $sweep = $this->register('Kominiarz Nowak', '81.22.Z');
+        $other = $this->register('Inny', '81.22.Z');
+        $job = $this->job();
+        $job->forceFill(['status' => 'open', 'selected_providers' => [$sweep->id, $other->id]])->save();
+
+        $this->post(route('fachora.job.direct.contacted', [$job->token, $sweep->id]), ['channel' => 'copy'])->assertRedirect();
+        $this->post(route('fachora.job.direct.contacted', [$job->token, $sweep->id]), ['channel' => 'mail'])->assertRedirect();
+        $this->post(route('fachora.job.direct.contacted', [$job->token, $sweep->id]), ['channel' => 'fax'])->assertSessionHasErrors('channel');
+        $this->post(route('fachora.job.direct.contacted', [$job->token, 999999]), ['channel' => 'mail'])->assertRedirect();
+
+        $job->refresh();
+        $this->assertSame(['copy', 'mail'], $job->direct_contacted[(string) $sweep->id]['channels']);
+        $this->assertArrayNotHasKey((string) $other->id, $job->direct_contacted);
+        $this->assertSame(1, $job->events()->where('kind', 'direct_contacted')->count(), 'één logregel per bedrijf');
+
+        $this->get(route('fachora.job.show', $job->token))->assertOk()
+            ->assertInertia(fn ($p) => $p->where('direct.0.contacted.channels', ['copy', 'mail'])->where('direct.1.contacted', null));
+    }
+
     public function test_the_import_skips_companies_whose_main_activity_is_not_trade_work(): void
     {
         $firm = fn (string $id, string $nip) => [

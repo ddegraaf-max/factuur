@@ -112,6 +112,7 @@ class JobController extends Controller
                 // 1.96.2: hoofdactiviteit (welk bedrijf past het best) en WhatsApp-nummer
                 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkd_main_name,
                 'phone_wa' => \App\Support\Fachora::whatsappNumber($p->phone),
+                'contacted' => $this->jobs->directContacted($job, $p->id), // 1.96.4: {channels, at} of null
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
@@ -130,6 +131,16 @@ class JobController extends Controller
     }
 
     /** De klant kiest 1 tot vijf bedrijven en betaalt (zo nodig) de bijdrage. */
+    /** 1.96.4: de klant benaderde een registerbedrijf zelf; zie JobService::markDirectContacted(). */
+    public function markContacted(Request $request, string $token, int $provider)
+    {
+        $job = $this->find($token);
+        $data = $request->validate(['channel' => ['required', Rule::in(['mail', 'copy', 'copy_mail', 'whatsapp', 'phone'])]]);
+        $this->jobs->markDirectContacted($job, $provider, $data['channel']);
+
+        return back();
+    }
+
     /** 1.96.3: de klant haalt een registerbedrijf van zijn lijst; zie JobService::removeDirectContact(). */
     public function removeDirect(string $token, int $provider)
     {

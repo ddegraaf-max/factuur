@@ -2082,5 +2082,6 @@
   "Nieuw concept als kopie van :label": "Nowy szkic jako kopia :label",
   "Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.": "Firma usunięta z Twojej listy i z bazy Fachory.",
   "Bedrijf van je lijst gehaald.": "Firma usunięta z Twojej listy.",
-  "Klant haalde :name van zijn lijst": "Klient usunął :name ze swojej listy"
+  "Klant haalde :name van zijn lijst": "Klient usunął :name ze swojej listy",
+  "Klant benaderde :name zelf": "Klient sam skontaktował się z :name"
 }

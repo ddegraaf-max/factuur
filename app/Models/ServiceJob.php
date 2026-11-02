@@ -38,7 +38,7 @@ class ServiceJob extends Model
         'paid_at', 'payout_at', 'refunded_at', 'fee_percent', 'fee_amount', 'payout_amount',
         'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
         'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
-        'languages', 'selected_providers', 'request_fee', 'request_session_id', 'request_paid_at',
+        'languages', 'selected_providers', 'direct_contacted', 'request_fee', 'request_session_id', 'request_paid_at',
         'phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at', 'provider_search_at',
     ];
 
@@ -73,6 +73,7 @@ class ServiceJob extends Model
         'owner_notified_at' => 'datetime',
         'languages' => 'array',
         'selected_providers' => 'array',
+        'direct_contacted' => 'array',
         'request_fee' => 'float',
         'request_paid_at' => 'datetime',
         'phone_code_sent_at' => 'datetime',

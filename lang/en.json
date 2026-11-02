@@ -2082,5 +2082,6 @@
   "Nieuw concept als kopie van :label": "New draft as a copy of :label",
   "Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.": "Company removed from your list and from the Fachora database.",
   "Bedrijf van je lijst gehaald.": "Company removed from your list.",
-  "Klant haalde :name van zijn lijst": "The customer removed :name from their list"
+  "Klant haalde :name van zijn lijst": "The customer removed :name from their list",
+  "Klant benaderde :name zelf": "The customer contacted :name directly"
 }
