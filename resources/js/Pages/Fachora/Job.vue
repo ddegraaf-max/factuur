@@ -99,10 +99,10 @@ onBeforeUnmount(() => clearInterval(searchTimer));
 // Het Poolse bericht aan een bedrijf uit het register; de klant verstuurt het zelf (mail, Gmail, WhatsApp, sms).
 const messageFor = (p) => {
   const j = props.job || {};
-  const subject = t('Zapytanie: :title (:city)', { title: j.title || '', city: j.city || '' });
+  const subject = t('Zapytanie: :title (:city)', { title: j.title_pl || j.title || '', city: j.city || '' }); // 1.96: Poolse titel als die er is
   // 1.94: de klant is de boodschapper — één feitelijke zin over het bestaande profiel (Fachora stuurt het bedrijf zelf niets).
   const profileLine = p.url ? 'Państwa firma jest już na fachora.pl (profil z rejestru): ' + p.url + '. Jeśli chcą Państwo otrzymywać takie zapytania bezpośrednio, profil można przejąć w dwie minuty na tej stronie.' : '';
-  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', profileLine, profileLine ? '' : null, j.customer_name || ''].filter((line) => line !== null).join('\n');
+  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label_pl || j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', profileLine, profileLine ? '' : null, j.customer_name || ''].filter((line) => line !== null).join('\n');
   return { subject, body };
 };
 const mailtoFor = (p) => {
@@ -253,6 +253,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
               {{ p.city }}<template v-if="p.distance_km != null"> · {{ $t(':km km', { km: p.distance_km }) }}</template>
               <template v-if="p.rating_count"> · ★ {{ rating(p.rating) }} ({{ p.rating_count }})</template>
               <template v-if="!p.verified"> · {{ $t('uit het bedrijvenregister') }}</template>
+            </div>
+            <!-- 1.96: hoofdactiviteit uit CEIDG, zodat de klant ziet of de klus het vak van het bedrijf is -->
+            <div v-if="!p.verified && p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
+              {{ p.pkd_fit === 'main' ? $t('Hoofdactiviteit: :name (past bij je klus)', { name: p.pkd_main_name }) : $t('Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)', { name: p.pkd_main_name }) }}
             </div>
             <div class="fa-chips jb-prov-chips">
               <span v-for="l in p.languages || []" :key="l.code" class="fa-chip fa-chip--muted">{{ l.flag }} {{ l.name }}</span>
@@ -619,6 +623,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-section .fa-h2 { margin-bottom: 12px; }
 .jb-count { font-size: 14px; font-weight: 500; }
 .fa-btn.is-copied { background: #E6F4EA; border-color: #34A853; color: #1E7E34; }
+.jb-fit-ok { color: #1E7E34; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }

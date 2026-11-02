@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.95.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.96.0</div>
+        <h2>Fachora: alleen bedrijven waarvan het echt het vak is</h2>
+        <ul class="tl-list">
+          <li><b>Hoofdactiviteit uit CEIDG</b> — Poolse eenmanszaken schrijven vaak tientallen PKD-codes in, waardoor een vastgoedadviseur tussen de schoorsteenvegers kon staan. De keuzelijst kijkt nu naar de hoofdactiviteit: past die bij de klus, dan staat het bedrijf bovenaan; staat de klus alleen als nevenactiviteit ingeschreven, dan eronder met het label "hoofdactiviteit: …"; is de hoofdactiviteit geen vakwerk, dan komt het bedrijf er niet in en wordt het niet geïmporteerd.</li>
+          <li><b>Binnen een dag opgeruimd</b> — al geïmporteerde bedrijven zonder vakwerk als hoofdactiviteit verwijdert de app elk uur, met een regel in het verantwoordingslog; bedrijven zonder bekende hoofdactiviteit worden eerst bij CEIDG nagevraagd.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.95.0</div>
         <h2>Fachora: meerdere talen per aanvraag</h2>
         <ul class="tl-list">
           <li><b>Pools altijd aan</b> — stap 5 van de aanvraag is een meerkeuze geworden: Pools staat vast aan (rood bolletje, "zawsze"), want alle bedrijven werken in het Pools en de omschrijving wordt vertaald. Daarnaast vinkt de klant de talen aan die hij zelf spreekt.</li>

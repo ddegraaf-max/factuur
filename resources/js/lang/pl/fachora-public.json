@@ -397,5 +397,7 @@
   "Bericht kopiëren": "Skopiuj wiadomość",
   "Gekopieerd": "Skopiowano",
   "Kopieer het bericht hieronder:": "Skopiuj poniższą wiadomość:",
-  "Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.": "Wklej wiadomość w Gmailu, WhatsAppie albo SMS-ie; jest już po polsku, z opisem Twojego zlecenia."
+  "Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.": "Wklej wiadomość w Gmailu, WhatsAppie albo SMS-ie; jest już po polsku, z opisem Twojego zlecenia.",
+  "Hoofdactiviteit: :name (past bij je klus)": "Główna działalność: :name (pasuje do Twojego zlecenia)",
+  "Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)": "Główna działalność: :name (Twoje zlecenie to działalność dodatkowa tej firmy)"
 }

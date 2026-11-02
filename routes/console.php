@@ -165,6 +165,11 @@ Schedule::command('fachora:purge-register')
     ->dailyAt('04:40')
     ->timezone('Europe/Warsaw');
 
+// Fachora 1.96: hoofdactiviteit uit CEIDG bijwerken en bedrijven zonder vakwerk als hoofdactiviteit opruimen (binnen een dag).
+Schedule::command('fachora:pkd-check')
+    ->hourlyAt(25)
+    ->withoutOverlapping(30);
+
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
     Schedule::command('fachora:local-search')

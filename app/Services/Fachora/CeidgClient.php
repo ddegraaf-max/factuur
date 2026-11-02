@@ -108,6 +108,11 @@ class CeidgClient
             'consent' => false,
             'source' => 'ceidg',
             'note' => 'CEIDG ' . ($firm['status'] ?? '') . ' · PKD ' . implode(', ', array_slice($pkd, 0, 4)),
+            // 1.96: hoofdactiviteit en het CEIDG-id (alleen bekend als het detailrecord is opgehaald).
+            'pkd_main' => isset($firm['pkdGlowny']['kod']) ? mb_substr((string) $firm['pkdGlowny']['kod'], 0, 10) : null,
+            'pkd_main_name' => isset($firm['pkdGlowny']['nazwa']) ? mb_substr((string) $firm['pkdGlowny']['nazwa'], 0, 200) : null,
+            'pkd_codes' => array_slice($pkd, 0, 40),
+            'source_id' => isset($firm['id']) ? mb_substr((string) $firm['id'], 0, 64) : null,
         ];
     }
 
@@ -292,7 +297,7 @@ class CeidgClient
      *
      * @param  array<string, mixed>  $firm
      * @param  array<string, mixed>  $region
-     * @return 'created'|'known'|'old'|'far'|'no_email'|'no_detail'
+     * @return 'created'|'known'|'old'|'far'|'no_email'|'no_detail'|'unrelated'
      */
     public function importFirm(array $firm, string $pkd, array $region, float $radius, Carbon $minStart): string
     {
@@ -325,6 +330,10 @@ class CeidgClient
             return 'no_detail';
         }
         $record = $this->normalize(array_merge($firm, $detail), [$pkd]);
+        // 1.96: geen vakwerk als hoofdactiviteit (bijv. vastgoedadvies met een bouwcode als bijcode) → niet importeren.
+        if ($record['pkd_main'] !== null && ! Fachora::isTradePkd($record['pkd_main'])) {
+            return 'unrelated';
+        }
         if (blank($record['email'])) {
             return 'no_email';
         }
@@ -337,6 +346,47 @@ class CeidgClient
         $counts = $this->providers->importRecords([$record + ['lat' => $coords['lat'], 'lng' => $coords['lng']]], 'ceidg');
 
         return $counts['created'] > 0 ? 'created' : 'known';
+    }
+
+    /**
+     * Hoofdactiviteit bijwerken (1.96) voor registerbedrijven die nog geen
+     * pkd_main hebben: via het bewaarde CEIDG-id, anders via een zoekopdracht op
+     * NIP. Hooguit $budget detailopvragen per run; wat niet gevonden wordt,
+     * krijgt wel pkd_checked_at zodat het niet elke keer opnieuw wordt gevraagd.
+     */
+    public function refreshMainPkd(int $budget = 25): int
+    {
+        $done = 0;
+        $providers = Provider::query()->where('status', 'unclaimed')->where('source', 'ceidg')
+            ->whereNull('pkd_checked_at')->whereNull('claimed_at')
+            ->where(fn ($q) => $q->whereNotNull('source_id')->orWhereNotNull('nip'))
+            ->orderBy('id')->limit($budget)->get();
+        foreach ($providers as $provider) {
+            $detail = null;
+            try {
+                $id = $provider->source_id;
+                if (blank($id) && filled($provider->nip)) {
+                    $found = $this->search(['nip' => $provider->nip, 'status' => 'AKTYWNY']);
+                    $id = $found['firms'][0]['id'] ?? null;
+                }
+                $detail = filled($id) ? $this->detail((string) $id) : null;
+                usleep(200_000);
+            } catch (\Throwable $e) {
+                Log::warning('CEIDG hoofdactiviteit ophalen mislukt', ['provider' => $provider->id, 'error' => $e->getMessage()]);
+                break; // API-storing: volgende run opnieuw
+            }
+            $record = $detail ? $this->normalize($detail) : [];
+            $provider->forceFill([
+                'pkd_main' => $record['pkd_main'] ?? null,
+                'pkd_main_name' => $record['pkd_main_name'] ?? null,
+                'pkd_codes' => $record['pkd_codes'] ?? null,
+                'source_id' => $provider->source_id ?: ($id ?? null),
+                'pkd_checked_at' => now(),
+            ])->save();
+            $done++;
+        }
+
+        return $done;
     }
 
     /**

@@ -529,7 +529,7 @@ class JobService
             $prompt = "Jesteś asystentem platformy Fachora (Polska). Klient opisał zlecenie dla fachowca.\n"
                 . 'Kategoria: ' . Fachora::categoryName($job->category, 'pl') . "\nMiasto: {$job->city}\nJęzyk klienta: {$job->language}\nPilność: {$job->urgency}\n"
                 . "Opis klienta (może być w innym języku):\n\"\"\"\n{$job->description}\n\"\"\"\n\n"
-                . 'Zwróć: krótki tytuł po polsku (max 8 słów), rzeczową polską wersję opisu dla fachowca (bez danych kontaktowych), '
+                . 'Zwróć: krótki tytuł po polsku (max 8 słów), rzeczową polską wersję opisu dla fachowca napisaną w pierwszej osobie, tak jak napisałby ją sam klient (np. „Proszę o…”, nigdy „klient prosi”; bez danych kontaktowych), '
                 . 'jednozdaniowe streszczenie po angielsku, realistyczny przedział ceny brutto w PLN dla takiej usługi w Polsce w 2026 r. '
                 . '(estimate_low/estimate_high, robocizna i dojazd, bez materiałów o dużej wartości) oraz maksymalnie trzy pytania po polsku, '
                 . 'które fachowiec powinien zadać przed wyceną. Jeśli opis jest zbyt ogólny, przedział może być szeroki.';

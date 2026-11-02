@@ -36,6 +36,7 @@ class Presenter
             'language_fallback' => (bool) ($job->ai['language_fallback'] ?? false),
             'urgency' => $job->urgency,
             'urgency_label' => $this->urgency($job),
+            'urgency_label_pl' => $this->urgencyPl($job), // 1.96: voor het Poolse bericht aan een bedrijf, los van de schermtaal
             'wanted_date' => $job->wanted_date?->toDateString(),
             'time_window' => $job->time_window,
             'language' => $job->language,
@@ -186,6 +187,17 @@ class Presenter
             'week' => __('Deze week'),
             'month' => __('Binnen een maand'),
             default => $job->wanted_date?->translatedFormat('j F Y') ?? __('In overleg'),
+        };
+    }
+
+    /** De wanneer-regel altijd in het Pools (het bericht aan een bedrijf is Pools, welke taal de klant ook kijkt). */
+    private function urgencyPl(ServiceJob $job): string
+    {
+        return match ($job->urgency) {
+            'now' => 'Jak najszybciej',
+            'week' => 'W tym tygodniu',
+            'month' => 'W ciągu miesiąca',
+            default => $job->wanted_date?->copy()->locale('pl')->translatedFormat('j F Y') ?? 'Termin do uzgodnienia',
         };
     }
 

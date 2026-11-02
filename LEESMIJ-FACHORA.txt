@@ -233,6 +233,20 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+HOOFDACTIVITEIT UIT CEIDG (2 nov 2026, 1.96.0, besluit Daniël: "specifiek voor wat ik zoek, rest binnen 24 uur weg met log")
+- Kolommen providers.pkd_main / pkd_main_name / pkd_codes / source_id / pkd_checked_at (uit het CEIDG-detailrecord,
+  pkdGlowny). config fachora.trade_pkd_prefixes = vakwerk (41–43, 33.1x/33.2x, 45.2x, 80.2x, 81.2x, 81.3x, 95.2x, 02.4x).
+- Provider::pkdFit(categorie): main (hoofd-PKD = categoriecode) · secondary (ander vakwerk; categorie als bijcode) ·
+  unrelated (geen vakwerk) · unknown (nog niet bekend). Geclaimd/Verified = altijd main.
+- Keuzelijst (ProviderService::choiceCandidates): unrelated valt weg; volgorde status → fit → taal → beoordeling →
+  afstand. Kaartje toont "Główna działalność: … (pasuje / działalność dodatkowa)".
+- Import (CeidgClient::importFirm): hoofd-PKD buiten de vaklijst → 'unrelated', niet geïmporteerd.
+- fachora:pkd-check (elk uur, :25): refreshMainPkd (budget 25: via source_id, anders zoeken op NIP) en
+  RegisterNoticeService::purgeUnrelated (nooit geclaimd/toestemming, geen aanbieding, door geen klant gekozen) met
+  logregel purge_unrelated in fachora_privacy_log. Dus binnen een dag uit elke lijst.
+- Klantbericht aan registerbedrijf: Poolse titel (ai.title_pl) en Poolse wanneer-regel (urgency_label_pl); de
+  AI-vertaling staat in de eerste persoon ("Proszę o…", nooit "klient prosi").
+
 MEERDERE TALEN PER AANVRAAG (2 nov 2026, 1.95.0)
 - Stap 5 is een meerkeuze: Pools staat vast aan (rood bolletje, "zawsze"), de andere talen zijn optioneel.
   Kolom service_jobs.languages (json, Pools altijd eerst); 'language' blijft de voorkeurstaal (eerste taal

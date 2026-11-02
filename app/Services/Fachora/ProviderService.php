@@ -84,6 +84,12 @@ class ProviderService
                 'consent_at' => $consent ? now() : null,
                 'consent_source' => $consent ? ($consentSource ?: $source) : null,
                 'notes' => $record['note'] ?? null,
+                // 1.96: hoofdactiviteit uit CEIDG (null bij een plaklijst of een lijst zonder detailrecord)
+                'pkd_main' => $record['pkd_main'] ?? null,
+                'pkd_main_name' => $record['pkd_main_name'] ?? null,
+                'pkd_codes' => $record['pkd_codes'] ?? null,
+                'source_id' => $record['source_id'] ?? null,
+                'pkd_checked_at' => isset($record['pkd_main']) ? now() : null,
             ], (array) ($record['categories'] ?? []));
 
             $created++;
@@ -494,9 +500,15 @@ class ProviderService
 
         $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 2];
         $extra = $job->extraLanguages(); // 1.95: bedrijven die een taal van de klant spreken komen binnen hun groep vooraan
+        $fitRank = ['main' => 0, 'secondary' => 1, 'unknown' => 2]; // 1.96: hoofdactiviteit eerst, bijcode daarna
 
         return $query->get()->filter(function (Provider $p) use ($job, $radius) {
             if ($p->isDemo() || ! (ConsentPolicy::mayEmailRequest($p) || ConsentPolicy::mayShowDirectContact($p))) {
+                return false;
+            }
+            // 1.96: geen vakwerk als hoofdactiviteit → niet in de lijst (fachora:pkd-check ruimt het record op).
+            $p->setAttribute('pkd_fit', $p->pkdFit($job->category));
+            if ($p->pkd_fit === 'unrelated') {
                 return false;
             }
             if ($job->lat !== null && $p->lat !== null) {
@@ -509,6 +521,7 @@ class ProviderService
             return true;
         })->sortBy([
             fn (Provider $a, Provider $b) => ($rank[$a->status] ?? 9) <=> ($rank[$b->status] ?? 9),
+            fn (Provider $a, Provider $b) => ($fitRank[$a->pkd_fit] ?? 3) <=> ($fitRank[$b->pkd_fit] ?? 3),
             fn (Provider $a, Provider $b) => (int) ! $a->speaksAny($extra) <=> (int) ! $b->speaksAny($extra),
             fn (Provider $a, Provider $b) => ($b->rating_avg ?? 0) <=> ($a->rating_avg ?? 0),
             fn (Provider $a, Provider $b) => ($a->distance_km ?? 999) <=> ($b->distance_km ?? 999),

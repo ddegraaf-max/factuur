@@ -96,6 +96,31 @@ class Fachora
         return 'pl';
     }
 
+    /** PKD-code in vaste vorm ("43.22.Z" → "4322Z"), of null. */
+    public static function normalisePkd(?string $code): ?string
+    {
+        $code = strtoupper(str_replace(['.', ' ', '-'], '', (string) $code));
+
+        return $code === '' ? null : $code;
+    }
+
+    /** Is deze PKD-code vakwerk (config fachora.trade_pkd_prefixes)? (1.96) */
+    public static function isTradePkd(?string $code): bool
+    {
+        $code = self::normalisePkd($code);
+        if ($code === null) {
+            return false;
+        }
+        foreach ((array) config('fachora.trade_pkd_prefixes', []) as $prefix) {
+            $prefix = (string) self::normalisePkd((string) $prefix);
+            if ($prefix !== '' && str_starts_with($code, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** Afstand in kilometers tussen twee punten (haversine). */
     public static function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
     {

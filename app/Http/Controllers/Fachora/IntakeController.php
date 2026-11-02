@@ -91,8 +91,8 @@ class IntakeController extends Controller
             . (filled($data['title'] ?? null) ? "Their title: {$data['title']}\n" : '')
             . "\nReturn JSON:\n"
             . "- language: the ISO 639-1 code of the language the draft is written in.\n"
-            . "- description: the draft rewritten in that SAME language as a complete, concrete, friendly description for a tradesperson: what is wrong or wanted, where exactly, since when, what has been tried, access and timing if mentioned. 2 to 6 sentences. Keep every fact; never invent details, measurements or brands; leave out names, phone numbers and e-mail addresses.\n"
-            . "- description_pl: the same description in natural Polish for the tradesperson (if the draft is already Polish, the polished Polish text).\n"
+            . "- description: the draft rewritten in that SAME language as a complete, concrete, friendly description for a tradesperson, written in the first person as the customer speaking to the tradesperson: what is wrong or wanted, where exactly, since when, what has been tried, access and timing if mentioned. 2 to 6 sentences. Keep every fact; never invent details, measurements or brands; leave out names, phone numbers and e-mail addresses.\n"
+            . "- description_pl: the same description in natural Polish, first person, as the customer would write it to the tradesperson (if the draft is already Polish, the polished Polish text).\n"
             . "- title and title_pl: a short title (max 8 words) in the draft's language and in Polish.\n"
             . "- questions: at most 3 short questions in the draft's language about details that are missing but matter for a price (for example gas or electric, which floor, dimensions, materials already bought, when the fault started). An empty list if nothing important is missing.";
 

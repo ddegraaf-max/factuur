@@ -151,6 +151,31 @@ class RegisterNoticeService
         return $deleted;
     }
 
+    /**
+     * Registerbedrijven zonder vakwerk als hoofdactiviteit (1.96) verwijderen:
+     * nooit geclaimd, geen toestemming, geen aanbieding, door geen klant gekozen.
+     * Elk uur via fachora:pkd-check, met één regel in het verantwoordingslog.
+     */
+    public function purgeUnrelated(bool $dry = false): int
+    {
+        $chosen = app(LetterService::class)->chosenIds();
+        $offered = \App\Models\ServiceJobOffer::query()->distinct()->pluck('provider_id')->all();
+        $ids = Provider::query()->where('status', 'unclaimed')->where('source', 'ceidg')
+            ->whereNull('claimed_at')->whereNull('consent_at')->whereNull('terms_accepted_at')->whereNull('removed_at')->whereNull('user_id')->whereNotNull('pkd_main')
+            ->whereNotIn('id', array_values(array_unique(array_merge($chosen, $offered))) ?: [0])
+            ->get(['id', 'pkd_main'])
+            ->filter(fn (Provider $p) => ! \App\Support\Fachora::isTradePkd($p->pkd_main))
+            ->pluck('id')->all();
+        if ($dry || $ids === []) {
+            return count($ids);
+        }
+        \Illuminate\Support\Facades\DB::table('provider_category')->whereIn('provider_id', $ids)->delete();
+        $deleted = Provider::query()->whereIn('id', $ids)->delete();
+        self::log('purge_unrelated', $deleted, 'Registerbedrijven zonder vakwerk als hoofdactiviteit (PKD buiten de vaklijst): niet gekozen, niet gemaild, geen aanbieding. Verwijderd (art. 5 lid 1 sub c AVG, minimale gegevensverwerking).');
+
+        return $deleted;
+    }
+
     /** Eén regel in het verantwoordingslog, zonder persoonsgegevens. */
     public static function log(string $action, int $count, string $note): void
     {

@@ -112,7 +112,8 @@ class JobController extends Controller
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
-                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months'])) + ['distance_km' => $p->distance_km])
+                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months']))
+                        + ['distance_km' => $p->distance_km, 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->claimed_at ? null : $p->pkd_main_name])
                     ->values()->all(),
                 'max' => (int) config('fachora.max_offers', 5),
                 'fee' => $this->jobs->requestFee(),

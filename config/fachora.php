@@ -211,6 +211,20 @@ return [
     'urgencies' => ['now', 'week', 'month', 'date'],
 
     /*
+     * Hoofdactiviteit (1.96). Een bedrijf uit CEIDG hoort alleen in een keuzelijst
+     * als zijn hoofd-PKD vakwerk is: deze prefixen (bouw 41–43, installatie en
+     * reparatie van machines 33.1x/33.2x, autoreparatie 45.2x, beveiliging 80.2x,
+     * reiniging incl. kominiarstwo 81.2x, tuinen 81.3x, reparatie van apparaten
+     * 95.2x, bosbouwdiensten 02.4x). Past de hoofd-PKD precies bij de categorie,
+     * dan staat het bedrijf bovenaan; staat de categorie alleen als bijcode
+     * ingeschreven, dan eronder met het label "hoofdactiviteit: …". Valt de
+     * hoofd-PKD buiten deze lijst, dan wordt het bedrijf niet geïmporteerd en
+     * verwijdert fachora:pkd-check (elk uur) al geïmporteerde records, met een
+     * regel in fachora_privacy_log.
+     */
+    'trade_pkd_prefixes' => ['41', '42', '43', '33.1', '33.2', '45.2', '80.2', '81.2', '81.3', '95.2', '02.4'],
+
+    /*
      * SEO-steden (1.92): voor elke categorie bestaat /uslugi/{categorie}/{stad}
      * voor deze steden, ook zonder Verified bedrijf; ze staan in de sitemap en
      * als stadslinks op de categoriepagina's. Sleutel = slug in de URL, waarde =

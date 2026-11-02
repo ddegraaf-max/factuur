@@ -397,5 +397,7 @@
   "Bericht kopiëren": "Copy message",
   "Gekopieerd": "Copied",
   "Kopieer het bericht hieronder:": "Copy the message below:",
-  "Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.": "Paste the message into Gmail, WhatsApp or a text message; it is already in Polish, with your job description."
+  "Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.": "Paste the message into Gmail, WhatsApp or a text message; it is already in Polish, with your job description.",
+  "Hoofdactiviteit: :name (past bij je klus)": "Main activity: :name (matches your job)",
+  "Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)": "Main activity: :name (your job is a secondary activity of this company)"
 }

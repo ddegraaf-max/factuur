@@ -27,7 +27,8 @@ class Provider extends Model
     protected $fillable = [
         'nip', 'regon', 'krs', 'legal_name', 'display_name', 'slug', 'legal_form',
         'address_line', 'postal_code', 'city', 'voivodeship', 'lat', 'lng',
-        'phone', 'email', 'website', 'source', 'source_fetched_at', 'registry_status', 'vat_status', 'vat_checked_at',
+        'phone', 'email', 'website', 'source', 'source_fetched_at', 'pkd_main', 'pkd_main_name', 'pkd_codes', 'source_id', 'pkd_checked_at',
+        'registry_status', 'vat_status', 'vat_checked_at',
         'status', 'status_reason', 'languages', 'radius_km', 'rates', 'warranty_months', 'invoice_promise', 'protect_opt_in',
         'description', 'photo_data', 'company_id', 'user_id',
         'claim_code', 'claim_token', 'claim_email', 'claim_phone', 'claim_name', 'claim_requested_at', 'claimed_at',
@@ -50,6 +51,8 @@ class Provider extends Model
         'stripe_payouts_enabled' => 'boolean',
         'rating_avg' => 'float',
         'source_fetched_at' => 'datetime',
+        'pkd_codes' => 'array',
+        'pkd_checked_at' => 'datetime',
         'vat_checked_at' => 'datetime',
         'claim_requested_at' => 'datetime',
         'claimed_at' => 'datetime',
@@ -189,6 +192,31 @@ class Provider extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Past de hoofdactiviteit (hoofd-PKD uit CEIDG) bij deze categorie? (1.96)
+     * 'main' = de hoofd-PKD is een code van de categorie; 'secondary' = de
+     * hoofd-PKD is ander vakwerk (de categorie staat als bijcode ingeschreven);
+     * 'unrelated' = geen vakwerk (hoort niet in de lijst, wordt opgeruimd);
+     * 'unknown' = hoofd-PKD (nog) niet bekend. Geclaimde en Verified bedrijven
+     * kozen hun categorieën zelf en gelden altijd als 'main'.
+     */
+    public function pkdFit(string $category): string
+    {
+        if ($this->claimed_at !== null || $this->status === 'verified') {
+            return 'main';
+        }
+        $main = \App\Support\Fachora::normalisePkd($this->pkd_main);
+        if ($main === null) {
+            return 'unknown';
+        }
+        $codes = array_map(fn ($c) => \App\Support\Fachora::normalisePkd((string) $c), (array) config("fachora.categories.{$category}.pkd", []));
+        if (in_array($main, $codes, true)) {
+            return 'main';
+        }
+
+        return \App\Support\Fachora::isTradePkd($main) ? 'secondary' : 'unrelated';
     }
 
     /** Fee die voor dit bedrijf geldt: introductietarief in de eerste maanden na verificatie. */
