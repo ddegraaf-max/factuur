@@ -43,19 +43,26 @@
         </div>
         <div class="date">{{ $date }}</div>
 
-        <h1>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h1>
+        <h1>Nowi klienci w Twojej okolicy. {{ config('fachora.lead_pricing') ? 'Płacisz tylko za zapytania, na które odpowiadasz.' : 'Płacisz tylko za zrealizowane zlecenia.' }}</h1>
 
         <p>Szanowni Państwo,</p>
         <p>Fachora to platforma, na której klienci — także obcokrajowcy mieszkający w Polsce — szukają sprawdzonego fachowca
             w kategorii{{ count($l['categories']) === 1 ? '' : 'ch' }} <strong>{{ implode(', ', $l['categories']) ?: 'usług' }}</strong>.
             Firma {{ $p->display_name }} znajduje się już w naszej bazie na podstawie danych z publicznych rejestrów,
-            ale profil nie jest jeszcze aktywny. Nie wysyłamy e-maili ani SMS-ów bez Państwa zgody, dlatego piszemy listownie.</p>
+            ale profil nie jest jeszcze aktywny. Klient sam wybiera z listy, do których firm trafi jego zapytanie — firmy ze znakiem
+            Fachora Verified są na górze listy i dostają zapytanie od nas, a nieaktywny profil nie dostaje od nas niczego.
+            Nie wysyłamy e-maili ani SMS-ów bez Państwa zgody, dlatego piszemy listownie.</p>
 
         <p>Co daje aktywny profil ze znakiem <strong>Fachora Verified</strong>:</p>
         <ul>
-            <li>zlecenia z Państwa okolicy wprost na e-mail, z opisem, zdjęciami i terminem,</li>
-            <li>cena ustalona z góry i zabezpieczona płatność Fachora Protect — klient rezerwuje kwotę przed pracą,</li>
+            <li>zapytania z Państwa okolicy wprost na e-mail, z opisem, zdjęciami i terminem; cenę podają Państwo z góry,</li>
+            @if(fachora_protect())<li>bezpieczna płatność Fachora Protect — klient rezerwuje kwotę przed pracą, wypłata po jego akceptacji,</li>@endif
+            @if(config('fachora.lead_pricing'))
+            <li>0 zł abonamentu i 0 zł za rejestrację; płacą Państwo tylko za zapytanie, na które chcą odpowiedzieć
+                ({{ (int) config('fachora.lead_min') }}–{{ (int) config('fachora.lead_max') }} zł netto), pierwsze gratis; klient płaci Państwu bezpośrednio, bez prowizji,</li>
+            @else
             <li>0 zł abonamentu, 0 zł za zapytanie; prowizja tylko od wykonanego zlecenia,</li>
+            @endif
             <li>bezpłatny program do faktur (KSeF), ofert i terminarza.</li>
         </ul>
 
