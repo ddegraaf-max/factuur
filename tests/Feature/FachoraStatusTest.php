@@ -31,6 +31,17 @@ class FachoraStatusTest extends TestCase
         $this->assertStringNotContainsString('PDF generation', $en);
     }
 
+    public function test_without_a_stripe_key_payments_show_as_not_set_up_and_the_banner_stays_green(): void
+    {
+        config(['brand.active' => 'fachora', 'fachora.ceidg_token' => 'jwt', 'services.anthropic.key' => 'sk-ant-test', 'services.stripe.secret' => null]);
+        Cache::forever(HealthController::HEARTBEAT_KEY, now()->timestamp);
+
+        $html = (string) $this->get('/status?lang=en')->assertOk()->getContent();
+        $this->assertStringContainsString('Not set up yet', $html);
+        $this->assertStringContainsString('All systems operational', $html, 'een bewust nog niet ingerichte betaalkoppeling is geen storing');
+        $this->assertStringNotContainsString('Outage', $html);
+    }
+
     public function test_easyinvoice_keeps_its_invoice_components(): void
     {
         config(['brand.active' => 'easyinvoice']);

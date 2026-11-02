@@ -19,6 +19,8 @@
   .status-tag { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }
   .status-tag.ok { color: var(--success); }
   .status-tag.down { color: var(--brand-darker); }
+  .status-tag.pending { color: var(--text-3); }
+  .status-tag.pending .dot { background: var(--text-4); }
   .status-tag .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
   .status-note { margin-top: 22px; font-size: 13px; color: var(--text-3); line-height: 1.6; }
 </style>
@@ -41,7 +43,9 @@
       @foreach ($components as $component)
         <div class="status-row">
           <span style="font-weight:500;">{{ $component['label'] }}</span>
-          @if ($component['ok'])
+          @if (! empty($component['pending']))
+            <span class="status-tag pending"><span class="dot"></span> {{ __('Nog niet ingericht') }}</span>
+          @elseif ($component['ok'])
             <span class="status-tag ok"><span class="dot"></span> {{ __('Operationeel') }}</span>
           @else
             <span class="status-tag down"><span class="dot"></span> {{ __('Storing') }}</span>

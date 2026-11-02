@@ -64,7 +64,8 @@ class StatusController extends Controller
                 ['label' => __('Bedrijvenregister (CEIDG)'),          'ok' => filled(config('fachora.ceidg_token'))],
                 ['label' => __('AI-hulp bij de omschrijving'),        'ok' => app(\App\Services\Ai\StructuredClaude::class)->enabled()],
                 ['label' => __('Bedrijvenpaneel en inloggen'),        'ok' => $dbOk],
-                ['label' => __('Betalingen voor bedrijven (Stripe)'), 'ok' => filled(config('services.stripe.secret'))],
+                // Zonder Stripe-sleutel is dit een bewuste stand (aanvragen gratis), geen storing.
+                ['label' => __('Betalingen voor bedrijven (Stripe)'), 'ok' => filled(config('services.stripe.secret')), 'pending' => blank(config('services.stripe.secret'))],
                 ['label' => __("Foto's bij aanvragen"),              'ok' => $dbOk && $storageOk],
                 ['label' => __('E-mail versturen'),                   'ok' => $mailOk],
                 ['label' => __('Cache'),                              'ok' => $cacheOk],
@@ -83,7 +84,7 @@ class StatusController extends Controller
             ];
         }
 
-        $allOk = collect($components)->every(fn ($c) => $c['ok']);
+        $allOk = collect($components)->every(fn ($c) => $c['ok'] || ! empty($c['pending']));
 
         return view('marketing.status', [
             'components' => $components,
