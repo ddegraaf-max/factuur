@@ -3,7 +3,9 @@
 {{--
   Fachora — lista firm w kategorii, opcjonalnie w mieście (/uslugi/{category}[/{city}]).
   Zmienne z PublicController::category(): $category (klucz), $categoryName, $examples, $city (nazwa|null),
-  $citySlug, $providers (Collection<Provider>), $cities [{name,slug,n}], $allCategories [{key,name,icon,examples}], $intakeUrl.
+  $citySlug, $providers (Collection<Provider>), $cities [{name,slug,n}], $cityLinks (SEO-steden + steden z Verified),
+  $registerCount (firmy z rejestru w tej kategorii/mieście), $allCategories [{key,name,icon,examples}], $intakeUrl.
+  Structured data: BreadcrumbList + Service (1.92).
   Tylko firmy Fachora Verified. Bez firm: uczciwy komunikat „wkrótce” zamiast pustej strony-wydmuszki.
 --}}
 
@@ -21,6 +23,16 @@
         ? $categoryName . ' ' . $city . ' – sprawdzone firmy | Fachora'
         : $categoryName . ' – sprawdzone firmy w Polsce | Fachora';
     $desc = ($city ? $categoryName . ' w mieście ' . $city : $categoryName . ' w Polsce') . ': firmy Fachora Verified — sprawdzone w rejestrach, z ceną ustaloną z góry, ' . ($protect ? 'bezpieczną płatnością Fachora Protect, ' : '') . 'fakturą i gwarancją.' . ($examples ? ' Np. ' . $examples . '.' : '') . ' Zostaw zlecenie bezpłatnie.';
+    $ld = ['@context' => 'https://schema.org', '@graph' => [
+        ['@type' => 'BreadcrumbList', 'itemListElement' => array_values(array_filter([
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Fachora', 'item' => url('/') . '/'],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $categoryName, 'item' => route('fachora.category', $category)],
+            $city ? ['@type' => 'ListItem', 'position' => 3, 'name' => $city, 'item' => route('fachora.category.city', [$category, $citySlug])] : null,
+        ]))],
+        ['@type' => 'Service', 'name' => $h1, 'serviceType' => $categoryName, 'url' => url()->current(), 'description' => $desc,
+            'provider' => ['@type' => 'Organization', 'name' => 'Fachora', 'url' => url('/') . '/'],
+            'areaServed' => $city ? ['@type' => 'City', 'name' => $city, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Polska']] : ['@type' => 'Country', 'name' => 'Polska']],
+    ]];
 @endphp
 
 @section('title', $title)
@@ -79,6 +91,7 @@
   .fc-seo a { color: var(--brand); font-weight: 500; }
   .fc-h2 { font-size: 22px; margin-bottom: 14px; }
 </style>
+<script type="application/ld+json">{!! json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
@@ -92,10 +105,10 @@
       <div class="fc-icon">@include('fachora.partials.icon', ['name' => $icon, 'size' => 34])</div>
       <div style="flex:1;min-width:260px;">
         <h1>{{ $h1 }}</h1>
-        @if($examples)<p class="fc-ex">Na przykład: {{ $examples }}. Tylko firmy Fachora Verified — sprawdzone w rejestrach, z ceną z góry, fakturą i gwarancją.</p>@endif
+        @if($examples)<p class="fc-ex">Na przykład: {{ $examples }}. Firmy Fachora Verified: sprawdzone w rejestrach, z ceną z góry, fakturą i gwarancją. Do tego firmy z rejestru przedsiębiorców, które sam wybierasz po opisaniu zlecenia.</p>@endif
         <div class="fc-ctas">
           <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Zostaw zlecenie →</a>
-          <small>Bezpłatnie, bez konta. Oferty od maks. {{ (int) config('fachora.max_offers') }} firm.</small>
+          <small>Bezpłatnie, bez konta. Sam wybierasz do {{ (int) config('fachora.max_offers') }} firm z listy.</small>
         </div>
       </div>
     </div>
@@ -140,21 +153,21 @@
     @else
       <div class="fc-empty" style="margin-top:34px;">
         <div style="font-size:30px;margin-bottom:8px;">🔧</div>
-        <h2>Wkrótce{{ $city ? ' w mieście ' . $city : '' }}</h2>
-        <p>Nie mamy jeszcze firmy Fachora Verified {{ $city ? 'w tej okolicy' : 'w tej kategorii' }}, którą moglibyśmy Ci z czystym sumieniem polecić. Nie pokazujemy firm, których nie sprawdziliśmy.<br>Zostaw zlecenie — znajdziemy firmę, sprawdzimy ją i wrócimy do Ciebie z ofertą.</p>
-        <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Zostaw zlecenie – znajdziemy firmę →</a>
+        <h2>{{ $city ? $categoryName . ' w mieście ' . $city : $categoryName . ' w całej Polsce' }}: sam wybierasz firmę</h2>
+        <p>Opisz, co trzeba zrobić, a pokażemy Ci do {{ (int) config('fachora.choice_candidates') }} firm z okolicy: Fachora Verified na górze, firmy z rejestru przedsiębiorców (CEIDG) wyraźnie oznaczone. Zaznaczasz maksymalnie {{ (int) config('fachora.max_offers') }}. Firmy Verified odpowiadają na Twojej stronie zlecenia; z firmą z rejestru kontaktujesz się sam, bo pokażemy Ci jej publiczne dane.@if($registerCount > 0) W rejestrze mamy już {{ $registerCount }} {{ $plural($registerCount, 'firmę', 'firmy', 'firm') }} z tej kategorii{{ $city ? ' w okolicy' : '' }}.@endif<br>Na tej stronie pokazujemy tylko firmy Fachora Verified; {{ $city ? 'w tej okolicy' : 'w tej kategorii' }} nie ma ich jeszcze.</p>
+        <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Opisz zlecenie i wybierz firmy →</a>
       </div>
     @endif
   </div>
 </section>
 
-@if($cities->isNotEmpty())
+@if($cityLinks->isNotEmpty())
 <section class="section" style="padding:40px 0 10px;">
   <div class="container">
     <h2 class="fc-h2">{{ $categoryName }} — miasta</h2>
     <div class="fc-cities">
-      @foreach($cities as $c)
-        <a class="fc-city{{ $citySlug === $c['slug'] ? ' is-active' : '' }}" href="{{ route('fachora.category.city', [$category, $c['slug']]) }}">{{ $c['name'] }} <small>{{ $c['n'] }}</small></a>
+      @foreach($cityLinks as $c)
+        <a class="fc-city{{ $citySlug === $c['slug'] ? ' is-active' : '' }}" href="{{ route('fachora.category.city', [$category, $c['slug']]) }}">{{ $c['name'] }}@if($c['n'] > 0) <small>{{ $c['n'] }}</small>@endif</a>
       @endforeach
     </div>
   </div>

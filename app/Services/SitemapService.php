@@ -29,7 +29,7 @@ class SitemapService
 
             return [
                 'strony' => fn () => $this->plain(['/', '/zlecenie/nowe', '/jak-to-dziala', ...(fachora_protect() ? ['/fachora-protect'] : []), '/standard', '/dla-firm', '/dla-firm/zglos',
-                    '/przejmij', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/status', '/login']),
+                    '/przejmij', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci']),
                 'uslugi' => fn () => $this->plain(array_map(fn ($c) => '/uslugi/' . $c, $categories)),
                 'miasta' => fn () => $this->categoryCityPages(),
                 'firmy' => fn () => $this->providerPages(),
@@ -109,13 +109,25 @@ class SitemapService
     }
 
     /**
-     * Fachora: categoriepagina's per stad, alleen waar Verified bedrijven zijn
-     * (anders zijn het lege doorway-pagina's).
+     * Fachora: categoriepagina's per stad. Altijd voor de SEO-steden uit
+     * config fachora.seo_cities (elke categorie × elke stad; de pagina vertelt
+     * daar hoe de klant zelf kiest), plus elke andere stad met een Verified
+     * bedrijf. Overige steden geven 404 (geen lege doorway-pagina's).
      *
      * @return list<array{0: string, 1: Carbon|null}>
      */
     private function categoryCityPages(): array
     {
+        $pages = [];
+        $seen = [];
+        $categories = array_keys((array) config('fachora.categories', []));
+        foreach (array_keys((array) config('fachora.seo_cities', [])) as $slug) {
+            foreach ($categories as $category) {
+                $pages[] = ['/uslugi/' . $category . '/' . $slug, null];
+                $seen[$category . '/' . $slug] = true;
+            }
+        }
+
         $rows = \Illuminate\Support\Facades\DB::table('providers')
             ->join('provider_category', 'provider_category.provider_id', '=', 'providers.id')
             ->where('providers.status', 'verified')->whereNotNull('providers.city')
@@ -123,9 +135,12 @@ class SitemapService
             ->groupBy('provider_category.category', 'providers.city')
             ->get();
 
-        $pages = [];
         foreach ($rows as $row) {
-            $pages[] = ['/uslugi/' . $row->category . '/' . \Illuminate\Support\Str::slug(\Illuminate\Support\Str::ascii((string) $row->city)), $row->updated ? Carbon::parse($row->updated) : null];
+            $slug = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::ascii((string) $row->city));
+            if (isset($seen[$row->category . '/' . $slug])) {
+                continue;
+            }
+            $pages[] = ['/uslugi/' . $row->category . '/' . $slug, $row->updated ? Carbon::parse($row->updated) : null];
         }
 
         return $pages;

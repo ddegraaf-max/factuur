@@ -17,8 +17,16 @@
                 'title' => brand('register_seo_title'),
                 'description' => brand('register_seo_description'),
             ],
+            // Fachora: de aanvraagpagina is de belangrijkste landingspagina (advertenties, zoekmachines).
+            'zlecenie/nowe' => [
+                'title' => brand('intake_seo_title'),
+                'description' => brand('intake_seo_description'),
+            ],
         ];
         $seo = $seoPages[request()->path()] ?? null;
+        if ($seo && empty($seo['title'])) {
+            $seo = null; // merk zonder SEO-tekst voor deze pagina: gewoon noindex
+        }
     @endphp
     <title inertia>{{ $seo['title'] ?? brand('name') }}</title>
     @unless($seo)

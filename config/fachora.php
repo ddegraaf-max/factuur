@@ -211,6 +211,20 @@ return [
     'urgencies' => ['now', 'week', 'month', 'date'],
 
     /*
+     * SEO-steden (1.92): voor elke categorie bestaat /uslugi/{categorie}/{stad}
+     * voor deze steden, ook zonder Verified bedrijf; ze staan in de sitemap en
+     * als stadslinks op de categoriepagina's. Sleutel = slug in de URL, waarde =
+     * de naam met diakrieten. Volgorde = prioriteit (grootste markt eerst).
+     * Andere steden bestaan alleen als er een Verified bedrijf zit; de rest 404.
+     */
+    'seo_cities' => [
+        'warszawa' => 'Warszawa', 'krakow' => 'Kraków', 'wroclaw' => 'Wrocław', 'gdansk' => 'Gdańsk',
+        'poznan' => 'Poznań', 'lodz' => 'Łódź', 'szczecin' => 'Szczecin', 'gdynia' => 'Gdynia',
+        'lublin' => 'Lublin', 'katowice' => 'Katowice', 'bydgoszcz' => 'Bydgoszcz', 'bialystok' => 'Białystok',
+        'rzeszow' => 'Rzeszów', 'torun' => 'Toruń', 'kielce' => 'Kielce', 'olsztyn' => 'Olsztyn',
+    ],
+
+    /*
      * Middelpunten van Poolse steden: vangnet als de geocoder niet bereikbaar
      * is (of in tests). Sleutel zonder diakrieten en in kleine letters.
      */

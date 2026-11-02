@@ -153,7 +153,7 @@ class FachoraBrandTest extends TestCase
     public function test_the_sitemap_lists_intake_categories_city_pages_and_verified_profiles_only(): void
     {
         $verified = $this->verifiedProvider('Hydro-Max');
-        $unclaimed = Provider::create(['legal_name' => 'Nieznany', 'display_name' => 'Nieznany', 'slug' => 'nieznany-lodz', 'status' => 'unclaimed', 'city' => 'Łódź']);
+        $unclaimed = Provider::create(['legal_name' => 'Nieznany', 'display_name' => 'Nieznany', 'slug' => 'nieznany-pcim', 'status' => 'unclaimed', 'city' => 'Pcim']);
         $unclaimed->syncCategories(['elektryk']);
 
         $urls = $this->sitemapUrls();
@@ -163,10 +163,11 @@ class FachoraBrandTest extends TestCase
         $this->assertContains(url('/przejmij'), $urls);
         $this->assertContains(url('/uslugi/hydraulik'), $urls);
         $this->assertContains(url('/uslugi/mechanik'), $urls);
-        $this->assertContains(url('/uslugi/hydraulik/lodz'), $urls, 'Stadspagina alleen waar een Verified bedrijf zit');
+        $this->assertContains(url('/uslugi/hydraulik/lodz'), $urls, 'Stadspagina voor een SEO-stad (config fachora.seo_cities)');
+        $this->assertContains(url('/uslugi/elektryk/warszawa'), $urls, 'Elke categorie × elke SEO-stad, ook zonder Verified bedrijf');
         $this->assertContains(url('/firma/'.$verified->slug), $urls);
         $this->assertNotContains(url('/firma/'.$unclaimed->slug), $urls, 'Onbevestigde profielen horen niet in de sitemap');
-        $this->assertNotContains(url('/uslugi/elektryk/lodz'), $urls);
+        $this->assertNotContains(url('/uslugi/elektryk/pcim'), $urls, 'Een stad met alleen een onbevestigd registerbedrijf krijgt geen stadspagina');
         $this->assertContains(url('/demo'), $urls, 'De demo van het bedrijvenpanel staat in de sitemap');
         $this->assertNotContains(url('/kalkulator-odsetek'), $urls);
 

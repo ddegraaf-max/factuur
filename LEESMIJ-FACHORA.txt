@@ -233,6 +233,21 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+SEO EN SITEMAPS VOOR ADVERTENTIES (2 nov 2026, 1.92.0)
+- Twee taalversies per pagina: Pools op het pad, Engels op hetzelfde pad met ?lang=en. De layout geeft per
+  taal een eigen canonical en hreflang (pl, en, x-default); de sitemaps (/sitemap.xml → -strony, -uslugi,
+  -miasta, -firmy) bevatten elke pagina in beide talen met xhtml:link-alternates.
+- Stadspagina's: config fachora.seo_cities (16 grote steden, slug → naam met diakrieten) × 14 categorieën
+  = /uslugi/{categorie}/{stad}, altijd in sitemap-miasta en als stadslinks op elke categoriepagina.
+  Andere steden alleen met een Verified bedrijf of een bekend stadsmiddelpunt (fachora.cities); rest 404.
+  Zonder Verified bedrijf vertelt de pagina hoe de klant zelf kiest, met het aantal registerbedrijven.
+- Aanvraagpagina /zlecenie/nowe is indexeerbaar (brand intake_seo_title/description); structured data:
+  WebSite + Organization (layout), BreadcrumbList + Service (categoriepagina's), FAQPage (faq).
+- Advertenties: landingspagina per stad × categorie, bijv. fachora.pl/uslugi/hydraulik/warszawa
+  (Engels: ?lang=en). Vooraf registerbedrijven importeren per stad: Eigenaar → Fachora → bedrijven →
+  "Importeren uit CEIDG" of `php artisan fachora:import-ceidg 43.22.Z --miasto=Warszawa --pages=8`.
+- Nog handmatig: Search Console + Bing Webmaster aanmelden met https://fachora.pl/sitemap.xml.
+
 PROTECT UIT, ALLEEN STRIPE (2 nov 2026, 1.91.0, besluit Daniël: "nu nog geen zin")
 - config fachora.protect staat standaard op false; helper fachora_protect() (= ProtectService::enabled():
   vlag én STRIPE_SECRET) bepaalt of Protect bestaat. Uit = geen menu-/voettekstlink, /fachora-protect 404,

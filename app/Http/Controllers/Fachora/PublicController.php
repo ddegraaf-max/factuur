@@ -36,25 +36,44 @@ class PublicController extends Controller
     public function category(string $category, ?string $city = null): View
     {
         abort_unless(Fachora::hasCategory($category), 404);
-        $cityName = $city ? Str::title(str_replace('-', ' ', $city)) : null;
+        // Stadsnaam met diakrieten uit config fachora.seo_cities ("krakow" → "Kraków"); anders uit de slug.
+        $seoCities = (array) config('fachora.seo_cities', []);
+        $cityName = $city ? ($seoCities[$city] ?? Str::title(str_replace('-', ' ', $city))) : null;
+        $known = $city === null || isset($seoCities[$city]);
 
         $query = Provider::query()->verified()->inCategory($category)->orderByDesc('rating_avg')->orderByDesc('jobs_done');
         if ($cityName) {
             $norm = GeocodeService::normalise($cityName);
             $query->whereRaw('LOWER(city) = ?', [mb_strtolower($cityName)]);
-            // Zonder exacte naamtreffer: alles binnen 30 km van het stadsmiddelpunt.
-            if ((clone $query)->doesntExist() && ($center = app(GeocodeService::class)->fallback($norm))) {
+            if ((clone $query)->exists()) {
+                $known = true;
+            } elseif ($center = app(GeocodeService::class)->fallback($norm)) {
+                // Zonder exacte naamtreffer: alles binnen 30 km van het stadsmiddelpunt.
+                $known = true;
                 $query = Provider::query()->verified()->inCategory($category)->whereNotNull('lat')
                     ->whereBetween('lat', [$center['lat'] - 0.3, $center['lat'] + 0.3])->whereBetween('lng', [$center['lng'] - 0.45, $center['lng'] + 0.45])
                     ->orderByDesc('rating_avg');
             }
         }
+        // Onbekende stad zonder Verified bedrijf: 404, geen lege doorway-pagina (1.92).
+        abort_unless($known, 404);
         $providers = $query->limit(60)->get();
+
+        // Bedrijven uit het register (CEIDG) in deze categorie en stad: de klant kiest ze zelf na de aanvraag.
+        $registerCount = Provider::query()->inCategory($category)->whereIn('status', ['unclaimed', 'claimed', 'pending'])
+            ->when($cityName, fn ($q) => $q->whereRaw('LOWER(city) = ?', [mb_strtolower((string) $cityName)]))
+            ->count();
 
         // Steden met Verified bedrijven in deze categorie, voor de interne links.
         $cities = Provider::query()->verified()->inCategory($category)->whereNotNull('city')
             ->selectRaw('city, COUNT(*) as n')->groupBy('city')->orderByDesc('n')->limit(30)->pluck('n', 'city')
             ->map(fn ($n, $name) => ['name' => $name, 'slug' => Str::slug(Str::ascii((string) $name)), 'n' => (int) $n])->values();
+        // Stadslinks: eerst de SEO-steden (met het aantal Verified bedrijven als dat er is), dan overige steden met Verified bedrijven.
+        $cityLinks = collect($seoCities)
+            ->map(fn ($name, $slug) => ['name' => $name, 'slug' => $slug, 'n' => (int) ($cities->firstWhere('slug', $slug)['n'] ?? 0)])
+            ->values()
+            ->concat($cities->reject(fn ($c) => isset($seoCities[$c['slug']])))
+            ->values();
 
         return view(Market::view('fachora.kategoria'), [
             'category' => $category,
@@ -64,6 +83,8 @@ class PublicController extends Controller
             'citySlug' => $city,
             'providers' => $providers,
             'cities' => $cities,
+            'cityLinks' => $cityLinks,
+            'registerCount' => $registerCount,
             'allCategories' => Fachora::categoryList(),
             'intakeUrl' => route('fachora.intake', array_filter(['kategoria' => $category, 'miasto' => $cityName])),
         ]);

@@ -7,12 +7,27 @@
 <meta name="description" content="@yield('description', brand('seo_description'))">
 <title>@yield('title', brand('seo_title'))</title>
 
-{{-- SEO: canonical + social preview + structured data --}}
-<link rel="canonical" href="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
+{{-- SEO: canonical + social preview + structured data. Markten met twee UI-talen (Polen: pl + en) krijgen
+     per taal een eigen canonical (de Engelse versie leeft op ?lang=en) en hreflang-alternates (1.92). --}}
+@php
+    $seoBase = rtrim(config('app.url'), '/');
+    $seoPath = request()->getPathInfo();
+    $seoLocales = \App\Support\Market::uiLocales();
+    $seoDefault = \App\Support\Market::locale();
+    $seoUrl = fn (string $l) => $seoBase . $seoPath . ($l === $seoDefault ? '' : '?lang=' . $l);
+    $seoCanonical = count($seoLocales) > 1 ? $seoUrl(app()->getLocale()) : $seoBase . $seoPath;
+@endphp
+<link rel="canonical" href="{{ $seoCanonical }}">
+@if(count($seoLocales) > 1)
+@foreach($seoLocales as $seoLoc)
+<link rel="alternate" hreflang="{{ $seoLoc }}" href="{{ $seoUrl($seoLoc) }}">
+@endforeach
+<link rel="alternate" hreflang="x-default" href="{{ $seoUrl($seoDefault) }}">
+@endif
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ brand('name') }}">
 <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_GB' : (market('locale') === 'pl' ? 'pl_PL' : 'nl_NL') }}">
-<meta property="og:url" content="{{ rtrim(config('app.url'), '/') . request()->getPathInfo() }}">
+<meta property="og:url" content="{{ $seoCanonical }}">
 <meta property="og:title" content="@yield('title', brand('seo_title'))">
 <meta property="og:description" content="@yield('description', brand('og_description'))">
 <meta property="og:image" content="{{ \App\Support\Brand::asset('og_image') }}">
@@ -27,15 +42,19 @@
   "@@context": "https://schema.org",
   "@@graph": [
     {
-      "@@type": "SoftwareApplication",
+      "@@type": "{{ brand('ld_type', 'SoftwareApplication') }}",
       "name": "{{ brand('name') }}",
-      "url": "{{ url('/') }}",
+      "url": "{{ url('/') }}/",
+@if(brand('ld_type', 'SoftwareApplication') === 'SoftwareApplication')
       "applicationCategory": "BusinessApplication",
       "operatingSystem": "Web",
+@endif
       "inLanguage": "{{ app()->getLocale() }}",
       "description": "{{ brand('app_description') }}",
       "image": "{{ \App\Support\Brand::asset('og_image') }}",
+@if(brand('ld_type', 'SoftwareApplication') === 'SoftwareApplication')
       "offers": {!! json_encode(array_map(fn ($o) => ['@type' => 'Offer'] + $o, config('marketing.' . \App\Support\Brand::key() . '.offers', config('marketing.easyinvoice.offers', []))), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!},
+@endif
       "publisher": { "@@type": "Organization", "name": "{{ brand('owner_name', 'Creditline B.V.') }}" }
     },
     {

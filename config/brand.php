@@ -281,6 +281,9 @@ return [
             'seo_title' => 'Fachora — sam wybierasz fachowca z okolicy: jasna cena, pewny termin, gwarancja',
             'seo_description' => 'Fachora pokazuje Ci firmy z Twojej okolicy: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Sam wybierasz, do kogo trafi zapytanie: firmy Fachora Verified z ceną ustaloną z góry, fakturą i gwarancją, albo firmy z rejestru. Bezpłatnie, po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
             'og_description' => 'Sprawdzone firmy. Bezpieczne usługi. Jasna cena, pewny termin, gwarancja.',
+            'ld_type' => 'WebSite', // structured data: een marktplaats is een WebSite, geen SoftwareApplication
+            'intake_seo_title' => 'Opisz zlecenie i sam wybierz fachowca | Fachora',
+            'intake_seo_description' => 'Bezpłatnie i bez konta: opisz, co trzeba zrobić, potwierdź e-mailem i wybierz do 5 firm z okolicy — Fachora Verified i firmy z rejestru CEIDG. Ceny porównasz na swojej stronie zlecenia.',
             'app_description' => 'Platforma fachowców w Polsce: zlecenie online, sam wybierasz firmy z okolicy, oferty od firm Fachora Verified, faktura i 12 miesięcy gwarancji.',
             'pwa_description' => 'Sprawdzone firmy. Bezpieczne usługi.',
             'footer_description' => 'Fachora: zweryfikowani fachowcy, jasna cena ustalona z góry, bezpieczna płatność i gwarancja. Dla klientów bezpłatnie.',
@@ -298,6 +301,8 @@ return [
                     'seo_title' => 'Fachora — pick your own tradesperson in Poland: clear price, reliable appointment, guarantee',
                     'seo_description' => 'Fachora shows you companies near you in Poland: plumber, electrician, heating, air conditioning, locksmith, roofing, renovation, appliances, car mechanic. You choose who receives your request: Fachora Verified companies with a price agreed up front, invoice and guarantee, or companies from the business register. Free, in English, Polish, German, Dutch and Ukrainian.',
                     'og_description' => 'Verified companies. Safe services. Clear price, reliable appointment, guarantee.',
+                    'intake_seo_title' => 'Describe your job and pick the tradesperson yourself | Fachora',
+                    'intake_seo_description' => 'Free, no account: describe what needs doing, confirm by e-mail and pick up to 5 companies near you — Fachora Verified and companies from the CEIDG business register. Compare prices on your job page, in English.',
                     'app_description' => 'Platform of tradespeople in Poland: request online, you pick the companies near you, offers from Fachora Verified companies, invoice and 12-month guarantee.',
                     'pwa_description' => 'Verified companies. Safe services.',
                     'footer_description' => 'Fachora: verified tradespeople, a clear price agreed up front, secure payment and a guarantee. Free for customers.',

@@ -3,7 +3,9 @@
 {{--
   Fachora — companies in a category, optionally in a city (/uslugi/{category}[/{city}]), English edition.
   Variables from PublicController::category(): $category (key), $categoryName, $examples, $city (name|null),
-  $citySlug, $providers (Collection<Provider>), $cities [{name,slug,n}], $allCategories [{key,name,icon,examples}], $intakeUrl.
+  $citySlug, $providers (Collection<Provider>), $cities [{name,slug,n}], $cityLinks (SEO cities + cities with Verified companies),
+  $registerCount (register companies in this category/city), $allCategories [{key,name,icon,examples}], $intakeUrl.
+  Structured data: BreadcrumbList + Service (1.92).
   Fachora Verified companies only. Without companies: an honest "coming soon" instead of an empty doorway page.
 --}}
 
@@ -16,6 +18,16 @@
         ? $categoryName . ' in ' . $city . ' – verified companies | Fachora'
         : $categoryName . ' – verified companies in Poland | Fachora';
     $desc = ($city ? $categoryName . ' in ' . $city : $categoryName . ' in Poland') . ': Fachora Verified companies — checked in the public registers, price agreed up front, ' . ($protect ? 'secure Fachora Protect payment, ' : '') . 'invoice and warranty.' . ($examples ? ' E.g. ' . $examples . '.' : '') . ' Leave a request for free.';
+    $ld = ['@context' => 'https://schema.org', '@graph' => [
+        ['@type' => 'BreadcrumbList', 'itemListElement' => array_values(array_filter([
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Fachora', 'item' => url('/') . '/?lang=en'],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $categoryName, 'item' => route('fachora.category', $category) . '?lang=en'],
+            $city ? ['@type' => 'ListItem', 'position' => 3, 'name' => $city, 'item' => route('fachora.category.city', [$category, $citySlug]) . '?lang=en'] : null,
+        ]))],
+        ['@type' => 'Service', 'name' => $h1, 'serviceType' => $categoryName, 'url' => url()->current() . '?lang=en', 'description' => $desc, 'inLanguage' => 'en',
+            'provider' => ['@type' => 'Organization', 'name' => 'Fachora', 'url' => url('/') . '/'],
+            'areaServed' => $city ? ['@type' => 'City', 'name' => $city, 'containedInPlace' => ['@type' => 'Country', 'name' => 'Poland']] : ['@type' => 'Country', 'name' => 'Poland']],
+    ]];
 @endphp
 
 @section('title', $title)
@@ -74,6 +86,7 @@
   .fc-seo a { color: var(--brand); font-weight: 500; }
   .fc-h2 { font-size: 22px; margin-bottom: 14px; }
 </style>
+<script type="application/ld+json">{!! json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
 @endpush
 
 @section('content')
@@ -87,10 +100,10 @@
       <div class="fc-icon">@include('fachora.partials.icon', ['name' => $icon, 'size' => 34])</div>
       <div style="flex:1;min-width:260px;">
         <h1>{{ $h1 }}</h1>
-        @if($examples)<p class="fc-ex">For example: {{ $examples }}. Fachora Verified companies only — checked in the public registers, with a price up front, an invoice and a warranty.</p>@endif
+        @if($examples)<p class="fc-ex">For example: {{ $examples }}. Fachora Verified companies: checked in the public registers, with a price up front, an invoice and a warranty. Plus companies from the business register, which you pick yourself after describing the job.</p>@endif
         <div class="fc-ctas">
           <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Leave a request →</a>
-          <small>Free, no account needed. Offers from up to {{ (int) config('fachora.max_offers') }} companies.</small>
+          <small>Free, no account needed. You pick up to {{ (int) config('fachora.max_offers') }} companies from the list.</small>
         </div>
       </div>
     </div>
@@ -135,21 +148,21 @@
     @else
       <div class="fc-empty" style="margin-top:34px;">
         <div style="font-size:30px;margin-bottom:8px;">🔧</div>
-        <h2>Coming soon{{ $city ? ' in ' . $city : '' }}</h2>
-        <p>We do not yet have a Fachora Verified company {{ $city ? 'in this area' : 'in this category' }} that we could recommend with a clear conscience. We do not list companies we have not checked.<br>Leave a request — we will find a company, verify it and come back to you with an offer.</p>
-        <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Leave a request – we will find a company →</a>
+        <h2>{{ $city ? $categoryName . ' in ' . $city : $categoryName . ' across Poland' }}: you pick the company</h2>
+        <p>Describe what needs doing and we show you up to {{ (int) config('fachora.choice_candidates') }} companies near you: Fachora Verified at the top, companies from the business register (CEIDG) clearly marked. You tick up to {{ (int) config('fachora.max_offers') }}. Verified companies reply on your job page; you contact a register company yourself, using the public details we show you.@if($registerCount > 0) We already have {{ $registerCount }} {{ $registerCount === 1 ? 'company' : 'companies' }} from the register in this category{{ $city ? ' nearby' : '' }}.@endif<br>This page lists Fachora Verified companies only; there are none {{ $city ? 'in this area' : 'in this category' }} yet.</p>
+        <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Describe the job and pick companies →</a>
       </div>
     @endif
   </div>
 </section>
 
-@if($cities->isNotEmpty())
+@if($cityLinks->isNotEmpty())
 <section class="section" style="padding:40px 0 10px;">
   <div class="container">
     <h2 class="fc-h2">{{ $categoryName }} — cities</h2>
     <div class="fc-cities">
-      @foreach($cities as $c)
-        <a class="fc-city{{ $citySlug === $c['slug'] ? ' is-active' : '' }}" href="{{ route('fachora.category.city', [$category, $c['slug']]) }}">{{ $c['name'] }} <small>{{ $c['n'] }}</small></a>
+      @foreach($cityLinks as $c)
+        <a class="fc-city{{ $citySlug === $c['slug'] ? ' is-active' : '' }}" href="{{ route('fachora.category.city', [$category, $c['slug']]) }}">{{ $c['name'] }}@if($c['n'] > 0) <small>{{ $c['n'] }}</small>@endif</a>
       @endforeach
     </div>
   </div>
