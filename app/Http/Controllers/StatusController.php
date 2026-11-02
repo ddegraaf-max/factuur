@@ -55,6 +55,15 @@ class StatusController extends Controller
         $schedulerOk = $heartbeat > 0 && now()->timestamp - $heartbeat < 15 * 60;
 
         if (Brand::is('fachora')) {
+            // 1.97.5: Stripe echt aanspreken (saldo-opvraag, geen wijziging), hooguit eens per tien minuten.
+            $stripeKey = (string) config('services.stripe.secret');
+            $stripeOk = $stripeKey !== '' && Cache::remember('status.stripe.' . substr(sha1($stripeKey), 0, 12), 600, function () use ($stripeKey) {
+                try {
+                    return \Illuminate\Support\Facades\Http::withToken($stripeKey)->timeout(8)->get('https://api.stripe.com/v1/balance')->successful();
+                } catch (\Throwable) {
+                    return false;
+                }
+            });
             // 1.97.1: Fachora is een marktplaats, geen facturatieprogramma: eigen onderdelen.
             $components = [
                 ['label' => __('Webapplicatie'),                      'ok' => true],
@@ -65,7 +74,7 @@ class StatusController extends Controller
                 ['label' => __('AI-hulp bij de omschrijving'),        'ok' => app(\App\Services\Ai\StructuredClaude::class)->enabled()],
                 ['label' => __('Bedrijvenpaneel en inloggen'),        'ok' => $dbOk],
                 // Zonder Stripe-sleutel is dit een bewuste stand (aanvragen gratis), geen storing.
-                ['label' => __('Betalingen voor bedrijven (Stripe)'), 'ok' => filled(config('services.stripe.secret')), 'pending' => blank(config('services.stripe.secret'))],
+                ['label' => __('Betalingen voor bedrijven (Stripe)'), 'ok' => $stripeOk, 'pending' => $stripeKey === ''],
                 ['label' => __("Foto's bij aanvragen"),              'ok' => $dbOk && $storageOk],
                 ['label' => __('E-mail versturen'),                   'ok' => $mailOk],
                 ['label' => __('Cache'),                              'ok' => $cacheOk],
