@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 1 november 2026 · {{ brand('version_prefix') }} 1.86.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.89.0</div>
+        <h2>Offerte vervangen in één stap</h2>
+        <ul class="tl-list">
+          <li><b>Nieuwe offerte als kopie</b> — bij "Laten vervallen" kies je nu ook "Nieuwe offerte maken als kopie van deze". Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum; de oude offerte vervalt en verwijst naar de vervanger. Je komt direct in het concept om het aan te passen en te versturen.</li>
+          <li><b>Zichtbaar aan beide kanten</b> — op de nieuwe offerte staat welke hij vervangt, op de oude welke ervoor in de plaats kwam. Informeer je de klant meteen, dan meldt de mail dat er een nieuwe offerte volgt.</li>
+          <li><b>Bestandsvelden</b> — de knop "Bestand kiezen" ziet er nu overal uit als de rest van de app.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">1 november 2026 · {{ brand('version_prefix') }} 1.86.0</div>
         <h2>Demo op aanvraag</h2>
         <ul class="tl-list">
           <li><b>Even je e-mailadres achterlaten</b> — de demo start niet meer met één klik. Wie wil rondkijken, laat naam en e-mailadres achter (en eventueel waar hij naar wil kijken); wij keuren de aanvraag goed en je krijgt een persoonlijke link. Die werkt twee weken en mag je vaker gebruiken: elke start is een verse voorbeeldomgeving.</li>

@@ -80,11 +80,19 @@ const withdrawForm = useForm({
   notify: !!props.quote.customer_email,
 });
 const selectedReplacement = computed(() => replacementOptions.value.find(o => o.id === withdrawForm.replaced_by_quote_id) || null);
+// 'new' in de keuzelijst: de vervanger is een nieuw concept als kopie van deze offerte.
+const isNewCopy = computed(() => withdrawForm.replaced_by_quote_id === 'new');
 const withdraw = () => {
-  withdrawForm.post(route('quotes.withdraw', props.quote.id), {
-    preserveScroll: true,
-    onSuccess: () => { showWithdrawModal.value = false; },
-  });
+  withdrawForm
+    .transform((data) => ({
+      ...data,
+      copy: data.replaced_by_quote_id === 'new',
+      replaced_by_quote_id: data.replaced_by_quote_id === 'new' ? null : data.replaced_by_quote_id,
+    }))
+    .post(route('quotes.withdraw', props.quote.id), {
+      preserveScroll: true,
+      onSuccess: () => { showWithdrawModal.value = false; },
+    });
 };
 const notifyWithdrawn = () => {
   const again = props.quote.withdrawal_mail_sent_at_label ? t('De klant is al gemaild op :date.', { date: props.quote.withdrawal_mail_sent_at_label }) + '\n\n' : '';
@@ -219,6 +227,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <template v-else-if="quote.status === 'rejected'">{{ $t('Afgewezen op :date', { date: quote.rejected_at_label }) }}<template v-if="quote.decline_reason"> · {{ $t('Reden van de klant: :reason', { reason: quote.decline_reason }) }}</template></template>
           <template v-else-if="quote.status === 'withdrawn'">{{ $t('Vervallen op :date|offerte', { date: quote.withdrawn_at_label }) }}<template v-if="quote.accepted_at_label"> · {{ $t('was geaccepteerd op :date', { date: quote.accepted_at_label }) }}</template><template v-if="quote.replaced_by"> · {{ $t('vervangen door') }} <Link :href="route('quotes.show', quote.replaced_by.id)" style="color:inherit;font-weight:600;">{{ quote.replaced_by.number || $t('concept') }}</Link></template><template v-if="quote.withdrawal_mail_sent_at_label"> · {{ $t('klant gemaild :date', { date: quote.withdrawal_mail_sent_at_label }) }}</template></template>
           <template v-else-if="quote.sent_at_label">{{ $t('Verstuurd op :date', { date: quote.sent_at_label }) }}</template>
+          <template v-for="r in (quote.replaces || [])" :key="r.id"> · {{ $t('vervangt offerte') }} <Link :href="route('quotes.show', r.id)" style="color:inherit;text-decoration:underline;">{{ r.number || $t('concept') }}</Link></template>
           <template v-if="quote.brand_profile_name"> · {{ $t('als') }} <b>{{ quote.brand_profile_name }}</b></template>
           <template v-if="quote.language === 'en'"> · {{ $t('Engelstalig') }}</template>
           <template v-else-if="quote.language === 'pl'"> · {{ $t('Poolstalig') }}</template>
@@ -334,9 +343,11 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
             <label>{{ $t('Vervangen door') }}</label>
             <select v-model="withdrawForm.replaced_by_quote_id">
               <option :value="null">{{ $t('— geen vervangende offerte —') }}</option>
+              <option value="new">{{ $t('Nieuwe offerte maken als kopie van deze') }}</option>
               <option v-for="o in replacementOptions" :key="o.id" :value="o.id">{{ o.label }} ({{ o.status_label }})</option>
             </select>
-            <div v-if="!replacementOptions.length" class="opt-sub">{{ $t('Er zijn geen andere offertes voor deze klant.') }}</div>
+            <div v-if="isNewCopy" class="opt-sub">{{ $t('Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum. Je komt direct in het concept om het aan te passen en te versturen.') }}</div>
+            <div v-else-if="!replacementOptions.length" class="opt-sub">{{ $t('Er zijn geen andere offertes voor deze klant.') }}</div>
           </div>
           <div class="wd-field">
             <label>{{ $t('Toelichting voor de klant') }} <span class="wd-opt">({{ $t('optioneel') }})</span></label>
@@ -348,6 +359,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
               <div class="opt-title">{{ $t('Klant informeren per e-mail') }}</div>
               <div class="opt-sub">
                 <template v-if="!quote.customer_email">{{ $t('Deze klant heeft geen e-mailadres.') }}</template>
+                <template v-else-if="isNewCopy">{{ $t('Mailt :email dat offerte :number is vervallen en dat er een nieuwe offerte volgt.', { email: quote.customer_email, number: quote.number }) }}</template>
                 <template v-else-if="selectedReplacement && selectedReplacement.number">{{ $t('Mailt :email dat offerte :number is vervallen en is vervangen door :replacement — zonder de oude offerte als bijlage.', { email: quote.customer_email, number: quote.number, replacement: selectedReplacement.number }) }}</template>
                 <template v-else-if="selectedReplacement">{{ $t('Mailt :email dat offerte :number is vervallen en dat er een nieuwe offerte volgt.', { email: quote.customer_email, number: quote.number }) }}</template>
                 <template v-else>{{ $t('Mailt :email dat offerte :number is vervallen en niet meer geldt.', { email: quote.customer_email, number: quote.number }) }}</template>
@@ -359,7 +371,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <div></div>
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showWithdrawModal = false">{{ $t('Annuleren') }}</button>
-            <button class="btn btn-danger btn-sm" @click="withdraw" :disabled="withdrawForm.processing">{{ $t('Laten vervallen') }}</button>
+            <button class="btn btn-danger btn-sm" @click="withdraw" :disabled="withdrawForm.processing">{{ isNewCopy ? $t('Laten vervallen en kopie maken') : $t('Laten vervallen') }}</button>
           </div>
         </div>
       </div>

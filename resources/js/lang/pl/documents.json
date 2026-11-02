@@ -674,5 +674,9 @@
   "btw :vat · incl. btw :gross": "VAT :vat · z VAT :gross",
   "nog open :open": "otwarte :open",
   "incl. btw :amount": "z VAT :amount",
-  "nog open :amount": "otwarte :amount"
+  "nog open :amount": "otwarte :amount",
+  "Nieuwe offerte maken als kopie van deze": "Utwórz nową ofertę jako kopię tej",
+  "Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum. Je komt direct in het concept om het aan te passen en te versturen.": "Pozycje, teksty, raty i załączniki trafiają do nowego szkicu z nową datą ważności. Od razu przechodzisz do szkicu, aby go poprawić i wysłać.",
+  "Laten vervallen en kopie maken": "Wycofaj i utwórz kopię",
+  "vervangt offerte": "zastępuje ofertę"
 }

@@ -141,6 +141,57 @@ class QuoteWithdrawTest extends TestCase
         $this->assertNull($quote->fresh()->signed_at);
     }
 
+    public function test_withdraw_can_replace_the_quote_with_a_fresh_copy(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+
+        $old = $this->sentQuote($user->company_id);
+        $old->attachments()->create([
+            'company_id' => $user->company_id, 'filename' => 'offertedocument.pdf', 'mime_type' => 'application/pdf',
+            'size_bytes' => 4, 'file_data' => base64_encode('%PDF'), 'for_customer' => true,
+        ]);
+        $lineCount = $old->lines()->count();
+        $this->assertGreaterThan(0, $lineCount);
+
+        $response = $this->post(route('quotes.withdraw', $old), ['copy' => 1, 'note' => 'Nieuwe prijzen.', 'notify' => 1]);
+
+        // De oude is vervallen en verwijst naar een nieuw concept: zelfde regels, totaal en bijlage, geen nummer of link.
+        $old->refresh();
+        $this->assertSame('withdrawn', $old->status);
+        $copy = Quote::withoutGlobalScope('company')->find($old->replaced_by_quote_id);
+        $this->assertNotNull($copy);
+        $response->assertRedirect(route('quotes.edit', $copy))->assertSessionHas('flash');
+        $this->assertSame('draft', $copy->status);
+        $this->assertNull($copy->number);
+        $this->assertNull($copy->portal_token);
+        $this->assertSame($old->customer_id, $copy->customer_id);
+        $this->assertSame((string) $old->total, (string) $copy->total);
+        $this->assertSame($lineCount, $copy->lines()->count());
+        $this->assertSame(1, $copy->attachments()->count());
+        $this->assertTrue($copy->valid_until->isAfter(now()));
+        $this->assertSame('Nieuwe prijzen.', $old->withdrawal_note);
+
+        // De klant hoort dat er een nieuwe offerte volgt; het concept heeft nog geen nummer of link.
+        Mail::assertSent(QuoteWithdrawnMail::class, function (QuoteWithdrawnMail $mail) use ($old) {
+            $html = $mail->render();
+
+            return $mail->hasTo($old->customer_email) && str_contains($html, 'binnenkort een nieuwe offerte');
+        });
+
+        // Beide kanten verwijzen naar elkaar.
+        $this->get(route('quotes.show', $copy))->assertOk()
+            ->assertInertia(fn ($page) => $page->where('quote.replaces.0.number', $old->number));
+        $this->get(route('quotes.show', $old))->assertOk()
+            ->assertInertia(fn ($page) => $page->where('quote.replaced_by.id', $copy->id));
+
+        // Van een concept kan geen kopie-vervanger: de weigering laat geen los concept achter.
+        $before = Quote::withoutGlobalScope('company')->count();
+        $this->post(route('quotes.withdraw', $copy), ['copy' => 1])->assertSessionHasErrors('quote');
+        $this->assertSame($before, Quote::withoutGlobalScope('company')->count());
+    }
+
     public function test_only_sent_or_expired_quotes_can_be_withdrawn_and_reopen_undoes_it(): void
     {
         Mail::fake();

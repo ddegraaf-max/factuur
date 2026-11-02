@@ -386,6 +386,83 @@ class QuoteManager
     }
 
     /** Waarom de klant (nu) niet over het vervallen kan worden gemaild — of null als het kan. */
+    /**
+     * Laten vervallen én meteen de vervanger klaarzetten: een nieuw concept als
+     * kopie van deze offerte. In één transactie, zodat er bij een weigering
+     * (verkeerde status, al gefactureerd) geen los concept achterblijft.
+     */
+    public function withdrawWithCopy(Quote $quote, ?string $note = null): Quote
+    {
+        return DB::transaction(function () use ($quote, $note) {
+            $copy = $this->duplicate($quote);
+            $this->withdraw($quote, $copy, $note);
+
+            return $copy;
+        });
+    }
+
+    /**
+     * Een nieuw concept als kopie van een offerte. Regels, teksten, termijnen en
+     * bijlagen gaan mee; nummer, link, handtekening, status en mails niet. De
+     * klantgegevens zijn een verse momentopname en de geldigheid loopt vanaf vandaag.
+     */
+    public function duplicate(Quote $quote): Quote
+    {
+        return DB::transaction(function () use ($quote) {
+            $quote->loadMissing('lines', 'installments', 'attachments', 'customer', 'company');
+            $customer = $quote->customer;
+            $validDays = (int) ($quote->company?->quote_valid_days ?? 30);
+
+            $copy = $quote->replicate([
+                'number', 'portal_token', 'status', 'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
+                'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
+                'accept_mail_sent_at', 'accept_mail_sent_to',
+                'withdrawn_at', 'withdrawal_note', 'replaced_by_quote_id', 'withdrawal_mail_sent_at', 'withdrawal_mail_sent_to',
+            ]);
+            $copy->forceFill(array_merge([
+                'status' => 'draft',
+                'quote_date' => now(),
+                'valid_until' => now()->addDays($validDays),
+            ], $customer ? [
+                'customer_name' => $customer->name,
+                'customer_address_line' => $customer->address_line,
+                'customer_postal_code' => $customer->postal_code,
+                'customer_city' => $customer->city,
+                'customer_country' => $customer->country,
+                'customer_vat_number' => $customer->vat_number,
+                'customer_kvk_number' => $customer->kvk_number,
+                'customer_email' => $customer->email,
+            ] : []))->save();
+
+            foreach ($quote->lines as $line) {
+                $l = $line->replicate();
+                $l->quote_id = $copy->id;
+                $l->save();
+            }
+            foreach ($quote->installments as $installment) {
+                $i = $installment->replicate(['invoice_id']);
+                $i->quote_id = $copy->id;
+                $i->save();
+            }
+            // Bijlagen: de inhoud gaat mee (ook van oude bijlagen op schijf), zodat
+            // beide offertes los van elkaar hun bijlagen kunnen verwijderen.
+            foreach ($quote->attachments as $attachment) {
+                $data = $attachment->file_data ?: (($raw = $attachment->contents()) !== null ? base64_encode($raw) : null);
+                if ($data === null) {
+                    continue;
+                }
+                $a = $attachment->replicate(['storage_path', 'file_data']);
+                $a->attachable_id = $copy->id;
+                $a->file_data = $data;
+                $a->save();
+            }
+
+            \App\Support\Audit::log('created', $copy, __('Nieuw concept als kopie van :label', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
+
+            return $copy->fresh('lines');
+        });
+    }
+
     public function withdrawalNoticeBlocker(Quote $quote, bool $force = false): ?string
     {
         if ($quote->status !== 'withdrawn') {

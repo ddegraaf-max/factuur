@@ -167,6 +167,9 @@ class QuoteController extends Controller
                     'number' => $quote->replacedBy->number,
                     'status' => $quote->replacedBy->status,
                 ] : null,
+                // Offertes die door deze zijn vervangen (de oude verwijst naar deze).
+                'replaces' => Quote::where('replaced_by_quote_id', $quote->id)->orderBy('id')->get()
+                    ->map(fn (Quote $q) => ['id' => $q->id, 'number' => $q->number])->values()->all(),
                 // Andere offertes van deze klant die deze kunnen vervangen (knop "Vervallen").
                 'replacement_options' => in_array($quote->status, ['sent', 'expired', 'accepted'], true) ? $this->replacementOptions($quote) : [],
                 'portal_url' => $quote->portalUrl(),
@@ -336,6 +339,7 @@ class QuoteController extends Controller
     {
         $data = $request->validate([
             'replaced_by_quote_id' => ['nullable', 'integer'],
+            'copy' => ['nullable', 'boolean'],   // vervanger = nieuw concept als kopie van deze offerte
             'note' => ['nullable', 'string', 'max:1000'],
             'notify' => ['nullable', 'boolean'],
         ]);
@@ -346,13 +350,21 @@ class QuoteController extends Controller
             return back()->withErrors(['quote' => __('De gekozen vervangende offerte bestaat niet (meer).')]);
         }
 
+        $copy = null;
         try {
-            $quote = $this->manager->withdraw($quote, $replacement, $data['note'] ?? null);
+            if ($request->boolean('copy')) {
+                $copy = $this->manager->withdrawWithCopy($quote, $data['note'] ?? null);
+                $quote->refresh();
+            } else {
+                $quote = $this->manager->withdraw($quote, $replacement, $data['note'] ?? null);
+            }
         } catch (\DomainException $e) {
             return back()->withErrors(['quote' => $e->getMessage()]);
         }
 
-        $flash = __('Offerte :number is vervallen.', ['number' => $quote->number]);
+        $flash = $copy
+            ? __('Offerte :number is vervallen. Dit concept is de vervanger: pas het aan en verstuur het.', ['number' => $quote->number])
+            : __('Offerte :number is vervallen.', ['number' => $quote->number]);
 
         if ($request->boolean('notify')) {
             try {
@@ -366,7 +378,10 @@ class QuoteController extends Controller
             }
         }
 
-        return back()->with('flash', $flash);
+        // Met een kopie als vervanger ga je meteen door naar dat concept.
+        return $copy
+            ? redirect()->route('quotes.edit', $copy)->with('flash', $flash)
+            : back()->with('flash', $flash);
     }
 
     /** De klant (opnieuw) laten weten dat de offerte is vervallen. */
