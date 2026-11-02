@@ -401,5 +401,7 @@
   "Hoofdactiviteit: :name (past bij je klus)": "Main activity: :name (matches your job)",
   "Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)": "Main activity: :name (your job is a secondary activity of this company)",
   "E-mailadres kopiëren": "Copy e-mail address",
-  "Kopieer het e-mailadres hieronder:": "Copy the e-mail address below:"
+  "Kopieer het e-mailadres hieronder:": "Copy the e-mail address below:",
+  "Van mijn lijst verwijderen": "Remove from my list",
+  "Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.": "Remove this company from your list? If nobody else picked it, Fachora stops keeping its register details."
 }

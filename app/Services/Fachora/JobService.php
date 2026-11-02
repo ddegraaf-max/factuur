@@ -424,6 +424,29 @@ class JobService
      *
      * @return \Illuminate\Support\Collection<int, Provider>
      */
+    /**
+     * 1.96.3: de klant haalt een registerbedrijf van zijn lijst. Het verdwijnt uit
+     * selected_providers (met een regel in het opdrachtlogboek) en, als geen andere
+     * klant het koos en het nooit een aanbieding kreeg, meteen uit de database
+     * (RegisterNoticeService::purgeIfUnused, met een regel in het verantwoordingslog).
+     *
+     * @return array{removed: bool, deleted: bool}
+     */
+    public function removeDirectContact(ServiceJob $job, int $providerId): array
+    {
+        $ids = array_map('intval', (array) $job->selected_providers);
+        if (! in_array($providerId, $ids, true)) {
+            return ['removed' => false, 'deleted' => false];
+        }
+        $provider = Provider::query()->find($providerId);
+        $job->forceFill(['selected_providers' => array_values(array_diff($ids, [$providerId]))])->save();
+        $this->log($job, 'direct_removed', 'customer', __('Klant haalde :name van zijn lijst', ['name' => $provider?->display_name ?? '#' . $providerId]));
+
+        $deleted = $provider !== null && app(RegisterNoticeService::class)->purgeIfUnused($provider);
+
+        return ['removed' => true, 'deleted' => $deleted];
+    }
+
     public function directContacts(ServiceJob $job): \Illuminate\Support\Collection
     {
         $ids = array_map('intval', (array) $job->selected_providers);

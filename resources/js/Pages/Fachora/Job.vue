@@ -109,6 +109,11 @@ const mailtoFor = (p) => {
   const m = messageFor(p);
   return 'mailto:' + p.email + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
 };
+// 1.96.3: van de lijst halen (en als niemand anders het koos: uit de database).
+const removeDirect = (p) => {
+  if (!window.confirm(t('Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.'))) return;
+  router.post(route('fachora.job.direct.remove', [props.token, p.id]), {}, { preserveScroll: true });
+};
 // WhatsApp met het bericht al ingevuld (alleen bij een Pools mobiel nummer, zie Fachora::whatsappNumber).
 const whatsappFor = (p) => {
   const m = messageFor(p);
@@ -346,6 +351,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':msg' }" @click="copyMessage(p)">{{ copied === p.id + ':msg' ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
           <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' }" @click="copyEmail(p)">{{ copied === p.id + ':mail' ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
+          <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
         <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
       </article>
@@ -653,6 +659,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .fa-btn.is-copied { background: #E6F4EA; border-color: #34A853; color: #1E7E34; }
 .jb-fit-ok { color: #1E7E34; }
 .fa-btn.jb-wa { background: #25D366; color: #fff; }
+.jb-remove { margin-left: auto; color: #8A2A1F; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }

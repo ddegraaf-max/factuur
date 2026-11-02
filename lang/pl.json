@@ -2079,5 +2079,8 @@
   "Vul je postcode in, dan rekenen we de afstand tot de bedrijven precies uit.": "Podaj kod pocztowy, a dokładnie obliczymy odległość do firm.",
   "We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.": "Nie znaleźliśmy Twojej miejscowości na mapie. Sprawdź pisownię lub podaj kod pocztowy – inaczej szukamy tylko w samej miejscowości.",
   "Offerte :number is vervallen. Dit concept is de vervanger: pas het aan en verstuur het.": "Oferta :number została wycofana. Ten szkic ją zastępuje: popraw go i wyślij.",
-  "Nieuw concept als kopie van :label": "Nowy szkic jako kopia :label"
+  "Nieuw concept als kopie van :label": "Nowy szkic jako kopia :label",
+  "Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.": "Firma usunięta z Twojej listy i z bazy Fachory.",
+  "Bedrijf van je lijst gehaald.": "Firma usunięta z Twojej listy.",
+  "Klant haalde :name van zijn lijst": "Klient usunął :name ze swojej listy"
 }

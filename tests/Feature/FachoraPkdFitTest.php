@@ -125,6 +125,30 @@ class FachoraPkdFitTest extends TestCase
                 ->where('direct.1.pkd_fit', 'unrelated')->where('direct.1.phone_wa', '48608222133')->where('direct.1.pkd_main_name', 'Działalność 68.31.Z'));
     }
 
+    public function test_the_customer_can_remove_a_register_company_from_the_list_and_an_unused_record_is_deleted_with_a_log(): void
+    {
+        $estate = $this->register('Pasja Nieruchomości', '68.31.Z');
+        $sweep = $this->register('Kominiarz Nowak', '81.22.Z');
+        $shared = $this->register('Gdzie indziej wybrany', '68.31.Z');
+        $job = $this->job();
+        $job->forceFill(['status' => 'open', 'selected_providers' => [$estate->id, $sweep->id, $shared->id]])->save();
+        $this->job()->forceFill(['status' => 'open', 'selected_providers' => [$shared->id]])->save(); // andere klant koos dit bedrijf ook
+
+        $this->post(route('fachora.job.direct.remove', [$job->token, $estate->id]))->assertRedirect()->assertSessionHas('flash', 'Firma usunięta z Twojej listy i z bazy Fachory.');
+        $job->refresh();
+        $this->assertSame([$sweep->id, $shared->id], array_map('intval', $job->selected_providers));
+        $this->assertNull(Provider::query()->find($estate->id), 'door niemand anders gekozen: weg uit de database');
+        $this->assertDatabaseHas('fachora_privacy_log', ['action' => 'purge_customer_removed', 'count' => 1]);
+        $this->assertDatabaseHas('service_job_events', ['service_job_id' => $job->id, 'kind' => 'direct_removed']);
+
+        $this->post(route('fachora.job.direct.remove', [$job->token, $shared->id]))->assertRedirect()->assertSessionHas('flash', 'Firma usunięta z Twojej listy.');
+        $this->assertNotNull(Provider::query()->find($shared->id), 'door een andere klant gekozen: blijft bestaan');
+        $this->assertSame([$sweep->id], array_map('intval', $job->fresh()->selected_providers));
+
+        $this->post(route('fachora.job.direct.remove', [$job->token, 999999]))->assertRedirect()->assertSessionMissing('flash');
+        $this->get(route('fachora.job.show', $job->token))->assertOk()->assertInertia(fn ($p) => $p->count('direct', 1)->where('direct.0.id', $sweep->id));
+    }
+
     public function test_the_import_skips_companies_whose_main_activity_is_not_trade_work(): void
     {
         $firm = fn (string $id, string $nip) => [

@@ -44,6 +44,8 @@ Route::middleware('brand:fachora')->group(function () {
         Route::post('potwierdz/zmien', [JobController::class, 'updatePending'])->middleware('throttle:20,1')->name('confirm.update');
         Route::get('/', [JobController::class, 'show'])->name('show');
         Route::post('firmy', [JobController::class, 'select'])->middleware('throttle:20,1')->name('select');
+        // 1.96.3: een gekozen registerbedrijf van de lijst halen (en, als niemand anders het koos, uit de database).
+        Route::post('firmy/{provider}/usun', [JobController::class, 'removeDirect'])->where('provider', '[0-9]+')->middleware('throttle:20,1')->name('direct.remove');
         Route::post('sms', [JobController::class, 'smsSend'])->middleware('throttle:5,1')->name('sms.send');
         Route::post('sms/kod', [JobController::class, 'smsVerify'])->middleware('throttle:10,1')->name('sms.verify');
         Route::get('oplacono', [JobController::class, 'requestPaid'])->middleware('throttle:20,1')->name('request.paid');

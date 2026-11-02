@@ -2079,5 +2079,8 @@
   "Vul je postcode in, dan rekenen we de afstand tot de bedrijven precies uit.": "Enter your postal code and we'll calculate the distance to companies exactly.",
   "We konden je plaats niet op de kaart vinden. Controleer de spelling of vul de postcode in, anders zoeken we alleen in de plaats zelf.": "We couldn't find your town on the map. Check the spelling or enter the postal code, otherwise we only search in the town itself.",
   "Offerte :number is vervallen. Dit concept is de vervanger: pas het aan en verstuur het.": "Quote :number has been withdrawn. This draft replaces it: adjust it and send it.",
-  "Nieuw concept als kopie van :label": "New draft as a copy of :label"
+  "Nieuw concept als kopie van :label": "New draft as a copy of :label",
+  "Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.": "Company removed from your list and from the Fachora database.",
+  "Bedrijf van je lijst gehaald.": "Company removed from your list.",
+  "Klant haalde :name van zijn lijst": "The customer removed :name from their list"
 }

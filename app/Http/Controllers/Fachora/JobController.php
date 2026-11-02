@@ -130,6 +130,20 @@ class JobController extends Controller
     }
 
     /** De klant kiest 1 tot vijf bedrijven en betaalt (zo nodig) de bijdrage. */
+    /** 1.96.3: de klant haalt een registerbedrijf van zijn lijst; zie JobService::removeDirectContact(). */
+    public function removeDirect(string $token, int $provider)
+    {
+        $job = $this->find($token);
+        $result = $this->jobs->removeDirectContact($job, $provider);
+        if (! $result['removed']) {
+            return back();
+        }
+
+        return back()->with('flash', $result['deleted']
+            ? __('Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.')
+            : __('Bedrijf van je lijst gehaald.'));
+    }
+
     public function select(Request $request, string $token)
     {
         $job = $this->find($token);

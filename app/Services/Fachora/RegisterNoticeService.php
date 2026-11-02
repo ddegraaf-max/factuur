@@ -176,6 +176,30 @@ class RegisterNoticeService
         return $deleted;
     }
 
+    /**
+     * Eén registerbedrijf meteen verwijderen als het ongebruikt is (1.96.3: de klant
+     * haalde het van zijn lijst): nooit geclaimd, geen toestemming, geen aanbieding,
+     * door geen (andere) klant gekozen. Geclaimde of Verified bedrijven nooit.
+     */
+    public function purgeIfUnused(Provider $provider): bool
+    {
+        $provider->refresh();
+        if ($provider->status !== 'unclaimed' || ! in_array($provider->source, ['ceidg', 'krs', 'import'], true)
+            || $provider->claimed_at !== null || $provider->consent_at !== null || $provider->terms_accepted_at !== null
+            || $provider->user_id !== null || $provider->removed_at !== null) {
+            return false;
+        }
+        if (\App\Models\ServiceJobOffer::query()->where('provider_id', $provider->id)->exists()
+            || in_array($provider->id, app(LetterService::class)->chosenIds(), true)) {
+            return false;
+        }
+        \Illuminate\Support\Facades\DB::table('provider_category')->where('provider_id', $provider->id)->delete();
+        $provider->delete();
+        self::log('purge_customer_removed', 1, 'Registerbedrijf door de klant van zijn lijst gehaald: niet door anderen gekozen, niet gemaild, geen aanbieding. Verwijderd (art. 5 lid 1 sub c AVG, minimale gegevensverwerking).');
+
+        return true;
+    }
+
     /** Eén regel in het verantwoordingslog, zonder persoonsgegevens. */
     public static function log(string $action, int $count, string $note): void
     {
