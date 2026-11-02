@@ -131,6 +131,49 @@ class JobController extends Controller
     }
 
     /** De klant kiest 1 tot vijf bedrijven en betaalt (zo nodig) de bijdrage. */
+    /** 1.97: de klant maakte zelf een afspraak met een registerbedrijf (prijs en datum optioneel). */
+    public function agreeDirect(Request $request, string $token, int $provider)
+    {
+        $job = $this->find($token);
+        $data = $request->validate([
+            'price' => ['nullable', 'numeric', 'min:0', 'max:1000000'],
+            'date' => ['nullable', 'date', 'after_or_equal:today'],
+        ]);
+        try {
+            $this->jobs->agreeDirect($job, $provider, $data);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['direct' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Vastgelegd. Rond de opdracht hier af zodra het werk klaar is.'));
+    }
+
+    /** 1.97: zelf geregeld werk klaar en in orde. */
+    public function finishDirect(string $token)
+    {
+        $job = $this->find($token);
+        try {
+            $this->jobs->finishDirect($job);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['direct' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Afgerond. Bedankt dat je Fachora hebt gebruikt.'));
+    }
+
+    /** 1.97: opnieuw bedrijven kiezen. */
+    public function reopenSelection(string $token)
+    {
+        $job = $this->find($token);
+        try {
+            $this->jobs->reopenSelection($job);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['direct' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Kies hieronder opnieuw tot :n bedrijven.', ['n' => (int) config('fachora.max_offers', 5)]));
+    }
+
     /** 1.96.4: de klant benaderde een registerbedrijf zelf; zie JobService::markDirectContacted(). */
     public function markContacted(Request $request, string $token, int $provider)
     {

@@ -170,6 +170,46 @@ class FachoraPkdFitTest extends TestCase
             ->assertInertia(fn ($p) => $p->where('direct.0.contacted.channels', ['copy', 'mail'])->where('direct.1.contacted', null));
     }
 
+    public function test_after_contacting_companies_himself_the_customer_can_record_the_agreement_finish_or_pick_again(): void
+    {
+        $sweep = $this->register('Kominiarz Nowak', '81.22.Z');
+        $other = $this->register('Inny', '81.22.Z');
+        $job = $this->job();
+        $job->forceFill(['status' => 'open', 'selected_providers' => [$sweep->id, $other->id], 'offered_at' => now()])->save();
+
+        $this->get(route('fachora.job.show', $job->token))->assertInertia(fn ($p) => $p->where('job.can_agree_direct', true)->where('job.can_reopen', true)->where('job.is_direct', false));
+
+        $this->post(route('fachora.job.direct.agree', [$job->token, 999999]), [])->assertSessionHasErrors('direct');
+        $this->post(route('fachora.job.direct.agree', [$job->token, $sweep->id]), ['price' => '450', 'date' => now()->addDays(3)->toDateString()])->assertRedirect()->assertSessionHas('flash');
+        $job->refresh();
+        $this->assertSame('scheduled', $job->status);
+        $this->assertSame($sweep->id, $job->provider_id);
+        $this->assertNull($job->chosen_offer_id);
+        $this->assertSame(450.0, (float) $job->agreed_amount);
+        $this->assertFalse((bool) $job->protect);
+        $this->assertTrue($job->isDirect());
+        $this->assertDatabaseHas('service_job_events', ['service_job_id' => $job->id, 'kind' => 'direct_agreed']);
+        $this->get(route('fachora.job.show', $job->token))->assertInertia(fn ($p) => $p->where('job.is_direct', true)->where('job.can_finish_direct', true)->where('provider.id', $sweep->id));
+
+        $this->post(route('fachora.job.direct.finish', $job->token))->assertRedirect()->assertSessionHas('flash');
+        $job->refresh();
+        $this->assertSame('accepted', $job->status);
+        $this->assertSame(0.0, (float) $job->fee_amount);
+        $this->assertNull($job->invoice_id, 'geen fee, geen factuur, geen uitbetaling');
+        $this->post(route('fachora.job.review', $job->token), ['rating' => 5, 'text' => 'Super'])->assertRedirect();
+        $this->assertSame(0, $job->review()->count(), 'geen beoordeling van een bedrijf dat niet via Fachora werkte');
+        Mail::assertNothingSent();
+
+        // Opnieuw kiezen vanuit 'open' zonder aanbiedingen.
+        $job2 = $this->job();
+        $job2->forceFill(['status' => 'open', 'selected_providers' => [$other->id], 'offered_at' => now()])->save();
+        $this->post(route('fachora.job.reopen', $job2->token))->assertRedirect()->assertSessionHas('flash');
+        $job2->refresh();
+        $this->assertSame('selecting', $job2->status);
+        $this->assertNull($job2->selected_providers);
+        $this->assertDatabaseHas('service_job_events', ['service_job_id' => $job2->id, 'kind' => 'reselect']);
+    }
+
     public function test_the_import_skips_companies_whose_main_activity_is_not_trade_work(): void
     {
         $firm = fn (string $id, string $nip) => [

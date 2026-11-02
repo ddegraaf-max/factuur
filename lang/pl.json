@@ -2083,5 +2083,16 @@
   "Bedrijf van je lijst gehaald en uit het register van Fachora verwijderd.": "Firma usunięta z Twojej listy i z bazy Fachory.",
   "Bedrijf van je lijst gehaald.": "Firma usunięta z Twojej listy.",
   "Klant haalde :name van zijn lijst": "Klient usunął :name ze swojej listy",
-  "Klant benaderde :name zelf": "Klient sam skontaktował się z :name"
+  "Klant benaderde :name zelf": "Klient sam skontaktował się z :name",
+  "Klant sprak zelf af met :provider": "Klient sam umówił się z :provider",
+  "Klant meldde het werk klaar en in orde": "Klient zgłosił pracę jako wykonaną i w porządku",
+  "Klant kiest opnieuw bedrijven": "Klient wybiera firmy od nowa",
+  "Beoordelen kan alleen bij een bedrijf dat via Fachora werkte.": "Ocenić można tylko firmę, która pracowała przez Fachorę.",
+  "Dit bedrijf staat niet op je lijst.": "Tej firmy nie ma na Twojej liście.",
+  "Deze opdracht kan nu niet worden vastgelegd.": "Tego zlecenia nie można teraz zapisać.",
+  "Deze opdracht kan nu niet worden afgerond.": "Tego zlecenia nie można teraz zakończyć.",
+  "Opnieuw kiezen kan nu niet.": "Ponowny wybór nie jest teraz możliwy.",
+  "Vastgelegd. Rond de opdracht hier af zodra het werk klaar is.": "Zapisane. Zakończ zlecenie tutaj, gdy praca będzie wykonana.",
+  "Afgerond. Bedankt dat je Fachora hebt gebruikt.": "Zakończone. Dziękujemy, że korzystasz z Fachory.",
+  "Kies hieronder opnieuw tot :n bedrijven.": "Wybierz poniżej ponownie do :n firm."
 }

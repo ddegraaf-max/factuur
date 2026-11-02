@@ -404,5 +404,16 @@
   "Kopieer het e-mailadres hieronder:": "Copy the e-mail address below:",
   "Van mijn lijst verwijderen": "Remove from my list",
   "Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.": "Remove this company from your list? If nobody else picked it, Fachora stops keeping its register details.",
-  "Benaderd op :date": "Contacted on :date"
+  "Benaderd op :date": "Contacted on :date",
+  "Hoe nu verder: de antwoorden komen in je eigen mailbox of op je telefoon. Heb je een afspraak gemaakt, zet dat hier bij het bedrijf; dan houdt Fachora je opdracht bij.": "What next: replies arrive in your own mailbox or on your phone. Once you have made an appointment, mark it here at the company and Fachora keeps track of your job.",
+  "Ik heb een afspraak met dit bedrijf": "I made an appointment with this company",
+  "Afgesproken prijs (optioneel)": "Agreed price (optional)",
+  "Datum (optioneel)": "Date (optional)",
+  "Niemand gereageerd? Kies andere bedrijven": "Nobody replied? Pick other companies",
+  "Opnieuw bedrijven kiezen? Je huidige keuze vervalt.": "Pick companies again? Your current choice is dropped.",
+  "Afspraak gemaakt met :name": "Appointment made with :name",
+  "Je regelt de klus rechtstreeks met dit bedrijf: prijs, termijn en betaling spreek je samen af. Is het werk klaar en in orde, rond de opdracht dan hier af.": "You settle the job directly with this company: price, date and payment are between you. When the work is done and in order, close the job here.",
+  "Werk klaar en in orde": "Work done and in order",
+  "Werk klaar en in orde? De opdracht wordt dan afgerond.": "Work done and in order? The job will be closed.",
+  "Niet doorgegaan? Kies andere bedrijven": "Did not go ahead? Pick other companies"
 }

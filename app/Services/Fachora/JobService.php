@@ -425,6 +425,65 @@ class JobService
      * @return \Illuminate\Support\Collection<int, Provider>
      */
     /**
+     * 1.97: de klant maakte zelf een afspraak met een registerbedrijf van zijn lijst.
+     * De opdracht gaat naar 'scheduled' met dat bedrijf, zonder aanbieding, zonder
+     * Protect en zonder mail aan het bedrijf (dat mag niet). Prijs en datum zijn
+     * optioneel; de klant regelt alles rechtstreeks.
+     */
+    public function agreeDirect(ServiceJob $job, int $providerId, array $data = []): void
+    {
+        if ($job->status !== 'open' || $job->offers()->exists()) {
+            throw new \DomainException(__('Deze opdracht kan nu niet worden vastgelegd.'));
+        }
+        $provider = $this->directContacts($job)->firstWhere('id', $providerId);
+        if ($provider === null) {
+            throw new \DomainException(__('Dit bedrijf staat niet op je lijst.'));
+        }
+        $price = isset($data['price']) && $data['price'] !== '' && $data['price'] !== null ? round((float) $data['price'], 2) : null;
+        $job->forceFill([
+            'status' => 'scheduled',
+            'chosen_offer_id' => null,
+            'provider_id' => $provider->id,
+            'agreed_amount' => $price,
+            'agreed_type' => $price !== null ? 'fixed' : null,
+            'agreed_scope' => null,
+            'agreed_at' => now(),
+            'scheduled_at' => ! empty($data['date']) ? \Illuminate\Support\Carbon::parse($data['date']) : null,
+            'scheduled_window' => null,
+            'warranty_months' => null,
+            'protect' => false,
+        ])->save();
+        $this->log($job, 'direct_agreed', 'customer', __('Klant sprak zelf af met :provider', ['provider' => $provider->display_name]));
+    }
+
+    /** 1.97: de klant meldt het zelf geregelde werk klaar en in orde: afgerond, zonder fee, uitbetaling, factuur of mail. */
+    public function finishDirect(ServiceJob $job): void
+    {
+        if (! $job->isDirect() || ! in_array($job->status, ['scheduled', 'in_progress'], true)) {
+            throw new \DomainException(__('Deze opdracht kan nu niet worden afgerond.'));
+        }
+        $job->forceFill([
+            'status' => 'accepted', 'done_at' => now(), 'accepted_at' => now(), 'accepted_by' => 'customer',
+            'fee_percent' => 0, 'fee_amount' => 0, 'payout_amount' => null,
+        ])->save();
+        $this->log($job, 'direct_done', 'customer', __('Klant meldde het werk klaar en in orde'));
+    }
+
+    /** 1.97: niemand gereageerd of niet doorgegaan: de klant kiest opnieuw bedrijven uit de lijst. */
+    public function reopenSelection(ServiceJob $job): void
+    {
+        $allowed = ($job->status === 'open' && ! $job->offers()->exists()) || ($job->isDirect() && $job->status === 'scheduled');
+        if (! $allowed) {
+            throw new \DomainException(__('Opnieuw kiezen kan nu niet.'));
+        }
+        $job->forceFill([
+            'status' => 'selecting', 'selected_providers' => null, 'offered_at' => null,
+            'provider_id' => null, 'chosen_offer_id' => null, 'agreed_amount' => null, 'agreed_type' => null, 'agreed_at' => null, 'scheduled_at' => null,
+        ])->save();
+        $this->log($job, 'reselect', 'customer', __('Klant kiest opnieuw bedrijven'));
+    }
+
+    /**
      * 1.96.4: de klant benaderde een gekozen registerbedrijf zelf (mail, kopie van
      * het bericht of adres, WhatsApp, bellen). Per bedrijf onthouden we de kanalen
      * en het eerste moment; het opdrachtlogboek krijgt één regel per bedrijf.
@@ -1111,6 +1170,9 @@ class JobService
     {
         if ($job->status !== 'accepted' || $job->provider === null) {
             throw new \DomainException(__('Beoordelen kan pas na een afgeronde opdracht.'));
+        }
+        if ($job->isDirect()) {
+            throw new \DomainException(__('Beoordelen kan alleen bij een bedrijf dat via Fachora werkte.'));
         }
         if ($job->review()->exists()) {
             throw new \DomainException(__('Deze opdracht is al beoordeeld.'));

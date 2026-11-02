@@ -119,6 +119,12 @@ const removeDirect = (p) => {
   if (!window.confirm(t('Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.'))) return;
   router.post(route('fachora.job.direct.remove', [props.token, p.id]), {}, { preserveScroll: true });
 };
+// 1.97: vervolg na zelf contact opnemen.
+const agreeOpen = ref(null);
+const agreeForm = useForm({ price: '', date: '' });
+const agree = (p) => agreeForm.post(route('fachora.job.direct.agree', [props.token, p.id]), { preserveScroll: true, onSuccess: () => { agreeOpen.value = null; agreeForm.reset(); } });
+const finishDirect = () => { if (window.confirm(t('Werk klaar en in orde? De opdracht wordt dan afgerond.'))) router.post(route('fachora.job.direct.finish', props.token), {}, { preserveScroll: true }); };
+const reopen = () => { if (window.confirm(t('Opnieuw bedrijven kiezen? Je huidige keuze vervalt.'))) router.post(route('fachora.job.reopen', props.token), {}, { preserveScroll: true }); };
 // WhatsApp met het bericht al ingevuld (alleen bij een Pools mobiel nummer, zie Fachora::whatsappNumber).
 const whatsappFor = (p) => {
   const m = messageFor(p);
@@ -340,6 +346,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
     <section v-if="direct.length" class="jb-section">
       <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
       <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
+      <p v-if="job.can_agree_direct" class="fa-note" style="margin:0 0 14px;">{{ $t('Hoe nu verder: de antwoorden komen in je eigen mailbox of op je telefoon. Heb je een afspraak gemaakt, zet dat hier bij het bedrijf; dan houdt Fachora je opdracht bij.') }}</p>
+      <div v-if="$page.props.errors && $page.props.errors.direct" class="fa-err" style="margin-bottom:10px;">{{ $page.props.errors.direct }}</div>
       <article v-for="p in direct" :key="p.id" class="fa-card jb-offer" :class="{ 'jb-contacted': p.contacted }">
         <div class="jb-prov">
           <div class="jb-prov-main">
@@ -359,8 +367,28 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'phone') }" :href="'tel:' + p.phone" @click="markContacted(p, 'phone')">{{ done(p, 'phone') ? '✓ ' : '' }}{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
           <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
+        <div v-if="job.can_agree_direct" class="jb-agree">
+          <button v-if="agreeOpen !== p.id" type="button" class="fa-btn fa-btn--navy" @click="agreeOpen = p.id">{{ $t('Ik heb een afspraak met dit bedrijf') }}</button>
+          <form v-else class="jb-agree-form" @submit.prevent="agree(p)">
+            <div class="fa-field"><label>{{ $t('Afgesproken prijs (optioneel)') }}</label><input type="number" min="0" step="0.01" v-model="agreeForm.price" placeholder="zł"><div v-if="agreeForm.errors.price" class="fa-err">{{ agreeForm.errors.price }}</div></div>
+            <div class="fa-field"><label>{{ $t('Datum (optioneel)') }}</label><input type="date" v-model="agreeForm.date"><div v-if="agreeForm.errors.date" class="fa-err">{{ agreeForm.errors.date }}</div></div>
+            <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
+          </form>
+        </div>
         <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
       </article>
+      <p v-if="job.can_reopen && status === 'open'" style="margin:12px 0 0;"><button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niemand gereageerd? Kies andere bedrijven') }}</button></p>
+    </section>
+
+    <!-- ===== Zelf geregeld: klaar melden (1.97) ===== -->
+    <section v-if="job.is_direct && job.can_finish_direct && provider" class="fa-card fa-card--tint">
+      <h2 class="fa-h2">{{ $t('Afspraak gemaakt met :name', { name: provider.name }) }}</h2>
+      <p>{{ $t('Je regelt de klus rechtstreeks met dit bedrijf: prijs, termijn en betaling spreek je samen af. Is het werk klaar en in orde, rond de opdracht dan hier af.') }}</p>
+      <div v-if="$page.props.errors && $page.props.errors.direct" class="fa-err">{{ $page.props.errors.direct }}</div>
+      <div class="fa-actions">
+        <button type="button" class="fa-btn" @click="finishDirect">{{ $t('Werk klaar en in orde') }}</button>
+        <button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niet doorgegaan? Kies andere bedrijven') }}</button>
+      </div>
     </section>
 
     <!-- ===== Aanbiedingen ===== -->
@@ -473,7 +501,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       <dl class="fa-kv">
         <dt>{{ $t('Bedrijf') }}</dt><dd><strong>{{ provider.name }}</strong> <FachoraBadge :verified="!!provider.verified" small /> <a v-if="provider.url" :href="provider.url" target="_blank" rel="noopener" class="fa-link fa-small">{{ $t('Bekijk profiel') }}</a></dd>
         <dt>{{ $t('Moment') }}</dt><dd><template v-if="job.scheduled_label">{{ job.scheduled_label }}<template v-if="job.scheduled_window"> · {{ job.scheduled_window }}</template></template><template v-else>{{ job.scheduled_window || $t('Het bedrijf neemt contact met je op om een moment af te spreken.') }}</template></dd>
-        <dt>{{ $t('Afgesproken prijs') }}</dt><dd><strong>{{ money(job.agreed_amount) }}</strong> <span class="fa-muted">· {{ priceType(job.agreed_type) }} · {{ $t('bruto, incl. btw') }}</span></dd>
+        <template v-if="job.agreed_amount"><dt>{{ $t('Afgesproken prijs') }}</dt><dd><strong>{{ money(job.agreed_amount) }}</strong> <span class="fa-muted">· {{ priceType(job.agreed_type) }} · {{ $t('bruto, incl. btw') }}</span></dd></template>
         <template v-if="approvedExtras.length"><dt>{{ $t('Met meerwerk') }}</dt><dd><strong>{{ money(job.total) }}</strong></dd></template>
         <template v-if="job.agreed_scope"><dt>{{ $t('Wat erin zit') }}</dt><dd class="fa-pre">{{ job.agreed_scope }}</dd></template>
         <dt>{{ $t('Garantie') }}</dt><dd>{{ job.warranty_months ? $t(':n maanden', { n: job.warranty_months }) : $t('volgens afspraak met het bedrijf') }}</dd>
@@ -567,7 +595,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
     </section>
 
     <!-- ===== Afgerond: overzicht en beoordeling ===== -->
-    <section v-if="status === 'accepted'" class="fa-card">
+    <section v-if="status === 'accepted' && !job.is_direct" class="fa-card">
       <h2 class="fa-h2">{{ $t('Overzicht') }}</h2>
       <dl class="fa-kv">
         <dt>{{ $t('Afgerond op') }}</dt><dd>{{ job.accepted_at }}<template v-if="job.accepted_by === 'auto'"> <span class="fa-muted fa-small">({{ $t('automatisch, zonder reactie') }})</span></template></dd>
@@ -667,6 +695,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .fa-btn.jb-wa { background: #25D366; color: #fff; }
 .jb-remove { margin-left: auto; color: #8A2A1F; }
 .jb-contacted { border-left: 4px solid #34A853; }
+.jb-agree { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #D9E6F2; }
+.jb-agree-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
+.jb-agree-form .fa-actions { grid-column: 1 / -1; }
+@media (max-width: 560px) { .jb-agree-form { grid-template-columns: 1fr; } }
 .jb-contacted-chip { margin-left: 10px; vertical-align: middle; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }

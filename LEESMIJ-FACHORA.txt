@@ -233,6 +233,16 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+VERVOLG NA ZELF CONTACT OPNEMEN (2 nov 2026, 1.97.0, gebruiker: "hoe nu verder, kan niks")
+- Opdracht open zonder aanbiedingen = klant benadert registerbedrijven zelf. Nieuwe routes in de job-groep:
+  POST firmy/{provider}/umowa (agreeDirect: status scheduled, provider_id, agreed_amount/agreed_type optioneel,
+  chosen_offer_id null, protect false, event direct_agreed, geen mail), POST wykonane (finishDirect: accepted, fee 0,
+  geen factuur/uitbetaling/beoordeling/mail, event direct_done), POST wybierz-ponownie (reopenSelection: terug naar
+  selecting, keuze leeg, event reselect). ServiceJob::isDirect() = provider zonder aanbieding; review() weigert direct.
+- Presenter-vlaggen can_agree_direct, can_finish_direct, can_reopen, is_direct; Job.vue: "Ik heb een afspraak met dit
+  bedrijf" (inline prijs/datum), kaart "Umówione z …" met "Praca wykonana i w porządku", en "Nikt nie odpowiedział?
+  Wybierz inne firmy". 1.96.4: direct_contacted (benaderd-status, knoppen blijven groen).
+
 HOOFDACTIVITEIT UIT CEIDG (2 nov 2026, 1.96.0, besluit Daniël: "specifiek voor wat ik zoek, rest binnen 24 uur weg met log")
 - Kolommen providers.pkd_main / pkd_main_name / pkd_codes / source_id / pkd_checked_at (uit het CEIDG-detailrecord,
   pkdGlowny). config fachora.trade_pkd_prefixes = vakwerk (41–43, 33.1x/33.2x, 45.2x, 80.2x, 81.2x, 81.3x, 95.2x, 02.4x).

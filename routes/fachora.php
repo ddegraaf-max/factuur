@@ -48,6 +48,10 @@ Route::middleware('brand:fachora')->group(function () {
         Route::post('firmy/{provider}/usun', [JobController::class, 'removeDirect'])->where('provider', '[0-9]+')->middleware('throttle:20,1')->name('direct.remove');
         // 1.96.4: de klant benaderde dit bedrijf zelf (mail, kopie, WhatsApp, bellen): onthouden, zodat de knoppen groen blijven.
         Route::post('firmy/{provider}/kontakt', [JobController::class, 'markContacted'])->where('provider', '[0-9]+')->middleware('throttle:60,1')->name('direct.contacted');
+        // 1.97: vervolg na zelf contact opnemen: afspraak vastleggen, werk klaar melden, opnieuw kiezen.
+        Route::post('firmy/{provider}/umowa', [JobController::class, 'agreeDirect'])->where('provider', '[0-9]+')->middleware('throttle:20,1')->name('direct.agree');
+        Route::post('wykonane', [JobController::class, 'finishDirect'])->middleware('throttle:20,1')->name('direct.finish');
+        Route::post('wybierz-ponownie', [JobController::class, 'reopenSelection'])->middleware('throttle:20,1')->name('reopen');
         Route::post('sms', [JobController::class, 'smsSend'])->middleware('throttle:5,1')->name('sms.send');
         Route::post('sms/kod', [JobController::class, 'smsVerify'])->middleware('throttle:10,1')->name('sms.verify');
         Route::get('oplacono', [JobController::class, 'requestPaid'])->middleware('throttle:20,1')->name('request.paid');

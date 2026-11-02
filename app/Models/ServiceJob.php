@@ -104,6 +104,12 @@ class ServiceJob extends Model
         return array_values(array_diff($this->languageCodes(), ['pl']));
     }
 
+    /** Opdracht die de klant zelf met een registerbedrijf regelde (1.97): wel een bedrijf, geen aanbieding via Fachora. */
+    public function isDirect(): bool
+    {
+        return $this->provider_id !== null && $this->chosen_offer_id === null;
+    }
+
     protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id', 'phone_code'];
 
     public function provider(): BelongsTo

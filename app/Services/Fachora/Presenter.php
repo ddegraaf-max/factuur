@@ -52,6 +52,7 @@ class Presenter
             'agreed_amount' => $job->agreed_amount,
             'agreed_type' => $job->agreed_type,
             'agreed_scope' => $job->agreed_scope,
+            'is_direct' => $job->isDirect(), // 1.97: zelf geregeld met een registerbedrijf
             'scheduled_at' => $job->scheduled_at?->toIso8601String(),
             'scheduled_label' => $job->scheduled_at?->translatedFormat('l j F Y, H:i'),
             'scheduled_window' => $job->scheduled_window,
@@ -106,6 +107,10 @@ class Presenter
         if ($for === 'customer') {
             $out['can_pay'] = $job->status === 'agreed' && $job->protect && $this->protect->availableFor($job);
             $out['can_cancel'] = ! $job->isClosed() && ! in_array($job->status, ['done', 'disputed'], true);
+            // 1.97: vervolg na zelf contact opnemen met registerbedrijven.
+            $out['can_agree_direct'] = $job->status === 'open' && ! $job->offers()->exists();
+            $out['can_finish_direct'] = $job->isDirect() && in_array($job->status, ['scheduled', 'in_progress'], true);
+            $out['can_reopen'] = ($job->status === 'open' && ! $job->offers()->exists()) || ($job->isDirect() && $job->status === 'scheduled');
         }
 
         return $out;

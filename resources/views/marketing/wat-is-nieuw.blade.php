@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.96.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.97.0</div>
+        <h2>Fachora: vervolg na zelf contact opnemen</h2>
+        <ul class="tl-list">
+          <li><b>Afspraak vastleggen</b> — heeft de klant met een registerbedrijf iets afgesproken, dan zet hij dat op zijn opdrachtpagina bij dat bedrijf ("Umówiłem się z tą firmą"), met prijs en datum als hij wil. De opdracht gaat op "ingepland" met dat bedrijf; Fachora stuurt het bedrijf niets.</li>
+          <li><b>Klaar melden en opnieuw kiezen</b> — na het werk rondt de klant de opdracht af met "Praca wykonana i w porządku" (zonder fee, factuur of beoordeling, want het bedrijf werkte niet via Fachora). Reageert niemand of gaat het niet door, dan kiest hij met één klik opnieuw bedrijven uit de lijst.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.96.0</div>
         <h2>Fachora: alleen bedrijven waarvan het echt het vak is</h2>
         <ul class="tl-list">
           <li><b>Hoofdactiviteit uit CEIDG</b> — Poolse eenmanszaken schrijven vaak tientallen PKD-codes in, waardoor een vastgoedadviseur tussen de schoorsteenvegers kon staan. De keuzelijst kijkt nu naar de hoofdactiviteit: past die bij de klus, dan staat het bedrijf bovenaan; staat de klus alleen als nevenactiviteit ingeschreven, dan eronder met het label "hoofdactiviteit: …"; is de hoofdactiviteit geen vakwerk, dan komt het bedrijf er niet in en wordt het niet geïmporteerd.</li>
