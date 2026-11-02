@@ -34,7 +34,7 @@
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.92.0</div>
         <h2>Fachora: sitemaps compleet en SEO klaar voor advertenties</h2>
         <ul class="tl-list">
-          <li><b>Sitemaps in twee talen</b> — elke pagina staat in de sitemap als Poolse én Engelse versie met hreflang-alternates; de stadspagina's (veertien categorieën × zestien grote steden) en de Verified-profielen zitten er nu altijd in. Inlog- en statuspagina zijn eruit.</li>
+          <li><b>Sitemaps in twee talen</b> — elke pagina staat in de sitemap als Poolse én Engelse versie met hreflang-alternates; de stadspagina's (veertien categorieën × ruim honderd Poolse steden, van Warszawa tot Kołobrzeg) en de Verified-profielen zitten er nu altijd in. Inlog- en statuspagina zijn eruit.</li>
           <li><b>Engels eindelijk vindbaar</b> — Engelse pagina's hadden een canonical naar de Poolse versie en waren daardoor onzichtbaar voor Google. Nu heeft elke taal zijn eigen canonical en hreflang; de aanvraagpagina is indexeerbaar met een eigen titel en omschrijving.</li>
           <li><b>Stadspagina's als landingspagina</b> — nette stadsnamen (Kraków in plaats van Krakow), onbekende steden geven 404 in plaats van een lege pagina, en zonder Verified-bedrijf vertelt de pagina hoe de klant zelf kiest, met het aantal registerbedrijven in de buurt. Kruimelpad en Service als structured data; de site presenteert zich als website in plaats van software.</li>
         </ul>

@@ -214,14 +214,37 @@ return [
      * SEO-steden (1.92): voor elke categorie bestaat /uslugi/{categorie}/{stad}
      * voor deze steden, ook zonder Verified bedrijf; ze staan in de sitemap en
      * als stadslinks op de categoriepagina's. Sleutel = slug in de URL, waarde =
-     * de naam met diakrieten. Volgorde = prioriteit (grootste markt eerst).
-     * Andere steden bestaan alleen als er een Verified bedrijf zit; de rest 404.
+     * de naam met diakrieten. Volgorde = prioriteit (grootste eerst). Sinds
+     * 1.92.1 alle 104 steden uit 'cities' hieronder (zelfde volgorde); een stad
+     * die hier niet staat bestaat alleen met een Verified bedrijf, anders 404.
      */
     'seo_cities' => [
-        'warszawa' => 'Warszawa', 'krakow' => 'Kraków', 'wroclaw' => 'Wrocław', 'gdansk' => 'Gdańsk',
-        'poznan' => 'Poznań', 'lodz' => 'Łódź', 'szczecin' => 'Szczecin', 'gdynia' => 'Gdynia',
-        'lublin' => 'Lublin', 'katowice' => 'Katowice', 'bydgoszcz' => 'Bydgoszcz', 'bialystok' => 'Białystok',
-        'rzeszow' => 'Rzeszów', 'torun' => 'Toruń', 'kielce' => 'Kielce', 'olsztyn' => 'Olsztyn',
+        'warszawa' => 'Warszawa', 'krakow' => 'Kraków', 'lodz' => 'Łódź', 'wroclaw' => 'Wrocław',
+        'poznan' => 'Poznań', 'gdansk' => 'Gdańsk', 'szczecin' => 'Szczecin', 'bydgoszcz' => 'Bydgoszcz',
+        'lublin' => 'Lublin', 'bialystok' => 'Białystok', 'katowice' => 'Katowice', 'gdynia' => 'Gdynia',
+        'czestochowa' => 'Częstochowa', 'radom' => 'Radom', 'torun' => 'Toruń', 'sosnowiec' => 'Sosnowiec',
+        'rzeszow' => 'Rzeszów', 'kielce' => 'Kielce', 'gliwice' => 'Gliwice', 'olsztyn' => 'Olsztyn',
+        'zabrze' => 'Zabrze', 'bielsko-biala' => 'Bielsko-Biała', 'bytom' => 'Bytom', 'zielona-gora' => 'Zielona Góra',
+        'rybnik' => 'Rybnik', 'ruda-slaska' => 'Ruda Śląska', 'opole' => 'Opole', 'tychy' => 'Tychy',
+        'gorzow-wielkopolski' => 'Gorzów Wielkopolski', 'elblag' => 'Elbląg', 'plock' => 'Płock', 'dabrowa-gornicza' => 'Dąbrowa Górnicza',
+        'walbrzych' => 'Wałbrzych', 'wloclawek' => 'Włocławek', 'tarnow' => 'Tarnów', 'chorzow' => 'Chorzów',
+        'koszalin' => 'Koszalin', 'kalisz' => 'Kalisz', 'legnica' => 'Legnica', 'grudziadz' => 'Grudziądz',
+        'jaworzno' => 'Jaworzno', 'slupsk' => 'Słupsk', 'jastrzebie-zdroj' => 'Jastrzębie-Zdrój', 'nowy-sacz' => 'Nowy Sącz',
+        'jelenia-gora' => 'Jelenia Góra', 'siedlce' => 'Siedlce', 'myslowice' => 'Mysłowice', 'konin' => 'Konin',
+        'piotrkow-trybunalski' => 'Piotrków Trybunalski', 'inowroclaw' => 'Inowrocław', 'lubin' => 'Lubin', 'ostrowiec-swietokrzyski' => 'Ostrowiec Świętokrzyski',
+        'suwalki' => 'Suwałki', 'stargard' => 'Stargard', 'gniezno' => 'Gniezno', 'ostrow-wielkopolski' => 'Ostrów Wielkopolski',
+        'siemianowice-slaskie' => 'Siemianowice Śląskie', 'glogow' => 'Głogów', 'pabianice' => 'Pabianice', 'leszno' => 'Leszno',
+        'zory' => 'Żory', 'zamosc' => 'Zamość', 'pruszkow' => 'Pruszków', 'lomza' => 'Łomża',
+        'elk' => 'Ełk', 'tarnowskie-gory' => 'Tarnowskie Góry', 'tomaszow-mazowiecki' => 'Tomaszów Mazowiecki', 'chelm' => 'Chełm',
+        'mielec' => 'Mielec', 'kedzierzyn-kozle' => 'Kędzierzyn-Koźle', 'przemysl' => 'Przemyśl', 'stalowa-wola' => 'Stalowa Wola',
+        'tczew' => 'Tczew', 'biala-podlaska' => 'Biała Podlaska', 'belchatow' => 'Bełchatów', 'swidnica' => 'Świdnica',
+        'zgierz' => 'Zgierz', 'piekary-slaskie' => 'Piekary Śląskie', 'legionowo' => 'Legionowo', 'ostroleka' => 'Ostrołęka',
+        'bedzin' => 'Będzin', 'skierniewice' => 'Skierniewice', 'zyrardow' => 'Żyrardów', 'lowicz' => 'Łowicz',
+        'sochaczew' => 'Sochaczew', 'kutno' => 'Kutno', 'sieradz' => 'Sieradz', 'radomsko' => 'Radomsko',
+        'piaseczno' => 'Piaseczno', 'wolomin' => 'Wołomin', 'otwock' => 'Otwock', 'grodzisk-mazowiecki' => 'Grodzisk Mazowiecki',
+        'minsk-mazowiecki' => 'Mińsk Mazowiecki', 'marki' => 'Marki', 'zabki' => 'Ząbki', 'jozefow' => 'Józefów',
+        'konstancin-jeziorna' => 'Konstancin-Jeziorna', 'lomianki' => 'Łomianki', 'wieliczka' => 'Wieliczka', 'skawina' => 'Skawina',
+        'zakopane' => 'Zakopane', 'sopot' => 'Sopot', 'swinoujscie' => 'Świnoujście', 'kolobrzeg' => 'Kołobrzeg',
     ],
 
     /*
