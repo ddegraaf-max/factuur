@@ -96,13 +96,37 @@ onMounted(() => {
 onBeforeUnmount(() => clearInterval(searchTimer));
 
 /* ---------- zelf contact opnemen (1.87) ---------- */
-const mailtoFor = (p) => {
+// Het Poolse bericht aan een bedrijf uit het register; de klant verstuurt het zelf (mail, Gmail, WhatsApp, sms).
+const messageFor = (p) => {
   const j = props.job || {};
   const subject = t('Zapytanie: :title (:city)', { title: j.title || '', city: j.city || '' });
   // 1.94: de klant is de boodschapper — één feitelijke zin over het bestaande profiel (Fachora stuurt het bedrijf zelf niets).
   const profileLine = p.url ? 'Państwa firma jest już na fachora.pl (profil z rejestru): ' + p.url + '. Jeśli chcą Państwo otrzymywać takie zapytania bezpośrednio, profil można przejąć w dwie minuty na tej stronie.' : '';
   const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', profileLine, profileLine ? '' : null, j.customer_name || ''].filter((line) => line !== null).join('\n');
-  return 'mailto:' + p.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  return { subject, body };
+};
+const mailtoFor = (p) => {
+  const m = messageFor(p);
+  return 'mailto:' + p.email + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
+};
+// 1.95.1: kopiëren naar het klembord, voor wie webmail of WhatsApp gebruikt (mailto opent dan vaak niets).
+const copied = ref(null);
+const copyMessage = async (p) => {
+  const m = messageFor(p);
+  const text = m.subject + '\n\n' + m.body;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    copied.value = p.id;
+    setTimeout(() => { if (copied.value === p.id) copied.value = null; }, 2500);
+  } catch (e) {
+    window.prompt(t('Kopieer het bericht hieronder:'), text);
+  }
 };
 
 /* ---------- sms-code (1.87) ---------- */
@@ -283,13 +307,15 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         <div class="jb-prov">
           <div class="jb-prov-main">
             <div class="jb-prov-name"><strong>{{ p.name }}</strong></div>
-            <div class="fa-small fa-muted">{{ p.city }}</div>
+            <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template></div>
           </div>
         </div>
         <div class="fa-actions">
           <a v-if="p.email" class="fa-btn" :href="mailtoFor(p)">{{ $t('E-mail sturen') }}</a>
+          <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id }" @click="copyMessage(p)">{{ copied === p.id ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
         </div>
+        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
       </article>
     </section>
 
@@ -592,6 +618,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-section { margin-bottom: 16px; }
 .jb-section .fa-h2 { margin-bottom: 12px; }
 .jb-count { font-size: 14px; font-weight: 500; }
+.fa-btn.is-copied { background: #E6F4EA; border-color: #34A853; color: #1E7E34; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }
