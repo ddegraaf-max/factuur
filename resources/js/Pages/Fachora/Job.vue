@@ -109,8 +109,30 @@ const mailtoFor = (p) => {
   const m = messageFor(p);
   return 'mailto:' + p.email + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
 };
+// WhatsApp met het bericht al ingevuld (alleen bij een Pools mobiel nummer, zie Fachora::whatsappNumber).
+const whatsappFor = (p) => {
+  const m = messageFor(p);
+  return 'https://wa.me/' + p.phone_wa + '?text=' + encodeURIComponent(m.subject + '\n\n' + m.body);
+};
 // 1.95.1: kopiëren naar het klembord, voor wie webmail of WhatsApp gebruikt (mailto opent dan vaak niets).
+// 1.96.2: ook alleen het e-mailadres (sleutel "<id>:mail" naast "<id>:msg").
 const copied = ref(null);
+const copyText = async (key, text, fallbackLabel) => {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    copied.value = key;
+    setTimeout(() => { if (copied.value === key) copied.value = null; }, 2500);
+  } catch (e) {
+    window.prompt(fallbackLabel, text);
+  }
+};
+const copyEmail = (p) => copyText(p.id + ':mail', p.email, t('Kopieer het e-mailadres hieronder:'));
 const copyMessage = async (p) => {
   const m = messageFor(p);
   const text = m.subject + '\n\n' + m.body;
@@ -122,8 +144,8 @@ const copyMessage = async (p) => {
       ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
       document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
     }
-    copied.value = p.id;
-    setTimeout(() => { if (copied.value === p.id) copied.value = null; }, 2500);
+    copied.value = p.id + ':msg';
+    setTimeout(() => { if (copied.value === p.id + ':msg') copied.value = null; }, 2500);
   } catch (e) {
     window.prompt(t('Kopieer het bericht hieronder:'), text);
   }
@@ -311,12 +333,18 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         <div class="jb-prov">
           <div class="jb-prov-main">
             <div class="jb-prov-name"><strong>{{ p.name }}</strong></div>
-            <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template></div>
+            <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template><template v-if="p.phone"> · {{ p.phone }}</template></div>
+            <!-- 1.96.2: hoofdactiviteit, zodat de klant ziet welk bedrijf het best past -->
+            <div v-if="p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
+              {{ p.pkd_fit === 'main' ? $t('Hoofdactiviteit: :name (past bij je klus)', { name: p.pkd_main_name }) : $t('Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)', { name: p.pkd_main_name }) }}
+            </div>
           </div>
         </div>
         <div class="fa-actions">
           <a v-if="p.email" class="fa-btn" :href="mailtoFor(p)">{{ $t('E-mail sturen') }}</a>
-          <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id }" @click="copyMessage(p)">{{ copied === p.id ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
+          <a v-if="p.phone_wa" class="fa-btn jb-wa" :href="whatsappFor(p)" target="_blank" rel="noopener">WhatsApp</a>
+          <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':msg' }" @click="copyMessage(p)">{{ copied === p.id + ':msg' ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
+          <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' }" @click="copyEmail(p)">{{ copied === p.id + ':mail' ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :href="'tel:' + p.phone">{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
         </div>
         <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
@@ -624,6 +652,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-count { font-size: 14px; font-weight: 500; }
 .fa-btn.is-copied { background: #E6F4EA; border-color: #34A853; color: #1E7E34; }
 .jb-fit-ok { color: #1E7E34; }
+.fa-btn.jb-wa { background: #25D366; color: #fff; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }

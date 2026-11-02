@@ -109,6 +109,9 @@ class JobController extends Controller
             'direct' => $job->isSelecting() ? [] : $this->jobs->directContacts($job)->map(fn ($p) => [
                 'id' => $p->id, 'name' => $p->display_name, 'city' => $p->city,
                 'email' => $p->email, 'phone' => $p->phone, 'url' => $p->publicUrl(),
+                // 1.96.2: hoofdactiviteit (welk bedrijf past het best) en WhatsApp-nummer
+                'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkd_main_name,
+                'phone_wa' => \App\Support\Fachora::whatsappNumber($p->phone),
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)

@@ -36,6 +36,7 @@
         <ul class="tl-list">
           <li><b>Hoofdactiviteit uit CEIDG</b> — Poolse eenmanszaken schrijven vaak tientallen PKD-codes in, waardoor een vastgoedadviseur tussen de schoorsteenvegers kon staan. De keuzelijst kijkt nu naar de hoofdactiviteit: past die bij de klus, dan staat het bedrijf bovenaan; staat de klus alleen als nevenactiviteit ingeschreven, dan eronder met het label "hoofdactiviteit: …"; is de hoofdactiviteit geen vakwerk, dan komt het bedrijf er niet in en wordt het niet geïmporteerd.</li>
           <li><b>Binnen een dag opgeruimd</b> — al geïmporteerde bedrijven zonder vakwerk als hoofdactiviteit verwijdert de app elk uur, met een regel in het verantwoordingslog; bedrijven zonder bekende hoofdactiviteit worden eerst bij CEIDG nagevraagd.</li>
+          <li><b>Zelf contact opnemen, makkelijker (1.96.2)</b> — in het blok met gekozen registerbedrijven staan de best passende bovenaan met hun hoofdactiviteit, en naast "E-mail sturen" en "Bericht kopiëren" staan nu "E-mailadres kopiëren" en een WhatsApp-knop met het Poolse bericht al ingevuld (bij een Pools mobiel nummer).</li>
         </ul>
       </article>
       <article class="tl-item">

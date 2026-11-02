@@ -432,8 +432,12 @@ class JobService
         }
         $offered = $job->offers()->pluck('provider_id')->all();
 
+        $fitRank = ['main' => 0, 'secondary' => 1, 'unknown' => 2, 'unrelated' => 3]; // 1.96.2: best passende bedrijven eerst
+
         return Provider::query()->whereIn('id', $ids)->whereNotIn('id', $offered)->get()
-            ->filter(fn (Provider $p) => ConsentPolicy::mayShowDirectContact($p))->values();
+            ->filter(fn (Provider $p) => ConsentPolicy::mayShowDirectContact($p))
+            ->each(fn (Provider $p) => $p->setAttribute('pkd_fit', $p->pkdFit($job->category)))
+            ->sortBy(fn (Provider $p) => $fitRank[$p->pkd_fit] ?? 9)->values();
     }
 
     /** Betalingen die via Stripe binnenkwamen terwijl de klant de pagina al had gesloten (planner). */

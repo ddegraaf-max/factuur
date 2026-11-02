@@ -34,7 +34,7 @@ class FachoraPkdFitTest extends TestCase
             'services.anthropic.key' => null, 'services.stripe.secret' => null,
             'services.smstools.client_id' => null, 'services.smstools.client_secret' => null,
             'services.marketing_stats.emails' => 'eigenaar@example.com',
-            'fachora.customer_choice' => true, 'fachora.email_unregistered' => true, 'fachora.request_fee' => 0,
+            'fachora.customer_choice' => true, 'fachora.email_unregistered' => false, 'fachora.request_fee' => 0, // zoals productie: registerbedrijven krijgen niets
             'fachora.ceidg_token' => 'jwt', 'fachora.local_import' => true,
         ]);
         Cache::flush();
@@ -101,6 +101,28 @@ class FachoraPkdFitTest extends TestCase
                 ->where('choice.candidates.0.pkd_main_name', 'Działalność 81.22.Z')
                 ->where('choice.candidates.1.pkd_fit', 'secondary')
                 ->where('choice.candidates.2.pkd_fit', 'unknown'));
+    }
+
+    public function test_direct_contacts_are_ordered_by_fit_and_carry_a_whatsapp_number(): void
+    {
+        $this->assertSame('48608222133', Fachora::whatsappNumber('608 222 133'));
+        $this->assertSame('48608222133', Fachora::whatsappNumber('+48 608-222-133'));
+        $this->assertSame('48608222133', Fachora::whatsappNumber('0048608222133'));
+        $this->assertSame('48500163349', Fachora::whatsappNumber('500163349'));
+        $this->assertNull(Fachora::whatsappNumber('24 262 11 22'), 'vast nummer Płock');
+        $this->assertNull(Fachora::whatsappNumber('22 123 45 67'), 'vast nummer Warszawa');
+        $this->assertNull(Fachora::whatsappNumber('+31 6 12345678'), 'geen Pools nummer');
+        $this->assertNull(Fachora::whatsappNumber(null));
+
+        $estate = $this->register('Pasja Nieruchomości', '68.31.Z', ['phone' => '608 222 133']);
+        $sweep = $this->register('Kominiarz Nowak', '81.22.Z', ['phone' => '24 262 11 22']);
+        $job = $this->job();
+        $job->forceFill(['status' => 'open', 'selected_providers' => [$estate->id, $sweep->id]])->save();
+
+        $this->assertSame([$sweep->id, $estate->id], app(JobService::class)->directContacts($job)->pluck('id')->all(), 'best passend eerst, ook bij een oude keuze');
+        $this->get(route('fachora.job.show', $job->token))->assertOk()
+            ->assertInertia(fn ($p) => $p->where('direct.0.pkd_fit', 'main')->where('direct.0.phone_wa', null)
+                ->where('direct.1.pkd_fit', 'unrelated')->where('direct.1.phone_wa', '48608222133')->where('direct.1.pkd_main_name', 'Działalność 68.31.Z'));
     }
 
     public function test_the_import_skips_companies_whose_main_activity_is_not_trade_work(): void

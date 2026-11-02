@@ -96,6 +96,29 @@ class Fachora
         return 'pl';
     }
 
+    /**
+     * Pools mobiel nummer als WhatsApp-nummer (alleen cijfers, met landcode 48):
+     * "608 222 133" → "48608222133", "+48 608..." idem. Vaste nummers (bijv. 24 …
+     * Płock, 22 … Warszawa) en buitenlandse nummers → null: geen WhatsApp-knop. (1.96.2)
+     */
+    public static function whatsappNumber(?string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone) ?? '';
+        if (str_starts_with($digits, '0048')) {
+            $digits = substr($digits, 2);
+        }
+        if (strlen($digits) === 11 && str_starts_with($digits, '48')) {
+            $digits = substr($digits, 2);
+        }
+        if (strlen($digits) !== 9) {
+            return null;
+        }
+        // Poolse mobiele reeksen (eerste twee cijfers); de rest zijn netnummers of diensten.
+        $mobile = ['45', '50', '51', '53', '57', '60', '66', '69', '72', '73', '78', '79', '88'];
+
+        return in_array(substr($digits, 0, 2), $mobile, true) ? '48' . $digits : null;
+    }
+
     /** PKD-code in vaste vorm ("43.22.Z" → "4322Z"), of null. */
     public static function normalisePkd(?string $code): ?string
     {

@@ -246,6 +246,9 @@ HOOFDACTIVITEIT UIT CEIDG (2 nov 2026, 1.96.0, besluit Daniël: "specifiek voor 
   logregel purge_unrelated in fachora_privacy_log. Dus binnen een dag uit elke lijst.
 - Klantbericht aan registerbedrijf: Poolse titel (ai.title_pl) en Poolse wanneer-regel (urgency_label_pl); de
   AI-vertaling staat in de eerste persoon ("Proszę o…", nooit "klient prosi").
+- 1.96.2: contactblok "Neem zelf contact op": best passende bedrijven eerst (pkd_fit) met label hoofdactiviteit,
+  knop "E-mailadres kopieren" en WhatsApp-knop (wa.me, alleen Poolse mobiele prefixen via Fachora::whatsappNumber)
+  met het Poolse bericht ingevuld.
 
 MEERDERE TALEN PER AANVRAAG (2 nov 2026, 1.95.0)
 - Stap 5 is een meerkeuze: Pools staat vast aan (rood bolletje, "zawsze"), de andere talen zijn optioneel.
