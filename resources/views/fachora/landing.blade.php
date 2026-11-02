@@ -1,22 +1,22 @@
 @extends('layouts.marketing')
-
-{{-- Strona główna Fachory (APP_BRAND=fachora): klient opisuje zlecenie, Fachora przekazuje je kilku firmom Fachora Verified,
-     klient porównuje ceny, płaci przez Fachora Protect i dostaje fakturę oraz gwarancję. Liczby z config/fachora.php. --}}
-
+{{-- Strona główna Fachory (APP_BRAND=fachora): klient opisuje zlecenie i sam wybiera do max_offers firm z okolicy
+     (Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone). Firmy Verified dostają zapytanie od nas;
+     z firmą z rejestru klient kontaktuje się sam (Fachora nie wysyła jej niczego). Płatność przez Fachora Protect
+     albo bezpośrednio po pracy. Liczby z config/fachora.php. --}}
 @php
-  $fee = config('fachora.fee_percent');
-  $intro = config('fachora.intro_fee_percent');
-  $lead = (bool) config('fachora.lead_pricing');
-  $introDays = config('fachora.intro_days');
-  $warranty = config('fachora.default_warranty_months');
-  $maxOffers = config('fachora.max_offers');
-  $offerHours = config('fachora.offer_hours');
-  $acceptDays = config('fachora.auto_accept_days');
-  $disputeHours = config('fachora.dispute_hours');
+    $fee = config('fachora.fee_percent');
+    $intro = config('fachora.intro_fee_percent');
+    $lead = (bool) config('fachora.lead_pricing');
+    $introDays = config('fachora.intro_days');
+    $warranty = config('fachora.default_warranty_months');
+    $maxOffers = config('fachora.max_offers');
+    $offerHours = config('fachora.offer_hours');
+    $acceptDays = config('fachora.auto_accept_days');
+    $disputeHours = config('fachora.dispute_hours');
+    $candidates = config('fachora.choice_candidates');
 @endphp
-
-@section('title', 'Fachora — sprawdzone firmy, bezpieczne usługi. Hydraulik, elektryk, ślusarz i inni fachowcy z jasną ceną i gwarancją')
-@section('description', 'Opisz, co trzeba zrobić, a Fachora przekaże zlecenie kilku zweryfikowanym firmom w Twojej okolicy. Porównujesz ceny, wybierasz, cena jest ustalona z góry, płatność zabezpiecza Fachora Protect, zawsze dostajesz fakturę i gwarancję. Dla klientów bezpłatnie.')
+@section('title', 'Fachora — sam wybierasz fachowca z okolicy. Hydraulik, elektryk, ślusarz i inni, bez obdzwaniania')
+@section('description', 'Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z Twojej okolicy: zweryfikowane Fachora Verified i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Dla klientów bezpłatnie, także po angielsku.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -30,16 +30,15 @@
     <div class="eyebrow">Sprawdzone firmy. Bezpieczne usługi.</div>
     <h1>Zaufani fachowcy <span class="accent">w całej Polsce.</span></h1>
     <p class="hero-sub">
-      Jasna cena. Pewny termin. Gwarancja. Opisz, co trzeba zrobić, a my przekażemy zlecenie kilku firmom Fachora Verified w Twojej okolicy. Porównasz oferty i wybierzesz, bez dzwonienia po znajomych.
+      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: zweryfikowane Fachora Verified i firmy z rejestru przedsiębiorców. Sam wybierasz, do kogo trafi zapytanie. Bez konta, bez obdzwaniania po znajomych, bez niechcianych telefonów.
     </p>
-
     <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Znajdź fachowca">
       <label>
         <span class="lbl">Czego potrzebujesz?</span>
         <select name="kategoria">
           <option value="">Wybierz usługę</option>
           @foreach(config('fachora.categories') as $key => $cat)
-          <option value="{{ $key }}">{{ $cat['pl'] }}</option>
+            <option value="{{ $key }}">{{ $cat['pl'] }}</option>
           @endforeach
         </select>
       </label>
@@ -49,12 +48,11 @@
       </label>
       <button type="submit" class="btn btn-primary btn-lg">Znajdź fachowca</button>
     </form>
-
     <ul class="fh-ticks">
       <li>Bezpłatnie dla klientów</li>
-      <li>Cena ustalona z góry</li>
-      <li>Faktura zawsze</li>
-      <li>Gwarancja {{ $warranty }} miesięcy</li>
+      <li>Ty wybierasz firmy</li>
+      <li>Adres tylko dla wybranej firmy</li>
+      <li>Faktura i gwarancja {{ $warranty }} mies. od firm Verified</li>
       <li>Obsługa także po angielsku</li>
     </ul>
   </div>
@@ -66,15 +64,15 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Usługi</div>
       <h2>Czego potrzebujesz?</h2>
-      <p>{{ count(config('fachora.categories')) }} kategorii, w których działają firmy Fachora Verified. Wybierz swoją, a formularz zlecenia będzie już wypełniony.</p>
+      <p>{{ count(config('fachora.categories')) }} kategorii usług. Wybierz swoją, a formularz zlecenia będzie już wypełniony.</p>
     </div>
     <div class="fh-cats">
       @foreach(config('fachora.categories') as $key => $cat)
-      <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-cat">
-        <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 26])</span>
-        <b>{{ $cat['pl'] }}</b>
-        <span>{{ $cat['examples']['pl'] }}</span>
-      </a>
+        <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-cat">
+          <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 26])</span>
+          <b>{{ $cat['pl'] }}</b>
+          <span>{{ $cat['examples']['pl'] }}</span>
+        </a>
       @endforeach
     </div>
   </div>
@@ -86,28 +84,28 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Jak to działa</div>
       <h2>Od problemu do fachowca w czterech krokach</h2>
-      <p>Bez konta, bez obdzwaniania, bez zgadywania, ile to będzie kosztować.</p>
+      <p>Bez konta, bez obdzwaniania, bez zgadywania. To Ty decydujesz, kto w ogóle zobaczy Twoje zlecenie.</p>
     </div>
     <div class="fh-steps">
       <div class="fh-step">
         <div class="nr">1</div>
         <h3>Opisz zlecenie</h3>
-        <p>Co, gdzie i kiedy. Dodaj zdjęcia, jeśli pomogą. Potwierdzasz e-mailem i dostajesz tajny link do swojego zlecenia.</p>
+        <p>Co, gdzie i kiedy, własnymi słowami. Dodaj zdjęcia, jeśli pomogą. Potwierdzasz e-mailem i dostajesz tajny link do swojego zlecenia.</p>
       </div>
       <div class="fh-step">
         <div class="nr">2</div>
-        <h3>Porównaj oferty</h3>
-        <p>Zlecenie trafia do maksymalnie {{ $maxOffers }} firm Fachora Verified. W ciągu {{ $offerHours }} godzin widzisz ceny, terminy i oceny.</p>
+        <h3>Wybierz firmy</h3>
+        <p>Pokazujemy do {{ $candidates }} firm z okolicy: Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone. Zaznaczasz maksymalnie {{ $maxOffers }}. Numer telefonu potwierdzasz kodem SMS, żeby firmy wiedziały, że zapytanie jest prawdziwe.</p>
       </div>
       <div class="fh-step">
         <div class="nr">3</div>
-        <h3>Wybierz i ustal cenę</h3>
-        <p>Wybierasz firmę. Cena, zakres, termin i gwarancja trafiają do potwierdzenia zlecenia. Dopiero teraz firma widzi Twój adres.</p>
+        <h3>Porównaj ceny</h3>
+        <p>Firmy Verified dostają zapytanie od nas i mają {{ $offerHours }} godzin na cenę i termin; widzisz je na swojej stronie zlecenia. Z firmą z rejestru kontaktujesz się sam: pokazujemy Ci jej publiczne dane z CEIDG i gotową wiadomość po polsku.</p>
       </div>
       <div class="fh-step">
         <div class="nr">4</div>
-        <h3>Odbierz pracę</h3>
-        <p>Firma wykonuje pracę, Ty ją akceptujesz. Dostajesz fakturę i gwarancję, a firma otrzymuje wypłatę. Na koniec wystawiasz opinię.</p>
+        <h3>Wybierz jedną i odbierz pracę</h3>
+        <p>Dopiero teraz wybrana firma widzi Twój adres i numer. Z Fachora Protect płacisz po akceptacji pracy. Firma Verified wystawia fakturę i daje gwarancję {{ $warranty }} miesięcy; na koniec wystawiasz opinię.</p>
       </div>
     </div>
     <div class="fh-more"><a href="{{ route('fachora.how') }}">Zobacz wszystkie kroki ze szczegółami →</a></div>
@@ -117,9 +115,9 @@
 <!-- FACHORA PROTECT -->
 <section class="fh-band" id="protect">
   <div class="container">
-    <div class="eyebrow">Fachora Protect</div>
+    <div class="eyebrow">Fachora Protect · do wyboru</div>
     <h2>Pieniądze czekają, aż powiesz: zrobione.</h2>
-    <p class="lead">Przy zleceniu z Fachora Protect rezerwujesz ustaloną kwotę z góry. Firma wie, że zapłata jest pewna, a Ty, że zapłacisz dopiero za wykonaną pracę.</p>
+    <p class="lead">Przy zleceniu z firmą Verified możesz zarezerwować ustaloną kwotę z góry. Firma wie, że zapłata jest pewna, a Ty, że zapłacisz dopiero za wykonaną pracę. Możesz też zapłacić firmie bezpośrednio po pracy, bez rezerwacji.</p>
     <div class="fh-band-grid">
       <div class="fh-flow">
         <div class="fh-flow-item">
@@ -168,8 +166,8 @@
       <div>
         <div class="eyebrow">Fachora Verified</div>
         <h2>Nie każda firma trafia na Fachorę.</h2>
-        <p>Zanim firma dostanie znak Fachora Verified i pierwsze zlecenie, sprawdzamy ją w rejestrach i u partnera płatniczego. Dopiero wtedy ręczymy za to, co widzisz w jej profilu.</p>
-        <p>Firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil z rejestru</b>, wyraźnie oznaczony i bez numeru telefonu. Możesz wysłać im zapytanie, ale znak Verified mają tylko firmy, które sprawdziliśmy. Każda firma może przejąć swój profil i przejść weryfikację.</p>
+        <p>Zanim firma dostanie znak Fachora Verified i pierwsze zapytanie, sprawdzamy ją w rejestrach i u partnera płatniczego. Dopiero wtedy ręczymy za to, co widzisz w jej profilu.</p>
+        <p>Firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil z rejestru</b>: wyraźnie oznaczony, bez znaku Verified i bez naszych gwarancji. Nie wysyłamy im żadnych wiadomości. Jeśli taką firmę wybierzesz, zobaczysz jej publiczne dane kontaktowe z CEIDG i skontaktujesz się z nią sam. Każda firma może przejąć swój profil i przejść weryfikację.</p>
         <p><a href="{{ route('fachora.standard') }}" class="btn btn-secondary">Standard Fachora: dziesięć zasad</a></p>
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
@@ -222,7 +220,7 @@
         <div class="rates">Stawki orientacyjne: dojazd 90 zł · otwarcie od 200 zł</div>
       </div>
     </div>
-    <p style="text-align:center;font-size:13.5px;color:var(--text-3);margin-top:18px;">Nie pokazujemy numerów telefonu. Rozmowa i płatność idą przez Fachorę, dzięki temu działa gwarancja.</p>
+    <p style="text-align:center;font-size:13.5px;color:var(--text-3);margin-top:18px;">Firma Verified nie podaje numeru telefonu: zapytanie, ceny i ustalenia idą przez Twoją stronę zlecenia, dzięki temu wszystko jest zapisane i działa gwarancja. Przy firmie z rejestru jest odwrotnie: dostajesz jej publiczne dane i dzwonisz lub piszesz sam.</p>
   </div>
 </section>
 
@@ -232,9 +230,10 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Dlaczego Fachora</div>
       <h2>Cztery rzeczy, które obiecujemy</h2>
+      <p>Dotyczą firm Fachora Verified i zleceń prowadzonych przez Twoją stronę zlecenia. Z firmą z rejestru umawiasz się bezpośrednio.</p>
     </div>
     <div class="fh-usps">
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Weryfikacja firm</h3><p>Rejestr, NIP, tożsamość, konto bankowe, telefon i e-mail sprawdzone, zanim firma zobaczy pierwsze zlecenie.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Weryfikacja firm</h3><p>Rejestr, NIP, tożsamość, konto bankowe, telefon i e-mail sprawdzone, zanim firma dostanie znak Verified i pierwsze zapytanie.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'clock', 'size' => 22])</span><h3>Pewny termin</h3><p>Termin jest częścią zlecenia. Firma go potwierdza, a odwołać może tylko z podanego powodu. No-show po rezerwacji to usunięcie z platformy.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span><h3>Bezpieczne płatności</h3><p>Z Fachora Protect płacisz dopiero po akceptacji pracy. W razie sporu pieniądze czekają na rozstrzygnięcie.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 22])</span><h3>Gwarancja na usługi</h3><p>Standardowo {{ $warranty }} miesięcy. Reklamacja wraca do zlecenia, a firma musi odpowiedzieć w {{ $disputeHours }} godzin.</p></div>
@@ -249,12 +248,13 @@
       <div>
         <div class="eyebrow">Dla firm</div>
         @if ($lead)
-        <h2>Nowi klienci w Twojej okolicy. Bez abonamentu.</h2>
-        <p>Klient sam wybiera Twoją firmę. Zlecenie oglądasz za darmo, a płacisz tylko za zapytanie, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł netto, zależnie od wielkości pracy. Pierwsze gratis. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
+          <h2>Nowi klienci w Twojej okolicy. Bez abonamentu.</h2>
+          <p>Klient sam wybiera Twoją firmę. Zapytanie oglądasz za darmo, a płacisz tylko za to, na które chcesz odpowiedzieć: od {{ (int) config('fachora.lead_min') }} do {{ (int) config('fachora.lead_max') }} zł netto, zależnie od wielkości pracy. Pierwsze gratis. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
         @else
-        <h2>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h2>
-        <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
+          <h2>Nowi klienci w Twojej okolicy. Płacisz tylko za zrealizowane zlecenia.</h2>
+          <p>0 zł abonamentu, 0 zł za rejestrację, 0 zł za zlecenie. Prowizja {{ $fee }}% wyłącznie od wykonanej i zaakceptowanej pracy, a przez pierwsze {{ $introDays }} dni tylko {{ $intro }}%. Do tego profil z opiniami od prawdziwych klientów i znak Fachora Verified.</p>
         @endif
+        <p>Żadnych wiadomości bez Twojej zgody: zapytania od nas dostają tylko firmy, które przejęły profil. Firmę z rejestru klient kontaktuje sam.</p>
         <div class="fh-cta-row" style="justify-content:flex-start;">
           <a href="{{ route('fachora.for-companies') }}" class="btn btn-primary">Zobacz ofertę dla firm</a>
           <a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Przejmij profil firmy</a>
@@ -263,11 +263,11 @@
       <div class="fh-prices" style="grid-template-columns:1fr 1fr;">
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>abonament</b><span>bez miesięcznej opłaty</span></div>
         @if ($lead)
-        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>podgląd zlecenia</b><span>opis, zdjęcia i termin za darmo</span></div>
-        <div class="fh-price hl"><div class="v">{{ (int) config('fachora.lead_min') }}–{{ (int) config('fachora.lead_max') }}<small> zł</small></div><b>za odblokowanie</b><span>pierwsze zapytanie gratis</span></div>
+          <div class="fh-price"><div class="v">0 <small>zł</small></div><b>podgląd zapytania</b><span>opis, zdjęcia i termin za darmo</span></div>
+          <div class="fh-price hl"><div class="v">{{ (int) config('fachora.lead_min') }}–{{ (int) config('fachora.lead_max') }}<small> zł</small></div><b>za odblokowanie</b><span>pierwsze zapytanie gratis</span></div>
         @else
-        <div class="fh-price"><div class="v">0 <small>zł</small></div><b>za zlecenie</b><span>nie płacisz za kontakt ani za ofertę</span></div>
-        <div class="fh-price hl"><div class="v">{{ $fee }}<small>%</small></div><b>od wykonanej pracy</b><span>przez pierwsze {{ $introDays }} dni {{ $intro }}%</span></div>
+          <div class="fh-price"><div class="v">0 <small>zł</small></div><b>za zlecenie</b><span>nie płacisz za kontakt ani za ofertę</span></div>
+          <div class="fh-price hl"><div class="v">{{ $fee }}<small>%</small></div><b>od wykonanej pracy</b><span>przez pierwsze {{ $introDays }} dni {{ $intro }}%</span></div>
         @endif
         <div class="fh-price"><div class="v">0 <small>zł</small></div><b>weryfikacja</b><span>znak Fachora Verified bez opłat</span></div>
       </div>
@@ -281,11 +281,11 @@
     <div class="section-header" style="margin-bottom:28px;">
       <div class="eyebrow" style="margin-bottom:16px;">Nie mówisz po polsku?</div>
       <h2>Wybierz język, w którym chcesz rozmawiać z firmą</h2>
-      <p>Przy zleceniu zaznaczasz język. Trafi ono tylko do firm, które go znają, a ich poziom widzisz w profilu.</p>
+      <p>Przy zleceniu zaznaczasz język. Firmy Verified dostają zapytanie tylko wtedy, gdy ten język znają, a ich poziom widzisz w profilu. Opis zlecenia tłumaczymy automatycznie na polski, więc firmę z rejestru możesz zapytać gotową wiadomością po polsku.</p>
     </div>
     <div class="fh-langs">
       @foreach(config('fachora.languages') as $code => $lang)
-      <span class="fh-lang"><span class="flag" aria-hidden="true">{{ $lang['flag'] }}</span>{{ $lang['pl'] }}</span>
+        <span class="fh-lang"><span class="flag" aria-hidden="true">{{ $lang['flag'] }}</span>{{ $lang['pl'] }}</span>
       @endforeach
     </div>
   </div>
@@ -301,15 +301,15 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>Ile to kosztuje?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, oferty ani za Fachora Protect. Płacisz tylko cenę ustaloną z firmą. Opłaty Fachory ponosi firma.</div>
+        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, za wybór firm, za oferty ani za Fachora Protect. Płacisz tylko cenę ustaloną z firmą. Opłaty Fachory ponosi firma.</div>
       </details>
       <details class="faq-item">
-        <summary>Czy dostanę numer telefonu firmy?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Nie przed wyborem firmy. Oferty, pytania i ustalenia idą przez Twoją stronę zlecenia, dzięki temu wszystko jest zapisane i obowiązuje gwarancja. Po wyborze firma dostaje Twój adres i możecie uzgodnić szczegóły.</div>
+        <summary>Kto zobaczy moje zlecenie?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="faq-content">Tylko firmy, które sam zaznaczysz, maksymalnie {{ $maxOffers }}. Firmy Verified dostają zapytanie od nas; firmie z rejestru wysyłasz wiadomość sam, bo Fachora nie wysyła jej niczego. Adres i numer telefonu dostaje wyłącznie ta firma, którą ostatecznie wybierzesz.</div>
       </details>
       <details class="faq-item">
         <summary>Co, jeśli praca jest źle wykonana?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Zgłaszasz spór na stronie zlecenia, ze zdjęciami i opisem. Firma ma {{ $disputeHours }} godzin na odpowiedź, a Fachora rozstrzyga: wypłata, częściowa wypłata, naprawa albo zwrot. Przy Fachora Protect pieniądze przez cały ten czas pozostają zablokowane.</div>
+        <div class="faq-content">Przy zleceniu z firmą Verified zgłaszasz spór na stronie zlecenia, ze zdjęciami i opisem. Firma ma {{ $disputeHours }} godzin na odpowiedź, a Fachora rozstrzyga: wypłata, częściowa wypłata, naprawa albo zwrot. Przy Fachora Protect pieniądze przez cały ten czas pozostają zablokowane.</div>
       </details>
     </div>
     <div class="fh-more"><a href="{{ route('pl.faq') }}">Wszystkie pytania i odpowiedzi →</a></div>
@@ -319,8 +319,8 @@
 <!-- CTA -->
 <section class="cta-final">
   <div class="container cta-inner">
-    <h2>Opisz zlecenie. Resztą zajmiemy się my.</h2>
-    <p>Kilka minut na opis, oferty w ciągu {{ $offerHours }} godzin, cena ustalona przed przyjazdem fachowca.</p>
+    <h2>Opisz zlecenie. Firmy wybierzesz sam.</h2>
+    <p>Kilka minut na opis, lista firm z okolicy, cena ustalona przed przyjazdem fachowca.</p>
     <div class="fh-cta-row">
       <a href="{{ route('fachora.intake') }}" class="btn btn-primary btn-lg">Znajdź fachowca</a>
       <a href="{{ route('fachora.how') }}" class="btn btn-white btn-lg">Jak to działa</a>

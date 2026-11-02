@@ -241,8 +241,8 @@
         <div class="fp-card">
           <h2>How it works</h2>
           <div class="fp-steps">
-            <div class="fp-step"><b>1. Describe the job</b>A few sentences and photos. Your request goes to up to {{ (int) config('fachora.max_offers') }} Fachora Verified companies nearby — including this one.</div>
-            <div class="fp-step"><b>2. Compare offers</b>Price up front, date, warranty. You choose — no phone calls, no haggling.</div>
+            <div class="fp-step"><b>1. Describe the job</b>A few sentences and photos. Then you pick up to {{ (int) config('fachora.max_offers') }} companies nearby yourself — including this one.</div>
+            <div class="fp-step"><b>2. Compare prices</b>Verified companies reply on your job page: price up front, date, warranty. You choose — no phone calls, no haggling.</div>
             <div class="fp-step"><b>3. Pay after the work</b>With Fachora Protect the money waits with the payment provider and reaches the company only after your "OK".</div>
           </div>
         </div>
@@ -251,7 +251,7 @@
       <aside class="fp-side">
         <div class="fp-cta">
           <h2>Ask for a quote</h2>
-          <p>We do not show a phone number — you send your request through Fachora. The company replies with a price and a date, and you decide without any obligation.</p>
+          <p>We do not show a Verified company's phone number — you send your request through Fachora. The company replies with a price and a date, and you decide without any obligation.</p>
           <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Ask for a quote →</a>
           <ul>
             <li>Free, no account needed</li>
@@ -294,12 +294,12 @@
         <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">This profile is temporarily suspended and the company is currently not receiving jobs through Fachora. A suspension follows from the <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Standard</a> (for example an expired check or unresolved complaints) and is reviewed again after the set period.</p>
       @else
         <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;"><strong>This profile is not active yet.</strong> The data comes from the public business register (CEIDG or KRS): name, town and type of activity. The company has not claimed its profile and has not passed Fachora's verification — so we do not mark it as Fachora Verified and we do not send it any jobs.</p>
-        <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">We do not publish contact details of companies that have not registered with us, and we only e-mail them a request from a customer who chose them, never advertising. Being listed in a register does not mean a company has been checked — <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Verified</a> means more than that.</p>
+        <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">We do not publish contact details of companies that have not registered with us, and we send them no messages at all. If a customer picks this company for their job, they see its public details from the register and contact it themselves. Being listed in a register does not mean a company has been checked — <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Verified</a> means more than that.</p>
       @endif
 
       <div style="margin-top:22px;padding:22px;border-radius:14px;background:var(--brand-tint);border:1px solid var(--brand-border);">
         <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--brand-darker);margin-bottom:6px;">Is this your company?</div>
-        <p style="color:var(--text-2);font-size:14.5px;line-height:1.6;margin:0 0 14px;">Claim the profile, complete your details and pass verification. No subscription, no registration fee — a commission only on completed jobs.</p>
+        <p style="color:var(--text-2);font-size:14.5px;line-height:1.6;margin:0 0 14px;">Claim the profile, complete your details and pass verification. No subscription, no registration fee — you pay only for a request you want to answer.</p>
         <a href="{{ $claimUrl }}" class="btn btn-primary btn-lg">Is this your company? Claim the profile →</a>
         <div style="font-size:13px;color:var(--text-3);margin-top:12px;">Did you receive a letter from us with a code? Enter it on the next page.</div>
       </div>

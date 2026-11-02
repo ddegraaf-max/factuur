@@ -48,7 +48,7 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">What you get</div>
       <h2>Jobs, not "leads"</h2>
-      <p>Every job is a real customer with a concrete problem, a confirmed e-mail address and a date. You respond only to the ones that suit you.</p>
+      <p>Every request is a real customer with a concrete problem, a confirmed e-mail address, a phone number confirmed by SMS code and a date, who picked your company from the list. You respond only to the ones that suit you.</p>
     </div>
     <div class="fh-usps cols-3">
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 22])</span><h3>The job by e-mail</h3><p>Description, photos, date, the customer's language and the rough scope. You have {{ $offerHours }} hours to give a price and a date through a link, no login needed.</p></div>
@@ -103,11 +103,11 @@
     </div>
     <div class="fh-ways">
       <div class="fh-way"><span class="k">You received a letter</span><h3>Enter the code from the letter</h3><p>We send companies from the public registers a letter by post with a code. The code links you to your profile; you confirm your e-mail and phone, and the profile is yours.</p><a href="{{ route('fachora.claim') }}" class="btn btn-primary">I have a letter code</a></div>
-      <div class="fh-way"><span class="k">You are in our database</span><h3>Find your profile</h3><p>Your company may already be in our database as an inactive profile, with no phone number and no jobs. Look it up by tax number (NIP) and claim it.</p><a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Find profile by NIP</a></div>
+      <div class="fh-way"><span class="k">You are in our database</span><h3>Find your profile</h3><p>Your company may already be in our database as a register profile: no phone number, no ratings and no requests from us. Look it up by tax number (NIP) and claim it.</p><a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Find profile by NIP</a></div>
       <div class="fh-way"><span class="k">You are not in the database</span><h3>Register your company</h3><p>Enter your NIP, categories, working area and languages. We check the registers, ask you to onboard with Mollie and accept the Standard, then grant the Verified mark.</p><a href="{{ route('fachora.apply') }}" class="btn btn-secondary">Register your company</a></div>
     </div>
     <div class="fh-note warm" style="max-width:860px;margin:28px auto 0;">
-      <b>No advertising, no newsletters.</b> If your company is in our database from a public register, the only thing you can receive from us is a request from a customer who chose your company, with an unsubscribe link. A claimed, verified profile gives you more: the Verified mark, a higher place in the list and jobs from your whole working area.
+      <b>No advertising, no newsletters, no messages without your consent.</b> If your company is in our database from a public register, we send it nothing: a customer who picks such a profile contacts you directly, using your public details from the register. A claimed, verified profile gives you more: the Verified mark, a higher place in the list, requests straight from us by e-mail and jobs from your whole working area.
     </div>
   </div>
 </section>

@@ -366,7 +366,7 @@ const today = todayLocal();
               <strong>{{ $t('Wat er nu gebeurt') }}</strong>
               <ul class="fa-ticks">
                 <li>{{ $t('Je bevestigt je e-mailadres via de link in de mail. Tot die klik sturen we niets naar bedrijven.') }}</li>
-                <li>{{ $t('We bieden de klus aan bij maximaal vijf Fachora Verified-bedrijven in de buurt die jouw taal spreken.') }}</li>
+                <li>{{ $t('Daarna kies je zelf tot vijf bedrijven uit de buurt. Fachora Verified-bedrijven krijgen je aanvraag van ons; bij bedrijven uit het register zie je hun openbare gegevens en neem je zelf contact op.') }}</li>
                 <li>{{ $t('Je ziet hun prijzen op je eigen pagina en kiest zelf. De prijs staat vooraf vast.') }}</li>
                 <li>{{ $t('Gratis voor jou als klant. Je adres en nummer gaan alleen naar het bedrijf dat je kiest.') }}</li>
               </ul>

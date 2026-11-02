@@ -278,10 +278,10 @@ return [
             'wordmark' => '/brand/fachora/fachora-logo.svg',
             'wordmark_dark' => '/brand/fachora/fachora-logo-dark.svg',
 
-            'seo_title' => 'Fachora — sprawdzeni fachowcy: jasna cena, pewny termin, gwarancja',
-            'seo_description' => 'Fachora łączy klientów ze zweryfikowanymi firmami w Polsce: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Cena ustalona z góry, bezpieczna płatność Fachora Protect, faktura i gwarancja. Obsługa po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
+            'seo_title' => 'Fachora — sam wybierasz fachowca z okolicy: jasna cena, pewny termin, gwarancja',
+            'seo_description' => 'Fachora pokazuje Ci firmy z Twojej okolicy: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Sam wybierasz, do kogo trafi zapytanie: firmy Fachora Verified z ceną ustaloną z góry, fakturą i gwarancją, albo firmy z rejestru. Bezpłatnie, po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
             'og_description' => 'Sprawdzone firmy. Bezpieczne usługi. Jasna cena, pewny termin, gwarancja.',
-            'app_description' => 'Platforma zweryfikowanych fachowców w Polsce: zlecenie online, oferty od firm Fachora Verified, bezpieczna płatność Fachora Protect, faktura i 12 miesięcy gwarancji.',
+            'app_description' => 'Platforma fachowców w Polsce: zlecenie online, sam wybierasz firmy z okolicy, oferty od firm Fachora Verified, opcjonalna bezpieczna płatność Fachora Protect, faktura i 12 miesięcy gwarancji.',
             'pwa_description' => 'Sprawdzone firmy. Bezpieczne usługi.',
             'footer_description' => 'Fachora: zweryfikowani fachowcy, jasna cena ustalona z góry, bezpieczna płatność i gwarancja. Dla klientów bezpłatnie.',
             'auth_title' => 'Panel firmy Fachora',
@@ -289,16 +289,16 @@ return [
             'login_seo_title' => 'Logowanie do Fachora — panel firmy',
             'login_seo_description' => 'Zaloguj się do panelu firmy Fachora: nowe zlecenia, profil, weryfikacja i faktury.',
             'register_seo_title' => 'Zostań firmą Fachora Verified',
-            'register_seo_description' => 'Przejmij profil swojej firmy, przejdź weryfikację i odbieraj zlecenia od klientów w Twojej okolicy. 0 zł abonamentu, prowizja tylko od wykonanych zleceń.',
+            'register_seo_description' => 'Przejmij profil swojej firmy, przejdź weryfikację i odbieraj zapytania od klientów z okolicy, którzy sami Cię wybrali. 0 zł abonamentu, płacisz tylko za zapytania, na które odpowiadasz.',
 
             'i18n' => [
                 'en' => [
                     'tagline' => 'Verified companies. Safe services.',
                     'positioning' => 'Trusted tradespeople across Poland: clear price, reliable appointment, guarantee',
-                    'seo_title' => 'Fachora — verified tradespeople in Poland: clear price, reliable appointment, guarantee',
-                    'seo_description' => 'Fachora connects you with verified companies in Poland: plumber, electrician, heating, air conditioning, locksmith, roofing, renovation, appliances, car mechanic. Price agreed up front, secure Fachora Protect payment, invoice and guarantee. Service in English, Polish, German, Dutch and Ukrainian.',
+                    'seo_title' => 'Fachora — pick your own tradesperson in Poland: clear price, reliable appointment, guarantee',
+                    'seo_description' => 'Fachora shows you companies near you in Poland: plumber, electrician, heating, air conditioning, locksmith, roofing, renovation, appliances, car mechanic. You choose who receives your request: Fachora Verified companies with a price agreed up front, invoice and guarantee, or companies from the business register. Free, in English, Polish, German, Dutch and Ukrainian.',
                     'og_description' => 'Verified companies. Safe services. Clear price, reliable appointment, guarantee.',
-                    'app_description' => 'Platform of verified tradespeople in Poland: request online, offers from Fachora Verified companies, secure Fachora Protect payment, invoice and 12-month guarantee.',
+                    'app_description' => 'Platform of tradespeople in Poland: request online, you pick the companies near you, offers from Fachora Verified companies, optional secure Fachora Protect payment, invoice and 12-month guarantee.',
                     'pwa_description' => 'Verified companies. Safe services.',
                     'footer_description' => 'Fachora: verified tradespeople, a clear price agreed up front, secure payment and a guarantee. Free for customers.',
                     'auth_title' => 'Fachora company panel',
@@ -306,7 +306,7 @@ return [
                     'login_seo_title' => 'Log in to Fachora — company panel',
                     'login_seo_description' => 'Log in to the Fachora company panel: new jobs, profile, verification and invoices.',
                     'register_seo_title' => 'Become a Fachora Verified company',
-                    'register_seo_description' => 'Claim your company profile, pass verification and receive jobs from customers near you. No subscription, commission only on completed jobs.',
+                    'register_seo_description' => 'Claim your company profile, pass verification and receive requests from customers near you who picked you themselves. No subscription, you pay only for the requests you answer.',
                 ],
             ],
             // De aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V.

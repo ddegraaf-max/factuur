@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.89.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.90.0</div>
+        <h2>Fachora: de voorkant vertelt nu hoe het echt werkt</h2>
+        <ul class="tl-list">
+          <li><b>Klant kiest zelf</b> — homepage, "Jak to działa", veelgestelde vragen, bedrijvenpagina en openbare profielen (Pools en Engels) beschrijven de huidige werkwijze: de klant ziet tot vijftien bedrijven uit de buurt, kiest er zelf maximaal vijf, bevestigt zijn nummer per sms en vergelijkt daarna de prijzen op zijn eigen pagina.</li>
+          <li><b>Twee soorten bedrijven, eerlijk uitgelegd</b> — Fachora Verified-bedrijven krijgen de aanvraag van ons en vallen onder de Standaard (prijs vooraf, factuur, garantie, geschillen). Bedrijven uit het register krijgen niets van Fachora: de klant ziet hun openbare gegevens uit CEIDG en neemt zelf contact op; ongebruikte registergegevens verdwijnen na veertien dagen.</li>
+          <li><b>Protect als keuze</b> — de betaalreservering staat overal als optie naast rechtstreeks betalen na het werk; zoekmachineteksten en de uitleg in het aanvraagformulier zijn meegenomen.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.89.0</div>
         <h2>Offerte vervangen in één stap</h2>
         <ul class="tl-list">
           <li><b>Nieuwe offerte als kopie</b> — bij "Laten vervallen" kies je nu ook "Nieuwe offerte maken als kopie van deze". Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum; de oude offerte vervalt en verwijst naar de vervanger. Je komt direct in het concept om het aan te passen en te versturen.</li>

@@ -247,8 +247,8 @@
         <div class="fp-card">
           <h2>Jak to działa</h2>
           <div class="fp-steps">
-            <div class="fp-step"><b>1. Opisz, co trzeba zrobić</b>Kilka zdań i zdjęcia. Zlecenie trafia do maksymalnie {{ (int) config('fachora.max_offers') }} firm Fachora Verified w okolicy — w tym do tej.</div>
-            <div class="fp-step"><b>2. Porównaj oferty</b>Cena z góry, termin, gwarancja. Wybierasz Ty — bez telefonów, bez targowania się.</div>
+            <div class="fp-step"><b>1. Opisz, co trzeba zrobić</b>Kilka zdań i zdjęcia. Potem sam wybierasz do {{ (int) config('fachora.max_offers') }} firm z okolicy — w tym tę.</div>
+            <div class="fp-step"><b>2. Porównaj ceny</b>Firmy Verified odpowiadają na Twojej stronie zlecenia: cena z góry, termin, gwarancja. Wybierasz Ty — bez telefonów, bez targowania się.</div>
             <div class="fp-step"><b>3. Zapłać po pracy</b>Z Fachora Protect pieniądze czekają u operatora płatności i trafiają do firmy dopiero po Twoim „OK”.</div>
           </div>
         </div>
@@ -257,7 +257,7 @@
       <aside class="fp-side">
         <div class="fp-cta">
           <h2>Zapytaj o wycenę</h2>
-          <p>Nie podajemy numeru telefonu — zlecenie wysyłasz przez Fachora. Firma odpowiada ofertą z ceną i terminem, a Ty decydujesz bez zobowiązań.</p>
+          <p>Nie podajemy numeru telefonu firmy Verified — zapytanie wysyłasz przez Fachora. Firma odpowiada ofertą z ceną i terminem, a Ty decydujesz bez zobowiązań.</p>
           <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Zapytaj o wycenę →</a>
           <ul>
             <li>Bezpłatnie i bez konta</li>
@@ -300,12 +300,12 @@
         <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">Ten profil jest tymczasowo zawieszony i firma nie otrzymuje obecnie zleceń przez Fachora. Zawieszenie wynika z zasad <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Standardu Fachora</a> (np. wygasła kontrola lub nierozstrzygnięte zgłoszenia) i jest ponownie oceniane po upływie wyznaczonego okresu.</p>
       @else
         <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;"><strong>Ten profil nie jest jeszcze aktywny.</strong> Dane pochodzą z publicznego rejestru przedsiębiorców (CEIDG lub KRS): nazwa, miejscowość i rodzaj działalności. Firma nie przejęła jeszcze swojego profilu i nie przeszła weryfikacji Fachora — dlatego nie oznaczamy jej jako Fachora Verified i nie kierujemy do niej zleceń.</p>
-        <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">Nie publikujemy danych kontaktowych firm, które się u nas nie zarejestrowały. E-mail wysyłamy im wyłącznie z zapytaniem klienta, który sam je wybrał, nigdy z reklamą. Obecność w rejestrze nie oznacza, że firma jest sprawdzona — <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Verified</a> to coś więcej.</p>
+        <p style="color:var(--text-2);line-height:1.7;margin:0 0 14px;">Nie publikujemy danych kontaktowych firm, które się u nas nie zarejestrowały, i nie wysyłamy im żadnych wiadomości. Jeśli klient wybierze tę firmę do swojego zlecenia, zobaczy jej publiczne dane z rejestru i skontaktuje się z nią sam. Obecność w rejestrze nie oznacza, że firma jest sprawdzona — <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Fachora Verified</a> to coś więcej.</p>
       @endif
 
       <div style="margin-top:22px;padding:22px;border-radius:14px;background:var(--brand-tint);border:1px solid var(--brand-border);">
         <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--brand-darker);margin-bottom:6px;">Jesteś właścicielem tej firmy?</div>
-        <p style="color:var(--text-2);font-size:14.5px;line-height:1.6;margin:0 0 14px;">Przejmij profil, uzupełnij dane i przejdź weryfikację. Bez abonamentu, bez opłat za rejestrację — prowizja tylko od wykonanych zleceń.</p>
+        <p style="color:var(--text-2);font-size:14.5px;line-height:1.6;margin:0 0 14px;">Przejmij profil, uzupełnij dane i przejdź weryfikację. Bez abonamentu, bez opłat za rejestrację — płacisz tylko za zapytanie, na które chcesz odpowiedzieć.</p>
         <a href="{{ $claimUrl }}" class="btn btn-primary btn-lg">Jesteś właścicielem? Przejmij profil →</a>
         <div style="font-size:13px;color:var(--text-3);margin-top:12px;">Dostałeś od nas list z kodem? Wpisz go na następnej stronie.</div>
       </div>

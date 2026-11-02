@@ -34,7 +34,7 @@
 <section class="hero">
   <div class="container hero-inner">
     <div class="eyebrow">Dla firm</div>
-    <h1>Nowi klienci w Twojej okolicy. <span class="accent">Płacisz tylko za zrealizowane zlecenia.</span></h1>
+    <h1>Nowi klienci w Twojej okolicy. <span class="accent">{{ $lead ? 'Bez abonamentu.' : 'Płacisz tylko za zrealizowane zlecenia.' }}</span></h1>
     <p class="hero-sub">{{ $lead ? 'Klient sam wybiera Twoją firmę i opisuje zlecenie, Ty podajesz cenę i termin. Bez abonamentu: płacisz tylko za zapytanie, na które odpowiadasz, a pierwsze jest gratis.' : 'Klient opisuje zlecenie, Ty podajesz cenę i termin. Jeśli Cię wybierze, kwota jest zarezerwowana, zanim wyjedziesz. Żadnych opłat za kontakt, żadnego abonamentu.' }}</p>
     <div class="hero-ctas">
       <a href="{{ route('fachora.apply') }}" class="btn btn-primary btn-lg">Zgłoś firmę</a>
@@ -49,7 +49,7 @@
     <div class="section-header">
       <div class="eyebrow" style="margin-bottom:16px;">Co dostajesz</div>
       <h2>Zlecenia, nie „leady”</h2>
-      <p>Każde zlecenie to prawdziwy klient z konkretnym problemem, potwierdzonym adresem e-mail i terminem. Odpowiadasz tylko na te, które Ci pasują.</p>
+      <p>Każde zapytanie to prawdziwy klient z konkretnym problemem, potwierdzonym adresem e-mail, numerem telefonu (kod SMS) i terminem, który sam wybrał Twoją firmę z listy. Odpowiadasz tylko na te, które Ci pasują.</p>
     </div>
     <div class="fh-usps cols-3">
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 22])</span><h3>Zlecenie na e-mail</h3><p>Opis, zdjęcia, termin, język klienta i szacunkowy zakres. Masz {{ $offerHours }} godzin, żeby podać cenę i termin przez link, bez logowania.</p></div>
@@ -104,11 +104,11 @@
     </div>
     <div class="fh-ways">
       <div class="fh-way"><span class="k">Dostałeś list</span><h3>Wpisz kod z listu</h3><p>Firmom z rejestrów publicznych wysyłamy pocztą list z kodem. Kod łączy Cię z Twoim profilem; potwierdzasz e-mail i telefon, i profil jest Twój.</p><a href="{{ route('fachora.claim') }}" class="btn btn-primary">Mam kod z listu</a></div>
-      <div class="fh-way"><span class="k">Jesteś w bazie</span><h3>Znajdź swój profil</h3><p>Twoja firma może już być w naszej bazie jako profil nieaktywny, bez telefonu i bez zleceń. Wyszukaj ją po NIP i przejmij profil.</p><a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Znajdź profil po NIP</a></div>
+      <div class="fh-way"><span class="k">Jesteś w bazie</span><h3>Znajdź swój profil</h3><p>Twoja firma może już być w naszej bazie jako profil z rejestru: bez telefonu, bez ocen i bez zapytań od nas. Wyszukaj ją po NIP i przejmij profil.</p><a href="{{ route('fachora.claim') }}" class="btn btn-secondary">Znajdź profil po NIP</a></div>
       <div class="fh-way"><span class="k">Nie ma Cię w bazie</span><h3>Zgłoś firmę</h3><p>Podaj NIP, kategorie, zasięg i języki. Sprawdzimy rejestry, poprosimy o onboarding w Mollie i akceptację Standardu, a potem przyznamy znak Verified.</p><a href="{{ route('fachora.apply') }}" class="btn btn-secondary">Zgłoś firmę</a></div>
     </div>
     <div class="fh-note warm" style="max-width:860px;margin:28px auto 0;">
-      <b>Żadnych reklam ani newsletterów.</b> Jeśli Twoja firma jest w naszej bazie z rejestru publicznego, możesz dostać od nas jedynie zapytanie klienta, który sam wybrał Twoją firmę — z linkiem do rezygnacji. Przejęty i zweryfikowany profil daje więcej: znak Verified, wyższą pozycję na liście i zlecenia z całego Twojego zasięgu.
+      <b>Żadnych reklam, newsletterów ani wiadomości bez Twojej zgody.</b> Jeśli Twoja firma jest w naszej bazie z rejestru publicznego, nie wysyłamy jej niczego: klient, który wybierze taki profil, kontaktuje się z Tobą sam, korzystając z publicznych danych z CEIDG. Przejęty i zweryfikowany profil daje więcej: znak Verified, wyższą pozycję na liście, zapytania prosto od nas na e-mail i zlecenia z całego Twojego zasięgu.
     </div>
   </div>
 </section>
