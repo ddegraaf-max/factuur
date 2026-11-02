@@ -20,6 +20,8 @@ const props = defineProps({
   presetCity: { type: String, default: '' },
   wait: { type: Object, default: null },
   maxPhotos: { type: Number, default: 5 },
+  // 1.93: AI-hulp bij de omschrijving (alleen als de AI-koppeling aan staat).
+  assistant: { type: Boolean, default: false },
 });
 
 const page = usePage();
@@ -44,6 +46,35 @@ const form = useForm({
   website: '',
   'cf-turnstile-response': '',
 });
+
+/* ---------- AI-hulp bij de omschrijving (1.93) ---------- */
+const assist = ref({ busy: false, error: '', result: null });
+const xsrf = () => decodeURIComponent((document.cookie.match(/XSRF-TOKEN=([^;]+)/) || [])[1] || '');
+const askAssistant = async () => {
+  if (assist.value.busy || form.description.trim().length < 10) return;
+  assist.value = { busy: true, error: '', result: null };
+  try {
+    const res = await fetch(route('fachora.intake.assist'), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-XSRF-TOKEN': xsrf() },
+      body: JSON.stringify({ description: form.description, title: form.title, category: form.category, city: form.city, locale: uiLocale.value }),
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    assist.value.result = await res.json();
+  } catch (e) {
+    assist.value.error = t('De hulp is even niet beschikbaar. Probeer het zo opnieuw, of ga gewoon verder: wij vertalen je omschrijving na het versturen.');
+  } finally {
+    assist.value.busy = false;
+  }
+};
+const useAssistant = () => {
+  const r = assist.value.result;
+  if (!r) return;
+  if (r.description) form.description = r.description;
+  if (!form.title && r.title) form.title = r.title;
+  assist.value.result = null;
+};
 
 /* ---------- stappen ---------- */
 const STEPS = [
@@ -248,6 +279,36 @@ const today = todayLocal();
               <label for="in-desc">{{ $t('Omschrijving van de klus') }} *</label>
               <textarea id="in-desc" v-model="form.description" rows="5" maxlength="3000" :placeholder="$t('Wat is er kapot, waar zit het, sinds wanneer? Schrijf gerust in je eigen taal: wij vertalen het voor het bedrijf.')" :aria-invalid="!!errorFor('description')"></textarea>
               <div v-if="errorFor('description')" class="fa-err">{{ errorFor('description') }}</div>
+              <!-- AI-hulp (1.93): eigen taal in, voorstel + Poolse versie + vragen uit; de klant kiest zelf of hij het overneemt. -->
+              <div v-if="assistant" class="in-assist">
+                <div class="in-assist-head">
+                  <span class="in-assist-ic" aria-hidden="true" v-html="icon('star', 18)"></span>
+                  <div class="in-assist-txt">
+                    <b>{{ $t('Hulp bij je omschrijving') }}</b>
+                    <p class="fa-small fa-muted">{{ $t('Schrijf in je eigen taal. De assistent maakt er een complete omschrijving van, laat zien wat het bedrijf in het Pools te zien krijgt en vraagt wat er nog ontbreekt.') }}</p>
+                  </div>
+                  <button type="button" class="fa-btn fa-btn--secondary in-assist-btn" :disabled="assist.busy || form.description.trim().length < 10" @click="askAssistant">
+                    <span v-if="assist.busy" class="in-spin" aria-hidden="true"></span>{{ assist.busy ? $t('Even geduld…') : $t('Help me beschrijven') }}
+                  </button>
+                </div>
+                <div v-if="assist.error" class="fa-err">{{ assist.error }}</div>
+                <div v-if="assist.result" class="in-assist-result" role="status">
+                  <div v-if="assist.result.questions && assist.result.questions.length" class="in-assist-q">
+                    <b>{{ $t('Dit helpt het bedrijf bij de prijs:') }}</b>
+                    <ul><li v-for="q in assist.result.questions" :key="q">{{ q }}</li></ul>
+                  </div>
+                  <div class="fa-small in-assist-lbl">{{ $t('Voorstel voor je omschrijving') }}</div>
+                  <div class="in-assist-text">{{ assist.result.description }}</div>
+                  <details class="in-assist-pl">
+                    <summary>{{ $t('Zo ziet het bedrijf het in het Pools') }}</summary>
+                    <div class="in-assist-text">{{ assist.result.description_pl }}</div>
+                  </details>
+                  <div class="fa-actions in-assist-actions">
+                    <button type="button" class="fa-btn fa-btn--navy" @click="useAssistant">{{ $t('Gebruik dit voorstel') }}</button>
+                    <button type="button" class="fa-link fa-small" @click="assist.result = null">{{ $t('Liever mijn eigen tekst') }}</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="fa-field">
               <label for="in-title">{{ $t('Korte titel') }} <span class="fa-hint">{{ $t('optioneel') }}</span></label>
@@ -403,6 +464,26 @@ const today = todayLocal();
 .in-upload input { display: none; }
 .in-plus { font-size: 20px; font-weight: 800; line-height: 1; }
 .in-gallery { margin-bottom: 4px; }
+/* AI-hulp bij de omschrijving (1.93) */
+.in-assist { margin-top: 12px; padding: 14px 16px; border: 1px solid #C5D8EC; border-radius: 12px; background: #F3F8FD; }
+.in-assist-head { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.in-assist-ic { flex: 0 0 auto; width: 34px; height: 34px; border-radius: 10px; background: #fff; color: #F4781F; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(11, 37, 69, 0.1); }
+.in-assist-txt { flex: 1 1 220px; min-width: 0; }
+.in-assist-txt b { display: block; font-size: 15px; margin-bottom: 2px; }
+.in-assist-txt p { margin: 0; }
+.in-assist-btn { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px; }
+.in-spin { width: 14px; height: 14px; border: 2px solid rgba(11, 37, 69, 0.25); border-top-color: #0B2545; border-radius: 50%; animation: in-spin 0.8s linear infinite; }
+@keyframes in-spin { to { transform: rotate(360deg); } }
+.in-assist-result { margin-top: 14px; padding-top: 14px; border-top: 1px solid #D9E6F2; }
+.in-assist-q { margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; background: #FFF4EA; border: 1px solid #F8D3B3; font-size: 14px; }
+.in-assist-q b { display: block; margin-bottom: 4px; }
+.in-assist-q ul { margin: 0; padding-left: 18px; }
+.in-assist-lbl { font-weight: 600; margin-bottom: 4px; }
+.in-assist-text { white-space: pre-wrap; background: #fff; border: 1px solid #D9E6F2; border-radius: 10px; padding: 12px 14px; font-size: 15px; line-height: 1.55; }
+.in-assist-pl { margin-top: 10px; }
+.in-assist-pl summary { cursor: pointer; font-size: 14px; font-weight: 600; color: #0B2545; margin-bottom: 6px; }
+.in-assist-actions { margin-top: 12px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { .in-spin { animation: none; } }
 .in-when { margin-top: 14px; }
 .in-consent { margin: 6px 0 4px; }
 .in-promise { margin: 18px 0 4px; }

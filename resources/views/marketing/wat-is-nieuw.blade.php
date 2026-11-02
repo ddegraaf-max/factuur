@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.92.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.93.0</div>
+        <h2>Fachora: AI-hulp bij de omschrijving en een zandloper tijdens het zoeken</h2>
+        <ul class="tl-list">
+          <li><b>Help me beschrijven</b> — in stap 3 van de aanvraag schrijft de klant in zijn eigen taal; de assistent maakt er een complete omschrijving van, laat zien wat het bedrijf in het Pools te zien krijgt en stelt hooguit drie vragen over wat nog ontbreekt (gas of elektrisch, welke verdieping, afmetingen). De klant kiest zelf of hij het voorstel overneemt; niets wordt opgeslagen.</li>
+          <li><b>Zandloper</b> — zolang de app na de bevestiging live in het bedrijvenregister zoekt, ziet de klant een draaiende zandloper en een lopende balk; de pagina ververst vanzelf.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.92.0</div>
         <h2>Fachora: sitemaps compleet en SEO klaar voor advertenties</h2>
         <ul class="tl-list">
           <li><b>Sitemaps in twee talen</b> — elke pagina staat in de sitemap als Poolse én Engelse versie met hreflang-alternates; de stadspagina's (veertien categorieën × ruim honderd Poolse steden, van Warszawa tot Kołobrzeg) en de Verified-profielen zitten er nu altijd in. Inlog- en statuspagina zijn eruit.</li>

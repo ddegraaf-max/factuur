@@ -34,6 +34,8 @@ Route::middleware('brand:fachora')->group(function () {
     Route::get('/zlecenie/nowe', [IntakeController::class, 'show'])->name('fachora.intake');
     Route::post('/zlecenie', [IntakeController::class, 'store'])->middleware(['throttle:10,1', 'turnstile'])->name('fachora.intake.store');
     Route::post('/zlecenie/ponownie', [IntakeController::class, 'resend'])->middleware('throttle:10,1')->name('fachora.intake.resend');
+    // AI-hulp bij de omschrijving (1.93): eigen taal in, complete omschrijving + Poolse versie + vragen uit.
+    Route::post('/zlecenie/asystent', [IntakeController::class, 'assist'])->middleware('throttle:12,1')->name('fachora.intake.assist');
 
     // ---------- klant: opdrachtpagina (geheime link) ----------
     Route::prefix('zlecenie/{token}')->where(['token' => '[a-f0-9]{64}'])->name('fachora.job.')->group(function () {

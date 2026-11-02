@@ -233,6 +233,14 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+AI-HULP BIJ DE OMSCHRIJVING EN ZANDLOPER (2 nov 2026, 1.93.0)
+- Stap 3 van de aanvraag: knop "Pomóż mi opisać / Help me describe it" → POST /zlecenie/asystent
+  (IntakeController@assist, StructuredClaude, throttle 12/min). De klant schrijft in zijn eigen taal;
+  terug komen een complete omschrijving in die taal, de Poolse versie die het bedrijf ziet, een titel en
+  hooguit drie vragen over wat ontbreekt. Niets wordt opgeslagen; de klant kiest "Użyj tej propozycji".
+  Zonder ANTHROPIC_API_KEY: geen knop (prop assistant=false) en 404 op de route.
+- Opdrachtpagina: zandloper + lopende balk zolang choice.searching (live zoeken in CEIDG), 1.92.2.
+
 SEO EN SITEMAPS VOOR ADVERTENTIES (2 nov 2026, 1.92.0)
 - Twee taalversies per pagina: Pools op het pad, Engels op hetzelfde pad met ?lang=en. De layout geeft per
   taal een eigen canonical en hreflang (pl, en, x-default); de sitemaps (/sitemap.xml → -strony, -uslugi,
