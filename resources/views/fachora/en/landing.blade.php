@@ -17,7 +17,7 @@
     $candidates = config('fachora.choice_candidates');
 @endphp
 @section('title', 'Fachora — pick your own tradesperson in Poland. Plumber, electrician, locksmith and more, in English')
-@section('description', 'Describe the job and Fachora shows you companies near you: verified Fachora Verified companies and companies from the business register. You choose who receives your request, compare prices and pay only after the work. Free for customers, in English.')
+@section('description', 'Describe the job and Fachora shows you companies near you: Fachora Verified companies, checked by us, and companies from the business register. You choose who receives your request, compare prices and pay only after the work. Free for customers, in English.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -31,7 +31,7 @@
     <div class="eyebrow">Verified companies. Safe services.</div>
     <h1>Trusted tradespeople <span class="accent">across Poland.</span></h1>
     <p class="hero-sub">
-      Describe what needs doing, in English if you like, and we show you companies near you: verified Fachora Verified companies and companies from the Polish business register. You choose who receives your request. No account, no calling around, no unwanted phone calls.
+      Describe what needs doing, in English if you like, and we show you companies near you: Fachora Verified companies, checked by us, and companies from the Polish business register. You choose who receives your request. No account, no calling around, no unwanted phone calls.
     </p>
     <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Find a tradesperson">
       <label>

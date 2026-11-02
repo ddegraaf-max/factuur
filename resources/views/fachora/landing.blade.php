@@ -16,7 +16,7 @@
     $candidates = config('fachora.choice_candidates');
 @endphp
 @section('title', 'Fachora — sam wybierasz fachowca z okolicy. Hydraulik, elektryk, ślusarz i inni, bez obdzwaniania')
-@section('description', 'Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z Twojej okolicy: zweryfikowane Fachora Verified i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Dla klientów bezpłatnie, także po angielsku.')
+@section('description', 'Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Dla klientów bezpłatnie, także po angielsku.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -30,7 +30,7 @@
     <div class="eyebrow">Sprawdzone firmy. Bezpieczne usługi.</div>
     <h1>Zaufani fachowcy <span class="accent">w całej Polsce.</span></h1>
     <p class="hero-sub">
-      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: zweryfikowane Fachora Verified i firmy z rejestru przedsiębiorców. Sam wybierasz, do kogo trafi zapytanie. Bez konta, bez obdzwaniania po znajomych, bez niechcianych telefonów.
+      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru przedsiębiorców. Sam wybierasz, do kogo trafi zapytanie. Bez konta, bez obdzwaniania po znajomych, bez niechcianych telefonów.
     </p>
     <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Znajdź fachowca">
       <label>
