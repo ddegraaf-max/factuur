@@ -33,7 +33,8 @@ class FachoraStatusTest extends TestCase
 
     public function test_without_a_stripe_key_payments_show_as_not_set_up_and_the_banner_stays_green(): void
     {
-        config(['brand.active' => 'fachora', 'fachora.ceidg_token' => 'jwt', 'services.anthropic.key' => 'sk-ant-test', 'services.stripe.secret' => null]);
+        config(['brand.active' => 'fachora', 'fachora.ceidg_token' => 'jwt', 'services.anthropic.key' => 'sk-ant-test', 'services.stripe.secret' => null,
+            'services.smstools.client_id' => 'id', 'services.smstools.client_secret' => 'secret', 'services.resend.key' => 're_test']); // alles ingericht behalve Stripe
         Cache::forever(HealthController::HEARTBEAT_KEY, now()->timestamp);
 
         $html = (string) $this->get('/status?lang=en')->assertOk()->getContent();
