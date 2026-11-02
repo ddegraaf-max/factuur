@@ -201,9 +201,16 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 
     <!-- ===== Zelf bedrijven kiezen (1.86) ===== -->
     <section v-if="status === 'selecting' && choice" class="jb-section">
-      <div v-if="choice.searching" class="fa-card fa-card--tint jb-searching">
-        <h2 class="fa-h2">{{ $t('We zoeken vakmensen bij jou in de buurt') }}</h2>
-        <p>{{ $t('We kijken in het Poolse bedrijvenregister welke bedrijven rond :city dit werk doen. Dat duurt meestal een paar minuten; je krijgt een e-mail zodra je kunt kiezen. Deze pagina ververst vanzelf.', { city: job.city }) }}</p>
+      <!-- Zoeken loopt: draaiende zandloper + lopende balk, zodat de klant ziet dat er iets gebeurt (de pagina ververst elke 20 s). -->
+      <div v-if="choice.searching" class="fa-card fa-card--tint jb-searching" role="status" aria-live="polite">
+        <div class="jb-searching-row">
+          <span class="jb-hourglass" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12M6 22h12M7 2v4.5a5 5 0 0 0 2 4l3 1.5 3-1.5a5 5 0 0 0 2-4V2M7 22v-4.5a5 5 0 0 1 2-4l3-1.5 3 1.5a5 5 0 0 1 2 4V22"/><path d="M9.5 19.5h5" stroke-width="2.6"/></svg></span>
+          <div>
+            <h2 class="fa-h2">{{ $t('We zoeken vakmensen bij jou in de buurt') }}</h2>
+            <p>{{ $t('We kijken in het Poolse bedrijvenregister welke bedrijven rond :city dit werk doen. Dat duurt meestal een paar minuten; je krijgt een e-mail zodra je kunt kiezen. Deze pagina ververst vanzelf.', { city: job.city }) }}</p>
+          </div>
+        </div>
+        <div class="jb-progress" aria-hidden="true"><span></span></div>
       </div>
       <h2 v-else class="fa-h2">{{ $t('Kies de bedrijven') }} <span class="fa-muted jb-count">{{ picked.length }}/{{ pickMax }}</span></h2>
       <article v-for="p in choice.candidates" :key="p.id" class="fa-card jb-offer jb-pick" :class="{ 'is-open': picked.includes(p.id) }" @click="togglePick(p.id)">
@@ -583,6 +590,15 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-section { margin-bottom: 16px; }
 .jb-section .fa-h2 { margin-bottom: 12px; }
 .jb-count { font-size: 14px; font-weight: 500; }
+/* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
+.jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
+.jb-searching-row .fa-h2 { margin-bottom: 6px; }
+.jb-hourglass { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 14px; background: #fff; color: #0B2545; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(11, 37, 69, 0.12); animation: jb-flip 2.4s ease-in-out infinite; }
+@keyframes jb-flip { 0%, 55% { transform: rotate(0deg); } 78%, 100% { transform: rotate(180deg); } }
+.jb-progress { position: relative; height: 4px; margin-top: 14px; border-radius: 2px; background: rgba(11, 37, 69, 0.12); overflow: hidden; }
+.jb-progress span { position: absolute; top: 0; bottom: 0; width: 35%; border-radius: 2px; background: #F4781F; animation: jb-slide 1.6s ease-in-out infinite; }
+@keyframes jb-slide { from { left: -35%; } to { left: 100%; } }
+@media (prefers-reduced-motion: reduce) { .jb-hourglass, .jb-progress span { animation: none; } }
 .jb-offer.is-off { opacity: 0.6; }
 .jb-pick { cursor: pointer; }
 .jb-pick-box { display: flex; align-items: flex-start; padding-top: 2px; }
