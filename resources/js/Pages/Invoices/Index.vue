@@ -120,23 +120,3 @@ const setStatus = (s) => {
     </div>
   </AppLayout>
 </template>
-
-<style>
-.pagination {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  padding: 16px;
-  border-top: 1px solid var(--border);
-}
-.page-link {
-  padding: 6px 10px;
-  border-radius: var(--r-sm);
-  font-size: 13px;
-  color: var(--text-2);
-  border: 1px solid var(--border);
-}
-.page-link:hover { background: var(--surface-2); }
-.page-link.active { background: var(--brand); color: white; border-color: var(--brand); }
-.page-link.disabled { opacity: 0.4; pointer-events: none; }
-</style>

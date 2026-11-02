@@ -757,6 +757,21 @@ table { border-collapse: collapse; width: 100%; }
   color: var(--text-3);
 }
 
+/* PAGINERING onder lijsten (Laravel-paginator-links; labels uit lang/<taal>/pagination.php).
+   Los onder een lijst: gecentreerd met ruimte erboven; in een kaart: eigen strook met lijn erboven. */
+.pagination { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; align-items: center; margin-top: 20px; }
+.card .pagination { margin-top: 0; padding: 14px 16px; border-top: 1px solid var(--border); }
+.page-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 34px; height: 34px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--surface);
+  font-size: 13px; font-weight: 500; color: var(--text-2); text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.page-link:hover { background: var(--surface-2); border-color: var(--border-strong); color: var(--text); }
+.page-link.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.page-link.disabled { opacity: 0.4; pointer-events: none; }
+
 /* FORMS */
 .form-group { margin-bottom: 16px; }
 .form-group label {
