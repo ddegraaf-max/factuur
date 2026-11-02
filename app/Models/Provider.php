@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
  * Platformbreed, dus bewust zonder company-scope.
  *
  * @property float|null $distance_km  afstand tot een opdracht, gezet door ProviderService::match()
+ * @property string|null $pkd_fit  main|secondary|unknown (unrelated valt weg), gezet door ProviderService::choiceCandidates() (1.96)
  */
 class Provider extends Model
 {
