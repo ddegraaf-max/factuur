@@ -38,7 +38,7 @@ const form = useForm({
   urgency: 'week',
   wanted_date: '',
   time_window: '',
-  language: uiLocale.value === 'en' ? 'en' : 'pl',
+  languages: uiLocale.value === 'en' ? ['pl', 'en'] : ['pl'], // 1.95: Pools altijd, de rest optioneel
   customer_name: '',
   customer_email: '',
   customer_phone: '',
@@ -82,7 +82,7 @@ const STEPS = [
   { n: 2, title: 'Waar?', fields: ['postal_code', 'city'] },
   { n: 3, title: 'Wat is er aan de hand?', fields: ['title', 'description', 'photos'] },
   { n: 4, title: 'Wanneer?', fields: ['urgency', 'wanted_date', 'time_window'] },
-  { n: 5, title: 'In welke taal?', fields: ['language'] },
+  { n: 5, title: 'In welke taal?', fields: ['languages'] },
   { n: 6, title: 'Contact', fields: ['customer_name', 'customer_email', 'customer_phone', 'consent', 'cf-turnstile-response'] },
 ];
 const step = ref(props.preset ? 2 : 1);
@@ -105,7 +105,7 @@ const summary = (n) => {
     case 2: return [form.postal_code, form.city].filter(Boolean).join(' ');
     case 3: return (form.title || form.description).slice(0, 70) + ((form.title || form.description).length > 70 ? '…' : '') + (form.photos.length ? ' · ' + t(':n foto\'s', { n: form.photos.length }) : '');
     case 4: { const u = urgencies.find((x) => x.key === form.urgency); return (form.urgency === 'date' && form.wanted_date ? form.wanted_date : t(u?.label || '')) + (form.time_window ? ' · ' + form.time_window : ''); }
-    case 5: { const l = languageOf(form.language); return l ? l.flag + ' ' + l.name : form.language; }
+    case 5: return props.languages.filter((l) => form.languages.includes(l.code)).map((l) => l.flag + ' ' + l.name).join(' · ');
     default: return '';
   }
 };
@@ -119,7 +119,7 @@ const validate = (n) => {
   }
   if (n === 3 && form.description.trim().length < 10) e.description = t('Beschrijf de klus in minstens een paar woorden.');
   if (n === 4 && form.urgency === 'date' && !form.wanted_date) e.wanted_date = t('Kies een datum.');
-  if (n === 5 && !form.language) e.language = t('Kies een taal.');
+  if (n === 5 && !form.languages.includes('pl')) form.languages = ['pl', ...form.languages]; // Pools staat altijd aan
   if (n === 6) {
     if (!form.customer_name.trim()) e.customer_name = t('Vul je naam in.');
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(form.customer_email.trim())) e.customer_email = t('Vul een geldig e-mailadres in.');
@@ -376,14 +376,14 @@ const today = todayLocal();
             <button v-if="step !== 5 && reached >= 5" type="button" class="fa-link fa-small">{{ $t('Wijzigen') }}</button>
           </header>
           <div v-if="step === 5" class="in-step-body">
-            <p class="fa-small fa-muted">{{ $t('We bieden de klus alleen aan bij bedrijven die deze taal spreken.') }}</p>
-            <div class="fa-options">
-              <label v-for="l in languages" :key="l.code" class="fa-option" :class="{ 'is-on': form.language === l.code }">
-                <input type="radio" name="language" :value="l.code" v-model="form.language">
-                <span class="flag">{{ l.flag }}</span><span>{{ l.name }}</span>
+            <p class="fa-small fa-muted">{{ $t('Pools staat altijd aan: alle bedrijven werken in het Pools en wij vertalen je omschrijving. Vink daarnaast de talen aan die je zelf spreekt; bedrijven die die taal spreken zetten we vooraan.') }}</p>
+            <div class="fa-options in-langs">
+              <label v-for="l in languages" :key="l.code" class="fa-option" :class="{ 'is-on': form.languages.includes(l.code), 'in-lang-always': l.code === 'pl' }">
+                <input type="checkbox" :value="l.code" v-model="form.languages" :disabled="l.code === 'pl'" :aria-label="l.name">
+                <span class="flag">{{ l.flag }}</span><span>{{ l.name }}</span><span v-if="l.code === 'pl'" class="in-lang-tag">{{ $t('altijd') }}</span>
               </label>
             </div>
-            <div v-if="errorFor('language')" class="fa-err">{{ errorFor('language') }}</div>
+            <div v-if="errorFor('languages')" class="fa-err">{{ errorFor('languages') }}</div>
             <div class="fa-actions"><button type="button" class="fa-btn fa-btn--navy" @click="next">{{ $t('Volgende') }}</button></div>
           </div>
         </section>
@@ -464,6 +464,12 @@ const today = todayLocal();
 .in-upload input { display: none; }
 .in-plus { font-size: 20px; font-weight: 800; line-height: 1; }
 .in-gallery { margin-bottom: 4px; }
+/* Talen (1.95): ronde vinkjes; Pools staat vast aan met een rood bolletje */
+.in-langs .fa-option input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #C5CFDC; background: #fff; cursor: pointer; margin: 0; }
+.in-langs .fa-option input:checked { background: #0B2545; border-color: #0B2545; box-shadow: inset 0 0 0 3px #fff; }
+.in-langs .in-lang-always { cursor: default; }
+.in-langs .in-lang-always input, .in-langs .in-lang-always input:checked { background: #E8231F; border-color: #E8231F; box-shadow: inset 0 0 0 3px #fff; cursor: default; opacity: 1; }
+.in-lang-tag { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #E8231F; }
 /* AI-hulp bij de omschrijving (1.93) */
 .in-assist { margin-top: 12px; padding: 14px 16px; border: 1px solid #C5D8EC; border-radius: 12px; background: #F3F8FD; }
 .in-assist-head { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }

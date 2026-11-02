@@ -37,7 +37,7 @@ const edit = useForm({
   urgency: props.job.urgency,
   wanted_date: props.job.wanted_date_value || '',
   time_window: props.job.time_window || '',
-  language: props.job.language,
+  languages: props.job.languages || [props.job.language], // 1.95: Pools altijd, de rest optioneel
   postal_code: props.job.postal_code || '',
   city: props.job.city || '',
 });
@@ -119,11 +119,15 @@ const townsLabel = () => props.advice.towns.map((x) => t(':name (:km km)', { nam
           <div v-if="edit.errors.wanted_date" class="fa-err">{{ edit.errors.wanted_date }}</div>
         </div>
         <div class="fa-field">
-          <label for="cf-language">{{ $t('Taal') }}</label>
-          <select id="cf-language" v-model="edit.language">
-            <option v-for="l in languages" :key="l.code" :value="l.code">{{ l.flag }} {{ l.name }}</option>
-          </select>
-          <p v-if="edit.language !== 'pl'" class="fa-small fa-muted">{{ $t('Tip: met Pools heb je de meeste keus. Je omschrijving vertalen we toch automatisch.') }}</p>
+          <label>{{ $t('Taal') }}</label>
+          <p class="fa-small fa-muted">{{ $t('Pools staat altijd aan: alle bedrijven werken in het Pools en wij vertalen je omschrijving. Vink daarnaast de talen aan die je zelf spreekt; bedrijven die die taal spreken zetten we vooraan.') }}</p>
+          <div class="fa-options cf-langs">
+            <label v-for="l in languages" :key="l.code" class="fa-option" :class="{ 'is-on': edit.languages.includes(l.code), 'cf-lang-always': l.code === 'pl' }">
+              <input type="checkbox" :value="l.code" v-model="edit.languages" :disabled="l.code === 'pl'" :aria-label="l.name">
+              <span class="flag">{{ l.flag }}</span><span>{{ l.name }}</span><span v-if="l.code === 'pl'" class="cf-lang-tag">{{ $t('altijd') }}</span>
+            </label>
+          </div>
+          <div v-if="edit.errors.languages" class="fa-err">{{ edit.errors.languages }}</div>
         </div>
         <div class="fa-field">
           <label for="cf-title">{{ $t('Titel') }}</label>
@@ -179,4 +183,8 @@ const townsLabel = () => props.advice.towns.map((x) => t(':name (:km km)', { nam
 .cf-next { margin-top: 18px; }
 .cf-actions { margin-top: 20px; }
 .cf-foot { margin-top: 14px; }
+.cf-langs .fa-option input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #C5CFDC; background: #fff; cursor: pointer; margin: 0; }
+.cf-langs .fa-option input:checked { background: #0B2545; border-color: #0B2545; box-shadow: inset 0 0 0 3px #fff; }
+.cf-langs .cf-lang-always input, .cf-langs .cf-lang-always input:checked { background: #E8231F; border-color: #E8231F; box-shadow: inset 0 0 0 3px #fff; cursor: default; opacity: 1; }
+.cf-lang-tag { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #E8231F; }
 </style>

@@ -176,6 +176,21 @@ class Provider extends Model
         return $language === 'pl' || isset(($this->languages ?? [])[$language]);
     }
 
+    /** Spreekt het bedrijf minstens één van deze talen? (1.95, lege lijst = ja) @param  list<string>  $languages */
+    public function speaksAny(array $languages): bool
+    {
+        if ($languages === []) {
+            return true;
+        }
+        foreach ($languages as $language) {
+            if ($this->speaks($language)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /** Fee die voor dit bedrijf geldt: introductietarief in de eerste maanden na verificatie. */
     public function feePercent(): float
     {

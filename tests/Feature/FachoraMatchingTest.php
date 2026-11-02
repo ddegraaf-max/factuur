@@ -100,6 +100,7 @@ class FachoraMatchingTest extends TestCase
         $this->assertNull($matches[0]->distance_km);
     }
 
+    /** 1.95: de extra talen van de klant zijn een voorkeur: eerst wie ze spreekt, anders iedereen (Pools staat altijd aan). */
     public function test_the_language_of_the_customer_is_a_hard_filter_with_a_fallback_when_nobody_speaks_it(): void
     {
         $this->fakeGeocoderDown();

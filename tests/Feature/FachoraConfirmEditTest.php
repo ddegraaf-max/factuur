@@ -52,8 +52,7 @@ class FachoraConfirmEditTest extends TestCase
             ->assertInertia(fn ($page) => $page->component('Fachora/Confirm')
                 ->where('advice.radius', 50)
                 ->where('advice.towns.0.name', 'Płock')
-                ->where('advice.tips.0.key', 'language')
-                ->where('advice.tips.1.key', 'description')
+                ->where('advice.tips.0.key', 'description') // 1.95: geen taaltip meer, Pools staat altijd aan
                 ->has('categories')->has('languages'));
     }
 

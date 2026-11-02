@@ -77,7 +77,8 @@ class JobService
             'urgency' => in_array($data['urgency'] ?? null, (array) config('fachora.urgencies'), true) ? $data['urgency'] : 'week',
             'wanted_date' => $data['wanted_date'] ?? null,
             'time_window' => $data['time_window'] ?? null,
-            'language' => Fachora::isLanguage($data['language'] ?? null) ? $data['language'] : 'pl',
+            'language' => Fachora::preferredLanguage($languageCodes = Fachora::languageCodes($data)),
+            'languages' => $languageCodes,
             'customer_name' => mb_substr(trim((string) $data['customer_name']), 0, 120),
             'customer_email' => mb_strtolower(trim((string) $data['customer_email'])),
             'customer_phone' => $data['customer_phone'] ?? null,
@@ -465,7 +466,8 @@ class JobService
             'urgency' => $data['urgency'],
             'wanted_date' => $data['urgency'] === 'date' ? ($data['wanted_date'] ?? null) : null,
             'time_window' => $data['time_window'] ?? null,
-            'language' => $data['language'],
+            'language' => Fachora::preferredLanguage($languageCodes = Fachora::languageCodes($data)),
+            'languages' => $languageCodes,
             'postal_code' => $postal,
             'city' => $city,
         ];
@@ -490,9 +492,6 @@ class JobService
         $towns = $job->lat !== null && $job->lng !== null
             ? array_slice(CeidgClient::nearbyTowns([(float) $job->lat, (float) $job->lng], $radius), 0, 3) : [];
         $tips = [];
-        if ($job->language !== 'pl') {
-            $tips[] = ['key' => 'language', 'text' => __('De meeste vakmensen in Polen werken alleen in het Pools. Wij vertalen je omschrijving automatisch naar het Pools, dus met Pools als taal heb je de meeste keus. Kies alleen een andere taal als je de vakman echt in die taal wilt spreken.')];
-        }
         if (mb_strlen((string) $job->description) < 80) {
             $tips[] = ['key' => 'description', 'text' => __('Je omschrijving is kort. Vertel wat er moet gebeuren, hoe groot het is, op welke verdieping en of er al materiaal is: dan krijg je betere en snellere prijzen.')];
         }
@@ -577,7 +576,7 @@ class JobService
                 ->filter(fn (Provider $p) => ConsentPolicy::mayEmail($p) && in_array($p->status, ['claimed', 'pending', 'verified'], true))->values();
         } else {
             $candidates = $this->providers->match($job, (int) config('fachora.max_offers', 5), $already);
-            if ($candidates->isEmpty() && $job->language !== 'pl') {
+            if ($candidates->isEmpty() && $job->extraLanguages() !== []) {
                 $candidates = $this->providers->match($job, (int) config('fachora.max_offers', 5), $already, requireLanguage: false);
                 if ($candidates->isNotEmpty()) {
                     $job->forceFill(['ai' => array_merge($job->ai ?? [], ['language_fallback' => true])])->save();

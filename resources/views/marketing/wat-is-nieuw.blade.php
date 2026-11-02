@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.93.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.95.0</div>
+        <h2>Fachora: meerdere talen per aanvraag</h2>
+        <ul class="tl-list">
+          <li><b>Pools altijd aan</b> — stap 5 van de aanvraag is een meerkeuze geworden: Pools staat vast aan (rood bolletje, "zawsze"), want alle bedrijven werken in het Pools en de omschrijving wordt vertaald. Daarnaast vinkt de klant de talen aan die hij zelf spreekt.</li>
+          <li><b>Voorkeur, geen eis</b> — bedrijven die zo'n extra taal spreken staan in de keuzelijst binnen hun groep vooraan en worden bij het aanbieden eerst geprobeerd; is er niemand, dan gaat de aanvraag gewoon naar Poolstalige bedrijven. Bedrijven zien alle talen van de klant op de opdracht en in de mail.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.93.0</div>
         <h2>Fachora: AI-hulp bij de omschrijving en een zandloper tijdens het zoeken</h2>
         <ul class="tl-list">
           <li><b>De klant als boodschapper (1.94.0)</b> — het kant-en-klare Poolse bericht waarmee de klant een registerbedrijf benadert, noemt nu in één zin dat het bedrijf al een profiel op fachora.pl heeft en dat in twee minuten kan overnemen. Fachora stuurt het bedrijf zelf nog steeds niets.</li>

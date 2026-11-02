@@ -59,7 +59,9 @@ class JobController extends Controller
             'urgency' => ['required', Rule::in((array) config('fachora.urgencies'))],
             'wanted_date' => ['nullable', 'required_if:urgency,date', 'date', 'after_or_equal:today'],
             'time_window' => ['nullable', 'string', 'max:40'],
-            'language' => ['required', Rule::in(array_keys((array) config('fachora.languages')))],
+            'language' => ['nullable', Rule::in(array_keys((array) config('fachora.languages')))],
+            'languages' => ['nullable', 'array', 'max:5'],
+            'languages.*' => ['string', Rule::in(array_keys((array) config('fachora.languages')))],
             'postal_code' => ['nullable', 'regex:/^\d{2}-\d{3}$/'],
             'city' => ['required', 'string', 'max:120'],
         ], [

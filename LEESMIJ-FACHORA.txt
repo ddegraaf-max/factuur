@@ -233,6 +233,17 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+MEERDERE TALEN PER AANVRAAG (2 nov 2026, 1.95.0)
+- Stap 5 is een meerkeuze: Pools staat vast aan (rood bolletje, "zawsze"), de andere talen zijn optioneel.
+  Kolom service_jobs.languages (json, Pools altijd eerst); 'language' blijft de voorkeurstaal (eerste taal
+  naast het Pools, anders 'pl') voor bestaande schermen en mails. Helpers: Fachora::languageCodes($data),
+  Fachora::preferredLanguage(), ServiceJob::languageCodes()/extraLanguages(), Provider::speaksAny().
+- Matchen: extra talen zijn een voorkeur, geen eis. ProviderService::match filtert in de eerste ronde op
+  speaksAny(extraLanguages); JobService::dispatch valt terug op iedereen (language_fallback) als niemand ze
+  spreekt. choiceCandidates zet binnen een groep (Verified/geclaimd/register) de sprekers vooraan.
+- Presenter language_label en de mailregel "Taal van de klant" tonen alle talen. Geen taaltip meer op de
+  bevestigingspagina. Tests: FachoraLanguagesTest.
+
 KLANT ALS BOODSCHAPPER EN BRIEVEN AAN GEKOZEN BEDRIJVEN (2 nov 2026, 1.94.0)
 - Het kant-en-klare Poolse mailtje van de klant aan een registerbedrijf (Job.vue mailtoFor) eindigt met
   één feitelijke zin: "Państwa firma jest już na fachora.pl (profil z rejestru): <profiel-url> …profil można

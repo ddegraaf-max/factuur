@@ -380,7 +380,7 @@ class FachoraMail extends Mailable
             __('Wanneer') => trim($urgency . ($job->time_window ? ', ' . $job->time_window : '')),
         ];
         if ($this->audience === 'provider') {
-            $facts[__('Taal van de klant')] = ($languages[$job->language]['flag'] ?? '') . ' ' . ($languages[$job->language]['pl'] ?? strtoupper($job->language));
+            $facts[__('Taal van de klant')] = implode(', ', array_map(fn (string $c) => trim(($languages[$c]['flag'] ?? '') . ' ' . ($languages[$c]['pl'] ?? strtoupper($c))), $job->languageCodes()));
             if ($job->estimate_low !== null && $job->estimate_high !== null) {
                 $facts[__('Indicatie')] = Fachora::money($job->estimate_low) . ' – ' . Fachora::money($job->estimate_high);
             }

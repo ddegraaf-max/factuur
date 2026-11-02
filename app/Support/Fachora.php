@@ -61,6 +61,41 @@ class Fachora
         return $code !== null && isset(((array) config('fachora.languages', []))[$code]);
     }
 
+    /**
+     * Talen uit een formulier (1.95): de lijst 'languages' en/of het oude
+     * losse 'language'. Pools altijd en eerst, onbekende codes vallen weg.
+     *
+     * @param  array<string, mixed>  $data
+     * @return list<string>
+     */
+    public static function languageCodes(array $data): array
+    {
+        $codes = ['pl'];
+        foreach ((array) ($data['languages'] ?? []) as $code) {
+            if (is_string($code) && self::isLanguage($code)) {
+                $codes[] = $code;
+            }
+        }
+        $single = $data['language'] ?? null;
+        if (is_string($single) && self::isLanguage($single)) {
+            $codes[] = $single;
+        }
+
+        return array_values(array_unique($codes));
+    }
+
+    /** De voorkeurstaal voor schermen en mails: de eerste taal naast het Pools, anders 'pl'. @param  list<string>  $codes */
+    public static function preferredLanguage(array $codes): string
+    {
+        foreach ($codes as $code) {
+            if ($code !== 'pl') {
+                return $code;
+            }
+        }
+
+        return 'pl';
+    }
+
     /** Afstand in kilometers tussen twee punten (haversine). */
     public static function distanceKm(float $lat1, float $lng1, float $lat2, float $lng2): float
     {

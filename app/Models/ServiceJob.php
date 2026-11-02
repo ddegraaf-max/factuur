@@ -38,7 +38,7 @@ class ServiceJob extends Model
         'paid_at', 'payout_at', 'refunded_at', 'fee_percent', 'fee_amount', 'payout_amount',
         'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
         'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
-        'selected_providers', 'request_fee', 'request_session_id', 'request_paid_at',
+        'languages', 'selected_providers', 'request_fee', 'request_session_id', 'request_paid_at',
         'phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at', 'provider_search_at',
     ];
 
@@ -71,6 +71,7 @@ class ServiceJob extends Model
         'cancelled_at' => 'datetime',
         'reviewed_at' => 'datetime',
         'owner_notified_at' => 'datetime',
+        'languages' => 'array',
         'selected_providers' => 'array',
         'request_fee' => 'float',
         'request_paid_at' => 'datetime',
@@ -78,6 +79,29 @@ class ServiceJob extends Model
         'phone_verified_at' => 'datetime',
         'provider_search_at' => 'datetime',
     ];
+
+    /**
+     * Alle talen van de klant (1.95): Pools altijd en eerst, dan de talen die
+     * hij zelf aanvinkte. Oude opdrachten hebben alleen 'language'.
+     *
+     * @return list<string>
+     */
+    public function languageCodes(): array
+    {
+        $codes = array_merge(['pl'], (array) ($this->languages ?? []), $this->language ? [$this->language] : []);
+
+        return array_values(array_unique(array_filter($codes, fn ($c) => is_string($c) && \App\Support\Fachora::isLanguage($c))));
+    }
+
+    /**
+     * De talen naast het Pools: een voorkeur bij het matchen, geen eis.
+     *
+     * @return list<string>
+     */
+    public function extraLanguages(): array
+    {
+        return array_values(array_diff($this->languageCodes(), ['pl']));
+    }
 
     protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id', 'phone_code'];
 

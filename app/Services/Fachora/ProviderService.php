@@ -445,7 +445,8 @@ class ProviderService
             if (! ConsentPolicy::mayEmail($p)) {
                 return false;
             }
-            if ($requireLanguage && ! $p->speaks($job->language)) {
+            // 1.95: de extra talen van de klant zijn een voorkeur; Pools spreekt iedereen. Zonder extra talen geen filter.
+            if ($requireLanguage && ! $p->speaksAny($job->extraLanguages())) {
                 return false;
             }
             if ($job->lat !== null && $p->lat !== null) {
@@ -492,6 +493,7 @@ class ProviderService
         }
 
         $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 2];
+        $extra = $job->extraLanguages(); // 1.95: bedrijven die een taal van de klant spreken komen binnen hun groep vooraan
 
         return $query->get()->filter(function (Provider $p) use ($job, $radius) {
             if ($p->isDemo() || ! (ConsentPolicy::mayEmailRequest($p) || ConsentPolicy::mayShowDirectContact($p))) {
@@ -507,6 +509,7 @@ class ProviderService
             return true;
         })->sortBy([
             fn (Provider $a, Provider $b) => ($rank[$a->status] ?? 9) <=> ($rank[$b->status] ?? 9),
+            fn (Provider $a, Provider $b) => (int) ! $a->speaksAny($extra) <=> (int) ! $b->speaksAny($extra),
             fn (Provider $a, Provider $b) => ($b->rating_avg ?? 0) <=> ($a->rating_avg ?? 0),
             fn (Provider $a, Provider $b) => ($a->distance_km ?? 999) <=> ($b->distance_km ?? 999),
         ])->take($limit)->values();
