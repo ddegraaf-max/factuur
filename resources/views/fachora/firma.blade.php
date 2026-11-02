@@ -10,6 +10,7 @@
 --}}
 
 @php
+    $protect = fachora_protect();
     $v = $summary['verified'];
     $catNames = collect($categories)->pluck('name')->all();
     $plural = function (int $n, string $one, string $few, string $many): string {
@@ -26,7 +27,7 @@
         ? $summary['name'] . ' – ' . implode(', ', array_slice($catNames, 0, 2)) . ($summary['city'] ? ' ' . $summary['city'] : '') . ' | Fachora Verified'
         : $summary['name'] . ($summary['city'] ? ' – ' . $summary['city'] : '') . ' | Fachora';
     $desc = $v
-        ? $summary['name'] . ' (' . $summary['city'] . '): firma Fachora Verified — ' . implode(', ', $catNames) . '. Zweryfikowana w rejestrach, cena ustalona z góry, bezpieczna płatność Fachora Protect, faktura i gwarancja. Zapytaj o wycenę przez Fachora.'
+        ? $summary['name'] . ' (' . $summary['city'] . '): firma Fachora Verified — ' . implode(', ', $catNames) . '. Zweryfikowana w rejestrach, cena ustalona z góry, ' . ($protect ? 'bezpieczna płatność Fachora Protect, ' : '') . 'faktura i gwarancja. Zapytaj o wycenę przez Fachora.'
         : $summary['name'] . ($summary['city'] ? ' (' . $summary['city'] . ')' : '') . ' — profil firmy na Fachora na podstawie rejestru publicznego. Profil nie został jeszcze przejęty ani zweryfikowany. Jesteś właścicielem? Przejmij profil.';
 
     $ld = null;
@@ -193,15 +194,15 @@
           <div class="fp-facts">
             <div class="fp-fact"><div class="k">Gwarancja</div><div class="v ok">{{ $summary['warranty_months'] ? $summary['warranty_months'] . ' ' . $plural((int) $summary['warranty_months'], 'miesiąc', 'miesiące', 'miesięcy') : 'wg oferty' }}</div></div>
             <div class="fp-fact"><div class="k">Faktura</div><div class="v {{ $summary['invoice'] ? 'ok' : '' }}">{{ $summary['invoice'] ? 'Zawsze' : 'Potwierdzenie wykonania' }}</div></div>
-            <div class="fp-fact"><div class="k">Fachora Protect</div>@if($summary['protect'])<div class="v ok">Dostępny</div>@else<div class="v no">Niedostępny</div>@endif</div>
+            @if($protect)<div class="fp-fact"><div class="k">Fachora Protect</div>@if($summary['protect'])<div class="v ok">Dostępny</div>@else<div class="v no">Niedostępny</div>@endif</div>@endif
             <div class="fp-fact"><div class="k">Ubezpieczenie OC</div>@if($summary['insured'])<div class="v ok">Aktualne</div>@else<div class="v no">Brak informacji</div>@endif</div>
             @if($summary['radius_km'])
             <div class="fp-fact"><div class="k">Zasięg</div><div class="v">do {{ $summary['radius_km'] }} km</div></div>
             @endif
           </div>
           <div class="fp-note">
-            Firma Fachora Verified: sprawdzona w rejestrach (CEIDG/KRS, biała lista VAT), z potwierdzonym e-mailem i telefonem, tożsamością i kontem bankowym zweryfikowanymi przez Mollie, i z zaakceptowanym <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Standardem Fachora</a>.
-            @if($summary['protect']) Z <a href="{{ route('fachora.protect') }}" style="color:var(--brand);font-weight:500;">Fachora Protect</a> płacisz dopiero po zakończeniu pracy — pieniądze czekają u operatora płatności.@endif
+            Firma Fachora Verified: sprawdzona w rejestrach (CEIDG/KRS, biała lista VAT), z potwierdzonym e-mailem i telefonem{{ $protect ? ', tożsamością i kontem bankowym zweryfikowanymi przez Stripe,' : '' }} i z zaakceptowanym <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:500;">Standardem Fachora</a>.
+            @if($protect && $summary['protect']) Z <a href="{{ route('fachora.protect') }}" style="color:var(--brand);font-weight:500;">Fachora Protect</a> płacisz dopiero po zakończeniu pracy — pieniądze czekają u operatora płatności.@endif
           </div>
         </div>
 
@@ -249,7 +250,7 @@
           <div class="fp-steps">
             <div class="fp-step"><b>1. Opisz, co trzeba zrobić</b>Kilka zdań i zdjęcia. Potem sam wybierasz do {{ (int) config('fachora.max_offers') }} firm z okolicy — w tym tę.</div>
             <div class="fp-step"><b>2. Porównaj ceny</b>Firmy Verified odpowiadają na Twojej stronie zlecenia: cena z góry, termin, gwarancja. Wybierasz Ty — bez telefonów, bez targowania się.</div>
-            <div class="fp-step"><b>3. Zapłać po pracy</b>Z Fachora Protect pieniądze czekają u operatora płatności i trafiają do firmy dopiero po Twoim „OK”.</div>
+            <div class="fp-step"><b>3. Zapłać po pracy</b>@if($protect)Z Fachora Protect pieniądze czekają u operatora płatności i trafiają do firmy dopiero po Twoim „OK”.@else Płacisz firmie bezpośrednio po wykonanej pracy, na warunkach z potwierdzenia zlecenia. Firma Verified wystawia fakturę.@endif</div>
           </div>
         </div>
       </div>
@@ -262,7 +263,7 @@
           <ul>
             <li>Bezpłatnie i bez konta</li>
             <li>Cena ustalona przed rozpoczęciem pracy</li>
-            @if($summary['protect'])<li>Płatność przez Fachora Protect — po zakończeniu</li>@endif
+            @if($protect && $summary['protect'])<li>Płatność przez Fachora Protect — po zakończeniu</li>@endif
             <li>Odpowiedź zwykle w ciągu {{ (int) config('fachora.offer_hours') }} godzin</li>
           </ul>
         </div>

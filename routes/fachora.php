@@ -25,7 +25,8 @@ Route::middleware('brand:fachora')->group(function () {
     $page = fn (string $leaf) => fn () => view(Market::view('fachora.' . $leaf));
 
     Route::get('/jak-to-dziala', $page('jak-to-dziala'))->name('fachora.how');
-    Route::get('/fachora-protect', $page('protect'))->name('fachora.protect');
+    // Alleen als Protect op deze omgeving bestaat (config fachora.protect + Stripe-sleutel); anders 404.
+    Route::get('/fachora-protect', fn () => fachora_protect() ? view(Market::view('fachora.protect')) : abort(404))->name('fachora.protect');
     Route::get('/standard', $page('standard'))->name('fachora.standard');
     Route::get('/dla-firm', $page('dla-firm'))->name('fachora.for-companies');
 

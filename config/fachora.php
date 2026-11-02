@@ -14,7 +14,10 @@
  */
 return [
     // env() alleen hier: config wordt in productie gecachet.
-    'protect' => (bool) env('FACHORA_PROTECT', true),           // betaling via Stripe Connect met uitgestelde uitbetaling
+    // Fachora Protect (betaalreservering via Stripe Connect, uitbetaling na akkoord). Staat UIT tot er genoeg
+    // Verified-bedrijven zijn (1.91): de voorkant zwijgt er dan over en /fachora-protect geeft 404. Aanzetten =
+    // FACHORA_PROTECT=true én STRIPE_SECRET; de bank-/identiteitscheck van Verified hoort bij deze vlag.
+    'protect' => (bool) env('FACHORA_PROTECT', false),
     'ceidg_token' => env('CEIDG_TOKEN'),                          // JWT van dane.biznes.gov.pl (CEIDG API v3)
     'ceidg_url' => rtrim(env('CEIDG_URL', 'https://dane.biznes.gov.pl/api/ceidg/v3'), '/'),
     'geocode_url' => rtrim(env('FACHORA_GEOCODE_URL', 'https://nominatim.openstreetmap.org'), '/'),
@@ -52,8 +55,6 @@ return [
     // Kiest de klant een bedrijf uit het register, dan krijgt hij diens openbare contactgegevens
     // (CEIDG) en neemt hij zelf contact op. Zet dit pas aan na juridisch akkoord (art. 398 PKE).
     'email_unregistered' => (bool) env('FACHORA_EMAIL_UNREGISTERED', false),
-    // Betalingen alleen via het Mollie-account van Creditline; Stripe (oud account) alleen als je dit expliciet aanzet.
-    'stripe_fallback' => (bool) env('FACHORA_STRIPE_FALLBACK', false),
     // 1.87: gratis voor de klant. Zet FACHORA_REQUEST_FEE > 0 om toch een bijdrage te vragen.
     'request_fee' => (float) env('FACHORA_REQUEST_FEE', 0),
     // Sms-code voor de klant voordat de aanvraag weggaat (alleen als de sms-koppeling werkt).
@@ -66,9 +67,7 @@ return [
      * Zonder schatting: lead_default. De eerste lead_free_count leads per
      * bedrijf zijn gratis. Zonder Stripe-sleutel is alles gratis.
      */
-    // Betalingen van Fachora zelf (leads, bijdrage): Mollie-account van Creditline B.V. Zonder sleutel: Stripe of gratis.
-    'mollie_key' => env('FACHORA_MOLLIE_KEY'),
-    'mollie_methods' => ['blik', 'przelewy24', 'creditcard'],
+    // Betalingen van Fachora zelf (leads, bijdrage) lopen via het Stripe-account van Creditline B.V. (STRIPE_SECRET).
     'lead_pricing' => (bool) env('FACHORA_LEAD_PRICING', true),
     'lead_percent' => (float) env('FACHORA_LEAD_PERCENT', 5),
     'lead_min' => (float) env('FACHORA_LEAD_MIN', 15),

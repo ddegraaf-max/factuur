@@ -521,7 +521,9 @@
           return route($l['route'], $l['params'] ?? []) . ($l['fragment'] ?? '');
       };
       $mkLabel = fn (array $l) => str_replace('{brand}', brand('name'), $l['label']);
-      $mkShow = fn (array $l) => (empty($l['brand_watch']) || \App\Support\Brand::watchesTrademark()) && $mkUrl($l);
+      // Fachora Protect staat op de meeste omgevingen uit: dan geen menu- of voettekstlink (config fachora.protect).
+      $mkShow = fn (array $l) => (empty($l['brand_watch']) || \App\Support\Brand::watchesTrademark())
+          && (($l['route'] ?? '') !== 'fachora.protect' || fachora_protect()) && $mkUrl($l);
     @endphp
     <nav class="nav-links">
       @foreach($mk['nav'] as $l)@if($mkShow($l))

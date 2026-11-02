@@ -3,6 +3,7 @@
      dostają zapytanie od nas, z firmą z rejestru klient kontaktuje się sam), co widać przy firmie, spory, koszty.
      Liczby z config/fachora.php. --}}
 @php
+    $protect = fachora_protect();
     $warranty = config('fachora.default_warranty_months');
     $maxOffers = config('fachora.max_offers');
     $offerHours = config('fachora.offer_hours');
@@ -14,7 +15,7 @@
     $keepDays = (int) config('fachora.register_keep_days');
 @endphp
 @section('title', 'Jak działa Fachora — sam wybierasz firmy, od zgłoszenia do gwarancji w sześciu krokach')
-@section('description', 'Opisujesz zlecenie, potwierdzasz e-mailem, sam wybierasz do ' . $maxOffers . ' firm z okolicy (Fachora Verified i firmy z rejestru), porównujesz ceny, wybierasz jedną, płacisz po pracy przez Fachora Protect albo bezpośrednio. Dla klientów bezpłatnie.')
+@section('description', 'Opisujesz zlecenie, potwierdzasz e-mailem, sam wybierasz do ' . $maxOffers . ' firm z okolicy (Fachora Verified i firmy z rejestru), porównujesz ceny, wybierasz jedną, płacisz po pracy' . ($protect ? ' przez Fachora Protect albo bezpośrednio firmie' : ' bezpośrednio firmie') . '. Dla klientów bezpłatnie.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -81,9 +82,15 @@
       <div class="fh-step">
         <div class="nr">5</div>
         <div>
+          @if($protect)
           <h3>Rezerwujesz płatność albo płacisz po</h3>
-          <p>Z <a href="{{ route('fachora.protect') }}">Fachora Protect</a> rezerwujesz ustaloną kwotę przez BLIK, Przelewy24 lub kartę. Płatność obsługuje Mollie, licencjonowana instytucja płatnicza; Fachora nie przechowuje Twoich pieniędzy. Firma dostaje je dopiero po Twojej akceptacji.</p>
+          <p>Z <a href="{{ route('fachora.protect') }}">Fachora Protect</a> rezerwujesz ustaloną kwotę przez BLIK, Przelewy24 lub kartę. Płatność obsługuje Stripe, instytucja pieniądza elektronicznego; Fachora nie przechowuje Twoich pieniędzy. Firma dostaje je dopiero po Twojej akceptacji.</p>
           <p style="margin-top:10px;">Możesz też zapłacić firmie bezpośrednio po wykonaniu pracy. Wtedy nie działa blokada pieniędzy ani rozstrzyganie sporu z udziałem płatności, ale weryfikacja firmy, faktura i gwarancja firmy Verified pozostają.</p>
+          @else
+          <h3>Płacisz po pracy</h3>
+          <p>Płacisz firmie bezpośrednio po wykonaniu pracy, dokładnie tyle, ile jest w potwierdzeniu zlecenia: BLIK, przelew albo gotówka, jak się umówicie. Fachora nie pośredniczy w płatności i nigdy nie trzyma Twoich pieniędzy.</p>
+          <p style="margin-top:10px;">Firma Verified zawsze wystawia fakturę i daje gwarancję; dodatkowe prace tylko po Twojej zgodzie na stronie zlecenia.</p>
+          @endif
           <span class="tag">Do {{ $cancelHours }} godzin przed terminem odwołasz zlecenie bezpłatnie</span>
         </div>
       </div>
@@ -114,11 +121,11 @@
       <p>Wszystko, co pozwala porównać oferty. Firma Verified: bez numeru telefonu, kontakt i płatność idą przez Twoją stronę zlecenia, dzięki temu wszystko jest zapisane. Firma z rejestru: publiczne dane z CEIDG, widoczne dopiero wtedy, gdy ją wybierzesz.</p>
     </div>
     <div class="fh-checks">
-      <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Znak Fachora Verified</b><p>Firma przeszła weryfikację: rejestr, NIP, tożsamość, konto bankowe, telefon, e-mail i Standard Fachora. Bez znaku: profil z rejestru.</p></div></div>
+      <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Znak Fachora Verified</b><p>Firma przeszła weryfikację: rejestr, NIP,{{ $protect ? ' tożsamość, konto bankowe,' : '' }} telefon, e-mail i Standard Fachora. Bez znaku: profil z rejestru.</p></div></div>
       <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 20])</span><div><b>Ocena i liczba zleceń</b><p>Tylko z zleceń wykonanych przez Fachorę. Opinie z odpowiedzią firmy, nigdy przez nią usuwane.</p></div></div>
       <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'lang', 'size' => 20])</span><div><b>Języki i poziom</b><p>Polski, angielski, niemiecki, niderlandzki, ukraiński: ojczysty, dobry albo podstawowy.</p></div></div>
       <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 20])</span><div><b>Stawki orientacyjne</b><p>Dojazd, pierwsza godzina, kolejna godzina. Ostateczna cena jest zawsze w ofercie do Twojego zlecenia.</p></div></div>
-      <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Faktura, gwarancja, Protect</b><p>Każda firma Verified wystawia fakturę i daje gwarancję. Widzisz też, czy ma ubezpieczenie OC.</p></div></div>
+      <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Faktura, gwarancja{{ $protect ? ', Protect' : '' }}</b><p>Każda firma Verified wystawia fakturę i daje gwarancję. Widzisz też, czy ma ubezpieczenie OC.</p></div></div>
       <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 20])</span><div><b>Zasięg i odległość</b><p>Miasto, promień działania i odległość od Twojego zlecenia; przy firmach Verified także to, jak szybko zwykle odpowiadają.</p></div></div>
     </div>
   </div>
@@ -130,14 +137,14 @@
       <div>
         <div class="eyebrow">Gdy coś pójdzie nie tak</div>
         <h2>Spór rozstrzyga Fachora, nie siła przebicia</h2>
-        <p>Przy zleceniu z firmą Verified zgłaszasz spór na stronie zlecenia: opis, zdjęcia, czego oczekujesz. Firma ma {{ $disputeHours }} godzin na odpowiedź. Potem Fachora patrzy na potwierdzenie zlecenia, zdjęcia i wiadomości i decyduje: pełna wypłata, częściowa wypłata, naprawa w nowym terminie albo zwrot.</p>
-        <p>Jeśli firma nie odpowie w terminie, decyzja jest po Twojej stronie. Przy Fachora Protect pieniądze są przez cały czas zablokowane, więc nikt nie musi ich od nikogo odzyskiwać.</p>
-        <p>Dwie uzasadnione reklamacje w 90 dni zawieszają firmę; no-show po rezerwacji albo próba ominięcia Fachory to usunięcie z platformy. Szczegóły w <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:600;">Standardzie Fachora</a>. Z firmą z rejestru umawiasz się bezpośrednio, więc te zasady jej nie obejmują.</p>
+        <p>Przy zleceniu z firmą Verified zgłaszasz spór na stronie zlecenia: opis, zdjęcia, czego oczekujesz. Firma ma {{ $disputeHours }} godzin na odpowiedź. Potem Fachora patrzy na potwierdzenie zlecenia, zdjęcia i wiadomości i decyduje: {{ $protect ? 'pełna wypłata, częściowa wypłata, naprawa w nowym terminie albo zwrot' : 'naprawa w nowym terminie albo niższa cena; firma, która nie respektuje rozstrzygnięcia, traci znak Verified' }}.</p>
+        <p>Jeśli firma nie odpowie w terminie, decyzja jest po Twojej stronie.@if($protect) Przy Fachora Protect pieniądze są przez cały czas zablokowane, więc nikt nie musi ich od nikogo odzyskiwać.@endif</p>
+        <p>Dwie uzasadnione reklamacje w 90 dni zawieszają firmę; no-show po {{ $protect ? 'rezerwacji' : 'potwierdzonym terminie' }} albo próba ominięcia Fachory to usunięcie z platformy. Szczegóły w <a href="{{ route('fachora.standard') }}" style="color:var(--brand);font-weight:600;">Standardzie Fachora</a>. Z firmą z rejestru umawiasz się bezpośrednio, więc te zasady jej nie obejmują.</p>
       </div>
       <div>
         <div class="fh-note">
           <b>Ile to kosztuje?</b><br>
-          Dla klientów Fachora jest bezpłatna. Nie płacisz za zgłoszenie, za wybór firm, za oferty, za Fachora Protect ani za rozstrzygnięcie sporu. Płacisz wyłącznie cenę ustaloną z firmą, taką, jaka jest w potwierdzeniu zlecenia. Opłaty Fachory ponosi firma.
+          Dla klientów Fachora jest bezpłatna. Nie płacisz za zgłoszenie, za wybór firm, za oferty{{ $protect ? ', za Fachora Protect' : '' }} ani za rozstrzygnięcie sporu. Płacisz wyłącznie cenę ustaloną z firmą, taką, jaka jest w potwierdzeniu zlecenia. Opłaty Fachory ponosi firma.
         </div>
         <div class="fh-note warm" style="margin-top:14px;">
           <b>Twoje zlecenie widzą tylko firmy, które sam zaznaczysz.</b><br>
@@ -154,7 +161,7 @@
     <p>Kilka minut, bez konta. Firmy Verified odpowiadają w ciągu {{ $offerHours }} godzin.</p>
     <div class="fh-cta-row">
       <a href="{{ route('fachora.intake') }}" class="btn btn-primary btn-lg">Znajdź fachowca</a>
-      <a href="{{ route('fachora.protect') }}" class="btn btn-white btn-lg">Fachora Protect</a>
+      @if($protect)<a href="{{ route('fachora.protect') }}" class="btn btn-white btn-lg">Fachora Protect</a>@endif
     </div>
   </div>
 </section>

@@ -442,19 +442,8 @@ Route::post('/stripe/webhook', [StripeWebhookController::class, 'handle'])->name
 Route::post('/webhooks/smstools', [\App\Http\Controllers\SmstoolsWebhookController::class, 'handle'])->middleware('throttle:120,1')->name('webhooks.smstools');
 
 // ---------- MOLLIE WEBHOOK (publiek, geen CSRF) ----------
-// Fachora (1.87): betalingen van het platform zelf via het Mollie-account van Creditline B.V.
-Route::post('/webhooks/mollie-fachora', function (\Illuminate\Http\Request $request) {
-    $id = (string) $request->input('id', '');
-    if (preg_match('/^tr_\w+$/', $id)) {
-        try {
-            app(\App\Services\Fachora\FachoraPayments::class)->handleWebhook($id);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Fachora Mollie-webhook mislukt', ['id' => $id, 'error' => $e->getMessage()]);
-        }
-    }
-
-    return response('OK');
-})->middleware('throttle:120,1')->name('fachora.mollie.webhook');
+// Alleen de Mollie-koppeling van administraties (eigen Mollie-account van de gebruiker). Fachora's eigen
+// betalingen lopen sinds 1.91 uitsluitend via Stripe; de webhook /webhooks/mollie-fachora is weg.
 Route::post('/webhooks/mollie', [\App\Http\Controllers\MollieWebhookController::class, 'handle'])
     ->middleware('throttle:120,1')->name('mollie.webhook');
 // Peppol (Recommand): ontvangen e-facturen en verificatiestatus, ondertekend met X-Signature.

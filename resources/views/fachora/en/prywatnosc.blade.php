@@ -4,12 +4,12 @@
   DRAFT — PENDING LEGAL REVIEW.
   Fachora privacy policy (GDPR), English edition (convenience translation; the Polish text is binding).
   Controller: Creditline B.V. (Bussum, the Netherlands). Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
-  verification, Mollie as an independent controller), companies' representatives and visitors.
+  verification, Stripe as an independent controller), companies' representatives and visitors. Fachora Protect only when fachora_protect().
   The "draft" marker is deliberately discreet, at the bottom.
 --}}
 
 @section('title', 'Fachora privacy policy')
-@section('description', 'How Fachora (Creditline B.V.) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Mollie, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
+@section('description', 'How Fachora (Creditline B.V.) processes personal data of customers, companies and visitors: which data, for what purpose and on what legal basis, who processes them for us (Stripe, Resend, Railway, Anthropic, OpenStreetMap), how long we keep them, how we deal with companies from public registers, cookies and your GDPR rights.')
 
 @push('styles')
 <style>
@@ -78,7 +78,7 @@
 
     <h2 id="s1">1. Who this policy covers</h2>
     <ul>
-      <li><strong>Customers</strong> — people who submit a request through fachora.pl, choose a company, pay through Fachora Protect, open disputes and leave reviews.</li>
+      <li><strong>Customers</strong> — people who submit a request through fachora.pl, choose a company,{{ fachora_protect() ? ' pay through Fachora Protect,' : '' }} open disputes and leave reviews.</li>
       <li><strong>Companies and the people representing them</strong> — businesses from public registers (inactive profile), companies that have claimed their profile, companies under verification and Fachora Verified companies, as well as owners, board members and employees who use the panel on their behalf.</li>
       <li><strong>Visitors</strong> to fachora.pl, including those using the contact form and the company application form.</li>
     </ul>
@@ -89,7 +89,7 @@
       <li><strong>Contact details:</strong> e-mail address (always), name and phone number (if you provide them or they are needed to arrange the appointment), preferred service language.</li>
       <li><strong>Job description:</strong> category, description of the problem, photos, urgency, postal code or town. Photos may incidentally contain personal data (e.g. the inside of a flat) — please photograph only what concerns the fault.</li>
       <li><strong>Address where the service is performed</strong> — given only after a company is chosen and passed only to that company.</li>
-      <li><strong>Payment:</strong> payment status, amount, transaction identifier with the payment provider, payment method (e.g. "BLIK"). <strong>We do not receive or store card numbers or bank login details</strong> — they are handled solely by Mollie.</li>
+      <li><strong>Payment:</strong> payment status, amount, transaction identifier with the payment provider, payment method (e.g. "BLIK"). <strong>We do not receive or store card numbers or bank login details</strong> — they are handled solely by Stripe.</li>
       <li><strong>Course of the job:</strong> offers, choice, approved extra work, completion reports, disputes with description and photos, review, correspondence through the platform, dates and IP addresses of actions (confirmation, choice, approval).</li>
     </ul>
     <p>Source: you, and for payment status, the payment provider.</p>
@@ -97,9 +97,9 @@
     <h3>Companies and the people representing them</h3>
     <ul>
       <li><strong>Register data</strong> (inactive profile): name, the trader's full name (for a sole trader these are personal data), NIP, REGON, KRS, legal form, registered address, PKD activity codes, business status, VAT status and account numbers from the VAT taxpayer list. Source: CEIDG (dane.biznes.gov.pl), KRS (Ministry of Justice), the VAT taxpayer list (Ministry of Finance). Details in section 4.</li>
-      <li><strong>Claimed-profile data:</strong> e-mail address and phone number of the person claiming the profile, their name, the code from the letter, display name, description, photo or logo, categories, languages and their level, service radius, indicative rates, warranty period, invoice declaration, Fachora Protect opt-in. Source: the company.</li>
+      <li><strong>Claimed-profile data:</strong> e-mail address and phone number of the person claiming the profile, their name, the code from the letter, display name, description, photo or logo, categories, languages and their level, service radius, indicative rates, warranty period, invoice declaration{{ fachora_protect() ? ', Fachora Protect opt-in' : '' }}. Source: the company.</li>
       <li><strong>Verification data:</strong> results of checks in the registers and the VAT list (with date and response), e-mail and phone confirmation (codes, dates), date and version of the accepted terms and Fachora Standard, liability insurance policy (if you upload one: file, insurer, scope, expiry date), notes from verification and from handling reports.</li>
-      <li><strong>Payment provider account (Mollie):</strong> account identifier with the payment provider, status of the ability to accept payments and payouts, list of outstanding requirements. <strong>Identity documents, beneficial-owner data and the bank account number are collected and verified by Mollie as an independent controller</strong> (section 5); we only see the result.</li>
+      @if(fachora_protect())<li><strong>Payment provider account (Stripe):</strong> account identifier with the payment provider, status of the ability to accept payments and payouts, list of outstanding requirements. <strong>Identity documents, beneficial-owner data and the bank account number are collected and verified by Stripe as an independent controller</strong> (section 5); we only see the result.</li>@endif
       <li><strong>Activity on the platform:</strong> requests received, offers, jobs in progress, reports, disputes, reviews and replies, average rating, number of jobs, response time, breaches of the Fachora Standard, commission invoices, payouts.</li>
       <li><strong>Account:</strong> login, hashed password, login dates, IP addresses, activity log.</li>
     </ul>
@@ -116,11 +116,11 @@
         <tr><th>Purpose</th><th>Data</th><th>Legal basis (GDPR)</th><th>How long</th></tr>
         <tr><td>Receiving and confirming a request, passing it to companies, collecting offers</td><td>customer's contact details and job description</td><td>Art. 6(1)(b) — contract for use of the platform (at the customer's request)</td><td>unconfirmed request: deleted after {{ (int) config('fachora.confirm_days') }} days; request without a chosen offer: 6 months from submission</td></tr>
         <tr><td>Conclusion and performance of the contract between customer and company: job confirmation, appointment, extra work, approval, invoice</td><td>course of the job, service address</td><td>Art. 6(1)(b); towards the company — (b) (contract for use of the platform)</td><td>warranty period ({{ (int) config('fachora.default_warranty_months') }} months by default) and the limitation period for claims — up to 6 years from completion of the job</td></tr>
-        <tr><td>Fachora Protect: reservation, payout, refund, dispute decisions</td><td>payment status, amounts, dispute with description and photos, correspondence</td><td>Art. 6(1)(b); Art. 6(1)(c) — tax and accounting law</td><td>as above; accounting records 5 years from the end of the tax year</td></tr>
+        @if(fachora_protect())<tr><td>Fachora Protect: reservation, payout, refund, dispute decisions</td><td>payment status, amounts, dispute with description and photos, correspondence</td><td>Art. 6(1)(b); Art. 6(1)(c) — tax and accounting law</td><td>as above; accounting records 5 years from the end of the tax year</td></tr>@endif
         <tr><td>Reviews and their publication, companies' replies</td><td>rating, text, job number, date</td><td>Art. 6(1)(f) — legitimate interest: reliable information about companies for customers</td><td>as long as the company's profile is on the platform; at the author's request the text can be anonymised</td></tr>
         <tr><td>Inactive profile from a public register</td><td>register data</td><td>Art. 6(1)(f) — legitimate interest (section 4)</td><td>until a removal request or up to 12 months after deregistration; after removal only the NIP and the date of the request</td></tr>
         <tr><td>Claiming a profile, running the company account, the panel, communication about jobs</td><td>claimed-profile data, account, activity on the platform</td><td>Art. 6(1)(b) — contract for use of the platform</td><td>duration of the contract and 6 years after it ends (limitation of claims)</td></tr>
-        <tr><td>Verification and the Fachora Verified mark, trader traceability (Art. 30 DSA), enforcing the Fachora Standard</td><td>verification data, Mollie verification result, policy, breaches</td><td>Art. 6(1)(c) — Regulation (EU) 2022/2065; Art. 6(1)(f) — safety of customers and the platform</td><td>duration of the contract and 6 months after it ends (DSA); records of serious breaches and a blocked NIP — 5 years</td></tr>
+        <tr><td>Verification and the Fachora Verified mark, trader traceability (Art. 30 DSA), enforcing the Fachora Standard</td><td>verification data,{{ fachora_protect() ? ' Stripe verification result,' : '' }} policy, breaches</td><td>Art. 6(1)(c) — Regulation (EU) 2022/2065; Art. 6(1)(f) — safety of customers and the platform</td><td>duration of the contract and 6 months after it ends (DSA); records of serious breaches and a blocked NIP — 5 years</td></tr>
         <tr><td>Commission: invoices, settlements, debt collection</td><td>company data, job amounts, invoices</td><td>Art. 6(1)(b) and (c) (tax law)</td><td>5 years from the end of the tax year</td></tr>
         <tr><td>Handling reports, complaints, appeals and content notices (DSA)</td><td>content of the report, the reporter's details, decision and reasons</td><td>Art. 6(1)(c) (DSA, consumer law); (f) — defence against claims</td><td>3 years from the closing of the case</td></tr>
         <tr><td>Contact form</td><td>form data</td><td>Art. 6(1)(f) — replying to your message</td><td>12 months from the last message</td></tr>
@@ -143,7 +143,7 @@
     <div class="tbl-wrap">
       <table class="tbl">
         <tr><th>Recipient</th><th>Role</th><th>Purpose</th><th>Where</th></tr>
-        <tr><td>Mollie B.V. (Amsterdam, the Netherlands)</td><td>payment provider — a licensed payment institution supervised by De Nederlandsche Bank; <strong>independent controller</strong> for payments and company verification (KYC); partly a processor</td><td>Fachora Protect: taking the customer's payment, holding the funds, paying out the company, refunds; companies' payments for unlocking requests; verifying the company's identity and bank account. Mollie applies its own privacy policy (mollie.com)</td><td>EU (the Netherlands)</td></tr>
+        <tr><td>Stripe Payments Europe, Ltd. (Dublin, Ireland)</td><td>payment provider — an e-money institution authorised by the Central Bank of Ireland; <strong>independent controller</strong> for payments{{ fachora_protect() ? ' and company verification (KYC)' : '' }}; partly a processor</td><td>companies' payments for unlocking requests{{ fachora_protect() ? '; Fachora Protect: taking the customer\'s payment, holding the funds, paying out the company, refunds; verifying the company\'s identity and bank account' : '' }}. Stripe applies its own privacy policy (stripe.com/privacy)</td><td>EU (Ireland); some processing in the USA (Stripe, Inc.) under the Data Privacy Framework and standard contractual clauses</td></tr>
         <tr><td>Resend, Inc. (USA)</td><td>processor</td><td>sending e-mails (confirmations, offers, reminders, invoices) and delivery logs</td><td>USA — standard contractual clauses</td></tr>
         <tr><td>Railway Corp. (USA)</td><td>processor</td><td>hosting of the application and database</td><td>servers in the EU region (Amsterdam); administrative access from the USA possible under standard contractual clauses</td></tr>
         <tr><td>Anthropic, PBC (USA)</td><td>processor</td><td>AI tools: tidying up and translating the job description, indicative price range, reading data from a liability policy, a dispute summary for the person deciding it (section 8). Submitted content is not used to train models</td><td>USA — standard contractual clauses</td></tr>

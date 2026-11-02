@@ -65,6 +65,9 @@ class FachoraBrandTest extends TestCase
         $checked = [];
         $missing = [];
         foreach ($pages as $view => $path) {
+            if ($view === 'fachora.protect' && ! fachora_protect()) {
+                continue; // Protect staat uit: de pagina bestaat dan bewust niet (404), zie FachoraProtectOffTest
+            }
             if (! view()->exists($view)) {
                 $missing[] = $view;
 

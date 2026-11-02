@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.90.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.91.0</div>
+        <h2>Fachora: Protect uit tot er genoeg Verified-bedrijven zijn, en één betaalpartij</h2>
+        <ul class="tl-list">
+          <li><b>Protect staat uit</b> — de betaalreservering is van de hele voorkant verdwenen (menu, homepage, stappen, veelgestelde vragen, bedrijvenpagina, profielen, Standaard, reglement en privacyverklaring, Pools en Engels) en de pagina zelf geeft 404. De klant betaalt het bedrijf na het werk; een geschil is bemiddeling en een bedrijf dat de uitspraak negeert verliest Verified. Eén schakelaar zet alles weer aan.</li>
+          <li><b>Verified zonder bankcheck</b> — de identiteits- en bankcontrole hoorde bij de Stripe-onboarding van Protect en is daarom ook uit de uitleg gehaald. Verified is nu: register (CEIDG/KRS), btw-witte lijst, bevestigde e-mail en telefoon, en de Standaard.</li>
+          <li><b>Alleen Stripe</b> — de Mollie-weg voor leadbetalingen en de bijbehorende webhook zijn verwijderd; leads lopen via Stripe Checkout (BLIK, Przelewy24, kaart) en alle teksten noemen Stripe als betaalpartij.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.90.0</div>
         <h2>Fachora: de voorkant vertelt nu hoe het echt werkt</h2>
         <ul class="tl-list">
           <li><b>Klant kiest zelf</b> — homepage, "Jak to działa", veelgestelde vragen, bedrijvenpagina en openbare profielen (Pools en Engels) beschrijven de huidige werkwijze: de klant ziet tot vijftien bedrijven uit de buurt, kiest er zelf maximaal vijf, bevestigt zijn nummer per sms en vergelijkt daarna de prijzen op zijn eigen pagina.</li>

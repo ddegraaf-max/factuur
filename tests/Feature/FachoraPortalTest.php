@@ -101,7 +101,7 @@ class FachoraPortalTest extends TestCase
 
     public function test_fachora_names_creditline_bv_as_the_operator(): void
     {
-        config(['brand.active' => 'fachora']);
+        config(['brand.active' => 'fachora', 'fachora.protect' => true, 'services.stripe.secret' => 'sk_test_x']); // Protect aan, zodat ook die pagina meedoet
 
         foreach (['/o-nas', '/kontakt', '/regulamin', '/polityka-prywatnosci', '/faq', '/fachora-protect', '/dla-firm', '/'] as $path) {
             foreach (['pl', 'en'] as $lang) {

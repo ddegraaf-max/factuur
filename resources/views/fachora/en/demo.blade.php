@@ -52,11 +52,11 @@
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'pin', 'size' => 18]) Visit and work in progress</h2>
-        <p>A radiator replacement scheduled for tomorrow, paid through Fachora Protect. A burst riser in progress, with a proposed extra for the customer to approve.</p>
+        <p>A radiator replacement scheduled for tomorrow{{ fachora_protect() ? ', paid through Fachora Protect' : ', with a confirmed price' }}. A burst riser in progress, with a proposed extra for the customer to approve.</p>
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'check', 'size' => 18]) Acceptance and payout</h2>
-        <p>A boiler service marked as done: the customer has {{ config('fachora.auto_accept_days') }} days to accept, after which Protect pays out automatically. The fee is visible straight away.</p>
+        <p>A boiler service marked as done: the customer has {{ config('fachora.auto_accept_days') }} days to accept{{ fachora_protect() ? ', after which Protect pays out automatically. The fee is visible straight away' : ', after which the job counts as accepted' }}.</p>
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'star', 'size' => 18]) Reviews</h2>
@@ -72,7 +72,7 @@
       <b>Safe to try.</b> The demo is a separate environment just for you:
       <ul>
         <li><b>No e-mail or text message</b> reaches anyone, even when you send a quote or mark work as done. The customers in the demo are made up.</li>
-        <li>You type nothing in and <b>pay nothing</b>; Fachora Protect is simulated here.</li>
+        <li>You type nothing in and <b>pay nothing</b>{{ fachora_protect() ? '; Fachora Protect is simulated here' : '' }}.</li>
         <li>After 24 hours the environment is removed; you can also leave it straight away with the button in the panel.</li>
       </ul>
     </div>

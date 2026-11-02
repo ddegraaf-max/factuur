@@ -1,9 +1,10 @@
 @extends('layouts.marketing')
 {{-- Strona główna Fachory (APP_BRAND=fachora): klient opisuje zlecenie i sam wybiera do max_offers firm z okolicy
      (Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone). Firmy Verified dostają zapytanie od nas;
-     z firmą z rejestru klient kontaktuje się sam (Fachora nie wysyła jej niczego). Płatność przez Fachora Protect
-     albo bezpośrednio po pracy. Liczby z config/fachora.php. --}}
+     z firmą z rejestru klient kontaktuje się sam (Fachora nie wysyła jej niczego). Klient płaci firmie po pracy;
+     Fachora Protect (rezerwacja przez Stripe) pokazujemy tylko, gdy fachora_protect() jest włączone. Liczby z config/fachora.php. --}}
 @php
+    $protect = fachora_protect();
     $fee = config('fachora.fee_percent');
     $intro = config('fachora.intro_fee_percent');
     $lead = (bool) config('fachora.lead_pricing');
@@ -110,14 +111,15 @@
       <div class="fh-step">
         <div class="nr">4</div>
         <h3>Wybierz jedną i odbierz pracę</h3>
-        <p>Dopiero teraz wybrana firma widzi Twój adres i numer. Z Fachora Protect płacisz po akceptacji pracy. Firma Verified wystawia fakturę i daje gwarancję {{ $warranty }} miesięcy; na koniec wystawiasz opinię.</p>
+        <p>Dopiero teraz wybrana firma widzi Twój adres i numer. @if($protect)Z Fachora Protect płacisz po akceptacji pracy.@else Płacisz firmie po wykonanej pracy, dokładnie tyle, ile ustaliliście.@endif Firma Verified wystawia fakturę i daje gwarancję {{ $warranty }} miesięcy; na koniec wystawiasz opinię.</p>
       </div>
     </div>
     <div class="fh-more"><a href="{{ route('fachora.how') }}">Zobacz wszystkie kroki ze szczegółami →</a></div>
   </div>
 </section>
 
-<!-- FACHORA PROTECT -->
+@if($protect)
+<!-- FACHORA PROTECT (tylko gdy włączony) -->
 <section class="fh-band" id="protect">
   <div class="container">
     <div class="eyebrow">Fachora Protect · do wyboru</div>
@@ -127,7 +129,7 @@
       <div class="fh-flow">
         <div class="fh-flow-item">
           <div class="nr">1</div>
-          <div><b>Rezerwujesz kwotę</b><p>BLIK, Przelewy24 lub karta. Płatność obsługuje Mollie, licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank.</p></div>
+          <div><b>Rezerwujesz kwotę</b><p>BLIK, Przelewy24 lub karta. Płatność obsługuje Stripe, instytucja pieniądza elektronicznego nadzorowana przez Central Bank of Ireland.</p></div>
         </div>
         <div class="fh-flow-item">
           <div class="nr">2</div>
@@ -156,13 +158,14 @@
           <div class="ex">Przykład. Kwoty i terminy ustalasz z wybraną firmą.</div>
         </div>
         <div class="note">
-          <b>Spór?</b> Pieniądze zostają zablokowane, dopóki sprawa nie zostanie rozstrzygnięta. Firma ma {{ $disputeHours }} godzin na odpowiedź; jeśli jej nie ma, decyzja jest po Twojej stronie. Fachora nie przechowuje Twoich pieniędzy: całą płatnością zajmuje się Mollie.
+          <b>Spór?</b> Pieniądze zostają zablokowane, dopóki sprawa nie zostanie rozstrzygnięta. Firma ma {{ $disputeHours }} godzin na odpowiedź; jeśli jej nie ma, decyzja jest po Twojej stronie. Fachora nie przechowuje Twoich pieniędzy: całą płatnością zajmuje się Stripe.
         </div>
         <div style="margin-top:18px;"><a href="{{ route('fachora.protect') }}" class="btn btn-white">Jak działa Fachora Protect</a></div>
       </div>
     </div>
   </div>
 </section>
+@endif
 
 <!-- FACHORA VERIFIED -->
 <section class="section" id="verified">
@@ -177,7 +180,7 @@
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Rejestr i NIP</b><p>Firma istnieje, jest aktywna w CEIDG lub KRS, NIP i status VAT się zgadzają.</p></div></div>
-        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Tożsamość i konto bankowe</b><p>Osoba reprezentująca firmę i jej rachunek bankowy potwierdzone przez Mollie.</p></div></div>
+        @if($protect)<div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Tożsamość i konto bankowe</b><p>Osoba reprezentująca firmę i jej rachunek bankowy potwierdzone przez Stripe.</p></div></div>@endif
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 20])</span><div><b>Telefon, e-mail, regulamin</b><p>Numer potwierdzony kodem SMS, adres linkiem, Standard Fachora zaakceptowany z datą i wersją.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 20])</span><div><b>Ubezpieczenie OC: widoczne</b><p>Jeśli firma ma polisę, zobaczysz to w profilu. Po jej wygaśnięciu znak znika do czasu odnowienia.</p></div></div>
       </div>
@@ -201,7 +204,7 @@
         <div class="meta">Hydraulik · Ogrzewanie · Łódź, do 25 km</div>
         <div class="rating"><b>★ 4,8</b> · ocena z potwierdzonych zleceń</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span><span>🇩🇪 Deutsch</span></div>
-        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li><li>Fachora Protect</li><li>Ubezpieczony</li></ul>
+        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li>@if($protect)<li>Fachora Protect</li>@endif<li>Ubezpieczony</li></ul>
         <div class="rates">Stawki orientacyjne: dojazd 80 zł · pierwsza godzina 150 zł</div>
       </div>
       <div class="fh-company">
@@ -211,7 +214,7 @@
         <div class="meta">Elektryk · Warszawa, do 30 km</div>
         <div class="rating"><b>★ 4,9</b> · ocena z potwierdzonych zleceń</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span><span>🇺🇦 українська</span></div>
-        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li><li>Fachora Protect</li><li>Reakcja w 24 h</li></ul>
+        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li>@if($protect)<li>Fachora Protect</li>@endif<li>Reakcja w 24 h</li></ul>
         <div class="rates">Stawki orientacyjne: dojazd 60 zł · pierwsza godzina 140 zł</div>
       </div>
       <div class="fh-company">
@@ -221,7 +224,7 @@
         <div class="meta">Ślusarz · Kraków, do 20 km</div>
         <div class="rating"><b>★ 4,7</b> · ocena z potwierdzonych zleceń</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span></div>
-        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li><li>Fachora Protect</li><li>Awarie 24/7</li></ul>
+        <ul class="ticks"><li>Faktura</li><li>Gwarancja {{ $warranty }} mies.</li>@if($protect)<li>Fachora Protect</li>@endif<li>Awarie 24/7</li></ul>
         <div class="rates">Stawki orientacyjne: dojazd 90 zł · otwarcie od 200 zł</div>
       </div>
     </div>
@@ -238,9 +241,9 @@
       <p>Dotyczą firm Fachora Verified i zleceń prowadzonych przez Twoją stronę zlecenia. Z firmą z rejestru umawiasz się bezpośrednio.</p>
     </div>
     <div class="fh-usps">
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Weryfikacja firm</h3><p>Rejestr, NIP, tożsamość, konto bankowe, telefon i e-mail sprawdzone, zanim firma dostanie znak Verified i pierwsze zapytanie.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Weryfikacja firm</h3><p>Rejestr, NIP,{{ $protect ? ' tożsamość, konto bankowe,' : '' }} telefon i e-mail sprawdzone, zanim firma dostanie znak Verified i pierwsze zapytanie.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'clock', 'size' => 22])</span><h3>Pewny termin</h3><p>Termin jest częścią zlecenia. Firma go potwierdza, a odwołać może tylko z podanego powodu. No-show po rezerwacji to usunięcie z platformy.</p></div>
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span><h3>Bezpieczne płatności</h3><p>Z Fachora Protect płacisz dopiero po akceptacji pracy. W razie sporu pieniądze czekają na rozstrzygnięcie.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span>@if($protect)<h3>Bezpieczne płatności</h3><p>Z Fachora Protect płacisz dopiero po akceptacji pracy. W razie sporu pieniądze czekają na rozstrzygnięcie.</p>@else<h3>Płacisz po pracy</h3><p>Cenę znasz z góry, a płacisz dopiero po wykonanej pracy, bezpośrednio firmie. Firma Verified zawsze wystawia fakturę.</p>@endif</div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 22])</span><h3>Gwarancja na usługi</h3><p>Standardowo {{ $warranty }} miesięcy. Reklamacja wraca do zlecenia, a firma musi odpowiedzieć w {{ $disputeHours }} godzin.</p></div>
     </div>
   </div>
@@ -306,7 +309,7 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>Ile to kosztuje?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, za wybór firm, za oferty ani za Fachora Protect. Płacisz tylko cenę ustaloną z firmą. Opłaty Fachory ponosi firma.</div>
+        <div class="faq-content">Dla klientów Fachora jest bezpłatna: nie płacisz za zgłoszenie, za wybór firm{{ $protect ? ', za oferty ani za Fachora Protect' : ' ani za oferty' }}. Płacisz tylko cenę ustaloną z firmą. Opłaty Fachory ponosi firma.</div>
       </details>
       <details class="faq-item">
         <summary>Kto zobaczy moje zlecenie?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -314,7 +317,7 @@
       </details>
       <details class="faq-item">
         <summary>Co, jeśli praca jest źle wykonana?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">Przy zleceniu z firmą Verified zgłaszasz spór na stronie zlecenia, ze zdjęciami i opisem. Firma ma {{ $disputeHours }} godzin na odpowiedź, a Fachora rozstrzyga: wypłata, częściowa wypłata, naprawa albo zwrot. Przy Fachora Protect pieniądze przez cały ten czas pozostają zablokowane.</div>
+        <div class="faq-content">Przy zleceniu z firmą Verified zgłaszasz spór na stronie zlecenia, ze zdjęciami i opisem. Firma ma {{ $disputeHours }} godzin na odpowiedź, a Fachora rozstrzyga: {{ $protect ? 'wypłata, częściowa wypłata, naprawa albo zwrot' : 'naprawa w nowym terminie albo niższa cena' }}.@if($protect) Przy Fachora Protect pieniądze przez cały ten czas pozostają zablokowane.@endif</div>
       </details>
     </div>
     <div class="fh-more"><a href="{{ route('pl.faq') }}">Wszystkie pytania i odpowiedzi →</a></div>

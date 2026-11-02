@@ -4,12 +4,12 @@
   WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
   Polityka prywatności Fachora (RODO). Administrator: Creditline B.V. (Bussum, Holandia). Obejmuje Klientów, Firmy
   (dane z rejestrów na podstawie art. 6 ust. 1 lit. f, przejęty profil na podstawie lit. b, weryfikację,
-  Mollie jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających.
+  Stripe jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających. Fachora Protect tylko gdy fachora_protect().
   Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
 
 @section('title', 'Polityka prywatności Fachora')
-@section('description', 'Jak Fachora (Creditline B.V.) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Mollie, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
+@section('description', 'Jak Fachora (Creditline B.V.) przetwarza dane osobowe klientów, firm i odwiedzających: jakie dane, w jakim celu i na jakiej podstawie, komu je powierzamy (Stripe, Resend, Railway, Anthropic, OpenStreetMap), jak długo je przechowujemy, zasady kontaktu z firmami z rejestrów, pliki cookie i prawa z RODO.')
 
 @push('styles')
 <style>
@@ -75,7 +75,7 @@
 
     <h2 id="s1">1. Kogo dotyczy ta polityka</h2>
     <ul>
-      <li><strong>Klientów</strong> — osób, które składają zlecenie przez fachora.pl, wybierają firmę, płacą przez Fachora Protect, zgłaszają spory i wystawiają opinie.</li>
+      <li><strong>Klientów</strong> — osób, które składają zlecenie przez fachora.pl, wybierają firmę,{{ fachora_protect() ? ' płacą przez Fachora Protect,' : '' }} zgłaszają spory i wystawiają opinie.</li>
       <li><strong>Firm i osób je reprezentujących</strong> — przedsiębiorców z rejestrów publicznych (profil nieaktywny), firm, które przejęły profil, firm w weryfikacji i firm Fachora Verified, oraz właścicieli, członków zarządu i pracowników, którzy w ich imieniu korzystają z panelu.</li>
       <li><strong>Osób odwiedzających</strong> stronę fachora.pl, w tym korzystających z formularza kontaktowego i formularza zgłoszenia firmy.</li>
     </ul>
@@ -86,7 +86,7 @@
       <li><strong>Dane kontaktowe:</strong> adres e-mail (zawsze), imię i nazwisko oraz numer telefonu (jeżeli je podasz lub są potrzebne do umówienia terminu), preferowany język obsługi.</li>
       <li><strong>Opis zlecenia:</strong> kategoria, opis problemu, zdjęcia, pilność, kod pocztowy lub miejscowość. Zdjęcia mogą przypadkowo zawierać dane osobowe (np. wnętrze mieszkania) — prosimy, żeby fotografować tylko to, co dotyczy usterki.</li>
       <li><strong>Adres wykonania usługi</strong> — podawany dopiero po wyborze firmy i przekazywany tylko tej firmie.</li>
-      <li><strong>Płatność:</strong> status płatności, kwota, identyfikator transakcji u operatora płatności, metoda płatności (np. „BLIK”). <strong>Nie otrzymujemy i nie przechowujemy numerów kart ani danych logowania do banku</strong> — obsługuje je wyłącznie Mollie.</li>
+      <li><strong>Płatność:</strong> status płatności, kwota, identyfikator transakcji u operatora płatności, metoda płatności (np. „BLIK”). <strong>Nie otrzymujemy i nie przechowujemy numerów kart ani danych logowania do banku</strong> — obsługuje je wyłącznie Stripe.</li>
       <li><strong>Przebieg zlecenia:</strong> oferty, wybór, zatwierdzone prace dodatkowe, zgłoszenia zakończenia, spory z opisem i zdjęciami, opinia, korespondencja przez platformę, daty i adresy IP czynności (potwierdzenie, wybór, akceptacja).</li>
     </ul>
     <p>Źródło: Ty, a w zakresie statusu płatności — operator płatności.</p>
@@ -94,9 +94,9 @@
     <h3>Firmy i osoby je reprezentujące</h3>
     <ul>
       <li><strong>Dane rejestrowe</strong> (profil nieaktywny): nazwa, imię i nazwisko przedsiębiorcy (przy jednoosobowej działalności są to dane osobowe), NIP, REGON, KRS, forma prawna, adres siedziby, kody PKD, status działalności, status VAT i numery rachunków z wykazu podatników VAT. Źródło: CEIDG (dane.biznes.gov.pl), KRS (Ministerstwo Sprawiedliwości), wykaz podatników VAT (Ministerstwo Finansów). Szczegóły w pkt 4.</li>
-      <li><strong>Dane przejętego profilu:</strong> adres e-mail i numer telefonu osoby przejmującej profil, jej imię i nazwisko, kod z listu, nazwa wyświetlana, opis, zdjęcie lub logo, kategorie, języki i ich poziom, zasięg, stawki orientacyjne, okres gwarancji, deklaracja faktury, zgoda na Fachora Protect. Źródło: firma.</li>
+      <li><strong>Dane przejętego profilu:</strong> adres e-mail i numer telefonu osoby przejmującej profil, jej imię i nazwisko, kod z listu, nazwa wyświetlana, opis, zdjęcie lub logo, kategorie, języki i ich poziom, zasięg, stawki orientacyjne, okres gwarancji, deklaracja faktury{{ fachora_protect() ? ', zgoda na Fachora Protect' : '' }}. Źródło: firma.</li>
       <li><strong>Dane weryfikacji:</strong> wyniki sprawdzeń w rejestrach i wykazie VAT (z datą i treścią odpowiedzi), potwierdzenie e-maila i telefonu (kody, daty), data i wersja zaakceptowanego regulaminu i Standardu Fachora, polisa OC (jeżeli ją prześlesz: plik, ubezpieczyciel, zakres, data ważności), notatki z weryfikacji i z obsługi zgłoszeń.</li>
-      <li><strong>Konto u operatora płatności (Mollie):</strong> identyfikator konta u operatora płatności, status możliwości przyjmowania płatności i wypłat, lista brakujących wymagań. <strong>Dokumenty tożsamości, dane beneficjentów rzeczywistych i numer rachunku bankowego zbiera i weryfikuje Mollie jako odrębny administrator</strong> (pkt 5); my widzimy tylko wynik.</li>
+      @if(fachora_protect())<li><strong>Konto u operatora płatności (Stripe):</strong> identyfikator konta u operatora płatności, status możliwości przyjmowania płatności i wypłat, lista brakujących wymagań. <strong>Dokumenty tożsamości, dane beneficjentów rzeczywistych i numer rachunku bankowego zbiera i weryfikuje Stripe jako odrębny administrator</strong> (pkt 5); my widzimy tylko wynik.</li>@endif
       <li><strong>Działalność na platformie:</strong> otrzymane zlecenia, oferty, zlecenia w toku, zgłoszenia, spory, opinie i odpowiedzi, średnia ocena, liczba zleceń, czas reakcji, naruszenia Standardu Fachora, faktury za prowizję, wypłaty.</li>
       <li><strong>Konto:</strong> login, zaszyfrowane hasło (hash), daty logowania, adresy IP, dziennik czynności.</li>
     </ul>
@@ -113,11 +113,11 @@
         <tr><th>Cel</th><th>Dane</th><th>Podstawa prawna (RODO)</th><th>Jak długo</th></tr>
         <tr><td>Przyjęcie i potwierdzenie zlecenia, przekazanie go firmom, zebranie ofert</td><td>dane kontaktowe i opis zlecenia klienta</td><td>art. 6 ust. 1 lit. b — umowa o korzystanie z platformy (na żądanie klienta)</td><td>zlecenie niepotwierdzone: usuwane po {{ (int) config('fachora.confirm_days') }} dniach; zlecenie bez wybranej oferty: 6 miesięcy od złożenia</td></tr>
         <tr><td>Zawarcie i wykonanie umowy między klientem a firmą: potwierdzenie zlecenia, termin, prace dodatkowe, akceptacja, faktura</td><td>przebieg zlecenia, adres wykonania usługi</td><td>art. 6 ust. 1 lit. b; wobec firmy — lit. b (umowa o korzystanie z platformy)</td><td>okres gwarancji (standardowo {{ (int) config('fachora.default_warranty_months') }} miesięcy) i okres przedawnienia roszczeń — do 6 lat od zakończenia zlecenia</td></tr>
-        <tr><td>Fachora Protect: rezerwacja, wypłata, zwrot, rozstrzyganie sporów</td><td>status płatności, kwoty, spór z opisem i zdjęciami, korespondencja</td><td>art. 6 ust. 1 lit. b; art. 6 ust. 1 lit. c — przepisy podatkowe i rachunkowe</td><td>jak wyżej; dokumenty księgowe 5 lat od końca roku podatkowego</td></tr>
+        @if(fachora_protect())<tr><td>Fachora Protect: rezerwacja, wypłata, zwrot, rozstrzyganie sporów</td><td>status płatności, kwoty, spór z opisem i zdjęciami, korespondencja</td><td>art. 6 ust. 1 lit. b; art. 6 ust. 1 lit. c — przepisy podatkowe i rachunkowe</td><td>jak wyżej; dokumenty księgowe 5 lat od końca roku podatkowego</td></tr>@endif
         <tr><td>Opinie i ich publikacja, odpowiedzi firm</td><td>ocena, tekst, numer zlecenia, data</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes: rzetelna informacja o firmach dla klientów</td><td>dopóki profil firmy jest na platformie; na żądanie autora tekst można zanonimizować</td></tr>
         <tr><td>Profil nieaktywny z rejestru publicznego</td><td>dane rejestrowe</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (pkt 4)</td><td>do żądania usunięcia albo do 12 miesięcy po wykreśleniu z rejestru; po usunięciu tylko NIP i data żądania</td></tr>
         <tr><td>Przejęcie profilu, prowadzenie konta firmy, panel, komunikacja o zleceniach</td><td>dane przejętego profilu, konto, działalność na platformie</td><td>art. 6 ust. 1 lit. b — umowa o korzystanie z platformy</td><td>czas trwania umowy i 6 lat po jej zakończeniu (przedawnienie roszczeń)</td></tr>
-        <tr><td>Weryfikacja i oznaczenie Fachora Verified, identyfikowalność przedsiębiorcy (art. 30 DSA), egzekwowanie Standardu Fachora</td><td>dane weryfikacji, wynik weryfikacji w Mollie, polisa, naruszenia</td><td>art. 6 ust. 1 lit. c — rozporządzenie (UE) 2022/2065; art. 6 ust. 1 lit. f — bezpieczeństwo klientów i platformy</td><td>czas trwania umowy i 6 miesięcy po jej zakończeniu (DSA); informacje o poważnych naruszeniach i zablokowany NIP — 5 lat</td></tr>
+        <tr><td>Weryfikacja i oznaczenie Fachora Verified, identyfikowalność przedsiębiorcy (art. 30 DSA), egzekwowanie Standardu Fachora</td><td>dane weryfikacji,{{ fachora_protect() ? ' wynik weryfikacji w Stripe,' : '' }} polisa, naruszenia</td><td>art. 6 ust. 1 lit. c — rozporządzenie (UE) 2022/2065; art. 6 ust. 1 lit. f — bezpieczeństwo klientów i platformy</td><td>czas trwania umowy i 6 miesięcy po jej zakończeniu (DSA); informacje o poważnych naruszeniach i zablokowany NIP — 5 lat</td></tr>
         <tr><td>Prowizja: faktury, rozliczenia, windykacja</td><td>dane firmy, kwoty zleceń, faktury</td><td>art. 6 ust. 1 lit. b i lit. c (przepisy podatkowe)</td><td>5 lat od końca roku podatkowego</td></tr>
         <tr><td>Obsługa zgłoszeń, reklamacji, odwołań i zgłoszeń treści (DSA)</td><td>treść zgłoszenia, dane zgłaszającego, decyzja i uzasadnienie</td><td>art. 6 ust. 1 lit. c (DSA, prawa konsumenta); lit. f — obrona przed roszczeniami</td><td>3 lata od zakończenia sprawy</td></tr>
         <tr><td>Formularz kontaktowy</td><td>dane z formularza</td><td>art. 6 ust. 1 lit. f — odpowiedź na Twoją wiadomość</td><td>12 miesięcy od ostatniej wiadomości</td></tr>
@@ -140,7 +140,7 @@
     <div class="tbl-wrap">
       <table class="tbl">
         <tr><th>Odbiorca</th><th>Rola</th><th>Po co</th><th>Gdzie</th></tr>
-        <tr><td>Mollie B.V. (Amsterdam, Holandia)</td><td>operator płatności — licencjonowana instytucja płatnicza nadzorowana przez De Nederlandsche Bank; <strong>odrębny administrator</strong> w zakresie płatności i weryfikacji (KYC) firm; częściowo podmiot przetwarzający</td><td>Fachora Protect: przyjęcie płatności klienta, przechowanie środków, wypłata firmie, zwroty; płatności firm za odblokowanie zleceń; weryfikacja tożsamości i rachunku firmy. Mollie stosuje własną politykę prywatności (mollie.com)</td><td>UE (Holandia)</td></tr>
+        <tr><td>Stripe Payments Europe, Ltd. (Dublin, Irlandia)</td><td>operator płatności — instytucja pieniądza elektronicznego z zezwoleniem Central Bank of Ireland; <strong>odrębny administrator</strong> w zakresie płatności{{ fachora_protect() ? ' i weryfikacji (KYC) firm' : '' }}; częściowo podmiot przetwarzający</td><td>płatności firm za odblokowanie zapytań{{ fachora_protect() ? '; Fachora Protect: przyjęcie płatności klienta, przechowanie środków, wypłata firmie, zwroty; weryfikacja tożsamości i rachunku firmy' : '' }}. Stripe stosuje własną politykę prywatności (stripe.com/privacy)</td><td>UE (Irlandia); część przetwarzania w USA (Stripe, Inc.) na podstawie Data Privacy Framework i standardowych klauzul umownych</td></tr>
         <tr><td>Resend, Inc. (USA)</td><td>podmiot przetwarzający</td><td>wysyłka wiadomości e-mail (potwierdzenia, oferty, przypomnienia, faktury) i rejestr doręczeń</td><td>USA — standardowe klauzule umowne</td></tr>
         <tr><td>Railway Corp. (USA)</td><td>podmiot przetwarzający</td><td>hosting aplikacji i bazy danych</td><td>serwery w regionie UE (Amsterdam); dostęp administracyjny z USA możliwy na podstawie standardowych klauzul umownych</td></tr>
         <tr><td>Anthropic, PBC (USA)</td><td>podmiot przetwarzający</td><td>narzędzia AI: porządkowanie i tłumaczenie opisu zlecenia, orientacyjny przedział cen, odczyt danych z polisy OC, streszczenie sporu dla osoby, która go rozstrzyga (pkt 8). Przesyłane treści nie są wykorzystywane do trenowania modeli</td><td>USA — standardowe klauzule umowne</td></tr>

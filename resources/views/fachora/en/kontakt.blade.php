@@ -3,7 +3,7 @@
 {{-- Contact — Fachora (customers and companies), English edition. The form POSTs to route('contact.send') (shared handler: name, email, subject, message, Turnstile); messages are shown in English regardless of the session content. Companies that want to join are sent to the application form (fachora.apply). --}}
 
 @section('title', 'Contact Fachora — for customers and companies')
-@section('description', 'A question about a job, an offer, a Fachora Protect payment, a dispute or company verification? Write to the Fachora team via the form or at ' . brand('email') . ' — we reply within one working day, in English or Polish.')
+@section('description', 'A question about a job, an offer, ' . (fachora_protect() ? 'a Fachora Protect payment, ' : '') . 'a dispute or company verification? Write to the Fachora team via the form or at ' . brand('email') . ' — we reply within one working day, in English or Polish.')
 
 @push('styles')
 <style>
@@ -86,7 +86,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">⏱</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Response time</div><div style="font-weight:600;">Within 1 working day</div><div style="font-size:13px;color:var(--text-2);">Fachora Protect disputes: we keep both sides informed while the case is being reviewed.</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Response time</div><div style="font-weight:600;">Within 1 working day</div><div style="font-size:13px;color:var(--text-2);">{{ fachora_protect() ? 'Fachora Protect disputes' : 'Disputes' }}: we keep both sides informed while the case is being reviewed.</div></div>
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
@@ -114,7 +114,7 @@
     <div class="contact-help">
       <div class="contact-card">
         <h3>👤 For customers</h3>
-        <p>Questions about a job, offers, appointments, <a class="lnk" href="{{ route('fachora.protect') }}">Fachora Protect</a>, refunds or a dispute with a company. Include your job number — we will answer faster.</p>
+        <p>Questions about a job, offers, appointments@if(fachora_protect()), <a class="lnk" href="{{ route('fachora.protect') }}">Fachora Protect</a>, refunds@endif or a dispute with a company. Include your job number — we will answer faster.</p>
         <ul>
           <li>No offers received? Write to us — we will look for a company by hand.</li>
           <li>The company did not show up? That breaches the Fachora Standard, please report it.</li>
@@ -123,7 +123,7 @@
       </div>
       <div class="contact-card">
         <h3>🔧 For companies</h3>
-        <p>Verification, the panel, payouts through Mollie, commission invoices, a suspended profile or removal of your register data. <a class="lnk" href="{{ route('login') }}">Log in</a> to check your verification status.</p>
+        <p>Verification, the panel, @if(fachora_protect())payouts through Stripe, @endif invoices from Fachora, a suspended profile or removal of your register data. <a class="lnk" href="{{ route('login') }}">Log in</a> to check your verification status.</p>
         <ul>
           <li>Want to join? Use the <a class="lnk" href="{{ route('fachora.apply') }}">application form</a>.</li>
           <li>Do not want to be listed on Fachora? Write to us — we will remove the register profile.</li>

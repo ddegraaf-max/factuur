@@ -28,7 +28,7 @@ class SitemapService
             $categories = array_keys((array) config('fachora.categories', []));
 
             return [
-                'strony' => fn () => $this->plain(['/', '/zlecenie/nowe', '/jak-to-dziala', '/fachora-protect', '/standard', '/dla-firm', '/dla-firm/zglos',
+                'strony' => fn () => $this->plain(['/', '/zlecenie/nowe', '/jak-to-dziala', ...(fachora_protect() ? ['/fachora-protect'] : []), '/standard', '/dla-firm', '/dla-firm/zglos',
                     '/przejmij', '/demo', '/faq', '/kontakt', '/o-nas', '/regulamin', '/polityka-prywatnosci', '/status', '/login']),
                 'uslugi' => fn () => $this->plain(array_map(fn ($c) => '/uslugi/' . $c, $categories)),
                 'miasta' => fn () => $this->categoryCityPages(),

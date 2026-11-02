@@ -3,7 +3,7 @@
 {{-- Kontakt — Fachora (klienci i firmy). Formularz wysyła POST na route('contact.send') (wspólny handler: name, email, subject, message, Turnstile); komunikaty pokazujemy po polsku niezależnie od treści z sesji. Firmy, które chcą dołączyć, kierujemy do formularza zgłoszenia (fachora.apply). --}}
 
 @section('title', 'Kontakt z Fachora — dla klientów i firm')
-@section('description', 'Pytanie o zlecenie, ofertę, płatność Fachora Protect, spór albo weryfikację firmy? Napisz do zespołu Fachora przez formularz albo na ' . brand('email') . ' — odpowiadamy w ciągu jednego dnia roboczego, po polsku i po angielsku.')
+@section('description', 'Pytanie o zlecenie, ofertę, ' . (fachora_protect() ? 'płatność Fachora Protect, ' : '') . 'spór albo weryfikację firmy? Napisz do zespołu Fachora przez formularz albo na ' . brand('email') . ' — odpowiadamy w ciągu jednego dnia roboczego, po polsku i po angielsku.')
 
 @push('styles')
 <style>
@@ -86,7 +86,7 @@
         </div>
         <div class="contact-line">
           <span class="contact-ic">⏱</span>
-          <div><div style="font-size:13px;color:var(--text-3);">Czas odpowiedzi</div><div style="font-weight:600;">Do 1 dnia roboczego</div><div style="font-size:13px;color:var(--text-2);">Spory w ramach Fachora Protect: w trakcie rozpatrywania informujemy obie strony na bieżąco.</div></div>
+          <div><div style="font-size:13px;color:var(--text-3);">Czas odpowiedzi</div><div style="font-weight:600;">Do 1 dnia roboczego</div><div style="font-size:13px;color:var(--text-2);">Spory{{ fachora_protect() ? ' w ramach Fachora Protect' : '' }}: w trakcie rozpatrywania informujemy obie strony na bieżąco.</div></div>
         </div>
         <div class="contact-line">
           <span class="contact-ic">📍</span>
@@ -114,7 +114,7 @@
     <div class="contact-help">
       <div class="contact-card">
         <h3>👤 Dla klientów</h3>
-        <p>Pytania o zlecenie, oferty, termin, <a class="lnk" href="{{ route('fachora.protect') }}">Fachora Protect</a>, zwrot pieniędzy lub spór z firmą. Podaj numer zlecenia — odpowiemy szybciej.</p>
+        <p>Pytania o zlecenie, oferty, termin@if(fachora_protect()), <a class="lnk" href="{{ route('fachora.protect') }}">Fachora Protect</a>, zwrot pieniędzy@endif lub spór z firmą. Podaj numer zlecenia — odpowiemy szybciej.</p>
         <ul>
           <li>Nie dostałeś żadnej oferty? Napisz — poszukamy firmy ręcznie.</li>
           <li>Firma się nie zjawiła? To naruszenie Standardu Fachora, zgłoś nam to.</li>
@@ -123,7 +123,7 @@
       </div>
       <div class="contact-card">
         <h3>🔧 Dla firm</h3>
-        <p>Weryfikacja, panel, wypłaty przez Mollie, faktury za prowizję, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
+        <p>Weryfikacja, panel, @if(fachora_protect())wypłaty przez Stripe, @endif faktury od Fachory, zawieszenie profilu albo usunięcie danych z rejestru. <a class="lnk" href="{{ route('login') }}">Zaloguj się</a>, żeby sprawdzić status weryfikacji.</p>
         <ul>
           <li>Chcesz dołączyć? Skorzystaj z <a class="lnk" href="{{ route('fachora.apply') }}">formularza zgłoszenia</a>.</li>
           <li>Nie chcesz figurować na Fachora? Napisz — usuniemy profil z rejestru.</li>

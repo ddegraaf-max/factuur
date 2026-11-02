@@ -2,9 +2,11 @@
 {{-- Fachora home page, English version (APP_BRAND=fachora, visitor chose EN): for foreigners living in Poland.
      The customer describes the job and picks up to max_offers companies nearby (Fachora Verified on top, register
      companies clearly marked). Verified companies get the request from us; a register company is contacted by the
-     customer directly (Fachora sends it nothing). Payment through Fachora Protect or directly after the work.
+     customer directly (Fachora sends it nothing). The customer pays the company after the work; Fachora Protect
+     (a Stripe reservation) is shown only when fachora_protect() is on.
      Same structure as the Polish page; numbers come from config/fachora.php. --}}
 @php
+    $protect = fachora_protect();
     $fee = config('fachora.fee_percent');
     $intro = config('fachora.intro_fee_percent');
     $lead = (bool) config('fachora.lead_pricing');
@@ -111,14 +113,15 @@
       <div class="fh-step">
         <div class="nr">4</div>
         <h3>Choose one and approve the work</h3>
-        <p>Only now does the chosen company see your address and number. With Fachora Protect you pay after approving the work. A Verified company issues an invoice and gives a {{ $warranty }}-month warranty; at the end you leave a review.</p>
+        <p>Only now does the chosen company see your address and number. @if($protect)With Fachora Protect you pay after approving the work.@else You pay the company after the work, exactly what you agreed.@endif A Verified company issues an invoice and gives a {{ $warranty }}-month warranty; at the end you leave a review.</p>
       </div>
     </div>
     <div class="fh-more"><a href="{{ route('fachora.how') }}">See all the steps in detail →</a></div>
   </div>
 </section>
 
-<!-- FACHORA PROTECT -->
+@if($protect)
+<!-- FACHORA PROTECT (only when switched on) -->
 <section class="fh-band" id="protect">
   <div class="container">
     <div class="eyebrow">Fachora Protect · optional</div>
@@ -128,7 +131,7 @@
       <div class="fh-flow">
         <div class="fh-flow-item">
           <div class="nr">1</div>
-          <div><b>You reserve the amount</b><p>BLIK, Przelewy24 or card. The payment is handled by Mollie, a licensed payment institution supervised by De Nederlandsche Bank.</p></div>
+          <div><b>You reserve the amount</b><p>BLIK, Przelewy24 or card. The payment is handled by Stripe, an e-money institution supervised by the Central Bank of Ireland.</p></div>
         </div>
         <div class="fh-flow-item">
           <div class="nr">2</div>
@@ -157,13 +160,14 @@
           <div class="ex">Example. Amounts and dates are agreed with the company you choose.</div>
         </div>
         <div class="note">
-          <b>Dispute?</b> The money stays blocked until the matter is settled. The company has {{ $disputeHours }} hours to respond; if it does not, the decision goes your way. Fachora never holds your money: the whole payment is handled by Mollie.
+          <b>Dispute?</b> The money stays blocked until the matter is settled. The company has {{ $disputeHours }} hours to respond; if it does not, the decision goes your way. Fachora never holds your money: the whole payment is handled by Stripe.
         </div>
         <div style="margin-top:18px;"><a href="{{ route('fachora.protect') }}" class="btn btn-white">How Fachora Protect works</a></div>
       </div>
     </div>
   </div>
 </section>
+@endif
 
 <!-- FACHORA VERIFIED -->
 <section class="section" id="verified">
@@ -178,7 +182,7 @@
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 20])</span><div><b>Register and tax number</b><p>The company exists, is active in CEIDG or KRS, and its NIP and VAT status check out.</p></div></div>
-        <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Identity and bank account</b><p>The person representing the company and its bank account are confirmed by Mollie.</p></div></div>
+        @if($protect)<div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><div><b>Identity and bank account</b><p>The person representing the company and its bank account are confirmed by Stripe.</p></div></div>@endif
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 20])</span><div><b>Phone, e-mail, terms</b><p>Number confirmed by SMS code, address by link, the Fachora Standard accepted with date and version.</p></div></div>
         <div class="fh-check"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 20])</span><div><b>Liability insurance: visible</b><p>If the company has a policy, you see it in the profile. When it expires the mark disappears until it is renewed.</p></div></div>
       </div>
@@ -202,7 +206,7 @@
         <div class="meta">Plumber · Heating · Łódź, up to 25 km</div>
         <div class="rating"><b>★ 4.8</b> · rating from confirmed jobs</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span><span>🇩🇪 Deutsch</span></div>
-        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li><li>Fachora Protect</li><li>Insured</li></ul>
+        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li>@if($protect)<li>Fachora Protect</li>@endif<li>Insured</li></ul>
         <div class="rates">Indicative rates: call-out 80 zł · first hour 150 zł</div>
       </div>
       <div class="fh-company">
@@ -212,7 +216,7 @@
         <div class="meta">Electrician · Warsaw, up to 30 km</div>
         <div class="rating"><b>★ 4.9</b> · rating from confirmed jobs</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span><span>🇺🇦 українська</span></div>
-        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li><li>Fachora Protect</li><li>Responds within 24 h</li></ul>
+        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li>@if($protect)<li>Fachora Protect</li>@endif<li>Responds within 24 h</li></ul>
         <div class="rates">Indicative rates: call-out 60 zł · first hour 140 zł</div>
       </div>
       <div class="fh-company">
@@ -222,7 +226,7 @@
         <div class="meta">Locksmith · Kraków, up to 20 km</div>
         <div class="rating"><b>★ 4.7</b> · rating from confirmed jobs</div>
         <div class="langs"><span>🇵🇱 polski</span><span>🇬🇧 English</span></div>
-        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li><li>Fachora Protect</li><li>Emergencies 24/7</li></ul>
+        <ul class="ticks"><li>Invoice</li><li>{{ $warranty }}-month warranty</li>@if($protect)<li>Fachora Protect</li>@endif<li>Emergencies 24/7</li></ul>
         <div class="rates">Indicative rates: call-out 90 zł · lock opening from 200 zł</div>
       </div>
     </div>
@@ -239,9 +243,9 @@
       <p>They apply to Fachora Verified companies and to jobs handled through your job page. With a register company you make your own arrangements.</p>
     </div>
     <div class="fh-usps">
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Verified companies</h3><p>Register, tax number, identity, bank account, phone and e-mail checked before a company gets the Verified mark and its first request.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 22])</span><h3>Verified companies</h3><p>Register, tax number,{{ $protect ? ' identity, bank account,' : '' }} phone and e-mail checked before a company gets the Verified mark and its first request.</p></div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'clock', 'size' => 22])</span><h3>Reliable appointment</h3><p>The date is part of the job. The company confirms it and can only cancel for a stated reason. A no-show after a reservation means removal from the platform.</p></div>
-      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span><h3>Safe payments</h3><p>With Fachora Protect you pay only after approving the work. In a dispute the money waits for the decision.</p></div>
+      <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 22])</span>@if($protect)<h3>Safe payments</h3><p>With Fachora Protect you pay only after approving the work. In a dispute the money waits for the decision.</p>@else<h3>Pay after the work</h3><p>You know the price up front and pay only when the work is done, directly to the company. A Verified company always issues an invoice.</p>@endif</div>
       <div class="fh-usp"><span class="ic">@include('fachora.partials.icon', ['name' => 'star', 'size' => 22])</span><h3>Warranty on the work</h3><p>{{ $warranty }} months as standard. A complaint goes back to the job and the company has to respond within {{ $disputeHours }} hours.</p></div>
     </div>
   </div>
@@ -307,7 +311,7 @@
     <div class="faq-list">
       <details class="faq-item">
         <summary>What does it cost?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">For customers Fachora is free: you do not pay for posting a job, for picking companies, for the offers or for Fachora Protect. You pay only the price agreed with the company. Fachora's fees are paid by the company.</div>
+        <div class="faq-content">For customers Fachora is free: you do not pay for posting a job, for picking companies{{ $protect ? ', for the offers or for Fachora Protect' : ' or for the offers' }}. You pay only the price agreed with the company. Fachora's fees are paid by the company.</div>
       </details>
       <details class="faq-item">
         <summary>Who will see my job?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
@@ -315,7 +319,7 @@
       </details>
       <details class="faq-item">
         <summary>What if the work is done badly?<svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></summary>
-        <div class="faq-content">For a job with a Verified company you open a dispute on your job page, with photos and a description. The company has {{ $disputeHours }} hours to respond and Fachora decides: payout, partial payout, a repair or a refund. With Fachora Protect the money stays blocked the whole time.</div>
+        <div class="faq-content">For a job with a Verified company you open a dispute on your job page, with photos and a description. The company has {{ $disputeHours }} hours to respond and Fachora decides: {{ $protect ? 'payout, partial payout, a repair or a refund' : 'a repair on a new date or a lower price' }}.@if($protect) With Fachora Protect the money stays blocked the whole time.@endif</div>
       </details>
     </div>
     <div class="fh-more"><a href="{{ route('pl.faq') }}">All questions and answers →</a></div>

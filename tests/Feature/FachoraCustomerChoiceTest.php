@@ -139,7 +139,7 @@ class FachoraCustomerChoiceTest extends TestCase
 
     public function test_with_a_fee_the_customer_pays_first_and_then_the_request_goes_out(): void
     {
-        config(['services.stripe.secret' => 'sk_test_x', 'fachora.stripe_fallback' => true]);
+        config(['services.stripe.secret' => 'sk_test_x']);
         $a = $this->registerProvider('Hydro A');
         $job = $this->pendingJob();
         app(JobService::class)->confirm($job, request());

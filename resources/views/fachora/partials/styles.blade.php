@@ -53,7 +53,7 @@
   .fh-steps.list .fh-step .nr { margin: 0; }
   .fh-steps.list .fh-step ul { margin: 10px 0 0; padding-left: 18px; font-size: 14px; color: var(--text-2); line-height: 1.6; }
 
-  /* ===== Granatowy pas (Fachora Protect) ===== */
+  /* ===== Granatowy pas (fh-band: Protect, tylko gdy włączony) ===== */
   .fh-band { background: linear-gradient(160deg, #143A66 0%, var(--brand) 60%, var(--brand-darker) 100%); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
   .fh-band::before { content: ''; position: absolute; width: 700px; height: 700px; border-radius: 50%; right: -260px; top: -320px; background: radial-gradient(circle, rgba(244,120,31,0.22) 0%, rgba(244,120,31,0) 62%); pointer-events: none; }
   .fh-band .eyebrow { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: var(--accent-light); }

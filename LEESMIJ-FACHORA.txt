@@ -99,7 +99,7 @@ Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:
 2. Stripe: Connect inschakelen op het account (platform in NL, bedrijven in PL), webhook op
    https://fachora.pl/stripe/webhook met events checkout.session.completed en account.updated.
    Laten bevestigen door Stripe: separate charges & transfers NL→PL in PLN, BLIK/P24 in Checkout,
-   refunds bij geschil. Zonder bevestiging: FACHORA_PROTECT=false en de Protect-belofte van de site halen.
+   refunds bij geschil. Zonder bevestiging blijft FACHORA_PROTECT uit (standaard sinds 1.91.0; de site zwijgt dan vanzelf over Protect).
 3. CEIDG: token aanvragen op dane.biznes.gov.pl; daarna
    php artisan fachora:import-ceidg 43.22.Z 43.21.Z --wojewodztwo=łódzkie
    (veldnamen van de API zijn volgens de documentatie; bij afwijking CeidgClient::normalize aanpassen).
@@ -107,7 +107,7 @@ Migraties draaien bij containerstart (Dockerfile CMD), de planner ook (schedule:
    printen (PDF per 100) en posten. Geclaimde bedrijven verschijnen onder status 'claimed';
    na hun aanvraag 'pending' → controles nalopen → Zatwierdź.
 5. Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Torenlaan 5B, 1402 AT Bussum,
-   KvK 59683198, btw NL853603108B01); betalingen via Mollie B.V.; zo staat het in config/brand.php (owner_*), config/marketing.php
+   KvK 59683198, btw NL853603108B01); betalingen via Stripe (Stripe Payments Europe, Ltd.); zo staat het in config/brand.php (owner_*), config/marketing.php
    en alle Fachora-pagina's. Juridisch vóór livegang: regulamin en polityka prywatności zijn concepten (door een Poolse jurist
    laten nakijken), PKE-toets op de uitnodigingsmail voor opt-in-lijsten, DSA-contactpunt,
    merknaam Fachora bij UPRP/EUIPO, domeinen fachora.pl/.com.
@@ -224,13 +224,23 @@ OPTIE 2: GEEN IMPORT VOORAF (1.87, 22 okt 2026, besluit Daniël)
 - Afmelden in twee stappen: de link toont een keuze (geen e-mail meer / profiel verwijderen), pas de knop
   verandert iets (virusscanners openen links automatisch).
 
-EXPLOITANT CREDITLINE B.V. EN MOLLIE (22 okt 2026, besluit Daniël)
+EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.91.0 weer alleen Stripe)
 - Aanbieder en verwerkingsverantwoordelijke van Fachora is Creditline B.V. (Bussum, KvK 59683198, VAT
   NL853603108B01). Teksten PL+EN, voorwaarden, privacy, brief en mails omgezet; terms_version 2026-10-22b.
-- Leadbetalingen via het Mollie-account van Creditline: FACHORA_MOLLIE_KEY op Railway zetten (live_...).
-  Webhook: https://fachora.pl/webhooks/mollie-fachora (wordt per betaling meegestuurd). Methoden BLIK,
-  Przelewy24, kaart; bedragen in PLN, netto, btw verlegd (art. 196 btw-richtlijn).
-- Fachora Protect draait in de code nog op Stripe Connect: zet FACHORA_PROTECT uit tot Mollie Connect is
-  ingebouwd. De panelschermen voor bedrijven noemen Stripe nog (hoort bij die ombouw).
+- Leadbetalingen: Stripe Checkout op het Stripe-account van Creditline (STRIPE_SECRET op Railway), BLIK,
+  Przelewy24, kaart; bedragen in PLN, netto, btw verlegd (art. 196 btw-richtlijn). De Mollie-weg van
+  22 okt (FACHORA_MOLLIE_KEY, webhook /webhooks/mollie-fachora) is in 1.91.0 verwijderd.
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
+
+PROTECT UIT, ALLEEN STRIPE (2 nov 2026, 1.91.0, besluit Daniël: "nu nog geen zin")
+- config fachora.protect staat standaard op false; helper fachora_protect() (= ProtectService::enabled():
+  vlag én STRIPE_SECRET) bepaalt of Protect bestaat. Uit = geen menu-/voettekstlink, /fachora-protect 404,
+  niet in de sitemap, en alle Fachora-pagina's (pl+en) laten de Protect-stukken weg: band op de homepage,
+  stap 5 "płacisz po pracy", FAQ-vraag, dla-firm, profiel, categorie, kontakt, o-nas, standard (regel 02/09
+  en stap 3 zonder identiteits-/bankcheck, want die hoort bij de Stripe Connect-onboarding van Protect),
+  demo, privacy en regulamin (§ 8, § 11.4, § 13.4). Geschil zonder Protect = bemiddeling; wie de uitspraak
+  negeert verliest Verified. FachoraProtectOffTest bewaakt dat "Fachora Protect", "/fachora-protect" en
+  "Mollie" op tien pagina's ontbreken en met de vlag aan terugkomen.
+- Weer aanzetten: FACHORA_PROTECT=true + STRIPE_SECRET + Stripe Connect-platform en webhook + jurist.
+  Dan komt alles vanzelf terug (protect.blade.php noemt al Stripe als operator płatności).

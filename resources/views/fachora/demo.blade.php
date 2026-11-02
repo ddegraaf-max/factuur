@@ -52,11 +52,11 @@
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'pin', 'size' => 18]) Wizyta i praca w toku</h2>
-        <p>Wymiana grzejnika zaplanowana na jutro, opłacona przez Fachora Protect. Awaria pionu w toku, z propozycją pracy dodatkowej do zatwierdzenia przez klienta.</p>
+        <p>Wymiana grzejnika zaplanowana na jutro{{ fachora_protect() ? ', opłacona przez Fachora Protect' : ', z potwierdzoną ceną' }}. Awaria pionu w toku, z propozycją pracy dodatkowej do zatwierdzenia przez klienta.</p>
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'check', 'size' => 18]) Odbiór i wypłata</h2>
-        <p>Przegląd kotła oznaczony jako wykonany: klient ma {{ config('fachora.auto_accept_days') }} dni na odbiór, potem Protect wypłaca automatycznie. Prowizja widoczna od razu.</p>
+        <p>Przegląd kotła oznaczony jako wykonany: klient ma {{ config('fachora.auto_accept_days') }} dni na odbiór{{ fachora_protect() ? ', potem Protect wypłaca automatycznie. Prowizja widoczna od razu' : ', potem zlecenie uznaje się za przyjęte' }}.</p>
       </div>
       <div class="demo-feat">
         <h2>@include('fachora.partials.icon', ['name' => 'star', 'size' => 18]) Opinie</h2>
@@ -72,7 +72,7 @@
       <b>Bezpieczne testowanie.</b> Demo to odseparowane środowisko tylko dla Ciebie:
       <ul>
         <li><b>Żaden e-mail ani SMS</b> nie trafia do nikogo, nawet gdy wyślesz wycenę albo oznaczysz pracę jako wykonaną. Klienci w demo są zmyśleni.</li>
-        <li>Nic nie wpisujesz i <b>nic nie płacisz</b>; Fachora Protect działa tu na niby.</li>
+        <li>Nic nie wpisujesz i <b>nic nie płacisz</b>{{ fachora_protect() ? '; Fachora Protect działa tu na niby' : '' }}.</li>
         <li>Po 24 godzinach środowisko jest usuwane; możesz je też opuścić od razu przyciskiem w panelu.</li>
       </ul>
     </div>

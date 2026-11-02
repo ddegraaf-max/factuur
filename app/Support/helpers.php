@@ -32,3 +32,15 @@ if (! function_exists('money')) {
         return \App\Support\Market::money($amount, $withSymbol, $decimals);
     }
 }
+
+if (! function_exists('fachora_protect')) {
+    /**
+     * Is Fachora Protect (betaalreservering via Stripe Connect) op deze omgeving beschikbaar?
+     * Vlag config fachora.protect én een Stripe-sleutel; zie ProtectService::enabled(). De
+     * marketingpagina's, het menu en de sitemap kijken hiernaar.
+     */
+    function fachora_protect(): bool
+    {
+        return app(\App\Services\Fachora\ProtectService::class)->enabled();
+    }
+}

@@ -2,7 +2,7 @@
 
 {{--
   WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
-  Regulamin platformy Fachora (pośrednictwo między Klientem a Firmą; Fachora Protect przez Mollie;
+  Regulamin platformy Fachora (pośrednictwo między Klientem a Firmą; Fachora Protect przez Stripe, tylko gdy fachora_protect();
   prowizja od Firmy; DSA; prawa konsumenta). Liczby (prowizja, terminy) z config/fachora.php.
   Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
@@ -16,7 +16,7 @@
 @endphp
 
 @section('title', 'Regulamin platformy Fachora')
-@section('description', 'Regulamin platformy Fachora (Creditline B.V.): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, Fachora Protect i płatności przez Mollie, spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
+@section('description', 'Regulamin platformy Fachora (Creditline B.V.): rola Fachora jako pośrednika, zlecenia i oferty, umowa między Klientem a Firmą, ' . (fachora_protect() ? 'Fachora Protect i płatności przez Stripe, ' : '') . 'spory, odwołania, gwarancja, prawa konsumenta, prowizja od Firmy, opinie, zasady DSA, odpowiedzialność, prawo właściwe.')
 
 @push('styles')
 <style>
@@ -65,7 +65,7 @@
       <a href="#p5">§ 5. Standard Fachora</a>
       <a href="#p6">§ 6. Zlecenia i oferty</a>
       <a href="#p7">§ 7. Umowa Klienta z Firmą</a>
-      <a href="#p8">§ 8. Fachora Protect</a>
+      @if(fachora_protect())<a href="#p8">§ 8. Fachora Protect</a>@endif
       <a href="#p9">§ 9. Spory</a>
       <a href="#p10">§ 10. Odwołanie i niestawiennictwo</a>
       <a href="#p11">§ 11. Gwarancja i reklamacje</a>
@@ -92,8 +92,8 @@
       <li><strong>Zlecenie</strong> — opis usługi, której potrzebuje Klient (kategoria, miejsce, opis, zdjęcia, termin, język), złożony przez Platformę i potwierdzony przez Klienta.</li>
       <li><strong>Oferta</strong> — odpowiedź Firmy na Zlecenie: cena (ryczałtowa albo według stawek), proponowany termin, okres gwarancji i uwagi.</li>
       <li><strong>Umowa o Usługę</strong> — umowa między Klientem a Firmą o wykonanie Zlecenia, zawarta z chwilą wyboru Oferty przez Klienta (§ 7).</li>
-      <li><strong>Fachora Protect</strong> (<strong>Protect</strong>) — sposób zapłaty za Zlecenie opisany w § 8: Klient rezerwuje kwotę Oferty u operatora płatności, a Firma otrzymuje wypłatę po akceptacji wykonanej pracy.</li>
-      <li><strong>Operator płatności</strong> — Mollie B.V. z siedzibą w Amsterdamie (Keizersgracht 126, Holandia), instytucja płatnicza posiadająca zezwolenie De Nederlandsche Bank i podlegająca jego nadzorowi, świadcząca usługi płatnicze na podstawie własnych warunków.</li>
+      @if(fachora_protect())<li><strong>Fachora Protect</strong> (<strong>Protect</strong>) — sposób zapłaty za Zlecenie opisany w § 8: Klient rezerwuje kwotę Oferty u operatora płatności, a Firma otrzymuje wypłatę po akceptacji wykonanej pracy.</li>@endif
+      <li><strong>Operator płatności</strong> — Stripe Payments Europe, Ltd. z siedzibą w Dublinie (1 Grand Canal Street Lower, Irlandia), instytucja pieniądza elektronicznego posiadająca zezwolenie Central Bank of Ireland i podlegająca jego nadzorowi, świadcząca usługi płatnicze na podstawie własnych warunków.</li>
       <li><strong>Standard Fachora</strong> — dziesięć zasad, które Firma Verified zobowiązuje się przestrzegać (§ 5).</li>
       <li><strong>Strona Zlecenia</strong> — strona Klienta dostępna przez indywidualny link z e-maila, na której Klient zarządza swoim Zleceniem (oferty, wybór, płatność, akceptacja, spór, opinia).</li>
       <li><strong>Panel Firmy</strong> — część Platformy dostępna po zalogowaniu dla Firmy.</li>
@@ -103,13 +103,13 @@
     <h2 id="p2">§ 2. Czym jest Fachora — role stron</h2>
     <p>1. Fachora jest platformą pośredniczącą. Usługodawca udostępnia narzędzia, dzięki którym Klient opisuje potrzebę, Firmy składają Oferty, Klient wybiera Firmę, a płatność, komunikacja, gwarancja i opinie przebiegają w uporządkowany sposób.</p>
     <p>2. <strong>Usługodawca nie wykonuje usług budowlanych, instalacyjnych, naprawczych ani innych usług będących przedmiotem Zleceń i nie jest stroną Umowy o Usługę.</strong> Umowę o Usługę zawierają wyłącznie Klient i Firma. Firma wykonuje Zlecenie na własny rachunek i własną odpowiedzialność, wystawia Klientowi fakturę lub inny dowód wykonania usługi i odpowiada za jakość pracy.</p>
-    <p>3. Usługodawca świadczy na rzecz Klienta i Firmy usługi drogą elektroniczną: udostępnienie Platformy, przekazanie Zlecenia i Ofert, prowadzenie Strony Zlecenia i Panelu Firmy, obsługę Fachora Protect, mediację w sporach, publikację opinii i oznaczenia Fachora Verified.</p>
+    <p>3. Usługodawca świadczy na rzecz Klienta i Firmy usługi drogą elektroniczną: udostępnienie Platformy, przekazanie Zlecenia i Ofert, prowadzenie Strony Zlecenia i Panelu Firmy, {{ fachora_protect() ? 'obsługę Fachora Protect, ' : '' }}mediację w sporach, publikację opinii i oznaczenia Fachora Verified.</p>
     <p>4. Oznaczenie „Fachora Verified” jest wynikiem weryfikacji opisanej w § 4 i oceną Usługodawcy na dzień jej przeprowadzenia. Nie stanowi gwarancji ani poręczenia za wykonanie usługi przez Firmę, z zastrzeżeniem Gwarancji Fachora opisanej w § 11.</p>
     <p>5. Usługodawca jest dostawcą platformy internetowej w rozumieniu rozporządzenia (UE) 2022/2065 (akt o usługach cyfrowych, DSA). Postanowienia wynikające z tego rozporządzenia znajdują się w § 4 ust. 3, § 14 i § 15.</p>
 
     <h2 id="p3">§ 3. Korzystanie z Platformy</h2>
     <p>1. Do korzystania z Platformy potrzebne są: urządzenie z dostępem do Internetu, aktualna przeglądarka z obsługą JavaScript i plików cookie oraz aktywny adres e-mail. Firma potrzebuje dodatkowo numeru telefonu komórkowego i konta w polskim banku.</p>
-    <p>2. Korzystanie z Platformy przez Klienta jest <strong>bezpłatne</strong>. Klient płaci wyłącznie Firmie za wykonaną usługę — za pośrednictwem Fachora Protect albo bezpośrednio Firmie, jeżeli Protect nie jest dostępny dla danego Zlecenia.</p>
+    <p>2. Korzystanie z Platformy przez Klienta jest <strong>bezpłatne</strong>. Klient płaci wyłącznie Firmie za wykonaną usługę{{ fachora_protect() ? ' — za pośrednictwem Fachora Protect albo bezpośrednio Firmie, jeżeli Protect nie jest dostępny dla danego Zlecenia' : ', bezpośrednio Firmie, na warunkach Oferty' }}.</p>
     <p>3. Klient nie zakłada konta. Dostęp do Zlecenia odbywa się przez indywidualny, poufny link przesłany na adres e-mail podany przy składaniu Zlecenia. Klient chroni ten link jak hasło; każdy, kto go posiada, może zarządzać Zleceniem.</p>
     <p>4. Zabronione jest korzystanie z Platformy w sposób niezgodny z prawem lub Regulaminem, w szczególności: składanie fikcyjnych Zleceń lub Ofert, podawanie nieprawdziwych danych, omijanie Platformy przy Zleceniach, które przez nią nadeszły (§ 13 ust. 6), nękanie drugiej strony, wprowadzanie treści niezgodnych z prawem (§ 15), automatyczne pobieranie danych z Platformy (scraping).</p>
     <p>5. Usługodawca może ograniczyć lub zablokować dostęp do Platformy osobie, która narusza ust. 4, oraz zablokować numer NIP Firmy, której Konto zostało usunięte z powodu poważnego naruszenia (§ 5 ust. 4).</p>
@@ -123,7 +123,7 @@
       <li>sprawdzenie statusu VAT i rachunku bankowego w wykazie podatników VAT (biała lista), o ile dotyczy;</li>
       <li>potwierdzenie adresu e-mail i numeru telefonu;</li>
       <li>akceptację Regulaminu i Standardu Fachora z zapisem daty i wersji;</li>
-      <li>weryfikację tożsamości osoby reprezentującej Firmę i rachunku bankowego, prowadzoną przez Operatora płatności w ramach jego procedury rejestracji (onboardingu) w Mollie (Usługodawca otrzymuje wynik, nie dokumenty);</li>
+      @if(fachora_protect())<li>weryfikację tożsamości osoby reprezentującej Firmę i rachunku bankowego, prowadzoną przez Operatora płatności w ramach jego procedury rejestracji (onboardingu) w Stripe (Usługodawca otrzymuje wynik, nie dokumenty);</li>@endif
       <li>opcjonalnie: przesłanie polisy ubezpieczenia odpowiedzialności cywilnej; informacja o aktualnym ubezpieczeniu jest widoczna na Profilu do dnia wygaśnięcia polisy.</li>
     </ul>
     <p>Zbierane w ten sposób informacje odpowiadają obowiązkowi identyfikowalności przedsiębiorców z art. 30 DSA. Firma aktualizuje dane niezwłocznie, gdy ulegną zmianie.</p>
@@ -142,12 +142,12 @@
       <li>Zawsze wystawia fakturę albo inny dowód wykonania usługi.</li>
       <li>Udziela gwarancji na wykonaną pracę tam, gdzie ma to zastosowanie (standardowo {{ (int) config('fachora.default_warranty_months') }} miesięcy).</li>
       <li>Odpowiada na reklamację i spór w ciągu {{ (int) config('fachora.dispute_hours') }} godzin.</li>
-      <li>Rozlicza Zlecenia z Platformy zgodnie z zasadami Fachora (w tym Fachora Protect, jeżeli Klient go wybrał).</li>
+      <li>Rozlicza Zlecenia z Platformy zgodnie z zasadami Fachora{{ fachora_protect() ? ' (w tym Fachora Protect, jeżeli Klient go wybrał)' : ' i potwierdzeniem Zlecenia' }}.</li>
       <li>Utrzymuje średnią ocenę co najmniej {{ $minRating }} (przy co najmniej 5 opiniach) i odpowiada na nowe Zlecenia w ciągu 24 godzin.</li>
     </ol>
     <p>2. <strong>Sygnały i sankcje.</strong> Naruszenie Standardu jest odnotowywane w Koncie Firmy. Dwa uzasadnione zgłoszenia Klientów w ciągu 90 dni skutkują zawieszeniem Profilu na 30 dni; po tym okresie Usługodawca ponownie ocenia Firmę. Spadek średniej oceny poniżej {{ $minRating }} skutkuje ostrzeżeniem, a przy braku poprawy — zawieszeniem.</p>
     <p>3. W okresie zawieszenia Profil nie jest oznaczony jako Verified, nie jest widoczny na listach i Firma nie otrzymuje nowych Zleceń; Zlecenia w toku są kończone.</p>
-    <p>4. <strong>Usunięcie z Platformy</strong> następuje w razie poważnego naruszenia, w szczególności: oszustwa lub próby oszustwa, niestawienia się na Zlecenie po dokonanej rezerwacji Protect bez usprawiedliwienia, przyjmowania zapłaty poza Platformą za Zlecenie, które przez nią nadeszło, podania nieprawdziwych danych w weryfikacji, wygaśnięcia działalności. Usługodawca może wówczas zablokować numer NIP Firmy dla ponownej rejestracji.</p>
+    <p>4. <strong>Usunięcie z Platformy</strong> następuje w razie poważnego naruszenia, w szczególności: oszustwa lub próby oszustwa, niestawienia się na {{ fachora_protect() ? 'Zlecenie po dokonanej rezerwacji Protect' : 'potwierdzone Zlecenie' }} bez usprawiedliwienia, przyjmowania zapłaty poza Platformą za Zlecenie, które przez nią nadeszło, podania nieprawdziwych danych w weryfikacji, wygaśnięcia działalności. Usługodawca może wówczas zablokować numer NIP Firmy dla ponownej rejestracji.</p>
     <p>5. Wygaśnięcie warunku weryfikacji (np. wykreślenie z rejestru, utrata statusu VAT, wygaśnięcie uprawnień do wypłat u Operatora płatności) powoduje automatyczne zawieszenie do czasu uzupełnienia.</p>
 
     <h2 id="p6">§ 6. Zlecenia i oferty</h2>
@@ -164,23 +164,25 @@
     <p>2. Umowa o Usługę jest umową zawieraną na odległość za pośrednictwem Platformy. Firma jest przedsiębiorcą zobowiązanym wobec Klienta-konsumenta z tytułu tej umowy, w tym do wykonania obowiązków informacyjnych; Usługodawca pomaga je spełnić, udostępniając dane Firmy i potwierdzenie zlecenia.</p>
     <p>3. Po wyborze Oferty Firma otrzymuje dane niezbędne do wykonania Zlecenia (imię i nazwisko lub nazwa Klienta, adres wykonania usługi, dane kontaktowe do umówienia terminu), a Klient — dane Firmy wymagane przepisami (nazwa, adres, NIP) oraz możliwość kontaktu przez Platformę.</p>
     <p>4. Firma potwierdza termin, informuje o dojeździe i zgłasza na Platformie rozpoczęcie i zakończenie pracy, dołączając zdjęcia wykonanych prac tam, gdzie to możliwe.</p>
-    <p>5. Usługodawca nie jest stroną Umowy o Usługę, nie udziela gwarancji na prace Firmy i nie odpowiada za ich wykonanie, z zastrzeżeniem Gwarancji Fachora (§ 11) i zasad Fachora Protect (§ 8).</p>
+    <p>5. Usługodawca nie jest stroną Umowy o Usługę, nie udziela gwarancji na prace Firmy i nie odpowiada za ich wykonanie, z zastrzeżeniem{{ fachora_protect() ? ' Gwarancji Fachora (§ 11) i zasad Fachora Protect (§ 8)' : ' mediacji w sporach (§ 9)' }}.</p>
 
+    @if(fachora_protect())
     <h2 id="p8">§ 8. Fachora Protect — płatność</h2>
     <p>1. Fachora Protect jest dostępny, jeżeli wybrana Firma ma aktywne konto u Operatora płatności z włączonymi wypłatami. Informacja o dostępności Protect jest widoczna na Profilu i w Ofercie. Jeżeli Protect nie jest dostępny, Klient płaci Firmie bezpośrednio po wykonaniu usługi, na warunkach Oferty, bez Gwarancji Fachora.</p>
-    <p>2. <strong>Rezerwacja.</strong> Po wyborze Oferty z Protect Klient płaci kwotę Oferty (brutto) przez stronę płatności Operatora płatności (BLIK, Przelewy24, karta lub inne udostępnione metody). <strong>Środki są przechowywane przez Operatora płatności na rachunku platformy;</strong> Usługodawca nie prowadzi rachunków płatniczych ani nie przechowuje środków Klientów we własnym imieniu. Do płatności stosuje się warunki Operatora płatności (mollie.com).</p>
+    <p>2. <strong>Rezerwacja.</strong> Po wyborze Oferty z Protect Klient płaci kwotę Oferty (brutto) przez stronę płatności Operatora płatności (BLIK, Przelewy24, karta lub inne udostępnione metody). <strong>Środki są przechowywane przez Operatora płatności na rachunku platformy;</strong> Usługodawca nie prowadzi rachunków płatniczych ani nie przechowuje środków Klientów we własnym imieniu. Do płatności stosuje się warunki Operatora płatności (stripe.com).</p>
     <p>3. Zatwierdzone prace dodatkowe (§ 6 ust. 6) Klient opłaca w ten sam sposób, przed ich wykonaniem albo niezwłocznie po zatwierdzeniu.</p>
     <p>4. <strong>Akceptacja.</strong> Po zgłoszeniu zakończenia pracy przez Firmę Klient sprawdza wykonanie i na Stronie Zlecenia: (a) akceptuje pracę albo (b) zgłasza spór (§ 9). <strong>Jeżeli Klient nie zrobi żadnej z tych rzeczy w ciągu {{ (int) config('fachora.auto_accept_days') }} dni od zgłoszenia zakończenia, pracę uznaje się za zaakceptowaną</strong> (akceptacja milcząca). Usługodawca przypomina Klientowi o tym terminie e-mailem.</p>
     <p>5. <strong>Wypłata.</strong> Po akceptacji (wyraźnej lub milczącej) Operator płatności przekazuje Firmie kwotę Zlecenia pomniejszoną o prowizję Usługodawcy (§ 13). Firma wystawia Klientowi fakturę na pełną kwotę Zlecenia. Termin dotarcia środków na rachunek Firmy zależy od Operatora płatności.</p>
     <p>6. <strong>Zwrot.</strong> Środki wracają do Klienta w całości, jeżeli: Zlecenie zostało odwołane zgodnie z § 10 przed rozpoczęciem pracy (z zastrzeżeniem opłaty za dojazd w § 10 ust. 2), Firma nie stawiła się i nie uzgodniono nowego terminu, albo Usługodawca tak rozstrzygnął spór. Zwrot następuje tą samą metodą płatności, w terminie zależnym od Operatora płatności (zwykle do 14 dni).</p>
     <p>7. Korzystanie z Protect jest dla Klienta bezpłatne. Usługodawca może w przyszłości wprowadzić opłatę za Protect dla Klienta; będzie ona widoczna przed płatnością i nie obejmie Zleceń rozpoczętych wcześniej.</p>
     <p>8. Klient i Firma zobowiązują się <strong>nie omijać Protect</strong> przy Zleceniu, dla którego został wybrany: Firma nie przyjmuje od Klienta dodatkowej zapłaty poza Platformą, a Klient nie płaci Firmie bezpośrednio. Zapłata poza Platformą pozbawia Klienta Gwarancji Fachora, a Firmę naraża na usunięcie z Platformy (§ 5 ust. 4).</p>
+    @endif
 
     <h2 id="p9">§ 9. Spory</h2>
     <p>1. Jeżeli Klient uważa, że praca nie została wykonana lub została wykonana niezgodnie z Umową o Usługę, zgłasza <strong>spór</strong> na Stronie Zlecenia w terminie z § 8 ust. 4, opisując problem i dołączając zdjęcia. Zgłoszenie sporu wstrzymuje wypłatę.</p>
     <p>2. Firma ma <strong>{{ (int) config('fachora.dispute_hours') }} godzin</strong> na odpowiedź na Platformie (wyjaśnienie, propozycja naprawy, propozycja obniżenia ceny). Strony mogą w tym czasie uzgodnić rozwiązanie samodzielnie; uzgodnienie zapisane na Platformie kończy spór.</p>
     <p>3. Jeżeli strony nie dojdą do porozumienia albo Firma nie odpowie w terminie, <strong>Usługodawca rozstrzyga spór</strong> na podstawie Zlecenia, Oferty, potwierdzenia zlecenia, zdjęć, korespondencji na Platformie i wyjaśnień stron, kierując się zasadami rozsądku i dobrej wiary. Usługodawca może poprosić o dodatkowe informacje. Rozstrzygnięcie może polegać na: wypłacie pełnej kwoty Firmie, zwrocie pełnej kwoty Klientowi, podziale kwoty między strony, albo wyznaczeniu terminu naprawy. Brak odpowiedzi Firmy w terminie jest rozstrzygany na korzyść Klienta.</p>
-    <p>4. Usługodawca dąży do rozstrzygnięcia w ciągu 14 dni od upływu terminu na odpowiedź Firmy i przekazuje je obu stronom wraz z uzasadnieniem. Rozstrzygnięcie dotyczy wyłącznie środków zarezerwowanych w Protect i wykonywane jest przez Operatora płatności.</p>
+    <p>4. Usługodawca dąży do rozstrzygnięcia w ciągu 14 dni od upływu terminu na odpowiedź Firmy i przekazuje je obu stronom wraz z uzasadnieniem. {{ fachora_protect() ? 'Rozstrzygnięcie dotyczy wyłącznie środków zarezerwowanych w Protect i wykonywane jest przez Operatora płatności.' : 'Rozstrzygnięcie ma charakter mediacji: Usługodawca nie dysponuje środkami stron; Firma, która nie stosuje się do rozstrzygnięcia, traci oznaczenie Fachora Verified (§ 5).' }}</p>
     <p>5. <strong>Rozstrzygnięcie sporu przez Usługodawcę nie zastępuje drogi sądowej ani pozasądowych metod rozwiązywania sporów konsumenckich</strong> i nie ogranicza roszczeń stron z Umowy o Usługę. Strona, która nie zgadza się z rozstrzygnięciem, może dochodzić roszczeń od drugiej strony Umowy o Usługę na zasadach ogólnych (§ 20). Rozstrzygnięcie co do wypłaty środków z Protect jest ostateczne w relacji z Usługodawcą.</p>
 
     <h2 id="p10">§ 10. Odwołanie Zlecenia i niestawiennictwo</h2>
@@ -193,12 +195,14 @@
     <p>1. <strong>Odpowiedzialność Firmy.</strong> Za wykonanie Umowy o Usługę odpowiada Firma zgodnie z przepisami prawa (w szczególności Kodeksu cywilnego o umowie o dzieło i rękojmi oraz przepisów o ochronie konsumentów) i z Ofertą. Postanowienia Regulaminu nie ograniczają ustawowej odpowiedzialności Firmy wobec Klienta.</p>
     <p>2. <strong>Gwarancja Firmy.</strong> Firma udziela gwarancji na wykonaną pracę na okres wskazany w Ofercie (standardowo {{ (int) config('fachora.default_warranty_months') }} miesięcy od akceptacji). Gwarancja obejmuje wady wykonanej pracy; nie obejmuje normalnego zużycia, uszkodzeń mechanicznych, ingerencji osób trzecich ani wad materiałów dostarczonych przez Klienta, chyba że Oferta stanowi inaczej. Gwarancja nie wyłącza uprawnień ustawowych.</p>
     <p>3. <strong>Reklamacja w okresie gwarancji.</strong> Klient zgłasza wadę na Stronie Zlecenia (zgłoszenie otwiera Zlecenie ponownie). Firma odpowiada w ciągu {{ (int) config('fachora.dispute_hours') }} godzin i uzgadnia termin naprawy. Usługodawca pośredniczy w komunikacji i monitoruje realizację.</p>
+    @if(fachora_protect())
     <p>4. <strong>Gwarancja Fachora.</strong> Dla Zleceń opłaconych przez Fachora Protect Usługodawca dodatkowo zapewnia:</p>
     <ul>
       <li><strong>mediację</strong> — prowadzenie sporu i reklamacji gwarancyjnej zgodnie z § 9 i ust. 3, oraz</li>
       <li><strong>naprawę zastępczą</strong> — jeżeli Firma nie odpowiada na reklamację, odmawia naprawy uzasadnionej wady albo nie wykonuje jej w uzgodnionym terminie, Usługodawca może, według własnej oceny, zlecić usunięcie wady innej Firmie Verified i pokryć jej koszt <strong>do wysokości kwoty Zlecenia zapłaconej przez Protect</strong>.</li>
     </ul>
     <p>Gwarancja Fachora jest dobrowolnym świadczeniem Usługodawcy, ograniczonym do powyższego zakresu; nie obejmuje szkód następczych, utraconych korzyści ani Zleceń opłaconych poza Protect. Usługodawca może odmówić naprawy zastępczej, jeżeli wada nie jest objęta gwarancją Firmy (ust. 2), Klient uniemożliwił Firmie naprawę albo zgłoszenie nastąpiło po upływie okresu gwarancji. Usługodawca, który pokrył koszt naprawy zastępczej, może dochodzić jego zwrotu od Firmy.</p>
+    @endif
 
     <h2 id="p12">§ 12. Prawa konsumenta</h2>
     <p>1. Klient będący konsumentem ma prawo <strong>odstąpić od Umowy o Usługę zawartej na odległość w terminie 14 dni</strong> od jej zawarcia bez podania przyczyny (art. 27 ustawy z dnia 30 maja 2014 r. o prawach konsumenta), składając oświadczenie Firmie — także przez Stronę Zlecenia lub na adres {{ brand('email') }}, który przekażemy Firmie. Odwołanie Zlecenia na Stronie Zlecenia jest równoznaczne ze złożeniem oświadczenia o odstąpieniu.</p>
@@ -213,13 +217,13 @@
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu ani opłaty rejestracyjnej. Podgląd Zlecenia (opis, zdjęcia, termin, miejscowość) jest bezpłatny.</p>
     <p>2. <strong>Opłata za odblokowanie.</strong> Aby złożyć Ofertę, Firma odblokowuje Zlecenie. Opłata wynosi {{ $leadPct }}% szacowanej wartości Zlecenia określonej przez Platformę, nie mniej niż {{ (int) config('fachora.lead_min') }} zł i nie więcej niż {{ (int) config('fachora.lead_max') }} zł netto. Kwota jest widoczna przed odblokowaniem. Pierwsze odblokowanie każdej Firmy jest bezpłatne. Odblokowane Zlecenie pozostaje odblokowane: zmiana lub wycofanie Oferty nie kosztuje nic.</p>
     <p>3. Opłata za odblokowanie należy się niezależnie od tego, czy Klient wybierze Ofertę Firmy. Jeżeli Zlecenie okaże się nieprawdziwe (np. fałszywe dane Klienta albo zlecenie zgłoszone wyłącznie w celu pozyskania ofert przez konkurencję), Firma może to zgłosić w ciągu 7 dni od odblokowania; po weryfikacji Usługodawca zwraca opłatę.</p>
-    <p>4. <strong>Prowizja przy Fachora Protect.</strong> Za Zlecenie opłacone przez Fachora Protect i zaakceptowane (wyraźnie lub milcząco) Usługodawca potrąca z wypłaty prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. Przy Zleceniach rozliczanych bezpośrednio między Klientem a Firmą prowizja nie jest pobierana.</p>
+    @if(fachora_protect())<p>4. <strong>Prowizja przy Fachora Protect.</strong> Za Zlecenie opłacone przez Fachora Protect i zaakceptowane (wyraźnie lub milcząco) Usługodawca potrąca z wypłaty prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. Przy Zleceniach rozliczanych bezpośrednio między Klientem a Firmą prowizja nie jest pobierana.</p>@endif
     <p>5. Opłaty i prowizja są kwotami netto. Usługodawca jest zarejestrowanym podatnikiem VAT w Holandii (NL853603108B01) i wystawia na nie faktury bez polskiego podatku VAT, z adnotacją „odwrotne obciążenie” (art. 196 dyrektywy Rady 2006/112/WE); podatek VAT należny w Polsce rozlicza Firma jako nabywca usługi (import usług). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną. Jeżeli Zlecenie z Protect zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie.</p>
     <p>6. Usługodawca może zmienić wysokość opłat i prowizji z 30-dniowym wyprzedzeniem, informując Firmę e-mailem i w Panelu Firmy. Nowe stawki dotyczą Zleceń odblokowanych po ich wejściu w życie. Firma, która nie akceptuje zmiany, może usunąć Konto przed tym terminem.</p>
     @else
     <p>1. Platforma jest dla Klienta bezpłatna. Firma nie płaci abonamentu, opłaty rejestracyjnej ani opłat za otrzymane Zlecenia lub złożone Oferty.</p>
     <p>2. <strong>Prowizja.</strong> Za każde Zlecenie wykonane i zaakceptowane (wyraźnie lub milcząco) Firma płaci Usługodawcy prowizję w wysokości <strong>{{ $fee }}%</strong> kwoty brutto Zlecenia, łącznie z zatwierdzonymi pracami dodatkowymi. W okresie <strong>{{ (int) config('fachora.intro_days') }} dni</strong> od nadania oznaczenia Fachora Verified prowizja wynosi <strong>{{ $introFee }}%</strong>. Stawka obowiązująca Firmę jest widoczna w Panelu Firmy i w każdej Ofercie przed jej złożeniem.</p>
-    <p>3. Przy Zleceniach z Protect prowizja jest potrącana z wypłaty przez Operatora płatności. Przy Zleceniach bez Protect Usługodawca wystawia Firmie fakturę za prowizję z terminem płatności 14 dni; Firma zgłasza na Platformie wykonanie Zlecenia i ostateczną kwotę.</p>
+    <p>3. {{ fachora_protect() ? 'Przy Zleceniach z Protect prowizja jest potrącana z wypłaty przez Operatora płatności. Przy Zleceniach bez Protect ' : '' }}Usługodawca wystawia Firmie fakturę za prowizję z terminem płatności 14 dni; Firma zgłasza na Platformie wykonanie Zlecenia i ostateczną kwotę.</p>
     <p>4. Prowizja jest kwotą netto. Usługodawca jest zarejestrowanym podatnikiem VAT w Holandii (NL853603108B01) i wystawia faktury za prowizję bez polskiego podatku VAT, z adnotacją „odwrotne obciążenie” (art. 196 dyrektywy Rady 2006/112/WE); podatek VAT należny w Polsce rozlicza Firma jako nabywca usługi (import usług). Firma wyraża zgodę na otrzymywanie faktur drogą elektroniczną.</p>
     <p>5. Jeżeli Zlecenie zostało rozstrzygnięte zwrotem na rzecz Klienta, prowizja nie przysługuje; przy podziale kwoty prowizja jest liczona od części wypłaconej Firmie. Przy odwołaniu Zlecenia prowizja od opłaty za dojazd nie jest pobierana.</p>
     <p>6. <strong>Zakaz omijania.</strong> Jeżeli Firma wykona dla Klienta pracę, o którą Klient zwrócił się przez Platformę, rozliczając ją poza Platformą, prowizja należy się Usługodawcy w pełnej wysokości od kwoty Oferty, niezależnie od sankcji z § 5 ust. 4. Nie dotyczy to Zleceń, które Klient odwołał, a następnie — po upływie 6 miesięcy — zlecił Firmie poza Platformą.</p>
@@ -256,7 +260,7 @@
     <p>3. Firma, której nieaktywny Profil powstał na podstawie rejestru publicznego, może zażądać jego usunięcia na adres {{ brand('email') }}; Usługodawca usuwa Profil w ciągu 14 dni i zachowuje wyłącznie numer NIP z datą żądania, aby nie utworzyć Profilu ponownie.</p>
 
     <h2 id="p18">§ 18. Reklamacje dotyczące usług Usługodawcy</h2>
-    <p>1. Reklamacje dotyczące działania Platformy, Fachora Protect, weryfikacji, opinii lub innych usług Usługodawcy można składać na adres <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> albo pisemnie na adres siedziby. Reklamacja powinna zawierać dane składającego, numer Zlecenia (jeżeli dotyczy) i opis problemu.</p>
+    <p>1. Reklamacje dotyczące działania Platformy, {{ fachora_protect() ? 'Fachora Protect, ' : '' }}weryfikacji, opinii lub innych usług Usługodawcy można składać na adres <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> albo pisemnie na adres siedziby. Reklamacja powinna zawierać dane składającego, numer Zlecenia (jeżeli dotyczy) i opis problemu.</p>
     <p>2. Usługodawca odpowiada na reklamację w terminie 14 dni od jej otrzymania, drogą elektroniczną. Reklamacje dotyczące samej usługi wykonanej przez Firmę rozpatruje Firma; Usługodawca przekazuje je Firmie i pośredniczy zgodnie z § 9 i § 11.</p>
 
     <h2 id="p19">§ 19. Zmiany Regulaminu</h2>
@@ -274,7 +278,7 @@
     <h2 id="p21">§ 21. Postanowienia końcowe</h2>
     <p>1. Regulamin jest dostępny bezpłatnie pod adresem fachora.pl/regulamin w formie umożliwiającej jego pobranie, utrwalenie i wydrukowanie. Wersja polska jest wiążąca; tłumaczenie angielskie służy wygodzie.</p>
     <p>2. Jeżeli którekolwiek postanowienie Regulaminu okaże się nieważne lub bezskuteczne, pozostałe postanowienia pozostają w mocy.</p>
-    <p>3. Integralną częścią Regulaminu są: <a href="{{ route('fachora.standard') }}">Standard Fachora</a> (streszczony w § 5), opis <a href="{{ route('fachora.protect') }}">Fachora Protect</a> i <a href="{{ route('pl.prywatnosc') }}">Polityka prywatności</a>. W razie rozbieżności pierwszeństwo ma Regulamin.</p>
+    <p>3. Integralną częścią Regulaminu są: <a href="{{ route('fachora.standard') }}">Standard Fachora</a> (streszczony w § 5)@if(fachora_protect()), opis <a href="{{ route('fachora.protect') }}">Fachora Protect</a>@endif i <a href="{{ route('pl.prywatnosc') }}">Polityka prywatności</a>. W razie rozbieżności pierwszeństwo ma Regulamin.</p>
     <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia.</p>
     <p>5. Regulamin w wersji {{ config('fachora.terms_version') }} wchodzi w życie 22 października 2026 r.</p>
 

@@ -8,13 +8,14 @@
 --}}
 
 @php
+    $protect = fachora_protect();
     $icon = config("fachora.categories.{$category}.icon", 'tools');
     $n = $providers->count();
     $h1 = $city ? $categoryName . ' – ' . $city : $categoryName;
     $title = $city
         ? $categoryName . ' in ' . $city . ' – verified companies | Fachora'
         : $categoryName . ' – verified companies in Poland | Fachora';
-    $desc = ($city ? $categoryName . ' in ' . $city : $categoryName . ' in Poland') . ': Fachora Verified companies — checked in the public registers, price agreed up front, secure Fachora Protect payment, invoice and warranty.' . ($examples ? ' E.g. ' . $examples . '.' : '') . ' Leave a request for free.';
+    $desc = ($city ? $categoryName . ' in ' . $city : $categoryName . ' in Poland') . ': Fachora Verified companies — checked in the public registers, price agreed up front, ' . ($protect ? 'secure Fachora Protect payment, ' : '') . 'invoice and warranty.' . ($examples ? ' E.g. ' . $examples . '.' : '') . ' Leave a request for free.';
 @endphp
 
 @section('title', $title)
@@ -118,7 +119,7 @@
             <div class="fc-tags">
               @if($s['warranty_months'])<span class="fc-tag ok">✓ {{ $s['warranty_months'] }}-month warranty</span>@endif
               @if($s['invoice'])<span class="fc-tag ok">✓ Invoice</span>@endif
-              @if($s['protect'])<span class="fc-tag ok">✓ Fachora Protect</span>@endif
+              @if($protect && $s['protect'])<span class="fc-tag ok">✓ Fachora Protect</span>@endif
               @if($s['insured'])<span class="fc-tag ok">✓ Insured</span>@endif
               @foreach($s['categories'] as $ck)
                 @if($ck !== $category)<span class="fc-tag">{{ \App\Support\Fachora::categoryName($ck) }}</span>@endif
@@ -173,7 +174,7 @@
 <section class="section" style="padding:40px 0 70px;">
   <div class="container">
     <h2 class="fc-h2">How we check companies: {{ mb_strtolower($categoryName) }}</h2>
-    <p class="fc-seo">Before a company in the "{{ $categoryName }}" category appears on this list, we check it in CEIDG or KRS (is it legally active, does its registered activity match the service), in the VAT white list, we confirm its e-mail and phone number, and the owner's identity and bank account are verified by Mollie when payments are connected. The company accepts the <a href="{{ route('fachora.standard') }}">Fachora Standard</a>: price up front, no extra work without your approval, an invoice, a warranty and a reply to any complaint within {{ (int) config('fachora.dispute_hours') }} hours. If its rating drops below {{ number_format((float) config('fachora.min_rating'), 1, '.', '') }} or justified complaints come in, the company is removed from the list. With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you pay only once the work is done. More: <a href="{{ route('fachora.how') }}">how it works</a>.</p>
+    <p class="fc-seo">Before a company in the "{{ $categoryName }}" category appears on this list, we check it in CEIDG or KRS (is it legally active, does its registered activity match the service), in the VAT white list, we confirm its e-mail and phone number{{ $protect ? ", and the owner's identity and bank account are verified by Stripe when payments are connected" : '' }}. The company accepts the <a href="{{ route('fachora.standard') }}">Fachora Standard</a>: price up front, no extra work without your approval, an invoice, a warranty and a reply to any complaint within {{ (int) config('fachora.dispute_hours') }} hours. If its rating drops below {{ number_format((float) config('fachora.min_rating'), 1, '.', '') }} or justified complaints come in, the company is removed from the list.@if($protect) With <a href="{{ route('fachora.protect') }}">Fachora Protect</a> you pay only once the work is done.@else You pay only once the work is done, directly to the company.@endif More: <a href="{{ route('fachora.how') }}">how it works</a>.</p>
   </div>
 </section>
 @endsection
