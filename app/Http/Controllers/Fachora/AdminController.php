@@ -74,6 +74,7 @@ class AdminController extends Controller
             'filters' => ['status' => $status, 'q' => $q, 'categorie' => $category],
             'categories' => Fachora::categoryList('pl'),
             'letterCandidates' => $this->letters->candidates(null, null, 1000)->count(),
+            'letterChosen' => $this->letters->chosenCount(),
             'ceidg' => app(\App\Services\Fachora\CeidgClient::class)->configured(),
             'pkdOptions' => collect(config('fachora.categories', []))
                 ->flatMap(fn (array $cat) => collect((array) ($cat['pkd'] ?? []))->map(fn (string $code) => ['code' => $code, 'label' => $code . ' · ' . $cat['pl']]))
@@ -231,10 +232,11 @@ class AdminController extends Controller
         $category = Fachora::hasCategory($request->query('categorie')) ? (string) $request->query('categorie') : null;
         $city = trim((string) $request->query('miasto', '')) ?: null;
         $limit = max(1, min((int) config('fachora.letters_per_batch', 100), (int) $request->query('aantal', 50)));
-        $providers = $this->letters->candidates($category, $city, $limit);
+        $chosen = $request->boolean('gekozen'); // 1.94: alleen bedrijven die een klant uit de lijst koos
+        $providers = $this->letters->candidates($category, $city, $limit, $chosen);
         abort_if($providers->isEmpty(), 404, __('Geen bedrijven met een postadres in deze selectie.'));
 
-        return response($this->letters->pdf($providers), 200, [
+        return response($this->letters->pdf($providers, $chosen), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="fachora-listy-' . now()->format('Ymd') . '.pdf"',
         ]);

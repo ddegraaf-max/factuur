@@ -53,6 +53,11 @@
             Fachora Verified są na górze listy i dostają zapytanie od nas, a nieaktywny profil nie dostaje od nas niczego.
             Nie wysyłamy e-maili ani SMS-ów bez Państwa zgody, dlatego piszemy listownie.</p>
 
+        @if(!empty($chosen))
+        <p><strong>Klient z Państwa okolicy szukał ostatnio na fachora.pl fachowca i wybrał z listy właśnie Państwa firmę.</strong>
+            Ponieważ profil jest nieaktywny, zobaczył tylko dane z rejestru i musiał sam szukać kontaktu — nie mogliśmy
+            przekazać mu Państwa oferty. Z aktywnym profilem takie zapytanie trafia prosto na Państwa e-mail.</p>
+        @endif
         <p>Co daje aktywny profil ze znakiem <strong>Fachora Verified</strong>:</p>
         <ul>
             <li>zapytania z Państwa okolicy wprost na e-mail, z opisem, zdjęciami i terminem; cenę podają Państwo z góry,</li>

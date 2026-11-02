@@ -34,6 +34,8 @@
         <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.93.0</div>
         <h2>Fachora: AI-hulp bij de omschrijving en een zandloper tijdens het zoeken</h2>
         <ul class="tl-list">
+          <li><b>De klant als boodschapper (1.94.0)</b> — het kant-en-klare Poolse bericht waarmee de klant een registerbedrijf benadert, noemt nu in één zin dat het bedrijf al een profiel op fachora.pl heeft en dat in twee minuten kan overnemen. Fachora stuurt het bedrijf zelf nog steeds niets.</li>
+          <li><b>Brieven aan gekozen bedrijven (1.94.0)</b> — in het beheer kun je de claimbrieven beperken tot bedrijven die een klant uit de lijst koos maar nog niet geclaimd hebben; die brief vertelt dat een klant uit de buurt hen koos en alleen de registergegevens zag.</li>
           <li><b>Help me beschrijven</b> — in stap 3 van de aanvraag schrijft de klant in zijn eigen taal; de assistent maakt er een complete omschrijving van, laat zien wat het bedrijf in het Pools te zien krijgt en stelt hooguit drie vragen over wat nog ontbreekt (gas of elektrisch, welke verdieping, afmetingen). De klant kiest zelf of hij het voorstel overneemt; niets wordt opgeslagen.</li>
           <li><b>Zandloper</b> — zolang de app na de bevestiging live in het bedrijvenregister zoekt, ziet de klant een draaiende zandloper en een lopende balk; de pagina ververst vanzelf.</li>
         </ul>

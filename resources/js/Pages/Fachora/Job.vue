@@ -99,7 +99,9 @@ onBeforeUnmount(() => clearInterval(searchTimer));
 const mailtoFor = (p) => {
   const j = props.job || {};
   const subject = t('Zapytanie: :title (:city)', { title: j.title || '', city: j.city || '' });
-  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', j.customer_name || ''].join('\n');
+  // 1.94: de klant is de boodschapper — één feitelijke zin over het bestaande profiel (Fachora stuurt het bedrijf zelf niets).
+  const profileLine = p.url ? 'Państwa firma jest już na fachora.pl (profil z rejestru): ' + p.url + '. Jeśli chcą Państwo otrzymywać takie zapytania bezpośrednio, profil można przejąć w dwie minuty na tej stronie.' : '';
+  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', profileLine, profileLine ? '' : null, j.customer_name || ''].filter((line) => line !== null).join('\n');
   return 'mailto:' + p.email + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
 };
 

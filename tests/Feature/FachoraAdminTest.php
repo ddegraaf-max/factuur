@@ -210,6 +210,28 @@ class FachoraAdminTest extends TestCase
         Mail::assertNothingSent();
     }
 
+    /** 1.94: brieven alleen aan bedrijven die een klant uit de lijst koos; de brief krijgt dan de extra alinea. */
+    public function test_letters_can_be_limited_to_companies_a_customer_picked(): void
+    {
+        $this->owner();
+        $a = $this->provider('Hydro A');
+        $b = $this->provider('Hydro B');
+        $this->job(['status' => 'selecting', 'selected_providers' => [$b->id, 999999]]);
+        $this->job(['status' => 'selecting', 'selected_providers' => [$b->id], 'created_at' => now()->subMonths(8)]); // te oud: telt niet mee
+
+        $letters = app(LetterService::class);
+        $this->assertSame([$b->id], array_values(array_intersect($letters->chosenIds(), [$a->id, $b->id])));
+        $this->assertSame([$b->id], $letters->candidates(null, null, 100, true)->pluck('id')->all());
+        $this->assertEqualsCanonicalizing([$a->id, $b->id], $letters->candidates(null, null, 100)->pluck('id')->all(), 'Zonder de optie blijft alles');
+        $this->assertSame(1, $letters->chosenCount());
+
+        $this->get(route('fachora.admin.letters', ['gekozen' => 1]))->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        $this->assertNull($a->fresh()->claim_code, 'Niet gekozen, dus geen brief');
+        $this->assertNotNull($b->fresh()->claim_code);
+        $this->get(route('fachora.admin.letters', ['gekozen' => 1, 'categorie' => 'elektryk']))->assertNotFound();
+        $this->get(route('fachora.admin.providers'))->assertInertia(fn (Assert $p) => $p->where('letterChosen', 1));
+    }
+
     public function test_letters_are_a_pdf_for_unclaimed_companies_with_a_postal_address(): void
     {
         $this->owner();

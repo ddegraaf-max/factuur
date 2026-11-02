@@ -390,5 +390,7 @@
   "Fachora Protect staat op deze omgeving uit.": "Fachora Protect is off in this environment.",
   "Uitvoering": "Execution",
   "Klaar gemeld": "Reported done",
-  "automatisch akkoord op :date": "automatic approval on :date"
+  "automatisch akkoord op :date": "automatic approval on :date",
+  "Alleen bedrijven die een klant heeft gekozen (:n)": "Only companies a customer has picked (:n)",
+  "De brief zegt dan dat een klant uit de buurt het bedrijf koos, maar alleen de registergegevens zag.": "The letter then says a nearby customer picked the company but only saw its register details."
 }

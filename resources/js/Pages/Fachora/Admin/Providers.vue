@@ -18,6 +18,7 @@ const props = defineProps({
   filters: Object,
   categories: { type: Array, default: () => [] },
   letterCandidates: { type: Number, default: 0 },
+  letterChosen: { type: Number, default: 0 }, // 1.94: niet-geclaimd én door een klant gekozen
   ceidg: { type: Boolean, default: false },
   pkdOptions: { type: Array, default: () => [] },
   jobCounts: { type: Object, default: () => ({}) },
@@ -63,10 +64,11 @@ const runCeidg = () => ceidgForm.post(route('fachora.admin.ceidg'), { preserveSc
 
 /* ---------- brieven ---------- */
 const lettersModal = ref(false);
-const letters = ref({ categorie: '', miasto: '', aantal: 50 });
+const letters = ref({ categorie: '', miasto: '', aantal: 50, gekozen: false });
 const lettersUrl = computed(() => route('fachora.admin.letters', {
   categorie: letters.value.categorie || undefined,
   miasto: letters.value.miasto || undefined,
+  gekozen: letters.value.gekozen ? 1 : undefined,
   aantal: Math.max(1, Math.min(100, Number(letters.value.aantal) || 50)),
 }));
 </script>
@@ -239,6 +241,9 @@ const lettersUrl = computed(() => route('fachora.admin.letters', {
           <div class="form-group">
             <label>{{ $t('Aantal brieven') }} <span class="label-hint">{{ $t('(max. 100)') }}</span></label>
             <input type="number" min="1" max="100" v-model.number="letters.aantal" style="width:120px;">
+          </div>
+          <div class="form-group">
+            <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer;"><input type="checkbox" v-model="letters.gekozen" style="margin-top:3px;"> <span>{{ $t('Alleen bedrijven die een klant heeft gekozen (:n)', { n: letterChosen }) }}<br><span class="sub">{{ $t('De brief zegt dan dat een klant uit de buurt het bedrijf koos, maar alleen de registergegevens zag.') }}</span></span></label>
           </div>
         </div>
         <div class="modal-footer">

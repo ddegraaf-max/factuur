@@ -390,5 +390,7 @@
   "Fachora Protect staat op deze omgeving uit.": "Fachora Protect jest wyłączone w tym środowisku.",
   "Uitvoering": "Realizacja",
   "Klaar gemeld": "Zgłoszono zakończenie",
-  "automatisch akkoord op :date": "automatyczna akceptacja :date"
+  "automatisch akkoord op :date": "automatyczna akceptacja :date",
+  "Alleen bedrijven die een klant heeft gekozen (:n)": "Tylko firmy wybrane przez klienta (:n)",
+  "De brief zegt dan dat een klant uit de buurt het bedrijf koos, maar alleen de registergegevens zag.": "List mówi wtedy, że klient z okolicy wybrał tę firmę, ale zobaczył tylko dane z rejestru."
 }

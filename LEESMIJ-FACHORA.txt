@@ -233,6 +233,15 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+KLANT ALS BOODSCHAPPER EN BRIEVEN AAN GEKOZEN BEDRIJVEN (2 nov 2026, 1.94.0)
+- Het kant-en-klare Poolse mailtje van de klant aan een registerbedrijf (Job.vue mailtoFor) eindigt met
+  één feitelijke zin: "Państwa firma jest już na fachora.pl (profil z rejestru): <profiel-url> …profil można
+  przejąć w dwie minuty". De klant verstuurt het zelf; Fachora stuurt het bedrijf nog steeds niets.
+- Brieven (Eigenaar → Fachora → bedrijven → Brieven (pdf)): vinkje "Alleen bedrijven die een klant heeft
+  gekozen" (?gekozen=1 → LetterService::candidates(..., chosenOnly) op selected_providers van de laatste
+  6 maanden). De brief krijgt dan de alinea "Klient z Państwa okolicy … wybrał z listy właśnie Państwa firmę".
+  Advies: die brieven wekelijks printen; dat is het sterkste moment om te claimen.
+
 AI-HULP BIJ DE OMSCHRIJVING EN ZANDLOPER (2 nov 2026, 1.93.0)
 - Stap 3 van de aanvraag: knop "Pomóż mi opisać / Help me describe it" → POST /zlecenie/asystent
   (IntakeController@assist, StructuredClaude, throttle 12/min). De klant schrijft in zijn eigen taal;
