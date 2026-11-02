@@ -2094,5 +2094,13 @@
   "Opnieuw kiezen kan nu niet.": "Picking again is not possible right now.",
   "Vastgelegd. Rond de opdracht hier af zodra het werk klaar is.": "Recorded. Close the job here once the work is done.",
   "Afgerond. Bedankt dat je Fachora hebt gebruikt.": "Closed. Thank you for using Fachora.",
-  "Kies hieronder opnieuw tot :n bedrijven.": "Pick up to :n companies again below."
+  "Kies hieronder opnieuw tot :n bedrijven.": "Pick up to :n companies again below.",
+  "Aanvragen en bevestigingsmails": "Requests and confirmation e-mails",
+  "Sms-codes": "SMS codes",
+  "Bedrijvenregister (CEIDG)": "Business register (CEIDG)",
+  "AI-hulp bij de omschrijving": "AI help with the description",
+  "Bedrijvenpaneel en inloggen": "Company panel and login",
+  "Betalingen voor bedrijven (Stripe)": "Payments for companies (Stripe)",
+  "Foto's bij aanvragen": "Photos with requests",
+  "Planner (zoeken in het register, opschonen, herinneringen)": "Background tasks (register search, clean-up, reminders)"
 }

@@ -1,11 +1,11 @@
 @extends('layouts.marketing')
 
 {{--
-  WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
+  Oznaczenie „wersja robocza” zdjęte 2 listopada 2026 (decyzja właściciela). Punkt 4 opisuje import z rejestru,
+  wykorzystanie i cały proces usuwania; liczby z config/fachora.php.
   Polityka prywatności Fachora (RODO). Administrator: Creditline B.V. (Bussum, Holandia). Obejmuje Klientów, Firmy
   (dane z rejestrów na podstawie art. 6 ust. 1 lit. f, przejęty profil na podstawie lit. b, weryfikację,
   Stripe jako odrębnego administratora), osoby reprezentujące Firmy i odwiedzających. Fachora Protect tylko gdy fachora_protect().
-  Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
 
 @section('title', 'Polityka prywatności Fachora')
@@ -115,7 +115,7 @@
         <tr><td>Zawarcie i wykonanie umowy między klientem a firmą: potwierdzenie zlecenia, termin, prace dodatkowe, akceptacja, faktura</td><td>przebieg zlecenia, adres wykonania usługi</td><td>art. 6 ust. 1 lit. b; wobec firmy — lit. b (umowa o korzystanie z platformy)</td><td>okres gwarancji (standardowo {{ (int) config('fachora.default_warranty_months') }} miesięcy) i okres przedawnienia roszczeń — do 6 lat od zakończenia zlecenia</td></tr>
         @if(fachora_protect())<tr><td>Fachora Protect: rezerwacja, wypłata, zwrot, rozstrzyganie sporów</td><td>status płatności, kwoty, spór z opisem i zdjęciami, korespondencja</td><td>art. 6 ust. 1 lit. b; art. 6 ust. 1 lit. c — przepisy podatkowe i rachunkowe</td><td>jak wyżej; dokumenty księgowe 5 lat od końca roku podatkowego</td></tr>@endif
         <tr><td>Opinie i ich publikacja, odpowiedzi firm</td><td>ocena, tekst, numer zlecenia, data</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes: rzetelna informacja o firmach dla klientów</td><td>dopóki profil firmy jest na platformie; na żądanie autora tekst można zanonimizować</td></tr>
-        <tr><td>Profil nieaktywny z rejestru publicznego</td><td>dane rejestrowe</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (pkt 4)</td><td>do żądania usunięcia albo do 12 miesięcy po wykreśleniu z rejestru; po usunięciu tylko NIP i data żądania</td></tr>
+        <tr><td>Profil nieaktywny z rejestru publicznego</td><td>dane rejestrowe</td><td>art. 6 ust. 1 lit. f — prawnie uzasadniony interes (pkt 4)</td><td>{{ (int) config('fachora.register_keep_days') }} dni od pobrania, jeżeli żaden klient firmy nie wybrał; firmy spoza branż fachowych do godziny; firma wybrana przez klienta tak długo, jak trwa jego zlecenie; na żądanie natychmiast (po usunięciu tylko NIP i data żądania) — pkt 4</td></tr>
         <tr><td>Przejęcie profilu, prowadzenie konta firmy, panel, komunikacja o zleceniach</td><td>dane przejętego profilu, konto, działalność na platformie</td><td>art. 6 ust. 1 lit. b — umowa o korzystanie z platformy</td><td>czas trwania umowy i 6 lat po jej zakończeniu (przedawnienie roszczeń)</td></tr>
         <tr><td>Weryfikacja i oznaczenie Fachora Verified, identyfikowalność przedsiębiorcy (art. 30 DSA), egzekwowanie Standardu Fachora</td><td>dane weryfikacji,{{ fachora_protect() ? ' wynik weryfikacji w Stripe,' : '' }} polisa, naruszenia</td><td>art. 6 ust. 1 lit. c — rozporządzenie (UE) 2022/2065; art. 6 ust. 1 lit. f — bezpieczeństwo klientów i platformy</td><td>czas trwania umowy i 6 miesięcy po jej zakończeniu (DSA); informacje o poważnych naruszeniach i zablokowany NIP — 5 lat</td></tr>
         <tr><td>Prowizja: faktury, rozliczenia, windykacja</td><td>dane firmy, kwoty zleceń, faktury</td><td>art. 6 ust. 1 lit. b i lit. c (przepisy podatkowe)</td><td>5 lat od końca roku podatkowego</td></tr>
@@ -127,10 +127,35 @@
     </div>
     <p>Podanie danych jest dobrowolne, ale bez adresu e-mail nie możemy przyjąć zlecenia, a bez danych weryfikacyjnych firma nie może zostać Fachora Verified. Po upływie okresów dane usuwamy albo anonimizujemy; kopie zapasowe są nadpisywane w ciągu 30 dni.</p>
 
-    <h2 id="s4">4. Firmy z rejestrów publicznych — na jakiej zasadzie</h2>
-    <div class="box"><b>Krótko:</b> firmę z rejestru pokazujemy tylko z nazwy, miejscowości i rodzaju działalności. Nie publikujemy jej telefonu, e-maila ani adresu. Nie wysyłamy jej żadnych wiadomości, chyba że firma sama założyła konto i zaakceptowała regulamin. Jeżeli klient sam wybierze firmę z rejestru do swojego zlecenia, pokazujemy mu jej adres e-mail i numer telefonu z CEIDG, aby mógł skontaktować się z nią bezpośrednio. Dane takiej firmy usuwamy po 14 dniach, jeżeli nie doszło do współpracy przez platformę. Każda taka wiadomość zawiera link do rezygnacji. Firma może w każdej chwili zażądać usunięcia profilu.</div>
-    <p>Tworzymy nieaktywne profile firm z branż obsługiwanych przez Fachora na podstawie danych udostępnianych publicznie przez CEIDG, KRS i wykaz podatników VAT, aby klient mógł sprawdzić, czy dana firma jest już Fachora Verified, a firma — przejąć swój profil. Podstawą jest nasz prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO): zbudowanie rzetelnego katalogu firm i umożliwienie im przystąpienia do platformy. Oceniliśmy, że interes ten nie narusza praw przedsiębiorców, ponieważ: dane są już publicznie dostępne w celu obrotu gospodarczego, publikujemy ich minimalny zakres bez danych kontaktowych, adres e-mail z rejestru wykorzystujemy wyłącznie do przekazania zapytania klienta, który sam wybrał daną firmę (bez treści reklamowych, z informacją o źródle danych i linkiem do rezygnacji), a rezygnacja lub usunięcie profilu następuje na proste żądanie.</p>
-    <p>Dane rejestrowe aktualizujemy okresowo z tych samych źródeł. Po żądaniu usunięcia zachowujemy wyłącznie numer NIP z datą żądania, aby nie utworzyć profilu ponownie przy kolejnym imporcie; jest to realizacja Twojego sprzeciwu, nie dalsze przetwarzanie w pierwotnym celu.</p>
+    <h2 id="s4">4. Firmy z rejestrów publicznych — import, wykorzystanie i usuwanie</h2>
+    <div class="box"><b>Krótko:</b> dane firm z CEIDG pobieramy tylko na potrzeby konkretnego zlecenia, w promieniu {{ (int) config('fachora.region_radius_km') }} km od klienta, wyłącznie z publicznymi danymi i tylko wtedy, gdy główna działalność firmy to usługi fachowe. Nie wysyłamy tym firmom żadnych wiadomości. Pokazujemy je wyłącznie klientowi, który potwierdził zlecenie; dane kontaktowe widzi dopiero po zaznaczeniu firmy. Firmy, których nikt nie wybrał, usuwamy po {{ (int) config('fachora.register_keep_days') }} dniach, firmy spoza branż fachowych w ciągu godziny, a firmę usuniętą z listy przez klienta natychmiast. Każde usunięcie odnotowujemy w rejestrze rozliczalności, bez danych osobowych.</div>
+
+    <h3>Kiedy i skąd pobieramy dane</h3>
+    <p>Dane pochodzą wyłącznie z publicznych rejestrów: z CEIDG (interfejs dane.biznes.gov.pl), w razie potrzeby z KRS, a status podatkowy sprawdzamy w wykazie podatników VAT. Pobranie następuje automatycznie i tylko wtedy, gdy klient potwierdził zlecenie e-mailem, a w jego okolicy jest mniej niż {{ (int) config('fachora.local_import_min') }} firm do wyboru. Szukamy po kodzie PKD odpowiadającym kategorii zlecenia, w miejscowości klienta i jej okolicy, do {{ (int) config('fachora.region_radius_km') }} km. Pobieramy tylko firmy aktywne, które mają w rejestrze publiczny adres e-mail; dla każdej pobieramy rekord szczegółowy, aby poznać jej główną działalność.</p>
+
+    <h3>Jakie dane zapisujemy</h3>
+    <p>Nazwę, NIP i REGON, adres działalności i miejscowość, publiczny adres e-mail, numer telefonu i stronę WWW z rejestru, kody PKD (w tym główny), status wpisu, identyfikator wpisu w CEIDG, współrzędne miejscowości (do obliczania odległości) oraz datę pobrania i datę sprawdzenia głównej działalności. Nie pobieramy dokumentów ani innych danych niż te, które przedsiębiorca sam ujawnił w rejestrze.</p>
+
+    <h3>Czego nie importujemy i czego nie robimy</h3>
+    <p>Firm, których główna działalność nie należy do branż fachowych (budownictwo, instalacje, naprawy, sprzątanie specjalistyczne w tym kominiarstwo, ogrody i pokrewne), nie importujemy, nawet jeśli mają kod branżowy wpisany jako działalność dodatkową. Jeżeli taka firma trafiła do bazy wcześniej, automatyczne sprawdzenie (co godzinę) usuwa ją. Firmom z rejestru nie wysyłamy żadnych e-maili ani SMS-ów: ani zapytań, ani informacji handlowych. Jedyną formą kontaktu z naszej strony może być list pocztowy z kodem do przejęcia profilu.</p>
+
+    <h3>Kto widzi te dane</h3>
+    <p>Listę firm (nazwa, miejscowość, odległość, główna działalność, oznaczenie „z rejestru”) widzi wyłącznie klient, który potwierdził zlecenie i swój numer telefonu. Publiczny adres e-mail i numer telefonu z rejestru pokazujemy mu dopiero po zaznaczeniu firmy i wysłaniu wyboru; klient kontaktuje się z firmą sam, z własnej skrzynki lub telefonu, a Fachora nie pośredniczy w tej korespondencji. Publiczna strona profilu firmy z rejestru zawiera tylko nazwę, miejscowość i rodzaj działalności, bez danych kontaktowych, i jest wyłączona z indeksowania przez wyszukiwarki.</p>
+
+    <h3>Jak długo przechowujemy i kiedy usuwamy</h3>
+    <ul>
+      <li><strong>Firma, której żaden klient nie wybrał i która nie dostała od nas żadnej wiadomości:</strong> usuwana automatycznie po {{ (int) config('fachora.register_keep_days') }} dniach od pobrania (sprawdzenie codziennie).</li>
+      <li><strong>Firma spoza branż fachowych (główne PKD poza listą branż):</strong> usuwana w ciągu godziny od ustalenia głównej działalności; brakującą główną działalność sprawdzamy w CEIDG partiami, co godzinę.</li>
+      <li><strong>Firma usunięta przez klienta z jego listy:</strong> usuwana natychmiast, jeżeli nie wybrał jej inny klient i nie było z nią współpracy przez platformę.</li>
+      <li><strong>Firma wybrana przez klienta:</strong> pozostaje tak długo, jak trwa to zlecenie; jej nazwa i dane kontaktowe są wtedy częścią zlecenia klienta i podlegają okresom z pkt 3.</li>
+      <li><strong>Firma, która przejęła profil:</strong> staje się firmą z kontem i stosują się do niej zasady z pkt 2 i 3.</li>
+      <li><strong>Na żądanie firmy:</strong> usuwamy profil niezwłocznie i zachowujemy wyłącznie NIP z datą żądania, aby nie utworzyć profilu ponownie przy kolejnym pobraniu; to realizacja sprzeciwu (art. 21 RODO), nie dalsze przetwarzanie w pierwotnym celu.</li>
+    </ul>
+    <p>Każde automatyczne i ręczne usunięcie zapisujemy w wewnętrznym rejestrze rozliczalności (data, rodzaj, liczba rekordów, bez danych osobowych), aby móc wykazać, że dane nie są przechowywane dłużej, niż to konieczne (art. 5 ust. 1 lit. c i e RODO).</p>
+
+    <h3>Podstawa prawna i Twoje prawa</h3>
+    <p>Podstawą jest nasz prawnie uzasadniony interes oraz interes klienta (art. 6 ust. 1 lit. f RODO): umożliwienie klientowi znalezienia fachowca w okolicy na podstawie danych, które przedsiębiorca sam ujawnił w publicznym rejestrze w celu kontaktu w obrocie gospodarczym. Oceniliśmy, że interes ten nie narusza praw przedsiębiorców, ponieważ zakres danych jest minimalny, dane widzi tylko jeden klient z konkretnym zleceniem, nie wysyłamy żadnych wiadomości, okres przechowywania jest krótki, a sprzeciw lub usunięcie następuje na proste żądanie. Przedsiębiorca może w każdej chwili wnieść sprzeciw, zażądać usunięcia albo przejąć profil (pkt 10 i 13).</p>
+
     <p>Jeżeli otrzymałeś od nas list: adres korespondencyjny pochodzi z rejestru, a kod w liście służy wyłącznie do potwierdzenia, że osoba przejmująca profil ma dostęp do adresu firmy. Kod traci ważność po wykorzystaniu.</p>
 
     <h2 id="s5">5. Komu przekazujemy dane</h2>
@@ -187,7 +212,6 @@
     <h2 id="s13">13. Kontakt</h2>
     <p>W sprawach danych osobowych napisz na <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (w temacie „RODO”) albo listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia. Zasady korzystania z platformy opisuje <a href="{{ route('pl.regulamin') }}">regulamin</a>.</p>
 
-    <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Pytania dotyczące prywatności: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>
 </section>
 @endsection

@@ -1,10 +1,9 @@
 @extends('layouts.marketing')
 
 {{--
-  WERSJA ROBOCZA — DO WERYFIKACJI PRZEZ PRAWNIKA.
+  Oznaczenie „wersja robocza” zdjęte 2 listopada 2026 (decyzja właściciela).
   Regulamin platformy Fachora (pośrednictwo między Klientem a Firmą; Fachora Protect przez Stripe, tylko gdy fachora_protect();
   prowizja od Firmy; DSA; prawa konsumenta). Liczby (prowizja, terminy) z config/fachora.php.
-  Oznaczenie „wersja robocza” celowo dyskretne, na dole strony.
 --}}
 
 @php
@@ -282,7 +281,6 @@
     <p>4. Kontakt z Usługodawcą: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, <a href="{{ route('pl.kontakt') }}">formularz kontaktowy</a> lub listownie: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, Holandia.</p>
     <p>5. Regulamin w wersji {{ config('fachora.terms_version') }} wchodzi w życie 22 października 2026 r.</p>
 
-    <div class="disclaimer">Wersja robocza do weryfikacji przez prawnika. Uwagi: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>
 </section>
 @endsection

@@ -1,9 +1,9 @@
 @extends('layouts.marketing')
 
 {{--
-  DRAFT — PENDING LEGAL REVIEW.
+  "Draft" marker removed on 2 November 2026 (owner's decision).
   Fachora platform terms of service, English edition (convenience translation; the Polish text is binding).
-  Numbers (commission, deadlines) come from config/fachora.php. The "draft" marker is deliberately discreet, at the bottom.
+  Numbers (commission, deadlines) come from config/fachora.php. No draft marker on the page.
 --}}
 
 @php
@@ -282,7 +282,6 @@
     <p>4. Contact with the Service Provider: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>, the <a href="{{ route('pl.kontakt') }}">contact form</a>, or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands.</p>
     <p>5. Version {{ config('fachora.terms_version') }} of these Terms takes effect on 22 October 2026.</p>
 
-    <div class="disclaimer">Draft pending legal review. Remarks: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>
 </section>
 @endsection

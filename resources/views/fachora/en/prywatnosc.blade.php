@@ -1,11 +1,11 @@
 @extends('layouts.marketing')
 
 {{--
-  DRAFT — PENDING LEGAL REVIEW.
+  "Draft" marker removed on 2 November 2026 (owner's decision). Section 4 describes the register import, use and the
+  whole deletion process; numbers from config/fachora.php.
   Fachora privacy policy (GDPR), English edition (convenience translation; the Polish text is binding).
   Controller: Creditline B.V. (Bussum, the Netherlands). Covers customers, companies (register data under Art. 6(1)(f), claimed profile under (b),
   verification, Stripe as an independent controller), companies' representatives and visitors. Fachora Protect only when fachora_protect().
-  The "draft" marker is deliberately discreet, at the bottom.
 --}}
 
 @section('title', 'Fachora privacy policy')
@@ -118,7 +118,7 @@
         <tr><td>Conclusion and performance of the contract between customer and company: job confirmation, appointment, extra work, approval, invoice</td><td>course of the job, service address</td><td>Art. 6(1)(b); towards the company — (b) (contract for use of the platform)</td><td>warranty period ({{ (int) config('fachora.default_warranty_months') }} months by default) and the limitation period for claims — up to 6 years from completion of the job</td></tr>
         @if(fachora_protect())<tr><td>Fachora Protect: reservation, payout, refund, dispute decisions</td><td>payment status, amounts, dispute with description and photos, correspondence</td><td>Art. 6(1)(b); Art. 6(1)(c) — tax and accounting law</td><td>as above; accounting records 5 years from the end of the tax year</td></tr>@endif
         <tr><td>Reviews and their publication, companies' replies</td><td>rating, text, job number, date</td><td>Art. 6(1)(f) — legitimate interest: reliable information about companies for customers</td><td>as long as the company's profile is on the platform; at the author's request the text can be anonymised</td></tr>
-        <tr><td>Inactive profile from a public register</td><td>register data</td><td>Art. 6(1)(f) — legitimate interest (section 4)</td><td>until a removal request or up to 12 months after deregistration; after removal only the NIP and the date of the request</td></tr>
+        <tr><td>Inactive profile from a public register</td><td>register data</td><td>Art. 6(1)(f) — legitimate interest (section 4)</td><td>{{ (int) config('fachora.register_keep_days') }} days after fetching if no customer picked the company; companies outside the trades within an hour; a company a customer picked as long as that job lasts; on request immediately (afterwards only the NIP and the date of the request) — section 4</td></tr>
         <tr><td>Claiming a profile, running the company account, the panel, communication about jobs</td><td>claimed-profile data, account, activity on the platform</td><td>Art. 6(1)(b) — contract for use of the platform</td><td>duration of the contract and 6 years after it ends (limitation of claims)</td></tr>
         <tr><td>Verification and the Fachora Verified mark, trader traceability (Art. 30 DSA), enforcing the Fachora Standard</td><td>verification data,{{ fachora_protect() ? ' Stripe verification result,' : '' }} policy, breaches</td><td>Art. 6(1)(c) — Regulation (EU) 2022/2065; Art. 6(1)(f) — safety of customers and the platform</td><td>duration of the contract and 6 months after it ends (DSA); records of serious breaches and a blocked NIP — 5 years</td></tr>
         <tr><td>Commission: invoices, settlements, debt collection</td><td>company data, job amounts, invoices</td><td>Art. 6(1)(b) and (c) (tax law)</td><td>5 years from the end of the tax year</td></tr>
@@ -130,10 +130,35 @@
     </div>
     <p>Providing data is voluntary, but without an e-mail address we cannot accept a request, and without verification data a company cannot become Fachora Verified. When the periods expire we delete or anonymise the data; backups are overwritten within 30 days.</p>
 
-    <h2 id="s4">4. Companies from public registers — on what basis</h2>
-    <div class="box"><b>In short:</b> a company from a register is shown only by name, town and type of activity. We do not publish its phone number, e-mail or address. We send it no messages at all unless the company itself has created an account and accepted the terms. If a customer chooses a register company for their job, we show that customer the company's e-mail address and phone number from CEIDG so they can contact it directly. We delete such a company's data after 14 days unless it works with us through the platform. Every such message contains an unsubscribe link. A company can request removal of its profile at any time.</div>
-    <p>We create inactive profiles of companies in the trades served by Fachora from data made public by CEIDG, KRS and the VAT taxpayer list, so that a customer can check whether a given company is already Fachora Verified and a company can claim its profile. The basis is our legitimate interest (Art. 6(1)(f) GDPR): building a reliable directory of companies and enabling them to join the platform. We have assessed that this interest does not override the traders' rights because: the data are already public for the purposes of business dealings, we publish a minimal set without contact details, we use the e-mail address from the register only to pass on a request from a customer who chose that company (no advertising, with information on the source of the data and an unsubscribe link), and opting out or removal of the profile happens on simple request.</p>
-    <p>We update register data periodically from the same sources. After a removal request we keep only the NIP with the date of the request, so as not to create the profile again on the next import; this gives effect to your objection and is not further processing for the original purpose.</p>
+    <h2 id="s4">4. Companies from public registers — import, use and deletion</h2>
+    <div class="box"><b>In short:</b> we fetch company data from CEIDG only for a specific job, within {{ (int) config('fachora.region_radius_km') }} km of the customer, only public data, and only when the company's main activity is trade work. We send these companies no messages at all. We show them only to the customer who confirmed the request; contact details appear only after the customer ticks a company. Companies nobody picked are deleted after {{ (int) config('fachora.register_keep_days') }} days, companies outside the trades within an hour, and a company the customer removed from their list immediately. Every deletion is recorded in an accountability log, without personal data.</div>
+
+    <h3>When and where we fetch the data</h3>
+    <p>The data come only from public registers: CEIDG (the dane.biznes.gov.pl interface), KRS where needed, and the VAT taxpayer list for tax status. Fetching happens automatically and only when a customer has confirmed a request by e-mail and fewer than {{ (int) config('fachora.local_import_min') }} companies are available nearby. We search by the activity code (PKD) matching the job category, in the customer's town and its surroundings, up to {{ (int) config('fachora.region_radius_km') }} km. We fetch only active companies that have a public e-mail address in the register; for each we fetch the detail record to learn its main activity.</p>
+
+    <h3>What we store</h3>
+    <p>Name, NIP and REGON, business address and town, the public e-mail address, phone number and website from the register, activity codes (including the main one), register status, the CEIDG entry identifier, the coordinates of the town (to calculate distance), and the dates of fetching and of checking the main activity. We fetch no documents and no data other than what the trader has disclosed in the register.</p>
+
+    <h3>What we do not import and do not do</h3>
+    <p>Companies whose main activity is not trade work (construction, installations, repairs, specialist cleaning including chimney sweeping, gardens and related) are not imported, even if they list a trade code as a secondary activity. If such a company entered the database earlier, an automatic check (every hour) removes it. We send register companies no e-mails or text messages: no requests and no commercial information. The only contact from our side can be a postal letter with a code to claim the profile.</p>
+
+    <h3>Who sees the data</h3>
+    <p>The list of companies (name, town, distance, main activity, the "from the register" mark) is seen only by the customer who confirmed the request and their phone number. We show that customer the public e-mail address and phone number from the register only after they tick the company and send their choice; the customer contacts the company themselves, from their own mailbox or phone, and Fachora is not part of that correspondence. The public profile page of a register company contains only the name, town and type of activity, without contact details, and is excluded from search-engine indexing.</p>
+
+    <h3>How long we keep the data and when we delete it</h3>
+    <ul>
+      <li><strong>A company no customer picked and that received no message from us:</strong> deleted automatically {{ (int) config('fachora.register_keep_days') }} days after fetching (checked daily).</li>
+      <li><strong>A company outside the trades (main activity code outside the trade list):</strong> deleted within an hour of determining its main activity; a missing main activity is looked up in CEIDG in batches, every hour.</li>
+      <li><strong>A company the customer removed from their list:</strong> deleted immediately if no other customer picked it and there was no cooperation through the platform.</li>
+      <li><strong>A company a customer picked:</strong> kept as long as that job lasts; its name and contact details are then part of the customer's job and follow the periods in section 3.</li>
+      <li><strong>A company that claimed its profile:</strong> becomes a company with an account; sections 2 and 3 apply.</li>
+      <li><strong>At the company's request:</strong> we delete the profile without delay and keep only the NIP with the date of the request, so as not to create the profile again on the next fetch; this gives effect to the objection (Art. 21 GDPR) and is not further processing for the original purpose.</li>
+    </ul>
+    <p>Every automatic and manual deletion is recorded in an internal accountability log (date, type, number of records, no personal data) so that we can show that data are not kept longer than necessary (Art. 5(1)(c) and (e) GDPR).</p>
+
+    <h3>Legal basis and your rights</h3>
+    <p>The basis is our legitimate interest and the customer's interest (Art. 6(1)(f) GDPR): enabling a customer to find a tradesperson nearby using data the trader disclosed in a public register for the purpose of business contact. We have assessed that this interest does not override the traders' rights because the data set is minimal, the data are seen by one customer with a specific job only, we send no messages, the retention period is short, and an objection or deletion is honoured on simple request. A trader may object, request deletion or claim the profile at any time (sections 10 and 13).</p>
+
     <p>If you received a letter from us: the postal address comes from the register, and the code in the letter serves only to confirm that the person claiming the profile has access to the company's address. The code expires once used.</p>
 
     <h2 id="s5">5. Who we share data with</h2>
@@ -190,7 +215,6 @@
     <h2 id="s13">13. Contact</h2>
     <p>For data protection matters write to <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a> (subject "GDPR") or by post: Creditline B.V., Torenlaan 5B, 1402 AT Bussum, the Netherlands. The rules for using the platform are in the <a href="{{ route('pl.regulamin') }}">terms of service</a>.</p>
 
-    <div class="disclaimer">Draft pending legal review. Privacy questions: <a href="mailto:{{ brand('email') }}">{{ brand('email') }}</a>.</div>
   </div>
 </section>
 @endsection

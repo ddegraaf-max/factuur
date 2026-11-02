@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\Brand;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -48,16 +50,38 @@ class StatusController extends Controller
             || class_exists(\Barryvdh\DomPDF\PDF::class)
         );
 
-        $components = [
-            ['label' => __('Webapplicatie'),            'ok' => true], // rendert = draait
-            ['label' => __('Database'),                 'ok' => $dbOk],
-            ['label' => __('Inloggen & 2FA'),           'ok' => $dbOk],
-            ['label' => __('Facturen & PDF-generatie'), 'ok' => $pdfOk],
-            ['label' => __('Opslag (bijlagen)'),        'ok' => $storageOk],
-            ['label' => __('Cache'),                    'ok' => $cacheOk],
-            ['label' => __('E-mail versturen'),         'ok' => $mailOk],
-            ['label' => __('Herinneringen & incasso'),  'ok' => $dbOk && $mailOk],
-        ];
+        // Planner: de hartslag van schedule:work (zie routes/console.php); ouder dan een kwartier = stil.
+        $heartbeat = (int) Cache::get(HealthController::HEARTBEAT_KEY, 0);
+        $schedulerOk = $heartbeat > 0 && now()->timestamp - $heartbeat < 15 * 60;
+
+        if (Brand::is('fachora')) {
+            // 1.97.1: Fachora is een marktplaats, geen facturatieprogramma: eigen onderdelen.
+            $components = [
+                ['label' => __('Webapplicatie'),                      'ok' => true],
+                ['label' => __('Database'),                           'ok' => $dbOk],
+                ['label' => __('Aanvragen en bevestigingsmails'),     'ok' => $dbOk && $mailOk],
+                ['label' => __('Sms-codes'),                          'ok' => app(\App\Services\SmsService::class)->configured()],
+                ['label' => __('Bedrijvenregister (CEIDG)'),          'ok' => filled(config('fachora.ceidg_token'))],
+                ['label' => __('AI-hulp bij de omschrijving'),        'ok' => app(\App\Services\Ai\StructuredClaude::class)->enabled()],
+                ['label' => __('Bedrijvenpaneel en inloggen'),        'ok' => $dbOk],
+                ['label' => __('Betalingen voor bedrijven (Stripe)'), 'ok' => filled(config('services.stripe.secret'))],
+                ['label' => __("Foto's bij aanvragen"),              'ok' => $dbOk && $storageOk],
+                ['label' => __('E-mail versturen'),                   'ok' => $mailOk],
+                ['label' => __('Cache'),                              'ok' => $cacheOk],
+                ['label' => __('Planner (zoeken in het register, opschonen, herinneringen)'), 'ok' => $schedulerOk],
+            ];
+        } else {
+            $components = [
+                ['label' => __('Webapplicatie'),            'ok' => true], // rendert = draait
+                ['label' => __('Database'),                 'ok' => $dbOk],
+                ['label' => __('Inloggen & 2FA'),           'ok' => $dbOk],
+                ['label' => __('Facturen & PDF-generatie'), 'ok' => $pdfOk],
+                ['label' => __('Opslag (bijlagen)'),        'ok' => $storageOk],
+                ['label' => __('Cache'),                    'ok' => $cacheOk],
+                ['label' => __('E-mail versturen'),         'ok' => $mailOk],
+                ['label' => __('Herinneringen & incasso'),  'ok' => $dbOk && $mailOk],
+            ];
+        }
 
         $allOk = collect($components)->every(fn ($c) => $c['ok']);
 
