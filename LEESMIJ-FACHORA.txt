@@ -233,6 +233,14 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+HOOFDACTIVITEIT IN HET ENGELS (4 nov 2026, 1.100.0, vraag Daniël: "ik spreek geen Pools")
+- providers.pkd_main_name_en; App\Services\Fachora\PkdTranslator::fill() vertaalt de ontbrekende unieke Poolse namen in
+  één StructuredClaude-aanroep (json, 'low') en zet de vertaling bij alle bedrijven met die naam. Aangeroepen aan het
+  eind van fachora:local-search (als er is gezocht/aangevuld) en elke tien minuten via fachora:pkd-translate.
+  Provider::pkdMainName() kiest op app-locale (en → vertaling als die er is, anders Pools); JobController gebruikt
+  dat voor de keuzelijst en het blok "zelf contact opnemen". Zonder AI-sleutel blijft alles Pools.
+- Tests: FachoraPkdTranslateTest.
+
 MOJE ZLECENIA: KLANTLOGIN ZONDER WACHTWOORD (4 nov 2026, 1.99.0, vraag Daniël: "snel en simpel inloggen, desnoods code per mail")
 - /moje-zlecenia (CustomerAccessController, view fachora/moje-zlecenia, pl+en, noindex, link in menu en voettekst
   via config/marketing.php): e-mailadres → code per mail (6 cijfers, Cache 'fachora.my.'+sha1(adres), 15 min,

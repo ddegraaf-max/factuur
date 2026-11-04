@@ -31,7 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.99.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.100.0</div>
+        <h2>Fachora: hoofdactiviteit in het Engels</h2>
+        <ul class="tl-list">
+          <li><b>Vertaald uit CEIDG</b> — de hoofdactiviteit van een registerbedrijf komt letterlijk uit het Poolse register ("Wykonywanie instalacji wodno-kanalizacyjnych …"). Op de Engelse pagina staat die nu in het Engels ("Plumbing, heating, gas and air-conditioning installation"). Elke unieke naam wordt één keer door de AI vertaald en bij het bedrijf opgeslagen: direct na een import op aanvraag en verder elke tien minuten voor wat nog ontbreekt. De Poolse pagina blijft Pools.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">4 november 2026 · {{ brand('version_prefix') }} 1.99.0</div>
         <h2>Fachora: inloggen zonder wachtwoord voor klanten</h2>
         <ul class="tl-list">
           <li><b>Moje zlecenia</b> — op fachora.pl/moje-zlecenia vult de klant zijn e-mailadres in, krijgt een zescijferige code per mail (15 minuten geldig, vijf pogingen) en ziet daarna al zijn aanvragen met status en de link naar elke opdrachtpagina. Geen account, geen wachtwoord; de link staat in het menu en in de voettekst. Of een adres aanvragen heeft, verraadt de pagina niet.</li>

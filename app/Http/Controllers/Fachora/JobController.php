@@ -110,7 +110,7 @@ class JobController extends Controller
                 'id' => $p->id, 'name' => $p->display_name, 'city' => $p->city,
                 'email' => $p->email, 'phone' => $p->phone, 'url' => $p->publicUrl(),
                 // 1.96.2: hoofdactiviteit (welk bedrijf past het best) en WhatsApp-nummer
-                'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkd_main_name,
+                'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkdMainName(), // 1.100: Engels op de Engelse pagina
                 'phone_wa' => \App\Support\Fachora::whatsappNumber($p->phone),
                 'contacted' => $this->jobs->directContacted($job, $p->id), // 1.96.4: {channels, at} of null
                 // 1.98: link naar de deelpagina voor dit bedrijf, en of het die opende / wat het antwoordde
@@ -120,7 +120,7 @@ class JobController extends Controller
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
                     ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months']))
-                        + ['distance_km' => $p->distance_km, 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->claimed_at ? null : $p->pkd_main_name])
+                        + ['distance_km' => $p->distance_km, 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->claimed_at ? null : $p->pkdMainName()])
                     ->values()->all(),
                 'max' => (int) config('fachora.max_offers', 5),
                 'fee' => $this->jobs->requestFee(),

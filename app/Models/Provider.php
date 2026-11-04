@@ -28,7 +28,7 @@ class Provider extends Model
     protected $fillable = [
         'nip', 'regon', 'krs', 'legal_name', 'display_name', 'slug', 'legal_form',
         'address_line', 'postal_code', 'city', 'voivodeship', 'lat', 'lng',
-        'phone', 'email', 'website', 'source', 'source_fetched_at', 'pkd_main', 'pkd_main_name', 'pkd_codes', 'source_id', 'pkd_checked_at',
+        'phone', 'email', 'website', 'source', 'source_fetched_at', 'pkd_main', 'pkd_main_name', 'pkd_main_name_en', 'pkd_codes', 'source_id', 'pkd_checked_at',
         'registry_status', 'vat_status', 'vat_checked_at',
         'status', 'status_reason', 'languages', 'radius_km', 'rates', 'warranty_months', 'invoice_promise', 'protect_opt_in',
         'description', 'photo_data', 'company_id', 'user_id',
@@ -267,6 +267,12 @@ class Provider extends Model
         } while (static::query()->where('claim_code', $code)->exists());
 
         return $code;
+    }
+
+    /** 1.100: hoofdactiviteit in de taal van de pagina (Engels als die vertaling er al is, anders het Pools uit CEIDG). */
+    public function pkdMainName(): ?string
+    {
+        return app()->getLocale() === 'en' && filled($this->pkd_main_name_en) ? $this->pkd_main_name_en : $this->pkd_main_name;
     }
 
     /** Wat de openbare profielpagina en de klant mogen zien. @return array<string, mixed> */

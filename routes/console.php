@@ -170,6 +170,11 @@ Schedule::command('fachora:pkd-check')
     ->hourlyAt(25)
     ->withoutOverlapping(30);
 
+// Fachora 1.100: Poolse hoofdactiviteit naar het Engels (één AI-aanroep per batch unieke namen; niets te doen = geen aanroep).
+Schedule::command('fachora:pkd-translate')
+    ->everyTenMinutes()
+    ->withoutOverlapping(8);
+
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
     Schedule::command('fachora:local-search')
