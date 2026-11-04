@@ -80,7 +80,8 @@ class JobController extends Controller
             $this->jobs->confirm($job, $request);
         }
 
-        return redirect($job->url())->with('flash', $job->fresh()->isSelecting()
+        // 1.101.1: de bevestigde aanvraag is de conversie voor Google Ads (één event, op de eerstvolgende pagina).
+        return redirect($job->url())->with('ads_conversion', 'request')->with('flash', $job->fresh()->isSelecting()
             ? __('Je e-mailadres is bevestigd. Kies nu de bedrijven die je aanvraag krijgen.')
             : __('Je aanvraag is bevestigd. We bieden hem nu aan bij bedrijven in de buurt.'));
     }

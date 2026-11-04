@@ -7,6 +7,7 @@
 <meta name="description" content="@yield('description', brand('seo_description'))">
 @hasSection('robots')<meta name="robots" content="@yield('robots')">
 @endif<title>@yield('title', brand('seo_title'))</title>
+@include('partials.google-ads')
 
 {{-- SEO: canonical + social preview + structured data. Markten met twee UI-talen (Polen: pl + en) krijgen
      per taal een eigen canonical (de Engelse versie leeft op ?lang=en) en hreflang-alternates (1.92). --}}

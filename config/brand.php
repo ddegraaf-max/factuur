@@ -282,6 +282,10 @@ return [
             'seo_description' => 'Fachora pokazuje Ci firmy z Twojej okolicy: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Sam wybierasz, do kogo trafi zapytanie: firmy Fachora Verified z ceną ustaloną z góry, fakturą i gwarancją, albo firmy z rejestru. Bezpłatnie, po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
             'og_description' => 'Sprawdzone firmy. Bezpieczne usługi. Jasna cena, pewny termin, gwarancja.',
             'ld_type' => 'WebSite', // structured data: een marktplaats is een WebSite, geen SoftwareApplication
+            // 1.101.1: Google Ads-conversiemeting (account Polodom.pl, actie "Aanvraag of registratie (alle sites)").
+            // Openbare id's, geen geheimen; leeg = geen tag.
+            'google_ads_tag' => env('GOOGLE_ADS_TAG_FACHORA', 'AW-18521175925'),
+            'google_ads_lead_label' => env('GOOGLE_ADS_LEAD_LABEL_FACHORA', 'YSIXCNr9iLIdEPXuyv9E'),
             'intake_seo_title' => 'Opisz zlecenie i sam wybierz fachowca | Fachora',
             'intake_seo_description' => 'Bezpłatnie i bez konta: opisz, co trzeba zrobić, potwierdź e-mailem i wybierz do 5 firm z okolicy — Fachora Verified i firmy z rejestru CEIDG. Ceny porównasz na swojej stronie zlecenia.',
             'app_description' => 'Platforma fachowców w Polsce: zlecenie online, sam wybierasz firmy z okolicy, oferty od firm Fachora Verified, faktura i 12 miesięcy gwarancji.',

@@ -233,6 +233,16 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+GOOGLE ADS: CONVERSIEMETING (4 nov 2026, 1.101.1, opdracht Daniël: "alle sites staan in Railway dus je kan de tag overal zetten")
+- Google Ads-account Polodom.pl (ocid 8611805993): Google-tag AW-18521175925, conversieactie "Aanvraag of registratie
+  (alle sites)" (categorie Leadformulier indienen, label YSIXCNr9iLIdEPXuyv9E, 1 PLN, telling één per klik).
+- partials/google-ads.blade.php: basistag op elke pagina van een merk met brand('google_ads_tag') (alleen Fachora,
+  config/brand.php, env GOOGLE_ADS_TAG_FACHORA / GOOGLE_ADS_LEAD_LABEL_FACHORA); conversie-event alleen als de
+  sessie 'ads_conversion' heeft (JobController::confirm zet hem bij een bevestigde aanvraag; één keer, verversen
+  telt niet). Ingebouwd in app.blade.php (Inertia) en layouts/marketing.blade.php. Test: FachoraAdsTagTest.
+- Andere sites (aanenuitbouw, PanFrikandel, HonorRoutePoland, polodom/sprzedamfakture) zijn aparte repo's;
+  daar dezelfde tag + event op hun bedankpagina.
+
 HOOFDACTIVITEIT IN HET ENGELS (4 nov 2026, 1.100.0, vraag Daniël: "ik spreek geen Pools")
 - providers.pkd_main_name_en; App\Services\Fachora\PkdTranslator::fill() vertaalt de ontbrekende unieke Poolse namen in
   één StructuredClaude-aanroep (json, 'low') en zet de vertaling bij alle bedrijven met die naam. Aangeroepen aan het
