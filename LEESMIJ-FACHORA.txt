@@ -233,6 +233,16 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+MOJE ZLECENIA: KLANTLOGIN ZONDER WACHTWOORD (4 nov 2026, 1.99.0, vraag Daniël: "snel en simpel inloggen, desnoods code per mail")
+- /moje-zlecenia (CustomerAccessController, view fachora/moje-zlecenia, pl+en, noindex, link in menu en voettekst
+  via config/marketing.php): e-mailadres → code per mail (6 cijfers, Cache 'fachora.my.'+sha1(adres), 15 min,
+  5 pogingen; FachoraMail customer 'login_code' met de code als titel) → sessie fachora_my_email → lijst van
+  eigen aanvragen (lower(customer_email) gelijk, demo-adressen weg, nieuwste eerst, max 50) met status en
+  link (pending → bevestigingspagina). Uitloggen wist de sessiesleutels. Of een adres aanvragen heeft,
+  verraden we niet: zelfde melding na "Wyślij kod", mail alleen als er echt aanvragen zijn.
+- Eigenaarspagina's (fachora.pl/fachora/admin) blijven achter de gewone login (OwnerAccess, e-mail in config).
+- Tests: FachoraCustomerAccessTest.
+
 DEELPAGINA VOOR REGISTERBEDRIJVEN: HET BERICHT VAN DE KLANT IS GEEN SPAM (4 nov 2026, 1.98.0)
 - Aanleiding: drie mails van de klant (vanaf een Nederlands adres) zonder enige reactie. Het bericht leek op
   spam, en de zin "Państwa firma jest już na fachora.pl" leek op de bekende nep-registermails (catalogi die

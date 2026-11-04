@@ -31,7 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.98.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.99.0</div>
+        <h2>Fachora: inloggen zonder wachtwoord voor klanten</h2>
+        <ul class="tl-list">
+          <li><b>Moje zlecenia</b> — op fachora.pl/moje-zlecenia vult de klant zijn e-mailadres in, krijgt een zescijferige code per mail (15 minuten geldig, vijf pogingen) en ziet daarna al zijn aanvragen met status en de link naar elke opdrachtpagina. Geen account, geen wachtwoord; de link staat in het menu en in de voettekst. Of een adres aanvragen heeft, verraadt de pagina niet.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">4 november 2026 · {{ brand('version_prefix') }} 1.98.0</div>
         <h2>Fachora: het bericht aan registerbedrijven bewijst dat het geen spam is</h2>
         <ul class="tl-list">
           <li><b>Opdrachtpagina voor het bedrijf</b> — elk bericht dat de klant zelf verstuurt bevat nu een link naar een eigen, alleen-lezen pagina op fachora.pl voor dat ene bedrijf. Daar staan de klus (omschrijving, plaats, termijn, foto's), wie schrijft en waarom, en dat Fachora zelf geen e-mails of sms stuurt aan bedrijven uit het register. Het bedrijf antwoordt met één klik ("Tak, proszę o kontakt" met telefoon en e-mail, of "Nie, dziękuję") en kan zich met één klik van fachora.pl laten verwijderen.</li>

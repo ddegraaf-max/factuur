@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Fachora\AdminController;
 use App\Http\Controllers\Fachora\ClaimController;
+use App\Http\Controllers\Fachora\CustomerAccessController;
 use App\Http\Controllers\Fachora\IntakeController;
 use App\Http\Controllers\Fachora\JobController;
 use App\Http\Controllers\Fachora\OfferController;
@@ -36,6 +37,11 @@ Route::middleware('brand:fachora')->group(function () {
     Route::post('/zlecenie', [IntakeController::class, 'store'])->middleware(['throttle:10,1', 'turnstile'])->name('fachora.intake.store');
     Route::post('/zlecenie/ponownie', [IntakeController::class, 'resend'])->middleware('throttle:10,1')->name('fachora.intake.resend');
     // AI-hulp bij de omschrijving (1.93): eigen taal in, complete omschrijving + Poolse versie + vragen uit.
+    // 1.99: klantlogin zonder wachtwoord: e-mail + code per mail → lijst van eigen aanvragen.
+    Route::get('/moje-zlecenia', [CustomerAccessController::class, 'show'])->name('fachora.my');
+    Route::post('/moje-zlecenia/kod', [CustomerAccessController::class, 'sendCode'])->middleware('throttle:5,1')->name('fachora.my.code');
+    Route::post('/moje-zlecenia/zaloguj', [CustomerAccessController::class, 'verify'])->middleware('throttle:10,1')->name('fachora.my.verify');
+    Route::post('/moje-zlecenia/wyloguj', [CustomerAccessController::class, 'logout'])->name('fachora.my.logout');
     Route::post('/zlecenie/asystent', [IntakeController::class, 'assist'])->middleware('throttle:12,1')->name('fachora.intake.assist');
 
     // ---------- klant: opdrachtpagina (geheime link) ----------

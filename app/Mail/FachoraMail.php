@@ -79,7 +79,13 @@ class FachoraMail extends Mailable
             $out['eyebrow'] = $eyebrow ?: $out['eyebrow'];
         };
 
-        if ($this->audience === 'customer' && $job) {
+        if ($this->audience === 'customer' && $this->kind === 'login_code') { // 1.99: klantlogin zonder wachtwoord
+            $code = (string) ($this->extra['code'] ?? '');
+            $set(__('Je code voor Mijn opdrachten: :code', ['code' => $code]), $code, [
+                __('Vul deze code in op :url. De code is 15 minuten geldig.', ['url' => route('fachora.my')]),
+                __('Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.'),
+            ], null, [], __('Mijn opdrachten'));
+        } elseif ($this->audience === 'customer' && $job) {
             $jobUrl = $job->url();
             switch ($this->kind) {
                 case 'confirm':

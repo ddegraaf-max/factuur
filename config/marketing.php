@@ -187,10 +187,12 @@ $fachora = [
         ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
         ['route' => 'fachora.for-companies', 'label' => 'Dla firm'],
         ['route' => 'pl.o-nas', 'label' => 'O nas'],
+        ['route' => 'fachora.my', 'label' => 'Moje zlecenia'],
     ],
     'footer' => [
         ['title' => 'Dla klientów', 'links' => [
             ['route' => 'fachora.intake', 'label' => 'Znajdź fachowca'],
+            ['route' => 'fachora.my', 'label' => 'Moje zlecenia'],
             ['route' => 'fachora.how', 'label' => 'Jak to działa'],
             ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
             ['route' => 'fachora.standard', 'label' => 'Standard Fachora'],
@@ -233,10 +235,12 @@ $fachoraEn = [
         ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
         ['route' => 'fachora.for-companies', 'label' => 'For companies'],
         ['route' => 'pl.o-nas', 'label' => 'About'],
+        ['route' => 'fachora.my', 'label' => 'My jobs'],
     ],
     'footer' => [
         ['title' => 'For customers', 'links' => [
             ['route' => 'fachora.intake', 'label' => 'Find a tradesperson'],
+            ['route' => 'fachora.my', 'label' => 'My jobs'],
             ['route' => 'fachora.how', 'label' => 'How it works'],
             ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
             ['route' => 'fachora.standard', 'label' => 'Fachora Standard'],
