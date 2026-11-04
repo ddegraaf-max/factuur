@@ -135,6 +135,16 @@ const markContacted = (p, channel) => {
   router.post(route('fachora.job.direct.contacted', [props.token, p.id]), { channel }, { preserveScroll: true, preserveState: true, only: ['direct'] });
 };
 const done = (p, channel) => !!(p.contacted && p.contacted.channels && p.contacted.channels.includes(channel));
+// 1.99.2: "geen reactie, sluiten": het kaartje klapt in tot één regel; heropenen kan altijd. Zijn alle bedrijven
+// dicht, dan kiest de klant andere bedrijven of sluit hij de aanvraag (annuleren met een vaste reden).
+const isClosed = (p) => !!(p.response && p.response.closed_at);
+const closeDirect = (p, undo = false) => router.post(route('fachora.job.direct.close', [props.token, p.id]), { undo: undo ? 1 : 0 }, { preserveScroll: true, preserveState: true, only: ['direct'] });
+const allClosed = computed(() => props.direct.length > 0 && props.direct.every(isClosed));
+const closeRequest = () => {
+  if (!window.confirm(t('Je aanvraag sluiten? Je kunt altijd een nieuwe doen.'))) return;
+  cancelForm.reason = t('Geen reactie van de gekozen bedrijven');
+  cancel();
+};
 // 1.96.3: van de lijst halen (en als niemand anders het koos: uit de database).
 const removeDirect = (p) => {
   if (!window.confirm(t('Deze firma van je lijst halen? Koos niemand anders haar, dan bewaart Fachora haar registergegevens niet langer.'))) return;
@@ -373,7 +383,13 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
       <p class="fa-small fa-muted">{{ $t('In het bericht staat een link naar een pagina waarop het bedrijf je klus ziet, leest dat het geen spam is en met één klik kan antwoorden. Je ziet hier of het bedrijf de pagina opende en wat het antwoordde.') }}</p>
       <p v-if="job.can_agree_direct" class="fa-note" style="margin:0 0 14px;">{{ $t('Hoe nu verder: de antwoorden komen in je eigen mailbox of op je telefoon. Heb je een afspraak gemaakt, zet dat hier bij het bedrijf; dan houdt Fachora je opdracht bij.') }}</p>
       <div v-if="$page.props.errors && $page.props.errors.direct" class="fa-err" style="margin-bottom:10px;">{{ $page.props.errors.direct }}</div>
-      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer" :class="{ 'jb-contacted': p.contacted }">
+      <article v-for="p in direct" :key="p.id" class="fa-card jb-offer" :class="{ 'jb-contacted': p.contacted && !isClosed(p), 'jb-closed': isClosed(p) }">
+        <!-- 1.99.2: afgesloten als "geen reactie": één regel, met heropenen -->
+        <div v-if="isClosed(p)" class="jb-closed-row">
+          <div><strong>{{ p.name }}</strong><span class="fa-chip fa-chip--muted jb-contacted-chip">{{ $t('Gesloten: geen reactie (:date)', { date: p.response.closed_at }) }}</span><span v-if="p.response.kind === 'interested'" class="fa-chip fa-chip--ok jb-contacted-chip">★ {{ $t('Heeft interesse (:date)', { date: p.response.at }) }}</span></div>
+          <button type="button" class="fa-link fa-small" @click="closeDirect(p, true)">{{ $t('Heropenen') }}</button>
+        </div>
+        <template v-else>
         <div class="jb-prov">
           <div class="jb-prov-main">
             <div class="jb-prov-name"><strong>{{ p.name }}</strong><span v-if="p.contacted" class="fa-chip fa-chip--ok jb-contacted-chip">✓ {{ $t('Benaderd op :date', { date: p.contacted.at }) }}</span><span v-if="p.response && p.response.kind === 'interested'" class="fa-chip fa-chip--ok jb-contacted-chip">★ {{ $t('Heeft interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.kind === 'declined'" class="fa-chip fa-chip--muted jb-contacted-chip">✕ {{ $t('Geen interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.opened_at" class="fa-chip fa-chip--muted jb-contacted-chip">👁 {{ $t('Opende de opdrachtpagina op :date', { date: p.response.opened_at }) }}</span></div>
@@ -398,17 +414,26 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'phone') }" :href="'tel:' + p.phone" @click="markContacted(p, 'phone')">{{ done(p, 'phone') ? '✓ ' : '' }}{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
           <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
-        <div v-if="job.can_agree_direct" class="jb-agree">
-          <button v-if="agreeOpen !== p.id" type="button" class="fa-btn fa-btn--navy" @click="agreeOpen = p.id">{{ $t('Ik heb een afspraak met dit bedrijf') }}</button>
-          <form v-else class="jb-agree-form" @submit.prevent="agree(p)">
+        <div v-if="job.can_agree_direct || status === 'open'" class="jb-agree">
+          <button v-if="job.can_agree_direct && agreeOpen !== p.id" type="button" class="fa-btn fa-btn--navy" @click="agreeOpen = p.id">{{ $t('Ik heb een afspraak met dit bedrijf') }}</button>
+          <button v-if="agreeOpen !== p.id" type="button" class="fa-btn fa-btn--secondary" @click="closeDirect(p)">{{ $t('Geen reactie, sluiten') }}</button>
+          <form v-if="job.can_agree_direct && agreeOpen === p.id" class="jb-agree-form" @submit.prevent="agree(p)">
             <div class="fa-field"><label>{{ $t('Afgesproken prijs (optioneel)') }}</label><input type="number" min="0" step="0.01" v-model="agreeForm.price" placeholder="zł"><div v-if="agreeForm.errors.price" class="fa-err">{{ agreeForm.errors.price }}</div></div>
             <div class="fa-field"><label>{{ $t('Datum (optioneel)') }}</label><input type="date" v-model="agreeForm.date"><div v-if="agreeForm.errors.date" class="fa-err">{{ agreeForm.errors.date }}</div></div>
             <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
           </form>
         </div>
         <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button></p>
+        </template>
       </article>
-      <p v-if="job.can_reopen && status === 'open'" style="margin:12px 0 0;"><button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niemand gereageerd? Kies andere bedrijven') }}</button></p>
+      <div v-if="allClosed && status === 'open'" class="fa-card fa-card--tint">
+        <p style="margin:0 0 10px;">{{ $t('Alle bedrijven op je lijst zijn gesloten. Kies andere bedrijven of sluit je aanvraag.') }}</p>
+        <div class="fa-actions">
+          <button v-if="job.can_reopen" type="button" class="fa-btn" @click="reopen">{{ $t('Andere bedrijven kiezen') }}</button>
+          <button v-if="job.can_cancel" type="button" class="fa-btn fa-btn--secondary" @click="closeRequest">{{ $t('Aanvraag sluiten') }}</button>
+        </div>
+      </div>
+      <p v-else-if="job.can_reopen && status === 'open'" style="margin:12px 0 0;"><button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niemand gereageerd? Kies andere bedrijven') }}</button></p>
     </section>
 
     <!-- ===== Zelf geregeld: klaar melden (1.97) ===== -->
@@ -726,7 +751,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .fa-btn.jb-wa { background: #25D366; color: #fff; }
 .jb-remove { margin-left: auto; color: #8A2A1F; }
 .jb-contacted { border-left: 4px solid #34A853; }
-.jb-agree { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #D9E6F2; }
+.jb-agree { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #D9E6F2; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.jb-agree .jb-agree-form { flex-basis: 100%; }
+.jb-closed { background: #F5F6F8; opacity: .8; }
+.jb-closed-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .jb-agree-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: end; }
 .jb-agree-form .fa-actions { grid-column: 1 / -1; }
 @media (max-width: 560px) { .jb-agree-form { grid-template-columns: 1fr; } }

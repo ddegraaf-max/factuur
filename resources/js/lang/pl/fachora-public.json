@@ -425,5 +425,13 @@
   "Bericht van het bedrijf": "Wiadomość od firmy",
   "Opdrachtpagina voor dit bedrijf": "Strona zlecenia dla tej firmy",
   "Link kopiëren": "Kopiuj link",
-  "Kopieer de link hieronder:": "Skopiuj link poniżej:"
+  "Kopieer de link hieronder:": "Skopiuj link poniżej:",
+  "Geen reactie, sluiten": "Brak odpowiedzi – zamknij",
+  "Gesloten: geen reactie (:date)": "Zamknięte: brak odpowiedzi (:date)",
+  "Heropenen": "Otwórz ponownie",
+  "Alle bedrijven op je lijst zijn gesloten. Kies andere bedrijven of sluit je aanvraag.": "Wszystkie firmy z Twojej listy są zamknięte. Wybierz inne firmy albo zamknij zlecenie.",
+  "Andere bedrijven kiezen": "Wybierz inne firmy",
+  "Aanvraag sluiten": "Zamknij zlecenie",
+  "Je aanvraag sluiten? Je kunt altijd een nieuwe doen.": "Zamknąć zlecenie? Zawsze możesz złożyć nowe.",
+  "Geen reactie van de gekozen bedrijven": "Brak odpowiedzi od wybranych firm"
 }

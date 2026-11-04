@@ -177,6 +177,15 @@ class JobController extends Controller
         return back()->with('flash', __('Kies hieronder opnieuw tot :n bedrijven.', ['n' => (int) config('fachora.max_offers', 5)]));
     }
 
+    /** 1.99.2: de klant sluit een registerbedrijf af als "geen reactie", of heropent het; zie JobService::closeDirect(). */
+    public function closeDirect(Request $request, string $token, int $provider)
+    {
+        $job = $this->find($token);
+        $this->jobs->closeDirect($job, $provider, $request->boolean('undo'));
+
+        return back();
+    }
+
     /** 1.96.4: de klant benaderde een registerbedrijf zelf; zie JobService::markDirectContacted(). */
     public function markContacted(Request $request, string $token, int $provider)
     {

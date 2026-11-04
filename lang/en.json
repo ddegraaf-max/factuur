@@ -2159,5 +2159,7 @@
   "Nog te bevestigen": "Awaiting confirmation",
   "Je code voor Mijn opdrachten: :code": "Your code for My jobs: :code",
   "Vul deze code in op :url. De code is 15 minuten geldig.": "Enter this code at :url. The code is valid for 15 minutes.",
-  "Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.": "If this wasn't you, just ignore this e-mail; nothing will happen."
+  "Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.": "If this wasn't you, just ignore this e-mail; nothing will happen.",
+  "Klant sloot :name af: geen reactie": "Customer closed :name: no reply",
+  "Klant heropende :name": "Customer reopened :name"
 }

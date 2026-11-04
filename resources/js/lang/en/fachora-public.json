@@ -425,5 +425,13 @@
   "Bericht van het bedrijf": "Message from the company",
   "Opdrachtpagina voor dit bedrijf": "Job page for this company",
   "Link kopiëren": "Copy link",
-  "Kopieer de link hieronder:": "Copy the link below:"
+  "Kopieer de link hieronder:": "Copy the link below:",
+  "Geen reactie, sluiten": "No reply, close",
+  "Gesloten: geen reactie (:date)": "Closed: no reply (:date)",
+  "Heropenen": "Reopen",
+  "Alle bedrijven op je lijst zijn gesloten. Kies andere bedrijven of sluit je aanvraag.": "All companies on your list are closed. Pick other companies or close your request.",
+  "Andere bedrijven kiezen": "Pick other companies",
+  "Aanvraag sluiten": "Close request",
+  "Je aanvraag sluiten? Je kunt altijd een nieuwe doen.": "Close your request? You can always make a new one.",
+  "Geen reactie van de gekozen bedrijven": "No reply from the chosen companies"
 }

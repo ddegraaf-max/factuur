@@ -623,6 +623,7 @@ class JobService
         $entry['email'] = $clean($data['email'] ?? null);
         $entry['message'] = $clean($data['message'] ?? null);
         $entry['at'] = now()->toIso8601String();
+        unset($entry['closed_at']); // 1.99.2: een laat antwoord opent een afgesloten kaartje weer
         $all[(string) $provider->id] = $entry;
         $job->forceFill(['direct_responses' => $all])->save();
         $this->log($job, $interested ? 'direct_interested' : 'direct_declined', 'provider', $interested
@@ -646,7 +647,35 @@ class JobService
             'kind' => $entry['kind'] ?? null,
             'name' => $entry['name'] ?? null, 'phone' => $entry['phone'] ?? null, 'email' => $entry['email'] ?? null, 'message' => $entry['message'] ?? null,
             'at' => $fmt($entry['at'] ?? null),
+            'closed_at' => $fmt($entry['closed_at'] ?? null), // 1.99.2: door de klant afgesloten als "geen reactie"
         ];
+    }
+
+    /**
+     * 1.99.2: de klant sluit een registerbedrijf af als "geen reactie" (closed_at) of maakt dat
+     * ongedaan. Het record en een eventueel antwoord blijven staan; antwoordt het bedrijf alsnog
+     * via de deelpagina, dan gaat het kaartje vanzelf weer open (respondDirect wist closed_at).
+     */
+    public function closeDirect(ServiceJob $job, int $providerId, bool $undo = false): bool
+    {
+        if (! in_array($providerId, array_map('intval', (array) $job->selected_providers), true)) {
+            return false;
+        }
+        $all = (array) ($job->direct_responses ?? []);
+        $entry = (array) ($all[(string) $providerId] ?? []);
+        if ($undo) {
+            unset($entry['closed_at']);
+        } else {
+            $entry['closed_at'] = now()->toIso8601String();
+        }
+        $all[(string) $providerId] = $entry;
+        $job->forceFill(['direct_responses' => $all])->save();
+        $name = Provider::query()->find($providerId)?->display_name ?? '#' . $providerId;
+        $this->log($job, $undo ? 'direct_reopened' : 'direct_closed', 'customer', $undo
+            ? __('Klant heropende :name', ['name' => $name])
+            : __('Klant sloot :name af: geen reactie', ['name' => $name]));
+
+        return true;
     }
 
     public function directContacts(ServiceJob $job): \Illuminate\Support\Collection

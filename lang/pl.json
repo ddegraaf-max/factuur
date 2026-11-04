@@ -2159,5 +2159,7 @@
   "Nog te bevestigen": "Do potwierdzenia",
   "Je code voor Mijn opdrachten: :code": "Twój kod do Moich zleceń: :code",
   "Vul deze code in op :url. De code is 15 minuten geldig.": "Wpisz ten kod na stronie :url. Kod jest ważny 15 minut.",
-  "Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.": "Jeśli to nie Ty, zignoruj tę wiadomość – nic się nie stanie."
+  "Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.": "Jeśli to nie Ty, zignoruj tę wiadomość – nic się nie stanie.",
+  "Klant sloot :name af: geen reactie": "Klient zamknął :name: brak odpowiedzi",
+  "Klant heropende :name": "Klient ponownie otworzył :name"
 }
