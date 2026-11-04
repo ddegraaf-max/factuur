@@ -581,5 +581,7 @@
   "Andere ontvangsten in deze uitbetaling (niet via :brand)": "Other receipts in this payout (not via :brand)",
   "Verschil met de uitbetaling": "Difference with the payout",
   "Overgemaakt door Mollie": "Transferred by Mollie",
-  "Mollie maakt betalingen gebundeld over, minus zijn kosten. Het bedrag op het bankafschrift is daardoor lager dan het totaal van de facturen; het verschil boekt de boekhouder als betaalkosten. Elke nacht wordt bij Mollie gekeken welke betalingen in een uitbetaling zitten.": "Mollie transfers payments in batches, minus its fees. The amount on the bank statement is therefore lower than the total of the invoices; your accountant books the difference as payment costs. Every night we check with Mollie which payments are in a payout."
+  "Mollie maakt betalingen gebundeld over, minus zijn kosten. Het bedrag op het bankafschrift is daardoor lager dan het totaal van de facturen; het verschil boekt de boekhouder als betaalkosten. Elke nacht wordt bij Mollie gekeken welke betalingen in een uitbetaling zitten.": "Mollie transfers payments in batches, minus its fees. The amount on the bank statement is therefore lower than the total of the invoices; your accountant books the difference as payment costs. Every night we check with Mollie which payments are in a payout.",
+  "Algemene kosten (verzekering, incasso, kantoor): hoort bij geen project en wordt niet aangeboden om te koppelen": "General costs (insurance, debt collection, office): belongs to no project and is not offered for linking",
+  "algemene kosten, geen project": "general costs, no project"
 }

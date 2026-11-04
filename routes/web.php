@@ -738,6 +738,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::get('inkoop/{purchase}', [PurchaseInvoiceController::class, 'show'])->name('purchases.show');
     Route::get('inkoop/{purchase}/bewerken', [PurchaseInvoiceController::class, 'edit'])->name('purchases.edit');
     Route::patch('inkoop/{purchase}', [PurchaseInvoiceController::class, 'update'])->name('purchases.update');
+    Route::post('inkoop/{purchase}/geen-project', [PurchaseInvoiceController::class, 'exempt'])->name('purchases.exempt'); // 1.102.1: algemene kosten
     Route::delete('inkoop/{purchase}', [PurchaseInvoiceController::class, 'destroy'])->name('purchases.destroy');
     Route::post('inkoop/{purchase}/betaald', [PurchaseInvoiceController::class, 'markPaid'])->name('purchases.paid');
     Route::post('inkoop/{purchase}/heropen', [PurchaseInvoiceController::class, 'reopen'])->name('purchases.reopen');

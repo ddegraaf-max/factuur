@@ -47,6 +47,7 @@ const form = useForm({
   supplier_reference: props.purchase?.supplier_reference || '',
   category: props.purchase?.category || '',
   project_id: props.purchase?.project_id ?? props.preselect_project_id ?? null,
+  project_exempt: !!props.purchase?.project_exempt, // 1.102.1: algemene kosten, hoort bij geen project
   invoice_date: props.purchase?.invoice_date || today,
   due_date: props.purchase?.due_date || '',
   rows: initialRows(),
@@ -258,6 +259,7 @@ const submit = () => {
       supplier_reference: data.supplier_reference || null,
       category: data.category || null,
       project_id: data.project_id || null,
+      project_exempt: !data.project_id && !!data.project_exempt,
       invoice_date: data.invoice_date,
       due_date: data.due_date || null,
       vat_lines: data.rows.map(row => {
@@ -349,6 +351,11 @@ const fileError = computed(() => {
                     <option :value="null">{{ $t('Geen project') }}</option>
                     <option v-for="p in projects" :key="p.id" :value="p.id">{{ p.label }}</option>
                   </select>
+                  <!-- 1.102.1: algemene kosten horen bij geen project en worden niet aangeboden om te koppelen. -->
+                  <label v-if="!form.project_id" style="display:flex;gap:8px;align-items:flex-start;margin-top:8px;font-size:13px;color:var(--text-2);cursor:pointer;font-weight:400;">
+                    <input type="checkbox" v-model="form.project_exempt" style="margin-top:3px;">
+                    <span>{{ $t('Algemene kosten (verzekering, incasso, kantoor): hoort bij geen project en wordt niet aangeboden om te koppelen') }}</span>
+                  </label>
                 </template>
               </div>
             </div>

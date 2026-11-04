@@ -581,5 +581,7 @@
   "Andere ontvangsten in deze uitbetaling (niet via :brand)": "Inne wpływy w tej wypłacie (nie przez :brand)",
   "Verschil met de uitbetaling": "Różnica względem wypłaty",
   "Overgemaakt door Mollie": "Przelane przez Mollie",
-  "Mollie maakt betalingen gebundeld over, minus zijn kosten. Het bedrag op het bankafschrift is daardoor lager dan het totaal van de facturen; het verschil boekt de boekhouder als betaalkosten. Elke nacht wordt bij Mollie gekeken welke betalingen in een uitbetaling zitten.": "Mollie przelewa płatności zbiorczo, po potrąceniu swoich opłat. Kwota na wyciągu bankowym jest więc niższa niż suma faktur; różnicę księgowy księguje jako koszty płatności. Co noc sprawdzamy w Mollie, które płatności trafiły do wypłaty."
+  "Mollie maakt betalingen gebundeld over, minus zijn kosten. Het bedrag op het bankafschrift is daardoor lager dan het totaal van de facturen; het verschil boekt de boekhouder als betaalkosten. Elke nacht wordt bij Mollie gekeken welke betalingen in een uitbetaling zitten.": "Mollie przelewa płatności zbiorczo, po potrąceniu swoich opłat. Kwota na wyciągu bankowym jest więc niższa niż suma faktur; różnicę księgowy księguje jako koszty płatności. Co noc sprawdzamy w Mollie, które płatności trafiły do wypłaty.",
+  "Algemene kosten (verzekering, incasso, kantoor): hoort bij geen project en wordt niet aangeboden om te koppelen": "Koszty ogólne (ubezpieczenie, windykacja, biuro): nie należą do żadnego projektu i nie są proponowane do powiązania",
+  "algemene kosten, geen project": "koszty ogólne, bez projektu"
 }

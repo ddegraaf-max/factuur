@@ -162,7 +162,7 @@ const previewAttachment = computed(() =>
             </div>
             <div>
               <div class="pu-meta-label">{{ $t('Categorie') }}</div>
-              <div class="pu-meta-value">{{ purchase.category || '—' }}</div>
+              <div class="pu-meta-value">{{ purchase.category || '—' }}<template v-if="purchase.project_exempt"> · {{ $t('algemene kosten, geen project') }}</template></div>
             </div>
             <div v-if="purchase.status === 'paid'">
               <div class="pu-meta-label">{{ $t('Betaald op') }}</div>

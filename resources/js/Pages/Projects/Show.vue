@@ -79,6 +79,14 @@ const unlink = (type, id) => {
   }
 };
 const candidateList = computed(() => (linking.value ? props.candidates[candidateKey[linking.value]] || [] : []));
+// 1.102.1: algemene kosten (verzekering, incasso, kantoor) horen bij geen project; één klik en de inkoopfactuur komt hier niet meer terug.
+const exemptPurchase = (c) => {
+  if (confirm(t('":label" markeren als algemene kosten? Hij hoort dan bij geen project en wordt hier niet meer aangeboden. Terugdraaien kan op de inkoopfactuur zelf.', { label: c.label }))) {
+    const i = linkForm.ids.indexOf(c.id);
+    if (i >= 0) linkForm.ids.splice(i, 1);
+    router.post(route('purchases.exempt', c.id), { exempt: true }, { preserveScroll: true, only: ['candidates', 'flash'] });
+  }
+};
 
 const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-paid', paid: 'pill-paid', partial: 'pill-partial', overdue: 'pill-overdue', open: 'pill-sent', awarded: 'pill-paid', closed: 'pill-cancelled', rejected: 'pill-cancelled', expired: 'pill-cancelled', withdrawn: 'pill-cancelled', cancelled: 'pill-cancelled', incasso: 'pill-overdue' };
 </script>
@@ -397,11 +405,16 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
         </div>
         <div class="modal-body">
           <p class="sub" style="margin:0 0 12px;line-height:1.6;">{{ $t('Alleen wat nog bij geen project hoort; van deze klant eerst.') }}</p>
+          <p v-if="linking === 'purchase'" class="sub" style="margin:-6px 0 12px;line-height:1.6;">
+            {{ $t('Algemene kosten zoals verzekering, incasso of kantoor? Klik "Geen project": die factuur komt hier dan niet meer terug.') }}
+            <template v-if="candidates.purchases_hidden"> {{ $t(':n verborgen als algemene kosten (aan te passen op de inkoopfactuur zelf).', { n: candidates.purchases_hidden }) }}</template>
+          </p>
           <div v-if="candidateList.length" class="link-list">
             <label v-for="c in candidateList" :key="c.id" class="link-item" :class="{ mine: c.mine }">
               <input type="checkbox" :checked="linkForm.ids.includes(c.id)" @change="toggleId(c.id)">
               <span class="link-name">{{ c.label }}</span>
               <span class="sub">{{ c.sub }}</span>
+              <button v-if="linking === 'purchase'" type="button" class="btn btn-ghost btn-sm link-exempt" :title="$t('Algemene kosten: hoort bij geen project en komt hier niet meer terug')" @click.prevent.stop="exemptPurchase(c)">{{ $t('Geen project') }}</button>
             </label>
           </div>
           <div v-else class="sub">{{ $t('Niets te koppelen: alles hoort al bij een project, of er is nog niets.') }}</div>
@@ -430,6 +443,7 @@ const statusPill = { draft: 'pill-draft', sent: 'pill-sent', accepted: 'pill-pai
 .bad { color: var(--brand); }
 .pr-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
 .sub { font-size: 12px; color: var(--text-3); font-weight: 400; }
+.link-item .link-exempt { flex: none; margin-left: 6px; padding: 2px 8px; font-size: 12px; white-space: nowrap; }
 .count { font-size: 12px; color: var(--text-3); font-weight: 500; margin-left: 4px; }
 .actions { white-space: nowrap; }
 .data-table tr.total td { font-weight: 700; background: var(--surface-2); }

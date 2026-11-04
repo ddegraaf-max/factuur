@@ -708,5 +708,9 @@
   "Herinneringen aan de klant op de geplande momenten, per e-mail of sms": "Przypomnienia dla klienta w zaplanowanych terminach, e-mailem lub SMS-em",
   "Automatische herinneringen": "Automatyczne przypomnienia",
   "Stuur de klant nu een herinnering met de offerte, los van de planning": "Wyślij klientowi przypomnienie z ofertą teraz, niezależnie od harmonogramu",
-  "Nu herinneren": "Przypomnij teraz"
+  "Nu herinneren": "Przypomnij teraz",
+  "\":label\" markeren als algemene kosten? Hij hoort dan bij geen project en wordt hier niet meer aangeboden. Terugdraaien kan op de inkoopfactuur zelf.": "Oznaczyć \":label\" jako koszty ogólne? Nie będzie wtedy należeć do żadnego projektu i nie pojawi się tu więcej. Cofnąć można na samej fakturze zakupu.",
+  "Algemene kosten: hoort bij geen project en komt hier niet meer terug": "Koszty ogólne: nie należą do żadnego projektu i nie pojawią się tu więcej",
+  "Algemene kosten zoals verzekering, incasso of kantoor? Klik \"Geen project\": die factuur komt hier dan niet meer terug.": "Koszty ogólne, np. ubezpieczenie, windykacja lub biuro? Kliknij „Bez projektu”: ta faktura nie pojawi się tu więcej.",
+  ":n verborgen als algemene kosten (aan te passen op de inkoopfactuur zelf).": ":n ukryto jako koszty ogólne (do zmiany na samej fakturze zakupu)."
 }

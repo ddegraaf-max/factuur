@@ -375,6 +375,17 @@ class PurchaseInvoiceController extends Controller
         return response()->json(['result' => $result]);
     }
 
+    /** 1.102.1: algemene kosten — hoort bij geen project (of dat weer ongedaan maken). */
+    public function exempt(Request $request, PurchaseInvoice $purchase): RedirectResponse
+    {
+        $exempt = $request->boolean('exempt', true);
+        app(\App\Services\ProjectService::class)->exemptPurchase($purchase, $exempt);
+
+        return back()->with('flash', $exempt
+            ? __(':label gemarkeerd als algemene kosten: hoort bij geen project.', ['label' => trim($purchase->supplier_name . ' ' . ($purchase->supplier_reference ?? ''))])
+            : __(':label kan weer aan een project worden gekoppeld.', ['label' => trim($purchase->supplier_name . ' ' . ($purchase->supplier_reference ?? ''))]));
+    }
+
     public function storeAttachments(Request $request, PurchaseInvoice $purchase): RedirectResponse
     {
         $request->validate([
@@ -511,6 +522,7 @@ class PurchaseInvoiceController extends Controller
             'supplier_reference' => ['nullable', 'string', 'max:100'],
             'category' => ['nullable', 'string', 'max:60'],
             'project_id' => ['nullable', 'integer'],
+            'project_exempt' => ['nullable', 'boolean'],
             'invoice_date' => ['required', 'date'],
             'due_date' => ['nullable', 'date'],
             'vat_lines' => ['required', 'array', 'min:1'],
@@ -575,7 +587,9 @@ class PurchaseInvoiceController extends Controller
             'supplier_reference' => $data['supplier_reference'] ?? null,
             'category' => $data['category'] ?? null,
             // Alleen een project van deze administratie (de scope regelt dat).
-            'project_id' => ! empty($data['project_id']) ? \App\Models\Project::whereKey($data['project_id'])->value('id') : null,
+            'project_id' => $projectId = (! empty($data['project_id']) ? \App\Models\Project::whereKey($data['project_id'])->value('id') : null),
+            // 1.102.1: algemene kosten (verzekering, incasso, kantoor): hoort bij geen project en wordt niet aangeboden om te koppelen.
+            'project_exempt' => $projectId === null && ! empty($data['project_exempt']),
             'invoice_date' => $data['invoice_date'],
             'due_date' => $data['due_date'] ?? null,
             'status' => $isPaid ? 'paid' : 'open',

@@ -13,7 +13,7 @@ class PurchaseInvoice extends Model
     use HasFactory;
 
     protected $fillable = [
-        'company_id', 'project_id', 'supplier_name', 'supplier_reference', 'category',
+        'company_id', 'project_id', 'project_exempt', 'supplier_name', 'supplier_reference', 'category',
         'invoice_date', 'due_date', 'status', 'paid_at', 'payment_method',
         'subtotal', 'vat_total', 'total', 'vat_lines', 'deductions', 'notes',
     ];
@@ -27,6 +27,7 @@ class PurchaseInvoice extends Model
         'total' => 'decimal:2',
         'vat_lines' => 'array',
         'deductions' => 'array',
+        'project_exempt' => 'boolean', // 1.102.1: algemene kosten, hoort bij geen project
     ];
 
     protected static function booted(): void

@@ -2182,5 +2182,9 @@
   "Automatische herinneringen aangezet voor :label": "Włączono automatyczne przypomnienia dla :label",
   "Automatische herinneringen uitgezet voor :label": "Wyłączono automatyczne przypomnienia dla :label",
   "Automatische herinneringen staan aan.": "Automatyczne przypomnienia są włączone.",
-  "Automatische herinneringen staan uit voor deze offerte.": "Automatyczne przypomnienia są wyłączone dla tej oferty."
+  "Automatische herinneringen staan uit voor deze offerte.": "Automatyczne przypomnienia są wyłączone dla tej oferty.",
+  ":label gemarkeerd als algemene kosten (hoort bij geen project)": ":label oznaczono jako koszty ogólne (bez projektu)",
+  ":label kan weer aan een project worden gekoppeld": ":label można ponownie powiązać z projektem",
+  ":label gemarkeerd als algemene kosten: hoort bij geen project.": ":label oznaczono jako koszty ogólne: nie należy do żadnego projektu.",
+  ":label kan weer aan een project worden gekoppeld.": ":label można ponownie powiązać z projektem."
 }

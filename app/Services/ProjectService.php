@@ -169,14 +169,31 @@ class ProjectService
             default => throw new \DomainException(__('Onbekend soort document.')),
         };
 
-        return $query->where('company_id', $company->id)->whereIn('id', $ids)->update(['project_id' => $project?->id]);
+        $update = ['project_id' => $project?->id];
+        if ($type === 'purchase' && $project) {
+            $update['project_exempt'] = false; // toch gekoppeld: dan is het geen algemene kostenpost meer
+        }
+
+        return $query->where('company_id', $company->id)->whereIn('id', $ids)->update($update);
+    }
+
+    /**
+     * 1.102.1: een inkoopfactuur markeren als algemene kosten (verzekering, incasso, kantoor):
+     * hoort bij geen project en wordt niet meer aangeboden om te koppelen. Of dat weer ongedaan maken.
+     */
+    public function exemptPurchase(PurchaseInvoice $purchase, bool $exempt): void
+    {
+        $purchase->forceFill(['project_exempt' => $exempt, 'project_id' => $exempt ? null : $purchase->project_id])->save();
+        \App\Support\Audit::log('updated', $purchase, $exempt
+            ? __(':label gemarkeerd als algemene kosten (hoort bij geen project)', ['label' => \App\Support\Audit::label($purchase)])
+            : __(':label kan weer aan een project worden gekoppeld', ['label' => \App\Support\Audit::label($purchase)]));
     }
 
     /**
      * Wat er nog te koppelen valt: documenten zonder project, van deze klant
      * eerst. Kort gehouden; het gaat om de laatste maanden.
      *
-     * @return array<string, array<int, array<string, mixed>>>
+     * @return array<string, mixed>
      */
     public function candidates(Company $company, Project $project): array
     {
@@ -189,7 +206,9 @@ class ProjectService
                 ->map(fn (Quote $q) => ['id' => $q->id, 'label' => trim($q->number . ' ' . $q->customer_name), 'sub' => $q->quote_date?->translatedFormat('j M Y') . ' · ' . money((float) $q->subtotal), 'mine' => (int) $q->customer_id === (int) $project->customer_id])->values()->all(),
             'invoices' => $order(Invoice::withoutGlobalScope('company')->where('status', '!=', 'cancelled'), 'invoice_date')->get()
                 ->map(fn (Invoice $i) => ['id' => $i->id, 'label' => trim(($i->number ?: __('concept')) . ' ' . $i->customer_name), 'sub' => $i->invoice_date?->translatedFormat('j M Y') . ' · ' . money((float) $i->subtotal), 'mine' => (int) $i->customer_id === (int) $project->customer_id])->values()->all(),
-            'purchases' => PurchaseInvoice::withoutGlobalScope('company')->where('company_id', $company->id)->whereNull('project_id')->orderByDesc('invoice_date')->limit(40)->get()
+            // 1.102.1: algemene kosten (project_exempt) blijven weg; het aantal staat erbij zodat niemand ze kwijt is.
+            'purchases_hidden' => PurchaseInvoice::withoutGlobalScope('company')->where('company_id', $company->id)->whereNull('project_id')->where('project_exempt', true)->count(),
+            'purchases' => PurchaseInvoice::withoutGlobalScope('company')->where('company_id', $company->id)->whereNull('project_id')->where('project_exempt', false)->orderByDesc('invoice_date')->limit(40)->get()
                 ->map(fn (PurchaseInvoice $p) => ['id' => $p->id, 'label' => trim($p->supplier_name . ' ' . ($p->supplier_reference ?? '')), 'sub' => $p->invoice_date?->translatedFormat('j M Y') . ' · ' . money((float) $p->subtotal) . ($p->category ? ' · ' . __($p->category) : ''), 'mine' => false])->values()->all(),
             'hours' => $order(TimeEntry::withoutGlobalScope('company'), 'work_date')->get()
                 ->map(fn (TimeEntry $e) => ['id' => $e->id, 'label' => trim(($e->project ? $e->project . ' · ' : '') . (string) $e->description), 'sub' => $e->work_date?->translatedFormat('j M Y') . ' · ' . round($e->minutes / 60, 2) . ' ' . __('uur'), 'mine' => (int) $e->customer_id === (int) $project->customer_id])->values()->all(),
