@@ -50,6 +50,40 @@ const smsForm = useForm({ text: props.quote.sms?.text || '', phone: props.quote.
 const smsError = computed(() => (page.props.errors || {}).sms ?? null);
 const sendSms = () => smsForm.post(route('quotes.sms', props.quote.id), { preserveScroll: true, onSuccess: () => { showSmsModal.value = false; } });
 
+/* ---------- Opvolging (1.102): verstuurd → bekeken → herinnering 1 → herinnering 2 → verloopt ---------- */
+const followUp = computed(() => props.quote.follow_up);
+const toggleReminders = () => router.post(route('quotes.reminders', props.quote.id), { enabled: !followUp.value.enabled }, { preserveScroll: true });
+const remindNow = () => {
+  if (confirm(props.quote.send_email ? t('Nu een herinnering mailen naar :email?', { email: props.quote.send_email }) : t('Nu een herinnering per sms sturen?'))) {
+    router.post(route('quotes.remind', props.quote.id), {}, { preserveScroll: true });
+  }
+};
+const channelLabel = (c) => (c === 'sms' ? 'sms' : t('e-mail'));
+// De regel onder elke stap: datum, aantal keer bekeken, kanaal, of waarom er niets (meer) komt.
+const stepNote = (s) => {
+  const f = followUp.value || {};
+  if (s.key === 'viewed') {
+    if (s.state !== 'done') return t('nog niet bekeken');
+    return s.views > 1 ? t(':date · :n keer', { date: s.date, n: s.views }) : s.date;
+  }
+  if (s.key === 'reminder1' || s.key === 'reminder2') {
+    if (s.state === 'done') return s.date + ' · ' + channelLabel(s.channel) + (s.trigger === 'manual' ? ' · ' + t('handmatig') : '');
+    if (s.state === 'next') return t('gepland :date', { date: s.date });
+    if (s.state === 'planned') return s.date;
+    return f.enabled && f.company_enabled && props.quote.status === 'sent' ? t('vervalt') : t('uit');
+  }
+  return s.date || '—';
+};
+const followNote = computed(() => {
+  const f = followUp.value;
+  if (!f || props.quote.status !== 'sent') return '';
+  if (!f.company_enabled) return t('Automatische herinneringen staan uit (Instellingen → E-mailteksten).');
+  if (!f.enabled) return t('Automatische herinneringen staan uit voor deze offerte.');
+  if (f.next) return t('Volgende herinnering op :date per :channel.', { date: f.next, channel: props.quote.send_email ? t('e-mail') : 'sms' });
+  if (f.count >= 2) return t('Beide herinneringen zijn verstuurd — nu is het aan de klant.');
+  return t('Geen herinnering meer gepland: de vervaldatum is te dichtbij.');
+});
+
 /* ---------- Geaccepteerd markeren (+ bevestiging naar de klant) ---------- */
 const showAcceptModal = ref(false);
 const acceptForm = useForm({
@@ -286,6 +320,33 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <button v-if="quote.can_installments && !(quote.installments || []).length" class="btn btn-secondary btn-sm" @click="showPlanner = !showPlanner">{{ $t('In termijnen') }}</button>
         <button class="btn btn-secondary btn-sm" @click="reject">{{ $t('Afgewezen') }}</button>
         <button class="btn btn-primary btn-sm" @click="showAcceptModal = true">{{ $t('Geaccepteerd') }}</button>
+      </div>
+
+      <!-- Opvolging (1.102): wat is er gebeurd en wat staat er gepland? -->
+      <div v-if="followUp" class="follow">
+        <ol class="fu-steps">
+          <li v-for="s in followUp.steps" :key="s.key" class="fu-step" :class="'is-' + s.state">
+            <span class="fu-dot">
+              <svg v-if="s.state === 'done'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span class="fu-text">
+              <span class="fu-label">{{ s.label }}</span>
+              <span class="fu-note">{{ stepNote(s) }}</span>
+            </span>
+          </li>
+        </ol>
+        <div v-if="quote.status === 'sent'" class="fu-foot">
+          <label class="switch" :class="{ on: followUp.enabled }" :title="$t('Herinneringen aan de klant op de geplande momenten, per e-mail of sms')">
+            <input type="checkbox" :checked="followUp.enabled" :disabled="!followUp.company_enabled" @change="toggleReminders" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ $t('Automatische herinneringen') }}</span>
+          </label>
+          <span class="fu-foot-note">{{ followNote }}</span>
+          <button v-if="followUp.can_remind" class="btn btn-secondary btn-sm fu-now" :title="$t('Stuur de klant nu een herinnering met de offerte, los van de planning')" @click="remindNow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            {{ $t('Nu herinneren') }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -822,8 +883,44 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 .decide-text strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
 .decide-actions { display: flex; gap: 8px; }
 
+/* Opvolgingsbalk (1.102): vijf stappen met een lijn ertussen, daaronder schakelaar en "Nu herinneren". */
+.follow { flex-basis: 100%; border-top: 1px dashed var(--border); padding-top: 14px; }
+.fu-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.fu-step { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 6px; }
+.fu-step::before { content: ''; position: absolute; top: 10px; right: 50%; width: 100%; height: 2px; background: var(--border); z-index: 0; }
+.fu-step:first-child::before { display: none; }
+.fu-step.is-done::before { background: var(--success); }
+.fu-dot { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-strong); background: var(--surface); color: #fff; box-sizing: border-box; }
+.fu-dot svg { width: 12px; height: 12px; }
+.is-done .fu-dot { background: var(--success); border-color: var(--success); }
+.is-next .fu-dot { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-tint); }
+.is-skipped .fu-dot { border-style: dashed; }
+.is-skipped .fu-text { opacity: .6; }
+.fu-text { display: flex; flex-direction: column; margin-top: 7px; min-width: 0; }
+.fu-label { font-size: 12.5px; font-weight: 600; color: var(--text); }
+.fu-note { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+.is-next .fu-note { color: var(--brand-darker); font-weight: 600; }
+.fu-foot { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 14px; font-size: 13px; color: var(--text-2); }
+.fu-foot-note { flex: 1; min-width: 200px; }
+.fu-now { display: inline-flex; align-items: center; gap: 6px; }
+.fu-now svg { width: 15px; height: 15px; }
+.switch { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; flex: none; }
+.switch input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.switch-track { position: relative; width: 40px; height: 22px; border-radius: 999px; background: var(--border); transition: background .15s; flex: none; }
+.switch-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+.switch.on .switch-track { background: var(--success); }
+.switch.on .switch-thumb { transform: translateX(18px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--brand); outline-offset: 2px; }
+.switch input:disabled + .switch-track { opacity: .5; cursor: not-allowed; }
+.switch-text { font-size: 13px; font-weight: 600; color: var(--text-2); }
+
 @media (max-width: 640px) {
   .decide-actions { width: 100%; }
   .decide-actions .btn { flex: 1; }
+  .fu-steps { grid-template-columns: 1fr; gap: 10px; }
+  .fu-step { flex-direction: row; align-items: flex-start; text-align: left; gap: 10px; padding: 0; }
+  .fu-step::before { display: none; }
+  .fu-text { margin-top: 1px; }
+  .fu-now { width: 100%; justify-content: center; }
 }
 </style>

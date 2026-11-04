@@ -120,6 +120,8 @@ return [
     // Offertemail
     'mail_quote_subject' => 'Offerte :number — :company',
     'mail_quote_intro_default' => 'Hierbij ontvang je onze offerte. In de bijlage vind je het volledige overzicht als PDF.',
+    'mail_quote_reminder_subject' => 'Herinnering: offerte :number — :company',
+    'mail_quote_reminder_intro' => 'Een vriendelijke herinnering: onze offerte :number staat nog open en is geldig tot :date. In de bijlage vind je hem nogmaals als PDF; via de knop hieronder bekijk en accepteer je hem direct. Vragen? Beantwoord gerust deze e-mail.',
     'mail_quote_total_lbl' => 'totaal incl. btw',
     'mail_quote_number' => 'Offertenummer',
     'mail_date' => 'Datum',

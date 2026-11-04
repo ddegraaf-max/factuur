@@ -25,7 +25,7 @@ class Company extends Model
         'reminder_settings', 'email_texts', 'thanks_mail_enabled', 'review_url', 'quote_accept_mail_enabled',
         'peppol_company_id', 'peppol_verification_status', 'peppol_verification_url', 'peppol_registered_at', 'peppol_verified_at',
         'default_payment_terms', 'default_hourly_rate', 'default_km_rate', 'invoice_footer', 'invoice_footers', 'invoice_number_format',
-        'quote_number_format', 'quote_valid_days',
+        'quote_number_format', 'quote_valid_days', 'quote_reminder_settings',
         'trial_ends_at', 'trial_reminder_sent_at', 'trial_reminder_email_id', 'trial_ended_email_id',
         'subscription_status', 'subscription_ends_at', 'subscription_cancel_emailed_at',
         'stripe_customer_id', 'stripe_subscription_id',
@@ -66,6 +66,7 @@ class Company extends Model
         'daily_notification_enabled' => 'boolean',
         'numbering_settings' => 'array',
         'reminder_settings' => 'array',
+        'quote_reminder_settings' => 'array',
         'email_texts' => 'array',
         'invoice_footers' => 'array',
         'thanks_mail_enabled' => 'boolean',
@@ -212,6 +213,18 @@ class Company extends Model
             'warning_body' => "Beste {klant},\n\nOndanks onze eerdere herinnering(en) staat factuur {factuurnummer} van {factuurdatum} nog steeds open. Het openstaande bedrag bedraagt {openstaand}.\n\nWij verzoeken u dringend dit bedrag binnen {termijn} dagen te voldoen op {iban} t.n.v. {bedrijf}, onder vermelding van factuurnummer {factuurnummer}. Blijft betaling uit, dan zijn wij genoodzaakt de vordering — verhoogd met de wettelijke incassokosten en rente — over te dragen aan onze incassopartner.\n\nMet vriendelijke groet,\n{bedrijf}",
         ];
         return array_replace($defaults, $this->reminder_settings ?? []);
+    }
+
+    /**
+     * 1.102: automatische herinneringen aan de klant bij een verstuurde offerte:
+     * de eerste N dagen na het versturen, de tweede N dagen vóór de vervaldatum.
+     * @return array{enabled: bool, first_after_days: int, second_before_expiry_days: int}
+     */
+    public function quoteReminderSettings(): array
+    {
+        $s = array_replace(['enabled' => true, 'first_after_days' => 3, 'second_before_expiry_days' => 2], $this->quote_reminder_settings ?? []);
+
+        return ['enabled' => (bool) $s['enabled'], 'first_after_days' => max(1, (int) $s['first_after_days']), 'second_before_expiry_days' => max(1, (int) $s['second_before_expiry_days'])];
     }
 
     /**

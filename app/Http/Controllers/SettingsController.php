@@ -338,6 +338,7 @@ class SettingsController extends Controller
             'thanks_enabled' => (bool) $company->thanks_mail_enabled,
             'review_url' => $company->review_url ?? '',
             'accept_enabled' => (bool) $company->quote_accept_mail_enabled,
+            'quote_reminders' => $company->quoteReminderSettings(), // 1.102
             // De standaardteksten (in de taal van de markt) als voorbeeld/placeholder in het formulier.
             'defaults' => [
                 'invoice_subject' => __('Factuur {factuurnummer} — {bedrijf}'),
@@ -366,6 +367,9 @@ class SettingsController extends Controller
             'accept_subject' => 'nullable|string|max:200',
             'accept_body' => 'nullable|string|max:4000',
             'accept_enabled' => 'nullable|boolean',
+            'reminders_enabled' => 'nullable|boolean',
+            'reminder_first_after_days' => 'nullable|integer|min:1|max:60',
+            'reminder_second_before_expiry_days' => 'nullable|integer|min:1|max:60',
         ]);
 
         // Reviewlink: "g.page/r/…" zonder schema is ook goed — wij zetten https:// ervoor.
@@ -386,6 +390,11 @@ class SettingsController extends Controller
             'thanks_mail_enabled' => $request->boolean('thanks_enabled'),
             'review_url' => $reviewUrl,
             'quote_accept_mail_enabled' => $request->boolean('accept_enabled'),
+            'quote_reminder_settings' => [
+                'enabled' => $request->boolean('reminders_enabled'),
+                'first_after_days' => (int) ($data['reminder_first_after_days'] ?? 3),
+                'second_before_expiry_days' => (int) ($data['reminder_second_before_expiry_days'] ?? 2),
+            ],
         ]);
 
         return back()->with('flash', __('E-mailteksten opgeslagen.'));

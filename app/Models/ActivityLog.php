@@ -26,6 +26,7 @@ class ActivityLog extends Model
         'deleted' => 'Verwijderd',
         'sent' => 'Verstuurd',
         'reminded' => 'Herinnering',
+        'viewed' => 'Bekeken',
         'paused' => 'Op pauze',
         'resumed' => 'Hervat',
         'accepted' => 'Geaccepteerd',

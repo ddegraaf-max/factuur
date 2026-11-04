@@ -2166,5 +2166,21 @@
   ":label verstuurd per sms naar :number": ":label sent by text message to :number",
   "Offerte :number per sms verstuurd naar :number2.": "Quote :number sent by text message to :number2.",
   "Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — verstuur hem per sms of download de PDF.": "Quote :number recorded. This customer has no e-mail address — send it by text message or download the PDF.",
-  ":company: offerte van :amount. Bekijk en accepteer: :link": ":company: quote for :amount. View and accept: :link"
+  ":company: offerte van :amount. Bekijk en accepteer: :link": ":company: quote for :amount. View and accept: :link",
+  "Alleen bij een verstuurde offerte kan een herinnering worden gestuurd.": "A reminder can only be sent for a sent quotation.",
+  "Geen e-mailadres of mobiel nummer bekend; er kan geen herinnering worden verstuurd.": "No e-mail address or mobile number known; a reminder cannot be sent.",
+  "Herinnering :n voor :label verstuurd per :channel": "Reminder :n for :label sent by :channel",
+  "e-mail": "e-mail",
+  ":company: herinnering aan offerte :number van :amount, geldig tot :date. Bekijk en accepteer: :link": ":company: reminder of quotation :number for :amount, valid until :date. View and accept: :link",
+  "Bekeken": "Viewed",
+  "Herinnering 1": "Reminder 1",
+  "Herinnering 2": "Reminder 2",
+  "Verloopt": "Expires",
+  ":label voor het eerst bekeken door de klant in het portaal": ":label viewed by the customer in the portal for the first time",
+  "Herinnering per sms verstuurd naar :number.": "Reminder sent by SMS to :number.",
+  "Herinnering per e-mail verstuurd naar :email.": "Reminder sent by e-mail to :email.",
+  "Automatische herinneringen aangezet voor :label": "Automatic reminders switched on for :label",
+  "Automatische herinneringen uitgezet voor :label": "Automatic reminders switched off for :label",
+  "Automatische herinneringen staan aan.": "Automatic reminders are on.",
+  "Automatische herinneringen staan uit voor deze offerte.": "Automatic reminders are off for this quotation."
 }

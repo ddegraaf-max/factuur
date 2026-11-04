@@ -122,6 +122,8 @@ return [
     // Offertemail
     'mail_quote_subject' => 'Oferta :number — :company',
     'mail_quote_intro_default' => 'Przesyłamy naszą ofertę. Pełne zestawienie znajduje się w załączonym pliku PDF.',
+    'mail_quote_reminder_subject' => 'Przypomnienie: oferta :number — :company',
+    'mail_quote_reminder_intro' => 'Uprzejmie przypominamy: nasza oferta :number jest nadal aktualna i ważna do :date. W załączniku ponownie przesyłamy ją w formacie PDF; przyciskiem poniżej można ją od razu obejrzeć i zaakceptować. Pytania? Wystarczy odpowiedzieć na tę wiadomość.',
     'mail_quote_total_lbl' => 'razem brutto',
     'mail_quote_number' => 'Numer oferty',
     'mail_date' => 'Data',

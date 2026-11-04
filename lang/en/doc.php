@@ -122,6 +122,8 @@ return [
     // Offertemail
     'mail_quote_subject' => 'Quotation :number — :company',
     'mail_quote_intro_default' => 'Please find our quotation attached as a PDF.',
+    'mail_quote_reminder_subject' => 'Reminder: quotation :number — :company',
+    'mail_quote_reminder_intro' => 'A friendly reminder: our quotation :number is still open and valid until :date. It is attached again as a PDF; use the button below to view and accept it right away. Any questions? Just reply to this e-mail.',
     'mail_quote_total_lbl' => 'total incl. VAT',
     'mail_quote_number' => 'Quotation number',
     'mail_date' => 'Date',

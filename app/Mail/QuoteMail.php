@@ -19,6 +19,7 @@ class QuoteMail extends Mailable
     public function __construct(
         public Quote $quote,
         public string $pdf,
+        public bool $reminder = false, // 1.102: herinnering aan een nog openstaande offerte
     ) {}
 
     public function envelope(): Envelope
@@ -34,12 +35,14 @@ class QuoteMail extends Mailable
         return new Envelope(
             from: \App\Support\Sender::address($company, $company?->name ?: config('mail.from.name')),
             replyTo: $replyTo ? [new Address($replyTo, $company->name ?: null)] : [],
-            subject: $customSubject
+            subject: $this->reminder
+                ? __('doc.mail_quote_reminder_subject', ['number' => $this->quote->number, 'company' => $company->name ?? Brand::name()])
+                : ($customSubject
                 ? \App\Support\MailText::apply($customSubject, \App\Support\MailText::quoteVars($this->quote, $company))
                 : __('doc.mail_quote_subject', [
                     'number' => $this->quote->number,
                     'company' => $company->name ?? Brand::name(),
-                ]),
+                ])),
         );
     }
 
@@ -55,6 +58,7 @@ class QuoteMail extends Mailable
             with: [
                 'quote' => $this->quote,
                 'company' => $company,
+                'reminder' => $this->reminder,
                 'customBody' => $customBody
                     ? \App\Support\MailText::apply($customBody, \App\Support\MailText::quoteVars($this->quote, $company))
                     : null,

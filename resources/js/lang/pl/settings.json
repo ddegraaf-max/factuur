@@ -582,5 +582,10 @@
   "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(dla faktur i ofert w tym języku; puste = domyślna stopka)",
   "Ik doe mee aan de kleineondernemersregeling (KOR)": "Korzystam ze zwolnienia dla małych przedsiębiorców (KOR)",
   "Je facturen en offertes krijgen geen btw en wel de vermelding dat de vrijstelling geldt. Er is geen btw-aangifte; op het dashboard zie je je omzet tegenover de grens van 20.000 euro per jaar. Zet dit alleen aan als de Belastingdienst je aanmelding heeft bevestigd.": "Faktury i oferty nie zawierają VAT i mają adnotację o zwolnieniu. Nie ma deklaracji VAT; na pulpicie widzisz obrót na tle limitu 20 000 euro rocznie. Włącz to dopiero po potwierdzeniu zgłoszenia przez urząd skarbowy.",
-  "Een zelfgemaakte pdf (bijvoorbeeld de uitgewerkte offerte) kan Claude als bijlage meesturen.": "Claude może też dołączyć własny PDF (na przykład rozpisaną ofertę)."
+  "Een zelfgemaakte pdf (bijvoorbeeld de uitgewerkte offerte) kan Claude als bijlage meesturen.": "Claude może też dołączyć własny PDF (na przykład rozpisaną ofertę).",
+  "Herinneringen bij openstaande offertes": "Przypomnienia o otwartych ofertach",
+  "Twee vriendelijke herinneringen aan de klant zolang de offerte openstaat: per e-mail met de offerte als PDF, of per sms als er alleen een mobiel nummer is.": "Dwa uprzejme przypomnienia dla klienta, dopóki oferta jest otwarta: e-mailem z ofertą w PDF lub SMS-em, jeśli znany jest tylko numer komórkowy.",
+  "dagen na het versturen": "dni po wysłaniu",
+  "dagen vóór de vervaldatum": "dni przed terminem ważności",
+  "De herinneringen stoppen vanzelf zodra de klant beslist of de offerte verloopt. Op de offerte zelf zie je de tijdlijn, zet je de herinneringen voor die ene offerte uit, of stuur je er meteen een.": "Przypomnienia kończą się same, gdy klient podejmie decyzję lub oferta wygaśnie. Na samej ofercie widzisz oś czasu, możesz wyłączyć przypomnienia dla tej jednej oferty albo wysłać je od razu."
 }

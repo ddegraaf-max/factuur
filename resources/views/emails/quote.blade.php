@@ -44,7 +44,10 @@
         <div class="body">
             <h1>{{ __('doc.mail_greeting', ['name' => $quote->customer_name]) }}</h1>
 
-            @if ($quote->intro)
+            @if (!empty($reminder))
+                {{-- 1.102: herinnering — de offerte ligt nog open. --}}
+                <p>{{ __('doc.mail_quote_reminder_intro', ['number' => $quote->number, 'date' => $quote->valid_until->translatedFormat('j F Y')]) }}</p>
+            @elseif ($quote->intro)
                 <p>{!! nl2br(e($quote->intro)) !!}</p>
             @elseif (!empty($customBody))
                 {{-- Eigen standaardtekst (Instellingen → E-mailteksten). --}}

@@ -44,6 +44,13 @@ class PortalQuoteController extends Controller
 
         $quote->load('lines', 'replacedBy');
         $company = $quote->brandedCompany();
+
+        // 1.102: bekeken-moment en teller voor de opvolgingsbalk van de ondernemer (eerste keer ook in het logboek).
+        $firstView = ! $quote->portal_viewed_at;
+        $quote->forceFill(['portal_viewed_at' => $quote->portal_viewed_at ?? now(), 'portal_views' => (int) $quote->portal_views + 1])->saveQuietly();
+        if ($firstView) {
+            \App\Support\Audit::log('viewed', $quote, __(':label voor het eerst bekeken door de klant in het portaal', ['label' => \App\Support\Audit::label($quote)]), [], $quote->company_id);
+        }
         // Vervangen door een nieuwe offerte die al bij de klant ligt? Dan daarheen linken.
         $replacement = $quote->replacedBy;
         $replacementLive = $replacement && in_array($replacement->status, ['sent', 'expired', 'accepted'], true);

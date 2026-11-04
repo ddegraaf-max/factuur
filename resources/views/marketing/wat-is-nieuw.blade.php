@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.101.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.102.0</div>
+        <h2>Offerteopvolging: tijdlijn en herinneringen aan de klant</h2>
+        <ul class="tl-list">
+          <li><b>Wat gebeurt er met mijn offerte?</b> — onder "Wat heeft de klant besloten?" staat nu een tijdlijn: verstuurd, bekeken (met het aantal keer dat de klant de offerte in het portaal opende), herinnering 1, herinnering 2 en de vervaldatum. Zo zie je in één oogopslag waar een offerte staat in plaats van te wachten tot er misschien iets terugkomt.</li>
+          <li><b>Automatische herinneringen</b> — zolang de offerte openstaat krijgt de klant twee vriendelijke herinneringen: standaard 3 dagen na het versturen en 2 dagen vóór de vervaldatum (instelbaar bij Instellingen → E-mailteksten, daar ook helemaal uit te zetten). Per e-mail met de offerte opnieuw als PDF en de knop naar het portaal; heeft de klant alleen een mobiel nummer, dan gaat de herinnering per sms met een korte link. Ze stoppen vanzelf zodra de klant beslist of de offerte verloopt, en elke herinnering staat in het logboek.</li>
+          <li><b>Per offerte de regie</b> — met de schakelaar in de balk zet je de herinneringen voor één offerte uit (bijvoorbeeld omdat je de klant net gesproken hebt), en met "Nu herinneren" stuur je er direct een, los van de planning.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">4 november 2026 · {{ brand('version_prefix') }} 1.101.0</div>
         <h2>Offerte per sms versturen</h2>
         <ul class="tl-list">
           <li><b>Geen e-mailadres, toch versturen</b> — op de offertepagina staat naast "Versturen" nu "Per sms". De klant krijgt een sms met een korte link naar het portaal, waar hij de offerte bekijkt en digitaal akkoord geeft. Het nummer komt van de klantkaart (of je typt het in; het wordt dan bij de klant bewaard), de tekst staat klaar en is aan te passen. De offerte krijgt gewoon het nummer en de status Verstuurd; de sms gaat van je sms-tegoed, net als een aanmaning per sms.</li>

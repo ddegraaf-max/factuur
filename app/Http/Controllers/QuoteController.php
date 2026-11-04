@@ -173,6 +173,8 @@ class QuoteController extends Controller
                 // Andere offertes van deze klant die deze kunnen vervangen (knop "Vervallen").
                 'replacement_options' => in_array($quote->status, ['sent', 'expired', 'accepted'], true) ? $this->replacementOptions($quote) : [],
                 'portal_url' => $quote->portalUrl(),
+                // 1.102: opvolgingsbalk — verstuurd, bekeken, geplande/verstuurde herinneringen, vervaldatum.
+                'follow_up' => in_array($quote->status, ['sent', 'expired'], true) ? app(\App\Services\QuoteFollowUpService::class)->timeline($quote) : null,
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
                 'send_email' => $quote->customer_email ?: $quote->customer?->email,
                 // 1.101: per sms versturen (alleen mobiel, alleen met tegoed); de tekst staat klaar.
@@ -294,6 +296,32 @@ class QuoteController extends Controller
         }
 
         return redirect()->route('quotes.show', $quote->fresh())->with('flash', __('Offerte :number per sms verstuurd naar :number2.', ['number' => $quote->fresh()->number, 'number2' => \App\Support\PhoneNumber::display($message->recipient)]));
+    }
+
+    /** 1.102: nu een herinnering aan de klant sturen (per mail, anders per sms). */
+    public function remind(Request $request, Quote $quote): RedirectResponse
+    {
+        try {
+            $channel = app(\App\Services\QuoteFollowUpService::class)->send($quote, 'manual', $request->user()->id);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', $channel === 'sms'
+            ? __('Herinnering per sms verstuurd naar :number.', ['number' => \App\Support\PhoneNumber::display(\App\Support\PhoneNumber::mobile($quote->customer?->phone))])
+            : __('Herinnering per e-mail verstuurd naar :email.', ['email' => $quote->customer_email ?: $quote->customer?->email]));
+    }
+
+    /** 1.102: automatische herinneringen aan of uit voor deze offerte. */
+    public function reminders(Request $request, Quote $quote): RedirectResponse
+    {
+        $on = $request->boolean('enabled');
+        $quote->forceFill(['reminders_enabled' => $on])->save();
+        \App\Support\Audit::log('updated', $quote, $on
+            ? __('Automatische herinneringen aangezet voor :label', ['label' => \App\Support\Audit::label($quote)])
+            : __('Automatische herinneringen uitgezet voor :label', ['label' => \App\Support\Audit::label($quote)]));
+
+        return back()->with('flash', $on ? __('Automatische herinneringen staan aan.') : __('Automatische herinneringen staan uit voor deze offerte.'));
     }
 
     public function accept(Request $request, Quote $quote): RedirectResponse

@@ -9,6 +9,7 @@ const props = defineProps({
   thanks_enabled: Boolean,
   review_url: { type: String, default: '' },
   accept_enabled: Boolean,
+  quote_reminders: Object, // 1.102: { enabled, first_after_days, second_before_expiry_days }
 });
 
 // Markt (nl/pl): naam van de online betaalmethode (iDEAL / BLIK).
@@ -19,6 +20,9 @@ const form = useForm({
   thanks_enabled: !!props.thanks_enabled,
   review_url: props.review_url || '',
   accept_enabled: !!props.accept_enabled,
+  reminders_enabled: props.quote_reminders ? !!props.quote_reminders.enabled : true,
+  reminder_first_after_days: props.quote_reminders?.first_after_days ?? 3,
+  reminder_second_before_expiry_days: props.quote_reminders?.second_before_expiry_days ?? 2,
 });
 
 const previewAcceptUrl = computed(() => route('settings.emails.preview.accept', {
@@ -173,6 +177,34 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
         </div>
       </div>
 
+      <!-- Herinneringen bij openstaande offertes (1.102) -->
+      <div class="card" style="margin-top:14px;">
+        <div class="card-header thanks-head">
+          <div>
+            <div class="card-title">{{ $t('Herinneringen bij openstaande offertes') }}</div>
+            <div class="thanks-sub">{{ $t('Twee vriendelijke herinneringen aan de klant zolang de offerte openstaat: per e-mail met de offerte als PDF, of per sms als er alleen een mobiel nummer is.') }}</div>
+          </div>
+          <label class="switch" :class="{ on: form.reminders_enabled }">
+            <input type="checkbox" v-model="form.reminders_enabled" />
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+            <span class="switch-text">{{ form.reminders_enabled ? $t('Ingeschakeld') : $t('Uitgeschakeld') }}</span>
+          </label>
+        </div>
+        <div class="card-body" style="padding:18px 20px;">
+          <div class="rem-grid" :class="{ muted: !form.reminders_enabled }">
+            <label class="rem-field">
+              <span>{{ $t('Eerste herinnering') }}</span>
+              <span class="rem-inline"><input type="number" min="1" max="60" v-model.number="form.reminder_first_after_days" /> {{ $t('dagen na het versturen') }}</span>
+            </label>
+            <label class="rem-field">
+              <span>{{ $t('Tweede herinnering') }}</span>
+              <span class="rem-inline"><input type="number" min="1" max="60" v-model.number="form.reminder_second_before_expiry_days" /> {{ $t('dagen vóór de vervaldatum') }}</span>
+            </label>
+          </div>
+          <p class="txt-help" style="margin:12px 0 0;">{{ $t('De herinneringen stoppen vanzelf zodra de klant beslist of de offerte verloopt. Op de offerte zelf zie je de tijdlijn, zet je de herinneringen voor die ene offerte uit, of stuur je er meteen een.') }}</p>
+        </div>
+      </div>
+
       <div class="card" style="margin-top:14px;">
         <div class="card-header"><div class="card-title">{{ $t('Offertemail') }}</div></div>
         <div class="card-body" style="padding:18px 20px;">
@@ -225,6 +257,14 @@ const previewUrl = computed(() => route('settings.emails.preview.thanks', {
 .thanks-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .thanks-sub { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
 .switch { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; flex: none; }
+/* Offerteherinneringen (1.102) */
+.rem-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; transition: opacity .15s; }
+.rem-grid.muted { opacity: .55; }
+.rem-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--text-2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; background: var(--surface-2); }
+.rem-field > span:first-child { font-weight: 600; color: var(--text-1); font-size: 12.5px; }
+.rem-inline { display: flex; align-items: center; gap: 8px; }
+.rem-inline input { width: 72px; }
+@media (max-width: 640px) { .rem-grid { grid-template-columns: 1fr; } }
 .switch input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
 .switch-track { position: relative; width: 40px; height: 22px; border-radius: 999px; background: var(--border); transition: background .15s; flex: none; }
 .switch-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }

@@ -39,6 +39,11 @@ Schedule::command('tenders:remind')
     ->dailyAt('09:00')
     ->timezone('Europe/Amsterdam');
 
+// Dagelijks: offerteopvolging — herinnering aan de klant een paar dagen na het versturen en vlak vóór de vervaldatum (1.102).
+Schedule::command('quotes:remind')
+    ->dailyAt('09:30')
+    ->timezone('Europe/Amsterdam');
+
 // Elke tien minuten: offertecheck van nieuwe prijsopgaven, met een mail aan de ondernemer.
 Schedule::command('tenders:review')
     ->everyTenMinutes()

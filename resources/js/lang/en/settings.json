@@ -582,5 +582,10 @@
   "(voor facturen en offertes in deze taal; leeg = de standaard voetnoot)": "(for invoices and quotes in this language; empty = the default footer)",
   "Ik doe mee aan de kleineondernemersregeling (KOR)": "I take part in the small businesses scheme (KOR)",
   "Je facturen en offertes krijgen geen btw en wel de vermelding dat de vrijstelling geldt. Er is geen btw-aangifte; op het dashboard zie je je omzet tegenover de grens van 20.000 euro per jaar. Zet dit alleen aan als de Belastingdienst je aanmelding heeft bevestigd.": "Your invoices and quotes carry no VAT and state that the exemption applies. There is no VAT return; the dashboard shows your turnover against the limit of 20,000 euros a year. Only switch this on once the tax authority has confirmed your registration.",
-  "Een zelfgemaakte pdf (bijvoorbeeld de uitgewerkte offerte) kan Claude als bijlage meesturen.": "Claude can also attach a PDF of its own (for example the worked-out quote)."
+  "Een zelfgemaakte pdf (bijvoorbeeld de uitgewerkte offerte) kan Claude als bijlage meesturen.": "Claude can also attach a PDF of its own (for example the worked-out quote).",
+  "Herinneringen bij openstaande offertes": "Reminders for open quotations",
+  "Twee vriendelijke herinneringen aan de klant zolang de offerte openstaat: per e-mail met de offerte als PDF, of per sms als er alleen een mobiel nummer is.": "Two friendly reminders to the customer while the quotation is open: by e-mail with the quotation as a PDF, or by SMS when only a mobile number is known.",
+  "dagen na het versturen": "days after sending",
+  "dagen vóór de vervaldatum": "days before the expiry date",
+  "De herinneringen stoppen vanzelf zodra de klant beslist of de offerte verloopt. Op de offerte zelf zie je de tijdlijn, zet je de herinneringen voor die ene offerte uit, of stuur je er meteen een.": "The reminders stop automatically once the customer decides or the quotation expires. On the quotation itself you see the timeline, switch reminders off for that one quotation, or send one right away."
 }
