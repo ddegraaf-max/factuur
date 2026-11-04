@@ -68,7 +68,16 @@ class MailDomainService
         } catch (\Throwable $e) {
             Log::info('Resend: verify-aanroep mislukt', ['error' => $e->getMessage()]);
         }
-        $data = $this->json($this->http()->get('/domains/' . $company->mail_domain_id), __('De domeinstatus kon niet worden opgehaald.'));
+        // Resend controleert na de verify-aanroep asynchroon; meestal is dat binnen enkele seconden klaar.
+        // Even doorvragen (max. ±8 s), zodat één klik op "Controleer DNS" ook echt de uitkomst laat zien (1.101.5).
+        $data = [];
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $data = $this->json($this->http()->get('/domains/' . $company->mail_domain_id), __('De domeinstatus kon niet worden opgehaald.'));
+            if (($data['status'] ?? 'pending') !== 'pending' || app()->runningUnitTests()) {
+                break;
+            }
+            sleep(2);
+        }
 
         $company->forceFill([
             'mail_domain_status' => $this->status($data['status'] ?? 'pending'),
