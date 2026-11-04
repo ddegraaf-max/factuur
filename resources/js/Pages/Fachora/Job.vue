@@ -99,10 +99,31 @@ onBeforeUnmount(() => clearInterval(searchTimer));
 // Het Poolse bericht aan een bedrijf uit het register; de klant verstuurt het zelf (mail, Gmail, WhatsApp, sms).
 const messageFor = (p) => {
   const j = props.job || {};
-  const subject = t('Zapytanie: :title (:city)', { title: j.title_pl || j.title || '', city: j.city || '' }); // 1.96: Poolse titel als die er is
-  // 1.94: de klant is de boodschapper — één feitelijke zin over het bestaande profiel (Fachora stuurt het bedrijf zelf niets).
-  const profileLine = p.url ? 'Państwa firma jest już na fachora.pl (profil z rejestru): ' + p.url + '. Jeśli chcą Państwo otrzymywać takie zapytania bezpośrednio, profil można przejąć w dwie minuty na tej stronie.' : '';
-  const body = [t('Dzień dobry,'), '', j.description_pl || j.description || '', '', [j.postal_code, j.city].filter(Boolean).join(' '), j.urgency_label_pl || j.urgency_label || '', '', t('Proszę o wycenę i informację o terminie.'), '', profileLine, profileLine ? '' : null, j.customer_name || ''].filter((line) => line !== null).join('\n');
+  const subject = t('Zapytanie o wycenę: :title (:city)', { title: j.title_pl || j.title || '', city: j.city || '' }); // 1.96: Poolse titel als die er is
+  // 1.98: het bericht stelt de schrijver voor, legt uit waarom juist dit bedrijf (CEIDG) en dat het geen reclame of
+  // massamail is, noemt telefoon en talen, en verwijst naar de deelpagina (p.share_url) waar het bedrijf de klus ziet
+  // en met één klik antwoordt. De zin "uw bedrijf staat al op fachora.pl" is weg: die leek op registerfraude-mails.
+  const place = [j.postal_code, j.city].filter(Boolean).join(' ');
+  const body = [
+    'Szanowni Państwo,',
+    '',
+    'Piszę do firmy ' + (p.name || '') + '. Szukam wykonawcy w okolicy ' + (j.city || '') + ' – Państwa firma widnieje w rejestrze CEIDG jako firma z tej branży, dlatego piszę właśnie do Państwa. Piszę osobiście, z mojego prywatnego adresu e-mail; to nie jest reklama ani wiadomość masowa.',
+    '',
+    j.description_pl || j.description || '',
+    '',
+    'Miejsce: ' + place,
+    'Termin: ' + (j.urgency_label_pl || j.urgency_label || ''),
+    (j.languages || []).length > 1 && j.language_label_pl ? 'Języki: ' + j.language_label_pl : null,
+    j.customer_phone ? 'Telefon: ' + j.customer_phone : null,
+    '',
+    p.share_url ? 'Szczegóły zlecenia i odpowiedź jednym kliknięciem (bez logowania):' : null,
+    p.share_url || null,
+    p.share_url ? '' : null,
+    'Proszę o orientacyjną cenę i możliwy termin – wystarczy odpowiedzieć na tego e-maila lub zadzwonić. Jeśli nie są Państwo zainteresowani, proszę o krótkie „nie”; nie będę pisać ponownie.',
+    '',
+    'Z poważaniem',
+    j.customer_name || '',
+  ].filter((line) => line !== null).join('\n');
   return { subject, body };
 };
 const mailtoFor = (p) => {
@@ -346,18 +367,26 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
     <section v-if="direct.length" class="jb-section">
       <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
       <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
+      <!-- 1.98: de deelpagina in het bericht bewijst dat het geen spam is; hier ziet de klant het effect -->
+      <p class="fa-small fa-muted">{{ $t('In het bericht staat een link naar een pagina waarop het bedrijf je klus ziet, leest dat het geen spam is en met één klik kan antwoorden. Je ziet hier of het bedrijf de pagina opende en wat het antwoordde.') }}</p>
       <p v-if="job.can_agree_direct" class="fa-note" style="margin:0 0 14px;">{{ $t('Hoe nu verder: de antwoorden komen in je eigen mailbox of op je telefoon. Heb je een afspraak gemaakt, zet dat hier bij het bedrijf; dan houdt Fachora je opdracht bij.') }}</p>
       <div v-if="$page.props.errors && $page.props.errors.direct" class="fa-err" style="margin-bottom:10px;">{{ $page.props.errors.direct }}</div>
       <article v-for="p in direct" :key="p.id" class="fa-card jb-offer" :class="{ 'jb-contacted': p.contacted }">
         <div class="jb-prov">
           <div class="jb-prov-main">
-            <div class="jb-prov-name"><strong>{{ p.name }}</strong><span v-if="p.contacted" class="fa-chip fa-chip--ok jb-contacted-chip">✓ {{ $t('Benaderd op :date', { date: p.contacted.at }) }}</span></div>
+            <div class="jb-prov-name"><strong>{{ p.name }}</strong><span v-if="p.contacted" class="fa-chip fa-chip--ok jb-contacted-chip">✓ {{ $t('Benaderd op :date', { date: p.contacted.at }) }}</span><span v-if="p.response && p.response.kind === 'interested'" class="fa-chip fa-chip--ok jb-contacted-chip">★ {{ $t('Heeft interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.kind === 'declined'" class="fa-chip fa-chip--muted jb-contacted-chip">✕ {{ $t('Geen interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.opened_at" class="fa-chip fa-chip--muted jb-contacted-chip">👁 {{ $t('Opende de opdrachtpagina op :date', { date: p.response.opened_at }) }}</span></div>
             <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template><template v-if="p.phone"> · {{ p.phone }}</template></div>
             <!-- 1.96.2: hoofdactiviteit, zodat de klant ziet welk bedrijf het best past -->
             <div v-if="p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
               {{ p.pkd_fit === 'main' ? $t('Hoofdactiviteit: :name (past bij je klus)', { name: p.pkd_main_name }) : $t('Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)', { name: p.pkd_main_name }) }}
             </div>
           </div>
+        </div>
+        <!-- 1.98: antwoord van het bedrijf via de deelpagina -->
+        <div v-if="p.response && p.response.kind === 'interested'" class="jb-response">
+          <div v-if="p.response.name">{{ $t('Contactpersoon: :name', { name: p.response.name }) }}</div>
+          <div v-if="p.response.phone || p.response.email">{{ $t('Neem contact op: :contact', { contact: [p.response.phone, p.response.email].filter(Boolean).join(' · ') }) }}</div>
+          <blockquote v-if="p.response.message"><strong>{{ $t('Bericht van het bedrijf') }}</strong><br>{{ p.response.message }}</blockquote>
         </div>
         <div class="fa-actions">
           <a v-if="p.email" class="fa-btn" :class="{ 'is-copied': done(p, 'mail') }" :href="mailtoFor(p)" @click="markContacted(p, 'mail')">{{ done(p, 'mail') ? '✓ ' : '' }}{{ $t('E-mail sturen') }}</a>
@@ -375,7 +404,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
           </form>
         </div>
-        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }}</p>
+        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a></p>
       </article>
       <p v-if="job.can_reopen && status === 'open'" style="margin:12px 0 0;"><button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niemand gereageerd? Kies andere bedrijven') }}</button></p>
     </section>
@@ -700,6 +729,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-agree-form .fa-actions { grid-column: 1 / -1; }
 @media (max-width: 560px) { .jb-agree-form { grid-template-columns: 1fr; } }
 .jb-contacted-chip { margin-left: 10px; vertical-align: middle; }
+.jb-response { margin-top: 10px; padding: 10px 14px; background: #ECFDF5; border-radius: 10px; font-size: 14px; }
+.jb-response blockquote { margin: 8px 0 0; padding-left: 10px; border-left: 3px solid #34A853; white-space: pre-wrap; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }

@@ -415,5 +415,13 @@
   "Je regelt de klus rechtstreeks met dit bedrijf: prijs, termijn en betaling spreek je samen af. Is het werk klaar en in orde, rond de opdracht dan hier af.": "Zlecenie załatwiasz bezpośrednio z tą firmą: cenę, termin i płatność ustalacie między sobą. Gdy praca jest wykonana i w porządku, zakończ zlecenie tutaj.",
   "Werk klaar en in orde": "Praca wykonana i w porządku",
   "Werk klaar en in orde? De opdracht wordt dan afgerond.": "Praca wykonana i w porządku? Zlecenie zostanie zakończone.",
-  "Niet doorgegaan? Kies andere bedrijven": "Nie doszło do skutku? Wybierz inne firmy"
+  "Niet doorgegaan? Kies andere bedrijven": "Nie doszło do skutku? Wybierz inne firmy",
+  "In het bericht staat een link naar een pagina waarop het bedrijf je klus ziet, leest dat het geen spam is en met één klik kan antwoorden. Je ziet hier of het bedrijf de pagina opende en wat het antwoordde.": "W wiadomości jest link do strony, na której firma widzi Twoje zlecenie, czyta, że to nie spam, i odpowiada jednym kliknięciem. Zobaczysz tutaj, czy firma otworzyła stronę i co odpowiedziała.",
+  "Opende de opdrachtpagina op :date": "Otworzyła stronę zlecenia :date",
+  "Heeft interesse (:date)": "Zainteresowana (:date)",
+  "Geen interesse (:date)": "Niezainteresowana (:date)",
+  "Contactpersoon: :name": "Osoba kontaktowa: :name",
+  "Neem contact op: :contact": "Skontaktuj się: :contact",
+  "Bericht van het bedrijf": "Wiadomość od firmy",
+  "Opdrachtpagina voor dit bedrijf": "Strona zlecenia dla tej firmy"
 }

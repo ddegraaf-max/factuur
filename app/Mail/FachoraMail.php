@@ -96,6 +96,23 @@ class FachoraMail extends Mailable
                         __('Bewaar deze mail: de link hieronder is jouw persoonlijke opdrachtpagina.'),
                     ])), ['label' => __('Bedrijven kiezen'), 'url' => $jobUrl], $facts);
                     break;
+                case 'direct_response': // 1.98: een registerbedrijf antwoordde op de deelpagina van de klus
+                    $pn = (string) ($this->extra['provider_name'] ?? '');
+                    if (! empty($this->extra['interested'])) {
+                        $set(__(':provider heeft interesse in je klus :ref', ['provider' => $pn, 'ref' => $ref]), __('Een bedrijf heeft interesse'), [
+                            __(':provider opende de pagina van je klus en laat weten interesse te hebben. Neem contact op via de gegevens hieronder.', ['provider' => $pn]),
+                        ], ['label' => __('Mijn opdracht'), 'url' => $jobUrl], array_filter([
+                            __('Contactpersoon') => $this->extra['name'] ?? null,
+                            __('Telefoon') => $this->extra['phone'] ?? null,
+                            __('E-mail') => $this->extra['email'] ?? null,
+                        ]));
+                        $out['quote'] = $this->extra['message'] ?? null;
+                    } else {
+                        $set(__(':provider heeft geen interesse (:ref)', ['provider' => $pn, 'ref' => $ref]), __('Geen interesse'), [
+                            __(':provider laat weten geen interesse te hebben in je klus. Neem contact op met de andere bedrijven van je lijst, of kies op je opdrachtpagina nieuwe bedrijven.', ['provider' => $pn]),
+                        ], ['label' => __('Mijn opdracht'), 'url' => $jobUrl]);
+                    }
+                    break;
                 case 'confirmed':
                     $set(__('Je aanvraag :ref staat open', ['ref' => $ref]), __('We zoeken een bedrijf voor je'), [
                         ! empty($job->selected_providers) && $job->offers()->count() === 0

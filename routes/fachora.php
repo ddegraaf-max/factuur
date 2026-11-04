@@ -7,6 +7,7 @@ use App\Http\Controllers\Fachora\JobController;
 use App\Http\Controllers\Fachora\OfferController;
 use App\Http\Controllers\Fachora\ProviderController;
 use App\Http\Controllers\Fachora\PublicController;
+use App\Http\Controllers\Fachora\ShareController;
 use App\Support\Market;
 use Illuminate\Support\Facades\Route;
 
@@ -67,6 +68,14 @@ Route::middleware('brand:fachora')->group(function () {
     });
 
     // ---------- bedrijf: aanbieding (geheime link) ----------
+    // 1.98: de alleen-lezen opdrachtpagina die de klant in zijn bericht aan een registerbedrijf zet.
+    // Eigen token (share_token) + per bedrijf een HMAC-code, zodat de link niets prijsgeeft over de klantpagina.
+    Route::prefix('z/{share}/{firm}')->where(['share' => '[a-f0-9]{32,64}', 'firm' => '[0-9]+-[a-f0-9]{10}'])->name('fachora.share.')->group(function () {
+        Route::get('/', [ShareController::class, 'show'])->middleware('throttle:60,1')->name('show');
+        Route::post('/', [ShareController::class, 'respond'])->middleware('throttle:10,1')->name('respond');
+        Route::get('plik/{file}', [ShareController::class, 'file'])->whereNumber('file')->middleware('throttle:120,1')->name('file');
+    });
+
     Route::prefix('oferta/{token}')->where(['token' => '[a-f0-9]{64}'])->name('fachora.offer.')->group(function () {
         Route::get('/', [OfferController::class, 'show'])->name('show');
         Route::post('/', [OfferController::class, 'respond'])->middleware('throttle:20,1')->name('respond');

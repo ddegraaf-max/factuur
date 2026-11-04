@@ -544,6 +544,111 @@ class JobService
         return ['removed' => true, 'deleted' => $deleted];
     }
 
+    /**
+     * 1.98: de deelbare opdrachtpagina voor een registerbedrijf (/z/{share}/{id}-{code}).
+     * De klant zet de link zelf in zijn bericht; het bedrijf ziet daar de klus, leest
+     * waarom het die mail kreeg (en dat Fachora zelf niets stuurt) en antwoordt met één
+     * klik. De code per bedrijf is een HMAC over share_token en bedrijfs-id: een link
+     * werkt alleen voor dat bedrijf en zegt niets over het klanttoken.
+     */
+    public function shareCode(ServiceJob $job, int $providerId): string
+    {
+        return substr(hash_hmac('sha256', $job->shareToken() . '|' . $providerId, (string) config('app.key')), 0, 10);
+    }
+
+    public function shareUrl(ServiceJob $job, Provider $provider): string
+    {
+        return route('fachora.share.show', [$job->shareToken(), $provider->id . '-' . $this->shareCode($job, $provider->id)]);
+    }
+
+    /**
+     * Zoekt opdracht en bedrijf bij een deel-link. 'active' = het bedrijf staat nog op de
+     * lijst van de klant en de opdracht wacht nog op reacties; anders toont de pagina
+     * "nieaktualne" zonder formulier.
+     *
+     * @return array{job: ServiceJob, provider: Provider, active: bool}|null
+     */
+    public function findShared(string $share, string $firm): ?array
+    {
+        if (! preg_match('/^([0-9]+)-([a-f0-9]{10})$/', $firm, $m)) {
+            return null;
+        }
+        $job = ServiceJob::query()->where('share_token', $share)->first();
+        $provider = $job ? Provider::query()->find((int) $m[1]) : null;
+        if ($job === null || $provider === null || ! hash_equals($this->shareCode($job, $provider->id), $m[2])) {
+            return null;
+        }
+        $active = $job->status === 'open' && ! $job->offers()->exists()
+            && in_array($provider->id, array_map('intval', (array) $job->selected_providers), true)
+            && ConsentPolicy::mayShowDirectContact($provider);
+
+        return ['job' => $job, 'provider' => $provider, 'active' => $active];
+    }
+
+    /** Het bedrijf opende de deelpagina: eerste moment en aantal; één regel in het opdrachtlogboek. */
+    public function recordShareOpened(ServiceJob $job, Provider $provider): void
+    {
+        $all = (array) ($job->direct_responses ?? []);
+        $entry = (array) ($all[(string) $provider->id] ?? []);
+        $first = empty($entry['opened_at']);
+        $entry['opened_at'] = $entry['opened_at'] ?? now()->toIso8601String();
+        $entry['opened_count'] = (int) ($entry['opened_count'] ?? 0) + 1;
+        $all[(string) $provider->id] = $entry;
+        $job->forceFill(['direct_responses' => $all])->save();
+        if ($first) {
+            $this->log($job, 'direct_opened', 'provider', __(':name opende de opdrachtpagina', ['name' => $provider->display_name]));
+        }
+    }
+
+    /**
+     * Het antwoord van het bedrijf op de deelpagina: interesse (met contactgegevens en
+     * een bericht) of geen interesse. De klant krijgt een mail; het bedrijf krijgt niets.
+     *
+     * @param  array{kind: string, name?: ?string, phone?: ?string, email?: ?string, message?: ?string}  $data
+     */
+    public function respondDirect(ServiceJob $job, Provider $provider, array $data): void
+    {
+        $found = $this->findShared($job->shareToken(), $provider->id . '-' . $this->shareCode($job, $provider->id));
+        if ($found === null || ! $found['active']) {
+            throw new \DomainException(__('Deze opdracht is niet meer actueel.'));
+        }
+        $interested = ($data['kind'] ?? '') === 'interested';
+        $clean = fn ($v) => $interested && trim((string) $v) !== '' ? trim((string) $v) : null;
+        $all = (array) ($job->direct_responses ?? []);
+        $entry = (array) ($all[(string) $provider->id] ?? []);
+        $entry += ['opened_at' => now()->toIso8601String(), 'opened_count' => 1];
+        $entry['kind'] = $interested ? 'interested' : 'declined';
+        $entry['name'] = $clean($data['name'] ?? null);
+        $entry['phone'] = $clean($data['phone'] ?? null);
+        $entry['email'] = $clean($data['email'] ?? null);
+        $entry['message'] = $clean($data['message'] ?? null);
+        $entry['at'] = now()->toIso8601String();
+        $all[(string) $provider->id] = $entry;
+        $job->forceFill(['direct_responses' => $all])->save();
+        $this->log($job, $interested ? 'direct_interested' : 'direct_declined', 'provider', $interested
+            ? __(':name heeft interesse en vraagt om contact', ['name' => $provider->display_name])
+            : __(':name heeft geen interesse', ['name' => $provider->display_name]));
+        $this->notifier->customer($job, 'direct_response', ['provider_name' => $provider->display_name, 'interested' => $interested,
+            'name' => $entry['name'], 'phone' => $entry['phone'], 'email' => $entry['email'], 'message' => $entry['message']]);
+    }
+
+    /** Voor de klantpagina: opende het bedrijf de deelpagina en wat antwoordde het? @return array<string, mixed>|null */
+    public function directResponse(ServiceJob $job, int $providerId): ?array
+    {
+        $entry = ((array) ($job->direct_responses ?? []))[(string) $providerId] ?? null;
+        if (! is_array($entry)) {
+            return null;
+        }
+        $fmt = fn (?string $iso) => $iso ? \Illuminate\Support\Carbon::parse($iso)->timezone(config('app.timezone'))->translatedFormat('j M H:i') : null;
+
+        return [
+            'opened_at' => $fmt($entry['opened_at'] ?? null),
+            'kind' => $entry['kind'] ?? null,
+            'name' => $entry['name'] ?? null, 'phone' => $entry['phone'] ?? null, 'email' => $entry['email'] ?? null, 'message' => $entry['message'] ?? null,
+            'at' => $fmt($entry['at'] ?? null),
+        ];
+    }
+
     public function directContacts(ServiceJob $job): \Illuminate\Support\Collection
     {
         $ids = array_map('intval', (array) $job->selected_providers);

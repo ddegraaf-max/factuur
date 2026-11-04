@@ -38,7 +38,7 @@ class ServiceJob extends Model
         'paid_at', 'payout_at', 'refunded_at', 'fee_percent', 'fee_amount', 'payout_amount',
         'started_at', 'done_at', 'done_note', 'accepted_at', 'accepted_by', 'dispute_opened_at', 'dispute_reason', 'dispute_reply', 'dispute_replied_at',
         'dispute_resolution', 'dispute_note', 'resolved_at', 'cancelled_at', 'cancelled_by', 'cancel_reason', 'invoice_id', 'reviewed_at', 'owner_notified_at',
-        'languages', 'selected_providers', 'direct_contacted', 'request_fee', 'request_session_id', 'request_paid_at',
+        'languages', 'selected_providers', 'direct_contacted', 'direct_responses', 'share_token', 'request_fee', 'request_session_id', 'request_paid_at',
         'phone_code', 'phone_code_sent_at', 'phone_code_attempts', 'phone_verified_at', 'provider_search_at',
     ];
 
@@ -74,6 +74,7 @@ class ServiceJob extends Model
         'languages' => 'array',
         'selected_providers' => 'array',
         'direct_contacted' => 'array',
+        'direct_responses' => 'array',
         'request_fee' => 'float',
         'request_paid_at' => 'datetime',
         'phone_code_sent_at' => 'datetime',
@@ -105,12 +106,25 @@ class ServiceJob extends Model
     }
 
     /** Opdracht die de klant zelf met een registerbedrijf regelde (1.97): wel een bedrijf, geen aanbieding via Fachora. */
+    /**
+     * 1.98: token van de alleen-lezen opdrachtpagina voor registerbedrijven (/z/…).
+     * Los van het klanttoken, zodat een bedrijf nooit de beheerpagina van de klant ziet.
+     */
+    public function shareToken(): string
+    {
+        if (blank($this->share_token)) {
+            $this->forceFill(['share_token' => bin2hex(random_bytes(16))])->save();
+        }
+
+        return (string) $this->share_token;
+    }
+
     public function isDirect(): bool
     {
         return $this->provider_id !== null && $this->chosen_offer_id === null;
     }
 
-    protected $hidden = ['token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id', 'phone_code'];
+    protected $hidden = ['token', 'share_token', 'creator_ip', 'stripe_session_id', 'stripe_payment_intent', 'stripe_charge_id', 'stripe_transfer_id', 'stripe_refund_id', 'request_session_id', 'phone_code'];
 
     public function provider(): BelongsTo
     {

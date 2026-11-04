@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 2 november 2026 · {{ brand('version_prefix') }} 1.97.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.98.0</div>
+        <h2>Fachora: het bericht aan registerbedrijven bewijst dat het geen spam is</h2>
+        <ul class="tl-list">
+          <li><b>Opdrachtpagina voor het bedrijf</b> — elk bericht dat de klant zelf verstuurt bevat nu een link naar een eigen, alleen-lezen pagina op fachora.pl voor dat ene bedrijf. Daar staan de klus (omschrijving, plaats, termijn, foto's), wie schrijft en waarom, en dat Fachora zelf geen e-mails of sms stuurt aan bedrijven uit het register. Het bedrijf antwoordt met één klik ("Tak, proszę o kontakt" met telefoon en e-mail, of "Nie, dziękuję") en kan zich met één klik van fachora.pl laten verwijderen.</li>
+          <li><b>De klant ziet wat er gebeurt</b> — per bedrijf staat op de opdrachtpagina of het de pagina opende, of het interesse heeft (met contactgegevens en bericht) of niet; bij een antwoord krijgt de klant een mail. Het bedrijf krijgt van Fachora nog steeds niets.</li>
+          <li><b>Beter bericht</b> — de kant-en-klare Poolse mail noemt het bedrijf bij naam, legt uit dat het uit CEIDG komt en dat het geen reclame of massamail is, geeft telefoonnummer en talen van de klant en vraagt om een kort "nie" bij geen interesse. De zin "uw bedrijf staat al op fachora.pl" is weg: die leek te veel op de bekende nep-registermails.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">2 november 2026 · {{ brand('version_prefix') }} 1.97.0</div>
         <h2>Fachora: vervolg na zelf contact opnemen</h2>
         <ul class="tl-list">
           <li><b>Afspraak vastleggen</b> — heeft de klant met een registerbedrijf iets afgesproken, dan zet hij dat op zijn opdrachtpagina bij dat bedrijf ("Umówiłem się z tą firmą"), met prijs en datum als hij wil. De opdracht gaat op "ingepland" met dat bedrijf; Fachora stuurt het bedrijf niets.</li>

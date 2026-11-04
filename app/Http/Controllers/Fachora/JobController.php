@@ -113,6 +113,9 @@ class JobController extends Controller
                 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkd_main_name,
                 'phone_wa' => \App\Support\Fachora::whatsappNumber($p->phone),
                 'contacted' => $this->jobs->directContacted($job, $p->id), // 1.96.4: {channels, at} of null
+                // 1.98: link naar de deelpagina voor dit bedrijf, en of het die opende / wat het antwoordde
+                'share_url' => $this->jobs->shareUrl($job, $p),
+                'response' => $this->jobs->directResponse($job, $p->id),
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)

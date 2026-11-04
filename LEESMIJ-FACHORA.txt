@@ -233,6 +233,31 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+DEELPAGINA VOOR REGISTERBEDRIJVEN: HET BERICHT VAN DE KLANT IS GEEN SPAM (4 nov 2026, 1.98.0)
+- Aanleiding: drie mails van de klant (vanaf een Nederlands adres) zonder enige reactie. Het bericht leek op
+  spam, en de zin "Państwa firma jest już na fachora.pl" leek op de bekende nep-registermails (catalogi die
+  een factuur sturen). Die zin is weg; de profielclaim staat nu onderaan de deelpagina.
+- Elk bericht (Job.vue messageFor) bevat een link /z/{share_token}/{bedrijfs-id}-{code}: share_token (32 hex)
+  is een eigen kolom op service_jobs (ServiceJob::shareToken, los van het klanttoken, dus de link geeft geen
+  beheer); code = eerste 10 tekens van HMAC-SHA256(share_token|bedrijfs-id, APP_KEY) (JobService::shareCode).
+- ShareController + view fachora/zlecenie-dla-firmy (één Blade voor pl en ?lang=en, noindex via @section('robots')
+  in de marketinglay-out): klus, feiten, foto's (alleen afbeeldingen), blok "Dlaczego dostali Państwo tę wiadomość?"
+  (klant koos u uit CEIDG en schreef zelf; Fachora mailt/sms't registerbedrijven nooit; geen kosten/registratie),
+  formulier "Tak, proszę o kontakt" (naam, telefoon, e-mail — één van beide verplicht —, bericht) of "Nie,
+  dziękuję"; onderaan de afmeldlink (optout_token, zelfde pagina als onder een aanvraagmail) en "przejmij profil".
+- Opslag in service_jobs.direct_responses (json per bedrijf: opened_at, opened_count, kind, name, phone, email,
+  message, at); logboekregels direct_opened / direct_interested / direct_declined. De klant krijgt mail
+  (FachoraMail customer 'direct_response', contactfeiten + bericht als quote); het bedrijf krijgt NIETS.
+  'active' (JobService::findShared) = status open, geen aanbiedingen, bedrijf nog op selected_providers en
+  mayShowDirectContact; anders toont de pagina "nieaktualne" zonder formulier (en weigert respondDirect).
+- Klantpagina: chips "Otworzyła stronę zlecenia", "Zainteresowana"/"Niezainteresowana", contactgegevens en
+  bericht in een groen blok; link "Strona zlecenia dla tej firmy" om te zien wat het bedrijf ziet.
+- Het bericht zelf: "Piszę do firmy X. Szukam wykonawcy w okolicy …; Państwa firma widnieje w CEIDG…; piszę
+  osobiście, z prywatnego adresu; to nie reklama" + omschrijving, plaats, termijn, talen (language_label_pl),
+  telefoon van de klant, deel-link, "proszę o krótkie nie". Advies aan klanten blijft: bellen/WhatsApp werkt bij
+  eenmanszaken beter dan e-mail, en CEIDG-adressen zijn vaak oud of ongelezen.
+- Tests: FachoraShareTest.
+
 VERVOLG NA ZELF CONTACT OPNEMEN (2 nov 2026, 1.97.0, gebruiker: "hoe nu verder, kan niks")
 - Opdracht open zonder aanbiedingen = klant benadert registerbedrijven zelf. Nieuwe routes in de job-groep:
   POST firmy/{provider}/umowa (agreeDirect: status scheduled, provider_id, agreed_amount/agreed_type optioneel,

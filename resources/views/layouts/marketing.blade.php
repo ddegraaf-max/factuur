@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 {{-- Merknaam, logo's en teksten komen uit config/brand.php (EasyInvoice of Lopra). --}}
 <meta name="description" content="@yield('description', brand('seo_description'))">
-<title>@yield('title', brand('seo_title'))</title>
+@hasSection('robots')<meta name="robots" content="@yield('robots')">
+@endif<title>@yield('title', brand('seo_title'))</title>
 
 {{-- SEO: canonical + social preview + structured data. Markten met twee UI-talen (Polen: pl + en) krijgen
      per taal een eigen canonical (de Engelse versie leeft op ?lang=en) en hreflang-alternates (1.92). --}}

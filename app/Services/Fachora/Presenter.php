@@ -37,6 +37,7 @@ class Presenter
             'urgency' => $job->urgency,
             'urgency_label' => $this->urgency($job),
             'urgency_label_pl' => $this->urgencyPl($job), // 1.96: voor het Poolse bericht aan een bedrijf, los van de schermtaal
+            'language_label_pl' => $this->languagesPl($job), // 1.98: idem, de talen van de klant in het Pools
             'wanted_date' => $job->wanted_date?->toDateString(),
             'time_window' => $job->time_window,
             'language' => $job->language,
@@ -196,7 +197,7 @@ class Presenter
     }
 
     /** De wanneer-regel altijd in het Pools (het bericht aan een bedrijf is Pools, welke taal de klant ook kijkt). */
-    private function urgencyPl(ServiceJob $job): string
+    public function urgencyPl(ServiceJob $job): string
     {
         return match ($job->urgency) {
             'now' => 'Jak najszybciej',
@@ -204,6 +205,12 @@ class Presenter
             'month' => 'W ciągu miesiąca',
             default => $job->wanted_date?->copy()->locale('pl')->translatedFormat('j F Y') ?? 'Termin do uzgodnienia',
         };
+    }
+
+    /** De talen van de klant met Poolse namen ("polski, angielski"), voor het bericht en de deelpagina (1.98). */
+    public function languagesPl(ServiceJob $job): string
+    {
+        return implode(', ', array_map(fn (string $c) => mb_strtolower((string) config("fachora.languages.{$c}.pl", strtoupper($c))), $job->languageCodes()));
     }
 
     private function language(string $code): string

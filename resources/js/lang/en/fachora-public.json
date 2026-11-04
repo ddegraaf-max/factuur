@@ -415,5 +415,13 @@
   "Je regelt de klus rechtstreeks met dit bedrijf: prijs, termijn en betaling spreek je samen af. Is het werk klaar en in orde, rond de opdracht dan hier af.": "You settle the job directly with this company: price, date and payment are between you. When the work is done and in order, close the job here.",
   "Werk klaar en in orde": "Work done and in order",
   "Werk klaar en in orde? De opdracht wordt dan afgerond.": "Work done and in order? The job will be closed.",
-  "Niet doorgegaan? Kies andere bedrijven": "Did not go ahead? Pick other companies"
+  "Niet doorgegaan? Kies andere bedrijven": "Did not go ahead? Pick other companies",
+  "In het bericht staat een link naar een pagina waarop het bedrijf je klus ziet, leest dat het geen spam is en met één klik kan antwoorden. Je ziet hier of het bedrijf de pagina opende en wat het antwoordde.": "The message contains a link to a page where the company sees your job, reads that it is not spam and can reply with one click. You will see here whether the company opened the page and what it replied.",
+  "Opende de opdrachtpagina op :date": "Opened the job page on :date",
+  "Heeft interesse (:date)": "Interested (:date)",
+  "Geen interesse (:date)": "Not interested (:date)",
+  "Contactpersoon: :name": "Contact person: :name",
+  "Neem contact op: :contact": "Get in touch: :contact",
+  "Bericht van het bedrijf": "Message from the company",
+  "Opdrachtpagina voor dit bedrijf": "Job page for this company"
 }
