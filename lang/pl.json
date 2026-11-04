@@ -2165,5 +2165,6 @@
   ":company: offerte :number van :amount. Bekijk en accepteer: :link": ":company: oferta :number na kwotę :amount. Zobacz i zaakceptuj: :link",
   ":label verstuurd per sms naar :number": ":label wysłano SMS-em na :number",
   "Offerte :number per sms verstuurd naar :number2.": "Oferta :number wysłana SMS-em na :number2.",
-  "Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — verstuur hem per sms of download de PDF.": "Oferta :number zapisana. Ten klient nie ma adresu e-mail — wyślij ją SMS-em albo pobierz PDF."
+  "Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — verstuur hem per sms of download de PDF.": "Oferta :number zapisana. Ten klient nie ma adresu e-mail — wyślij ją SMS-em albo pobierz PDF.",
+  ":company: offerte van :amount. Bekijk en accepteer: :link": ":company: oferta na kwotę :amount. Zobacz i zaakceptuj: :link"
 }

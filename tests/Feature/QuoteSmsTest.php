@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Customer;
 use App\Models\Quote;
 use App\Models\SmsMessage;
+use App\Services\QuoteManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -48,8 +49,11 @@ class QuoteSmsTest extends TestCase
 
         $this->get(route('quotes.show', $quote))->assertOk()->assertInertia(fn ($page) => $page
             ->where('quote.sms.available', true)->where('quote.sms.mobile', '+31 6 12345678')->has('quote.sms.text'));
+        $preset = app(QuoteManager::class)->smsText($quote->fresh());
+        $this->assertStringNotContainsString('concept', $preset, 'geen "(concept)" in de voorgestelde tekst');
 
-        $this->post(route('quotes.sms', $quote))->assertRedirect(route('quotes.show', $quote))->assertSessionHas('flash');
+        // Het venster stuurt de voorgestelde tekst mee; na het nummeren staat het echte nummer erin.
+        $this->post(route('quotes.sms', $quote), ['text' => $preset])->assertRedirect(route('quotes.show', $quote))->assertSessionHas('flash');
         $quote->refresh();
         $this->assertSame('sent', $quote->status);
         $this->assertNotNull($quote->number);
@@ -58,6 +62,7 @@ class QuoteSmsTest extends TestCase
         $this->assertSame('sent', $message->status);
         $this->assertSame('31612345678', $message->recipient);
         $this->assertStringContainsString('offerte ' . $quote->number, $message->body);
+        $this->assertStringContainsString(__('Met vriendelijke groet,') . ' ' . explode(' ', trim($user->name))[0], $message->body, 'ondertekend met de voornaam van de verzender');
         $this->assertMatchesRegularExpression('#https?://\S+#', $message->body, 'korte link naar het portaal');
         Http::assertSent(fn ($r) => str_contains($r->url(), 'message/send') && $r['to'] === '31612345678');
         Mail::assertNothingSent();

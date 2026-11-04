@@ -224,8 +224,11 @@ class QuoteManager
         if ($to === null) {
             throw new \DomainException(__('Er is geen mobiel nummer bekend; een sms kan alleen naar een mobiel nummer.'));
         }
+        // De voorgestelde tekst in het venster is gemaakt vóór het nummer bestond; is die ongewijzigd,
+        // dan maken we hem na het nummeren opnieuw (dan staat het echte offertenummer erin).
+        $preset = trim($this->smsText($quote));
         $quote = $this->markSent($quote);
-        $body = filled($text) ? (string) $text : $this->smsText($quote);
+        $body = filled($text) && trim((string) $text) !== $preset ? (string) $text : $this->smsText($quote);
         $message = $sms->send($quote->company, $to, $body, $quote, $userId);
 
         // Nummer onthouden bij de klant als die er nog geen had.
@@ -244,17 +247,18 @@ class QuoteManager
     }
 
     /** De tekst die klaarstaat voor de sms, in de taal van de offerte, met een korte link naar het portaal. */
-    public function smsText(Quote $quote): string
+    public function smsText(Quote $quote, ?string $sender = null): string
     {
         $quote->ensurePortalToken();
         $link = \App\Models\ShortLink::for($quote->portalUrl(), $quote->company_id)->shortUrl();
 
-        return \App\Support\DocumentLocale::using($quote->language ?: 'nl', fn () => __(':company: offerte :number van :amount. Bekijk en accepteer: :link', [
-            'company' => $quote->brandedCompany()->name,
-            'number' => $quote->number ?: __('(concept)'),
-            'amount' => money($quote->total),
-            'link' => $link,
-        ]));
+        // Afzender met voornaam eronder: zo ziet de klant dat het een persoonlijk bericht is, geen spam (vraag Daniël).
+        $sender ??= \Illuminate\Support\Str::before(trim((string) auth()->user()?->name), ' ');
+        $greeting = fn () => filled($sender) ? "\n" . __('Met vriendelijke groet,') . ' ' . $sender : '';
+
+        return \App\Support\DocumentLocale::using($quote->language ?: 'nl', fn () => ($quote->number
+            ? __(':company: offerte :number van :amount. Bekijk en accepteer: :link', ['company' => $quote->brandedCompany()->name, 'number' => $quote->number, 'amount' => money($quote->total), 'link' => $link])
+            : __(':company: offerte van :amount. Bekijk en accepteer: :link', ['company' => $quote->brandedCompany()->name, 'amount' => money($quote->total), 'link' => $link])) . $greeting());
     }
 
     /** Nummer, status en portaalsleutel vastleggen (gedeeld door mail en sms). */
