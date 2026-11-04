@@ -68,4 +68,13 @@ class MailDomainTest extends TestCase
         $this->post(route('settings.integrations.maildomain.connect'), ['domain' => 'gmail.com', 'local_part' => 'jan'])->assertRedirect()->assertSessionHas('error');
         $this->post(route('settings.integrations.maildomain.connect'), ['domain' => 'https://bedrijf.nl', 'local_part' => 'jan'])->assertSessionHasErrors('domain');
     }
+
+    /** 1.101.4: zonder aparte RESEND_KEY telt het SMTP-wachtwoord van de Resend-mailer als API-sleutel. */
+    public function test_the_resend_smtp_password_counts_as_api_key(): void
+    {
+        config(['services.resend.key' => null, 'mail.mailers.smtp.password' => 're_abc123']);
+        $this->assertTrue(app(\App\Services\MailDomainService::class)->configured());
+        config(['mail.mailers.smtp.password' => 'gewoon-wachtwoord']);
+        $this->assertFalse(app(\App\Services\MailDomainService::class)->configured());
+    }
 }

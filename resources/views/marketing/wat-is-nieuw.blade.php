@@ -37,6 +37,7 @@
           <li><b>Geen e-mailadres, toch versturen</b> — op de offertepagina staat naast "Versturen" nu "Per sms". De klant krijgt een sms met een korte link naar het portaal, waar hij de offerte bekijkt en digitaal akkoord geeft. Het nummer komt van de klantkaart (of je typt het in; het wordt dan bij de klant bewaard), de tekst staat klaar en is aan te passen. De offerte krijgt gewoon het nummer en de status Verstuurd; de sms gaat van je sms-tegoed, net als een aanmaning per sms.</li>
           <li><b>Fachora: conversiemeting voor advertenties (1.101.1)</b> — fachora.pl draagt de Google Ads-tag, en de pagina direct na een bevestigde aanvraag meldt één conversie "Aanvraag of registratie". Zo leert Google Ads welke klikken aanvragen opleveren; geen persoonsgegevens in het event.</li>
           <li><b>Sms-tekst (1.101.3)</b> — de voorgestelde tekst noemt geen "(concept)" meer: het echte offertenummer komt erin zodra je verstuurt, en de sms eindigt met "Met vriendelijke groet" en je voornaam, zodat de klant ziet dat het een persoonlijk bericht is.</li>
+          <li><b>Eigen afzenderadres (1.101.4)</b> — de koppeling bij Instellingen → Koppelingen is nu beschikbaar: hij gebruikt de bestaande Resend-mailsleutel, zodat je je eigen domein (bijv. facturen@creditline.nl) kunt koppelen met een paar DNS-records.</li>
         </ul>
       </article>
       <article class="tl-item">

@@ -17,7 +17,18 @@ class MailDomainService
 {
     public function configured(): bool
     {
-        return filled(config('services.resend.key'));
+        return filled(self::key());
+    }
+
+    /**
+     * De Resend API-sleutel: RESEND_KEY, of anders het SMTP-wachtwoord van de Resend-mailer (dat is
+     * dezelfde sleutel, zie .env.example). Zo werkt de koppeling ook zonder aparte variabele (1.101.4).
+     */
+    public static function key(): ?string
+    {
+        $key = (string) (config('services.resend.key') ?: config('mail.mailers.smtp.password'));
+
+        return str_starts_with($key, 're_') ? $key : null;
     }
 
     /** Domein aanmelden bij Resend en de DNS-records op de administratie bewaren. */
@@ -108,7 +119,7 @@ class MailDomainService
 
     protected function http(): PendingRequest
     {
-        return Http::baseUrl('https://api.resend.com')->withToken((string) config('services.resend.key'))->acceptJson()->timeout(20);
+        return Http::baseUrl('https://api.resend.com')->withToken((string) self::key())->acceptJson()->timeout(20);
     }
 
     protected function json($response, string $fallback): array
