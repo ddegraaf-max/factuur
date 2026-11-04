@@ -169,6 +169,8 @@ const copyText = async (key, text, fallbackLabel) => {
     window.prompt(fallbackLabel, text);
   }
 };
+// 1.99.1: de deel-link zelf kopiëren (voor wie het bericht zelf schrijft).
+const copyShareUrl = (p) => copyText(p.id + ':link', p.share_url, t('Kopieer de link hieronder:'));
 const copyEmail = async (p) => { await copyText(p.id + ':mail', p.email, t('Kopieer het e-mailadres hieronder:')); markContacted(p, 'copy_mail'); };
 const copyMessage = async (p) => {
   const m = messageFor(p);
@@ -404,7 +406,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
           </form>
         </div>
-        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a></p>
+        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button></p>
       </article>
       <p v-if="job.can_reopen && status === 'open'" style="margin:12px 0 0;"><button type="button" class="fa-link fa-small" @click="reopen">{{ $t('Niemand gereageerd? Kies andere bedrijven') }}</button></p>
     </section>
@@ -729,6 +731,9 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-agree-form .fa-actions { grid-column: 1 / -1; }
 @media (max-width: 560px) { .jb-agree-form { grid-template-columns: 1fr; } }
 .jb-contacted-chip { margin-left: 10px; vertical-align: middle; }
+.jb-copy-icon { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; border: 1px solid #D7DBE3; background: #fff; color: inherit; border-radius: 6px; padding: 2px 8px; font: inherit; font-size: 12.5px; cursor: pointer; vertical-align: middle; }
+.jb-copy-icon:hover { border-color: #9AA3B2; }
+.jb-copy-icon.is-copied { background: #ECFDF5; border-color: #34A853; color: #1E7E34; }
 .jb-response { margin-top: 10px; padding: 10px 14px; background: #ECFDF5; border-radius: 10px; font-size: 14px; }
 .jb-response blockquote { margin: 8px 0 0; padding-left: 10px; border-left: 3px solid #34A853; white-space: pre-wrap; }
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */

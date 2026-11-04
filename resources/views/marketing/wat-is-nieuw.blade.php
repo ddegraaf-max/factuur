@@ -35,6 +35,7 @@
         <h2>Fachora: inloggen zonder wachtwoord voor klanten</h2>
         <ul class="tl-list">
           <li><b>Moje zlecenia</b> — op fachora.pl/moje-zlecenia vult de klant zijn e-mailadres in, krijgt een zescijferige code per mail (15 minuten geldig, vijf pogingen) en ziet daarna al zijn aanvragen met status en de link naar elke opdrachtpagina. Geen account, geen wachtwoord; de link staat in het menu en in de voettekst. Of een adres aanvragen heeft, verraadt de pagina niet.</li>
+          <li><b>Link kopiëren (1.99.1)</b> — naast "Opdrachtpagina voor dit bedrijf" staat een kopieerknop die de link naar het klembord zet, voor wie het bericht liever zelf schrijft.</li>
         </ul>
       </article>
       <article class="tl-item">
