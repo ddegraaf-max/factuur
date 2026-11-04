@@ -36,7 +36,7 @@
         <ul class="tl-list">
           <li><b>Moje zlecenia</b> — op fachora.pl/moje-zlecenia vult de klant zijn e-mailadres in, krijgt een zescijferige code per mail (15 minuten geldig, vijf pogingen) en ziet daarna al zijn aanvragen met status en de link naar elke opdrachtpagina. Geen account, geen wachtwoord; de link staat in het menu en in de voettekst. Of een adres aanvragen heeft, verraadt de pagina niet.</li>
           <li><b>Link kopiëren (1.99.1)</b> — naast "Opdrachtpagina voor dit bedrijf" staat een kopieerknop die de link naar het klembord zet, voor wie het bericht liever zelf schrijft.</li>
-          <li><b>Geen reactie, sluiten (1.99.2)</b> — reageert een registerbedrijf niet, dan sluit de klant het met één knop af: het kaartje klapt in tot één regel (heropenen kan altijd, en antwoordt het bedrijf alsnog via zijn opdrachtpagina, dan gaat het vanzelf weer open). Zijn alle bedrijven dicht, dan kiest de klant andere bedrijven of sluit hij de aanvraag.</li>
+          <li><b>Geen reactie, sluiten (1.99.2)</b> — reageert een registerbedrijf niet, dan sluit de klant het met één knop af: het kaartje klapt in tot één regel (heropenen kan altijd, en antwoordt het bedrijf alsnog via zijn opdrachtpagina, dan gaat het vanzelf weer open). Zijn alle bedrijven dicht, dan kiest de klant andere bedrijven of sluit hij de aanvraag. Het opdrachtlogboek onderaan de pagina werkt bij sluiten en benaderen meteen bij (1.99.3).</li>
         </ul>
       </article>
       <article class="tl-item">

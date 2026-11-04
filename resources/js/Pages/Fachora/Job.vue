@@ -132,13 +132,14 @@ const mailtoFor = (p) => {
 };
 // 1.96.4: onthouden dat de klant dit bedrijf benaderde (knoppen blijven groen, ook op een ander apparaat).
 const markContacted = (p, channel) => {
-  router.post(route('fachora.job.direct.contacted', [props.token, p.id]), { channel }, { preserveScroll: true, preserveState: true, only: ['direct'] });
+  router.post(route('fachora.job.direct.contacted', [props.token, p.id]), { channel }, { preserveScroll: true, preserveState: true, only: ['direct', 'job'] });
 };
 const done = (p, channel) => !!(p.contacted && p.contacted.channels && p.contacted.channels.includes(channel));
+// 1.99.3: 'job' mee herladen, zodat het opdrachtlogboek onderaan meteen de nieuwe regel toont (geen verversen nodig).
 // 1.99.2: "geen reactie, sluiten": het kaartje klapt in tot één regel; heropenen kan altijd. Zijn alle bedrijven
 // dicht, dan kiest de klant andere bedrijven of sluit hij de aanvraag (annuleren met een vaste reden).
 const isClosed = (p) => !!(p.response && p.response.closed_at);
-const closeDirect = (p, undo = false) => router.post(route('fachora.job.direct.close', [props.token, p.id]), { undo: undo ? 1 : 0 }, { preserveScroll: true, preserveState: true, only: ['direct'] });
+const closeDirect = (p, undo = false) => router.post(route('fachora.job.direct.close', [props.token, p.id]), { undo: undo ? 1 : 0 }, { preserveScroll: true, preserveState: true, only: ['direct', 'job'] });
 const allClosed = computed(() => props.direct.length > 0 && props.direct.every(isClosed));
 const closeRequest = () => {
   if (!window.confirm(t('Je aanvraag sluiten? Je kunt altijd een nieuwe doen.'))) return;
