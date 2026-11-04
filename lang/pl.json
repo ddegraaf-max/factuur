@@ -2161,5 +2161,9 @@
   "Vul deze code in op :url. De code is 15 minuten geldig.": "Wpisz ten kod na stronie :url. Kod jest ważny 15 minut.",
   "Heb je dit niet zelf aangevraagd? Negeer deze mail dan; er gebeurt niets.": "Jeśli to nie Ty, zignoruj tę wiadomość – nic się nie stanie.",
   "Klant sloot :name af: geen reactie": "Klient zamknął :name: brak odpowiedzi",
-  "Klant heropende :name": "Klient ponownie otworzył :name"
+  "Klant heropende :name": "Klient ponownie otworzył :name",
+  ":company: offerte :number van :amount. Bekijk en accepteer: :link": ":company: oferta :number na kwotę :amount. Zobacz i zaakceptuj: :link",
+  ":label verstuurd per sms naar :number": ":label wysłano SMS-em na :number",
+  "Offerte :number per sms verstuurd naar :number2.": "Oferta :number wysłana SMS-em na :number2.",
+  "Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — verstuur hem per sms of download de PDF.": "Oferta :number zapisana. Ten klient nie ma adresu e-mail — wyślij ją SMS-em albo pobierz PDF."
 }

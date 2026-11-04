@@ -678,5 +678,17 @@
   "Nieuwe offerte maken als kopie van deze": "Create a new quote as a copy of this one",
   "Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum. Je komt direct in het concept om het aan te passen en te versturen.": "Lines, texts, instalments and attachments are carried over to a new draft with a new validity date. You go straight to the draft to adjust and send it.",
   "Laten vervallen en kopie maken": "Withdraw and make a copy",
-  "vervangt offerte": "replaces quote"
+  "vervangt offerte": "replaces quote",
+  "Per sms": "By text message",
+  "Stuur de klant een sms met een korte link naar de offerte, ook zonder e-mailadres": "Send the customer a text message with a short link to the quote, even without an e-mail address",
+  "Offerte per sms versturen": "Send quote by text message",
+  "De klant krijgt een sms met een korte link naar de offerte; daar kan hij hem bekijken en digitaal akkoord geven. Ook zonder e-mailadres.": "The customer gets a text message with a short link to the quote, where they can view it and accept it digitally. No e-mail address needed.",
+  "Mobiel nummer": "Mobile number",
+  "06 12345678": "06 12345678",
+  "Bericht": "Message",
+  ":n tekens": ":n characters",
+  "Nog :n sms'en beschikbaar.": ":n text messages left.",
+  "Geen sms-tegoed.": "No text-message credit.",
+  "Koop een bundel bij Instellingen, Sms.": "Buy a bundle under Settings, SMS.",
+  "Sms versturen": "Send text message"
 }

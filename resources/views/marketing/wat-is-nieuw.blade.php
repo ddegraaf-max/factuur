@@ -31,7 +31,15 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.100.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.101.0</div>
+        <h2>Offerte per sms versturen</h2>
+        <ul class="tl-list">
+          <li><b>Geen e-mailadres, toch versturen</b> — op de offertepagina staat naast "Versturen" nu "Per sms". De klant krijgt een sms met een korte link naar het portaal, waar hij de offerte bekijkt en digitaal akkoord geeft. Het nummer komt van de klantkaart (of je typt het in; het wordt dan bij de klant bewaard), de tekst staat klaar en is aan te passen. De offerte krijgt gewoon het nummer en de status Verstuurd; de sms gaat van je sms-tegoed, net als een aanmaning per sms.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">4 november 2026 · {{ brand('version_prefix') }} 1.100.0</div>
         <h2>Fachora: hoofdactiviteit in het Engels</h2>
         <ul class="tl-list">
           <li><b>Vertaald uit CEIDG</b> — de hoofdactiviteit van een registerbedrijf komt letterlijk uit het Poolse register ("Wykonywanie instalacji wodno-kanalizacyjnych …"). Op de Engelse pagina staat die nu in het Engels ("Plumbing, heating, gas and air-conditioning installation"). Elke unieke naam wordt één keer door de AI vertaald en bij het bedrijf opgeslagen: direct na een import op aanvraag en verder elke tien minuten voor wat nog ontbreekt. De Poolse pagina blijft Pools.</li>

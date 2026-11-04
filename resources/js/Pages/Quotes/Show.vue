@@ -44,6 +44,12 @@ const send = () => {
   }
 };
 
+/* ---------- Per sms versturen (1.101): korte link naar het portaal, voor klanten zonder e-mail ---------- */
+const showSmsModal = ref(false);
+const smsForm = useForm({ text: props.quote.sms?.text || '', phone: props.quote.sms?.mobile || '' });
+const smsError = computed(() => (page.props.errors || {}).sms ?? null);
+const sendSms = () => smsForm.post(route('quotes.sms', props.quote.id), { preserveScroll: true, onSuccess: () => { showSmsModal.value = false; } });
+
 /* ---------- Geaccepteerd markeren (+ bevestiging naar de klant) ---------- */
 const showAcceptModal = ref(false);
 const acceptForm = useForm({
@@ -253,6 +259,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
         <button v-if="canWithdraw" class="btn btn-secondary btn-sm" :title="$t('Laat deze offerte vervallen, bijv. omdat er een nieuwe voor in de plaats komt — en laat het de klant weten')" @click="showWithdrawModal = true">{{ $t('Vervallen|offerte') }}</button>
         <button v-if="canReopen" class="btn btn-primary btn-sm" @click="reopen">{{ $t('Opnieuw aanbieden') }}</button>
         <button v-if="quote.status === 'draft'" class="btn btn-danger btn-sm" @click="destroy">{{ $t('Verwijder') }}</button>
+        <button v-if="canEdit && quote.sms" class="btn btn-secondary btn-sm" :title="$t('Stuur de klant een sms met een korte link naar de offerte, ook zonder e-mailadres')" @click="showSmsModal = true">{{ $t('Per sms') }}</button>
         <button v-if="canEdit" class="btn btn-primary btn-sm" @click="send">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           {{ quote.status === 'sent' ? $t('Opnieuw versturen') : $t('Versturen') }}
@@ -280,6 +287,43 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
     </div>
 
     <!-- Geaccepteerd markeren -->
+    <!-- Per sms versturen (1.101) -->
+    <div v-if="showSmsModal" class="modal-overlay" @click.self="showSmsModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Offerte per sms versturen') }}</div>
+          <button class="icon-btn" @click="showSmsModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-text">{{ $t('De klant krijgt een sms met een korte link naar de offerte; daar kan hij hem bekijken en digitaal akkoord geven. Ook zonder e-mailadres.') }}</p>
+          <div class="form-group">
+            <label>{{ $t('Mobiel nummer') }}</label>
+            <input type="tel" v-model="smsForm.phone" class="form-control" :placeholder="$t('06 12345678')">
+            <div v-if="smsForm.errors.phone" class="form-error">{{ smsForm.errors.phone }}</div>
+          </div>
+          <div class="form-group">
+            <label>{{ $t('Bericht') }} <span class="muted">({{ $t(':n tekens', { n: smsForm.text.length }) }})</span></label>
+            <textarea v-model="smsForm.text" class="form-control" rows="4" maxlength="500"></textarea>
+            <div v-if="smsForm.errors.text" class="form-error">{{ smsForm.errors.text }}</div>
+          </div>
+          <p class="muted" style="font-size:13px;margin:0;">
+            <template v-if="quote.sms.available">{{ $t("Nog :n sms'en beschikbaar.", { n: quote.sms.remaining }) }}</template>
+            <template v-else>{{ $t('Geen sms-tegoed.') }} <Link v-if="quote.sms.buy_url" :href="quote.sms.buy_url">{{ $t('Koop een bundel bij Instellingen, Sms.') }}</Link></template>
+          </p>
+          <div v-if="smsError" class="form-error" style="margin-top:8px;">{{ smsError }}</div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showSmsModal = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" @click="sendSms" :disabled="smsForm.processing || !quote.sms.available || !smsForm.phone">{{ $t('Sms versturen') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="showAcceptModal" class="modal-overlay" @click.self="showAcceptModal = false">
       <div class="modal">
         <div class="modal-header">

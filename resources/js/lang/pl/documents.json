@@ -678,5 +678,17 @@
   "Nieuwe offerte maken als kopie van deze": "Utwórz nową ofertę jako kopię tej",
   "Regels, teksten, termijnen en bijlagen gaan mee in een nieuw concept met een nieuwe geldigheidsdatum. Je komt direct in het concept om het aan te passen en te versturen.": "Pozycje, teksty, raty i załączniki trafiają do nowego szkicu z nową datą ważności. Od razu przechodzisz do szkicu, aby go poprawić i wysłać.",
   "Laten vervallen en kopie maken": "Wycofaj i utwórz kopię",
-  "vervangt offerte": "zastępuje ofertę"
+  "vervangt offerte": "zastępuje ofertę",
+  "Per sms": "SMS-em",
+  "Stuur de klant een sms met een korte link naar de offerte, ook zonder e-mailadres": "Wyślij klientowi SMS z krótkim linkiem do oferty, także bez adresu e-mail",
+  "Offerte per sms versturen": "Wyślij ofertę SMS-em",
+  "De klant krijgt een sms met een korte link naar de offerte; daar kan hij hem bekijken en digitaal akkoord geven. Ook zonder e-mailadres.": "Klient otrzyma SMS z krótkim linkiem do oferty; może ją tam obejrzeć i zaakceptować cyfrowo. Także bez adresu e-mail.",
+  "Mobiel nummer": "Numer komórkowy",
+  "06 12345678": "600 123 456",
+  "Bericht": "Wiadomość",
+  ":n tekens": ":n znaków",
+  "Nog :n sms'en beschikbaar.": "Pozostało :n SMS-ów.",
+  "Geen sms-tegoed.": "Brak środków na SMS.",
+  "Koop een bundel bij Instellingen, Sms.": "Kup pakiet w Ustawienia, SMS.",
+  "Sms versturen": "Wyślij SMS"
 }

@@ -175,6 +175,16 @@ class QuoteController extends Controller
                 'portal_url' => $quote->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
                 'send_email' => $quote->customer_email ?: $quote->customer?->email,
+                // 1.101: per sms versturen (alleen mobiel, alleen met tegoed); de tekst staat klaar.
+                'sms' => ($smsService = app(\App\Services\SmsService::class))->enabled($quote->company) && in_array($quote->status, ['draft', 'sent'], true) ? [
+                    'available' => $smsService->available($quote->company),
+                    'free' => $smsService->free($quote->company),
+                    'remaining' => $smsService->remaining($quote->company),
+                    'max_segments' => \App\Services\SmsService::MAX_SEGMENTS,
+                    'mobile' => ($m = $this->manager->smsMobile($quote)) ? \App\Support\PhoneNumber::display($m) : null,
+                    'text' => $this->manager->smsText($quote),
+                    'buy_url' => auth()->user()?->isOwner() ? route('settings.sms') : null,
+                ] : null,
                 // Uitvragen bij onderaannemers voor dit project, en de pool voor een nieuwe ronde.
                 'tender_rounds' => \App\Models\TenderRound::with(['workPackage', 'requests'])->where('quote_id', $quote->id)->orderByDesc('id')->get()
                     ->map(fn ($r) => [
@@ -267,6 +277,23 @@ class QuoteController extends Controller
     public function send(Quote $quote): RedirectResponse
     {
         return $this->dispatchSend($quote);
+    }
+
+    /** 1.101: de offerte per sms versturen (korte link naar het portaal), voor klanten zonder e-mailadres. */
+    public function sms(Request $request, Quote $quote): RedirectResponse
+    {
+        $data = $request->validate([
+            'text' => ['nullable', 'string', 'max:500'],
+            'phone' => ['nullable', 'string', 'max:40'],
+        ], ['text.max' => __('Het bericht is te lang voor een sms. Maak het korter.')]);
+
+        try {
+            $message = $this->manager->sendBySms($quote, $data['text'] ?? null, $data['phone'] ?? null, $request->user()->id);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['sms' => $e->getMessage()]);
+        }
+
+        return redirect()->route('quotes.show', $quote->fresh())->with('flash', __('Offerte :number per sms verstuurd naar :number2.', ['number' => $quote->fresh()->number, 'number2' => \App\Support\PhoneNumber::display($message->recipient)]));
     }
 
     public function accept(Request $request, Quote $quote): RedirectResponse
@@ -435,7 +462,7 @@ class QuoteController extends Controller
         $fresh = $quote->fresh();
         $message = $fresh->customer_email
             ? __('Offerte :number verstuurd naar :email.', ['number' => $fresh->number, 'email' => $fresh->customer_email])
-            : __('Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — download de PDF om hem zelf te versturen.', ['number' => $fresh->number]);
+            : __('Offerte :number vastgelegd. Deze klant heeft geen e-mailadres — verstuur hem per sms of download de PDF.', ['number' => $fresh->number]);
 
         return redirect()->route('quotes.show', $fresh)->with('flash', $message);
     }

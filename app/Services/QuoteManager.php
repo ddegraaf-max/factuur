@@ -193,25 +193,8 @@ class QuoteManager
             throw new \DomainException(__('Deze offerte kan niet (opnieuw) worden verstuurd.'));
         }
 
-        $quote = DB::transaction(function () use ($quote) {
-            if (! $quote->number) {
-                $quote->number = $this->nextNumber($quote->company, $quote->quote_date->year);
-            }
-            // Geen adres op de offerte, maar inmiddels wel bij de klant (bijv. later
-            // ingevuld)? Dan dat gebruiken — anders gaat er stilletjes niets uit.
-            if (! $quote->customer_email && $quote->customer?->email) {
-                $quote->customer_email = $quote->customer->email;
-            }
-            $quote->status = 'sent';
-            $quote->sent_at = now();
-            // Geheime link voor het portaal: bekijken én digitaal ondertekenen.
-            if (! $quote->portal_token) {
-                $quote->portal_token = bin2hex(random_bytes(32));
-            }
-            $quote->save();
-
-            return $quote;
-        });
+        // Geen adres op de offerte, maar inmiddels wel bij de klant? Dan dat gebruiken (zie markSent).
+        $quote = $this->markSent($quote);
 
         $this->email($quote);
 
@@ -220,6 +203,79 @@ class QuoteManager
             : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($quote)]));
 
         return $quote;
+    }
+
+    /**
+     * 1.101: offerte per sms versturen, voor klanten zonder e-mailadres (of als
+     * aanvulling). Zelfde vastlegging als bij mail (nummer, status 'sent',
+     * portaalsleutel), daarna één sms met een korte link naar het portaal waar
+     * de klant de offerte bekijkt en digitaal ondertekent. Tegoed en grenzen
+     * via SmsService.
+     *
+     * @throws \DomainException
+     */
+    public function sendBySms(Quote $quote, ?string $text = null, ?string $phone = null, ?int $userId = null): \App\Models\SmsMessage
+    {
+        if (! in_array($quote->status, ['draft', 'sent'], true)) {
+            throw new \DomainException(__('Deze offerte kan niet (opnieuw) worden verstuurd.'));
+        }
+        $sms = app(\App\Services\SmsService::class);
+        $to = \App\Support\PhoneNumber::mobile($phone) ?? $this->smsMobile($quote);
+        if ($to === null) {
+            throw new \DomainException(__('Er is geen mobiel nummer bekend; een sms kan alleen naar een mobiel nummer.'));
+        }
+        $quote = $this->markSent($quote);
+        $body = filled($text) ? (string) $text : $this->smsText($quote);
+        $message = $sms->send($quote->company, $to, $body, $quote, $userId);
+
+        // Nummer onthouden bij de klant als die er nog geen had.
+        if ($quote->customer && blank($quote->customer->phone) && filled($phone)) {
+            $quote->customer->forceFill(['phone' => $phone])->save();
+        }
+        \App\Support\Audit::log('sent', $quote, __(':label verstuurd per sms naar :number', ['label' => \App\Support\Audit::label($quote), 'number' => \App\Support\PhoneNumber::display($to)]));
+
+        return $message;
+    }
+
+    /** Het mobiele nummer van de klant op de offerte, als dat er is. */
+    public function smsMobile(Quote $quote): ?string
+    {
+        return \App\Support\PhoneNumber::mobile($quote->customer?->phone);
+    }
+
+    /** De tekst die klaarstaat voor de sms, in de taal van de offerte, met een korte link naar het portaal. */
+    public function smsText(Quote $quote): string
+    {
+        $quote->ensurePortalToken();
+        $link = \App\Models\ShortLink::for($quote->portalUrl(), $quote->company_id)->shortUrl();
+
+        return \App\Support\DocumentLocale::using($quote->language ?: 'nl', fn () => __(':company: offerte :number van :amount. Bekijk en accepteer: :link', [
+            'company' => $quote->brandedCompany()->name,
+            'number' => $quote->number ?: __('(concept)'),
+            'amount' => money($quote->total),
+            'link' => $link,
+        ]));
+    }
+
+    /** Nummer, status en portaalsleutel vastleggen (gedeeld door mail en sms). */
+    protected function markSent(Quote $quote): Quote
+    {
+        return DB::transaction(function () use ($quote) {
+            if (! $quote->number) {
+                $quote->number = $this->nextNumber($quote->company, $quote->quote_date->year);
+            }
+            if (! $quote->customer_email && $quote->customer?->email) {
+                $quote->customer_email = $quote->customer->email;
+            }
+            $quote->status = 'sent';
+            $quote->sent_at = now();
+            if (! $quote->portal_token) {
+                $quote->portal_token = bin2hex(random_bytes(32));
+            }
+            $quote->save();
+
+            return $quote;
+        });
     }
 
     public function accept(Quote $quote): Quote
