@@ -433,5 +433,19 @@
   "Andere bedrijven kiezen": "Pick other companies",
   "Aanvraag sluiten": "Close request",
   "Je aanvraag sluiten? Je kunt altijd een nieuwe doen.": "Close your request? You can always make a new one.",
-  "Geen reactie van de gekozen bedrijven": "No reply from the chosen companies"
+  "Geen reactie van de gekozen bedrijven": "No reply from the chosen companies",
+  "Wat staat er in het bericht? (vertaling)": "What does the message say? (translation)",
+  "Vertaling verbergen": "Hide translation",
+  "Vertaling van het Poolse bericht; je verstuurt de Poolse versie.": "Translation of the Polish message; you send the Polish version.",
+  "Onderwerp": "Subject",
+  "Prijsaanvraag: :title (:city)": "Quote request: :title (:city)",
+  "Geachte heer/mevrouw,": "Dear Sir or Madam,",
+  "Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – uw bedrijf staat in het CEIDG-register als bedrijf in deze branche, daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.": "I am writing to :company. I am looking for a tradesperson near :city – your company is listed in the CEIDG register as a business in this trade, which is why I am writing to you. I am writing personally, from my private e-mail address; this is not advertising or a mass mailing.",
+  "Plaats": "Place",
+  "Termijn": "Timing",
+  "Talen": "Languages",
+  "Telefoon": "Phone",
+  "Details van de klus en antwoorden met één klik (zonder inloggen):": "Job details and a one-click reply (no login needed):",
+  "Graag een richtprijs en een mogelijke datum – antwoord gewoon op deze e-mail of bel. Heeft u geen interesse, dan graag een kort \"nee\"; ik schrijf u dan niet opnieuw.": "Please send me an indicative price and a possible date – just reply to this e-mail or call. If you are not interested, a short \"no\" is enough; I will not write again.",
+  "Met vriendelijke groet": "Kind regards"
 }

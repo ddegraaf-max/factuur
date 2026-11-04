@@ -35,6 +35,7 @@
         <h2>Fachora: hoofdactiviteit in het Engels</h2>
         <ul class="tl-list">
           <li><b>Vertaald uit CEIDG</b> — de hoofdactiviteit van een registerbedrijf komt letterlijk uit het Poolse register ("Wykonywanie instalacji wodno-kanalizacyjnych …"). Op de Engelse pagina staat die nu in het Engels ("Plumbing, heating, gas and air-conditioning installation"). Elke unieke naam wordt één keer door de AI vertaald en bij het bedrijf opgeslagen: direct na een import op aanvraag en verder elke tien minuten voor wat nog ontbreekt. De Poolse pagina blijft Pools.</li>
+          <li><b>Wat staat er in mijn bericht? (1.100.1)</b> — onder het blok "zelf contact opnemen" klapt de klant een vertaling van het Poolse bericht open in zijn schermtaal, met zijn eigen omschrijving erin; hij verstuurt nog steeds de Poolse versie.</li>
         </ul>
       </article>
       <article class="tl-item">

@@ -126,6 +126,35 @@ const messageFor = (p) => {
   ].filter((line) => line !== null).join('\n');
   return { subject, body };
 };
+// 1.100.1: wat staat er in het Poolse bericht? Dezelfde opbouw in de schermtaal, met de omschrijving zoals de klant
+// die zelf schreef (description) in plaats van de Poolse vertaling. Alleen getoond als de schermtaal niet Pools is.
+const previewOpen = ref(null);
+const previewFor = (p) => {
+  const j = props.job || {};
+  const place = [j.postal_code, j.city].filter(Boolean).join(' ');
+  const subject = t('Prijsaanvraag: :title (:city)', { title: j.title || j.title_pl || '', city: j.city || '' });
+  const body = [
+    t('Geachte heer/mevrouw,'),
+    '',
+    t('Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – uw bedrijf staat in het CEIDG-register als bedrijf in deze branche, daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.', { company: p.name || '', city: j.city || '' }),
+    '',
+    j.description || j.description_pl || '',
+    '',
+    t('Plaats') + ': ' + place,
+    t('Termijn') + ': ' + (j.urgency_label || ''),
+    (j.languages || []).length > 1 && j.language_label ? t('Talen') + ': ' + j.language_label : null,
+    j.customer_phone ? t('Telefoon') + ': ' + j.customer_phone : null,
+    '',
+    p.share_url ? t('Details van de klus en antwoorden met één klik (zonder inloggen):') : null,
+    p.share_url || null,
+    p.share_url ? '' : null,
+    t('Graag een richtprijs en een mogelijke datum – antwoord gewoon op deze e-mail of bel. Heeft u geen interesse, dan graag een kort "nee"; ik schrijf u dan niet opnieuw.'),
+    '',
+    t('Met vriendelijke groet'),
+    j.customer_name || '',
+  ].filter((line) => line !== null).join('\n');
+  return { subject, body };
+};
 const mailtoFor = (p) => {
   const m = messageFor(p);
   return 'mailto:' + p.email + '?subject=' + encodeURIComponent(m.subject) + '&body=' + encodeURIComponent(m.body);
@@ -424,7 +453,13 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
           </form>
         </div>
-        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button></p>
+        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button>
+          <template v-if="$page.props.locale !== 'pl'"> · <button type="button" class="fa-link fa-small" @click="previewOpen = previewOpen === p.id ? null : p.id">{{ previewOpen === p.id ? $t('Vertaling verbergen') : $t('Wat staat er in het bericht? (vertaling)') }}</button></template></p>
+        <div v-if="previewOpen === p.id" class="jb-preview">
+          <div class="fa-small fa-muted" style="margin-bottom:6px;">{{ $t('Vertaling van het Poolse bericht; je verstuurt de Poolse versie.') }}</div>
+          <div><strong>{{ $t('Onderwerp') }}:</strong> {{ previewFor(p).subject }}</div>
+          <pre>{{ previewFor(p).body }}</pre>
+        </div>
         </template>
       </article>
       <div v-if="allClosed && status === 'open'" class="fa-card fa-card--tint">
@@ -760,6 +795,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-agree-form .fa-actions { grid-column: 1 / -1; }
 @media (max-width: 560px) { .jb-agree-form { grid-template-columns: 1fr; } }
 .jb-contacted-chip { margin-left: 10px; vertical-align: middle; }
+.jb-preview { margin-top: 10px; padding: 12px 14px; background: #F5F6F8; border: 1px dashed #D7DBE3; border-radius: 10px; font-size: 14px; }
+.jb-preview pre { margin: 8px 0 0; white-space: pre-wrap; font: inherit; line-height: 1.5; }
 .jb-copy-icon { display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; border: 1px solid #D7DBE3; background: #fff; color: inherit; border-radius: 6px; padding: 2px 8px; font: inherit; font-size: 12.5px; cursor: pointer; vertical-align: middle; }
 .jb-copy-icon:hover { border-color: #9AA3B2; }
 .jb-copy-icon.is-copied { background: #ECFDF5; border-color: #34A853; color: #1E7E34; }
