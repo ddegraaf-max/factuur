@@ -712,5 +712,6 @@
   "\":label\" markeren als algemene kosten? Hij hoort dan bij geen project en wordt hier niet meer aangeboden. Terugdraaien kan op de inkoopfactuur zelf.": "Oznaczyć \":label\" jako koszty ogólne? Nie będzie wtedy należeć do żadnego projektu i nie pojawi się tu więcej. Cofnąć można na samej fakturze zakupu.",
   "Algemene kosten: hoort bij geen project en komt hier niet meer terug": "Koszty ogólne: nie należą do żadnego projektu i nie pojawią się tu więcej",
   "Algemene kosten zoals verzekering, incasso of kantoor? Klik \"Geen project\": die factuur komt hier dan niet meer terug.": "Koszty ogólne, np. ubezpieczenie, windykacja lub biuro? Kliknij „Bez projektu”: ta faktura nie pojawi się tu więcej.",
-  ":n verborgen als algemene kosten (aan te passen op de inkoopfactuur zelf).": ":n ukryto jako koszty ogólne (do zmiany na samej fakturze zakupu)."
+  ":n verborgen als algemene kosten (aan te passen op de inkoopfactuur zelf).": ":n ukryto jako koszty ogólne (do zmiany na samej fakturze zakupu).",
+  "Geen mobiel nummer bekend: vul het eerst in bij de klant, dan kun je de offerte per sms versturen": "Brak numeru komórkowego: najpierw uzupełnij go u klienta, wtedy wyślesz ofertę SMS-em"
 }
