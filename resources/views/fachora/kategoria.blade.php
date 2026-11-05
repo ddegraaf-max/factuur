@@ -105,7 +105,7 @@
       <div class="fc-icon">@include('fachora.partials.icon', ['name' => $icon, 'size' => 34])</div>
       <div style="flex:1;min-width:260px;">
         <h1>{{ $h1 }}</h1>
-        @if($examples)<p class="fc-ex">Na przykład: {{ $examples }}. Firmy Fachora Verified: sprawdzone w rejestrach, z ceną z góry, fakturą i gwarancją. Do tego firmy z rejestru przedsiębiorców, które sam wybierasz po opisaniu zlecenia.</p>@endif
+        @if($examples)<p class="fc-ex">Na przykład: {{ $examples }}. Firmy Fachora Verified: sprawdzone w rejestrach, z ceną z góry, fakturą i gwarancją. Do tego firmy z dobrymi opiniami w Google i z rejestru przedsiębiorców, które sam wybierasz po opisaniu zlecenia.</p>@endif
         <div class="fc-ctas">
           <a href="{{ $intakeUrl }}" class="btn btn-primary btn-lg">Zostaw zlecenie →</a>
           <small>Bezpłatnie, bez konta. Sam wybierasz do {{ (int) config('fachora.max_offers') }} firm z listy.</small>
