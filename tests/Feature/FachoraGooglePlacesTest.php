@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Mail\FachoraMail;
 use App\Models\Provider;
 use App\Models\ServiceJob;
 use App\Services\Fachora\ConsentPolicy;
@@ -222,5 +223,55 @@ class FachoraGooglePlacesTest extends TestCase
         config(['fachora.google_places_key' => null]);
         $this->artisan('fachora:google-import', ['category' => 'hydraulik', 'city' => 'Szczecin'])->assertFailed();
         $this->assertFalse(app(JobService::class)->localImportAvailable(), 'zonder Google-sleutel en zonder CEIDG-token geen import op aanvraag');
+    }
+
+    public function test_with_only_register_companies_nearby_google_is_still_searched_first(): void
+    {
+        foreach (range(1, 6) as $i) {
+            $this->registerProvider("Zakład Kowalski $i");
+        }
+        $this->fakeGoogle([$this->place('ChA', 'Hydro-Max Szczecin', 4.9, 120)]);
+        $job = $this->confirmedJob();
+        $this->assertSame('selecting', $job->status);
+        $this->assertNotNull($job->provider_search_at, 'alleen registerbedrijven: eerst Google raadplegen, de klant wacht even');
+        Mail::assertNotSent(FachoraMail::class, fn (FachoraMail $m) => $m->kind === 'choose');
+
+        app(JobService::class)->runLocalSearches();
+        $job->refresh();
+        $this->assertNull($job->provider_search_at);
+        $names = app(ProviderService::class)->choiceCandidates($job)->pluck('display_name')->all();
+        $this->assertSame('Hydro-Max Szczecin', $names[0]);
+        $this->assertCount(7, $names);
+        Mail::assertSent(FachoraMail::class, fn (FachoraMail $m) => $m->kind === 'choose' && $m->hasTo('anna@example.com'));
+        $this->assertFalse(app(JobService::class)->needsQualitySearch($job), 'Google is geraadpleegd: niet nog eens');
+    }
+
+    public function test_an_older_selection_gets_the_google_search_when_the_customer_opens_the_page(): void
+    {
+        foreach (range(1, 6) as $i) {
+            $this->registerProvider("Zakład Kowalski $i");
+        }
+        $this->fakeGoogle([$this->place('ChA', 'Hydro-Max Szczecin', 4.9, 120)]);
+        $job = ServiceJob::create([
+            'reference' => ServiceJob::nextReference(), 'token' => bin2hex(random_bytes(32)), 'status' => 'selecting', 'confirmed_at' => now(), 'request_fee' => 0,
+            'category' => 'hydraulik', 'title' => 'Kran', 'description' => 'Kran w kuchni cieknie, potrzebna wymiana.',
+            'urgency' => 'week', 'language' => 'pl', 'customer_name' => 'Anna Nowak', 'customer_email' => 'anna@example.com',
+            'customer_locale' => 'pl', 'postal_code' => '70-001', 'city' => 'Szczecin', 'lat' => 53.4285, 'lng' => 14.5528,
+        ]);
+
+        $this->get(route('fachora.job.show', $job->token))->assertOk()->assertInertia(fn ($page) => $page->where('choice.searching', true));
+        $job->refresh();
+        $this->assertNotNull($job->provider_search_at);
+        $this->assertSame(1, $job->events()->where('kind', 'provider_research')->count());
+        $this->get(route('fachora.job.show', $job->token))->assertOk();
+        $this->assertSame(1, $job->events()->where('kind', 'provider_research')->count(), 'niet nog eens gestart');
+
+        app(JobService::class)->runLocalSearches();
+        $job->refresh();
+        $this->assertNull($job->provider_search_at);
+        Mail::assertNotSent(FachoraMail::class, fn (FachoraMail $m) => $m->kind === 'choose');
+        $this->get(route('fachora.job.show', $job->token))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('choice.searching', false)->where('choice.candidates.0.name', 'Hydro-Max Szczecin')->where('choice.candidates.0.source', 'google'));
+        $this->assertFalse(app(JobService::class)->ensureSearched($job->fresh()), 'Google is nu geraadpleegd: geen nieuwe zoektocht');
     }
 }

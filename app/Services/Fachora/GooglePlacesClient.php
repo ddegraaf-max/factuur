@@ -38,6 +38,17 @@ class GooglePlacesClient
         return filled(config('fachora.google_places_key'));
     }
 
+    /** Per categorie en plaats hooguit eens per local_import_days zoeken (ook bij een nieuwe klant op dezelfde plek). */
+    public static function cacheKey(ServiceJob $job): string
+    {
+        return 'fachora:google-import:' . $job->category . ':' . GeocodeService::normalise((string) $job->city);
+    }
+
+    public function recentlySearched(ServiceJob $job): bool
+    {
+        return Cache::has(self::cacheKey($job));
+    }
+
     /** Zoektermen (Pools) voor een categorie: config fachora.google_terms, anders de categorienaam. */
     public static function termsFor(string $category): array
     {
@@ -63,7 +74,7 @@ class GooglePlacesClient
         if ($job->lat === null || $job->lng === null || blank($job->city)) {
             return ['skipped' => 'no_location'] + $result;
         }
-        $key = 'fachora:google-import:' . $job->category . ':' . GeocodeService::normalise($job->city);
+        $key = self::cacheKey($job);
         if (Cache::has($key)) {
             return ['skipped' => 'recent'] + $result;
         }

@@ -92,6 +92,10 @@ class JobController extends Controller
         if ($job->isPending()) {
             return redirect($job->confirmUrl());
         }
+        // 1.103.1: alsnog goed beoordeelde bedrijven zoeken voor een klant die alleen registerbedrijven kreeg.
+        if ($job->isSelecting() && $this->jobs->ensureSearched($job)) {
+            $job->refresh();
+        }
         $job->load(['offers.provider', 'extras', 'events', 'review', 'files', 'provider']);
 
         return Inertia::render('Fachora/Job', [

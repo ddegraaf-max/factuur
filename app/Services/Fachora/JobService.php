@@ -143,7 +143,8 @@ class JobService
         // 1.87: is er (nog) niemand, dan zoeken we eerst in CEIDG rond de klant (import op aanvraag).
         $customerChoice = (bool) config('fachora.customer_choice', true);
         $available = $customerChoice ? $this->providers->choiceCandidates($job, (int) config('fachora.local_import_min', 5))->count() : 0;
-        $search = $customerChoice && $available === 0 && $this->localImportAvailable();
+        // 1.103.1: ook zoeken als er alleen registerbedrijven zijn en Google nog niet is geraadpleegd (goed beoordeelde bedrijven eerst).
+        $search = $customerChoice && $this->localImportAvailable() && ($available === 0 || $this->needsQualitySearch($job));
         $choose = $customerChoice && ($available > 0 || $search);
         $first = ServiceJob::query()->whereKey($job->id)->where('status', 'pending')
             ->update(['status' => $choose ? 'selecting' : 'open', 'confirmed_at' => now()]
@@ -355,6 +356,40 @@ class JobService
         }
     }
 
+    /**
+     * 1.103.1: nog geen Verified, geclaimd of Google-bedrijf om uit te kiezen (alleen eenmanszaken uit het
+     * register) terwijl Google beschikbaar is en hier nog niet is geraadpleegd? Dan eerst zoeken.
+     */
+    public function needsQualitySearch(ServiceJob $job): bool
+    {
+        $google = app(GooglePlacesClient::class);
+        if (! $google->configured() || $google->recentlySearched($job)) {
+            return false;
+        }
+        $min = (int) config('fachora.register_fallback_min', 5);
+        $quality = $this->providers->choiceCandidates($job, $min)->reject(fn (Provider $p) => $p->status === 'unclaimed' && ! $p->isGoogle())->count();
+
+        return $quality < $min;
+    }
+
+    /**
+     * 1.103.1: een klant die al mag kiezen (bijv. een aanvraag van vóór de Google-bron) krijgt alsnog een
+     * zoektocht zodra hij zijn pagina opent: zandloper, planner binnen een minuut, geen tweede keuzemail.
+     */
+    public function ensureSearched(ServiceJob $job): bool
+    {
+        if (! $job->isSelecting() || $job->provider_search_at !== null || ! $this->localImportAvailable() || ! $this->needsQualitySearch($job)) {
+            return false;
+        }
+        $started = ServiceJob::query()->whereKey($job->id)->where('status', 'selecting')->whereNull('provider_search_at')
+            ->update(['provider_search_at' => now()]) === 1;
+        if ($started) {
+            $this->log($job, 'provider_research', 'system', __('Zoeken naar goed beoordeelde bedrijven in de buurt'));
+        }
+
+        return $started;
+    }
+
     /** De zoektocht is klaar: keuzemail, of zonder kandidaten de gewone route. */
     public function finishSearch(ServiceJob $job): void
     {
@@ -367,7 +402,10 @@ class JobService
         $found = $this->providers->choiceCandidates($job)->count();
         $this->log($job, 'provider_search_done', 'system', __('Zoektocht klaar: :n bedrijven om uit te kiezen', ['n' => $found]));
         if ($found > 0) {
-            $this->notifier->customer($job, 'choose');
+            // Een herzoektocht (1.103.1) begint vanaf de pagina van de klant; die kreeg de keuzemail al.
+            if (! $job->events()->where('kind', 'provider_research')->exists()) {
+                $this->notifier->customer($job, 'choose');
+            }
 
             return;
         }
