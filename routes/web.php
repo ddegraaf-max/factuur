@@ -646,6 +646,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
 
     Route::resource('invoices', InvoiceController::class);
     Route::post('invoices/{invoice}/send', [InvoiceController::class, 'send'])->name('invoices.send');
+    Route::post('invoices/{invoice}/sms', [InvoiceController::class, 'sms'])->middleware('throttle:20,1')->name('invoices.sms'); // 1.104: per sms, voor klanten zonder e-mail
     Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
     Route::get('invoices/{invoice}/ubl', [InvoiceController::class, 'ubl'])->name('invoices.ubl');
     Route::post('invoices/{invoice}/herinnering', [InvoiceController::class, 'remind'])->name('invoices.remind');

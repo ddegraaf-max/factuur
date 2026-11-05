@@ -352,6 +352,12 @@ const sendInvoice = () => {
   router.post(route('invoices.send', props.invoice.id));
 };
 
+/* ---------- Per sms versturen (1.104): korte link naar het portaal, voor klanten zonder e-mail ---------- */
+const showSmsModal = ref(false);
+const smsForm = useForm({ text: props.invoice.sms_send?.text || '', phone: props.invoice.sms_send?.mobile || '' });
+const smsError = computed(() => (page.props.errors || {}).sms ?? null);
+const sendSms = () => smsForm.post(route('invoices.sms', props.invoice.id), { preserveScroll: true, onSuccess: () => { showSmsModal.value = false; } });
+
 /* ---------- Voorvertoning (PDF) ---------- */
 const viewMode = ref('regels');
 
@@ -514,6 +520,13 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
           {{ $t('Maak terugkerend') }}
         </button>
+        <!-- 1.104: per sms (korte link naar het portaal); grijs zonder mobiel nummer -->
+        <span v-if="invoice.sms_send" style="display:inline-flex;" :title="invoice.sms_send.mobile ? $t('Stuur de klant een sms met een korte link naar de factuur, om online te bekijken en te betalen') : $t('Geen mobiel nummer bekend: vul het eerst in bij de klant, dan kun je de factuur per sms versturen')">
+        <button class="btn btn-primary btn-sm" :disabled="!invoice.sms_send.mobile" @click="showSmsModal = true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          {{ $t('Per sms') }}
+        </button>
+        </span>
         <template v-if="invoice.status === 'draft'">
           <Link :href="route('invoices.edit', invoice.id)" class="btn btn-secondary btn-sm">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><polygon points="18.5 2.5 21.5 5.5 12 15 9 15 9 12 18.5 2.5"/></svg>
@@ -1509,6 +1522,42 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div style="display:flex;gap:8px;">
             <button class="btn btn-secondary btn-sm" @click="showRecurringModal = false">{{ $t('Annuleren') }}</button>
             <button class="btn btn-primary btn-sm" @click="createRecurring" :disabled="recurringForm.processing">{{ $t('Profiel aanmaken') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Per sms versturen (1.104) -->
+    <div v-if="showSmsModal" class="modal-overlay" @click.self="showSmsModal = false">
+      <div class="modal">
+        <div class="modal-header">
+          <div class="modal-title">{{ $t('Factuur per sms versturen') }}</div>
+          <button class="icon-btn" @click="showSmsModal = false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-text">{{ $t('De klant krijgt een sms met een korte link naar de factuur; daar kan hij hem bekijken en online betalen. Ook zonder e-mailadres.') }}</p>
+          <div class="form-group">
+            <label>{{ $t('Mobiel nummer') }}</label>
+            <input type="tel" v-model="smsForm.phone" class="form-control" :placeholder="$t('06 12345678')">
+            <div v-if="smsForm.errors.phone" class="form-error">{{ smsForm.errors.phone }}</div>
+          </div>
+          <div class="form-group">
+            <label>{{ $t('Bericht') }} <span class="muted">({{ $t(':n tekens', { n: smsForm.text.length }) }})</span></label>
+            <textarea v-model="smsForm.text" class="form-control" rows="4" maxlength="500"></textarea>
+            <div v-if="smsForm.errors.text" class="form-error">{{ smsForm.errors.text }}</div>
+          </div>
+          <p class="muted" style="font-size:13px;margin:0;">
+            <template v-if="invoice.sms_send.available">{{ $t("Nog :n sms'en beschikbaar.", { n: invoice.sms_send.remaining }) }}</template>
+            <template v-else>{{ $t('Geen sms-tegoed.') }} <Link v-if="invoice.sms_send.buy_url" :href="invoice.sms_send.buy_url">{{ $t('Koop een bundel bij Instellingen, Sms.') }}</Link></template>
+          </p>
+          <div v-if="smsError" class="form-error" style="margin-top:8px;">{{ smsError }}</div>
+        </div>
+        <div class="modal-footer">
+          <div></div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" @click="showSmsModal = false">{{ $t('Annuleren') }}</button>
+            <button class="btn btn-primary btn-sm" @click="sendSms" :disabled="smsForm.processing || !invoice.sms_send.available || !smsForm.phone">{{ $t('Sms versturen') }}</button>
           </div>
         </div>
       </div>

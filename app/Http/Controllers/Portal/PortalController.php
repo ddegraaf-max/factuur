@@ -91,17 +91,10 @@ class PortalController extends Controller
     {
         $invoice = $this->findByToken($token);
 
-        $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
-            // Bezit van de link is stap 1; stap 2 is de code naar het
-            // e-mailadres van de factuur. Zet de verificatie klaar.
-            $request->session()->put('portal_pending_email', mb_strtolower($invoice->customer_email));
-            $request->session()->put('portal_intended', route('portal.invoice', $token));
-            $request->session()->put('portal_gate', [
-                'type' => 'factuur',
-                'company' => $invoice->company?->name,
-                'number' => $invoice->number,
-            ]);
+        // Bezit van de link is stap 1; stap 2 is de code naar het e-mailadres van de factuur,
+        // of (1.104: factuur per sms, klant zonder e-mail) per sms naar het mobiele nummer.
+        if (! PortalAuthController::canAccessInvoice($request, $invoice)) {
+            PortalAuthController::startInvoiceGate($request, $invoice, route('portal.invoice', $token));
 
             return redirect()->route('portal.verify.show');
         }
@@ -208,8 +201,7 @@ class PortalController extends Controller
     {
         $invoice = $this->findByToken($token);
 
-        $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessInvoice($request, $invoice)) {
             return redirect()->route('portal.invoice', $token);
         }
 
@@ -230,8 +222,7 @@ class PortalController extends Controller
     {
         $invoice = $this->findByToken($token);
 
-        $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessInvoice($request, $invoice)) {
             return redirect()->route('portal.invoice', $token);
         }
 
@@ -256,8 +247,7 @@ class PortalController extends Controller
         abort_unless(ctype_digit($attachmentId), 404);
         $invoice = $this->findByToken($token);
 
-        $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $invoice->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessInvoice($request, $invoice)) {
             return redirect()->route('portal.invoice', $token);
         }
 
@@ -297,7 +287,8 @@ class PortalController extends Controller
             ->where('status', '!=', 'draft')
             ->first();
 
-        abort_if(! $invoice || ! $invoice->customer_email, 404);
+        // 1.104: een factuur per sms heeft geen e-mailadres, wel een mobiel nummer (de code gaat dan per sms).
+        abort_if(! $invoice || (! $invoice->customer_email && \App\Support\PhoneNumber::mobile($invoice->customer?->phone) === null), 404);
 
         return $invoice;
     }

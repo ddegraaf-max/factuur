@@ -356,5 +356,6 @@
   "We hebben een 6-cijferige code per sms gestuurd naar": "Wysłaliśmy 6-cyfrowy kod SMS-em na numer",
   "Voor je veiligheid sturen we eerst een eenmalige toegangscode per sms naar": "Dla bezpieczeństwa najpierw wyślemy jednorazowy kod dostępu SMS-em na numer",
   "het mobiele nummer waarop deze offerte is ontvangen.": "numer komórkowy, na który otrzymano tę ofertę.",
-  "De code is 10 minuten geldig.": "Kod jest ważny 10 minut."
+  "De code is 10 minuten geldig.": "Kod jest ważny 10 minut.",
+  "het mobiele nummer waarop deze factuur is ontvangen.": "numer komórkowy, na który otrzymano tę fakturę."
 }

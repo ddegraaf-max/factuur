@@ -170,7 +170,7 @@ class PortalAuthController extends Controller
         // Geslaagd: sessie vernieuwen tegen session fixation en opschonen.
         $intended = $session->pull('portal_intended');
         $session->forget([
-            'portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_code_hash', 'portal_code_expires_at',
+            'portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_pending_invoice_id', 'portal_code_hash', 'portal_code_expires_at',
             'portal_code_attempts', 'portal_code_sent_at', 'portal_gate',
         ]);
         $session->regenerate();
@@ -187,7 +187,7 @@ class PortalAuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         $request->session()->forget([
-            'portal_email', 'portal_verified_at', 'portal_pending_email', 'portal_phone', 'portal_pending_phone', 'portal_pending_quote_id',
+            'portal_email', 'portal_verified_at', 'portal_pending_email', 'portal_phone', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_pending_invoice_id',
             'portal_code_hash', 'portal_code_expires_at', 'portal_code_attempts',
             'portal_code_sent_at', 'portal_intended', 'portal_gate',
         ]);
@@ -254,6 +254,33 @@ class PortalAuthController extends Controller
         return $phone !== null && $mobile !== null && $phone === $mobile;
     }
 
+    /** 1.104: idem voor een factuur die per sms is verstuurd. */
+    public static function canAccessInvoice(Request $request, Invoice $invoice): bool
+    {
+        $email = self::verifiedEmail($request);
+        if ($email && filled($invoice->customer_email) && strcasecmp($email, $invoice->customer_email) === 0) {
+            return true;
+        }
+        $phone = self::verifiedPhone($request);
+        $mobile = PhoneNumber::mobile($invoice->customer?->phone);
+
+        return $phone !== null && $mobile !== null && $phone === $mobile;
+    }
+
+    public static function startInvoiceGate(Request $request, Invoice $invoice, string $intended): void
+    {
+        $session = $request->session();
+        $session->forget(['portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_pending_invoice_id']);
+        if (filled($invoice->customer_email)) {
+            $session->put('portal_pending_email', mb_strtolower($invoice->customer_email));
+        } elseif ($mobile = PhoneNumber::mobile($invoice->customer?->phone)) {
+            $session->put('portal_pending_phone', $mobile);
+            $session->put('portal_pending_invoice_id', $invoice->id);
+        }
+        $session->put('portal_intended', $intended);
+        $session->put('portal_gate', ['type' => 'factuur', 'company' => $invoice->company?->name, 'number' => $invoice->number]);
+    }
+
     /**
      * De poort voor een offertelink: code per e-mail als er een adres is, anders per sms naar het
      * mobiele nummer van de klant (1.103.6). Zet de sessie klaar voor showVerify en sendCode.
@@ -261,7 +288,7 @@ class PortalAuthController extends Controller
     public static function startQuoteGate(Request $request, Quote $quote, string $intended): void
     {
         $session = $request->session();
-        $session->forget(['portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id']);
+        $session->forget(['portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_pending_invoice_id']);
         if (filled($quote->customer_email)) {
             $session->put('portal_pending_email', mb_strtolower($quote->customer_email));
         } elseif ($mobile = PhoneNumber::mobile($quote->customer?->phone)) {
@@ -291,14 +318,17 @@ class PortalAuthController extends Controller
             'portal_code_attempts' => 0,
             'portal_code_sent_at' => now()->timestamp,
         ]);
-        $quote = Quote::withoutGlobalScope('company')->find($request->session()->get('portal_pending_quote_id'));
-        $company = $quote?->company;
-        $text = __(':company: je toegangscode voor de offerte is :code (10 minuten geldig).', ['company' => $company?->name ?: config('app.name'), 'code' => $code]);
+        $session = $request->session();
+        $document = ($invoiceId = $session->get('portal_pending_invoice_id'))
+            ? Invoice::withoutGlobalScope('company')->find($invoiceId)
+            : Quote::withoutGlobalScope('company')->find($session->get('portal_pending_quote_id'));
+        $company = $document?->company;
+        $text = __(':company: je toegangscode is :code (10 minuten geldig).', ['company' => $company?->name ?: config('app.name'), 'code' => $code]);
         $sms = app(SmsService::class);
         $sent = false;
-        if ($quote && $company && $sms->available($company)) {
+        if ($document && $company && $sms->available($company)) {
             try {
-                $sent = $sms->send($company, $phone, $text, $quote)->status !== 'failed';
+                $sent = $sms->send($company, $phone, $text, $document)->status !== 'failed';
             } catch (\DomainException) {
                 $sent = false;
             }

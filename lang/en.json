@@ -2190,5 +2190,11 @@
   "Nog geen bedrijven in de buurt: zoeken naar goed beoordeelde bedrijven en in het register": "No companies nearby yet: searching for well-rated companies and in the register",
   "Zoeken naar goed beoordeelde bedrijven in de buurt": "Searching for well-rated companies nearby",
   ":company: je toegangscode voor de offerte is :code (10 minuten geldig).": ":company: your access code for the quotation is :code (valid for 10 minutes).",
-  "De sms kon niet worden verstuurd. Probeer het later opnieuw of vraag de verzender om een e-mailadres toe te voegen.": "The text message could not be sent. Try again later or ask the sender to add an e-mail address."
+  "De sms kon niet worden verstuurd. Probeer het later opnieuw of vraag de verzender om een e-mailadres toe te voegen.": "The text message could not be sent. Try again later or ask the sender to add an e-mail address.",
+  "Deze factuur kan niet (opnieuw) per sms worden verstuurd.": "This invoice cannot be sent (again) by SMS.",
+  ":company: creditnota :number van :amount. Bekijk online: :link": ":company: credit note :number for :amount. View online: :link",
+  ":company: factuur :number van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: invoice :number for :amount, due by :date. View and pay online: :link",
+  ":company: factuur van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: invoice for :amount, due by :date. View and pay online: :link",
+  "Factuur :number per sms verstuurd naar :number2.": "Invoice :number sent by SMS to :number2.",
+  ":company: je toegangscode is :code (10 minuten geldig).": ":company: your access code is :code (valid for 10 minutes)."
 }

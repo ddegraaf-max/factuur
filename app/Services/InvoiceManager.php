@@ -215,7 +215,34 @@ class InvoiceManager
             throw new \DomainException(__('Alleen concepten kunnen worden verstuurd.'));
         }
 
-        $invoice = DB::transaction(function () use ($invoice) {
+        $invoice = $this->markSent($invoice);
+
+        $this->emailInvoice($invoice);
+
+        \App\Support\Audit::log('sent', $invoice, $invoice->customer_email
+            ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($invoice), 'email' => $invoice->customer_email])
+            : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($invoice)]));
+
+        // Een creditnota op een factuur uit het pakket: meteen verrekenen,
+        // voor zover die factuur nog openstaat.
+        if ($invoice->is_credit) {
+            app(CreditNoteService::class)->settleWithOriginal($invoice);
+        }
+
+        return $invoice;
+    }
+
+    /**
+     * Mail de factuur (met PDF) naar de klant.
+     *  - TO  : de klant
+     *  - CC  : jouw eigen kopie-adres (of je bedrijfs-e-mail)
+     *  - BCC : je boekhoudkantoor (indien ingesteld)
+     * Faalt de mail, dan blijft de factuur gewoon 'verstuurd' en loggen we de fout.
+     */
+    /** Nummer, datum, status en portaalsleutel vastleggen (gedeeld door mail en sms, 1.104). */
+    protected function markSent(Invoice $invoice): Invoice
+    {
+        return DB::transaction(function () use ($invoice) {
             /*
              * Eerst opnieuw uit de database lezen. Een verrekening die in
              * dezelfde handeling is opgeslagen ("reeds ontvangen" op het
@@ -266,29 +293,68 @@ class InvoiceManager
 
             return $invoice;
         });
-
-        $this->emailInvoice($invoice);
-
-        \App\Support\Audit::log('sent', $invoice, $invoice->customer_email
-            ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($invoice), 'email' => $invoice->customer_email])
-            : __(':label verstuurd (zonder e-mail)', ['label' => \App\Support\Audit::label($invoice)]));
-
-        // Een creditnota op een factuur uit het pakket: meteen verrekenen,
-        // voor zover die factuur nog openstaat.
-        if ($invoice->is_credit) {
-            app(CreditNoteService::class)->settleWithOriginal($invoice);
-        }
-
-        return $invoice;
     }
 
     /**
-     * Mail de factuur (met PDF) naar de klant.
-     *  - TO  : de klant
-     *  - CC  : jouw eigen kopie-adres (of je bedrijfs-e-mail)
-     *  - BCC : je boekhoudkantoor (indien ingesteld)
-     * Faalt de mail, dan blijft de factuur gewoon 'verstuurd' en loggen we de fout.
+     * 1.104: factuur per sms — voor klanten zonder e-mailadres. Een concept krijgt nummer en status
+     * "verstuurd" (zonder mail); een al verstuurde factuur krijgt alleen de sms. De klant opent via de
+     * korte link het portaal (toegangscode per sms) en betaalt daar online.
      */
+    public function sendBySms(Invoice $invoice, ?string $text = null, ?string $phone = null, ?int $userId = null): \App\Models\SmsMessage
+    {
+        if (! in_array($invoice->status, ['draft', 'sent', 'partial', 'overdue'], true)) {
+            throw new \DomainException(__('Deze factuur kan niet (opnieuw) per sms worden verstuurd.'));
+        }
+        $sms = app(\App\Services\SmsService::class);
+        $to = \App\Support\PhoneNumber::mobile($phone) ?? $this->smsMobile($invoice);
+        if ($to === null) {
+            throw new \DomainException(__('Er is geen mobiel nummer bekend; een sms kan alleen naar een mobiel nummer.'));
+        }
+        // De voorgestelde tekst is gemaakt vóór het nummer bestond; is die ongewijzigd, dan opnieuw maken na het nummeren.
+        $preset = trim($this->smsText($invoice));
+        if ($invoice->status === 'draft') {
+            $invoice = $this->markSent($invoice);
+        } else {
+            $invoice->ensurePortalToken();
+        }
+        $body = filled($text) && trim((string) $text) !== $preset ? (string) $text : $this->smsText($invoice);
+        $message = $sms->send($invoice->company, $to, $body, $invoice, $userId);
+        if ($invoice->customer && blank($invoice->customer->phone) && filled($phone)) {
+            $invoice->customer->forceFill(['phone' => $phone])->save();
+        }
+        \App\Support\Audit::log('sent', $invoice, __(':label verstuurd per sms naar :number', ['label' => \App\Support\Audit::label($invoice), 'number' => \App\Support\PhoneNumber::display($to)]));
+
+        return $message;
+    }
+
+    /** Het mobiele nummer van de klant op de factuur, als dat er is. */
+    public function smsMobile(Invoice $invoice): ?string
+    {
+        return \App\Support\PhoneNumber::mobile($invoice->customer?->phone);
+    }
+
+    /** De tekst die klaarstaat voor de sms, in de taal van de factuur, met een korte link naar het portaal. */
+    public function smsText(Invoice $invoice, ?string $sender = null): string
+    {
+        $invoice->ensurePortalToken();
+        $link = \App\Models\ShortLink::for($invoice->portalUrl(), $invoice->company_id)->shortUrl();
+        $sender ??= \Illuminate\Support\Str::before(trim((string) auth()->user()?->name), ' ');
+        $greeting = filled($sender) ? "\n" . __('Met vriendelijke groet,') . ' ' . $sender : '';
+
+        return \App\Support\DocumentLocale::using($invoice->language ?: 'nl', function () use ($invoice, $link) {
+            $company = $invoice->brandedCompany()->name;
+            $amount = money((float) $invoice->total);
+            if ($invoice->is_credit) {
+                return __(':company: creditnota :number van :amount. Bekijk online: :link', ['company' => $company, 'number' => $invoice->number ?: '', 'amount' => $amount, 'link' => $link]);
+            }
+            $date = $invoice->due_date?->translatedFormat('j F') ?? '';
+
+            return $invoice->number
+                ? __(':company: factuur :number van :amount, te betalen vóór :date. Bekijk en betaal online: :link', ['company' => $company, 'number' => $invoice->number, 'amount' => $amount, 'date' => $date, 'link' => $link])
+                : __(':company: factuur van :amount, te betalen vóór :date. Bekijk en betaal online: :link', ['company' => $company, 'amount' => $amount, 'date' => $date, 'link' => $link]);
+        }) . $greeting;
+    }
+
     protected function emailInvoice(Invoice $invoice): void
     {
         try {

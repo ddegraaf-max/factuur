@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 5 november 2026 · {{ brand('version_prefix') }} 1.103.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 5 november 2026 · {{ brand('version_prefix') }} 1.104.0</div>
+        <h2>Factuur per sms, betalen via het portaal</h2>
+        <ul class="tl-list">
+          <li><b>Factuur per sms</b> — net als bij offertes staat op de factuur nu "Per sms": de klant krijgt een sms met het bedrag, de uiterste betaaldatum en een korte link naar het klantenportaal. Daar bekijkt hij de factuur, downloadt de PDF en betaalt online via iDEAL (Mollie), ook zonder e-mailadres. Het nummer komt van de klantkaart; de tekst staat klaar en is aan te passen. De knop is grijs zolang er geen mobiel nummer is.</li>
+          <li><b>Toegangscode per sms</b> — heeft de klant geen e-mailadres, dan stuurt het portaal de eenmalige toegangscode per sms naar het nummer waarop de factuur binnenkwam (van je sms-tegoed, anders via EasyInvoice). Het bewijs van inzage en betaling vermeldt dan dat nummer.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">5 november 2026 · {{ brand('version_prefix') }} 1.103.0</div>
         <h2>Fachora: goed beoordeelde bedrijven eerst</h2>
         <ul class="tl-list">
           <li><b>Bedrijven met goede Google-beoordelingen</b> — eenmanszaken uit het bedrijvenregister reageerden niet op klanten. Fachora zoekt nu per klus eerst bedrijven met een goed Google-bedrijfsprofiel (minstens 4,5 sterren en 10 beoordelingen, open, met telefoon of website) en zet die bovenaan de keuzelijst, met hun beoordeling, het aantal reviews en een link naar hun Google-profiel. Het register komt alleen nog in beeld als er te weinig van zulke bedrijven zijn.</li>

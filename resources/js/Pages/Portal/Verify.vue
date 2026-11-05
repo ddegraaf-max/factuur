@@ -128,7 +128,7 @@ const sendCode = () => {
           </template>
           <template v-else-if="channel === 'sms'">
             {{ $t('Voor je veiligheid sturen we eerst een eenmalige toegangscode per sms naar') }}
-            <strong>{{ maskedPhone }}</strong> — {{ $t('het mobiele nummer waarop deze offerte is ontvangen.') }}
+            <strong>{{ maskedPhone }}</strong> — {{ gate?.type === 'factuur' ? $t('het mobiele nummer waarop deze factuur is ontvangen.') : $t('het mobiele nummer waarop deze offerte is ontvangen.') }}
           </template>
           <template v-else>
             {{ $t('Voor je veiligheid sturen we eerst een eenmalige toegangscode naar') }}

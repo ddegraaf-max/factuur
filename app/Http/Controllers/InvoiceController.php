@@ -173,6 +173,16 @@ class InvoiceController extends Controller
                 'portal_url' => $invoice->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de factuur, anders dat van de klant.
                 'send_email' => $invoice->customer_email ?: $invoice->customer?->email,
+                // 1.104: per sms versturen (alleen mobiel, alleen met tegoed); de tekst staat klaar.
+                'sms_send' => ($smsSvc = app(\App\Services\SmsService::class))->enabled($invoice->company) && in_array($invoice->status, ['draft', 'sent', 'partial', 'overdue'], true) ? [
+                    'available' => $smsSvc->available($invoice->company),
+                    'free' => $smsSvc->free($invoice->company),
+                    'remaining' => $smsSvc->remaining($invoice->company),
+                    'max_segments' => \App\Services\SmsService::MAX_SEGMENTS,
+                    'mobile' => ($m = $this->manager->smsMobile($invoice)) ? \App\Support\PhoneNumber::display($m) : null,
+                    'text' => $this->manager->smsText($invoice),
+                    'buy_url' => auth()->user()?->isOwner() ? route('settings.sms') : null,
+                ] : null,
                 'views' => $invoice->views->map(fn ($v) => [
                     'id' => $v->id,
                     'event' => $v->event,
@@ -427,6 +437,23 @@ class InvoiceController extends Controller
     {
         $this->manager->send($invoice);
         return back()->with('flash', $this->sentFlash($invoice));
+    }
+
+    /** 1.104: factuur per sms (korte link naar het portaal), voor klanten zonder e-mailadres. */
+    public function sms(Request $request, Invoice $invoice): RedirectResponse
+    {
+        $data = $request->validate([
+            'text' => ['nullable', 'string', 'max:500'],
+            'phone' => ['nullable', 'string', 'max:40'],
+        ], ['text.max' => __('Het bericht is te lang voor een sms. Maak het korter.')]);
+
+        try {
+            $message = $this->manager->sendBySms($invoice, $data['text'] ?? null, $data['phone'] ?? null, $request->user()->id);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['sms' => $e->getMessage()]);
+        }
+
+        return redirect()->route('invoices.show', $invoice->fresh())->with('flash', __('Factuur :number per sms verstuurd naar :number2.', ['number' => $invoice->fresh()->number, 'number2' => \App\Support\PhoneNumber::display($message->recipient)]));
     }
 
     /** Flash na versturen: naar welk adres — of eerlijk dat er niets gemaild is. */

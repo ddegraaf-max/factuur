@@ -2190,5 +2190,11 @@
   "Nog geen bedrijven in de buurt: zoeken naar goed beoordeelde bedrijven en in het register": "Brak firm w okolicy: szukamy firm z dobrymi opiniami i w rejestrze",
   "Zoeken naar goed beoordeelde bedrijven in de buurt": "Szukamy w okolicy firm z dobrymi opiniami",
   ":company: je toegangscode voor de offerte is :code (10 minuten geldig).": ":company: Twój kod dostępu do oferty to :code (ważny 10 minut).",
-  "De sms kon niet worden verstuurd. Probeer het later opnieuw of vraag de verzender om een e-mailadres toe te voegen.": "Nie udało się wysłać SMS-a. Spróbuj ponownie później lub poproś nadawcę o dodanie adresu e-mail."
+  "De sms kon niet worden verstuurd. Probeer het later opnieuw of vraag de verzender om een e-mailadres toe te voegen.": "Nie udało się wysłać SMS-a. Spróbuj ponownie później lub poproś nadawcę o dodanie adresu e-mail.",
+  "Deze factuur kan niet (opnieuw) per sms worden verstuurd.": "Tej faktury nie można (ponownie) wysłać SMS-em.",
+  ":company: creditnota :number van :amount. Bekijk online: :link": ":company: nota kredytowa :number na :amount. Zobacz online: :link",
+  ":company: factuur :number van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: faktura :number na :amount, płatna do :date. Zobacz i zapłać online: :link",
+  ":company: factuur van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: faktura na :amount, płatna do :date. Zobacz i zapłać online: :link",
+  "Factuur :number per sms verstuurd naar :number2.": "Faktura :number wysłana SMS-em na :number2.",
+  ":company: je toegangscode is :code (10 minuten geldig).": ":company: Twój kod dostępu to :code (ważny 10 minut)."
 }

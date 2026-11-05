@@ -713,5 +713,9 @@
   "Algemene kosten: hoort bij geen project en komt hier niet meer terug": "Koszty ogólne: nie należą do żadnego projektu i nie pojawią się tu więcej",
   "Algemene kosten zoals verzekering, incasso of kantoor? Klik \"Geen project\": die factuur komt hier dan niet meer terug.": "Koszty ogólne, np. ubezpieczenie, windykacja lub biuro? Kliknij „Bez projektu”: ta faktura nie pojawi się tu więcej.",
   ":n verborgen als algemene kosten (aan te passen op de inkoopfactuur zelf).": ":n ukryto jako koszty ogólne (do zmiany na samej fakturze zakupu).",
-  "Geen mobiel nummer bekend: vul het eerst in bij de klant, dan kun je de offerte per sms versturen": "Brak numeru komórkowego: najpierw uzupełnij go u klienta, wtedy wyślesz ofertę SMS-em"
+  "Geen mobiel nummer bekend: vul het eerst in bij de klant, dan kun je de offerte per sms versturen": "Brak numeru komórkowego: najpierw uzupełnij go u klienta, wtedy wyślesz ofertę SMS-em",
+  "Stuur de klant een sms met een korte link naar de factuur, om online te bekijken en te betalen": "Wyślij klientowi SMS z krótkim linkiem do faktury, aby obejrzał ją i zapłacił online",
+  "Geen mobiel nummer bekend: vul het eerst in bij de klant, dan kun je de factuur per sms versturen": "Brak numeru komórkowego: najpierw uzupełnij go u klienta, wtedy wyślesz fakturę SMS-em",
+  "Factuur per sms versturen": "Wyślij fakturę SMS-em",
+  "De klant krijgt een sms met een korte link naar de factuur; daar kan hij hem bekijken en online betalen. Ook zonder e-mailadres.": "Klient otrzyma SMS z krótkim linkiem do faktury; tam może ją obejrzeć i zapłacić online. Także bez adresu e-mail."
 }
