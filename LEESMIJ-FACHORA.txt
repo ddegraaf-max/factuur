@@ -425,5 +425,6 @@ HUISSTIJL (6 nov 2026, 1.105.0, ontwerp Daniël "Dobry fachowiec. Bez stresu.")
   Daniël), mechanik = rawpixel.com/image/5959936 (CC0), ogrodnik = wordpress.org/photos/photo/3867fde048
   (Rolly Bueno, getrimde heggen, CC0; 1.105.2), ogrod = rawpixel.com/image/6035741 (grasmaaier, CC0),
   szkodniki = flickr.com/photos/54563451@N08/25894310135 (Sam Droege, muis, publiek domein),
-  kominiarz = rawpixel.com/image/5910116 (houtkachel, CC0). Geen naamsvermelding vereist.
+  kominiarz = rawpixel.com/image/6027141 (schoorstenen op een dak, CC0; 1.105.3, keuze Daniël; de
+  houtkachel rawpixel.com/image/5910116 was het eerste idee). Geen naamsvermelding vereist.
 - Nog open: een scherpere herofoto; de huidige komt uit het ontwerpbeeld (668x420).
