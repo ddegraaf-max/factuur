@@ -41,7 +41,8 @@ class GooglePlacesClient
     /** Per categorie en plaats hooguit eens per local_import_days zoeken (ook bij een nieuwe klant op dezelfde plek). */
     public static function cacheKey(ServiceJob $job): string
     {
-        return 'fachora:google-import:' . $job->category . ':' . GeocodeService::normalise((string) $job->city);
+        // v2 (1.103.2): met omliggende plaatsen; eerdere zoektochten (alleen het dorp) tellen niet als "recent".
+        return 'fachora:google-import:v2:' . $job->category . ':' . GeocodeService::normalise((string) $job->city);
     }
 
     public function recentlySearched(ServiceJob $job): bool
@@ -79,7 +80,20 @@ class GooglePlacesClient
             return ['skipped' => 'recent'] + $result;
         }
 
-        $outcome = $this->importArea($job->category, (string) $job->city, [(float) $job->lat, (float) $job->lng], fn () => $count() >= $target);
+        $center = [(float) $job->lat, (float) $job->lng];
+        $enough = fn () => $count() >= $target;
+        $outcome = $this->importArea($job->category, (string) $job->city, $center, $enough);
+        // 1.103.2: een dorp levert bij Google weinig op; ook de dichtstbijzijnde grotere plaatsen (één pagina per term),
+        // met de klant als middelpunt, zodat alleen bedrijven binnen bereik overblijven.
+        foreach (self::nearbyCities($center, (float) config('fachora.region_radius_km', 50), (string) $job->city) as $cityName) {
+            if ($enough()) {
+                break;
+            }
+            $more = $this->importArea($job->category, $cityName, $center, $enough, 1);
+            foreach ($more as $k => $v) {
+                $outcome[$k] += $v;
+            }
+        }
         Cache::put($key, now()->toDateTimeString(), now()->addDays((int) config('fachora.local_import_days', 14)));
         $result = array_merge($result, $outcome);
         $result['candidates'] = $count();
@@ -94,11 +108,11 @@ class GooglePlacesClient
      * @param  array{0: float, 1: float}|null  $center
      * @return array{created: int, updated: int, found: int}
      */
-    public function importArea(string $category, string $city, ?array $center, ?\Closure $enough = null): array
+    public function importArea(string $category, string $city, ?array $center, ?\Closure $enough = null, ?int $pages = null): array
     {
         $result = ['created' => 0, 'updated' => 0, 'found' => 0];
         $radius = (float) config('fachora.google_radius_km', 30);
-        $pages = max(1, (int) config('fachora.google_pages', 3));
+        $pages = max(1, $pages ?? (int) config('fachora.google_pages', 3));
         foreach (self::termsFor($category) as $term) {
             $token = null;
             for ($page = 0; $page < $pages; $page++) {
@@ -129,6 +143,35 @@ class GooglePlacesClient
         }
 
         return $result;
+    }
+
+    /**
+     * De dichtstbijzijnde bekende plaatsen (config fachora.cities, namen uit seo_cities) binnen de straal,
+     * hooguit drie, zonder de plaats van de klant zelf.
+     *
+     * @param  array{0: float, 1: float}  $center
+     * @return list<string>
+     */
+    public static function nearbyCities(array $center, float $radiusKm, string $except = '', int $max = 3): array
+    {
+        $names = (array) config('fachora.seo_cities', []);
+        $found = [];
+        foreach ((array) config('fachora.cities', []) as $slug => $point) {
+            if (! is_array($point) || count($point) < 2) {
+                continue;
+            }
+            $name = (string) ($names[$slug] ?? ucfirst((string) $slug));
+            if (GeocodeService::normalise($name) === GeocodeService::normalise($except)) {
+                continue;
+            }
+            $km = Fachora::distanceKm($center[0], $center[1], (float) $point[0], (float) $point[1]);
+            if ($km <= $radiusKm) {
+                $found[$name] = $km;
+            }
+        }
+        asort($found);
+
+        return array_slice(array_keys($found), 0, $max);
     }
 
     /**

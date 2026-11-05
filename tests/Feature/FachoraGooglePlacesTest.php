@@ -225,6 +225,26 @@ class FachoraGooglePlacesTest extends TestCase
         $this->assertFalse(app(JobService::class)->localImportAvailable(), 'zonder Google-sleutel en zonder CEIDG-token geen import op aanvraag');
     }
 
+    public function test_a_small_town_also_searches_the_nearest_bigger_towns(): void
+    {
+        // Police ligt 14 km van Szczecin: de zoektocht gaat ook op "hydraulik Szczecin", met de klant als middelpunt.
+        $this->fakeGoogle([$this->place('ChA', 'Hydro-Max Szczecin', 4.9, 120)]);
+        $job = ServiceJob::create([
+            'reference' => ServiceJob::nextReference(), 'token' => bin2hex(random_bytes(32)), 'status' => 'selecting', 'confirmed_at' => now(), 'request_fee' => 0,
+            'category' => 'hydraulik', 'title' => 'Kran', 'description' => 'Kran w kuchni cieknie, potrzebna wymiana.',
+            'urgency' => 'week', 'language' => 'pl', 'customer_name' => 'Anna Nowak', 'customer_email' => 'anna@example.com',
+            'customer_locale' => 'pl', 'postal_code' => '72-010', 'city' => 'Police', 'lat' => 53.5521, 'lng' => 14.5718,
+        ]);
+        $this->assertSame(['Szczecin'], array_slice(GooglePlacesClient::nearbyCities([53.5521, 14.5718], 50, 'Police'), 0, 1));
+
+        $result = app(GooglePlacesClient::class)->importAround($job);
+        $this->assertSame(1, $result['created']);
+        Http::assertSent(fn ($r) => str_contains($r->url(), 'places:searchText') && $r['textQuery'] === 'hydraulik Police');
+        Http::assertSent(fn ($r) => str_contains($r->url(), 'places:searchText') && $r['textQuery'] === 'hydraulik Szczecin'
+            && abs($r['locationBias']['circle']['center']['latitude'] - 53.5521) < 0.001);
+        $this->assertSame('recent', app(GooglePlacesClient::class)->importAround($job)['skipped']);
+    }
+
     public function test_with_only_register_companies_nearby_google_is_still_searched_first(): void
     {
         foreach (range(1, 6) as $i) {
