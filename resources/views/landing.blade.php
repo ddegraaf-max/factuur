@@ -130,8 +130,68 @@
   #heroDash .d-field label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-4); font-weight: 700; margin-bottom: 4px; }
   #heroDash .d-field .val { font-size: 12px; color: var(--text); background: var(--surface); border: 1px solid var(--border-strong); border-radius: 8px; padding: 8px 11px; }
 
+  /* ===== Huisstijl 1.106.0: donkere hero met rood, laptop + telefoon, acht kaarten, vertrouwensbalk ===== */
+  .ei-hero { position: relative; overflow: hidden; color: #fff; padding: 56px 0 0; background: linear-gradient(105deg, #0E141B 0%, #171A22 46%, #3A0E12 72%, #C8121B 100%); }
+  .ei-hero::before { content: ''; position: absolute; right: -220px; top: -220px; width: 780px; height: 780px; border-radius: 50%; background: radial-gradient(circle, rgba(232,35,31,0.5) 0%, rgba(232,35,31,0) 62%); pointer-events: none; }
+  .ei-hero-grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding-bottom: 60px; }
+  .ei-hero-grid > * { min-width: 0; } /* anders rekt het 1080 px brede dashboard de kolom op */
+  .ei-pill { display: inline-flex; align-items: center; gap: 9px; padding: 7px 16px 7px 8px; border-radius: 100px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+  .ei-pill i { width: 22px; height: 22px; border-radius: 50%; background: var(--brand); color: #fff; font-style: normal; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; }
+  .ei-hero h1 { color: #fff; font-size: clamp(34px, 3.6vw, 48px); font-weight: 800; line-height: 1.06; letter-spacing: -0.03em; margin: 0 0 16px; }
+  .ei-hero h1 .accent { color: #FF4A45; }
+  .ei-hero h1 sup { font-size: 0.4em; vertical-align: super; font-weight: 600; margin-left: 2px; }
+  .ei-sub { font-size: clamp(16px, 1.3vw, 18px); color: rgba(255,255,255,0.84); line-height: 1.55; max-width: 560px; margin: 0 0 20px; }
+  .ei-checks { list-style: none; padding: 0; margin: 0 0 26px; display: grid; gap: 8px; }
+  .ei-checks li { display: flex; align-items: center; gap: 11px; font-size: 15.5px; font-weight: 500; color: #fff; }
+  .ei-checks li::before { content: '✓'; flex-shrink: 0; width: 22px; height: 22px; border-radius: 6px; background: rgba(232,35,31,0.22); color: #FF4A45; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; }
+  .ei-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .btn-outline-light { background: rgba(255,255,255,0.06); color: #fff; border-color: rgba(255,255,255,0.4); }
+  .btn-outline-light:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); }
+  .ei-trust { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: rgba(255,255,255,0.75); }
+  .ei-trust li::before { content: '✓ '; color: #FF4A45; font-weight: 800; }
+  .ei-hero-visual { position: relative; min-width: 0; }
+  .ei-screen { position: relative; overflow: hidden; width: 100%; background: #0B0E12; border: 10px solid #1B1E25; border-bottom-width: 14px; border-radius: 18px 18px 6px 6px; box-shadow: 0 40px 90px rgba(0,0,0,0.5); }
+  .ei-screen .app-mockup { width: 1080px; max-width: none; margin: 0; transform-origin: 0 0; border-radius: 0; border: 0; box-shadow: none; }
+  .ei-base { height: 16px; margin: 0 -5%; background: linear-gradient(180deg, #D6D8DD 0%, #B9BCC3 100%); border-radius: 0 0 14px 14px; position: relative; }
+  .ei-base::before { content: ''; position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: 120px; height: 6px; background: #A4A7AE; border-radius: 0 0 6px 6px; }
+  .ei-phone { position: absolute; right: -28px; bottom: -22px; width: 176px; padding: 8px 7px 10px; background: #0F1116; border-radius: 26px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); border: 3px solid #2A2D35; z-index: 2; }
+  .ei-phone-top { display: flex; align-items: center; gap: 6px; background: var(--brand); color: #fff; border-radius: 16px 16px 4px 4px; padding: 11px 10px; font-weight: 700; font-size: 11.5px; }
+  .ei-phone-top img { width: 16px; height: 16px; }
+  .ei-phone-top i { margin-left: auto; width: 12px; height: 2px; background: #fff; box-shadow: 0 -4px 0 #fff, 0 4px 0 #fff; border-radius: 2px; }
+  .ei-phone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #F3F4F6; border-radius: 4px; padding: 8px 6px; }
+  .ei-phone-grid div { background: #fff; border-radius: 10px; padding: 9px 6px 7px; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 9.5px; font-weight: 600; color: #1C1917; }
+  .ei-phone-grid svg { color: var(--brand); }
+  .ei-phone-btn { margin-top: 6px; background: var(--brand); color: #fff; font-size: 10.5px; font-weight: 700; text-align: center; padding: 8px; border-radius: 10px; }
+  @media (max-width: 1000px) {
+    .ei-hero-grid { grid-template-columns: 1fr; gap: 32px; }
+    .ei-hero-visual { max-width: 720px; }
+    .ei-phone { right: 0; }
+  }
+  @media (max-width: 760px) {
+    .ei-hero { padding-top: 36px; }
+    .ei-screen .app-mockup { width: 100%; transform: none !important; }
+    .ei-screen { height: auto !important; }
+    .ei-phone { display: none; }
+    .ei-base { margin: 0; }
+  }
+  .ei-cards { background: #F3F4F6; padding: 28px 0 32px; }
+  .ei-cards-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; }
+  @media (max-width: 1180px) { .ei-cards-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 640px) { .ei-cards-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+  .ei-card { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 20px 10px 16px; background: #fff; border: 1px solid var(--border); border-radius: 14px; color: inherit; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+  .ei-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--brand-border); }
+  .ei-card .ic { width: 44px; height: 44px; color: var(--brand); display: flex; align-items: center; justify-content: center; }
+  .ei-card b { font-family: var(--font-display); font-size: 15px; letter-spacing: -0.01em; color: var(--text); line-height: 1.2; }
+  .ei-card .tx { font-size: 12px; color: var(--text-2); line-height: 1.45; }
+  .ei-card .new { position: absolute; top: 10px; right: 10px; background: var(--brand); color: #fff; font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 7px; border-radius: 100px; }
+  .ei-trustbar { background: #EBECED; border-top: 1px solid #E0E2E5; border-bottom: 1px solid #E0E2E5; padding: 14px 0; }
+  .ei-trust-inner { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 28px; font-size: 14px; color: var(--text-2); font-weight: 500; }
+  .ei-trust-inner span::before { content: '✓'; color: var(--brand); font-weight: 800; margin-right: 8px; }
+  .ei-trust-inner b { color: var(--text); }
+  @media (prefers-reduced-motion: reduce) { .ei-card, .ei-card:hover { transition: none; transform: none; } }
+
   /* ===== Gratis tools onder de hero: twee kaarten, elk met een knop die van kleur verschuift ===== */
-  .free-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 940px; margin: 34px auto 0; text-align: left; }
+  .free-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 940px; margin: 0 auto; text-align: left; }
   .free-tool { display: flex; flex-direction: column; gap: 16px; padding: 20px 22px 22px; background: var(--surface); border: 1px solid var(--brand-border); border-radius: 16px; box-shadow: var(--shadow-md); color: inherit; text-decoration: none; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
   .free-tool:hover { transform: translateY(-3px); box-shadow: var(--shadow-brand); border-color: var(--brand); }
   .ft-top { display: flex; gap: 14px; align-items: flex-start; }
@@ -175,55 +235,34 @@
 </style>
 @endpush
 
-<!-- HERO -->
-<section class="hero">
-  <div class="container hero-inner">
-    <div class="eyebrow">Voor Nederlandse ondernemers</div>
-    <h1>Facturatie <span class="accent">zonder gedoe.</span></h1>
-    <p class="hero-sub">
-      Van offerte tot geld op je rekening: je klant ondertekent digitaal, betaalt met iDEAL of QR-code, en je BTW wordt automatisch bijgehouden. Alles zit erin — vanaf <b style="color:var(--text);font-weight:600;">€ 12,10 per maand (incl. 21% btw)</b>.
-    </p>
-    <div class="hero-ctas">
-      <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
-        Start 14 dagen gratis
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
-      <a href="{{ route('demo') }}" class="btn btn-secondary btn-lg">
-        Bekijk de demo
-      </a>
+<!-- HERO (huisstijl 1.106.0: donker met rood, het geanimeerde dashboard in een laptop, telefoon ernaast) -->
+<section class="ei-hero">
+  <div class="container ei-hero-grid">
+    <div class="ei-hero-text">
+      <div class="ei-pill"><i>✓</i>Alles-in-één platform voor ondernemers</div>
+      <h1>Factureren, administreren en méér – met <span class="accent">EasyInvoice</span><sup>&reg;</sup></h1>
+      <p class="ei-sub">Van offerte tot betaling, van urenregistratie tot boekhouding. Alles in één overzichtelijk platform, inclusief AI-assistent EASY.</p>
+      <ul class="ei-checks">
+        <li>Professioneel factureren en offertes versturen</li>
+        <li>Volledige administratie en btw-aangifte</li>
+        <li>Urenregistratie, projecten en planning</li>
+        <li>Betalingen, herinneringen en incasso</li>
+        <li>AI-assistent EASY en scan-en-herken</li>
+        <li>Meerdere bedrijven en handelsnamen</li>
+        <li>E-facturatie (UBL / Peppol) en bankafschriften inlezen</li>
+      </ul>
+      <div class="ei-ctas">
+        <a href="{{ route('register') }}" class="btn btn-primary btn-lg">
+          Start 14 dagen gratis
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="{{ route('demo') }}" class="btn btn-outline-light btn-lg">@include('partials.icon', ['name' => 'play', 'size' => 14]) Bekijk de demo</a>
+      </div>
+      <ul class="ei-trust"><li>Geen creditcard nodig</li><li>Binnen 2 minuten gestart</li><li>Maandelijks opzegbaar</li></ul>
     </div>
-    <div class="hero-trust">
-      Geen creditcard nodig · 14 dagen gratis · Daarna vanaf <b>€ 12,10/maand incl. btw</b>
-    </div>
-
-    <!-- Gratis tools: direct te gebruiken, zonder account -->
-    <div class="free-tools">
-      <a class="free-tool" href="{{ route('gratis-factuur') }}">
-        <span class="ft-top">
-          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
-          <span class="ft-body">
-            <span class="ft-kicker">Gratis · zonder account</span>
-            <span class="ft-title">Gratis factuur maken</span>
-            <span class="ft-text">Vul je gegevens in en download je factuur als PDF, met alle verplichte vermeldingen erop.</span>
-          </span>
-        </span>
-        <span class="btn btn-live">Maak je factuur <span class="live-badge">Gratis</span></span>
-      </a>
-      <a class="free-tool" href="{{ route('aanmaning') }}">
-        <span class="ft-top">
-          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span>
-          <span class="ft-body">
-            <span class="ft-kicker">Gratis · zonder account</span>
-            <span class="ft-title">Gratis online aanmaning</span>
-            <span class="ft-text">Betaalt je klant niet? Verstuur een aanmaning waarop de rente elke dag oploopt en je klant met één klik reageert.</span>
-          </span>
-        </span>
-        <span class="btn btn-live dark">Verstuur een aanmaning <span class="live-badge">Nieuw</span></span>
-      </a>
-    </div>
-
-    <!-- APP MOCKUP — geanimeerd, realistisch dashboard -->
-    <div class="app-mockup-wrap">
+    <div class="ei-hero-visual">
+      <div class="ei-laptop">
+        <div class="ei-screen">
       <div class="app-mockup" id="heroDash">
         <div class="mock-chrome">
           <div class="mock-dot red"></div>
@@ -489,6 +528,78 @@
           </div>
         </div>
       </div>
+        </div>
+        <div class="ei-base"></div>
+      </div>
+      <div class="ei-phone" aria-hidden="true">
+        <div class="ei-phone-top"><img src="/images/easyinvoice-logo-white.png" alt=""><span>EasyInvoice</span><i></i></div>
+        <div class="ei-phone-grid">
+          <div>@include('partials.icon', ['name' => 'invoice', 'size' => 18])Facturen</div>
+          <div>@include('partials.icon', ['name' => 'edit', 'size' => 18])Offertes</div>
+          <div>@include('partials.icon', ['name' => 'clock', 'size' => 18])Uren</div>
+          <div>@include('partials.icon', ['name' => 'layers', 'size' => 18])Projecten</div>
+          <div>@include('partials.icon', ['name' => 'card', 'size' => 18])Betalingen</div>
+          <div>@include('partials.icon', ['name' => 'chart', 'size' => 18])Administratie</div>
+        </div>
+        <div class="ei-phone-btn">+ Nieuwe factuur</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ACHT FUNCTIES IN ÉÉN RIJ -->
+<section class="ei-cards" aria-label="Functies in het kort">
+  <div class="container">
+    <div class="ei-cards-grid">
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'invoice', 'size' => 30])</span><b>Facturatie</b><span class="tx">Facturen, creditnota's, termijn- en terugkerende facturen.</span></a>
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'edit', 'size' => 30])</span><b>Offertes</b><span class="tx">Professionele offertes, digitaal ondertekenen met bewijsdossier.</span></a>
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'clock', 'size' => 30])</span><b>Uren &amp; projecten</b><span class="tx">Urenregistratie, projectcalculatie, planning en strippenkaarten.</span></a>
+      <a href="#waarom" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'layers', 'size' => 30])</span><b>Administraties</b><span class="tx">Meerdere bedrijven en handelsnamen in één account.</span></a>
+      <a href="{{ route('ai') }}" class="ei-card"><span class="new">Nieuw</span><span class="ic">@include('partials.icon', ['name' => 'bot', 'size' => 30])</span><b>AI-assistent EASY</b><span class="tx">Facturen, offertes en teksten genereren, scan-en-herken en Claude-koppeling.</span></a>
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'bank', 'size' => 30])</span><b>Betalingen &amp; incasso</b><span class="tx">iDEAL, QR-codes, herinneringen en incasso via Armaere Gerechtsdeurwaarders.</span></a>
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'mail', 'size' => 30])</span><b>E-facturatie</b><span class="tx">UBL / Peppol: klaar voor de e-factuur.</span></a>
+      <a href="#functies" class="ei-card"><span class="ic">@include('partials.icon', ['name' => 'chart', 'size' => 30])</span><b>Boekhouding</b><span class="tx">Inkoopfacturen, btw-overzichten, jaaroverzicht en cashflow.</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- VERTROUWEN (alleen wat we waar kunnen maken) -->
+<section class="ei-trustbar" aria-label="Waarom je op EasyInvoice kunt bouwen">
+  <div class="container ei-trust-inner">
+    <span><b>EasyInvoice&reg;</b> is een geregistreerd merk</span>
+    <span>Veilig: servers in Amsterdam (EU)</span>
+    <span>Nederlandse ondersteuning</span>
+    <span>AVG-proof: verwerkersovereenkomst inbegrepen</span>
+    <span>Door ondernemers, voor ondernemers</span>
+  </div>
+</section>
+
+<!-- GRATIS TOOLS: direct te gebruiken, zonder account -->
+<section class="section-alt" id="gratis-tools" style="padding:44px 0 56px;">
+  <div class="container">
+    <div class="free-tools">
+      <a class="free-tool" href="{{ route('gratis-factuur') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Gratis · zonder account</span>
+            <span class="ft-title">Gratis factuur maken</span>
+            <span class="ft-text">Vul je gegevens in en download je factuur als PDF, met alle verplichte vermeldingen erop.</span>
+          </span>
+        </span>
+        <span class="btn btn-live">Maak je factuur <span class="live-badge">Gratis</span></span>
+      </a>
+      <a class="free-tool" href="{{ route('aanmaning') }}">
+        <span class="ft-top">
+          <span class="ft-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></span>
+          <span class="ft-body">
+            <span class="ft-kicker">Gratis · zonder account</span>
+            <span class="ft-title">Gratis online aanmaning</span>
+            <span class="ft-text">Betaalt je klant niet? Verstuur een aanmaning waarop de rente elke dag oploopt en je klant met één klik reageert.</span>
+          </span>
+        </span>
+        <span class="btn btn-live dark">Verstuur een aanmaning <span class="live-badge">Nieuw</span></span>
+      </a>
     </div>
   </div>
 </section>
@@ -807,6 +918,21 @@
   </div>
 </section>
 
+<script>
+(function () {
+  // Laptop in de hero: het dashboard is op 1080 px ontworpen en wordt geschaald naar de schermbreedte (mobiel: ongeschaald, eigen layout).
+  var screen = document.querySelector('.ei-screen'), dash = document.getElementById('heroDash');
+  if (!screen || !dash) return;
+  function fit() {
+    if (window.innerWidth <= 760) { dash.style.transform = ''; screen.style.height = ''; return; }
+    var s = screen.clientWidth / 1080;
+    dash.style.transform = 'scale(' + s + ')';
+    screen.style.height = Math.round(dash.offsetHeight * s) + 'px';
+  }
+  fit();
+  if ('ResizeObserver' in window) { new ResizeObserver(fit).observe(screen); } else { window.addEventListener('resize', fit); }
+})();
+</script>
 <script>
 (function () {
   var mock = document.getElementById('heroDash');

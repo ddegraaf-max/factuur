@@ -99,8 +99,8 @@ class FachoraHouseStyleTest extends TestCase
 
         $this->get('/')->assertOk()
             ->assertDontSee('class="nav-logo"', false)
-            ->assertDontSee('class="nav-has-dd"', false)
-            ->assertSee('class="btn btn-ghost"', false);
+            ->assertDontSee('Moje zlecenia')
+            ->assertSee('Inloggen');
     }
 
     public function test_the_new_logo_files_exist_and_use_the_house_style_colours(): void

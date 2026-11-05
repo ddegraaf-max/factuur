@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 6 november 2026 · {{ brand('version_prefix') }} 1.105.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 6 november 2026 · {{ brand('version_prefix') }} 1.106.0</div>
+        <h2>Nieuwe startpagina van EasyInvoice</h2>
+        <ul class="tl-list">
+          <li><b>Nieuwe kop</b> — donker met rood: "Factureren, administreren en méér, met EasyInvoice", zeven punten die laten zien wat erin zit, en het bekende rondleidingsdashboard nu in een laptop met een telefoon ernaast.</li>
+          <li><b>Acht functies in één oogopslag</b> — Facturatie, Offertes, Uren &amp; projecten, Administraties, AI-assistent EASY, Betalingen &amp; incasso, E-facturatie en Boekhouding als kaarten onder de kop, met daaronder waar je op kunt bouwen (servers in Amsterdam, Nederlandse ondersteuning, verwerkersovereenkomst). De gratis tools hebben een eigen plek gekregen.</li>
+          <li><b>Menu</b> — logoblok met de naam in twee kleuren, "Functies" en "Gratis tools" klappen uit, AI EASY heeft het label Nieuw, en Support brengt je naar het helpcentrum.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">6 november 2026 · {{ brand('version_prefix') }} 1.105.0</div>
         <h2>Fachora: nieuwe huisstijl</h2>
         <ul class="tl-list">
           <li><b>Nieuw gezicht</b> — Fachora heeft een nieuwe huisstijl: nachtblauw met mint en teal, een nieuw logo (huisje met raam, woordmerk als vaste vorm) en de slogan "Dobry fachowiec. Bez stresu." De kleuren gelden overal: de marketingpagina's, het aanvraagformulier en de opdrachtpagina van de klant, het bedrijvenpaneel, e-mails, brieven en de deelafbeelding voor sociale media.</li>

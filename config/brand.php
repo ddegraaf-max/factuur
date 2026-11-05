@@ -73,6 +73,13 @@ return [
             'stripe_logo' => 'file_1ULTP8Bp1NB4xbZwklBtGfBF',
             'wordmark' => null,          // logo met naam (SVG); null = beeldmerk + tekst
             'wordmark_dark' => null,
+            // Huisstijl 1.106.0: logoblok in de balk en voet van de marketingsite — rode tegel met het
+            // beeldmerk, de naam in twee kleuren (Easy donker, Invoice rood) met ® en een regel eronder.
+            'header_lockup' => [
+                'mark' => '/images/easyinvoice-favicon-180.png',
+                'name' => ['Easy', 'Invoice'],
+                'tagline' => 'Het complete facturatie- en administratieplatform',
+            ],
 
             // Teksten voor SEO, schema.org en de PWA.
             'seo_title' => 'EasyInvoice — Facturatie zonder gedoe vanaf € 12,10 per maand',

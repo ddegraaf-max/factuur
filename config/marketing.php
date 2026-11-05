@@ -7,14 +7,35 @@
  */
 $nl = [
     'login' => 'Inloggen',
+    'login_icon' => 'user', // 1.106.0: inlogknop als omlijnde knop met icoon (layouts/marketing)
     'cta' => 'Start gratis →',
+    // 1.106.0: twee uitklapmenu's ('children'), een "Nieuw"-label ('badge') en Support in plaats van losse links.
     'nav' => [
-        ['route' => 'home', 'fragment' => '#waarom', 'label' => 'Waarom {brand}'],
-        ['route' => 'home', 'fragment' => '#functies', 'label' => 'Functies'],
-        ['route' => 'ai', 'label' => 'Factureren met AI'],
+        ['route' => 'home', 'fragment' => '#functies', 'label' => 'Functies', 'children' => [
+            ['route' => 'home', 'fragment' => '#functies', 'label' => 'Alle functies'],
+            ['route' => 'home', 'fragment' => '#waarom', 'label' => 'Waarom {brand}'],
+            ['route' => 'ai', 'label' => 'AI-assistent EASY'],
+            ['route' => 'bouw', 'label' => 'Voor de bouw'],
+            ['route' => 'boekhouders', 'label' => 'Voor boekhouders'],
+            ['route' => 'beroepen', 'label' => 'Voor jouw beroep'],
+            ['route' => 'overstappen.van', 'params' => ['wefact'], 'label' => 'Overstappen van WeFact'],
+            ['route' => 'overstappen.van', 'params' => ['moneybird'], 'label' => 'Overstappen van Moneybird'],
+            ['route' => 'changelog', 'label' => 'Wat is nieuw'],
+            ['route' => 'roadmap', 'label' => 'Roadmap'],
+        ]],
+        ['route' => 'ai', 'label' => 'AI EASY', 'badge' => 'Nieuw'],
         ['route' => 'home', 'fragment' => '#prijzen', 'label' => 'Prijzen'],
-        ['route' => 'gratis-factuur', 'label' => 'Gratis factuur'],
-        ['route' => 'faq', 'label' => 'Veelgestelde vragen'],
+        ['route' => 'home', 'fragment' => '#gratis-tools', 'label' => 'Gratis tools', 'children' => [
+            ['route' => 'gratis-factuur', 'label' => 'Gratis factuur maken'],
+            ['route' => 'aanmaning', 'label' => 'Gratis online aanmaning'],
+            ['route' => 'btw-calculator', 'label' => 'Btw-calculator'],
+            ['route' => 'uurtarief-calculator', 'label' => 'Uurtarief-calculator'],
+            ['route' => 'incassokosten-calculator', 'label' => 'Incassokosten berekenen'],
+            ['route' => 'voorbeelden', 'label' => 'Voorbeeldfacturen'],
+            ['route' => 'kennisbank', 'label' => 'Kennisbank'],
+            ['route' => 'begrippen', 'label' => 'Begrippenlijst'],
+        ]],
+        ['route' => 'helpcentrum', 'label' => 'Support'],
     ],
     'footer' => [
         ['title' => 'Product', 'links' => [

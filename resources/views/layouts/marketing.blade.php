@@ -190,6 +190,18 @@
   .btn-outline { background: transparent; color: var(--text); border-color: var(--border-strong); }
   .btn-outline:hover { background: var(--surface-2); }
   .btn svg.bi { width: 16px; height: 16px; flex-shrink: 0; }
+  /* Logoblok (brand header_lockup, 1.106.0) en "Nieuw"-label in het menu. */
+  .nav-brand .lk-mark { width: 44px; height: 44px; border-radius: 10px; }
+  .lk-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .lk-name { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; color: var(--text); }
+  .lk-name em { font-style: normal; color: var(--brand); }
+  .lk-name sup { font-size: 0.42em; vertical-align: super; font-weight: 600; margin-left: 1px; }
+  .lk-tag { font-size: 11.5px; font-weight: 500; color: var(--text-3); letter-spacing: 0; margin-top: 3px; font-family: var(--font-body); white-space: nowrap; }
+  @media (max-width: 560px) { .lk-tag { display: none; } .nav-brand .lk-mark { width: 38px; height: 38px; } .lk-name { font-size: 21px; } }
+  .footer-brand .lk-mark { width: 36px; height: 36px; border-radius: 9px; }
+  .footer-brand .lk-name { color: #fff; font-size: 20px; }
+  .footer-brand .lk-name em { color: #FF6B66; }
+  .nav-pill { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 100px; background: var(--brand); color: #fff; font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; vertical-align: 1px; line-height: 1.4; }
   /* Met zes menu-items, merknaam en twee knoppen past de balk pas vanaf
      ±1250px; daaronder nemen we het hamburgermenu, zodat niets over de
      merknaam heen schuift. */
@@ -541,7 +553,11 @@
   <input type="checkbox" id="navToggle" class="nav-toggle-cb" aria-label="Menu openen of sluiten">
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
-      @if(brand('header_logo'))
+      @if($lk = brand('header_lockup'))
+      {{-- Logoblok (1.106.0): tegel met beeldmerk, naam in twee kleuren met ® en een regel eronder. --}}
+      <img class="lk-mark" src="{{ $lk['mark'] }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
+      <span class="lk-text"><span class="lk-name">{{ $lk['name'][0] }}<em>{{ $lk['name'][1] ?? '' }}</em>@if(brand('registered'))<sup>&reg;</sup>@endif</span>@if(! empty($lk['tagline']))<small class="lk-tag">{{ $lk['tagline'] }}</small>@endif</span>
+      @elseif(brand('header_logo'))
       <img class="nav-logo" src="{{ brand('header_logo') }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
       @else
       <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
@@ -590,7 +606,7 @@
       @endphp
       @if($mkKids)
       <div class="nav-has-dd">
-        <a href="{{ $mkUrl($l) }}" class="nav-link" aria-haspopup="true">{{ $mkLabel($l) }}<svg class="caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <a href="{{ $mkUrl($l) }}" class="nav-link" aria-haspopup="true">{{ $mkLabel($l) }}@if(! empty($l['badge']))<span class="nav-pill">{{ $l['badge'] }}</span>@endif<svg class="caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></a>
         <div class="nav-dd"><div class="nav-dd-inner">
           @foreach($mkKids as $k)@if($mkUrl($k))
           <a href="{{ $mkUrl($k) }}">{{ $mkLabel($k) }}</a>
@@ -599,7 +615,7 @@
         </div></div>
       </div>
       @else
-      <a href="{{ $mkUrl($l) }}" class="nav-link">{{ $mkLabel($l) }}</a>
+      <a href="{{ $mkUrl($l) }}" class="nav-link">{{ $mkLabel($l) }}@if(! empty($l['badge']))<span class="nav-pill">{{ $l['badge'] }}</span>@endif</a>
       @endif
       @endif
       @endforeach
@@ -616,7 +632,7 @@
       </div>
       @endif
       @if(! $mkSecondary)
-      <a href="{{ route('login') }}" class="btn btn-ghost">{{ $mk['login'] }}</a>
+      <a href="{{ route('login') }}" class="btn {{ empty($mk['login_icon']) ? 'btn-ghost' : 'btn-outline' }}">@include('partials.nav-icon', ['name' => $mk['login_icon'] ?? null]){{ $mk['login'] }}</a>
       @endif
       <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary">@include('partials.nav-icon', ['name' => $mk['cta_icon'] ?? null]){{ $mk['cta'] }}</a>
     </div>
@@ -624,7 +640,7 @@
   </div>
   <div class="nav-mobile">
     @foreach($mk['nav'] as $l)@if($mkShow($l))
-    <a href="{{ $mkUrl($l) }}" class="nav-mobile-link">{{ $mkLabel($l) }}</a>
+    <a href="{{ $mkUrl($l) }}" class="nav-mobile-link">{{ $mkLabel($l) }}@if(! empty($l['badge']))<span class="nav-pill">{{ $l['badge'] }}</span>@endif</a>
     @foreach($mkChildren($l) as $k)@if($mkUrl($k))
     <a href="{{ $mkUrl($k) }}" class="nav-mobile-link nav-mobile-sub">{{ $mkLabel($k) }}</a>
     @endif
@@ -657,7 +673,10 @@
     <div class="footer-grid">
       <div class="footer-brand-block">
         <div class="footer-brand">
-          @if(brand('header_logo'))
+          @if($lk = brand('header_lockup'))
+          <img class="lk-mark" src="{{ $lk['mark'] }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
+          <span class="lk-text"><span class="lk-name">{{ $lk['name'][0] }}<em>{{ $lk['name'][1] ?? '' }}</em>@if(brand('registered'))<sup>&reg;</sup>@endif</span></span>
+          @elseif(brand('header_logo'))
           <img class="footer-logo" src="{{ brand('header_logo') }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
           @else
           <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">

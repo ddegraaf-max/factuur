@@ -35,6 +35,13 @@
         'thumbs' => '<path d="M7 11v9H3v-9h4z"/><path d="M7 11l4-7a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 16.8 20H7"/>',
         'home' => '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
         'arrow' => '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        // 1.106.0: startpagina EasyInvoice (kaarten, telefoon, demo-knop).
+        'layers' => '<path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/><path d="m3 17 9 5 9-5"/>',
+        'bot' => '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M8 4h8"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/><path d="M2 13v3M22 13v3"/>',
+        'bank' => '<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8"/><path d="M3 18h18M3 21h18"/>',
+        'mail' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+        'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+        'play' => '<path d="M6 4v16l14-8z"/>',
     ];
     $d = $paths[$name ?? 'tools'] ?? $paths['tools'];
 @endphp
