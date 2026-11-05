@@ -25,6 +25,16 @@
         'card' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/>',
         'invoice' => '<path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h6M9 16h6"/>',
         'lang' => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
+        // Huisstijl 1.105.0: zoekbalk, kaartjes, stappen op de startpagina.
+        'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+        'search' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+        'tag' => '<path d="M20 13 11 22 2 13V4h9l9 9z"/><circle cx="7" cy="9" r="1.5"/>',
+        'edit' => '<path d="M4 20h4L18 10l-4-4L4 16v4z"/><path d="m12.5 7.5 4 4"/>',
+        'offers' => '<path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"/><path d="M8 11h8M8 14h5"/>',
+        'calendar' => '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m9 15 2 2 4-4"/>',
+        'thumbs' => '<path d="M7 11v9H3v-9h4z"/><path d="M7 11l4-7a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 16.8 20H7"/>',
+        'home' => '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+        'arrow' => '<path d="M5 12h14M13 6l6 6-6 6"/>',
     ];
     $d = $paths[$name ?? 'tools'] ?? $paths['tools'];
 @endphp

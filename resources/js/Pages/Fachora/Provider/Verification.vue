@@ -282,5 +282,5 @@ const standard = [
 .fx-request { border-color: var(--brand-border); background: var(--brand-tint); }
 .fx-standard { margin: 0; padding-left: 22px; font-size: 13px; line-height: 1.7; color: var(--text-2); }
 .fx-fee { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
-.fx-fee-val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--accent, #F4781F); }
+.fx-fee-val { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--accent, #027A74); }
 </style>

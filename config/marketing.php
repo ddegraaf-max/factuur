@@ -179,15 +179,18 @@ $plEn = [
 // Fachora (markt pl): een marktplaats, geen abonnement — de knop leidt naar het aanvraagformulier.
 $fachora = [
     'login' => 'Panel firmy',
-    'cta' => 'Znajdź fachowca →',
+    'cta' => 'Znajdź fachowca',
     'cta_route' => 'fachora.intake',
+    'cta_icon' => 'search',
+    // Huisstijl 1.105.0: in de balk staat "Moje zlecenia" (klant) in plaats van de inlogknop; "Panel firmy" blijft in de voet.
+    'secondary' => ['route' => 'fachora.my', 'label' => 'Moje zlecenia', 'icon' => 'user'],
     'nav' => [
-        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Usługi'],
+        // "Usługi" klapt uit naar de categorieën uit config/fachora.php (layouts/marketing: children_from).
+        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Usługi', 'children_from' => 'fachora.categories'],
         ['route' => 'fachora.how', 'label' => 'Jak to działa'],
         ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
         ['route' => 'fachora.for-companies', 'label' => 'Dla firm'],
         ['route' => 'pl.o-nas', 'label' => 'O nas'],
-        ['route' => 'fachora.my', 'label' => 'Moje zlecenia'],
     ],
     'footer' => [
         ['title' => 'Dla klientów', 'links' => [
@@ -227,15 +230,16 @@ $fachora = [
 
 $fachoraEn = [
     'login' => 'Company panel',
-    'cta' => 'Find a tradesperson →',
+    'cta' => 'Find a tradesperson',
     'cta_route' => 'fachora.intake',
+    'cta_icon' => 'search',
+    'secondary' => ['route' => 'fachora.my', 'label' => 'My jobs', 'icon' => 'user'],
     'nav' => [
-        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Services'],
+        ['route' => 'home', 'fragment' => '#uslugi', 'label' => 'Services', 'children_from' => 'fachora.categories'],
         ['route' => 'fachora.how', 'label' => 'How it works'],
         ['route' => 'fachora.protect', 'label' => 'Fachora Protect'],
         ['route' => 'fachora.for-companies', 'label' => 'For companies'],
         ['route' => 'pl.o-nas', 'label' => 'About'],
-        ['route' => 'fachora.my', 'label' => 'My jobs'],
     ],
     'footer' => [
         ['title' => 'For customers', 'links' => [

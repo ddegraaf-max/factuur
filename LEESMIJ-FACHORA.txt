@@ -395,3 +395,28 @@ PROTECT UIT, ALLEEN STRIPE (2 nov 2026, 1.91.0, besluit Daniël: "nu nog geen zi
   "Mollie" op tien pagina's ontbreken en met de vlag aan terugkomen.
 - Weer aanzetten: FACHORA_PROTECT=true + STRIPE_SECRET + Stripe Connect-platform en webhook + jurist.
   Dan komt alles vanzelf terug (protect.blade.php noemt al Stripe als operator płatności).
+
+HUISSTIJL (6 nov 2026, 1.105.0, ontwerp Daniël "Dobry fachowiec. Bez stresu.")
+- Kleuren (public/brand/fachora/theme.css, config/brand.php): nachtblauw #0F2A44 (kop, hero, voet;
+  donker #0A2138, gradient tot #163D5F), diepteal #027A74 (knoppen, links, iconen op licht; hover
+  #065F59), mint #1ED1B6 alleen op donkere vlakken (logo-dak, tweede regel van de kop, vinkje van het
+  keurmerk), lichte mint #E6F4F1 als tint, sterren #F5B301. Oranje bestaat niet meer; de Vue-pagina's
+  (FachoraShell, Intake, Job, ...) hebben hun eigen hexwaarden en zijn één-op-één omgezet.
+- Logo's: huisje (mint dak met schoorsteen, vier raampjes) + woordmerk FACHORA als SVG-pad (Bricolage
+  Grotesque ExtraBold, gemaakt met fontkit in de scratchpad), dus overal gelijk. fachora-logo-dark.svg
+  (wit op donker; brand header_logo in balk en voet, FachoraShell, auth), fachora-logo.svg (navy op
+  licht), fachora-mark(-white).svg, favicon.svg, PNG-pictogrammen 32/180/512 en og-fachora.png
+  (1200x630) gerenderd via Edge. Geen ® in het logo: het merk is niet geregistreerd (brand registered=false).
+- Startpagina (landing.blade.php pl/en + partials/styles.blade.php): hero .fh-hero (zoekbalk met
+  dienst + plaats naar /zlecenie/nowe, foto public/brand/fachora/hero-fachowiec.jpg uit het ontwerp,
+  drie zwevende kaartjes met eerlijke claims: Verified, goede Google-opinies 4,5+, garantie 12 mies.),
+  pasek "do 15 / maks. 5 / 1", tegels .fh-tiles (foto per categorie in public/brand/fachora/cat/<key>.jpg,
+  acht uit het ontwerp; zonder foto een mintgradient), "Jak to działa?" in vier stappen naast een
+  voorbeeldprofiel (.fh-excard, duidelijk "Przykład"). De rest van de pagina (Verified, profielen,
+  beloften, dla firm, talen, FAQ, CTA) is ongewijzigd en volgt de kleuren via de tokens.
+- Balk (layouts/marketing.blade.php, generiek): brand header_logo toont het woordmerk; menu-item met
+  children_from => 'fachora.categories' klapt uit (.nav-has-dd/.nav-dd, mobiel als sublijst);
+  marketing 'secondary' (Moje zlecenia, icoon user) vervangt de inlogknop, cta_icon zet een icoon in de
+  hoofdknop (partials/nav-icon.blade.php). Andere merken merken er niets van (FachoraHouseStyleTest).
+- Niet gedaan: foto's voor de zes categorieën zonder ontwerpfoto (agd, mechanik, ogrodnik, ogrod,
+  szkodniki, kominiarz) en een scherpere herofoto; de huidige komen uit het ontwerpbeeld (668x420).

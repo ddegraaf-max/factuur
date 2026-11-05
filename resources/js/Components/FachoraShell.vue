@@ -68,27 +68,27 @@ const year = new Date().getFullYear();
 /* ===== Fachora, openbare pagina's. Prefix .fa- zodat niets botst met de app. ===== */
 .fa-shell { min-height: 100vh; display: flex; flex-direction: column; background: #F6F8FB; color: #0F172A; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
 .fa-shell *, .fa-shell *::before, .fa-shell *::after { box-sizing: border-box; }
-.fa-shell a { color: #0B2545; }
-.fa-shell h1, .fa-shell h2, .fa-shell h3 { font-family: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 0; color: #0B2545; }
+.fa-shell a { color: #0F2A44; }
+.fa-shell h1, .fa-shell h2, .fa-shell h3 { font-family: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 0; color: #0F2A44; }
 .fa-shell p { margin: 0 0 12px; }
 .fa-shell p:last-child { margin-bottom: 0; }
 
 /* Kop */
-.fa-top { background: #0B2545; color: #fff; }
+.fa-top { background: #0F2A44; color: #fff; }
 .fa-top-inner { max-width: 760px; margin: 0 auto; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .fa-logo { display: inline-flex; align-items: center; color: #fff; text-decoration: none; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 800; font-size: 20px; }
 .fa-logo img { height: 32px; width: auto; display: block; }
 .fa-lang { display: inline-flex; gap: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 100px; padding: 3px; }
 .fa-lang a { color: rgba(255, 255, 255, 0.75); text-decoration: none; font-size: 12px; font-weight: 700; letter-spacing: 0.05em; padding: 5px 10px; border-radius: 100px; min-width: 40px; text-align: center; }
-.fa-lang a.is-active { background: #fff; color: #0B2545; }
+.fa-lang a.is-active { background: #fff; color: #0F2A44; }
 
 /* Inhoud */
 .fa-main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 20px 16px 48px; }
 .fa-main--narrow { max-width: 600px; }
 .fa-card { background: #fff; border: 1px solid #DCE3EC; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
 @media (min-width: 640px) { .fa-card { padding: 24px 28px; } }
-.fa-card--tint { background: #EAF2FB; border-color: #B9D3EC; }
-.fa-card--warn { background: #FFF1E6; border-color: #F9C9A4; }
+.fa-card--tint { background: #E6F4F1; border-color: #A9DCD2; }
+.fa-card--warn { background: #E3F6F2; border-color: #F9C9A4; }
 .fa-h1 { font-size: 26px; margin-bottom: 8px; }
 .fa-h2 { font-size: 19px; margin-bottom: 10px; }
 .fa-h3 { font-size: 16px; margin-bottom: 6px; }
@@ -103,22 +103,22 @@ const year = new Date().getFullYear();
 .fa-flash, .fa-error, .fa-note, .fa-warn { border-radius: 10px; padding: 12px 14px; font-size: 14.5px; line-height: 1.5; margin-bottom: 14px; }
 .fa-flash { background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; }
 .fa-error { background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; }
-.fa-note { background: #EAF2FB; border: 1px solid #B9D3EC; color: #0B2545; }
+.fa-note { background: #E6F4F1; border: 1px solid #A9DCD2; color: #0F2A44; }
 .fa-warn { background: #FFF7ED; border: 1px solid #FED7AA; color: #9A3412; }
 
 /* Knoppen: oranje alleen voor de belangrijkste actie. */
-.fa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 22px; border-radius: 12px; border: 1px solid #F4781F; background: #F4781F; color: #fff; font-family: inherit; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 0.15s, transform 0.15s; width: 100%; }
-.fa-btn:hover { background: #D9640F; border-color: #D9640F; }
+.fa-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 12px 22px; border-radius: 12px; border: 1px solid #027A74; background: #027A74; color: #fff; font-family: inherit; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background 0.15s, transform 0.15s; width: 100%; }
+.fa-btn:hover { background: #065F59; border-color: #065F59; }
 .fa-btn:disabled { opacity: 0.6; cursor: default; }
-.fa-btn--secondary { background: #fff; color: #0B2545; border-color: #C5CFDC; }
+.fa-btn--secondary { background: #fff; color: #0F2A44; border-color: #C5CFDC; }
 .fa-btn--secondary:hover { background: #EEF2F7; border-color: #C5CFDC; }
-.fa-btn--navy { background: #0B2545; border-color: #0B2545; color: #fff; }
-.fa-btn--navy:hover { background: #143A66; border-color: #143A66; }
+.fa-btn--navy { background: #0F2A44; border-color: #0F2A44; color: #fff; }
+.fa-btn--navy:hover { background: #163D5F; border-color: #163D5F; }
 .fa-btn--danger { background: #fff; color: #B91C1C; border-color: #FECACA; }
 .fa-btn--danger:hover { background: #FEF2F2; border-color: #FECACA; }
 .fa-btn--sm { min-height: 40px; padding: 8px 16px; font-size: 14.5px; border-radius: 10px; }
 @media (min-width: 640px) { .fa-btn { width: auto; } .fa-btn--block { width: 100%; } }
-.fa-link { background: none; border: 0; padding: 0; color: #0B2545; text-decoration: underline; cursor: pointer; font-family: inherit; font-size: 14.5px; }
+.fa-link { background: none; border: 0; padding: 0; color: #0F2A44; text-decoration: underline; cursor: pointer; font-family: inherit; font-size: 14.5px; }
 .fa-link--muted { color: #64748B; }
 .fa-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
 @media (min-width: 640px) { .fa-actions { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 14px; } }
@@ -130,13 +130,13 @@ const year = new Date().getFullYear();
 .fa-field input[type="text"], .fa-field input[type="email"], .fa-field input[type="tel"], .fa-field input[type="date"], .fa-field input[type="datetime-local"], .fa-field input[type="number"], .fa-field input[type="password"], .fa-field input[type="url"], .fa-field textarea, .fa-field select,
 .fa-input { width: 100%; min-height: 48px; border: 1px solid #C5CFDC; border-radius: 10px; padding: 11px 14px; font-size: 16px; font-family: inherit; color: #0F172A; background: #fff; }
 .fa-field textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
-.fa-field input:focus, .fa-field textarea:focus, .fa-field select:focus, .fa-input:focus { outline: 2px solid #8FC4F2; outline-offset: 1px; border-color: #8FC4F2; }
+.fa-field input:focus, .fa-field textarea:focus, .fa-field select:focus, .fa-input:focus { outline: 2px solid #7FD6C6; outline-offset: 1px; border-color: #7FD6C6; }
 .fa-field input[aria-invalid="true"], .fa-field textarea[aria-invalid="true"] { border-color: #F87171; }
 .fa-field input[type="file"] { width: 100%; min-height: 48px; border: 1px solid #C5CFDC; border-radius: 10px; padding: 6px 14px 6px 6px; line-height: 34px; font-size: 14px; font-family: inherit; color: #64748B; background: #fff; cursor: pointer; }
-.fa-field input[type="file"]::file-selector-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0B2545; background: #EAF2FB; border: 1px solid #8FC4F2; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
-.fa-field input[type="file"]::-webkit-file-upload-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0B2545; background: #EAF2FB; border: 1px solid #8FC4F2; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
-.fa-field input[type="file"]:hover::file-selector-button { background: #D9E8F7; }
-.fa-field input[type="file"]:hover::-webkit-file-upload-button { background: #D9E8F7; }
+.fa-field input[type="file"]::file-selector-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0F2A44; background: #E6F4F1; border: 1px solid #7FD6C6; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
+.fa-field input[type="file"]::-webkit-file-upload-button { font: inherit; font-weight: 600; font-size: 14px; line-height: 1; color: #0F2A44; background: #E6F4F1; border: 1px solid #7FD6C6; border-radius: 8px; height: 34px; padding: 0 14px; margin: 0 12px 0 0; cursor: pointer; transition: background 0.15s; }
+.fa-field input[type="file"]:hover::file-selector-button { background: #CCEAE3; }
+.fa-field input[type="file"]:hover::-webkit-file-upload-button { background: #CCEAE3; }
 .fa-err { color: #B91C1C; font-size: 13px; margin-top: 5px; }
 .fa-row { display: grid; grid-template-columns: 1fr; gap: 0 14px; }
 @media (min-width: 560px) { .fa-row { grid-template-columns: 1fr 1fr; } }
@@ -144,25 +144,25 @@ const year = new Date().getFullYear();
 .fa-money input { border: 0 !important; min-height: 46px !important; flex: 1; }
 .fa-money span { padding: 0 14px; color: #64748B; font-weight: 600; }
 .fa-check { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; line-height: 1.45; cursor: pointer; }
-.fa-check input { width: 20px; height: 20px; margin: 2px 0 0; flex: 0 0 20px; accent-color: #0B2545; }
+.fa-check input { width: 20px; height: 20px; margin: 2px 0 0; flex: 0 0 20px; accent-color: #0F2A44; }
 .hp { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; opacity: 0; }
 
 /* Keuzekaarten (radio's die als knop ogen) */
 .fa-options { display: grid; grid-template-columns: 1fr; gap: 8px; }
 @media (min-width: 560px) { .fa-options { grid-template-columns: 1fr 1fr; } }
 .fa-option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #C5CFDC; border-radius: 12px; background: #fff; cursor: pointer; min-height: 52px; font-size: 15.5px; }
-.fa-option input { accent-color: #0B2545; width: 18px; height: 18px; flex: 0 0 18px; }
-.fa-option.is-on { border-color: #0B2545; background: #EAF2FB; box-shadow: inset 0 0 0 1px #0B2545; }
+.fa-option input { accent-color: #0F2A44; width: 18px; height: 18px; flex: 0 0 18px; }
+.fa-option.is-on { border-color: #0F2A44; background: #E6F4F1; box-shadow: inset 0 0 0 1px #0F2A44; }
 .fa-option .flag { font-size: 20px; line-height: 1; }
 
 /* Tegels (categorieën) */
 .fa-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 @media (min-width: 640px) { .fa-tiles { grid-template-columns: repeat(3, 1fr); } }
 .fa-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 14px; border: 1px solid #C5CFDC; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; font-family: inherit; color: #0F172A; min-height: 96px; transition: border-color 0.15s, background 0.15s; }
-.fa-tile:hover { border-color: #0B2545; }
-.fa-tile.is-on { border-color: #0B2545; background: #EAF2FB; box-shadow: inset 0 0 0 1px #0B2545; }
-.fa-tile .ic { color: #0B2545; }
-.fa-tile.is-on .ic { color: #F4781F; }
+.fa-tile:hover { border-color: #0F2A44; }
+.fa-tile.is-on { border-color: #0F2A44; background: #E6F4F1; box-shadow: inset 0 0 0 1px #0F2A44; }
+.fa-tile .ic { color: #0F2A44; }
+.fa-tile.is-on .ic { color: #027A74; }
 .fa-tile strong { font-size: 15px; }
 .fa-tile small { color: #64748B; font-size: 12.5px; line-height: 1.35; }
 .ic { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; }
@@ -173,18 +173,18 @@ const year = new Date().getFullYear();
 .fa-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 100px; background: #EEF2F7; color: #334155; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
 .fa-chip--ok { background: #ECFDF5; color: #065F46; }
 .fa-chip--warn { background: #FFF7ED; color: #9A3412; }
-.fa-chip--navy { background: #0B2545; color: #fff; }
-.fa-chip--blue { background: #EAF2FB; color: #0B2545; }
+.fa-chip--navy { background: #0F2A44; color: #fff; }
+.fa-chip--blue { background: #E6F4F1; color: #0F2A44; }
 .fa-chip--muted { background: #F1F5F9; color: #64748B; }
 .fa-stars { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #334155; }
 .fa-stars .st { color: #CBD5E1; letter-spacing: 1px; font-size: 16px; line-height: 1; }
-.fa-stars .st.on { color: #F4781F; }
+.fa-stars .st.on { color: #F5B301; }
 .fa-kv { display: grid; grid-template-columns: 1fr; gap: 6px 16px; font-size: 14.5px; }
 @media (min-width: 560px) { .fa-kv { grid-template-columns: 160px 1fr; } }
 .fa-kv dt { color: #64748B; margin: 0; }
 .fa-kv dd { margin: 0 0 4px; }
 @media (min-width: 560px) { .fa-kv dd { margin-bottom: 0; } }
-.fa-amount { font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 800; color: #0B2545; letter-spacing: -0.02em; }
+.fa-amount { font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 26px; font-weight: 800; color: #0F2A44; letter-spacing: -0.02em; }
 .fa-sep { border: 0; border-top: 1px solid #DCE3EC; margin: 16px 0; }
 
 /* Foto's */
@@ -192,18 +192,18 @@ const year = new Date().getFullYear();
 @media (min-width: 560px) { .fa-gallery { grid-template-columns: repeat(4, 1fr); } }
 .fa-gallery a, .fa-gallery .ph { display: block; position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #EEF2F7; border: 1px solid #DCE3EC; }
 .fa-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.fa-gallery .rm { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(11, 37, 69, 0.85); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; }
+.fa-gallery .rm { position: absolute; top: 4px; right: 4px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: rgba(15, 42, 68, 0.85); color: #fff; font-size: 16px; line-height: 1; cursor: pointer; }
 .fa-file { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #DCE3EC; border-radius: 10px; background: #fff; text-decoration: none; font-size: 14px; margin-top: 6px; }
 
 /* Lijsten met vinkjes */
 .fa-ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14.5px; }
 .fa-ticks li { display: flex; gap: 10px; align-items: flex-start; }
-.fa-ticks li::before { content: '✓'; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: #EAF2FB; color: #0B2545; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.fa-ticks li::before { content: '✓'; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 50%; background: #E6F4F1; color: #0F2A44; font-weight: 800; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
 
 /* Tijdlijn */
 .fa-timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid #DCE3EC; margin-left: 6px; }
 .fa-timeline li { position: relative; padding: 0 0 12px 18px; font-size: 14px; }
-.fa-timeline li::before { content: ''; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid #8FC4F2; }
+.fa-timeline li::before { content: ''; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 2px solid #7FD6C6; }
 .fa-timeline li:last-child { padding-bottom: 0; }
 .fa-timeline time { display: block; color: #64748B; font-size: 12.5px; }
 

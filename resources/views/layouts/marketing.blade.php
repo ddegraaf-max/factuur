@@ -175,6 +175,20 @@
   .nav-mobile-link:hover { color: var(--text); }
   .nav-mobile-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
   .btn-block { width: 100%; justify-content: center; }
+  /* Woordmerk in de balk/voet (brand header_logo), uitklapmenu en tweede knop (1.105.0). */
+  .nav-brand .nav-logo { width: auto; height: 32px; border-radius: 0; }
+  .footer-brand .footer-logo { width: auto; height: 30px; border-radius: 0; }
+  .nav-has-dd { position: relative; }
+  .nav-link .caret { width: 14px; height: 14px; vertical-align: -2px; margin-left: 3px; }
+  .nav-dd { display: none; position: absolute; top: 100%; left: 0; padding-top: 8px; z-index: 60; }
+  .nav-has-dd:hover > .nav-dd, .nav-has-dd:focus-within > .nav-dd { display: block; }
+  .nav-dd-inner { display: grid; grid-template-columns: repeat(2, 200px); gap: 2px; padding: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-lg); }
+  .nav-dd a { display: block; padding: 9px 12px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--text-2); white-space: nowrap; }
+  .nav-dd a:hover { background: var(--surface-2); color: var(--text); }
+  .nav-mobile-sub { padding-left: 18px; font-size: 15px; }
+  .btn-outline { background: transparent; color: var(--text); border-color: var(--border-strong); }
+  .btn-outline:hover { background: var(--surface-2); }
+  .btn svg.bi { width: 16px; height: 16px; flex-shrink: 0; }
   /* Met zes menu-items, merknaam en twee knoppen past de balk pas vanaf
      ±1250px; daaronder nemen we het hamburgermenu, zodat niets over de
      merknaam heen schuift. */
@@ -526,8 +540,12 @@
   <input type="checkbox" id="navToggle" class="nav-toggle-cb" aria-label="Menu openen of sluiten">
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
+      @if(brand('header_logo'))
+      <img class="nav-logo" src="{{ brand('header_logo') }}" alt="{{ brand('name') }}">
+      @else
       <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
       {{ brand('name') }}
+      @endif
     </a>
     @php
       // Navigatie en voettekst per merk (config/marketing.php); routes die hier niet bestaan worden overgeslagen.
@@ -545,14 +563,50 @@
       // Fachora Protect staat op de meeste omgevingen uit: dan geen menu- of voettekstlink (config fachora.protect).
       $mkShow = fn (array $l) => (empty($l['brand_watch']) || \App\Support\Brand::watchesTrademark())
           && (($l['route'] ?? '') !== 'fachora.protect' || fachora_protect()) && $mkUrl($l);
+      // Uitklapmenu (1.105.0): 'children' (vaste lijst) of 'children_from' => 'fachora.categories'
+      // (de categorieën uit config/fachora.php, label in de taal van de bezoeker).
+      $mkChildren = function (array $l): array {
+          if (! empty($l['children'])) {
+              return $l['children'];
+          }
+          if (($l['children_from'] ?? '') === 'fachora.categories') {
+              $loc = app()->getLocale();
+
+              return collect(config('fachora.categories', []))
+                  ->map(fn ($c, $k) => ['route' => 'fachora.intake', 'params' => ['kategoria' => $k], 'label' => $c[$loc] ?? $c['pl']])
+                  ->values()->all();
+          }
+
+          return [];
+      };
+      // Tweede knop in de balk (bijv. "Moje zlecenia" bij Fachora) in plaats van de inlogknop.
+      $mkSecondary = ! empty($mk['secondary']) && $mkUrl($mk['secondary']) ? $mk['secondary'] : null;
     @endphp
     <nav class="nav-links">
       @foreach($mk['nav'] as $l)@if($mkShow($l))
+      @php
+          $mkKids = $mkChildren($l);
+      @endphp
+      @if($mkKids)
+      <div class="nav-has-dd">
+        <a href="{{ $mkUrl($l) }}" class="nav-link" aria-haspopup="true">{{ $mkLabel($l) }}<svg class="caret" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></a>
+        <div class="nav-dd"><div class="nav-dd-inner">
+          @foreach($mkKids as $k)@if($mkUrl($k))
+          <a href="{{ $mkUrl($k) }}">{{ $mkLabel($k) }}</a>
+          @endif
+          @endforeach
+        </div></div>
+      </div>
+      @else
       <a href="{{ $mkUrl($l) }}" class="nav-link">{{ $mkLabel($l) }}</a>
+      @endif
       @endif
       @endforeach
     </nav>
     <div class="nav-actions">
+      @if($mkSecondary)
+      <a href="{{ $mkUrl($mkSecondary) }}" class="btn btn-outline">@include('partials.nav-icon', ['name' => $mkSecondary['icon'] ?? null]){{ $mkLabel($mkSecondary) }}</a>
+      @endif
       @if(count($mkLocales) > 1)
       <div class="nav-lang" aria-label="Language">
         @foreach($mkLocales as $loc)
@@ -560,14 +614,20 @@
         @endforeach
       </div>
       @endif
+      @if(! $mkSecondary)
       <a href="{{ route('login') }}" class="btn btn-ghost">{{ $mk['login'] }}</a>
-      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary">{{ $mk['cta'] }}</a>
+      @endif
+      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary">@include('partials.nav-icon', ['name' => $mk['cta_icon'] ?? null]){{ $mk['cta'] }}</a>
     </div>
     <label for="navToggle" class="nav-toggle" aria-hidden="true"><span></span><span></span><span></span></label>
   </div>
   <div class="nav-mobile">
     @foreach($mk['nav'] as $l)@if($mkShow($l))
     <a href="{{ $mkUrl($l) }}" class="nav-mobile-link">{{ $mkLabel($l) }}</a>
+    @foreach($mkChildren($l) as $k)@if($mkUrl($k))
+    <a href="{{ $mkUrl($k) }}" class="nav-mobile-link nav-mobile-sub">{{ $mkLabel($k) }}</a>
+    @endif
+    @endforeach
     @endif
       @endforeach
     <div class="nav-mobile-actions">
@@ -578,8 +638,12 @@
         @endforeach
       </div>
       @endif
+      @if($mkSecondary)
+      <a href="{{ $mkUrl($mkSecondary) }}" class="btn btn-secondary btn-block">@include('partials.nav-icon', ['name' => $mkSecondary['icon'] ?? null]){{ $mkLabel($mkSecondary) }}</a>
+      @else
       <a href="{{ route('login') }}" class="btn btn-secondary btn-block">{{ $mk['login'] }}</a>
-      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary btn-block">{{ $mk['cta'] }}</a>
+      @endif
+      <a href="{{ route($mk['cta_route'] ?? 'register') }}" class="btn btn-primary btn-block">@include('partials.nav-icon', ['name' => $mk['cta_icon'] ?? null]){{ $mk['cta'] }}</a>
     </div>
   </div>
 </header>
@@ -592,8 +656,12 @@
     <div class="footer-grid">
       <div class="footer-brand-block">
         <div class="footer-brand">
+          @if(brand('header_logo'))
+          <img class="footer-logo" src="{{ brand('header_logo') }}" alt="{{ brand('name') }}">
+          @else
           <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
           {{ brand('name') }}@if(brand('registered'))<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>@endif
+          @endif
         </div>
         <div class="footer-desc">
           {{ brand('footer_description') }}

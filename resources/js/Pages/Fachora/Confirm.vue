@@ -184,7 +184,7 @@ const townsLabel = () => props.advice.towns.map((x) => t(':name (:km km)', { nam
 .cf-actions { margin-top: 20px; }
 .cf-foot { margin-top: 14px; }
 .cf-langs .fa-option input { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; border: 2px solid #C5CFDC; background: #fff; cursor: pointer; margin: 0; }
-.cf-langs .fa-option input:checked { background: #0B2545; border-color: #0B2545; box-shadow: inset 0 0 0 3px #fff; }
+.cf-langs .fa-option input:checked { background: #0F2A44; border-color: #0F2A44; box-shadow: inset 0 0 0 3px #fff; }
 .cf-langs .cf-lang-always input, .cf-langs .cf-lang-always input:checked { background: #E8231F; border-color: #E8231F; box-shadow: inset 0 0 0 3px #fff; cursor: default; opacity: 1; }
 .cf-lang-tag { margin-left: auto; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #E8231F; }
 </style>

@@ -343,7 +343,7 @@ class ProviderService
             'city' => $provider->city,
             'country' => 'PL',
             'currency' => 'PLN',
-            'brand_color' => (string) brand('color', '#0B2545'),
+            'brand_color' => (string) brand('color', '#0F2A44'),
             'default_payment_terms' => 14,
             'invoice_number_format' => 'FV/{year}/{sequence:4}',
             'invoice_footer' => (string) Market::get('invoice_footer'),

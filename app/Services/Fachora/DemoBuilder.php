@@ -45,8 +45,8 @@ class DemoBuilder extends DemoDataBuilder
             'address_line' => 'ul. Puławska 12/3',
             'postal_code' => '02-566',
             'city' => 'Warszawa',
-            'brand_color' => '#0B2545',
-            'accent_color' => '#F4781F',
+            'brand_color' => '#0F2A44',
+            'accent_color' => '#027A74',
         ]);
         $this->d['user_name'] = 'Marek Nowak';
 

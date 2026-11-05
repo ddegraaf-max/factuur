@@ -64,19 +64,19 @@ defineProps({
 .fh-sub { font-size: 15.5px; line-height: 1.6; color: rgba(255,255,255,0.9); margin: 0 0 26px; }
 .fh-points { list-style: none; margin: 0 0 28px; padding: 0; display: grid; gap: 14px; }
 .fh-points li { display: flex; gap: 12px; align-items: flex-start; }
-.fh-points i { flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; color: #FFA45C; }
+.fh-points i { flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; color: #1ED1B6; }
 .fh-points svg { width: 17px; height: 17px; }
 .fh-points b { display: block; font-size: 14.5px; color: #fff; margin-bottom: 2px; }
 .fh-points span { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.72); }
 
 .fh-card { position: relative; background: #fff; color: #0F172A; border-radius: 16px; padding: 16px 18px 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.28); max-width: 380px; margin-bottom: 24px; overflow: hidden; }
-.fh-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 100px; background: #0B2545; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
-.fh-check { width: 16px; height: 16px; border-radius: 50%; background: #F4781F; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+.fh-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 100px; background: #0F2A44; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.fh-check { width: 16px; height: 16px; border-radius: 50%; background: #1ED1B6; color: #0A2138; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
 .fh-nm { font-family: var(--font-display); font-weight: 700; font-size: 17px; margin: 10px 0 6px; }
 .fh-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-.fh-tags span { font-size: 11.5px; padding: 3px 8px; border-radius: 100px; background: #EAF2FB; color: #0B2545; font-weight: 600; }
-.fh-job { display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: #FFF1E6; border: 1px solid #FFD5B0; }
-.fh-job span { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #D9640F; }
+.fh-tags span { font-size: 11.5px; padding: 3px 8px; border-radius: 100px; background: #E6F4F1; color: #0F2A44; font-weight: 600; }
+.fh-job { display: grid; gap: 2px; padding: 10px 12px; border-radius: 10px; background: #E3F6F2; border: 1px solid #A9DCD2; }
+.fh-job span { font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #065F59; }
 .fh-job b { font-size: 13px; }
 .fh-cap { margin-top: 10px; font-size: 10.5px; color: #94A3B8; }
 

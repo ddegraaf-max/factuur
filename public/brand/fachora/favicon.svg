@@ -1,8 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="14" fill="#0B2545"/>
-  <path d="M32 12 10 32h7v18h30V32h7L32 12z" fill="#FFFFFF"/>
-  <rect x="40" y="16" width="6" height="10" rx="1" fill="#FFFFFF"/>
-  <rect x="26" y="32" width="12" height="12" rx="2" fill="#F4781F"/>
-  <rect x="31" y="32" width="2" height="12" fill="#0B2545"/>
-  <rect x="26" y="37" width="12" height="2" fill="#0B2545"/>
+  <rect width="64" height="64" rx="14" fill="#0F2A44"/>
+  <g fill="none">
+    <polyline points="11,37 32,18 53,37" stroke="#1ED1B6" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="43" y="19" width="5.5" height="10" rx="1.2" fill="#1ED1B6"/>
+    <rect x="25" y="33" width="6.5" height="6.5" rx="1.5" fill="#FFFFFF"/>
+    <rect x="32.5" y="33" width="6.5" height="6.5" rx="1.5" fill="#FFFFFF"/>
+    <rect x="25" y="40.5" width="6.5" height="6.5" rx="1.5" fill="#FFFFFF"/>
+    <rect x="32.5" y="40.5" width="6.5" height="6.5" rx="1.5" fill="#FFFFFF"/>
+  </g>
 </svg>

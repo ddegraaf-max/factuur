@@ -804,12 +804,12 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-steps li { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; position: relative; }
 .jb-steps li::before { content: ''; position: absolute; top: 11px; left: -50%; right: 50%; height: 2px; background: #DCE3EC; z-index: 0; }
 .jb-steps li:first-child::before { display: none; }
-.jb-steps li.is-done::before, .jb-steps li.is-now::before { background: #0B2545; }
+.jb-steps li.is-done::before, .jb-steps li.is-now::before { background: #0F2A44; }
 .jb-steps .dot { position: relative; z-index: 1; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 2px solid #DCE3EC; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; }
-.jb-steps li.is-done .dot { background: #0B2545; border-color: #0B2545; }
-.jb-steps li.is-now .dot { border-color: #F4781F; box-shadow: 0 0 0 4px rgba(244, 120, 31, 0.2); }
+.jb-steps li.is-done .dot { background: #0F2A44; border-color: #0F2A44; }
+.jb-steps li.is-now .dot { border-color: #027A74; box-shadow: 0 0 0 4px rgba(2, 122, 116, 0.2); }
 .jb-steps .lbl { font-size: 10.5px; line-height: 1.2; color: #94A3B8; }
-.jb-steps li.is-done .lbl, .jb-steps li.is-now .lbl { color: #0B2545; font-weight: 600; }
+.jb-steps li.is-done .lbl, .jb-steps li.is-now .lbl { color: #0F2A44; font-weight: 600; }
 @media (min-width: 560px) { .jb-steps .lbl { font-size: 12px; } }
 .jb-banner { margin: 18px 0 0; }
 .jb-section { margin-bottom: 16px; }
@@ -820,7 +820,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .fa-btn.jb-wa { background: #25D366; color: #fff; }
 .jb-remove { margin-left: auto; color: #8A2A1F; }
 .jb-contacted { border-left: 4px solid #34A853; }
-.jb-agree { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #D9E6F2; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.jb-agree { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #CCEAE3; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .jb-agree .jb-agree-form { flex-basis: 100%; }
 .jb-closed { background: #F5F6F8; opacity: .8; }
 .jb-closed-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -838,17 +838,17 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 /* Zoeken in het register: zandloper die omdraait en een balk die blijft lopen */
 .jb-searching-row { display: flex; gap: 16px; align-items: flex-start; }
 .jb-searching-row .fa-h2 { margin-bottom: 6px; }
-.jb-hourglass { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 14px; background: #fff; color: #0B2545; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(11, 37, 69, 0.12); animation: jb-flip 2.4s ease-in-out infinite; }
+.jb-hourglass { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 14px; background: #fff; color: #0F2A44; display: flex; align-items: center; justify-content: center; box-shadow: 0 1px 3px rgba(15, 42, 68, 0.12); animation: jb-flip 2.4s ease-in-out infinite; }
 @keyframes jb-flip { 0%, 55% { transform: rotate(0deg); } 78%, 100% { transform: rotate(180deg); } }
-.jb-progress { position: relative; height: 4px; margin-top: 14px; border-radius: 2px; background: rgba(11, 37, 69, 0.12); overflow: hidden; }
-.jb-progress span { position: absolute; top: 0; bottom: 0; width: 35%; border-radius: 2px; background: #F4781F; animation: jb-slide 1.6s ease-in-out infinite; }
+.jb-progress { position: relative; height: 4px; margin-top: 14px; border-radius: 2px; background: rgba(15, 42, 68, 0.12); overflow: hidden; }
+.jb-progress span { position: absolute; top: 0; bottom: 0; width: 35%; border-radius: 2px; background: #027A74; animation: jb-slide 1.6s ease-in-out infinite; }
 @keyframes jb-slide { from { left: -35%; } to { left: 100%; } }
 @media (prefers-reduced-motion: reduce) { .jb-hourglass, .jb-progress span { animation: none; } }
 .jb-offer.is-off { opacity: 0.6; }
 .jb-pick { cursor: pointer; }
 .jb-pick-box { display: flex; align-items: flex-start; padding-top: 2px; }
-.jb-pick-box input { width: 20px; height: 20px; accent-color: #0B2545; }
-.jb-offer.is-open { border-color: #0B2545; box-shadow: 0 0 0 1px #0B2545; }
+.jb-pick-box input { width: 20px; height: 20px; accent-color: #0F2A44; }
+.jb-offer.is-open { border-color: #0F2A44; box-shadow: 0 0 0 1px #0F2A44; }
 .jb-prov { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .jb-prov-main { min-width: 0; flex: 1; }
 .jb-prov-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 17px; margin-bottom: 4px; }
@@ -857,13 +857,13 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-price { display: flex; flex-direction: column; gap: 10px; }
 @media (min-width: 560px) { .jb-price { flex-direction: row; justify-content: space-between; align-items: flex-end; } }
 .jb-avail { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #334155; }
-.jb-avail .ic { color: #0B2545; }
+.jb-avail .ic { color: #0F2A44; }
 .jb-remarks { margin-top: 10px; color: #334155; }
-.jb-protect-hint { display: flex; align-items: center; gap: 6px; margin-top: 10px; color: #0B2545; }
+.jb-protect-hint { display: flex; align-items: center; gap: 6px; margin-top: 10px; color: #0F2A44; }
 .jb-wait { display: flex; align-items: center; gap: 6px; }
 .jb-choose { margin-top: 16px; padding-top: 16px; border-top: 1px dashed #C5CFDC; }
 .jb-protect-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.jb-protect-head .ic { color: #F4781F; }
+.jb-protect-head .ic { color: #027A74; }
 .jb-protect-head .fa-h2 { margin: 0; }
 .jb-protect-list { margin: 12px 0 4px; }
 .jb-protect-foot { margin-top: 10px; }
@@ -878,10 +878,10 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
 .jb-done-sum { margin: 12px 0; }
 .jb-auto { margin-top: 12px; }
 .jb-dispute { margin-top: -4px; }
-.jb-reply { margin-top: 10px; padding-left: 12px; border-left: 3px solid #8FC4F2; }
+.jb-reply { margin-top: 10px; padding-left: 12px; border-left: 3px solid #7FD6C6; }
 .jb-rate { display: flex; gap: 4px; margin: 6px 0 10px; }
 .jb-rate-btn { background: none; border: 0; font-size: 36px; line-height: 1; color: #CBD5E1; cursor: pointer; padding: 2px; min-width: 44px; min-height: 44px; }
-.jb-rate-btn.on { color: #F4781F; }
+.jb-rate-btn.on { color: #027A74; }
 .jb-req { margin-top: 12px; }
 .jb-cancel { margin: 4px 0 16px; text-align: center; }
 .jb-cancel form { text-align: left; }

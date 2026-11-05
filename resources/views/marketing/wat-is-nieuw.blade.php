@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 5 november 2026 · {{ brand('version_prefix') }} 1.104.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 6 november 2026 · {{ brand('version_prefix') }} 1.105.0</div>
+        <h2>Fachora: nieuwe huisstijl</h2>
+        <ul class="tl-list">
+          <li><b>Nieuw gezicht</b> — Fachora heeft een nieuwe huisstijl: nachtblauw met mint en teal, een nieuw logo (huisje met raam, woordmerk als vaste vorm) en de slogan "Dobry fachowiec. Bez stresu." De kleuren gelden overal: de marketingpagina's, het aanvraagformulier en de opdrachtpagina van de klant, het bedrijvenpaneel, e-mails, brieven en de deelafbeelding voor sociale media.</li>
+          <li><b>Nieuwe startpagina</b> — een donkere kop met de zoekbalk (dienst en plaats), foto en drie beloften (gratis voor klanten, gecontroleerde bedrijven, betalen na het werk), daaronder de 14 categorieën als tegels met foto, en "Jak to działa?" in vier stappen naast een voorbeeldprofiel. In het Pools en in het Engels.</li>
+          <li><b>Menu</b> — "Usługi" klapt uit naar alle categorieën, en de klant ziet "Moje zlecenia" in de balk; het bedrijvenpaneel blijft via de voet bereikbaar.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">5 november 2026 · {{ brand('version_prefix') }} 1.104.0</div>
         <h2>Factuur per sms, betalen via het portaal</h2>
         <ul class="tl-list">
           <li><b>Factuur per sms</b> — net als bij offertes staat op de factuur nu "Per sms": de klant krijgt een sms met het bedrag, de uiterste betaaldatum en een korte link naar het klantenportaal. Daar bekijkt hij de factuur, downloadt de PDF en betaalt online via iDEAL (Mollie), ook zonder e-mailadres. Het nummer komt van de klantkaart; de tekst staat klaar en is aan te passen. De knop is grijs zolang er geen mobiel nummer is.</li>

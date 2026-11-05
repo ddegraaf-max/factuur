@@ -1,5 +1,6 @@
-{{-- Wspólne style stron marketingowych Fachory (PL i EN). Kolory przez zmienne z public/brand/fachora/theme.css:
-     --brand (granat), --accent (pomarańcz: tylko główna akcja i znak Verified), --brand-tint (jasny błękit). --}}
+{{-- Wspólne style stron marketingowych Fachory (PL i EN). Kolory przez zmienne z public/brand/fachora/theme.css
+     (huisstijl 1.105.0): --brand (granat), --accent (ciemna zieleń morska: akcje, linki, ikony), --accent-light (mięta,
+     tylko na ciemnym tle), --brand-tint (jasna mięta), --star (żółty gwiazdek). --}}
 <style>
   /* ===== Hero z wyszukiwarką ===== */
   .hero { padding: 72px 0 56px; }
@@ -54,10 +55,10 @@
   .fh-steps.list .fh-step ul { margin: 10px 0 0; padding-left: 18px; font-size: 14px; color: var(--text-2); line-height: 1.6; }
 
   /* ===== Granatowy pas (fh-band: Protect, tylko gdy włączony) ===== */
-  .fh-band { background: linear-gradient(160deg, #143A66 0%, var(--brand) 60%, var(--brand-darker) 100%); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
-  .fh-band::before { content: ''; position: absolute; width: 700px; height: 700px; border-radius: 50%; right: -260px; top: -320px; background: radial-gradient(circle, rgba(244,120,31,0.22) 0%, rgba(244,120,31,0) 62%); pointer-events: none; }
+  .fh-band { background: linear-gradient(160deg, #163D5F 0%, var(--brand) 60%, var(--brand-darker) 100%); color: #fff; padding: 88px 0; position: relative; overflow: hidden; }
+  .fh-band::before { content: ''; position: absolute; width: 700px; height: 700px; border-radius: 50%; right: -260px; top: -320px; background: radial-gradient(circle, rgba(30,209,182,0.2) 0%, rgba(30,209,182,0) 62%); pointer-events: none; }
   .fh-band .eyebrow { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.18); color: var(--accent-light); }
-  .fh-band .eyebrow::before { background: var(--accent); box-shadow: 0 0 0 4px rgba(244,120,31,0.2); }
+  .fh-band .eyebrow::before { background: var(--accent-light); box-shadow: 0 0 0 4px rgba(30,209,182,0.2); }
   .fh-band h2 { color: #fff; font-size: clamp(28px, 3.6vw, 42px); max-width: 720px; }
   .fh-band .lead { color: rgba(255,255,255,0.8); font-size: 17px; max-width: 640px; margin: 14px 0 40px; line-height: 1.6; }
   .fh-band-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 44px; align-items: start; position: relative; }
@@ -143,7 +144,7 @@
   .fh-table-wrap { overflow-x: auto; }
   .fh-note { background: var(--brand-tint); border: 1px solid var(--brand-border); border-radius: 14px; padding: 18px 20px; font-size: 14.5px; color: var(--text-2); line-height: 1.6; }
   .fh-note b { color: var(--brand-darker); }
-  .fh-note.warm { background: var(--accent-tint); border-color: #F8C9A3; }
+  .fh-note.warm { background: var(--accent-tint); border-color: var(--brand-border); }
   .fh-langs { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
   .fh-lang { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 100px; font-weight: 600; font-size: 14px; color: var(--text); }
   .fh-lang .flag { font-size: 18px; line-height: 1; }
@@ -168,5 +169,99 @@
   .fh-more a { color: var(--brand); font-weight: 600; }
   .fh-prose-wide { max-width: 860px; margin: 0 auto; }
 
-  @media (prefers-reduced-motion: reduce) { .fh-cat, .fh-cat:hover { transition: none; transform: none; } }
+  /* ===== Strona główna 1.105.0: granatowy hero z wyszukiwarką, zdjęciem i pływającymi kartami ===== */
+  .fh-hero { background: linear-gradient(135deg, #0A2138 0%, #0F2A44 55%, #163D5F 100%); color: #fff; padding: 56px 0 0; position: relative; overflow: hidden; }
+  .fh-hero::before { content: ''; position: absolute; width: 640px; height: 640px; border-radius: 50%; left: -260px; top: -300px; background: radial-gradient(circle, rgba(30,209,182,0.16) 0%, rgba(30,209,182,0) 62%); pointer-events: none; }
+  .fh-hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 36px; align-items: end; position: relative; }
+  .fh-hero-text { padding-bottom: 52px; }
+  .fh-hero h1 { color: #fff; font-size: clamp(38px, 5.2vw, 66px); font-weight: 800; line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 18px; }
+  .fh-hero h1 .accent { color: var(--accent-light); }
+  .fh-hero-sub { font-size: clamp(16px, 1.3vw, 18px); color: rgba(255,255,255,0.86); line-height: 1.55; max-width: 600px; margin: 0 0 26px; }
+  .fh-hero .fh-search { margin: 0 0 24px; max-width: none; box-shadow: 0 20px 50px rgba(0,0,0,0.28); }
+  .fh-hero .fh-search label { position: relative; }
+  .fh-hero .fh-search label .fi { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--accent); pointer-events: none; display: flex; }
+  .fh-hero .fh-search .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); padding: 0; margin: -1px; }
+  .fh-hero .fh-search select, .fh-hero .fh-search input { padding: 15px 14px 15px 44px; font-size: 15.5px; font-weight: 500; }
+  .fh-hero .fh-search label + label { border-left: 1px solid var(--border); }
+  .fh-usp3 { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px 0; }
+  .fh-usp3 li { display: flex; align-items: center; gap: 12px; padding: 4px 24px 4px 0; margin-right: 24px; border-right: 1px solid rgba(255,255,255,0.16); font-size: 14.5px; line-height: 1.3; font-weight: 700; color: #fff; }
+  .fh-usp3 li:last-child { border-right: 0; margin-right: 0; padding-right: 0; }
+  .fh-usp3 .ic { flex-shrink: 0; width: 40px; height: 40px; border-radius: 12px; border: 1.5px solid rgba(30,209,182,0.6); color: var(--accent-light); display: flex; align-items: center; justify-content: center; }
+  .fh-usp3 small { display: block; font-weight: 400; color: rgba(255,255,255,0.75); font-size: 13px; }
+  .fh-hero-visual { position: relative; align-self: stretch; min-height: 440px; }
+  .fh-hero-visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 55% 30%; border-radius: 22px 22px 0 0; }
+  .fh-hero-visual::after { content: ''; position: absolute; inset: 0; border-radius: 22px 22px 0 0; background: linear-gradient(180deg, rgba(10,33,56,0.18) 0%, rgba(10,33,56,0) 40%); pointer-events: none; }
+  .fh-float { position: absolute; z-index: 2; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: #fff; color: var(--text); border-radius: 14px; box-shadow: 0 14px 40px rgba(0,0,0,0.25); font-size: 13.5px; line-height: 1.25; }
+  .fh-float b { display: block; font-size: 14.5px; }
+  .fh-float span { color: var(--text-3); font-size: 12.5px; }
+  .fh-float .ic { flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .fh-float .ic.star { background: #FFF4D6; color: var(--star); }
+  .fh-float .ic.shield { background: var(--accent-tint); color: var(--accent-dark); }
+  .fh-float-1 { top: 44px; left: -28px; }
+  .fh-float-2 { top: 38%; right: -18px; }
+  .fh-float-3 { bottom: 20%; right: -8px; }
+  @media (max-width: 1000px) {
+    .fh-hero-grid { grid-template-columns: 1fr; gap: 28px; }
+    .fh-hero-text { padding-bottom: 0; }
+    .fh-hero-visual { min-height: 340px; max-width: 560px; }
+    .fh-float-1 { left: 12px; } .fh-float-2, .fh-float-3 { right: 12px; }
+  }
+  @media (max-width: 720px) {
+    .fh-hero { padding-top: 36px; }
+    .fh-hero .fh-search label + label { border-left: 0; }
+    .fh-usp3 li { border-right: 0; margin-right: 0; padding-right: 0; width: 100%; }
+    .fh-float-2 { display: none; }
+    .fh-hero-visual { min-height: 280px; }
+  }
+  /* Pasek „do 15 → maks. 5 → 1” pod hero */
+  .fh-pickband { background: var(--surface); border-bottom: 1px solid var(--border); padding: 24px 0; }
+  .fh-pickband .fh-pick { margin: 0; max-width: none; }
+
+  /* ===== Kafelki kategorii ze zdjęciem (public/brand/fachora/cat/<klucz>.jpg; bez zdjęcia gradient) ===== */
+  .fh-sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 26px; }
+  .fh-sec-head h2 { font-size: clamp(26px, 3.4vw, 38px); }
+  .fh-sec-head a { font-weight: 700; color: var(--accent-dark); white-space: nowrap; }
+  @media (max-width: 640px) { .fh-sec-head { flex-direction: column; align-items: flex-start; gap: 6px; } }
+  .fh-tiles { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; }
+  @media (max-width: 1100px) { .fh-tiles { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 640px) { .fh-tiles { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+  .fh-tile { position: relative; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+  .fh-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--brand-border); }
+  .fh-tile .ph { display: block; height: 84px; background: linear-gradient(135deg, #CCEAE3 0%, #E6F4F1 60%, #F6F9F9 100%) center/cover no-repeat; }
+  .fh-tile .ph.has-photo { background-size: cover; background-position: center; }
+  .fh-tile .ic { position: absolute; top: 62px; left: 14px; width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--accent-dark); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(15,42,68,0.14); }
+  .fh-tile .tx { padding: 28px 14px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .fh-tile b { font-family: var(--font-display); font-size: 16px; color: var(--text); letter-spacing: -0.01em; }
+  .fh-tile .ex { font-size: 12.5px; color: var(--text-3); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .fh-tile .go { margin-top: auto; padding-top: 6px; align-self: flex-end; color: var(--accent); display: flex; }
+
+  /* ===== Jak to działa: cztery kroki obok przykładowego profilu ===== */
+  .fh-how { display: grid; grid-template-columns: 1fr 340px; gap: 44px; align-items: start; }
+  @media (max-width: 1000px) { .fh-how { grid-template-columns: 1fr; } .fh-excard { max-width: 440px; } }
+  .fh-how-intro h2 { font-size: clamp(26px, 3.4vw, 38px); margin-bottom: 10px; }
+  .fh-how-intro > p { color: var(--text-2); font-size: 16px; line-height: 1.6; max-width: 600px; margin: 0 0 28px; }
+  .fh-how-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  @media (max-width: 760px) { .fh-how-steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 460px) { .fh-how-steps { grid-template-columns: 1fr; } }
+  .fh-how-step { position: relative; }
+  .fh-how-step .ic { position: relative; width: 60px; height: 60px; border-radius: 16px; background: var(--accent-tint); color: var(--accent-dark); display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .fh-how-step .ic i { position: absolute; top: -8px; left: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: #fff; font: 700 12px/24px var(--font-display); text-align: center; font-style: normal; }
+  .fh-how-step h3 { font-size: 17px; margin-bottom: 6px; }
+  .fh-how-step p { margin: 0; font-size: 13.5px; color: var(--text-2); line-height: 1.55; }
+  .fh-how-step::after { content: ''; position: absolute; top: 24px; right: -15px; width: 9px; height: 9px; border-top: 2px solid var(--border-strong); border-right: 2px solid var(--border-strong); transform: rotate(45deg); }
+  .fh-how-step:last-child::after { display: none; }
+  @media (max-width: 760px) { .fh-how-step::after { display: none; } }
+  .fh-excard { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-lg); position: relative; }
+  .fh-excard .ex { position: absolute; top: 14px; right: 14px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); background: var(--surface-2); border: 1px dashed var(--border-strong); border-radius: 100px; padding: 3px 9px; }
+  .fh-excard .top { display: flex; gap: 14px; align-items: center; margin: 12px 0; }
+  .fh-excard .av { flex-shrink: 0; width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-light), var(--accent)); color: #fff; font: 800 22px var(--font-display); display: flex; align-items: center; justify-content: center; }
+  .fh-excard .name { font-family: var(--font-display); font-weight: 700; font-size: 17px; letter-spacing: -0.01em; }
+  .fh-excard .meta { font-size: 13px; color: var(--text-3); }
+  .fh-excard .row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-2); padding: 5px 0; }
+  .fh-excard .row b { color: var(--text); }
+  .fh-excard .row .st { color: var(--star); font-size: 16px; }
+  .fh-excard .row svg { color: var(--accent); flex-shrink: 0; }
+  .fh-excard .btn { width: 100%; justify-content: center; margin-top: 12px; }
+
+  @media (prefers-reduced-motion: reduce) { .fh-cat, .fh-cat:hover, .fh-tile, .fh-tile:hover { transition: none; transform: none; } }
 </style>

@@ -1,9 +1,11 @@
 @extends('layouts.marketing')
-{{-- Fachora home page, English version (APP_BRAND=fachora, visitor chose EN): for foreigners living in Poland.
-     The customer describes the job and picks up to max_offers companies nearby (Fachora Verified on top, register
-     companies clearly marked). Verified companies get the request from us; a register company is contacted by the
-     customer directly (Fachora sends it nothing). The customer pays the company after the work; Fachora Protect
-     (a Stripe reservation) is shown only when fachora_protect() is on.
+{{-- Fachora home page, English version (APP_BRAND=fachora, visitor chose EN), house style 1.105.0 ("A good
+     tradesperson. No stress."): navy hero with the search bar and photo, category tiles with photos
+     (public/brand/fachora/cat/<key>.jpg; gradient when there is none), four steps next to an example profile.
+     The customer describes the job and picks up to max_offers companies nearby (Fachora Verified on top, companies
+     with good Google reviews and register companies clearly marked). Verified companies get the request from us;
+     a register company is contacted by the customer directly (Fachora sends it nothing). The customer pays the
+     company after the work; Fachora Protect (a Stripe reservation) is shown only when fachora_protect() is on.
      Same structure as the Polish page; numbers come from config/fachora.php. --}}
 @php
     $protect = fachora_protect();
@@ -17,9 +19,10 @@
     $acceptDays = config('fachora.auto_accept_days');
     $disputeHours = config('fachora.dispute_hours');
     $candidates = config('fachora.choice_candidates');
+    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg" : null;
 @endphp
-@section('title', 'Fachora — pick your own tradesperson in Poland. Plumber, electrician, locksmith and more, in English')
-@section('description', 'Describe the job and Fachora shows you companies near you: Fachora Verified companies, checked by us, and companies from the business register. You choose who receives your request, compare prices and pay only after the work. Free for customers, in English.')
+@section('title', 'Fachora — a good tradesperson, no stress. Pick your own company in Poland: plumber, electrician, locksmith and more, in English')
+@section('description', 'Find trusted local tradespeople for work in your home, flat or business in Poland. Describe the job and Fachora shows you companies near you: Fachora Verified, companies with good Google reviews and companies from the business register. You choose who receives your request, compare prices and pay only after the work. Free for customers, in English.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -28,38 +31,49 @@
 @section('content')
 
 <!-- HERO -->
-<section class="hero">
-  <div class="container hero-inner">
-    <div class="eyebrow">Tradespeople across Poland. You decide.</div>
-    <h1>You choose <span class="accent">who gets your job.</span></h1>
-    <p class="hero-sub">
-      Describe what needs doing, in English if you like, and we show you companies near you: Fachora Verified companies, checked by us, and companies from the Polish business register. You tick who receives your request, compare prices and pay only after the work.
-    </p>
-    <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Find a tradesperson">
-      <label>
-        <span class="lbl">What do you need?</span>
-        <select name="kategoria">
-          <option value="">Choose a service</option>
-          @foreach(config('fachora.categories') as $key => $cat)
-            <option value="{{ $key }}">{{ $cat['en'] }}</option>
-          @endforeach
-        </select>
-      </label>
-      <label>
-        <span class="lbl">Where?</span>
-        <input type="text" name="miasto" placeholder="City or postcode" autocomplete="address-level2">
-      </label>
-      <button type="submit" class="btn btn-primary btn-lg">Find a tradesperson</button>
-    </form>
-    <ul class="fh-ticks">
-      <li>Free for customers</li>
-      <li>No account, no calling around</li>
-      <li>Your address only for the company you choose</li>
-      <li>Invoice and {{ $warranty }}-month warranty from Verified companies</li>
-      <li>English-speaking companies</li>
-    </ul>
+<section class="fh-hero">
+  <div class="container fh-hero-grid">
+    <div class="fh-hero-text">
+      <h1>A good tradesperson.<br><span class="accent">No stress.</span></h1>
+      <p class="fh-hero-sub">Find trusted local tradespeople for work in your home, flat or business, in English. Describe what needs doing and pick yourself who receives your request: Fachora Verified companies, companies with good Google reviews and companies from the business register.</p>
+      <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Find a tradesperson">
+        <label>
+          <span class="fi">@include('fachora.partials.icon', ['name' => 'tools', 'size' => 20])</span>
+          <span class="lbl">What do you need?</span>
+          <select name="kategoria">
+            <option value="">What service do you need?</option>
+            @foreach(config('fachora.categories') as $key => $cat)
+              <option value="{{ $key }}">{{ $cat['en'] }}</option>
+            @endforeach
+          </select>
+        </label>
+        <label>
+          <span class="fi">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 20])</span>
+          <span class="lbl">Where?</span>
+          <input type="text" name="miasto" placeholder="City or postcode" autocomplete="address-level2">
+        </label>
+        <button type="submit" class="btn btn-primary btn-lg">@include('fachora.partials.icon', ['name' => 'search', 'size' => 18]) Find a tradesperson</button>
+      </form>
+      <ul class="fh-usp3">
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'tag', 'size' => 20])</span><span>Free<small>for customers</small></span></li>
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><span>Verified<small>companies and tradespeople</small></span></li>
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 20])</span><span>Payment<small>after the work is done</small></span></li>
+      </ul>
+    </div>
+    <div class="fh-hero-visual">
+      <img src="/brand/fachora/hero-fachowiec.jpg" alt="Smiling tradesperson in work clothes with the Fachora logo" width="668" height="420" fetchpriority="high">
+      <div class="fh-float fh-float-1"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 18])</span><div><b>Verified company</b><span>Fachora Verified</span></div></div>
+      <div class="fh-float fh-float-2"><span class="ic star">★</span><div><b>Good Google reviews</b><span>companies rated 4.5 and up</span></div></div>
+      <div class="fh-float fh-float-3"><span class="ic shield">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 18])</span><div><b>{{ $warranty }}-month warranty</b><span>from Fachora Verified companies</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW YOU PICK THE COMPANIES -->
+<section class="fh-pickband">
+  <div class="container">
     <div class="fh-pick" aria-label="How you pick the companies">
-      <div><b>up to {{ $candidates }}</b><span>companies near you: Fachora Verified at the top, register companies clearly marked.</span></div>
+      <div><b>up to {{ $candidates }}</b><span>companies near you: Fachora Verified at the top, companies with good Google reviews and register companies clearly marked.</span></div>
       <div><b>max {{ $maxOffers }}</b><span>you tick yourself and confirm your number with an SMS code. Only they receive your request.</span></div>
       <div><b>1</b><span>you choose after comparing prices. Only then does that company see your address and number.</span></div>
     </div>
@@ -67,19 +81,18 @@
 </section>
 
 <!-- CATEGORIES -->
-<section class="section section-alt" id="uslugi">
+<section class="section" id="uslugi" style="padding:64px 0 72px;">
   <div class="container">
-    <div class="section-header">
-      <div class="eyebrow" style="margin-bottom:16px;">Services</div>
-      <h2>What do you need?</h2>
-      <p>{{ count(config('fachora.categories')) }} categories of services. Pick yours and the job form is already filled in.</p>
+    <div class="fh-sec-head">
+      <h2>How can we help?</h2>
+      <a href="{{ route('fachora.intake') }}">See all services →</a>
     </div>
-    <div class="fh-cats">
+    <div class="fh-tiles">
       @foreach(config('fachora.categories') as $key => $cat)
-        <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-cat">
-          <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 26])</span>
-          <b>{{ $cat['en'] }}</b>
-          <span>{{ $cat['examples']['en'] }}</span>
+        <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-tile">
+          <span class="ph{{ $photo($key) ? ' has-photo' : '' }}"@if($photo($key)) style="background-image:url('{{ $photo($key) }}')"@endif></span>
+          <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 22])</span>
+          <span class="tx"><b>{{ $cat['en'] }}</b><span class="ex">{{ $cat['examples']['en'] }}</span><span class="go">@include('fachora.partials.icon', ['name' => 'arrow', 'size' => 18])</span></span>
         </a>
       @endforeach
     </div>
@@ -87,36 +100,32 @@
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="section" id="jak-to-dziala">
-  <div class="container">
-    <div class="section-header">
-      <div class="eyebrow" style="margin-bottom:16px;">How it works</div>
-      <h2>From problem to tradesperson in four steps</h2>
-      <p>No account, no calling around, no guessing. You decide who gets to see your job at all.</p>
+<section class="section section-alt" id="jak-to-dziala">
+  <div class="container fh-how">
+    <div class="fh-how-intro">
+      <h2>How does it work?</h2>
+      <p>Post your job in a few simple steps and find a trusted tradesperson near you. No account, no calling around: you decide who gets to see your job at all.</p>
+      <div class="fh-how-steps">
+        <div class="fh-how-step"><span class="ic"><i>1</i>@include('fachora.partials.icon', ['name' => 'edit', 'size' => 26])</span><h3>Post your job</h3><p>Describe what you need and where the work is to be done. You confirm by e-mail and receive a link to your job.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>2</i>@include('fachora.partials.icon', ['name' => 'offers', 'size' => 26])</span><h3>Pick the companies</h3><p>We show up to {{ $candidates }} companies near you. You tick up to {{ $maxOffers }} and confirm your number with an SMS code. Only they get the request.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>3</i>@include('fachora.partials.icon', ['name' => 'calendar', 'size' => 26])</span><h3>Compare offers</h3><p>Verified companies have {{ $offerHours }} hours to give a price and a date. A register company you contact yourself, with a ready-made message.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>4</i>@include('fachora.partials.icon', ['name' => 'thumbs', 'size' => 26])</span><h3>Get it done and rate</h3><p>Only the chosen company sees your address. You pay after the work, a Verified company issues an invoice, and you leave a review.</p></div>
+      </div>
+      <div class="fh-more" style="text-align:left;margin-top:24px;"><a href="{{ route('fachora.how') }}">See all the steps in detail →</a></div>
     </div>
-    <div class="fh-steps">
-      <div class="fh-step">
-        <div class="nr">1</div>
-        <h3>Describe the job</h3>
-        <p>What, where and when, in your own words and your own language. Add photos if they help. You confirm by e-mail and receive a secret link to your job.</p>
+    <div class="fh-excard">
+      <span class="ex">Example</span>
+      <span class="fv-badge">Fachora Verified</span>
+      <div class="top">
+        <div class="av">IP</div>
+        <div><div class="name">Instalacje Przykładowe</div><div class="meta">Plumber · Heating · Heat pumps</div></div>
       </div>
-      <div class="fh-step">
-        <div class="nr">2</div>
-        <h3>Pick the companies</h3>
-        <p>We show up to {{ $candidates }} companies near you: Fachora Verified at the top, register companies clearly marked. You tick up to {{ $maxOffers }}. You confirm your phone number with an SMS code, so companies know the request is real.</p>
-      </div>
-      <div class="fh-step">
-        <div class="nr">3</div>
-        <h3>Compare prices</h3>
-        <p>Verified companies receive the request from us and have {{ $offerHours }} hours to give a price and a date; you see them on your job page. A register company you contact yourself: we show you its public details from the register and a ready-made message in Polish.</p>
-      </div>
-      <div class="fh-step">
-        <div class="nr">4</div>
-        <h3>Choose one and approve the work</h3>
-        <p>Only now does the chosen company see your address and number. @if($protect)With Fachora Protect you pay after approving the work.@else You pay the company after the work, exactly what you agreed.@endif A Verified company issues an invoice and gives a {{ $warranty }}-month warranty; at the end you leave a review.</p>
-      </div>
+      <div class="row"><span class="st">★</span><b>4.8</b><span>· rating from confirmed jobs</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 16])<span>Łódź and surroundings, up to 25 km</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'lang', 'size' => 16])<span>polski · English · Deutsch</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 16])<span>Invoice and {{ $warranty }}-month warranty</span></div>
+      <a href="#profil" class="btn btn-secondary">See what a profile shows →</a>
     </div>
-    <div class="fh-more"><a href="{{ route('fachora.how') }}">See all the steps in detail →</a></div>
   </div>
 </section>
 

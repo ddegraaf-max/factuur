@@ -265,7 +265,7 @@ const openJob = (job) => router.visit(route('fachora.jobs.show', job.id));
 .row-link { cursor: pointer; }
 .fx-h2 { font-family: var(--font-display); font-size: 20px; font-weight: 600; margin: 0 0 8px; color: var(--text); }
 .fx-intro { display: flex; gap: 20px; align-items: flex-start; line-height: 1.6; }
-.fx-intro-icon { color: var(--accent, #F4781F); flex: none; }
+.fx-intro-icon { color: var(--accent, #027A74); flex: none; }
 .fx-intro p { margin: 0 0 14px; max-width: 640px; }
 .fx-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
 .fx-alert { padding: 10px 14px; border-radius: 8px; font-size: 13.5px; margin-bottom: 14px; }
@@ -280,7 +280,7 @@ const openJob = (job) => router.visit(route('fachora.jobs.show', job.id));
 .fx-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
 .fx-tile .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); font-weight: 600; margin-bottom: 4px; }
 .fx-tile .val { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text); }
-.stars { color: var(--accent, #F4781F); letter-spacing: 1px; font-size: 0.85em; }
+.stars { color: var(--accent, #027A74); letter-spacing: 1px; font-size: 0.85em; }
 .actions { white-space: normal; min-width: 140px; }
 .fx-reviews { display: flex; flex-direction: column; gap: 14px; }
 .fx-review { border-bottom: 1px solid var(--border); padding-bottom: 14px; }

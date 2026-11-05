@@ -1,8 +1,11 @@
 @extends('layouts.marketing')
-{{-- Strona główna Fachory (APP_BRAND=fachora): klient opisuje zlecenie i sam wybiera do max_offers firm z okolicy
-     (Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone). Firmy Verified dostają zapytanie od nas;
-     z firmą z rejestru klient kontaktuje się sam (Fachora nie wysyła jej niczego). Klient płaci firmie po pracy;
-     Fachora Protect (rezerwacja przez Stripe) pokazujemy tylko, gdy fachora_protect() jest włączone. Liczby z config/fachora.php. --}}
+{{-- Strona główna Fachory (APP_BRAND=fachora) w huisstijl 1.105.0 („Dobry fachowiec. Bez stresu.”): granatowy hero
+     z wyszukiwarką i zdjęciem, kafelki kategorii ze zdjęciami (public/brand/fachora/cat/<klucz>.jpg; bez zdjęcia
+     gradient), cztery kroki obok przykładowego profilu. Klient opisuje zlecenie i sam wybiera do max_offers firm
+     z okolicy (Fachora Verified na górze, firmy z dobrymi opiniami w Google i firmy z rejestru wyraźnie oznaczone).
+     Firmy Verified dostają zapytanie od nas; z firmą z rejestru klient kontaktuje się sam (Fachora nie wysyła jej
+     niczego). Klient płaci firmie po pracy; Fachora Protect (rezerwacja przez Stripe) pokazujemy tylko, gdy
+     fachora_protect() jest włączone. Liczby z config/fachora.php. --}}
 @php
     $protect = fachora_protect();
     $fee = config('fachora.fee_percent');
@@ -15,9 +18,10 @@
     $acceptDays = config('fachora.auto_accept_days');
     $disputeHours = config('fachora.dispute_hours');
     $candidates = config('fachora.choice_candidates');
+    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg" : null;
 @endphp
-@section('title', 'Fachora — sam wybierasz fachowca z okolicy. Hydraulik, elektryk, ślusarz i inni, bez obdzwaniania')
-@section('description', 'Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Dla klientów bezpłatnie, także po angielsku.')
+@section('title', 'Fachora — dobry fachowiec, bez stresu. Sam wybierasz firmę z okolicy: hydraulik, elektryk, ślusarz i inni')
+@section('description', 'Znajdź sprawdzonych, lokalnych fachowców do prac w domu, mieszkaniu lub firmie. Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z okolicy: Fachora Verified, firmy z dobrymi opiniami w Google i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Bezpłatnie, także po angielsku.')
 
 @push('styles')
 @include('fachora.partials.styles')
@@ -26,38 +30,49 @@
 @section('content')
 
 <!-- HERO -->
-<section class="hero">
-  <div class="container hero-inner">
-    <div class="eyebrow">Fachowcy w całej Polsce. Ty decydujesz.</div>
-    <h1>Sam wybierasz, <span class="accent">kto dostanie zlecenie.</span></h1>
-    <p class="hero-sub">
-      Opisz, co trzeba zrobić, a pokażemy Ci firmy z Twojej okolicy: sprawdzone przez nas firmy Fachora Verified i firmy z rejestru przedsiębiorców. Zaznaczasz, do kogo ma trafić zapytanie, porównujesz ceny i płacisz dopiero po pracy.
-    </p>
-    <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Znajdź fachowca">
-      <label>
-        <span class="lbl">Czego potrzebujesz?</span>
-        <select name="kategoria">
-          <option value="">Wybierz usługę</option>
-          @foreach(config('fachora.categories') as $key => $cat)
-            <option value="{{ $key }}">{{ $cat['pl'] }}</option>
-          @endforeach
-        </select>
-      </label>
-      <label>
-        <span class="lbl">Gdzie?</span>
-        <input type="text" name="miasto" placeholder="Miasto lub kod pocztowy" autocomplete="address-level2">
-      </label>
-      <button type="submit" class="btn btn-primary btn-lg">Znajdź fachowca</button>
-    </form>
-    <ul class="fh-ticks">
-      <li>Bezpłatnie dla klientów</li>
-      <li>Bez konta i bez obdzwaniania</li>
-      <li>Adres tylko dla wybranej firmy</li>
-      <li>Faktura i gwarancja {{ $warranty }} mies. od firm Verified</li>
-      <li>Obsługa także po angielsku</li>
-    </ul>
+<section class="fh-hero">
+  <div class="container fh-hero-grid">
+    <div class="fh-hero-text">
+      <h1>Dobry fachowiec.<br><span class="accent">Bez stresu.</span></h1>
+      <p class="fh-hero-sub">Znajdź sprawdzonych, lokalnych fachowców do prac w Twoim domu, mieszkaniu lub firmie. Opisz, co trzeba zrobić, i sam wybierz, do kogo trafi zapytanie: firmy Fachora Verified, firmy z dobrymi opiniami w Google i firmy z rejestru.</p>
+      <form class="fh-search" method="get" action="{{ route('fachora.intake') }}" role="search" aria-label="Znajdź fachowca">
+        <label>
+          <span class="fi">@include('fachora.partials.icon', ['name' => 'tools', 'size' => 20])</span>
+          <span class="lbl">Czego potrzebujesz?</span>
+          <select name="kategoria">
+            <option value="">Jakiej usługi szukasz?</option>
+            @foreach(config('fachora.categories') as $key => $cat)
+              <option value="{{ $key }}">{{ $cat['pl'] }}</option>
+            @endforeach
+          </select>
+        </label>
+        <label>
+          <span class="fi">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 20])</span>
+          <span class="lbl">Gdzie?</span>
+          <input type="text" name="miasto" placeholder="Miasto lub kod pocztowy" autocomplete="address-level2">
+        </label>
+        <button type="submit" class="btn btn-primary btn-lg">@include('fachora.partials.icon', ['name' => 'search', 'size' => 18]) Znajdź fachowca</button>
+      </form>
+      <ul class="fh-usp3">
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'tag', 'size' => 20])</span><span>Bezpłatnie<small>dla klientów</small></span></li>
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 20])</span><span>Zweryfikowane<small>firmy i wykonawcy</small></span></li>
+        <li><span class="ic">@include('fachora.partials.icon', ['name' => 'card', 'size' => 20])</span><span>Płatność<small>po wykonaniu pracy</small></span></li>
+      </ul>
+    </div>
+    <div class="fh-hero-visual">
+      <img src="/brand/fachora/hero-fachowiec.jpg" alt="Uśmiechnięty fachowiec w roboczym ubraniu z logo Fachora" width="668" height="420" fetchpriority="high">
+      <div class="fh-float fh-float-1"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 18])</span><div><b>Zweryfikowana firma</b><span>Fachora Verified</span></div></div>
+      <div class="fh-float fh-float-2"><span class="ic star">★</span><div><b>Dobre opinie w Google</b><span>przy firmach z oceną 4,5 i wyżej</span></div></div>
+      <div class="fh-float fh-float-3"><span class="ic shield">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 18])</span><div><b>Gwarancja {{ $warranty }} mies.</b><span>od firm Fachora Verified</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- JAK WYBIERASZ FIRMY -->
+<section class="fh-pickband">
+  <div class="container">
     <div class="fh-pick" aria-label="Jak wybierasz firmy">
-      <div><b>do {{ $candidates }}</b><span>firm z Twojej okolicy: Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone.</span></div>
+      <div><b>do {{ $candidates }}</b><span>firm z Twojej okolicy: Fachora Verified na górze, firmy z dobrymi opiniami w Google i firmy z rejestru wyraźnie oznaczone.</span></div>
       <div><b>maks. {{ $maxOffers }}</b><span>zaznaczasz sam i potwierdzasz numer kodem SMS. Tylko one dostają Twoje zapytanie.</span></div>
       <div><b>1</b><span>wybierasz po porównaniu cen. Dopiero ta firma widzi Twój adres i numer.</span></div>
     </div>
@@ -65,19 +80,18 @@
 </section>
 
 <!-- KATEGORIE -->
-<section class="section section-alt" id="uslugi">
+<section class="section" id="uslugi" style="padding:64px 0 72px;">
   <div class="container">
-    <div class="section-header">
-      <div class="eyebrow" style="margin-bottom:16px;">Usługi</div>
-      <h2>Czego potrzebujesz?</h2>
-      <p>{{ count(config('fachora.categories')) }} kategorii usług. Wybierz swoją, a formularz zlecenia będzie już wypełniony.</p>
+    <div class="fh-sec-head">
+      <h2>W czym możemy pomóc?</h2>
+      <a href="{{ route('fachora.intake') }}">Zobacz wszystkie usługi →</a>
     </div>
-    <div class="fh-cats">
+    <div class="fh-tiles">
       @foreach(config('fachora.categories') as $key => $cat)
-        <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-cat">
-          <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 26])</span>
-          <b>{{ $cat['pl'] }}</b>
-          <span>{{ $cat['examples']['pl'] }}</span>
+        <a href="{{ route('fachora.intake', ['kategoria' => $key]) }}" class="fh-tile">
+          <span class="ph{{ $photo($key) ? ' has-photo' : '' }}"@if($photo($key)) style="background-image:url('{{ $photo($key) }}')"@endif></span>
+          <span class="ic">@include('fachora.partials.icon', ['name' => $cat['icon'], 'size' => 22])</span>
+          <span class="tx"><b>{{ $cat['pl'] }}</b><span class="ex">{{ $cat['examples']['pl'] }}</span><span class="go">@include('fachora.partials.icon', ['name' => 'arrow', 'size' => 18])</span></span>
         </a>
       @endforeach
     </div>
@@ -85,36 +99,32 @@
 </section>
 
 <!-- JAK TO DZIAŁA -->
-<section class="section" id="jak-to-dziala">
-  <div class="container">
-    <div class="section-header">
-      <div class="eyebrow" style="margin-bottom:16px;">Jak to działa</div>
-      <h2>Od problemu do fachowca w czterech krokach</h2>
-      <p>Bez konta, bez obdzwaniania, bez zgadywania. To Ty decydujesz, kto w ogóle zobaczy Twoje zlecenie.</p>
+<section class="section section-alt" id="jak-to-dziala">
+  <div class="container fh-how">
+    <div class="fh-how-intro">
+      <h2>Jak to działa?</h2>
+      <p>Zleć pracę w kilku prostych krokach i znajdź sprawdzonego fachowca w swojej okolicy. Bez konta i bez obdzwaniania: to Ty decydujesz, kto w ogóle zobaczy Twoje zlecenie.</p>
+      <div class="fh-how-steps">
+        <div class="fh-how-step"><span class="ic"><i>1</i>@include('fachora.partials.icon', ['name' => 'edit', 'size' => 26])</span><h3>Dodaj zlecenie</h3><p>Opisz, czego potrzebujesz i gdzie ma być wykonana praca. Potwierdzasz e-mailem i dostajesz link do swojego zlecenia.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>2</i>@include('fachora.partials.icon', ['name' => 'offers', 'size' => 26])</span><h3>Wybierz firmy</h3><p>Pokazujemy do {{ $candidates }} firm z okolicy. Zaznaczasz maksymalnie {{ $maxOffers }} i potwierdzasz numer kodem SMS. Tylko one dostają zapytanie.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>3</i>@include('fachora.partials.icon', ['name' => 'calendar', 'size' => 26])</span><h3>Porównaj oferty</h3><p>Firmy Verified mają {{ $offerHours }} godzin na cenę i termin. Z firmą z rejestru kontaktujesz się sam, gotową wiadomością.</p></div>
+        <div class="fh-how-step"><span class="ic"><i>4</i>@include('fachora.partials.icon', ['name' => 'thumbs', 'size' => 26])</span><h3>Zrealizuj i oceń</h3><p>Dopiero wybrana firma widzi Twój adres. Płacisz po wykonanej pracy, firma Verified wystawia fakturę, a Ty opinię.</p></div>
+      </div>
+      <div class="fh-more" style="text-align:left;margin-top:24px;"><a href="{{ route('fachora.how') }}">Zobacz wszystkie kroki ze szczegółami →</a></div>
     </div>
-    <div class="fh-steps">
-      <div class="fh-step">
-        <div class="nr">1</div>
-        <h3>Opisz zlecenie</h3>
-        <p>Co, gdzie i kiedy, własnymi słowami. Dodaj zdjęcia, jeśli pomogą. Potwierdzasz e-mailem i dostajesz tajny link do swojego zlecenia.</p>
+    <div class="fh-excard">
+      <span class="ex">Przykład</span>
+      <span class="fv-badge">Fachora Verified</span>
+      <div class="top">
+        <div class="av">IP</div>
+        <div><div class="name">Instalacje Przykładowe</div><div class="meta">Hydraulik · Ogrzewanie · Pompy ciepła</div></div>
       </div>
-      <div class="fh-step">
-        <div class="nr">2</div>
-        <h3>Wybierz firmy</h3>
-        <p>Pokazujemy do {{ $candidates }} firm z okolicy: Fachora Verified na górze, firmy z rejestru wyraźnie oznaczone. Zaznaczasz maksymalnie {{ $maxOffers }}. Numer telefonu potwierdzasz kodem SMS, żeby firmy wiedziały, że zapytanie jest prawdziwe.</p>
-      </div>
-      <div class="fh-step">
-        <div class="nr">3</div>
-        <h3>Porównaj ceny</h3>
-        <p>Firmy Verified dostają zapytanie od nas i mają {{ $offerHours }} godzin na cenę i termin; widzisz je na swojej stronie zlecenia. Z firmą z rejestru kontaktujesz się sam: pokazujemy Ci jej publiczne dane z CEIDG i gotową wiadomość po polsku.</p>
-      </div>
-      <div class="fh-step">
-        <div class="nr">4</div>
-        <h3>Wybierz jedną i odbierz pracę</h3>
-        <p>Dopiero teraz wybrana firma widzi Twój adres i numer. @if($protect)Z Fachora Protect płacisz po akceptacji pracy.@else Płacisz firmie po wykonanej pracy, dokładnie tyle, ile ustaliliście.@endif Firma Verified wystawia fakturę i daje gwarancję {{ $warranty }} miesięcy; na koniec wystawiasz opinię.</p>
-      </div>
+      <div class="row"><span class="st">★</span><b>4,8</b><span>· ocena z potwierdzonych zleceń</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'pin', 'size' => 16])<span>Łódź i okolice, do 25 km</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'lang', 'size' => 16])<span>polski · English · Deutsch</span></div>
+      <div class="row">@include('fachora.partials.icon', ['name' => 'invoice', 'size' => 16])<span>Faktura i gwarancja {{ $warranty }} mies.</span></div>
+      <a href="#profil" class="btn btn-secondary">Zobacz, co widzisz w profilu →</a>
     </div>
-    <div class="fh-more"><a href="{{ route('fachora.how') }}">Zobacz wszystkie kroki ze szczegółami →</a></div>
   </div>
 </section>
 

@@ -180,7 +180,7 @@ class FachoraBrandTest extends TestCase
         $this->get('/manifest.webmanifest')->assertOk()
             ->assertJsonPath('name', 'Fachora')
             ->assertJsonPath('lang', 'pl')
-            ->assertJsonPath('theme_color', '#0B2545')
+            ->assertJsonPath('theme_color', '#0F2A44')
             ->assertJsonPath('icons.1.src', '/brand/fachora/fachora-icon-512.png');
 
         $this->get('/robots.txt')->assertOk()->assertSee('Sitemap: '.url('/sitemap.xml'), false);

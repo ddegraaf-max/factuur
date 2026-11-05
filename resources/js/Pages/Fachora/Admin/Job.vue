@@ -415,7 +415,7 @@ const retryPayout = () => {
 .fx-inline-form { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
 .fx-ok { color: var(--success); font-weight: 600; }
 .fx-warn { color: var(--warning); font-weight: 600; }
-.stars { color: var(--accent, #F4781F); letter-spacing: 1px; }
+.stars { color: var(--accent, #027A74); letter-spacing: 1px; }
 .fx-timeline { list-style: none; margin: 0; padding: 0 0 0 14px; border-left: 2px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
 .fx-timeline li { position: relative; font-size: 13px; }
 .fx-timeline li::before { content: ''; position: absolute; left: -19px; top: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }

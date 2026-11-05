@@ -246,18 +246,19 @@ return [
             'market' => 'pl',
             'home_view' => 'fachora.landing',
             'version_prefix' => 'Fachora',
-            'tagline' => 'Sprawdzone firmy. Bezpieczne usługi.',
+            'tagline' => 'Dobry fachowiec. Bez stresu.',
             'assistant' => 'Fa',
             'positioning' => 'Zaufani fachowcy w całej Polsce: jasna cena, pewny termin, gwarancja',
             'domain' => 'fachora.pl',
             'email' => 'czesc@fachora.pl',
             'contact_inbox' => null,
 
-            // Nachtblauw voor navigatie en koppen, oranje alleen voor de belangrijkste actie.
-            'color' => '#0B2545',
-            'color_dark' => '#071A33',
-            'accent' => '#F4781F',
-            'background' => '#F6F8FB',
+            // Huisstijl 1.105.0: nachtblauw voor kop, hero en voet, diepteal voor de belangrijkste actie,
+            // mint (#1ED1B6) alleen als accent op donkere vlakken (logo-dak, tweede regel van de kop).
+            'color' => '#0F2A44',
+            'color_dark' => '#0A2138',
+            'accent' => '#027A74',
+            'background' => '#F6F9F9',
             'fonts_url' => null,
             'theme_css' => '/brand/fachora/theme.css',
 
@@ -277,10 +278,12 @@ return [
             'stripe_logo' => null,
             'wordmark' => '/brand/fachora/fachora-logo.svg',
             'wordmark_dark' => '/brand/fachora/fachora-logo-dark.svg',
+            // Woordmerk in de (donkere) navigatiebalk en voet van de marketingpagina's, in plaats van beeldmerk + naam.
+            'header_logo' => '/brand/fachora/fachora-logo-dark.svg',
 
             'seo_title' => 'Fachora — sam wybierasz fachowca z okolicy: jasna cena, pewny termin, gwarancja',
             'seo_description' => 'Fachora pokazuje Ci firmy z Twojej okolicy: hydraulik, elektryk, ogrzewanie, klimatyzacja, ślusarz, dach, remonty, AGD, mechanik. Sam wybierasz, do kogo trafi zapytanie: firmy Fachora Verified z ceną ustaloną z góry, fakturą i gwarancją, albo firmy z rejestru. Bezpłatnie, po polsku, angielsku, niemiecku, niderlandzku i ukraińsku.',
-            'og_description' => 'Sprawdzone firmy. Bezpieczne usługi. Jasna cena, pewny termin, gwarancja.',
+            'og_description' => 'Dobry fachowiec. Bez stresu. Sam wybierasz firmy z okolicy: jasna cena, pewny termin, gwarancja.',
             'ld_type' => 'WebSite', // structured data: een marktplaats is een WebSite, geen SoftwareApplication
             // 1.101.1: Google Ads-conversiemeting (account Polodom.pl, actie "Aanvraag of registratie (alle sites)").
             // Openbare id's, geen geheimen; leeg = geen tag.
@@ -289,7 +292,7 @@ return [
             'intake_seo_title' => 'Opisz zlecenie i sam wybierz fachowca | Fachora',
             'intake_seo_description' => 'Bezpłatnie i bez konta: opisz, co trzeba zrobić, potwierdź e-mailem i wybierz do 5 firm z okolicy — Fachora Verified i firmy z rejestru CEIDG. Ceny porównasz na swojej stronie zlecenia.',
             'app_description' => 'Platforma fachowców w Polsce: zlecenie online, sam wybierasz firmy z okolicy, oferty od firm Fachora Verified, faktura i 12 miesięcy gwarancji.',
-            'pwa_description' => 'Sprawdzone firmy. Bezpieczne usługi.',
+            'pwa_description' => 'Dobry fachowiec. Bez stresu.',
             'footer_description' => 'Fachora: zweryfikowani fachowcy, jasna cena ustalona z góry, bezpieczna płatność i gwarancja. Dla klientów bezpłatnie.',
             'auth_title' => 'Panel firmy Fachora',
             'auth_subtitle' => 'Zlecenia, profil, weryfikacja i faktury — w jednym miejscu.',
@@ -300,15 +303,15 @@ return [
 
             'i18n' => [
                 'en' => [
-                    'tagline' => 'Verified companies. Safe services.',
+                    'tagline' => 'A good tradesperson. No stress.',
                     'positioning' => 'Trusted tradespeople across Poland: clear price, reliable appointment, guarantee',
                     'seo_title' => 'Fachora — pick your own tradesperson in Poland: clear price, reliable appointment, guarantee',
                     'seo_description' => 'Fachora shows you companies near you in Poland: plumber, electrician, heating, air conditioning, locksmith, roofing, renovation, appliances, car mechanic. You choose who receives your request: Fachora Verified companies with a price agreed up front, invoice and guarantee, or companies from the business register. Free, in English, Polish, German, Dutch and Ukrainian.',
-                    'og_description' => 'Verified companies. Safe services. Clear price, reliable appointment, guarantee.',
+                    'og_description' => 'A good tradesperson. No stress. You pick the companies near you: clear price, reliable appointment, guarantee.',
                     'intake_seo_title' => 'Describe your job and pick the tradesperson yourself | Fachora',
                     'intake_seo_description' => 'Free, no account: describe what needs doing, confirm by e-mail and pick up to 5 companies near you — Fachora Verified and companies from the CEIDG business register. Compare prices on your job page, in English.',
                     'app_description' => 'Platform of tradespeople in Poland: request online, you pick the companies near you, offers from Fachora Verified companies, invoice and 12-month guarantee.',
-                    'pwa_description' => 'Verified companies. Safe services.',
+                    'pwa_description' => 'A good tradesperson. No stress.',
                     'footer_description' => 'Fachora: verified tradespeople, a clear price agreed up front, secure payment and a guarantee. Free for customers.',
                     'auth_title' => 'Fachora company panel',
                     'auth_subtitle' => 'Jobs, profile, verification and invoices in one place.',

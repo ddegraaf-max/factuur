@@ -117,7 +117,7 @@ const open = (j) => router.visit(j.url);
 .fx-alert--err { background: var(--brand-tint-2); color: var(--brand-darker); border: 1px solid var(--brand-border); }
 .fx-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
 .fx-tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 14px 16px; }
-.fx-tile--accent { border-color: var(--accent, #F4781F); }
+.fx-tile--accent { border-color: var(--accent, #027A74); }
 .fx-tile .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-3); font-weight: 600; margin-bottom: 4px; }
 .fx-tile .val { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--text); }
 .fx-ok { color: var(--success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; }

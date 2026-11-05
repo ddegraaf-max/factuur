@@ -1,6 +1,6 @@
 @php
-    $color = (string) brand('color', '#0B2545');
-    $accent = (string) brand('accent', '#F4781F');
+    $color = (string) brand('color', '#0F2A44');
+    $accent = (string) brand('accent', '#027A74');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -15,7 +15,7 @@
         <div style="padding:22px 32px;background:{{ $color }};color:#fff;">
             <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>
                 <td style="vertical-align:middle;padding-right:10px;"><img src="{{ \App\Support\Brand::asset('email_mark') }}" alt="" width="34" height="34" style="display:block;border:0;border-radius:8px;"></td>
-                <td style="vertical-align:middle;font-size:20px;font-weight:800;letter-spacing:0.02em;color:#FFFFFF;"><span style="color:#FFFFFF;">FACH</span><span style="color:{{ $accent }};">ORA</span></td>
+                <td style="vertical-align:middle;font-size:20px;font-weight:800;letter-spacing:0.02em;color:#FFFFFF;"><span style="color:#FFFFFF;">FACHORA</span></td>
             </tr></table>
             <div style="font-size:12.5px;opacity:0.85;margin-top:6px;">{{ brand('tagline') }}</div>
         </div>

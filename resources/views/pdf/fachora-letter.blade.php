@@ -8,19 +8,19 @@
     body { font-family: {!! \App\Support\DocumentLocale::font('sans') !!}; font-size: 11pt; color: #0F172A; line-height: 1.5; }
     .letter { page-break-after: always; }
     .letter:last-child { page-break-after: auto; }
-    .head { border-bottom: 3px solid #0B2545; padding-bottom: 8px; margin-bottom: 26px; }
-    .wordmark { font-size: 22pt; font-weight: 700; letter-spacing: 0.04em; color: #0B2545; }
-    .wordmark span { color: #F4781F; }
+    .head { border-bottom: 3px solid #0F2A44; padding-bottom: 8px; margin-bottom: 26px; }
+    .wordmark { font-size: 22pt; font-weight: 700; letter-spacing: 0.04em; color: #0F2A44; }
+    .wordmark span { color: inherit; }
     .tag { font-size: 9pt; color: #64748B; }
     .addr { margin: 0 0 26px; font-size: 11pt; line-height: 1.45; }
     .date { text-align: right; color: #64748B; font-size: 10pt; margin-bottom: 18px; }
-    h1 { font-size: 15pt; margin: 0 0 12px; color: #0B2545; }
+    h1 { font-size: 15pt; margin: 0 0 12px; color: #0F2A44; }
     p { margin: 0 0 10px; }
     .box { border: 1px solid #CBD5E1; border-radius: 6px; padding: 12px 14px; margin: 16px 0; background: #F8FAFC; }
     .box table { width: 100%; border-collapse: collapse; }
     .box td { vertical-align: middle; padding: 0; }
-    .code { font-family: DejaVu Sans Mono, monospace; font-size: 20pt; font-weight: 700; letter-spacing: 0.08em; color: #0B2545; }
-    .url { font-family: DejaVu Sans Mono, monospace; font-size: 10.5pt; color: #0B2545; }
+    .code { font-family: DejaVu Sans Mono, monospace; font-size: 20pt; font-weight: 700; letter-spacing: 0.08em; color: #0F2A44; }
+    .url { font-family: DejaVu Sans Mono, monospace; font-size: 10.5pt; color: #0F2A44; }
     .small { font-size: 9pt; color: #64748B; }
     ul { margin: 6px 0 12px 18px; padding: 0; }
     li { margin-bottom: 4px; }
