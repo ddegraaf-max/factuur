@@ -421,8 +421,9 @@ HUISSTIJL (6 nov 2026, 1.105.0, ontwerp Daniël "Dobry fachowiec. Bez stresu.")
 - 1.105.1: de zes categorieën zonder ontwerpfoto hebben nu een rechtenvrije foto (gezocht via de
   Openverse-API met licentiefilter cc0/pdm, scratchpad/huisstijl/foto-zoek.js → foto-haal.js →
   foto-snij.js, dat laatste snijdt via een canvas in Edge naar 480x236 en kan webp lezen):
-  agd = rawpixel.com/image/5925482 (vaatwasser, CC0), mechanik = rawpixel.com/image/5959936 (CC0),
-  ogrodnik = rawpixel.com/image/5974914 (CC0), ogrod = rawpixel.com/image/6035741 (grasmaaier, CC0),
+  agd = flickr.com/photos/135396164@N05/23745702205 (freestocks.org, wasmachine, CC0; 1.105.2, keuze
+  Daniël), mechanik = rawpixel.com/image/5959936 (CC0), ogrodnik = wordpress.org/photos/photo/3867fde048
+  (Rolly Bueno, getrimde heggen, CC0; 1.105.2), ogrod = rawpixel.com/image/6035741 (grasmaaier, CC0),
   szkodniki = flickr.com/photos/54563451@N08/25894310135 (Sam Droege, muis, publiek domein),
   kominiarz = rawpixel.com/image/5910116 (houtkachel, CC0). Geen naamsvermelding vereist.
 - Nog open: een scherpere herofoto; de huidige komt uit het ontwerpbeeld (668x420).
