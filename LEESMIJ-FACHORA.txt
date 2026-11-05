@@ -418,5 +418,11 @@ HUISSTIJL (6 nov 2026, 1.105.0, ontwerp Daniël "Dobry fachowiec. Bez stresu.")
   children_from => 'fachora.categories' klapt uit (.nav-has-dd/.nav-dd, mobiel als sublijst);
   marketing 'secondary' (Moje zlecenia, icoon user) vervangt de inlogknop, cta_icon zet een icoon in de
   hoofdknop (partials/nav-icon.blade.php). Andere merken merken er niets van (FachoraHouseStyleTest).
-- Niet gedaan: foto's voor de zes categorieën zonder ontwerpfoto (agd, mechanik, ogrodnik, ogrod,
-  szkodniki, kominiarz) en een scherpere herofoto; de huidige komen uit het ontwerpbeeld (668x420).
+- 1.105.1: de zes categorieën zonder ontwerpfoto hebben nu een rechtenvrije foto (gezocht via de
+  Openverse-API met licentiefilter cc0/pdm, scratchpad/huisstijl/foto-zoek.js → foto-haal.js →
+  foto-snij.js, dat laatste snijdt via een canvas in Edge naar 480x236 en kan webp lezen):
+  agd = rawpixel.com/image/5925482 (vaatwasser, CC0), mechanik = rawpixel.com/image/5959936 (CC0),
+  ogrodnik = rawpixel.com/image/5974914 (CC0), ogrod = rawpixel.com/image/6035741 (grasmaaier, CC0),
+  szkodniki = flickr.com/photos/54563451@N08/25894310135 (Sam Droege, muis, publiek domein),
+  kominiarz = rawpixel.com/image/5910116 (houtkachel, CC0). Geen naamsvermelding vereist.
+- Nog open: een scherpere herofoto; de huidige komt uit het ontwerpbeeld (668x420).

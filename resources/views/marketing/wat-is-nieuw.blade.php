@@ -37,6 +37,7 @@
           <li><b>Nieuw gezicht</b> — Fachora heeft een nieuwe huisstijl: nachtblauw met mint en teal, een nieuw logo (huisje met raam, woordmerk als vaste vorm) en de slogan "Dobry fachowiec. Bez stresu." De kleuren gelden overal: de marketingpagina's, het aanvraagformulier en de opdrachtpagina van de klant, het bedrijvenpaneel, e-mails, brieven en de deelafbeelding voor sociale media.</li>
           <li><b>Nieuwe startpagina</b> — een donkere kop met de zoekbalk (dienst en plaats), foto en drie beloften (gratis voor klanten, gecontroleerde bedrijven, betalen na het werk), daaronder de 14 categorieën als tegels met foto, en "Jak to działa?" in vier stappen naast een voorbeeldprofiel. In het Pools en in het Engels.</li>
           <li><b>Menu</b> — "Usługi" klapt uit naar alle categorieën, en de klant ziet "Moje zlecenia" in de balk; het bedrijvenpaneel blijft via de voet bereikbaar.</li>
+          <li><b>Alle 14 tegels met foto (1.105.1)</b> — ook AGD, Mechanik, Ogrodnik, Sprzęt ogrodniczy, Szkodniki en Kominiarz hebben nu een foto (rechtenvrij, publiek domein).</li>
         </ul>
       </article>
       <article class="tl-item">
