@@ -29,15 +29,9 @@ class PortalQuoteController extends Controller
     {
         $quote = $this->findByToken($token);
 
-        $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $quote->customer_email) !== 0) {
-            $request->session()->put('portal_pending_email', mb_strtolower($quote->customer_email));
-            $request->session()->put('portal_intended', route('portal.quote', $token));
-            $request->session()->put('portal_gate', [
-                'type' => 'offerte',
-                'company' => $quote->company?->name,
-                'number' => $quote->number,
-            ]);
+        // 1.103.6: e-mailadres geverifieerd, of (offerte per sms aan een klant zonder e-mail) het mobiele nummer.
+        if (! PortalAuthController::canAccessQuote($request, $quote)) {
+            PortalAuthController::startQuoteGate($request, $quote, route('portal.quote', $token));
 
             return redirect()->route('portal.verify.show');
         }
@@ -111,7 +105,7 @@ class PortalQuoteController extends Controller
         $quote = $this->findByToken($token);
 
         $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $quote->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessQuote($request, $quote)) {
             return redirect()->route('portal.quote', $token);
         }
 
@@ -139,7 +133,7 @@ class PortalQuoteController extends Controller
             'signature_data' => $data['signature'],
             'signed_at' => now(),
             'signed_ip' => $request->ip(),
-            'signed_email' => $email,
+            'signed_email' => $email ?: PortalAuthController::verifiedContact($request), // 1.103.6: bij een offerte per sms het geverifieerde mobiele nummer
         ])->save();
 
         $this->notifyCompany($quote->fresh(), accepted: true);
@@ -164,7 +158,7 @@ class PortalQuoteController extends Controller
         $quote = $this->findByToken($token);
 
         $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $quote->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessQuote($request, $quote)) {
             return redirect()->route('portal.quote', $token);
         }
 
@@ -180,7 +174,7 @@ class PortalQuoteController extends Controller
 
         $quote->forceFill([
             'decline_reason' => filled($data['reason'] ?? null) ? trim($data['reason']) : null,
-            'signed_email' => $email,
+            'signed_email' => $email ?: PortalAuthController::verifiedContact($request), // 1.103.6: bij een offerte per sms het geverifieerde mobiele nummer
         ])->save();
 
         $this->notifyCompany($quote->fresh(), accepted: false);
@@ -194,7 +188,7 @@ class PortalQuoteController extends Controller
         $quote = $this->findByToken($token);
 
         $email = PortalAuthController::verifiedEmail($request);
-        if (! $email || strcasecmp($email, $quote->customer_email) !== 0) {
+        if (! PortalAuthController::canAccessQuote($request, $quote)) {
             return redirect()->route('portal.quote', $token);
         }
 

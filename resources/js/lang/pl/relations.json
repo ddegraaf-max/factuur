@@ -352,5 +352,9 @@
   "Deze offerte is komen te vervallen en geldt niet meer.": "Ta oferta została wycofana i już nie obowiązuje.",
   "In plaats daarvan geldt offerte :number.": "Zamiast niej obowiązuje oferta :number.",
   "Bekijk offerte :number": "Zobacz ofertę :number",
-  "Vragen? Neem contact op met :company.": "Pytania? Skontaktuj się z :company."
+  "Vragen? Neem contact op met :company.": "Pytania? Skontaktuj się z :company.",
+  "We hebben een 6-cijferige code per sms gestuurd naar": "Wysłaliśmy 6-cyfrowy kod SMS-em na numer",
+  "Voor je veiligheid sturen we eerst een eenmalige toegangscode per sms naar": "Dla bezpieczeństwa najpierw wyślemy jednorazowy kod dostępu SMS-em na numer",
+  "het mobiele nummer waarop deze offerte is ontvangen.": "numer komórkowy, na który otrzymano tę ofertę.",
+  "De code is 10 minuten geldig.": "Kod jest ważny 10 minut."
 }

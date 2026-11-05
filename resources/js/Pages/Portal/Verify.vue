@@ -5,6 +5,8 @@ import PortalLayout from '@/Layouts/PortalLayout.vue';
 
 const props = defineProps({
   maskedEmail: String,
+  channel: { type: String, default: 'mail' }, // 1.103.6: 'sms' bij een offerte per sms aan een klant zonder e-mail
+  maskedPhone: String,
   codeSent: { type: Boolean, default: false },
   canResendIn: { type: Number, default: 0 },
   // Kwam de bezoeker via een factuurlink? Dan tonen we die context.
@@ -121,8 +123,12 @@ const sendCode = () => {
         <h1 class="portal-card-title">{{ $t('Bevestig dat jij het bent') }}</h1>
         <p class="portal-card-sub">
           <template v-if="codeSent">
-            {{ $t('We hebben een 6-cijferige code gestuurd naar') }} <strong>{{ maskedEmail }}</strong>.
+            {{ channel === 'sms' ? $t('We hebben een 6-cijferige code per sms gestuurd naar') : $t('We hebben een 6-cijferige code gestuurd naar') }} <strong>{{ channel === 'sms' ? maskedPhone : maskedEmail }}</strong>.
             {{ $t('Voer die hieronder in.') }}
+          </template>
+          <template v-else-if="channel === 'sms'">
+            {{ $t('Voor je veiligheid sturen we eerst een eenmalige toegangscode per sms naar') }}
+            <strong>{{ maskedPhone }}</strong> — {{ $t('het mobiele nummer waarop deze offerte is ontvangen.') }}
           </template>
           <template v-else>
             {{ $t('Voor je veiligheid sturen we eerst een eenmalige toegangscode naar') }}
@@ -162,8 +168,10 @@ const sendCode = () => {
               <span v-else-if="sendForm.processing">{{ $t('Versturen…') }}</span>
               <span v-else>{{ $t('Stuur nieuwe code') }}</span>
             </button>
+            <template v-if="channel !== 'sms'">
             <span class="verify-sep">·</span>
             <Link :href="route('portal.login')" class="link-btn">{{ $t('Ander e-mailadres') }}</Link>
+            </template>
           </div>
         </template>
 
@@ -173,7 +181,7 @@ const sendCode = () => {
             {{ sendForm.processing ? $t('Versturen…') : $t('Stuur toegangscode') }}
           </button>
           <p class="portal-verify-note">
-            {{ $t('De code is 10 minuten geldig. Check ook je spam-map.') }}
+            {{ channel === 'sms' ? $t('De code is 10 minuten geldig.') : $t('De code is 10 minuten geldig. Check ook je spam-map.') }}
           </p>
         </template>
       </div>

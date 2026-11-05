@@ -37,6 +37,39 @@ class QuoteSmsTest extends TestCase
         return Quote::where('reference', $reference)->firstOrFail();
     }
 
+    /** 1.103.6: de klant uit de sms heeft geen e-mailadres; de poort van het portaal stuurt de code dan per sms. */
+    public function test_a_customer_without_email_enters_the_portal_with_a_code_by_sms(): void
+    {
+        Mail::fake();
+        $user = $this->demoUser();
+        $this->actingAs($user);
+        $this->enableSms($user->company_id);
+        $customer = Customer::orderBy('id')->firstOrFail();
+        $customer->update(['phone' => '06 12345678', 'email' => null]);
+        $quote = $this->draftQuote($customer, 'Sms-portaal');
+        $this->post(route('quotes.sms', $quote))->assertRedirect();
+        $quote->refresh();
+
+        $this->get($quote->portalUrl())->assertRedirect(route('portal.verify.show'));
+        $this->assertSame('31612345678', session('portal_pending_phone'));
+        $this->assertNull(session('portal_pending_email'));
+        $this->get(route('portal.verify.show'))->assertOk()->assertInertia(fn ($page) => $page
+            ->where('channel', 'sms')->where('maskedPhone', '+31 •••••678')->where('maskedEmail', null)->where('gate.type', 'offerte'));
+
+        $this->post(route('portal.code.send'))->assertRedirect()->assertSessionHas('flash');
+        Mail::assertNothingSent();
+        $message = SmsMessage::where('subject_type', $quote->getMorphClass())->where('subject_id', $quote->id)->orderByDesc('id')->firstOrFail();
+        $this->assertStringContainsString('toegangscode', $message->body);
+        $this->assertSame('31612345678', $message->recipient);
+        $this->assertSame(1, preg_match('/\b(\d{6})\b/', $message->body, $m));
+
+        $this->post(route('portal.verify'), ['code' => '000000'])->assertSessionHasErrors('code');
+        $this->post(route('portal.verify'), ['code' => $m[1]])->assertRedirect($quote->portalUrl());
+        $this->get($quote->portalUrl())->assertOk()->assertInertia(fn ($page) => $page->component('Portal/QuoteShow')->where('quote.number', $quote->number));
+        $this->post(route('portal.quote.sign', $quote->portal_token), ['signed_name' => 'Jan Jansen', 'signature' => 'data:image/png;base64,iVBORw0KGgo=', 'agree' => true])->assertRedirect();
+        $this->assertSame('accepted', $quote->fresh()->status);
+    }
+
     public function test_a_quote_goes_out_by_sms_with_a_short_portal_link_and_counts_as_sent(): void
     {
         Mail::fake();

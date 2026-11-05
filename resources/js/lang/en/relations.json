@@ -352,5 +352,9 @@
   "Deze offerte is komen te vervallen en geldt niet meer.": "This quotation has been withdrawn and is no longer valid.",
   "In plaats daarvan geldt offerte :number.": "Quotation :number applies instead.",
   "Bekijk offerte :number": "View quotation :number",
-  "Vragen? Neem contact op met :company.": "Questions? Contact :company."
+  "Vragen? Neem contact op met :company.": "Questions? Contact :company.",
+  "We hebben een 6-cijferige code per sms gestuurd naar": "We have sent a 6-digit code by text message to",
+  "Voor je veiligheid sturen we eerst een eenmalige toegangscode per sms naar": "For your security we first send a one-time access code by text message to",
+  "het mobiele nummer waarop deze offerte is ontvangen.": "the mobile number on which this quotation was received.",
+  "De code is 10 minuten geldig.": "The code is valid for 10 minutes."
 }

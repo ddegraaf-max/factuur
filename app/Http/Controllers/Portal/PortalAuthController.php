@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Portal;
 use App\Http\Controllers\Controller;
 use App\Mail\PortalCodeMail;
 use App\Models\Invoice;
+use App\Models\Quote;
+use App\Services\SmsService;
+use App\Support\PhoneNumber;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -75,12 +78,15 @@ class PortalAuthController extends Controller
     public function showVerify(Request $request): Response|RedirectResponse
     {
         $email = $request->session()->get('portal_pending_email');
-        if (! $email) {
+        $phone = $request->session()->get('portal_pending_phone'); // 1.103.6: offerte per sms, klant zonder e-mail
+        if (! $email && ! $phone) {
             return redirect()->route('portal.login');
         }
 
         return Inertia::render('Portal/Verify', [
-            'maskedEmail' => self::maskEmail($email),
+            'channel' => $phone && ! $email ? 'sms' : 'mail',
+            'maskedEmail' => $email ? self::maskEmail($email) : null,
+            'maskedPhone' => $phone && ! $email ? self::maskPhone((string) $phone) : null,
             'codeSent' => $request->session()->has('portal_code_hash'),
             'canResendIn' => $this->resendCooldown($request),
             'gate' => $request->session()->get('portal_gate'), // bedrijfsnaam + factuurnummer bij linkflow
@@ -91,7 +97,8 @@ class PortalAuthController extends Controller
     public function sendCode(Request $request): RedirectResponse
     {
         $email = $request->session()->get('portal_pending_email');
-        if (! $email) {
+        $phone = $request->session()->get('portal_pending_phone');
+        if (! $email && ! $phone) {
             return redirect()->route('portal.login');
         }
 
@@ -102,6 +109,13 @@ class PortalAuthController extends Controller
             ]);
         }
 
+        if (! $email) {
+            // 1.103.6: code per sms naar het mobiele nummer waarop de offerte is ontvangen.
+            $this->guardSendRate($request, 'tel:' . $phone);
+            $this->sendCodeBySms($request, (string) $phone);
+
+            return back()->with('flash', __('Code verstuurd per sms.'));
+        }
         $this->guardSendRate($request, $email);
         $this->sendCodeIfDocumentsExist($request, $email);
 
@@ -112,7 +126,8 @@ class PortalAuthController extends Controller
     public function verify(Request $request): RedirectResponse
     {
         $email = $request->session()->get('portal_pending_email');
-        if (! $email) {
+        $phone = $request->session()->get('portal_pending_phone');
+        if (! $email && ! $phone) {
             return redirect()->route('portal.login');
         }
 
@@ -155,11 +170,15 @@ class PortalAuthController extends Controller
         // Geslaagd: sessie vernieuwen tegen session fixation en opschonen.
         $intended = $session->pull('portal_intended');
         $session->forget([
-            'portal_pending_email', 'portal_code_hash', 'portal_code_expires_at',
+            'portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_code_hash', 'portal_code_expires_at',
             'portal_code_attempts', 'portal_code_sent_at', 'portal_gate',
         ]);
         $session->regenerate();
-        $session->put('portal_email', $email);
+        if ($email) {
+            $session->put('portal_email', $email);
+        } else {
+            $session->put('portal_phone', $phone); // 1.103.6: geverifieerd mobiel nummer (offerte per sms)
+        }
         $session->put('portal_verified_at', now()->timestamp);
 
         return redirect($intended ?: route('portal.index'));
@@ -168,7 +187,7 @@ class PortalAuthController extends Controller
     public function logout(Request $request): RedirectResponse
     {
         $request->session()->forget([
-            'portal_email', 'portal_verified_at', 'portal_pending_email',
+            'portal_email', 'portal_verified_at', 'portal_pending_email', 'portal_phone', 'portal_pending_phone', 'portal_pending_quote_id',
             'portal_code_hash', 'portal_code_expires_at', 'portal_code_attempts',
             'portal_code_sent_at', 'portal_intended', 'portal_gate',
         ]);
@@ -195,6 +214,102 @@ class PortalAuthController extends Controller
         }
 
         return $email;
+    }
+
+    /** 1.103.6: geverifieerd mobiel nummer (offerte per sms aan een klant zonder e-mailadres). */
+    public static function verifiedPhone(Request $request): ?string
+    {
+        $phone = $request->session()->get('portal_phone');
+        $verifiedAt = $request->session()->get('portal_verified_at');
+        if (! $phone || ! $verifiedAt) {
+            return null;
+        }
+        if (now()->timestamp - (int) $verifiedAt > self::SESSION_HOURS * 3600) {
+            $request->session()->forget(['portal_phone', 'portal_verified_at']);
+
+            return null;
+        }
+
+        return (string) $phone;
+    }
+
+    /** Het geverifieerde contact voor in het bewijsdossier: e-mailadres, anders het mobiele nummer. */
+    public static function verifiedContact(Request $request): ?string
+    {
+        $phone = self::verifiedPhone($request);
+
+        return self::verifiedEmail($request) ?? ($phone ? PhoneNumber::display($phone) : null);
+    }
+
+    /** Mag deze bezoeker deze offerte zien: e-mailadres geverifieerd, óf (offerte per sms) het mobiele nummer van de klant. */
+    public static function canAccessQuote(Request $request, Quote $quote): bool
+    {
+        $email = self::verifiedEmail($request);
+        if ($email && filled($quote->customer_email) && strcasecmp($email, $quote->customer_email) === 0) {
+            return true;
+        }
+        $phone = self::verifiedPhone($request);
+        $mobile = PhoneNumber::mobile($quote->customer?->phone);
+
+        return $phone !== null && $mobile !== null && $phone === $mobile;
+    }
+
+    /**
+     * De poort voor een offertelink: code per e-mail als er een adres is, anders per sms naar het
+     * mobiele nummer van de klant (1.103.6). Zet de sessie klaar voor showVerify en sendCode.
+     */
+    public static function startQuoteGate(Request $request, Quote $quote, string $intended): void
+    {
+        $session = $request->session();
+        $session->forget(['portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id']);
+        if (filled($quote->customer_email)) {
+            $session->put('portal_pending_email', mb_strtolower($quote->customer_email));
+        } elseif ($mobile = PhoneNumber::mobile($quote->customer?->phone)) {
+            $session->put('portal_pending_phone', $mobile);
+            $session->put('portal_pending_quote_id', $quote->id);
+        }
+        $session->put('portal_intended', $intended);
+        $session->put('portal_gate', ['type' => 'offerte', 'company' => $quote->company?->name, 'number' => $quote->number]);
+    }
+
+    /** 31612345678 → +31 •••••678 */
+    public static function maskPhone(string $digits): string
+    {
+        return '+' . substr($digits, 0, 2) . ' •••••' . substr($digits, -3);
+    }
+
+    /**
+     * 1.103.6: code per sms — van het sms-tegoed van de administratie die de offerte stuurde, anders
+     * via het platform (de klant moet altijd binnen kunnen). Zelfde sessiesleutels als de e-mailcode.
+     */
+    protected function sendCodeBySms(Request $request, string $phone): void
+    {
+        $code = (string) random_int(100000, 999999);
+        $request->session()->put([
+            'portal_code_hash' => Hash::make($code),
+            'portal_code_expires_at' => now()->addMinutes(self::CODE_TTL_MINUTES)->timestamp,
+            'portal_code_attempts' => 0,
+            'portal_code_sent_at' => now()->timestamp,
+        ]);
+        $quote = Quote::withoutGlobalScope('company')->find($request->session()->get('portal_pending_quote_id'));
+        $company = $quote?->company;
+        $text = __(':company: je toegangscode voor de offerte is :code (10 minuten geldig).', ['company' => $company?->name ?: config('app.name'), 'code' => $code]);
+        $sms = app(SmsService::class);
+        $sent = false;
+        if ($quote && $company && $sms->available($company)) {
+            try {
+                $sent = $sms->send($company, $phone, $text, $quote)->status !== 'failed';
+            } catch (\DomainException) {
+                $sent = false;
+            }
+        }
+        if (! $sent) {
+            $sent = $sms->platform($phone, $text, 'EasyInvoice');
+        }
+        if (! $sent) {
+            \Illuminate\Support\Facades\Log::warning('Portaalcode per sms kon niet worden verstuurd', ['phone' => '…' . substr($phone, -3)]);
+            throw ValidationException::withMessages(['code' => __('De sms kon niet worden verstuurd. Probeer het later opnieuw of vraag de verzender om een e-mailadres toe te voegen.')]);
+        }
     }
 
     /** Maskeer een e-mailadres voor weergave: d.degraaf@voorbeeld.nl → d••@v•••••.nl */
