@@ -19,6 +19,16 @@ return [
     // FACHORA_PROTECT=true én STRIPE_SECRET; de bank-/identiteitscheck van Verified hoort bij deze vlag.
     'protect' => (bool) env('FACHORA_PROTECT', false),
     'ceidg_token' => env('CEIDG_TOKEN'),                          // JWT van dane.biznes.gov.pl (CEIDG API v3)
+
+    // 1.103: bedrijven met een goede online reputatie (Google Business-profiel, Places API New). Eenmanszaken uit
+    // CEIDG reageerden niet op klanten (Daniël, 5 nov 2026); deze bedrijven komen vóór het register, dat alleen reserve is.
+    'google_places_key' => env('FACHORA_GOOGLE_PLACES_KEY'),
+    'google_min_rating' => (float) env('FACHORA_GOOGLE_MIN_RATING', 4.5),
+    'google_min_reviews' => (int) env('FACHORA_GOOGLE_MIN_REVIEWS', 10),
+    'google_radius_km' => 30,
+    'google_pages' => 3,          // per zoekterm hooguit 3 pagina's van 20 resultaten
+    'google_refresh_days' => 25,  // Places-beleid: opgeslagen gegevens binnen 30 dagen verversen of weggooien
+    'register_fallback_min' => (int) env('FACHORA_REGISTER_FALLBACK_MIN', 5), // registerbedrijven (CEIDG) pas als er minder dan zoveel andere zijn
     'ceidg_url' => rtrim(env('CEIDG_URL', 'https://dane.biznes.gov.pl/api/ceidg/v3'), '/'),
     'geocode_url' => rtrim(env('FACHORA_GEOCODE_URL', 'https://nominatim.openstreetmap.org'), '/'),
     'geocode_contact' => env('FACHORA_GEOCODE_CONTACT', 'czesc@fachora.pl'),
@@ -232,6 +242,26 @@ return [
      * 1.92.1 alle 104 steden uit 'cities' hieronder (zelfde volgorde); een stad
      * die hier niet staat bestaat alleen met een Verified bedrijf, anders 404.
      */
+    // 1.103: Poolse zoektermen per categorie voor Google Places (meer termen = meer dekking; zonder term: de categorienaam).
+    'google_terms' => [
+        'hydraulik' => ['hydraulik', 'usługi hydrauliczne'],
+        'elektryk' => ['elektryk', 'usługi elektryczne'],
+        'ogrzewanie' => ['instalacje grzewcze', 'serwis kotłów gazowych'],
+        'klimatyzacja' => ['montaż klimatyzacji', 'serwis klimatyzacji'],
+        'slusarz' => ['ślusarz', 'awaryjne otwieranie zamków'],
+        'okna-drzwi' => ['montaż okien i drzwi', 'serwis okien'],
+        'dach' => ['dekarz', 'usługi dekarskie'],
+        'remont' => ['remonty mieszkań', 'firma remontowa'],
+        'agd' => ['serwis AGD', 'naprawa pralek'],
+        'mechanik' => ['mechanik samochodowy', 'warsztat samochodowy'],
+        'ogrodnik' => ['ogrodnik', 'wycinka drzew'],
+        'ogrod' => ['serwis kosiarek', 'naprawa sprzętu ogrodniczego'],
+        'szkodniki' => ['dezynsekcja', 'deratyzacja'],
+        'kominiarz' => ['kominiarz', 'usługi kominiarskie'],
+    ],
+    // Advertentiesteden voor fachora:google-import --all (de zestien grootste, zoals in de Google Ads-campagne).
+    'ads_cities' => ['Warszawa', 'Kraków', 'Łódź', 'Wrocław', 'Poznań', 'Gdańsk', 'Szczecin', 'Bydgoszcz', 'Lublin', 'Białystok', 'Katowice', 'Gdynia', 'Częstochowa', 'Radom', 'Toruń', 'Sosnowiec'],
+
     'seo_cities' => [
         'warszawa' => 'Warszawa', 'krakow' => 'Kraków', 'lodz' => 'Łódź', 'wroclaw' => 'Wrocław',
         'poznan' => 'Poznań', 'gdansk' => 'Gdańsk', 'szczecin' => 'Szczecin', 'bydgoszcz' => 'Bydgoszcz',

@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 4 november 2026 · {{ brand('version_prefix') }} 1.102.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 5 november 2026 · {{ brand('version_prefix') }} 1.103.0</div>
+        <h2>Fachora: goed beoordeelde bedrijven eerst</h2>
+        <ul class="tl-list">
+          <li><b>Bedrijven met goede Google-beoordelingen</b> — eenmanszaken uit het bedrijvenregister reageerden niet op klanten. Fachora zoekt nu per klus eerst bedrijven met een goed Google-bedrijfsprofiel (minstens 4,5 sterren en 10 beoordelingen, open, met telefoon of website) en zet die bovenaan de keuzelijst, met hun beoordeling, het aantal reviews en een link naar hun Google-profiel. Het register komt alleen nog in beeld als er te weinig van zulke bedrijven zijn.</li>
+          <li><b>Zelf contact, ook via de website</b> — bij een gekozen bedrijf staat naast bellen en WhatsApp nu "website openen"; Fachora mailt of sms't deze bedrijven nooit. Gegevens worden volgens de regels van Google binnen 30 dagen ververst of verwijderd; bedrijven die niemand koos verdwijnen vanzelf.</li>
+          <li><b>Voor de eigenaar</b> — <code>fachora:google-import</code> vult een stad en categorie (of alle advertentiesteden) vooraf; nodig is een Google Places-sleutel op Railway.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">4 november 2026 · {{ brand('version_prefix') }} 1.102.0</div>
         <h2>Offerteopvolging: tijdlijn en herinneringen aan de klant</h2>
         <ul class="tl-list">
           <li><b>Wat gebeurt er met mijn offerte?</b> — onder "Wat heeft de klant besloten?" staat nu een tijdlijn: verstuurd, bekeken (met het aantal keer dat de klant de offerte in het portaal opende), herinnering 1, herinnering 2 en de vervaldatum. Zo zie je in één oogopslag waar een offerte staat in plaats van te wachten tot er misschien iets terugkomt.</li>

@@ -109,7 +109,9 @@ class JobController extends Controller
             // 1.87: gekozen bedrijven uit het register; de klant neemt zelf contact op.
             'direct' => $job->isSelecting() ? [] : $this->jobs->directContacts($job)->map(fn ($p) => [
                 'id' => $p->id, 'name' => $p->display_name, 'city' => $p->city,
-                'email' => $p->email, 'phone' => $p->phone, 'url' => $p->publicUrl(),
+                'email' => $p->email, 'phone' => $p->phone, 'url' => $p->isGoogle() ? null : $p->publicUrl(),
+                // 1.103: Google-bedrijf — reputatie en website, geen eigen profielpagina
+                'website' => $p->isGoogle() ? $p->website : null, 'google' => $p->googleSummary(),
                 // 1.96.2: hoofdactiviteit (welk bedrijf past het best) en WhatsApp-nummer
                 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->pkdMainName(), // 1.100: Engels op de Engelse pagina
                 'phone_wa' => \App\Support\Fachora::whatsappNumber($p->phone),
@@ -120,7 +122,7 @@ class JobController extends Controller
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
                 'candidates' => app(\App\Services\Fachora\ProviderService::class)->choiceCandidates($job)
-                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months']))
+                    ->map(fn ($p) => array_intersect_key($p->publicSummary(), array_flip(['id', 'name', 'city', 'status', 'verified', 'languages', 'rating', 'rating_count', 'jobs_done', 'url', 'invoice', 'warranty_months', 'source', 'google', 'website']))
                         + ['distance_km' => $p->distance_km, 'pkd_fit' => $p->pkd_fit, 'pkd_main_name' => $p->claimed_at ? null : $p->pkdMainName()])
                     ->values()->all(),
                 'max' => (int) config('fachora.max_offers', 5),
@@ -191,7 +193,7 @@ class JobController extends Controller
     public function markContacted(Request $request, string $token, int $provider)
     {
         $job = $this->find($token);
-        $data = $request->validate(['channel' => ['required', Rule::in(['mail', 'copy', 'copy_mail', 'whatsapp', 'phone'])]]);
+        $data = $request->validate(['channel' => ['required', Rule::in(['mail', 'copy', 'copy_mail', 'whatsapp', 'phone', 'website'])]]);
         $this->jobs->markDirectContacted($job, $provider, $data['channel']);
 
         return back();

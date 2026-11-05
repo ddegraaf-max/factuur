@@ -2186,5 +2186,6 @@
   ":label gemarkeerd als algemene kosten (hoort bij geen project)": ":label marked as general costs (belongs to no project)",
   ":label kan weer aan een project worden gekoppeld": ":label can be linked to a project again",
   ":label gemarkeerd als algemene kosten: hoort bij geen project.": ":label marked as general costs: belongs to no project.",
-  ":label kan weer aan een project worden gekoppeld.": ":label can be linked to a project again."
+  ":label kan weer aan een project worden gekoppeld.": ":label can be linked to a project again.",
+  "Nog geen bedrijven in de buurt: zoeken naar goed beoordeelde bedrijven en in het register": "No companies nearby yet: searching for well-rated companies and in the register"
 }

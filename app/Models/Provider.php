@@ -28,7 +28,7 @@ class Provider extends Model
     protected $fillable = [
         'nip', 'regon', 'krs', 'legal_name', 'display_name', 'slug', 'legal_form',
         'address_line', 'postal_code', 'city', 'voivodeship', 'lat', 'lng',
-        'phone', 'email', 'website', 'source', 'source_fetched_at', 'pkd_main', 'pkd_main_name', 'pkd_main_name_en', 'pkd_codes', 'source_id', 'pkd_checked_at',
+        'phone', 'email', 'website', 'ext_rating', 'ext_rating_count', 'ext_maps_url', 'ext_refreshed_at', 'source', 'source_fetched_at', 'pkd_main', 'pkd_main_name', 'pkd_main_name_en', 'pkd_codes', 'source_id', 'pkd_checked_at',
         'registry_status', 'vat_status', 'vat_checked_at',
         'status', 'status_reason', 'languages', 'radius_km', 'rates', 'warranty_months', 'invoice_promise', 'protect_opt_in',
         'description', 'photo_data', 'company_id', 'user_id',
@@ -43,6 +43,9 @@ class Provider extends Model
     protected $casts = [
         'lat' => 'float',
         'lng' => 'float',
+        'ext_rating' => 'float', // 1.103: Google-beoordeling
+        'ext_rating_count' => 'integer',
+        'ext_refreshed_at' => 'datetime',
         'languages' => 'array',
         'rates' => 'array',
         'stripe_requirements' => 'array',
@@ -151,6 +154,20 @@ class Provider extends Model
             ->whereColumn('provider_category.provider_id', 'providers.id')->where('provider_category.category', $category));
     }
 
+    /** 1.103: bedrijf uit een Google Business-profiel (goede reviews); nooit mailen, geen eigen profielpagina. */
+    public function isGoogle(): bool
+    {
+        return $this->source === \App\Services\Fachora\GooglePlacesClient::SOURCE;
+    }
+
+    /** Beoordeling, aantal reviews en Maps-link uit het Google-profiel, of null. @return array{rating: float, count: int, url: ?string}|null */
+    public function googleSummary(): ?array
+    {
+        return $this->isGoogle() && $this->ext_rating !== null
+            ? ['rating' => (float) $this->ext_rating, 'count' => (int) $this->ext_rating_count, 'url' => $this->ext_maps_url]
+            : null;
+    }
+
     public function isVerified(): bool
     {
         return $this->status === 'verified';
@@ -205,7 +222,8 @@ class Provider extends Model
      */
     public function pkdFit(string $category): string
     {
-        if ($this->claimed_at !== null || $this->status === 'verified') {
+        // 1.103: een Google-bedrijf is gevonden met de zoekterm van de categorie; dat geldt als hoofdactiviteit.
+        if ($this->claimed_at !== null || $this->status === 'verified' || $this->isGoogle()) {
             return 'main';
         }
         $main = \App\Support\Fachora::normalisePkd($this->pkd_main);
@@ -308,7 +326,11 @@ class Provider extends Model
             'jobs_done' => $this->jobs_done,
             'description' => $this->description,
             'photo' => $this->photo_data,
-            'url' => $this->publicUrl(),
+            // 1.103: Google-bedrijven hebben geen eigen profielpagina (Places-beleid); hun reputatie en website wel.
+            'url' => $this->isGoogle() && $this->claimed_at === null ? null : $this->publicUrl(),
+            'source' => $this->source,
+            'google' => $this->googleSummary(),
+            'website' => $this->isGoogle() ? $this->website : null,
         ];
     }
 }

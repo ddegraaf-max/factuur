@@ -488,7 +488,9 @@ class ProviderService
         $radius = (int) config('fachora.region_radius_km', 50);
         $query = Provider::query()->inCategory($job->category)
             ->whereIn('status', ['unclaimed', 'claimed', 'pending', 'verified'])
-            ->whereNotNull('email')->whereNull('email_blocked_at')
+            // 1.103: Google-bedrijven hebben meestal geen e-mailadres, wel telefoon of website (de klant belt of schrijft zelf).
+            ->where(fn ($q) => $q->whereNotNull('email')->orWhere('source', GooglePlacesClient::SOURCE))
+            ->whereNull('email_blocked_at')->whereNull('removed_at')
             ->where(fn ($q) => $q->whereNull('vat_status')->orWhere('vat_status', '!=', 'none'))
             ->orderBy('id');
 
@@ -498,11 +500,14 @@ class ProviderService
             $query->whereRaw('LOWER(city) = ?', [mb_strtolower((string) $job->city)]);
         }
 
-        $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 2];
+        // 1.103: Verified → geclaimd → Google-bedrijven met goede reviews → eenmanszaken uit het register (alleen als reserve).
+        $rank = ['verified' => 0, 'pending' => 1, 'claimed' => 1, 'unclaimed' => 3];
+        $group = fn (Provider $p) => $p->status === 'unclaimed' && $p->isGoogle() ? 2 : ($rank[$p->status] ?? 9);
+        $score = fn (Provider $p) => $p->isGoogle() ? GooglePlacesClient::weightedRating($p->ext_rating, $p->ext_rating_count) : (float) ($p->rating_avg ?? 0);
         $extra = $job->extraLanguages(); // 1.95: bedrijven die een taal van de klant spreken komen binnen hun groep vooraan
         $fitRank = ['main' => 0, 'secondary' => 1, 'unknown' => 2]; // 1.96: hoofdactiviteit eerst, bijcode daarna
 
-        return $query->get()->filter(function (Provider $p) use ($job, $radius) {
+        $sorted = $query->get()->filter(function (Provider $p) use ($job, $radius) {
             if ($p->isDemo() || ! (ConsentPolicy::mayEmailRequest($p) || ConsentPolicy::mayShowDirectContact($p))) {
                 return false;
             }
@@ -520,12 +525,21 @@ class ProviderService
 
             return true;
         })->sortBy([
-            fn (Provider $a, Provider $b) => ($rank[$a->status] ?? 9) <=> ($rank[$b->status] ?? 9),
+            fn (Provider $a, Provider $b) => $group($a) <=> $group($b),
             fn (Provider $a, Provider $b) => ($fitRank[$a->pkd_fit] ?? 3) <=> ($fitRank[$b->pkd_fit] ?? 3),
             fn (Provider $a, Provider $b) => (int) ! $a->speaksAny($extra) <=> (int) ! $b->speaksAny($extra),
-            fn (Provider $a, Provider $b) => ($b->rating_avg ?? 0) <=> ($a->rating_avg ?? 0),
+            fn (Provider $a, Provider $b) => $score($b) <=> $score($a),
             fn (Provider $a, Provider $b) => ($a->distance_km ?? 999) <=> ($b->distance_km ?? 999),
-        ])->take($limit)->values();
+        ])->values();
+
+        // Registerbedrijven (eenmanszaken uit CEIDG) alleen aanvullen als er te weinig anderen zijn (Daniël, 5 nov 2026: ze reageren niet).
+        $register = fn (Provider $p) => $p->status === 'unclaimed' && ! $p->isGoogle();
+        $others = $sorted->reject($register)->values();
+        if ($others->count() >= (int) config('fachora.register_fallback_min', 5)) {
+            return $others->take($limit)->values();
+        }
+
+        return $others->concat($sorted->filter($register)->values())->take($limit)->values();
     }
 
     /**

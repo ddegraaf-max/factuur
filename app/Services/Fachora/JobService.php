@@ -159,7 +159,7 @@ class JobService
         if ($choose) {
             $this->log($job, 'selecting', 'system', __('Klant kiest zelf de bedrijven'));
             if ($search) {
-                $this->log($job, 'provider_search', 'system', __('Nog geen bedrijven in de buurt: zoeken in het bedrijvenregister'));
+                $this->log($job, 'provider_search', 'system', __('Nog geen bedrijven in de buurt: zoeken naar goed beoordeelde bedrijven en in het register'));
             } else {
                 // Weinig keus? Op de achtergrond aanvullen; de klant kan nu al kiezen.
                 if ($available < (int) config('fachora.local_import_min', 5) && $this->localImportAvailable()) {
@@ -293,7 +293,8 @@ class JobService
 
     public function localImportAvailable(): bool
     {
-        return (bool) config('fachora.local_import', true) && filled(config('fachora.ceidg_token'));
+        // 1.103: Google Places (goed beoordeelde bedrijven) of CEIDG (register) — één van beide is genoeg.
+        return (bool) config('fachora.local_import', true) && (filled(config('fachora.ceidg_token')) || app(GooglePlacesClient::class)->configured());
     }
 
     /** Aanvullen zonder dat de klant wacht: de planner pakt het binnen een minuut op. */
@@ -312,13 +313,12 @@ class JobService
      */
     public function runLocalSearches(int $max = 3): array
     {
-        $ceidg = app(CeidgClient::class);
         $searched = 0;
         $waiting = ServiceJob::query()->where('status', 'selecting')->whereNotNull('provider_search_at')->orderBy('provider_search_at')->limit($max)->get();
         foreach ($waiting as $job) {
             $giveUp = $job->provider_search_at->lt(now()->subMinutes((int) config('fachora.local_search_minutes', 15)));
             if (! $giveUp && $this->localImportAvailable()) {
-                $ceidg->importAround($job);
+                $this->searchAround($job);
             }
             $this->finishSearch($job->fresh());
             $searched++;
@@ -328,7 +328,7 @@ class JobService
         $queue = (array) Cache::pull(self::LOCAL_QUEUE, []);
         foreach (array_slice($queue, 0, max(0, $max - $searched)) as $id) {
             if ($job = ServiceJob::query()->find($id)) {
-                $ceidg->importAround($job);
+                $this->searchAround($job);
                 $topped++;
             }
         }
@@ -337,6 +337,22 @@ class JobService
         }
 
         return ['searched' => $searched, 'topped_up' => $topped];
+    }
+
+    /**
+     * 1.103: eerst bedrijven met goede Google-beoordelingen; het register (eenmanszaken uit CEIDG)
+     * alleen als er daarna nog te weinig keus is. Beide bronnen slaan "recent gedaan" zelf over.
+     */
+    public function searchAround(ServiceJob $job): void
+    {
+        $google = app(GooglePlacesClient::class);
+        if ($google->configured()) {
+            $google->importAround($job);
+        }
+        $min = (int) config('fachora.register_fallback_min', 5);
+        if ($this->providers->choiceCandidates($job, $min)->count() < $min) {
+            app(CeidgClient::class)->importAround($job);
+        }
     }
 
     /** De zoektocht is klaar: keuzemail, of zonder kandidaten de gewone route. */

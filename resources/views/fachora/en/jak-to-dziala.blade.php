@@ -65,7 +65,7 @@
           <p>You see up to {{ $candidates }} companies near you. The order: Fachora Verified first, then rating, then distance; companies do not pay for a place on the list. For each one you see the profile, languages, distance and a "from the register" label if it is a company we have not checked yet. You tick up to {{ $maxOffers }} and send your request. Two kinds of company, two routes:</p>
           <ul>
             <li><b>A Fachora Verified company:</b> receives the request from us by e-mail, because it claimed its profile and agreed to receive jobs. It replies on your job page.</li>
-            <li><b>A register company:</b> receives nothing from us. We show you its public contact details from the register (CEIDG) and a ready-made message in Polish with your job description; you call or write yourself. Details of register companies nobody picked are deleted after {{ $keepDays }} days.</li>
+            <li><b>A company outside Fachora</b> (with good Google reviews or from the CEIDG register): receives nothing from us. We show you its public contact details (phone, website, e-mail from the register) and a ready-made message in Polish with your job description; you call or write yourself. Details of register companies nobody picked are deleted after {{ $keepDays }} days.</li>
           </ul>
         </div>
       </div>

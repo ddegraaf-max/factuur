@@ -63,7 +63,7 @@ class ConsentPolicy
             && $provider->email_blocked_at === null
             && $provider->removed_at === null
             && ! in_array($provider->status, ['blocked', 'suspended'], true)
-            && (filled($provider->email) || filled($provider->phone));
+            && (filled($provider->email) || filled($provider->phone) || filled($provider->website)); // 1.103: Google-bedrijf met alleen een website
     }
 
     public static function maySms(?Provider $provider): bool

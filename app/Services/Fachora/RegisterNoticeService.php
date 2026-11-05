@@ -28,7 +28,7 @@ class RegisterNoticeService
     public function pending(): Builder
     {
         return Provider::query()
-            ->whereIn('source', ['ceidg', 'krs', 'import'])
+            ->whereIn('source', ['ceidg', 'krs', 'import', 'google']) // 1.103: Google-bedrijven die niemand koos ook opruimen
             ->whereNull('claimed_at')->whereNull('register_notice_at')->whereNull('removed_at')
             ->whereNotNull('email')->whereNull('email_blocked_at')
             ->whereNotIn('status', ['blocked']);
@@ -124,7 +124,7 @@ class RegisterNoticeService
     public function unusedRegister(int $days): Builder
     {
         return Provider::query()
-            ->whereIn('source', ['ceidg', 'krs', 'import'])
+            ->whereIn('source', ['ceidg', 'krs', 'import', 'google']) // 1.103: Google-bedrijven die niemand koos ook opruimen
             ->whereNull('claimed_at')->whereNull('consent_at')->whereNull('terms_accepted_at')
             ->whereNull('register_notice_at')->whereNull('removed_at')->whereNull('user_id')
             ->where('created_at', '<', now()->subDays($days))

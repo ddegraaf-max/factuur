@@ -180,6 +180,11 @@ Schedule::command('fachora:pkd-translate')
     ->everyTenMinutes()
     ->withoutOverlapping(8);
 
+// Fachora 1.103: Google-bedrijven verversen (Places-beleid: binnen 30 dagen), 's nachts.
+Schedule::command('fachora:google-refresh')
+    ->dailyAt('04:20')
+    ->timezone('Europe/Warsaw');
+
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
     Schedule::command('fachora:local-search')

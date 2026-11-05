@@ -20,7 +20,10 @@ class PublicController extends Controller
 {
     public function provider(string $slug): View
     {
-        $provider = Provider::query()->where('slug', $slug)->whereNotIn('status', ['blocked'])->firstOrFail();
+        // 1.103: een Google-bedrijf heeft geen eigen profielpagina zolang het niet is geclaimd (Places-beleid: niet herpubliceren).
+        $provider = Provider::query()->where('slug', $slug)->whereNotIn('status', ['blocked'])
+            ->where(fn ($q) => $q->where('source', '!=', \App\Services\Fachora\GooglePlacesClient::SOURCE)->orWhereNotNull('claimed_at'))
+            ->firstOrFail();
         $reviews = ServiceReview::query()->where('provider_id', $provider->id)->where('published', true)->with('job')->latest()->limit(20)->get();
 
         return view(Market::view('fachora.firma'), [

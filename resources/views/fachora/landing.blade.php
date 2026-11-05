@@ -175,7 +175,7 @@
         <div class="eyebrow">Fachora Verified</div>
         <h2>Nie każda firma trafia na Fachorę.</h2>
         <p>Zanim firma dostanie znak Fachora Verified i pierwsze zapytanie, sprawdzamy ją w rejestrach i u partnera płatniczego. Dopiero wtedy ręczymy za to, co widzisz w jej profilu.</p>
-        <p>Firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil z rejestru</b>: wyraźnie oznaczony, bez znaku Verified i bez naszych gwarancji. Nie wysyłamy im żadnych wiadomości. Jeśli taką firmę wybierzesz, zobaczysz jej publiczne dane kontaktowe z CEIDG i skontaktujesz się z nią sam. Każda firma może przejąć swój profil i przejść weryfikację.</p>
+        <p>Firmy z dobrymi opiniami w Google pokazujemy z ich oceną i liczbą opinii; firmy z rejestrów publicznych, których jeszcze nie sprawdziliśmy, pokazujemy jako <b>profil z rejestru</b>: wyraźnie oznaczony, bez znaku Verified i bez naszych gwarancji. Nie wysyłamy im żadnych wiadomości. Jeśli taką firmę wybierzesz, zobaczysz jej publiczne dane kontaktowe z CEIDG i skontaktujesz się z nią sam. Każda firma może przejąć swój profil i przejść weryfikację.</p>
         <p><a href="{{ route('fachora.standard') }}" class="btn btn-secondary">Standard Fachora: dziesięć zasad</a></p>
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">

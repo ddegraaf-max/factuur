@@ -177,7 +177,7 @@
         <div class="eyebrow">Fachora Verified</div>
         <h2>Not every company makes it onto Fachora.</h2>
         <p>Before a company receives the Fachora Verified mark and its first request, we check it in the registers and with our payment partner. Only then do we vouch for what you see in its profile.</p>
-        <p>Companies from public registers that we have not checked yet are shown as a <b>register profile</b>: clearly marked, without the Verified mark and without our guarantees. We send them nothing. If you pick such a company, you see its public contact details from the register and get in touch yourself. Any company can claim its profile and go through verification.</p>
+        <p>Companies with good Google reviews are shown with their rating and number of reviews; companies from public registers that we have not checked yet are shown as a <b>register profile</b>: clearly marked, without the Verified mark and without our guarantees. We send them nothing. If you pick such a company, you see its public contact details from the register and get in touch yourself. Any company can claim its profile and go through verification.</p>
         <p><a href="{{ route('fachora.standard') }}" class="btn btn-secondary">The Fachora Standard: ten rules</a></p>
       </div>
       <div class="fh-checks" style="grid-template-columns:1fr;">

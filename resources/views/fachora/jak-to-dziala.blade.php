@@ -65,7 +65,7 @@
           <p>Widzisz do {{ $candidates }} firm z okolicy. Kolejność: najpierw Fachora Verified, potem ocena, potem odległość; firmy nie płacą za miejsce na liście. Przy każdej widzisz profil, języki, odległość i oznaczenie „z rejestru”, jeśli to firma, której jeszcze nie sprawdziliśmy. Zaznaczasz maksymalnie {{ $maxOffers }} i wysyłasz zapytanie. Dwa rodzaje firm, dwie drogi:</p>
           <ul>
             <li><b>Firma Fachora Verified:</b> zapytanie dostaje od nas e-mailem, bo sama przejęła profil i zgodziła się na zlecenia. Odpowiada na Twojej stronie zlecenia.</li>
-            <li><b>Firma z rejestru:</b> nie dostaje od nas nic. Pokazujemy Ci jej publiczne dane kontaktowe z CEIDG i gotową wiadomość po polsku z opisem zlecenia; dzwonisz lub piszesz sam. Dane firm z rejestru, których nikt nie wybrał, usuwamy po {{ $keepDays }} dniach.</li>
+            <li><b>Firma spoza Fachora</b> (z dobrymi opiniami w Google albo z rejestru CEIDG): nie dostaje od nas nic. Pokazujemy Ci jej publiczne dane kontaktowe (telefon, stronę www, e-mail z rejestru) i gotową wiadomość po polsku z opisem zlecenia; dzwonisz lub piszesz sam. Dane firm z rejestru, których nikt nie wybrał, usuwamy po {{ $keepDays }} dniach.</li>
           </ul>
         </div>
       </div>

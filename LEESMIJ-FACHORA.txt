@@ -233,6 +233,33 @@ EXPLOITANT CREDITLINE B.V. (22 okt 2026, besluit Daniël; betaalpartij sinds 1.9
 - Nog te bouwen: per betaalde lead automatisch een conceptfactuur (btw verlegd) in de administratie van
   Creditline in EasyInvoice.
 
+GOED BEOORDEELDE BEDRIJVEN EERST, EENMANSZAKEN ALLEEN ALS RESERVE (5 nov 2026, 1.103.0, besluit Daniël:
+"eenmanszaken reageren gewoon niet; bedrijven die online al een goede opinie hebben")
+- CEIDG is per definitie het register van eenmanszaken. Nieuwe bron: het Google Business-profiel van
+  bedrijven (Places API New, Text Search) — App\Services\Fachora\GooglePlacesClient. Alleen bedrijven
+  met ≥ google_min_rating (4,5) en ≥ google_min_reviews (10), open, met telefoon of website.
+  Opgeslagen als provider met source 'google', source_id = place-id, ext_rating/ext_rating_count/
+  ext_maps_url/ext_refreshed_at. Zoektermen per categorie: config fachora.google_terms.
+- Wanneer: op aanvraag rond een klant (JobService::searchAround, via fachora:local-search): eerst Google,
+  daarna CEIDG alleen als er minder dan register_fallback_min (5) andere bedrijven zijn. Vooraf vullen
+  kan met "fachora:google-import hydraulik Warszawa" of "--all" (fachora.ads_cities × categorieën).
+- Keuzelijst (ProviderService::choiceCandidates): Verified → geclaimd → Google-bedrijven (gewogen
+  beoordeling, Bayesiaans met m=25) → registerbedrijven, en die laatste alleen als er minder dan
+  register_fallback_min anderen zijn. Google-bedrijven hoeven geen e-mail te hebben (telefoon/website).
+- Klant: kaart toont ★ beoordeling + "n opinii w Google" (link naar Maps) en "firma z dobrymi opiniami";
+  in "Neem zelf contact op" een knop "Otwórz stronę www" (kanaal 'website' in het logboek).
+  Attributie "Powered by Google" onder de lijst. Geen eigen /firma-pagina voor Google-bedrijven
+  (404 zolang niet geclaimd; niet in de sitemap). Fachora mailt of sms't ze nooit (ConsentPolicy).
+- Places-beleid: fachora:google-refresh (dagelijks 04:20) ververst bedrijven ouder dan
+  google_refresh_days (25) via Place Details; gesloten/verdwenen/onder de drempel → removed_at.
+  fachora:purge-register ruimt ook Google-bedrijven op die niemand koos (register_keep_days).
+- Nodig op Railway (Fachora): FACHORA_GOOGLE_PLACES_KEY — een Google Maps Platform-sleutel met
+  "Places API (New)" aan, beperkt tot die API. Kosten: Text Search Enterprise ≈ $35 per 1.000
+  aanroepen (telefoon en website zitten in dat tarief); per klant hooguit 2 termen × 3 pagina's.
+  Zonder sleutel: alles werkt als voorheen (alleen CEIDG).
+- Teksten bijgewerkt (pl+en): kategoria, jak-to-dziala, landing, faq, prywatnosc (bron Google Places,
+  30 dagen). Test: FachoraGooglePlacesTest.
+
 GOOGLE ADS: CONVERSIEMETING (4 nov 2026, 1.101.1, opdracht Daniël: "alle sites staan in Railway dus je kan de tag overal zetten")
 - Google Ads-account Polodom.pl (ocid 8611805993): Google-tag AW-18521175925, conversieactie "Aanvraag of registratie
   (alle sites)" (categorie Leadformulier indienen, label YSIXCNr9iLIdEPXuyv9E, 1 PLN, telling één per klik).

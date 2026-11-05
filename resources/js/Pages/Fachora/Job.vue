@@ -354,7 +354,9 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <div class="fa-small fa-muted">
               {{ p.city }}<template v-if="p.distance_km != null"> · {{ $t(':km km', { km: p.distance_km }) }}</template>
               <template v-if="p.rating_count"> · ★ {{ rating(p.rating) }} ({{ p.rating_count }})</template>
-              <template v-if="!p.verified"> · {{ $t('uit het bedrijvenregister') }}</template>
+              <!-- 1.103: reputatie uit het Google Business-profiel; eenmanszaken uit het register alleen als reserve -->
+              <template v-if="p.google"> · ★ {{ rating(p.google.rating) }} · <a :href="p.google.url" target="_blank" rel="noopener" class="fa-link" @click.stop>{{ $t(':n beoordelingen op Google', { n: p.google.count }) }}</a></template>
+              <template v-if="!p.verified"> · {{ p.google ? $t('goed beoordeeld bedrijf') : $t('uit het bedrijvenregister') }}</template>
             </div>
             <!-- 1.96: hoofdactiviteit uit CEIDG, zodat de klant ziet of de klus het vak van het bedrijf is -->
             <div v-if="!p.verified && p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
@@ -365,10 +367,12 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             </div>
           </div>
           <a v-if="p.url" :href="p.url" target="_blank" rel="noopener" class="fa-link fa-small jb-prov-link" @click.stop>{{ $t('Bekijk profiel') }}</a>
+          <a v-else-if="p.website" :href="p.website" target="_blank" rel="noopener" class="fa-link fa-small jb-prov-link" @click.stop>{{ $t('Website') }}</a>
         </div>
       </article>
 
-      <p v-if="!choice.searching && choice.candidates.length" class="fa-small fa-muted">{{ $t('Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan op beoordeling, dan op afstand. Bedrijven betalen niet voor een plek in deze lijst.') }}</p>
+      <p v-if="!choice.searching && choice.candidates.length" class="fa-small fa-muted">{{ $t('Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan bedrijven met de beste Google-beoordelingen, dan het bedrijvenregister; daarbinnen op beoordeling en afstand. Bedrijven betalen niet voor een plek in deze lijst.') }}</p>
+      <p v-if="choice.candidates.some((c) => c.google)" class="fa-small fa-muted">{{ $t('Beoordelingen en gegevens van goed beoordeelde bedrijven komen uit hun Google-bedrijfsprofiel.') }} Powered by Google</p>
 
       <div v-if="!choice.searching" class="fa-card">
         <p class="fa-small">{{ $t('Je aanvraag gaat per e-mail naar de bedrijven die je kiest. Zij geven een prijs; jij kiest daarna rustig met wie je verdergaat.') }} <template v-if="!(choice.fee > 0)"><strong>{{ $t('Gratis voor jou.') }}</strong></template></p>
@@ -408,7 +412,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
     <!-- ===== Zelf contact opnemen (1.87) ===== -->
     <section v-if="direct.length" class="jb-section">
       <h2 class="fa-h2">{{ $t('Neem zelf contact op') }}</h2>
-      <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit het openbare bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
+      <p class="fa-small fa-muted">{{ $t('Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit openbare bronnen: hun Google-bedrijfsprofiel of het bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.') }}</p>
       <!-- 1.98: de deelpagina in het bericht bewijst dat het geen spam is; hier ziet de klant het effect -->
       <p class="fa-small fa-muted">{{ $t('In het bericht staat een link naar een pagina waarop het bedrijf je klus ziet, leest dat het geen spam is en met één klik kan antwoorden. Je ziet hier of het bedrijf de pagina opende en wat het antwoordde.') }}</p>
       <p v-if="job.can_agree_direct" class="fa-note" style="margin:0 0 14px;">{{ $t('Hoe nu verder: de antwoorden komen in je eigen mailbox of op je telefoon. Heb je een afspraak gemaakt, zet dat hier bij het bedrijf; dan houdt Fachora je opdracht bij.') }}</p>
@@ -423,7 +427,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
         <div class="jb-prov">
           <div class="jb-prov-main">
             <div class="jb-prov-name"><strong>{{ p.name }}</strong><span v-if="p.contacted" class="fa-chip fa-chip--ok jb-contacted-chip">✓ {{ $t('Benaderd op :date', { date: p.contacted.at }) }}</span><span v-if="p.response && p.response.kind === 'interested'" class="fa-chip fa-chip--ok jb-contacted-chip">★ {{ $t('Heeft interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.kind === 'declined'" class="fa-chip fa-chip--muted jb-contacted-chip">✕ {{ $t('Geen interesse (:date)', { date: p.response.at }) }}</span><span v-else-if="p.response && p.response.opened_at" class="fa-chip fa-chip--muted jb-contacted-chip">👁 {{ $t('Opende de opdrachtpagina op :date', { date: p.response.opened_at }) }}</span></div>
-            <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template><template v-if="p.phone"> · {{ p.phone }}</template></div>
+            <div class="fa-small fa-muted">{{ p.city }}<template v-if="p.email"> · {{ p.email }}</template><template v-if="p.phone"> · {{ p.phone }}</template><template v-if="p.google"> · ★ {{ rating(p.google.rating) }} · <a :href="p.google.url" target="_blank" rel="noopener" class="fa-link">{{ $t(':n beoordelingen op Google', { n: p.google.count }) }}</a></template></div>
             <!-- 1.96.2: hoofdactiviteit, zodat de klant ziet welk bedrijf het best past -->
             <div v-if="p.pkd_main_name" class="fa-small" :class="p.pkd_fit === 'main' ? 'jb-fit-ok' : 'fa-muted'">
               {{ p.pkd_fit === 'main' ? $t('Hoofdactiviteit: :name (past bij je klus)', { name: p.pkd_main_name }) : $t('Hoofdactiviteit: :name (jouw klus staat als nevenactiviteit ingeschreven)', { name: p.pkd_main_name }) }}
@@ -442,6 +446,7 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           <button type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':msg' || done(p, 'copy') }" @click="copyMessage(p)">{{ copied === p.id + ':msg' || done(p, 'copy') ? '✓ ' + $t('Gekopieerd') : $t('Bericht kopiëren') }}</button>
           <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' || done(p, 'copy_mail') }" @click="copyEmail(p)">{{ copied === p.id + ':mail' || done(p, 'copy_mail') ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'phone') }" :href="'tel:' + p.phone" @click="markContacted(p, 'phone')">{{ done(p, 'phone') ? '✓ ' : '' }}{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
+          <a v-if="p.website" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'website') }" :href="p.website" target="_blank" rel="noopener" @click="markContacted(p, 'website')">{{ done(p, 'website') ? '✓ ' : '' }}{{ $t('Website openen') }}</a>
           <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
         <div v-if="job.can_agree_direct || status === 'open'" class="jb-agree">
