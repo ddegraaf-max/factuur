@@ -78,6 +78,26 @@ class EasyInvoiceHouseStyleTest extends TestCase
             ->assertSee('Start gratis');
     }
 
+    /** 1.106.1: de site vertelt hoe je de webapp (PWA) installeert; er is geen app in de stores. */
+    public function test_the_app_page_explains_how_to_install_the_web_app_and_is_linked(): void
+    {
+        $this->get('/app')->assertOk()
+            ->assertSee('als app op je telefoon en computer')
+            ->assertSee('Zet op beginscherm')
+            ->assertSee('App installeren')
+            ->assertSee('installatie-icoon')
+            ->assertSee('Waarom staat EasyInvoice niet in de App Store')
+            ->assertSee(route('register'), false);
+
+        // Gelinkt vanuit de kop van de startpagina, het menu Functies en de voet; en in de sitemap.
+        $this->get('/')->assertOk()
+            ->assertSee('class="ei-applink"', false)
+            ->assertSee('zo installeer je EasyInvoice')
+            ->assertSee('App op telefoon en computer')
+            ->assertSee('App installeren');
+        $this->get('/sitemap-paginas.xml')->assertOk()->assertSee(url('/app'), false);
+    }
+
     public function test_the_other_brands_keep_their_own_bar(): void
     {
         config(['brand.active' => 'fachora', 'inertia.testing.ensure_pages_exist' => false, 'services.anthropic.key' => null, 'services.stripe.secret' => null]);

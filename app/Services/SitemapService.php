@@ -48,7 +48,7 @@ class SitemapService
 
         return [
             'paginas' => fn () => $this->plain(array_merge([
-                '/', '/over-ons', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum', '/kennisbank',
+                '/', '/over-ons', '/app', '/contact', '/demo', '/veelgestelde-vragen', '/helpcentrum', '/kennisbank',
                 '/facturatie-met-ai', '/boekhouders', '/factuurprogramma-bouw', '/roadmap', '/wat-is-nieuw', '/status',
                 '/privacy', '/voorwaarden', '/cookies', '/verwerkersovereenkomst', '/login', '/register',
                 '/begrippen', '/factuurprogramma-voor', '/voorbeelden', '/overzicht',

@@ -86,6 +86,8 @@ Route::view('/veelgestelde-vragen', 'marketing.faq')->name('faq')->middleware('m
 Route::view('/wat-is-nieuw', 'marketing.wat-is-nieuw')->name('changelog')->middleware('market:nl');
 Route::view('/roadmap', 'marketing.roadmap')->name('roadmap')->middleware('market:nl');
 Route::view('/over-ons', 'marketing.over-ons')->name('over')->middleware('market:nl');
+// 1.106.1: hoe je de webapp (PWA) op telefoon en computer installeert; er is bewust geen app in de stores.
+Route::view('/app', 'marketing.app')->name('app-install')->middleware('market:nl');
 Route::view('/helpcentrum', 'marketing.helpcentrum')->name('helpcentrum')->middleware('market:nl');
 Route::get('/helpcentrum/{slug}', function (string $slug) {
     $articles = config('help.articles');

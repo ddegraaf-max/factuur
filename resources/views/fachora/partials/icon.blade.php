@@ -42,6 +42,10 @@
         'mail' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
         'chart' => '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
         'play' => '<path d="M6 4v16l14-8z"/>',
+        // 1.106.1: pagina /app (installatie van de webapp).
+        'phone' => '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+        'laptop' => '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+        'download' => '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 20h16"/>',
     ];
     $d = $paths[$name ?? 'tools'] ?? $paths['tools'];
 @endphp

@@ -149,6 +149,9 @@
   .btn-outline-light:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); }
   .ei-trust { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13.5px; color: rgba(255,255,255,0.75); }
   .ei-trust li::before { content: '✓ '; color: #FF4A45; font-weight: 800; }
+  .ei-applink { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; font-size: 14px; color: rgba(255,255,255,0.8); }
+  .ei-applink svg { color: #FF4A45; flex-shrink: 0; }
+  .ei-applink a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
   .ei-hero-visual { position: relative; min-width: 0; }
   .ei-screen { position: relative; overflow: hidden; width: 100%; background: #0B0E12; border: 10px solid #1B1E25; border-bottom-width: 14px; border-radius: 18px 18px 6px 6px; box-shadow: 0 40px 90px rgba(0,0,0,0.5); }
   .ei-screen .app-mockup { width: 1080px; max-width: none; margin: 0; transform-origin: 0 0; border-radius: 0; border: 0; box-shadow: none; }
@@ -259,6 +262,7 @@
         <a href="{{ route('demo') }}" class="btn btn-outline-light btn-lg">@include('partials.icon', ['name' => 'play', 'size' => 14]) Bekijk de demo</a>
       </div>
       <ul class="ei-trust"><li>Geen creditcard nodig</li><li>Binnen 2 minuten gestart</li><li>Maandelijks opzegbaar</li></ul>
+      <p class="ei-applink">@include('partials.icon', ['name' => 'phone', 'size' => 16]) Ook als app op je telefoon en computer: <a href="{{ route('app-install') }}">zo installeer je {{ brand('name') }}</a></p>
     </div>
     <div class="ei-hero-visual">
       <div class="ei-laptop">

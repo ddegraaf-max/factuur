@@ -163,7 +163,7 @@ class MarketingContentController extends Controller
         }
 
         $fixed = [
-            '/' => 'Home', '/over-ons' => 'Over ons', '/contact' => 'Contact', '/demo' => 'Demo',
+            '/' => 'Home', '/over-ons' => 'Over ons', '/app' => 'App op telefoon en computer', '/contact' => 'Contact', '/demo' => 'Demo',
             '/veelgestelde-vragen' => 'Veelgestelde vragen', '/helpcentrum' => 'Helpcentrum', '/kennisbank' => 'Kennisbank',
             '/facturatie-met-ai' => 'Factureren met AI', '/boekhouders' => 'Voor boekhouders',
             '/factuurprogramma-bouw' => 'Factuurprogramma voor de bouw', '/roadmap' => 'Roadmap', '/wat-is-nieuw' => 'Wat is nieuw',

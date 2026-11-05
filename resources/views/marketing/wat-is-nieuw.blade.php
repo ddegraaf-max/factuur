@@ -37,6 +37,7 @@
           <li><b>Nieuwe kop</b> — donker met rood: "Factureren, administreren en méér, met EasyInvoice", zeven punten die laten zien wat erin zit, en het bekende rondleidingsdashboard nu in een laptop met een telefoon ernaast.</li>
           <li><b>Acht functies in één oogopslag</b> — Facturatie, Offertes, Uren &amp; projecten, Administraties, AI-assistent EASY, Betalingen &amp; incasso, E-facturatie en Boekhouding als kaarten onder de kop, met daaronder waar je op kunt bouwen (servers in Amsterdam, Nederlandse ondersteuning, verwerkersovereenkomst). De gratis tools hebben een eigen plek gekregen.</li>
           <li><b>Menu</b> — logoblok met de naam in twee kleuren, "Functies" en "Gratis tools" klappen uit, AI EASY heeft het label Nieuw, en Support brengt je naar het helpcentrum.</li>
+          <li><b>De app installeren (1.106.1)</b> — nieuwe pagina <a href="{{ route('app-install') }}">easyinvoice.nl/app</a> legt per apparaat uit hoe je {{ brand('name') }} als app op je telefoon of computer zet (geen App Store nodig), met wat je dan krijgt en de veelgestelde vragen. Gelinkt vanuit de kop, het menu Functies en de voet.</li>
         </ul>
       </article>
       <article class="tl-item">
