@@ -18,7 +18,9 @@
     $acceptDays = config('fachora.auto_accept_days');
     $disputeHours = config('fachora.dispute_hours');
     $candidates = config('fachora.choice_candidates');
-    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg" : null;
+    // ?v= na de bestandsnaam: Cloudflare bewaart /brand-bestanden vier uur, zo komt een vervangen foto meteen door.
+    $v = \App\Support\Brand::versionNumber();
+    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg?v={$v}" : null;
 @endphp
 @section('title', 'Fachora — dobry fachowiec, bez stresu. Sam wybierasz firmę z okolicy: hydraulik, elektryk, ślusarz i inni')
 @section('description', 'Znajdź sprawdzonych, lokalnych fachowców do prac w domu, mieszkaniu lub firmie. Opisz, co trzeba zrobić, a Fachora pokaże Ci firmy z okolicy: Fachora Verified, firmy z dobrymi opiniami w Google i firmy z rejestru. Sam wybierasz, do kogo trafi zapytanie, porównujesz ceny i płacisz dopiero po pracy. Bezpłatnie, także po angielsku.')
@@ -60,7 +62,7 @@
       </ul>
     </div>
     <div class="fh-hero-visual">
-      <img src="/brand/fachora/hero-fachowiec.jpg" alt="Uśmiechnięty fachowiec w roboczym ubraniu z logo Fachora" width="668" height="420" fetchpriority="high">
+      <img src="/brand/fachora/hero-fachowiec.jpg?v={{ $v }}" alt="Uśmiechnięty fachowiec w roboczym ubraniu z logo Fachora" width="668" height="420" fetchpriority="high">
       <div class="fh-float fh-float-1"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 18])</span><div><b>Zweryfikowana firma</b><span>Fachora Verified</span></div></div>
       <div class="fh-float fh-float-2"><span class="ic star">★</span><div><b>Dobre opinie w Google</b><span>przy firmach z oceną 4,5 i wyżej</span></div></div>
       <div class="fh-float fh-float-3"><span class="ic shield">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 18])</span><div><b>Gwarancja {{ $warranty }} mies.</b><span>od firm Fachora Verified</span></div></div>

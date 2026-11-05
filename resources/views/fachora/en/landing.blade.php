@@ -19,7 +19,9 @@
     $acceptDays = config('fachora.auto_accept_days');
     $disputeHours = config('fachora.dispute_hours');
     $candidates = config('fachora.choice_candidates');
-    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg" : null;
+    // ?v= after the file name: Cloudflare keeps /brand files for four hours, so a replaced photo shows up at once.
+    $v = \App\Support\Brand::versionNumber();
+    $photo = fn (string $key) => file_exists(public_path("brand/fachora/cat/{$key}.jpg")) ? "/brand/fachora/cat/{$key}.jpg?v={$v}" : null;
 @endphp
 @section('title', 'Fachora — a good tradesperson, no stress. Pick your own company in Poland: plumber, electrician, locksmith and more, in English')
 @section('description', 'Find trusted local tradespeople for work in your home, flat or business in Poland. Describe the job and Fachora shows you companies near you: Fachora Verified, companies with good Google reviews and companies from the business register. You choose who receives your request, compare prices and pay only after the work. Free for customers, in English.')
@@ -61,7 +63,7 @@
       </ul>
     </div>
     <div class="fh-hero-visual">
-      <img src="/brand/fachora/hero-fachowiec.jpg" alt="Smiling tradesperson in work clothes with the Fachora logo" width="668" height="420" fetchpriority="high">
+      <img src="/brand/fachora/hero-fachowiec.jpg?v={{ $v }}" alt="Smiling tradesperson in work clothes with the Fachora logo" width="668" height="420" fetchpriority="high">
       <div class="fh-float fh-float-1"><span class="ic">@include('fachora.partials.icon', ['name' => 'check', 'size' => 18])</span><div><b>Verified company</b><span>Fachora Verified</span></div></div>
       <div class="fh-float fh-float-2"><span class="ic star">★</span><div><b>Good Google reviews</b><span>companies rated 4.5 and up</span></div></div>
       <div class="fh-float fh-float-3"><span class="ic shield">@include('fachora.partials.icon', ['name' => 'shield', 'size' => 18])</span><div><b>{{ $warranty }}-month warranty</b><span>from Fachora Verified companies</span></div></div>

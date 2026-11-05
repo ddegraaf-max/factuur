@@ -70,8 +70,11 @@ class FachoraHouseStyleTest extends TestCase
         $res = $this->get('/')->assertOk();
 
         // Woordmerk in balk en voet in plaats van beeldmerk + naam.
-        $res->assertSee('class="nav-logo" src="/brand/fachora/fachora-logo-dark.svg"', false)
-            ->assertSee('class="footer-logo"', false);
+        // Met ?v=versie erachter: Cloudflare bewaart /brand-bestanden vier uur, een nieuw logo moet meteen doorkomen.
+        $res->assertSee('class="nav-logo" src="/brand/fachora/fachora-logo-dark.svg?v='.\App\Support\Brand::versionNumber().'"', false)
+            ->assertSee('class="footer-logo"', false)
+            ->assertSee('/brand/fachora/cat/hydraulik.jpg?v=', false)
+            ->assertSee('/brand/fachora/favicon.svg?v=', false);
 
         // "Usługi" klapt uit naar alle categorieën (desktop) en staat als sublijst in het mobiele menu.
         $res->assertSee('class="nav-has-dd"', false)

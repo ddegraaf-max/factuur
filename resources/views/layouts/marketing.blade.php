@@ -72,12 +72,13 @@
 }
 </script>
 
+{{-- ?v= achter de pictogrammen en logo's: Cloudflare bewaart /brand-bestanden vier uur, zo komt een nieuwe huisstijl meteen door. --}}
 @if(brand('favicon_svg'))
-<link rel="icon" type="image/svg+xml" href="{{ brand('favicon_svg') }}">
+<link rel="icon" type="image/svg+xml" href="{{ brand('favicon_svg') }}?v={{ \App\Support\Brand::versionNumber() }}">
 @endif
-<link rel="icon" type="image/png" sizes="32x32" href="{{ brand('favicon_32') }}">
-<link rel="icon" type="image/png" sizes="512x512" href="{{ brand('favicon_512') }}">
-<link rel="apple-touch-icon" sizes="180x180" href="{{ brand('apple_touch') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ brand('favicon_32') }}?v={{ \App\Support\Brand::versionNumber() }}">
+<link rel="icon" type="image/png" sizes="512x512" href="{{ brand('favicon_512') }}?v={{ \App\Support\Brand::versionNumber() }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ brand('apple_touch') }}?v={{ \App\Support\Brand::versionNumber() }}">
 {{-- Lettertypen van het eigen domein: geen extra verbindingen naar Google, dus de tekst
      staat er sneller (LCP). De twee bestanden boven de vouw worden vooruit geladen; met
      font-display: swap staat de tekst er meteen in de fallback. Licentie: public/fonts/LEESMIJ.txt --}}
@@ -541,7 +542,7 @@
   <div class="container nav-inner">
     <a href="/" class="nav-brand">
       @if(brand('header_logo'))
-      <img class="nav-logo" src="{{ brand('header_logo') }}" alt="{{ brand('name') }}">
+      <img class="nav-logo" src="{{ brand('header_logo') }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
       @else
       <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
       {{ brand('name') }}
@@ -657,7 +658,7 @@
       <div class="footer-brand-block">
         <div class="footer-brand">
           @if(brand('header_logo'))
-          <img class="footer-logo" src="{{ brand('header_logo') }}" alt="{{ brand('name') }}">
+          <img class="footer-logo" src="{{ brand('header_logo') }}?v={{ \App\Support\Brand::versionNumber() }}" alt="{{ brand('name') }}">
           @else
           <img src="{{ brand('mark') }}" alt="{{ brand('name') }} logo">
           {{ brand('name') }}@if(brand('registered'))<sup style="font-size:0.5em;vertical-align:super;font-weight:600;">&reg;</sup>@endif
