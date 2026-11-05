@@ -122,6 +122,7 @@ class JobController extends Controller
                 'contacted' => $this->jobs->directContacted($job, $p->id), // 1.96.4: {channels, at} of null
                 // 1.98: link naar de deelpagina voor dit bedrijf, en of het die opende / wat het antwoordde
                 'share_url' => $this->jobs->shareUrl($job, $p),
+                'share_url_short' => \App\Models\ShortLink::for($this->jobs->shareUrl($job, $p))->shortUrl(), // 1.103.3: voor in een sms
                 'response' => $this->jobs->directResponse($job, $p->id),
             ])->values()->all(),
             'choice' => $job->isSelecting() ? [
@@ -197,7 +198,7 @@ class JobController extends Controller
     public function markContacted(Request $request, string $token, int $provider)
     {
         $job = $this->find($token);
-        $data = $request->validate(['channel' => ['required', Rule::in(['mail', 'copy', 'copy_mail', 'whatsapp', 'phone', 'website'])]]);
+        $data = $request->validate(['channel' => ['required', Rule::in(['mail', 'copy', 'copy_mail', 'whatsapp', 'phone', 'website', 'sms', 'copy_sms'])]]);
         $this->jobs->markDirectContacted($job, $provider, $data['channel']);
 
         return back();

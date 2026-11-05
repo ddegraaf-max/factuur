@@ -38,6 +38,7 @@
           <li><b>Zelf contact, ook via de website</b> — bij een gekozen bedrijf staat naast bellen en WhatsApp nu "website openen"; Fachora mailt of sms't deze bedrijven nooit. Gegevens worden volgens de regels van Google binnen 30 dagen ververst of verwijderd; bedrijven die niemand koos verdwijnen vanzelf.</li>
           <li><b>Voor de eigenaar</b> — <code>fachora:google-import</code> vult een stad en categorie (of alle advertentiesteden) vooraf; nodig is een Google Places-sleutel op Railway.</li>
           <li><b>Ook bij een volle registerlijst (1.103.1)</b> — waren er al vijf of meer registerbedrijven bekend, dan sloeg Fachora de zoektocht over. Nu zoekt hij altijd eerst bij Google als er nog geen goed beoordeeld bedrijf in de lijst staat, en een klant die al mocht kiezen krijgt die zoektocht alsnog zodra hij zijn pagina opent (zandloper, resultaat binnen een minuut, geen tweede mail). Woont de klant in een dorp, dan zoekt Fachora ook op de dichtstbijzijnde grotere plaatsen binnen 50 km, met de klant als middelpunt (1.103.2).</li>
+          <li><b>Per sms benaderen (1.103.3)</b> — heeft het bedrijf geen WhatsApp en geen e-mailadres, dan staat er nu een knop SMS (en "Sms-tekst kopiëren") met een korte Poolse tekst die in een sms past: wat de klus is, waar, een korte link naar de opdrachtpagina en je naam en nummer. Het lange bericht zegt bij een Google-bedrijf voortaan "ik vond uw bedrijf in Google (beoordeling …)" in plaats van "staat in het CEIDG-register".</li>
         </ul>
       </article>
       <article class="tl-item">

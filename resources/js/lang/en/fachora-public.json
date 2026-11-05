@@ -454,5 +454,13 @@
   "Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan bedrijven met de beste Google-beoordelingen, dan het bedrijvenregister; daarbinnen op beoordeling en afstand. Bedrijven betalen niet voor een plek in deze lijst.": "Order: companies with the Fachora Verified mark first, then companies with the best Google reviews, then the business register; within each group by rating and distance. Companies do not pay for a place on this list.",
   "Beoordelingen en gegevens van goed beoordeelde bedrijven komen uit hun Google-bedrijfsprofiel.": "Ratings and details of well-rated companies come from their Google Business Profile.",
   "Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit openbare bronnen: hun Google-bedrijfsprofiel of het bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.": "These companies are not on Fachora yet. Their details come from public sources: their Google Business Profile or the business register (CEIDG). Send them a message with your job description yourself, or call them.",
-  "Website openen": "Open website"
+  "Website openen": "Open website",
+  "Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – ik vond uw bedrijf in Google (beoordeling :rating bij :n opinies), daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.": "I am writing to :company. I am looking for a tradesperson near :city – I found your company on Google (rating :rating from :n reviews), which is why I am writing to you. I am writing personally, from my private e-mail address; this is not advertising or a mass mailing.",
+  "Goedendag, ik zoek een vakman: :what (:place). :why Details en antwoord met één klik: :link Graag een richtprijs en een datum. Met vriendelijke groet, :name": "Hello, I am looking for a tradesperson: :what (:place). :why Details and a one-click reply: :link Please send an indicative price and a date. Kind regards, :name",
+  "Ik vond uw bedrijf in Google.": "I found your company on Google.",
+  "Uw bedrijf staat in het CEIDG-register.": "Your company is in the CEIDG register.",
+  "Kopieer de sms-tekst hieronder:": "Copy the SMS text below:",
+  "Sms-tekst kopiëren": "Copy SMS text",
+  "Sms-versie (kort)": "SMS version (short)",
+  "Plak het bericht in Gmail of WhatsApp; het staat al in het Pools, met je klusomschrijving. Geen WhatsApp of e-mail? De knop SMS (of \"Sms-tekst kopiëren\") geeft een korte versie die in een sms past, met de link naar de opdrachtpagina.": "Paste the message into Gmail or WhatsApp; it is already in Polish, with your job description. No WhatsApp or e-mail? The SMS button (or \"Copy SMS text\") gives a short version that fits in a text message, with the link to the job page."
 }

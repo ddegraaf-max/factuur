@@ -97,6 +97,10 @@ onBeforeUnmount(() => clearInterval(searchTimer));
 
 /* ---------- zelf contact opnemen (1.87) ---------- */
 // Het Poolse bericht aan een bedrijf uit het register; de klant verstuurt het zelf (mail, Gmail, WhatsApp, sms).
+// 1.103.3: waarom juist dit bedrijf — gevonden in Google (met beoordeling) of in het CEIDG-register.
+const whyFor = (p) => (p.google
+  ? 'znalazłem Państwa firmę w Google (ocena ' + rating(p.google.rating) + ' przy ' + p.google.count + ' opiniach), dlatego piszę właśnie do Państwa.'
+  : 'Państwa firma widnieje w rejestrze CEIDG jako firma z tej branży, dlatego piszę właśnie do Państwa.');
 const messageFor = (p) => {
   const j = props.job || {};
   const subject = t('Zapytanie o wycenę: :title (:city)', { title: j.title_pl || j.title || '', city: j.city || '' }); // 1.96: Poolse titel als die er is
@@ -107,7 +111,7 @@ const messageFor = (p) => {
   const body = [
     'Szanowni Państwo,',
     '',
-    'Piszę do firmy ' + (p.name || '') + '. Szukam wykonawcy w okolicy ' + (j.city || '') + ' – Państwa firma widnieje w rejestrze CEIDG jako firma z tej branży, dlatego piszę właśnie do Państwa. Piszę osobiście, z mojego prywatnego adresu e-mail; to nie jest reklama ani wiadomość masowa.',
+    'Piszę do firmy ' + (p.name || '') + '. Szukam wykonawcy w okolicy ' + (j.city || '') + ' – ' + whyFor(p) + ' Piszę osobiście, z mojego prywatnego adresu e-mail; to nie jest reklama ani wiadomość masowa.',
     '',
     j.description_pl || j.description || '',
     '',
@@ -136,7 +140,9 @@ const previewFor = (p) => {
   const body = [
     t('Geachte heer/mevrouw,'),
     '',
-    t('Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – uw bedrijf staat in het CEIDG-register als bedrijf in deze branche, daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.', { company: p.name || '', city: j.city || '' }),
+    (p.google
+      ? t('Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – ik vond uw bedrijf in Google (beoordeling :rating bij :n opinies), daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.', { company: p.name || '', city: j.city || '', rating: rating(p.google.rating), n: p.google.count })
+      : t('Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – uw bedrijf staat in het CEIDG-register als bedrijf in deze branche, daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.', { company: p.name || '', city: j.city || '' })),
     '',
     j.description || j.description_pl || '',
     '',
@@ -191,6 +197,24 @@ const whatsappFor = (p) => {
   const m = messageFor(p);
   return 'https://wa.me/' + p.phone_wa + '?text=' + encodeURIComponent(m.subject + '\n\n' + m.body);
 };
+// 1.103.3: sms — kort, past in een of twee berichten, met de korte link naar de opdrachtpagina (geen WhatsApp of e-mail nodig).
+const smsTextFor = (p) => {
+  const j = props.job || {};
+  const what = String(j.title_pl || j.title || '').slice(0, 70);
+  const place = [j.postal_code, j.city].filter(Boolean).join(' ');
+  const why = p.google ? 'Znalazłem Państwa firmę w Google.' : 'Państwa firma jest w rejestrze CEIDG.';
+  return 'Dzień dobry, szukam wykonawcy: ' + what + ' (' + place + '). ' + why + ' Szczegóły i odpowiedź jednym kliknięciem: ' + (p.share_url_short || p.share_url || '') + ' Proszę o orientacyjną cenę i termin. Pozdrawiam, ' + (j.customer_name || '') + (j.customer_phone ? ', ' + j.customer_phone : '');
+};
+const smsPreviewFor = (p) => {
+  const j = props.job || {};
+  return t('Goedendag, ik zoek een vakman: :what (:place). :why Details en antwoord met één klik: :link Graag een richtprijs en een datum. Met vriendelijke groet, :name', {
+    what: String(j.title || j.title_pl || '').slice(0, 70), place: [j.postal_code, j.city].filter(Boolean).join(' '),
+    why: p.google ? t('Ik vond uw bedrijf in Google.') : t('Uw bedrijf staat in het CEIDG-register.'),
+    link: p.share_url_short || p.share_url || '', name: (j.customer_name || '') + (j.customer_phone ? ', ' + j.customer_phone : ''),
+  });
+};
+const smsHref = (p) => 'sms:' + (p.phone_wa ? '+' + p.phone_wa : (p.phone || '')) + '?&body=' + encodeURIComponent(smsTextFor(p));
+const copySms = async (p) => { await copyText(p.id + ':sms', smsTextFor(p), t('Kopieer de sms-tekst hieronder:')); markContacted(p, 'copy_sms'); };
 // 1.95.1: kopiëren naar het klembord, voor wie webmail of WhatsApp gebruikt (mailto opent dan vaak niets).
 // 1.96.2: ook alleen het e-mailadres (sleutel "<id>:mail" naast "<id>:msg").
 const copied = ref(null);
@@ -447,6 +471,8 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
           <button v-if="p.email" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':mail' || done(p, 'copy_mail') }" @click="copyEmail(p)">{{ copied === p.id + ':mail' || done(p, 'copy_mail') ? '✓ ' + $t('Gekopieerd') : $t('E-mailadres kopiëren') }}</button>
           <a v-if="p.phone" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'phone') }" :href="'tel:' + p.phone" @click="markContacted(p, 'phone')">{{ done(p, 'phone') ? '✓ ' : '' }}{{ $t('Bellen: :phone', { phone: p.phone }) }}</a>
           <a v-if="p.website" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'website') }" :href="p.website" target="_blank" rel="noopener" @click="markContacted(p, 'website')">{{ done(p, 'website') ? '✓ ' : '' }}{{ $t('Website openen') }}</a>
+          <a v-if="p.phone_wa" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': done(p, 'sms') }" :href="smsHref(p)" @click="markContacted(p, 'sms')">{{ done(p, 'sms') ? '✓ ' : '' }}SMS</a>
+          <button v-if="p.phone_wa" type="button" class="fa-btn fa-btn--secondary" :class="{ 'is-copied': copied === p.id + ':sms' || done(p, 'copy_sms') }" @click="copySms(p)">{{ copied === p.id + ':sms' || done(p, 'copy_sms') ? '✓ ' + $t('Gekopieerd') : $t('Sms-tekst kopiëren') }}</button>
           <button type="button" class="fa-link fa-small jb-remove" @click="removeDirect(p)">{{ $t('Van mijn lijst verwijderen') }}</button>
         </div>
         <div v-if="job.can_agree_direct || status === 'open'" class="jb-agree">
@@ -458,12 +484,14 @@ const cancel = () => cancelForm.post(route('fachora.job.cancel', props.token), {
             <div class="fa-actions"><button type="submit" class="fa-btn fa-btn--navy" :disabled="agreeForm.processing">{{ $t('Bevestigen') }}</button><button type="button" class="fa-link fa-small" @click="agreeOpen = null">{{ $t('Toch niet') }}</button></div>
           </form>
         </div>
-        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail, WhatsApp of een sms; het staat al in het Pools, met je klusomschrijving.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button>
+        <p class="fa-small fa-muted" style="margin:8px 0 0;">{{ $t('Plak het bericht in Gmail of WhatsApp; het staat al in het Pools, met je klusomschrijving. Geen WhatsApp of e-mail? De knop SMS (of "Sms-tekst kopiëren") geeft een korte versie die in een sms past, met de link naar de opdrachtpagina.') }} <a v-if="p.share_url" :href="p.share_url" target="_blank" rel="noopener" class="fa-link">{{ $t('Opdrachtpagina voor dit bedrijf') }}</a><button v-if="p.share_url" type="button" class="jb-copy-icon" :class="{ 'is-copied': copied === p.id + ':link' }" :title="$t('Link kopiëren')" :aria-label="$t('Link kopiëren')" @click="copyShareUrl(p)"><svg v-if="copied !== p.id + ':link'" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><span v-else>✓</span> {{ copied === p.id + ':link' ? $t('Gekopieerd') : $t('Link kopiëren') }}</button>
           <template v-if="$page.props.locale !== 'pl'"> · <button type="button" class="fa-link fa-small" @click="previewOpen = previewOpen === p.id ? null : p.id">{{ previewOpen === p.id ? $t('Vertaling verbergen') : $t('Wat staat er in het bericht? (vertaling)') }}</button></template></p>
         <div v-if="previewOpen === p.id" class="jb-preview">
           <div class="fa-small fa-muted" style="margin-bottom:6px;">{{ $t('Vertaling van het Poolse bericht; je verstuurt de Poolse versie.') }}</div>
           <div><strong>{{ $t('Onderwerp') }}:</strong> {{ previewFor(p).subject }}</div>
           <pre>{{ previewFor(p).body }}</pre>
+          <div v-if="p.phone_wa" style="margin-top:10px;"><strong>{{ $t('Sms-versie (kort)') }}:</strong> {{ smsTextFor(p) }}</div>
+          <div v-if="p.phone_wa" class="fa-small fa-muted" style="margin-top:4px;">{{ smsPreviewFor(p) }}</div>
         </div>
         </template>
       </article>

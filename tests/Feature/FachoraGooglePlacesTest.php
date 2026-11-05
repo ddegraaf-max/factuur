@@ -177,9 +177,14 @@ class FachoraGooglePlacesTest extends TestCase
         Mail::assertNotSent(\App\Mail\FachoraMail::class, fn ($m) => $m->hasTo('biuro@cha.pl'));
 
         $this->get(route('fachora.job.show', $job->token))->assertOk()->assertInertia(fn ($page) => $page
-            ->where('direct.0.website', 'https://cha.pl/')->where('direct.0.google.count', 120)->where('direct.0.url', null)->where('direct.0.email', null));
+            ->where('direct.0.website', 'https://cha.pl/')->where('direct.0.google.count', 120)->where('direct.0.url', null)->where('direct.0.email', null)
+            ->where('direct.0.share_url_short', fn ($u) => preg_match('#/u/[A-Za-z0-9]{4,}$#', (string) $u) === 1)); // 1.103.3: korte link voor in een sms
         $this->post(route('fachora.job.direct.contacted', [$job->token, $google->id]), ['channel' => 'website'])->assertRedirect();
-        $this->assertContains('website', app(JobService::class)->directContacted($job->fresh(), $google->id)['channels']);
+        $this->post(route('fachora.job.direct.contacted', [$job->token, $google->id]), ['channel' => 'sms'])->assertRedirect();
+        $this->assertSame(['website', 'sms'], app(JobService::class)->directContacted($job->fresh(), $google->id)['channels']);
+        $link = \App\Models\ShortLink::query()->latest('id')->firstOrFail();
+        $this->assertStringContainsString('/z/', $link->url);
+        $this->get($link->shortUrl())->assertRedirect($link->url);
     }
 
     public function test_refresh_updates_ratings_and_drops_closed_or_vanished_companies(): void

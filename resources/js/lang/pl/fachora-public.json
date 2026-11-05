@@ -454,5 +454,13 @@
   "Volgorde: eerst bedrijven met het keurmerk Fachora Verified, dan bedrijven met de beste Google-beoordelingen, dan het bedrijvenregister; daarbinnen op beoordeling en afstand. Bedrijven betalen niet voor een plek in deze lijst.": "Kolejność: najpierw firmy ze znakiem Fachora Verified, potem firmy z najlepszymi opiniami w Google, na końcu rejestr firm; w każdej grupie według oceny i odległości. Firmy nie płacą za miejsce na tej liście.",
   "Beoordelingen en gegevens van goed beoordeelde bedrijven komen uit hun Google-bedrijfsprofiel.": "Oceny i dane firm z dobrymi opiniami pochodzą z ich profilu firmy w Google.",
   "Deze bedrijven staan nog niet op Fachora. Hun gegevens komen uit openbare bronnen: hun Google-bedrijfsprofiel of het bedrijvenregister (CEIDG). Stuur ze zelf een bericht met de beschrijving van je klus, of bel ze.": "Te firmy nie są jeszcze na Fachora. Ich dane pochodzą ze źródeł publicznych: z profilu firmy w Google lub z rejestru przedsiębiorców (CEIDG). Wyślij im sam wiadomość z opisem zlecenia albo zadzwoń.",
-  "Website openen": "Otwórz stronę www"
+  "Website openen": "Otwórz stronę www",
+  "Ik schrijf aan :company. Ik zoek een vakman in de buurt van :city – ik vond uw bedrijf in Google (beoordeling :rating bij :n opinies), daarom schrijf ik juist u. Ik schrijf persoonlijk, vanaf mijn privé-e-mailadres; dit is geen reclame of massamail.": "Piszę do firmy :company. Szukam wykonawcy w okolicy :city – znalazłem Państwa firmę w Google (ocena :rating przy :n opiniach), dlatego piszę właśnie do Państwa. Piszę osobiście, z mojego prywatnego adresu e-mail; to nie jest reklama ani wiadomość masowa.",
+  "Goedendag, ik zoek een vakman: :what (:place). :why Details en antwoord met één klik: :link Graag een richtprijs en een datum. Met vriendelijke groet, :name": "Dzień dobry, szukam wykonawcy: :what (:place). :why Szczegóły i odpowiedź jednym kliknięciem: :link Proszę o orientacyjną cenę i termin. Pozdrawiam, :name",
+  "Ik vond uw bedrijf in Google.": "Znalazłem Państwa firmę w Google.",
+  "Uw bedrijf staat in het CEIDG-register.": "Państwa firma jest w rejestrze CEIDG.",
+  "Kopieer de sms-tekst hieronder:": "Skopiuj poniższy tekst SMS-a:",
+  "Sms-tekst kopiëren": "Kopiuj tekst SMS-a",
+  "Sms-versie (kort)": "Wersja SMS (krótka)",
+  "Plak het bericht in Gmail of WhatsApp; het staat al in het Pools, met je klusomschrijving. Geen WhatsApp of e-mail? De knop SMS (of \"Sms-tekst kopiëren\") geeft een korte versie die in een sms past, met de link naar de opdrachtpagina.": "Wklej wiadomość do Gmaila lub WhatsAppa; jest już po polsku, z opisem zlecenia. Brak WhatsAppa i e-maila? Przycisk SMS (lub „Kopiuj tekst SMS-a”) daje krótką wersję, która mieści się w SMS-ie, z linkiem do strony zlecenia."
 }
