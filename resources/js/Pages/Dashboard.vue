@@ -23,6 +23,8 @@ const quotePill = (q) => {
 const quoteLabel = (q) => {
   if (q.status === 'sent' && q.is_expired) return t('Verlopen');
   if (q.status === 'sent' && q.days_left !== null && q.days_left <= 7) return q.days_left === 1 ? t('Nog 1 dag') : t('Nog :n dagen', { n: q.days_left });
+  if (q.invoiced) return t('Gefactureerd');
+  if (q.installments_done > 0) return t(':percent% gefactureerd', { percent: Number(q.invoiced_percent) % 1 === 0 ? String(Number(q.invoiced_percent)) : Number(q.invoiced_percent).toFixed(1).replace('.', ',') });
   if (q.to_invoice) return t('Te factureren');
   return q.status_label;
 };
@@ -107,7 +109,7 @@ const greeting = () => {
           {{ $t('Openstaand') }}
         </div>
         <div class="kpi-value">{{ eur(kpis.outstanding) }}</div>
-        <div class="kpi-meta">{{ kpis.outstanding_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: kpis.outstanding_count }) }}<span v-if="kpis.open_credit > 0"> · {{ $t("tegoed :amount op creditnota's", { amount: eur(kpis.open_credit) }) }}</span></div>
+        <div class="kpi-meta">{{ kpis.outstanding_count === 1 ? $t('1 factuur') : $t(':n facturen', { n: kpis.outstanding_count }) }}<span v-if="kpis.open_credit > 0"> · {{ $t("tegoed :amount op creditnota's", { amount: eur(kpis.open_credit) }) }}</span><span v-if="kpis.incasso_count > 0"> · {{ $t(':amount bij incasso (:n)', { amount: eur(kpis.incasso), n: kpis.incasso_count }) }}</span></div>
       </div>
 
       <div :class="['kpi-card', { alert: kpis.overdue > 0 }]">

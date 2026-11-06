@@ -25,8 +25,13 @@ class DashboardController extends Controller
         // Eerst achterstallig markeren (creditnota's en incasso blijven buiten schot).
         Invoice::markOverdue();
 
-        $outstanding = Invoice::open()->sum(DB::raw('total - paid_total'));
-        $outstandingCount = Invoice::open()->count();
+        // Openstaand = wat je zelf nog int (verstuurd, deels betaald, achterstallig). Facturen die bij
+        // incasso liggen tellen apart mee, zodat het cijfer gelijkloopt met de factuurlijst (1.106.5).
+        $receivable = Invoice::regular()->whereIn('status', ['sent', 'partial', 'overdue']);
+        $outstanding = (clone $receivable)->sum(DB::raw('total - paid_total'));
+        $outstandingCount = (clone $receivable)->count();
+        $incasso = Invoice::regular()->where('status', 'incasso')->sum(DB::raw('total - paid_total'));
+        $incassoCount = Invoice::regular()->where('status', 'incasso')->count();
 
         // Creditnota's die nog niet verrekend of terugbetaald zijn: tegoed van klanten.
         $openCredit = Invoice::where('is_credit', true)->where('status', 'sent')->sum(DB::raw('total - paid_total'));
@@ -88,7 +93,10 @@ class DashboardController extends Controller
         // Offertes: wat wacht op een reactie, wat is geaccepteerd maar nog
         // niet gefactureerd, en hoe vaak zegt een klant ja.
         $openQuotes = Quote::where('status', 'sent')->get(['id', 'status', 'total', 'valid_until']);
-        $toInvoice = Quote::where('status', 'accepted')->whereNull('converted_invoice_id')->get(['id', 'total']);
+        // Geaccepteerd en nog (deels) te factureren: bij een termijnplan telt alleen het restant mee (1.106.5).
+        $toInvoice = Quote::where('status', 'accepted')->whereNull('converted_invoice_id')->with('installments')->get()
+            ->map(fn (Quote $q) => ['remaining' => $this->quoteRemaining($q)])
+            ->filter(fn (array $r) => $r['remaining'] > 0.005);
         $decidedThisYear = Quote::whereIn('status', ['accepted', 'rejected', 'expired'])
             ->whereYear('quote_date', now()->year)
             ->get(['id', 'status', 'total']);
@@ -101,14 +109,14 @@ class DashboardController extends Controller
             'expired_count' => $openQuotes->filter(fn ($q) => $q->is_expired)->count(),
             'draft_count' => Quote::where('status', 'draft')->count(),
             'to_invoice_count' => $toInvoice->count(),
-            'to_invoice_total' => round((float) $toInvoice->sum('total'), 2),
+            'to_invoice_total' => round((float) $toInvoice->sum('remaining'), 2),
             'accepted_year_count' => $acceptedThisYear->count(),
             'accepted_year_total' => round((float) $acceptedThisYear->sum('total'), 2),
             'decided_year_count' => $decidedThisYear->count(),
             'acceptance_rate' => $decidedThisYear->count() > 0
                 ? (int) round($acceptedThisYear->count() / $decidedThisYear->count() * 100)
                 : null,
-            'recent' => Quote::latest('quote_date')->latest('id')->limit(6)->get()->map(fn ($q) => [
+            'recent' => Quote::with('installments')->latest('quote_date')->latest('id')->limit(6)->get()->map(fn ($q) => [
                 'id' => $q->id,
                 'number' => $q->number ?? __('— concept —'),
                 'customer_name' => $q->customer_name,
@@ -117,7 +125,12 @@ class DashboardController extends Controller
                 'status_label' => $q->status_label,
                 'is_expired' => $q->is_expired,
                 'days_left' => $q->status === 'sent' ? $q->days_left : null,
-                'to_invoice' => $q->status === 'accepted' && ! $q->converted_invoice_id,
+                'to_invoice' => $q->status === 'accepted' && $this->quoteRemaining($q) > 0.005,
+                // Termijnplan (1.106.5): "50% gefactureerd" of "Gefactureerd" als alle termijnen zijn gefactureerd.
+                'installments_done' => $q->installments->whereNotNull('invoice_id')->count(),
+                'installments_total' => $q->installments->count(),
+                'invoiced_percent' => round((float) $q->installments->whereNotNull('invoice_id')->sum('percentage'), 2),
+                'invoiced' => (bool) $q->converted_invoice_id || ($q->installments->isNotEmpty() && $q->installments->whereNull('invoice_id')->isEmpty()),
                 'total' => (float) $q->total,
             ]),
         ];
@@ -161,6 +174,8 @@ class DashboardController extends Controller
             'kpis' => [
                 'outstanding' => (float) $outstanding,
                 'outstanding_count' => $outstandingCount,
+                'incasso' => (float) $incasso,
+                'incasso_count' => $incassoCount,
                 'open_credit' => (float) $openCredit,
                 'overdue' => (float) $overdue,
                 'overdue_count' => $overdueCount,
@@ -207,6 +222,19 @@ class DashboardController extends Controller
     }
 
     /** Omzet per maand (excl. btw, creditnota's negatief) voor één kalenderjaar. */
+    /** Nog te factureren deel van een geaccepteerde offerte: alles, of bij een termijnplan de open termijnen (1.106.5). */
+    private function quoteRemaining(Quote $quote): float
+    {
+        if ($quote->converted_invoice_id) {
+            return 0.0;
+        }
+        if ($quote->installments->isEmpty()) {
+            return (float) $quote->total;
+        }
+
+        return round((float) $quote->installments->whereNull('invoice_id')->sum('amount'), 2);
+    }
+
     private function monthlyRevenue(int $year): array
     {
         return Invoice::whereNotIn('status', ['draft', 'cancelled'])

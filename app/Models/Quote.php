@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property-read int|null $installments_count            withCount('installments') in de lijst (QuoteController::index)
+ * @property-read int|null $installments_done_count       withCount: termijnen met een factuur
+ * @property-read float|null $invoiced_percent            withSum: gefactureerd percentage van het termijnplan
+ */
 class Quote extends Model
 {
     use HasFactory;
