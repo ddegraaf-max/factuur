@@ -4,6 +4,7 @@ import { Link, router, usePage } from '@inertiajs/vue3';
 import Toast from '@/Components/Toast.vue';
 import EasyAgent from '@/Components/EasyAgent.vue';
 import GlobalSearch from '@/Components/GlobalSearch.vue';
+import { useInstallApp } from '@/composables/useInstallApp';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -196,6 +197,16 @@ const switchAdministration = (a) => {
 const logout = () => {
   router.post(route('logout'));
 };
+
+/* ---------- Installeren als app (PWA, 1.106.2) ---------- */
+const { isStandalone: appInstalled, isIos: isIosDevice, install: promptInstall } = useInstallApp();
+const installHelp = ref(false);
+// De uitlegpagina /app bestaat alleen op de Nederlandse markt (routes/web.php, market:nl).
+const installPage = route().has('app-install') ? route('app-install') : null;
+const installApp = async () => {
+  if (await promptInstall()) { userMenuOpen.value = false; return; }
+  installHelp.value = !installHelp.value; // geen browserprompt (o.a. Safari): de stappen tonen
+};
 </script>
 
 <template>
@@ -289,6 +300,17 @@ const logout = () => {
           </template>
           <Link :href="route('administrations.index')" class="user-menu-item">{{ $t('Administraties beheren') }}</Link>
           <Link :href="route('settings.security')" class="user-menu-item">{{ $t('Beveiliging') }}</Link>
+          <template v-if="!appInstalled">
+            <button class="user-menu-item" @click.stop="installApp">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+              {{ $t('Installeer als app') }}
+            </button>
+            <div v-if="installHelp" class="user-menu-help" @click.stop>
+              <template v-if="isIosDevice">{{ $t('Op iPhone en iPad: tik in Safari op Delen (het vierkantje met de pijl) en kies „Zet op beginscherm”.') }}</template>
+              <template v-else>{{ $t('Open het menu van je browser en kies „App installeren” of „Toevoegen aan startscherm”. In Chrome en Edge op de computer staat het installatie-icoon in de adresbalk.') }}</template>
+              <a v-if="installPage" :href="installPage" target="_blank" rel="noopener">{{ $t('Alle stappen per apparaat') }}</a>
+            </div>
+          </template>
           <button class="user-menu-item" @click.stop="logout">{{ $t('Uitloggen') }}</button>
         </div>
       </div>
@@ -574,6 +596,8 @@ table { border-collapse: collapse; width: 100%; }
   text-transform: uppercase; color: var(--text-4);
 }
 .user-menu-sep { height: 1px; background: var(--border); margin: 4px 0; }
+.user-menu-help { margin: 0 6px 6px; padding: 8px 10px; border-radius: 8px; background: var(--surface-2); font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+.user-menu-help a { display: block; margin-top: 6px; color: var(--brand); font-weight: 600; text-decoration: none; }
 .user-menu-lang { display: flex; gap: 6px; padding: 4px 10px 8px; }
 .user-menu-lang-item { flex: 1; text-align: center; padding: 6px 0; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; font-weight: 700; letter-spacing: 0.04em; color: var(--text-2); text-decoration: none; }
 .user-menu-lang-item:hover { background: var(--surface-2); }

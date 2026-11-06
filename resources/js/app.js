@@ -19,6 +19,19 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
 
+// Installeren als app (1.106.2): Chrome, Edge en Android melden met beforeinstallprompt dat
+// de app installeerbaar is, vaak al vóór Vue gestart is. We houden die melding hier vast;
+// de knop "Installeer als app" in het gebruikersmenu (composables/useInstallApp) toont hem.
+window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault();
+    window.__installPrompt = event;
+    window.dispatchEvent(new Event('installprompt-ready'));
+});
+window.addEventListener('appinstalled', () => {
+    window.__installPrompt = null;
+    window.dispatchEvent(new Event('installprompt-done'));
+});
+
 // Vangnet: als een Inertia-bezoek een gewone HTML-pagina terugkrijgt (bijv. een
 // Blade-route zoals de homepage, of een sessie die verlopen is), toont Inertia
 // standaard een debug-modal met de pagina in een iframe. Dat willen we niet in
