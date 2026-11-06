@@ -26,6 +26,18 @@ const canEdit = computed(() => ['draft', 'sent'].includes(props.quote.status));
 // Afgewezen, verlopen of vervallen: opnieuw aanbieden (terug naar concept), tenzij er al een factuur uit is gemaakt.
 const canReopen = computed(() => ['rejected', 'expired', 'withdrawn'].includes(props.quote.status) && !props.quote.invoice);
 
+/* ---------- Twee ondertekenaars (1.107) ---------- */
+const signedCount = computed(() => (props.quote.signers || []).filter(s => s.signed_at_label).length);
+const pendingCoSigner = computed(() => (props.quote.signers || []).find(s => s.role === 'co' && !s.signed_at_label) || null);
+const statusText = computed(() => props.quote.status === 'sent' && props.quote.signers_required >= 2 && signedCount.value > 0
+  ? t(':done van :total getekend', { done: signedCount.value, total: props.quote.signers_required })
+  : props.quote.status_label);
+const inviteCoSigner = () => router.post(route('quotes.cosigner.invite', props.quote.id), {}, { preserveScroll: true });
+const coLinkCopied = ref(false);
+const copyCoSignLink = async () => {
+  try { await navigator.clipboard.writeText(props.quote.co_signer_url); coLinkCopied.value = true; setTimeout(() => { coLinkCopied.value = false; }, 2000); } catch (e) { /* geen klembord */ }
+};
+
 const pillClass = computed(() => ({
   draft: 'pill-draft',
   sent: 'pill-sent',
@@ -499,8 +511,30 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
       </div>
     </div>
 
+    <!-- Twee ondertekenaars (1.107): beide handtekeningen, of wie er nog ontbreekt -->
+    <div v-if="quote.signers_required >= 2 && quote.status !== 'draft'" class="sig-card sig-dual">
+      <div class="sig-info" style="width:100%;">
+        <div class="sig-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.5A5 5 0 0 1 22 19"/></svg>
+          {{ $t('Twee ondertekenaars') }} · {{ $t(':done van :total handtekeningen', { done: signedCount, total: quote.signers.length }) }}
+        </div>
+        <div v-for="s in quote.signers" :key="s.role" class="sig-row">
+          <div>
+            <div class="sig-line"><strong>{{ s.name }}</strong> <span class="sig-meta" style="display:inline;">· {{ s.role === 'co' ? $t('tweede ondertekenaar') : $t('klant') }}<template v-if="s.email"> · {{ s.email }}</template></span></div>
+            <div v-if="s.signed_at_label" class="sig-meta">✓ {{ $t('Ondertekend op :date', { date: s.signed_at_label }) }}<template v-if="s.signed_name && s.signed_name !== s.name"> {{ $t('als :name', { name: s.signed_name }) }}</template><template v-if="s.signed_ip"> · IP {{ s.signed_ip }}</template></div>
+            <div v-else class="sig-meta">{{ s.invited_at_label ? $t('Uitgenodigd op :date, nog niet ondertekend', { date: s.invited_at_label }) : $t('Nog niet ondertekend') }}</div>
+          </div>
+          <img v-if="s.signature_data" :src="s.signature_data" :alt="$t('Handtekening')" class="sig-img">
+        </div>
+        <div v-if="quote.status === 'sent' && pendingCoSigner" class="sig-actions">
+          <button type="button" class="btn btn-secondary btn-sm" @click="inviteCoSigner">{{ $t('Uitnodiging opnieuw sturen aan :name', { name: pendingCoSigner.name }) }}</button>
+          <button v-if="quote.co_signer_url" type="button" class="btn btn-secondary btn-sm" @click="copyCoSignLink">{{ coLinkCopied ? $t('Gekopieerd ✓') : $t('Kopieer link voor tweede ondertekenaar') }}</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Digitale handtekening: het bewijsdossier -->
-    <div v-if="quote.signed_at_label" class="sig-card">
+    <div v-if="quote.signed_at_label && !(quote.signers_required >= 2)" class="sig-card">
       <div class="sig-info">
         <div class="sig-title">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>
@@ -599,7 +633,7 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
           <div>
             <div class="inv-number">{{ quote.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;">
-              <span class="pill" :class="pillClass">{{ quote.status_label }}</span>
+              <span class="pill" :class="pillClass">{{ statusText }}</span>
             </div>
           </div>
           <div style="text-align:right">
@@ -832,6 +866,9 @@ const invoicedCount = computed(() => (props.quote.installments || []).filter(i =
 .sig-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13.5px; color: var(--success); }
 .sig-line { font-size: 13px; color: var(--text-2); margin-top: 4px; }
 .sig-meta { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
+.sig-dual { flex-direction: column; align-items: stretch; }
+.sig-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 0; border-top: 1px solid var(--border); }
+.sig-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
 .sig-img { max-height: 54px; max-width: 200px; background: #fff; border: 1px solid var(--success-border); border-radius: 8px; padding: 4px 10px; }
 
 .sig-share {

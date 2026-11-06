@@ -48,7 +48,17 @@
                     // "5 september 2026 om 14:30" — datum en tijd in de taal van de markt.
                     $stamp = fn (?\Carbon\CarbonInterface $at) => $at ? __(':date om :time', ['date' => $at->translatedFormat('j F Y'), 'time' => $at->format('H:i')]) : '';
                 @endphp
-                @if($accepted)
+                @if(! empty($partial))
+                    {{-- 1.107: twee ondertekenaars, de eerste handtekening is binnen. --}}
+                    <h1>{{ __('Offerte :number: eerste handtekening gezet (1 van 2)', ['number' => $quote->number]) }}</h1>
+                    <p>{!! __('<strong>:name</strong> heeft de offerte digitaal ondertekend. De offerte is definitief zodra de tweede ondertekenaar (:other) ook heeft getekend; die heeft daarvoor automatisch een uitnodiging gekregen.', ['name' => e($partial), 'other' => e($other ?? '')]) !!}</p>
+                    <table class="facts" role="presentation">
+                        <tr><td class="k">{{ __('Klant') }}</td><td class="v">{{ $quote->customer_name }}</td></tr>
+                        <tr><td class="k">{{ __('Ondertekend door') }}</td><td class="v">{{ $partial }}</td></tr>
+                        <tr><td class="k">{{ __('Wacht op') }}</td><td class="v">{{ $other }}</td></tr>
+                        <tr><td class="k">{{ __('Totaal incl. btw') }}</td><td class="v">{{ $eur($quote->total) }}</td></tr>
+                    </table>
+                @elseif($accepted)
                     <h1>🎉 {{ __('Offerte :number is ondertekend', ['number' => $quote->number]) }}</h1>
                     <p>{!! __('<strong>:name</strong> heeft de offerte digitaal ondertekend. Het akkoord staat zwart-op-wit — met handtekening en bewijsdossier bij de offerte in :brand.', ['name' => e($quote->signed_name ?: $quote->customer_name), 'brand' => e(brand('name'))]) !!}</p>
                     <table class="facts" role="presentation">

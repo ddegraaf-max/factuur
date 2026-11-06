@@ -69,6 +69,10 @@ const form = useForm({
     ? daysBetween(props.quote.quote_date, props.quote.valid_until)
     : props.default_valid_days,
   reference: props.quote?.reference ?? '',
+  // 1.107: één of twee ondertekenaars (bijv. twee bestuurders), de tweede met naam en e-mailadres.
+  signers_required: props.quote?.signers_required ?? 1,
+  co_signer_name: props.quote?.co_signer_name ?? '',
+  co_signer_email: props.quote?.co_signer_email ?? '',
   project_id: props.quote?.project_id ?? props.preselect_project_id ?? null,
   intro: props.quote?.intro ?? '',
   notes: props.quote?.notes ?? '',
@@ -403,6 +407,29 @@ const submit = (action) => {
                 <div style="font-size:11px;color:var(--text-4);margin-top:4px;">{{ $t('Geldig tot en met :date', { date: validUntilLabel }) }}</div>
                 <div v-if="form.errors.valid_days" class="field-error">{{ form.errors.valid_days }}</div>
               </div>
+            </div>
+            <!-- 1.107: wie moet tekenen -->
+            <div class="form-row">
+              <div class="form-group">
+                <label>{{ $t('Ondertekening') }}<span class="label-hint">{{ $t('(wie moet akkoord geven)') }}</span></label>
+                <select v-model.number="form.signers_required">
+                  <option :value="1">{{ $t('Eén ondertekenaar (de klant)') }}</option>
+                  <option :value="2">{{ $t('Twee ondertekenaars (bijv. twee bestuurders)') }}</option>
+                </select>
+                <div style="font-size:11px;color:var(--text-4);margin-top:4px;">{{ $t('Bij twee ondertekenaars krijgt de tweede persoon een eigen ondertekenlink; de offerte is akkoord zodra beide handtekeningen zijn gezet.') }}</div>
+              </div>
+              <template v-if="form.signers_required === 2">
+                <div class="form-group">
+                  <label>{{ $t('Tweede ondertekenaar: naam') }} *</label>
+                  <input type="text" v-model="form.co_signer_name" maxlength="120" :placeholder="$t('Bijv. J. de Vries (bestuurder)')">
+                  <div v-if="form.errors.co_signer_name" class="field-error">{{ form.errors.co_signer_name }}</div>
+                </div>
+                <div class="form-group">
+                  <label>{{ $t('Tweede ondertekenaar: e-mailadres') }} *</label>
+                  <input type="email" v-model="form.co_signer_email" maxlength="180" placeholder="naam@bedrijf.nl">
+                  <div v-if="form.errors.co_signer_email" class="field-error">{{ form.errors.co_signer_email }}</div>
+                </div>
+              </template>
             </div>
             <div class="form-row">
               <div class="form-group">

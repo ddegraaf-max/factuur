@@ -119,6 +119,7 @@ const pillClass = (status) => ({
               <!-- In één keer omgezet, of alle termijnen gefactureerd: "Gefactureerd"; een deel van de termijnen: het percentage. -->
               <span v-if="q.converted || (q.installments_total > 0 && q.installments_done >= q.installments_total)" class="pill pill-sent" style="margin-left:4px;">{{ $t('Gefactureerd') }}</span>
               <span v-else-if="q.installments_done > 0" class="pill pill-partial" style="margin-left:4px;" :title="$t(':done van :total termijnen gefactureerd', { done: q.installments_done, total: q.installments_total })">{{ $t(':percent% gefactureerd', { percent: pct(q.invoiced_percent) }) }}</span>
+              <span v-else-if="q.status === 'sent' && q.signers_required >= 2 && q.signatures_done > 0" class="pill pill-partial" style="margin-left:4px;">{{ $t(':done van :total getekend', { done: q.signatures_done, total: q.signers_required }) }}</span>
             </td>
             <td class="right num" :data-label="$t('Bedrag')">{{ eur(q.total) }}</td>
           </tr>

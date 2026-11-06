@@ -13,7 +13,8 @@ const props = defineProps({
 const email = computed(() => usePage().props.portal_email || null);
 const brand = computed(() => props.company.brand_color || '#E8231F');
 
-const canDecide = computed(() => ['sent', 'expired'].includes(props.quote.status));
+// 1.107: bij twee ondertekenaars tekent ieder één keer; wie al tekende ziet het formulier niet meer.
+const canDecide = computed(() => ['sent', 'expired'].includes(props.quote.status) && !(props.quote.signing && props.quote.signing.mine_signed));
 
 /* ---------- Tekenveld (handtekening) ---------- */
 const canvasEl = ref(null);
@@ -69,7 +70,7 @@ const clearSignature = () => {
 
 /* ---------- Ondertekenen ---------- */
 const form = useForm({
-  signed_name: props.quote.customer_name || '',
+  signed_name: props.quote.signing?.my_name || props.quote.customer_name || '',
   signature: '',
   agree: false,
 });
@@ -110,11 +111,22 @@ const decline = () => {
         </div>
       </div>
 
+      <!-- 1.107: twee ondertekenaars — wie heeft al getekend, wie nog -->
+      <div v-if="quote.signing && !['accepted', 'rejected', 'withdrawn'].includes(quote.status)" class="pq-banner info">
+        <strong>{{ $t('Deze offerte wordt door twee personen ondertekend.') }}</strong>
+        <span v-for="s in quote.signing.signers" :key="s.role" style="display:block;">
+          {{ s.name }}<template v-if="s.is_me"> ({{ $t('u') }})</template>:
+          <template v-if="s.signed_at_label">✓ {{ $t('ondertekend op :date', { date: s.signed_at_label }) }}</template>
+          <template v-else>{{ $t('nog niet ondertekend') }}</template>
+        </span>
+        <span v-if="quote.signing.mine_signed" style="display:block;margin-top:4px;">{{ $t('Bedankt, uw handtekening staat. De offerte is definitief zodra de andere handtekening ook is gezet.') }}</span>
+      </div>
       <!-- Status na beslissing -->
       <div v-if="quote.status === 'accepted'" class="pq-banner ok">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
         <span v-if="quote.signed_name">
           {{ $t('Digitaal ondertekend door') }} <strong>{{ quote.signed_name }}</strong> {{ $t('op :date.', { date: quote.signed_at_label }) }}
+          <template v-if="quote.signing && quote.signing.co_signed_name">{{ $t('En door') }} <strong>{{ quote.signing.co_signed_name }}</strong> {{ $t('op :date.', { date: quote.signing.co_signed_at_label }) }}</template>
           {{ $t('Download hieronder de ondertekende PDF voor je eigen administratie.') }}
         </span>
         <span v-else>{{ quote.accepted_at_label ? $t('Deze offerte is geaccepteerd op :date.', { date: quote.accepted_at_label }) : $t('Deze offerte is geaccepteerd.') }}</span>
@@ -260,6 +272,7 @@ const decline = () => {
 .pq-banner { display: flex; align-items: flex-start; gap: 10px; margin: 18px 32px 0; padding: 13px 16px; border-radius: 10px; font-size: 13.5px; line-height: 1.55; }
 .pq-banner.ok { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
 .pq-banner.warn { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+.pq-banner.info { background: #EFF6FF; color: #1E3A8A; border: 1px solid #BFDBFE; flex-direction: column; gap: 2px; }
 .pq-banner svg { flex: none; margin-top: 2px; }
 
 .pq-body { padding: 22px 32px 28px; }

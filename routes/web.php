@@ -673,6 +673,7 @@ Route::middleware(['auth', 'readonly'])->group(function () {
     Route::post('offertes/{quote}/sms', [QuoteController::class, 'sms'])->middleware('throttle:20,1')->name('quotes.sms'); // 1.101: per sms, voor klanten zonder e-mail
     Route::post('offertes/{quote}/herinneren', [QuoteController::class, 'remind'])->middleware('throttle:20,1')->name('quotes.remind'); // 1.102: opvolging
     Route::post('offertes/{quote}/herinneringen', [QuoteController::class, 'reminders'])->name('quotes.reminders');
+    Route::post('offertes/{quote}/mede-ondertekenaar', [QuoteController::class, 'inviteCoSigner'])->middleware('throttle:20,1')->name('quotes.cosigner.invite'); // 1.107
     Route::post('offertes/{quote}/bijlagen', [\App\Http\Controllers\AttachmentController::class, 'storeForQuote'])->name('quotes.attachments.store');
     Route::get('offertes/{quote}/pdf', [QuoteController::class, 'pdf'])->name('quotes.pdf');
     Route::post('offertes/{quote}/accepteren', [QuoteController::class, 'accept'])->name('quotes.accept');

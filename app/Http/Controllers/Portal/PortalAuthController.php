@@ -248,10 +248,26 @@ class PortalAuthController extends Controller
         if ($email && filled($quote->customer_email) && strcasecmp($email, $quote->customer_email) === 0) {
             return true;
         }
+        // 1.107: de tweede ondertekenaar komt binnen met zijn eigen geverifieerde e-mailadres.
+        if ($email && $quote->needsCoSigner() && strcasecmp($email, (string) $quote->co_signer_email) === 0) {
+            return true;
+        }
         $phone = self::verifiedPhone($request);
         $mobile = PhoneNumber::mobile($quote->customer?->phone);
 
         return $phone !== null && $mobile !== null && $phone === $mobile;
+    }
+
+    /** 1.107: wie zit er in het portaal bij deze offerte — 'customer', 'co' (tweede ondertekenaar) of null (geen toegang). */
+    public static function quoteSignerRole(Request $request, Quote $quote): ?string
+    {
+        $email = self::verifiedEmail($request);
+        if ($email && $quote->needsCoSigner() && strcasecmp($email, (string) $quote->co_signer_email) === 0
+            && ! (filled($quote->customer_email) && strcasecmp($email, $quote->customer_email) === 0)) {
+            return 'co';
+        }
+
+        return self::canAccessQuote($request, $quote) ? 'customer' : null;
     }
 
     /** 1.104: idem voor een factuur die per sms is verstuurd. */
@@ -285,11 +301,14 @@ class PortalAuthController extends Controller
      * De poort voor een offertelink: code per e-mail als er een adres is, anders per sms naar het
      * mobiele nummer van de klant (1.103.6). Zet de sessie klaar voor showVerify en sendCode.
      */
-    public static function startQuoteGate(Request $request, Quote $quote, string $intended): void
+    public static function startQuoteGate(Request $request, Quote $quote, string $intended, bool $asCoSigner = false): void
     {
         $session = $request->session();
         $session->forget(['portal_pending_email', 'portal_pending_phone', 'portal_pending_quote_id', 'portal_pending_invoice_id']);
-        if (filled($quote->customer_email)) {
+        if ($asCoSigner && $quote->needsCoSigner()) {
+            // 1.107: via de eigen link van de tweede ondertekenaar gaat de code naar zíjn adres.
+            $session->put('portal_pending_email', mb_strtolower((string) $quote->co_signer_email));
+        } elseif (filled($quote->customer_email)) {
             $session->put('portal_pending_email', mb_strtolower($quote->customer_email));
         } elseif ($mobile = PhoneNumber::mobile($quote->customer?->phone)) {
             $session->put('portal_pending_phone', $mobile);
@@ -394,7 +413,8 @@ class PortalAuthController extends Controller
                 ->where('status', '!=', 'draft')
                 ->exists()
             || \App\Models\Quote::withoutGlobalScope('company')
-                ->whereRaw('LOWER(customer_email) = ?', [$email])
+                // 1.107: ook de tweede ondertekenaar van een offerte mag een code krijgen.
+                ->where(fn ($q) => $q->whereRaw('LOWER(customer_email) = ?', [$email])->orWhereRaw('LOWER(co_signer_email) = ?', [$email]))
                 ->where('status', '!=', 'draft')
                 ->exists();
 

@@ -180,12 +180,18 @@
 @include('pdf.partials.vat-reversed', ['doc' => $quote])
 @if($quote->notes)<div class="notes"><strong>{{ __('doc.note') }}:</strong><br>{!! nl2br(e($quote->notes)) !!}</div>@endif
 
-@if($quote->signed_at)
-  {{-- Digitaal ondertekend: het akkoord staat zwart-op-wit op het document. --}}
+@if($quote->signed_at && (! $quote->needsCoSigner() || $quote->co_signed_at))
+  {{-- Digitaal ondertekend: het akkoord staat zwart-op-wit op het document (1.107: bij twee ondertekenaars allebei). --}}
   <div class="validity" style="border-color: #16A34A;">
     {!! __('doc.signed_by', ['name' => e($quote->signed_name), 'date' => e($quote->signed_at->translatedFormat('j F Y, H:i'))]) !!}
     @if(extension_loaded('gd') && $quote->signature_data)
       <div style="margin-top: 8px;"><img src="{{ $quote->signature_data }}" style="max-height: 60px; max-width: 220px;" alt=""></div>
+    @endif
+    @if($quote->needsCoSigner() && $quote->co_signed_at)
+      <div style="margin-top: 10px;">{!! __('doc.signed_by', ['name' => e($quote->co_signed_name), 'date' => e($quote->co_signed_at->translatedFormat('j F Y, H:i'))]) !!}</div>
+      @if(extension_loaded('gd') && $quote->co_signature_data)
+        <div style="margin-top: 8px;"><img src="{{ $quote->co_signature_data }}" style="max-height: 60px; max-width: 220px;" alt=""></div>
+      @endif
     @endif
   </div>
 @else

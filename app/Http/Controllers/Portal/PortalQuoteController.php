@@ -30,11 +30,14 @@ class PortalQuoteController extends Controller
         $quote = $this->findByToken($token);
 
         // 1.103.6: e-mailadres geverifieerd, of (offerte per sms aan een klant zonder e-mail) het mobiele nummer.
+        // 1.107: via de link van de tweede ondertekenaar gaat de code naar diens adres.
+        $asCoSigner = $quote->co_signer_token !== null && hash_equals((string) $quote->co_signer_token, $token);
         if (! PortalAuthController::canAccessQuote($request, $quote)) {
-            PortalAuthController::startQuoteGate($request, $quote, route('portal.quote', $token));
+            PortalAuthController::startQuoteGate($request, $quote, route('portal.quote', $token), $asCoSigner);
 
             return redirect()->route('portal.verify.show');
         }
+        $role = PortalAuthController::quoteSignerRole($request, $quote);
 
         $quote->load('lines', 'replacedBy');
         $company = $quote->brandedCompany();
@@ -87,6 +90,20 @@ class PortalQuoteController extends Controller
                     'number' => $replacement->number,
                     'url' => $replacement->portalUrl(),
                 ] : null,
+                // 1.107: twee ondertekenaars — wie is wie, wie heeft al getekend, en wie zit er nu in het portaal.
+                'signing' => $quote->needsCoSigner() ? [
+                    'my_role' => $role,
+                    'my_name' => $role === 'co' ? $quote->co_signer_name : $quote->customer_name,
+                    'mine_signed' => $role === 'co' ? (bool) $quote->co_signed_at : (bool) $quote->signed_at,
+                    'co_signed_name' => $quote->co_signed_name,
+                    'co_signed_at_label' => $quote->co_signed_at?->translatedFormat('j F Y, H:i'),
+                    'signers' => array_map(fn (array $s) => [
+                        'role' => $s['role'],
+                        'name' => $s['name'],
+                        'is_me' => $s['role'] === $role,
+                        'signed_at_label' => $s['signed_at']?->translatedFormat('j F Y, H:i'),
+                    ], $quote->signers()),
+                ] : null,
             ],
             'company' => [
                 'name' => $company?->name,
@@ -105,7 +122,9 @@ class PortalQuoteController extends Controller
         $quote = $this->findByToken($token);
 
         $email = PortalAuthController::verifiedEmail($request);
-        if (! PortalAuthController::canAccessQuote($request, $quote)) {
+        // 1.107: de klant of de tweede ondertekenaar; elk zet zijn eigen handtekening.
+        $role = PortalAuthController::quoteSignerRole($request, $quote);
+        if ($role === null) {
             return redirect()->route('portal.quote', $token);
         }
 
@@ -122,19 +141,45 @@ class PortalQuoteController extends Controller
             'agree.accepted' => __('Vink aan dat je akkoord gaat met de offerte.'),
         ]);
 
-        try {
-            $manager->accept($quote);
-        } catch (\DomainException $e) {
-            return back()->with('error', $e->getMessage());
+        if (! in_array($quote->status, ['sent', 'expired'], true)) {
+            return back()->with('error', __('Alleen een verstuurde offerte kan worden geaccepteerd.'));
+        }
+        if ($role === 'co' ? $quote->co_signed_at : $quote->signed_at) {
+            return back()->with('error', __('Deze handtekening is al gezet.'));
         }
 
-        $quote->forceFill([
+        $fields = [
             'signed_name' => trim($data['signed_name']),
             'signature_data' => $data['signature'],
             'signed_at' => now(),
             'signed_ip' => $request->ip(),
             'signed_email' => $email ?: PortalAuthController::verifiedContact($request), // 1.103.6: bij een offerte per sms het geverifieerde mobiele nummer
-        ])->save();
+        ];
+        if ($role === 'co') {
+            $fields = array_combine(array_map(fn (string $k) => 'co_' . $k, array_keys($fields)), array_values($fields));
+        }
+        $quote->forceFill($fields)->save();
+
+        if ($quote->needsCoSigner()) {
+            \App\Support\Audit::log('signed', $quote, __(':label ondertekend door :name (:n van 2)', [
+                'label' => \App\Support\Audit::label($quote), 'name' => trim($data['signed_name']), 'n' => $quote->signaturesDone(),
+            ]), [], $quote->company_id);
+        }
+
+        if (! $quote->isFullySigned()) {
+            // 1.107: één handtekening binnen — de ander is aan de beurt, de ondernemer hoort het ook.
+            $other = $role === 'co' ? $quote->customer_name : $quote->co_signer_name;
+            $manager->notifyOtherSigner($quote->fresh(), $role);
+            $this->notifyCompany($quote->fresh(), accepted: true, partialBy: trim($data['signed_name']));
+
+            return back()->with('flash', __('Bedankt! Uw handtekening is gezet. De offerte is definitief zodra :name ook heeft ondertekend.', ['name' => $other]));
+        }
+
+        try {
+            $manager->accept($quote);
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
+        }
 
         $this->notifyCompany($quote->fresh(), accepted: true);
 
@@ -210,18 +255,19 @@ class PortalQuoteController extends Controller
 
         return Quote::withoutGlobalScope('company')
             ->with('company')
-            ->where('portal_token', $token)
+            // 1.107: de tweede ondertekenaar heeft een eigen link (co_signer_token) naar dezelfde offerte.
+            ->where(fn ($q) => $q->where('portal_token', $token)->orWhere('co_signer_token', $token))
             ->whereNotIn('status', ['draft'])
             ->firstOrFail();
     }
 
     /** Mail de ondernemer over de beslissing van zijn klant. */
-    protected function notifyCompany(Quote $quote, bool $accepted): void
+    protected function notifyCompany(Quote $quote, bool $accepted, ?string $partialBy = null): void
     {
         try {
             $to = $quote->company?->copy_email ?: $quote->company?->email;
             if ($to) {
-                Mail::to($to)->send(new QuoteDecisionMail($quote, $accepted));
+                Mail::to($to)->send(new QuoteDecisionMail($quote, $accepted, $partialBy));
             }
         } catch (\Throwable $e) {
             Log::error('Offertebeslissing mailen mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);

@@ -124,7 +124,28 @@ class QuoteFollowUpService
         }
         $email = $quote->customer_email ?: $quote->customer?->email;
         $mobile = PhoneNumber::mobile($quote->customer?->phone);
-        if ($email) {
+        if ($quote->needsCoSigner()) {
+            // 1.107: alleen wie nog moet tekenen krijgt de herinnering — de klant de offertemail, de tweede ondertekenaar zijn eigen mail.
+            $pending = [];
+            DocumentLocale::using($quote->language ?: 'nl', function () use ($quote, $email, &$pending) {
+                $company = $quote->brandedCompany();
+                if (! $quote->signed_at && $email) {
+                    $quote->load('lines');
+                    $pdf = Pdf::loadView('pdf.quote', ['quote' => $quote, 'company' => $company])->setPaper('a4')->output();
+                    Mail::to($email)->send(new QuoteMail($quote, $pdf, reminder: true));
+                    $pending[] = $email;
+                }
+                if (! $quote->co_signed_at) {
+                    $quote->ensureCoSignerToken();
+                    Mail::to($quote->co_signer_email)->send(new \App\Mail\QuoteSignerMail($quote, 'co', 'reminder'));
+                    $pending[] = $quote->co_signer_email;
+                }
+            });
+            if ($pending === []) {
+                throw new \DomainException(__('Beide handtekeningen zijn al gezet; er is niets om aan te herinneren.'));
+            }
+            $channel = 'mail';
+        } elseif ($email) {
             DocumentLocale::using($quote->language ?: 'nl', function () use ($quote, $email) {
                 $company = $quote->brandedCompany();
                 $quote->load('lines');

@@ -197,6 +197,7 @@ class QuoteManager
         $quote = $this->markSent($quote);
 
         $this->email($quote);
+        $this->inviteCoSigner($quote); // 1.107: de tweede ondertekenaar krijgt zijn eigen link
 
         \App\Support\Audit::log('sent', $quote, $quote->customer_email
             ? __(':label verstuurd naar :email', ['label' => \App\Support\Audit::label($quote), 'email' => $quote->customer_email])
@@ -230,6 +231,7 @@ class QuoteManager
         $quote = $this->markSent($quote);
         $body = filled($text) && trim((string) $text) !== $preset ? (string) $text : $this->smsText($quote);
         $message = $sms->send($quote->company, $to, $body, $quote, $userId);
+        $this->inviteCoSigner($quote); // 1.107: de tweede ondertekenaar krijgt (per e-mail) zijn eigen link
 
         // Nummer onthouden bij de klant als die er nog geen had.
         if ($quote->customer && blank($quote->customer->phone) && filled($phone)) {
@@ -337,9 +339,11 @@ class QuoteManager
             ])->setPaper('a4')->output();
 
             // Uit een demo vertrekt nooit echte post (ook niet via het portaal).
-            Mail::mailer($company->is_demo ? 'log' : null)
-                ->to($quote->customer_email)
-                ->send(new \App\Mail\QuoteAcceptedMail($quote, $pdf));
+            $mail = Mail::mailer($company->is_demo ? 'log' : null)->to($quote->customer_email);
+            if ($quote->needsCoSigner() && strcasecmp((string) $quote->co_signer_email, (string) $quote->customer_email) !== 0) {
+                $mail->cc($quote->co_signer_email); // 1.107: de tweede ondertekenaar krijgt de bevestiging ook
+            }
+            $mail->send(new \App\Mail\QuoteAcceptedMail($quote, $pdf));
         });
 
         $quote->forceFill([
@@ -394,6 +398,12 @@ class QuoteManager
             'signed_at' => null,
             'signed_ip' => null,
             'signed_email' => null,
+            'co_signed_name' => null,
+            'co_signature_data' => null,
+            'co_signed_at' => null,
+            'co_signed_ip' => null,
+            'co_signed_email' => null,
+            'co_signer_invited_at' => null,
             'accept_mail_sent_at' => null,
             'accept_mail_sent_to' => null,
             'withdrawn_at' => null,
@@ -688,6 +698,69 @@ class QuoteManager
                 $template
             );
         });
+    }
+
+    /**
+     * 1.107: de tweede ondertekenaar uitnodigen met zijn eigen link en mail. Gebeurt bij het versturen
+     * van de offerte, en op verzoek opnieuw vanaf de offertepagina ($resend).
+     *
+     * @throws \DomainException  bij opnieuw sturen als het niet kan
+     */
+    public function inviteCoSigner(Quote $quote, bool $resend = false): bool
+    {
+        if (! $quote->needsCoSigner()) {
+            if ($resend) {
+                throw new \DomainException(__('Deze offerte heeft geen tweede ondertekenaar.'));
+            }
+
+            return false;
+        }
+        if ($quote->co_signed_at) {
+            if ($resend) {
+                throw new \DomainException(__('De tweede ondertekenaar heeft al getekend.'));
+            }
+
+            return false;
+        }
+        $quote->ensureCoSignerToken();
+        try {
+            \App\Support\DocumentLocale::using($quote->language ?: 'nl', fn () => Mail::mailer($quote->company?->is_demo ? 'log' : null)
+                ->to($quote->co_signer_email)
+                ->send(new \App\Mail\QuoteSignerMail($quote, 'co', 'invite')));
+        } catch (\Throwable $e) {
+            Log::error('Uitnodiging tweede ondertekenaar mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+            if ($resend) {
+                throw new \DomainException(__('De uitnodiging kon niet worden verstuurd.'));
+            }
+
+            return false;
+        }
+        $quote->forceFill(['co_signer_invited_at' => now()])->saveQuietly();
+        \App\Support\Audit::log('sent', $quote, __('Tweede ondertekenaar :name uitgenodigd per e-mail (:email)', [
+            'name' => $quote->co_signer_name, 'email' => $quote->co_signer_email,
+        ]), [], $quote->company_id);
+
+        return true;
+    }
+
+    /** 1.107: na de eerste handtekening de andere ondertekenaar laten weten dat hij aan de beurt is. */
+    public function notifyOtherSigner(Quote $quote, string $signedRole): void
+    {
+        $role = $signedRole === 'co' ? 'customer' : 'co';
+        $to = $role === 'co' ? $quote->co_signer_email : ($quote->customer_email ?: $quote->customer?->email);
+        if (! $to) {
+            return;
+        }
+        if ($role === 'co') {
+            $quote->ensureCoSignerToken();
+        }
+        try {
+            \App\Support\DocumentLocale::using($quote->language ?: 'nl', fn () => Mail::mailer($quote->company?->is_demo ? 'log' : null)
+                ->to($to)
+                ->send(new \App\Mail\QuoteSignerMail($quote, $role, 'turn')));
+        } catch (\Throwable $e) {
+            Log::warning('Beurtmelding aan ondertekenaar mislukt', ['quote' => $quote->id, 'error' => $e->getMessage()]);
+        }
     }
 
     protected function email(Quote $quote): void

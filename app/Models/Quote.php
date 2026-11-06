@@ -40,6 +40,9 @@ class Quote extends Model
         'sent_at', 'accepted_at', 'rejected_at', 'converted_invoice_id',
         'portal_viewed_at', 'portal_views', 'reminders_enabled', 'reminder_log',
         'signed_name', 'signature_data', 'signed_at', 'signed_ip', 'signed_email', 'decline_reason',
+        // 1.107: tweede ondertekenaar (twee handtekeningen nodig).
+        'signers_required', 'co_signer_name', 'co_signer_email', 'co_signer_token', 'co_signer_invited_at',
+        'co_signed_name', 'co_signature_data', 'co_signed_at', 'co_signed_ip', 'co_signed_email',
         'accept_mail_sent_at', 'accept_mail_sent_to',
         'withdrawn_at', 'withdrawal_note', 'replaced_by_quote_id', 'withdrawal_mail_sent_at', 'withdrawal_mail_sent_to',
     ];
@@ -52,6 +55,8 @@ class Quote extends Model
         'accepted_at' => 'datetime',
         'rejected_at' => 'datetime',
         'signed_at' => 'datetime',
+        'co_signed_at' => 'datetime',
+        'co_signer_invited_at' => 'datetime',
         'accept_mail_sent_at' => 'datetime',
         'withdrawn_at' => 'datetime',
         'withdrawal_mail_sent_at' => 'datetime',
@@ -107,6 +112,60 @@ class Quote extends Model
         return $this->portal_token
             ? route('portal.quote', $this->portal_token)
             : null;
+    }
+
+    /** 1.107: moet deze offerte door twee personen worden ondertekend (bijv. twee bestuurders)? */
+    public function needsCoSigner(): bool
+    {
+        return (int) $this->signers_required >= 2 && filled($this->co_signer_email);
+    }
+
+    /** Eigen geheime portaallink voor de tweede ondertekenaar (los van die van de klant). */
+    public function ensureCoSignerToken(): string
+    {
+        if (! $this->co_signer_token) {
+            $this->co_signer_token = bin2hex(random_bytes(32));
+            $this->saveQuietly();
+        }
+
+        return $this->co_signer_token;
+    }
+
+    public function coSignerPortalUrl(): ?string
+    {
+        return $this->needsCoSigner() && $this->co_signer_token ? route('portal.quote', $this->co_signer_token) : null;
+    }
+
+    /**
+     * De ondertekenaars op volgorde: de klant en (bij twee) de tweede ondertekenaar, elk met wat er al getekend is.
+     *
+     * @return list<array{role: string, name: ?string, email: ?string, signed_name: ?string, signed_at: ?\Carbon\CarbonInterface, signed_ip: ?string, signature_data: ?string}>
+     */
+    public function signers(): array
+    {
+        $list = [[
+            'role' => 'customer', 'name' => $this->customer_name, 'email' => $this->customer_email,
+            'signed_name' => $this->signed_name, 'signed_at' => $this->signed_at, 'signed_ip' => $this->signed_ip, 'signature_data' => $this->signature_data,
+        ]];
+        if ($this->needsCoSigner()) {
+            $list[] = [
+                'role' => 'co', 'name' => $this->co_signer_name, 'email' => $this->co_signer_email,
+                'signed_name' => $this->co_signed_name, 'signed_at' => $this->co_signed_at, 'signed_ip' => $this->co_signed_ip, 'signature_data' => $this->co_signature_data,
+            ];
+        }
+
+        return $list;
+    }
+
+    /** Handtekeningen die er al staan (0, 1 of 2). */
+    public function signaturesDone(): int
+    {
+        return count(array_filter($this->signers(), fn (array $s) => $s['signed_at'] !== null));
+    }
+
+    public function isFullySigned(): bool
+    {
+        return $this->signaturesDone() >= count($this->signers());
     }
 
     public function getStatusLabelAttribute(): string

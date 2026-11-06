@@ -55,6 +55,9 @@ class QuoteController extends Controller
             'installments_total' => (int) $quote->installments_count,
             'installments_done' => (int) $quote->installments_done_count,
             'invoiced_percent' => round((float) ($quote->invoiced_percent ?? 0), 2),
+            // 1.107: twee ondertekenaars — "1 van 2 getekend" in de lijst.
+            'signers_required' => $quote->needsCoSigner() ? 2 : 1,
+            'signatures_done' => $quote->signaturesDone(),
         ]);
 
         return Inertia::render('Quotes/Index', [
@@ -139,7 +142,9 @@ class QuoteController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        $this->guardCoSigner($data);
         $quote = $this->manager->create($data);
+        $this->applySigners($quote, $data);
 
         if ($request->input('action') === 'send') {
             return $this->dispatchSend($quote);
@@ -180,6 +185,18 @@ class QuoteController extends Controller
                 // Andere offertes van deze klant die deze kunnen vervangen (knop "Vervallen").
                 'replacement_options' => in_array($quote->status, ['sent', 'expired', 'accepted'], true) ? $this->replacementOptions($quote) : [],
                 'portal_url' => $quote->portalUrl(),
+                // 1.107: twee ondertekenaars — wie, wat er getekend is en de eigen link van de tweede.
+                'signers' => array_map(fn (array $s) => [
+                    'role' => $s['role'],
+                    'name' => $s['name'],
+                    'email' => $s['email'],
+                    'signed_name' => $s['signed_name'],
+                    'signed_at_label' => $s['signed_at']?->translatedFormat('j F Y, H:i'),
+                    'signed_ip' => $s['signed_ip'],
+                    'signature_data' => $s['signature_data'],
+                    'invited_at_label' => ($s['role'] === 'co' ? $quote->co_signer_invited_at : $quote->sent_at)?->translatedFormat('j M Y, H:i'),
+                ], $quote->signers()),
+                'co_signer_url' => $quote->coSignerPortalUrl(),
                 // 1.102: opvolgingsbalk — verstuurd, bekeken, geplande/verstuurde herinneringen, vervaldatum.
                 'follow_up' => in_array($quote->status, ['sent', 'expired'], true) ? app(\App\Services\QuoteFollowUpService::class)->timeline($quote) : null,
                 // Waar 'Versturen' naartoe mailt: het adres op de offerte, anders dat van de klant.
@@ -258,9 +275,11 @@ class QuoteController extends Controller
     public function update(Request $request, Quote $quote): RedirectResponse
     {
         $data = $this->validated($request);
+        $this->guardCoSigner($data);
 
         try {
             $this->manager->update($quote, $data);
+            $this->applySigners($quote->fresh(), $data);
         } catch (\DomainException $e) {
             return back()->withErrors(['quote' => $e->getMessage()]);
         }
@@ -312,6 +331,10 @@ class QuoteController extends Controller
             $channel = app(\App\Services\QuoteFollowUpService::class)->send($quote, 'manual', $request->user()->id);
         } catch (\DomainException $e) {
             return back()->withErrors(['quote' => $e->getMessage()]);
+        }
+
+        if ($quote->needsCoSigner()) {
+            return back()->with('flash', __('Herinnering verstuurd aan wie nog moet ondertekenen.')); // 1.107
         }
 
         return back()->with('flash', $channel === 'sms'
@@ -549,6 +572,43 @@ class QuoteController extends Controller
         ];
     }
 
+    /** 1.107: de tweede ondertekenaar moet een ander adres hebben dan de klant, anders is het één persoon. */
+    private function guardCoSigner(array $data): void
+    {
+        if ((int) ($data['signers_required'] ?? 1) !== 2) {
+            return;
+        }
+        $customer = \App\Models\Customer::find($data['customer_id']);
+        if ($customer && filled($customer->email) && strcasecmp($customer->email, (string) ($data['co_signer_email'] ?? '')) === 0) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'co_signer_email' => __('De tweede ondertekenaar moet een ander e-mailadres hebben dan de klant.'),
+            ]);
+        }
+    }
+
+    /** 1.107: één of twee ondertekenaars op de offerte vastleggen (naam en e-mailadres van de tweede). */
+    private function applySigners(Quote $quote, array $data): void
+    {
+        $two = (int) ($data['signers_required'] ?? 1) === 2;
+        $quote->forceFill([
+            'signers_required' => $two ? 2 : 1,
+            'co_signer_name' => $two ? trim((string) ($data['co_signer_name'] ?? '')) : null,
+            'co_signer_email' => $two ? mb_strtolower(trim((string) ($data['co_signer_email'] ?? ''))) : null,
+        ])->saveQuietly();
+    }
+
+    /** 1.107: de uitnodiging aan de tweede ondertekenaar opnieuw sturen. */
+    public function inviteCoSigner(Quote $quote): RedirectResponse
+    {
+        try {
+            $this->manager->inviteCoSigner($quote, resend: true);
+        } catch (\DomainException $e) {
+            return back()->withErrors(['quote' => $e->getMessage()]);
+        }
+
+        return back()->with('flash', __('Uitnodiging opnieuw verstuurd aan :name (:email).', ['name' => $quote->co_signer_name, 'email' => $quote->co_signer_email]));
+    }
+
     protected function validated(Request $request): array
     {
         $data = $request->validate([
@@ -563,6 +623,10 @@ class QuoteController extends Controller
             'quote_date' => ['required', 'date'],
             'valid_days' => ['required', 'integer', 'min:1', 'max:365'],
             'reference' => ['nullable', 'string', 'max:255'],
+            // 1.107: één of twee ondertekenaars (bijv. twee bestuurders); de tweede met naam en e-mailadres.
+            'signers_required' => ['nullable', 'integer', 'in:1,2'],
+            'co_signer_name' => ['nullable', 'string', 'max:120', 'required_if:signers_required,2'],
+            'co_signer_email' => ['nullable', 'email', 'max:180', 'required_if:signers_required,2'],
             'project_id' => ['nullable', 'integer'],
             'intro' => ['nullable', 'string', 'max:2000'],
             'notes' => ['nullable', 'string'],
