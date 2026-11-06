@@ -31,8 +31,11 @@ class EasyInvoiceHouseStyleTest extends TestCase
             ->assertSee('Start 14 dagen gratis')
             ->assertSee('Bekijk de demo')
             ->assertSee('Geen creditcard nodig')
-            ->assertSee('id="heroDash"', false)
             ->assertSee('class="ei-screen"', false)
+            ->assertSee('class="ei-dash"', false)
+            ->assertSee('Welkom terug, De Graaf BV')
+            ->assertSee('Omzetontwikkeling')
+            ->assertDontSee('id="heroDash"', false)
             ->assertSee('class="ei-phone"', false);
 
         foreach (['Facturatie', 'Offertes', 'Uren &amp; projecten', 'Administraties', 'AI-assistent EASY', 'Betalingen &amp; incasso', 'E-facturatie', 'Boekhouding'] as $card) {
