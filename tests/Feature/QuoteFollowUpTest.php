@@ -22,7 +22,7 @@ class QuoteFollowUpTest extends TestCase
 {
     use RefreshDatabase, UsesDemoCompany;
 
-    private AppModelsSER $USER;
+    private \App\Models\User $user;
 
     private function enableSms(int $companyId): void
     {

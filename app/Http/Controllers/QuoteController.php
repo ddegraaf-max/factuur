@@ -26,6 +26,10 @@ class QuoteController extends Controller
         $q = $request->input('q');
 
         $quotes = Quote::with('customer')
+            // Termijnplan (1.106.4): hoeveel termijnen en welk deel al gefactureerd is, zodat de lijst
+            // "50% gefactureerd" kan tonen; converted_invoice_id dekt alleen een offerte die in één keer is omgezet.
+            ->withCount(['installments', 'installments as installments_done_count' => fn ($i) => $i->whereNotNull('invoice_id')])
+            ->withSum(['installments as invoiced_percent' => fn ($i) => $i->whereNotNull('invoice_id')], 'percentage')
             ->forStatus($status)
             ->when($q, fn ($qb) => $qb->where(function ($w) use ($q) {
                 $w->where('number', 'like', "%{$q}%")
@@ -48,6 +52,9 @@ class QuoteController extends Controller
             'status_label' => $quote->status_label,
             'total' => (float) $quote->total,
             'converted' => (bool) $quote->converted_invoice_id,
+            'installments_total' => (int) $quote->installments_count,
+            'installments_done' => (int) $quote->installments_done_count,
+            'invoiced_percent' => round((float) ($quote->invoiced_percent ?? 0), 2),
         ]);
 
         return Inertia::render('Quotes/Index', [

@@ -41,6 +41,9 @@ const chips = [
   { key: 'withdrawn', label: t('Vervallen|offerte') },
 ];
 
+// Percentage zonder overbodige decimalen (50, 33,3).
+const pct = (value) => (Number(value) % 1 === 0 ? String(Number(value)) : Number(value).toFixed(1).replace('.', ','));
+
 const pillClass = (status) => ({
   draft: 'pill-draft',
   sent: 'pill-sent',
@@ -113,7 +116,9 @@ const pillClass = (status) => ({
             </td>
             <td :data-label="$t('Status')">
               <span class="pill" :class="pillClass(q.status)">{{ q.status_label }}</span>
-              <span v-if="q.converted" class="pill pill-sent" style="margin-left:4px;">{{ $t('Gefactureerd') }}</span>
+              <!-- In één keer omgezet, of alle termijnen gefactureerd: "Gefactureerd"; een deel van de termijnen: het percentage. -->
+              <span v-if="q.converted || (q.installments_total > 0 && q.installments_done >= q.installments_total)" class="pill pill-sent" style="margin-left:4px;">{{ $t('Gefactureerd') }}</span>
+              <span v-else-if="q.installments_done > 0" class="pill pill-partial" style="margin-left:4px;" :title="$t(':done van :total termijnen gefactureerd', { done: q.installments_done, total: q.installments_total })">{{ $t(':percent% gefactureerd', { percent: pct(q.invoiced_percent) }) }}</span>
             </td>
             <td class="right num" :data-label="$t('Bedrag')">{{ eur(q.total) }}</td>
           </tr>

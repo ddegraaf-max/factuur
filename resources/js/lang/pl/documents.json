@@ -228,6 +228,8 @@
   "Maak een voorstel voor je klant. Gaat hij akkoord, dan wordt het met één klik een factuur.": "Przygotuj propozycję dla klienta. Gdy ją zaakceptuje, jednym kliknięciem zamienisz ją w fakturę.",
   "Eerste offerte maken": "Utwórz pierwszą ofertę",
   "nog :n d.": "jeszcze :n dni",
+  ":percent% gefactureerd": ":percent% zafakturowano",
+  ":done van :total termijnen gefactureerd": ":done z :total rat zafakturowano",
   "1 regel ingevuld": "uzupełniono 1 pozycję",
   ":n regels ingevuld": "uzupełniono pozycji: :n",
   "klant herkend": "rozpoznano klienta",

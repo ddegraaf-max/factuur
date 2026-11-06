@@ -228,6 +228,8 @@
   "Maak een voorstel voor je klant. Gaat hij akkoord, dan wordt het met één klik een factuur.": "Prepare a proposal for your customer. Once they accept, it becomes an invoice with one click.",
   "Eerste offerte maken": "Create first quote",
   "nog :n d.": ":n days left",
+  ":percent% gefactureerd": ":percent% invoiced",
+  ":done van :total termijnen gefactureerd": ":done of :total instalments invoiced",
   "1 regel ingevuld": "1 line filled in",
   ":n regels ingevuld": ":n lines filled in",
   "klant herkend": "customer recognised",
