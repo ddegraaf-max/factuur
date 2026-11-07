@@ -10,6 +10,16 @@ doorgelicht en naast het menu van e-Boekhouden gelegd. De grootboekkern is goed
 (RGS 3.3, debet = credit in PHP én Postgres, boekjaren, XAF). Maar bank, inkoop
 en btw lopen deels náást het grootboek.
 
+**Besluiten van Daniël (7 november 2026):**
+- Alleen de administratie van Creditline gaat over, **per 1 januari 2027**. Deel 1
+  en de punten 1, 3, 4, 5, 6 en 7 van deel 2 moeten dan af zijn, en de
+  XAF-import uit deel 3.
+- De btw-aangifte wordt **zelf digitaal ingediend**. Daniël vraagt een
+  certificaat aan; in het begin loopt het eventueel via de boekhouder
+  (Ted Accountancy). Bouw daarom eerst een aangifte die de boekhouder kan
+  overnemen (overzicht + export, en toegang voor de rol boekhouder), en daarna
+  rechtstreeks indienen via Digipoort met het eigen certificaat.
+
 Volledige doorlichting: https://claude.ai/artifact/GCHPYwEHLD7kiDpySK3LKm
 (hoofdstuk "Easy als boekhouding").
 
