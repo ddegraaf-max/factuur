@@ -48,6 +48,7 @@ class FachoraLetters extends Command
 
         if ($candidates->isEmpty()) {
             $this->info('Geen bedrijven voor een brief' . ($city ? " in {$city}" : '') . '.');
+            Log::info('fachora:letters: geen bedrijven voor een brief', ['stad' => $city, 'proef' => $dry]);
 
             return self::SUCCESS;
         }
@@ -74,6 +75,8 @@ class FachoraLetters extends Command
         if ($sent > 0) {
             RegisterNoticeService::log('letter_sent', $sent, 'brieven per post via Pingen' . ($city ? ", stad {$city}" : '') . ' aan bedrijven die een klant koos');
         }
+        // De planner stuurt de console-uitvoer naar /dev/null; het logboek van Railway laat zo toch zien wat er gebeurde.
+        Log::info('fachora:letters: run klaar', ['stad' => $city, 'proef' => $dry, 'kandidaten' => $candidates->count(), 'verstuurd' => $sent, 'bedrijven' => $candidates->pluck('id')->all()]);
         $this->info($dry
             ? sprintf('Proefdraai: %d brieven zouden worden verstuurd%s.', $candidates->count(), $pingen->configured() ? '' : ' (Pingen niet ingesteld)')
             : sprintf('%d van %d brieven verstuurd.', $sent, $candidates->count()));
