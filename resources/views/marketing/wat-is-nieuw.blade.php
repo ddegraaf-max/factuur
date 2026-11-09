@@ -47,6 +47,7 @@
           <li><b>Twee ondertekenaars</b> — moet een offerte bij je klant door twee personen worden getekend (bijvoorbeeld twee bestuurders die samen tekenbevoegd zijn), kies dan bij het opstellen "Twee ondertekenaars" en vul de naam en het e-mailadres van de tweede in. Bij het versturen krijgt die persoon een eigen beveiligde ondertekenlink; beiden bevestigen eerst hun eigen e-mailadres met een code.</li>
           <li><b>Soepel traject</b> — ieder tekent wanneer het uitkomt, in willekeurige volgorde. Zodra de eerste heeft getekend, krijgt de ander automatisch bericht dat hij aan de beurt is, en jij een melding "1 van 2". Pas bij de tweede handtekening is de offerte geaccepteerd; dan gaan de bevestiging en de ondertekende PDF naar beiden. Herinneringen gaan alleen naar wie nog moet tekenen, en op de offertepagina kun je de uitnodiging opnieuw sturen of de link kopiëren.</li>
           <li><b>Bewijsdossier</b> — beide handtekeningen staan met naam, geverifieerd e-mailadres, tijdstip en IP-adres op de offertepagina en op de PDF; in de lijst zie je "1 van 2 getekend" zolang er nog één ontbreekt.</li>
+          <li><b>Fachora: advertentiemeting (1.108.1)</b> — de Google Ads-conversie wordt nu al geteld bij het indienen van een aanvraag, in dezelfde browser als de klik op de advertentie; eerder pas na de bevestiging via de mail, die vaak op een ander apparaat gebeurt.</li>
         </ul>
       </article>
       <article class="tl-item">

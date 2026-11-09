@@ -149,7 +149,11 @@ class IntakeController extends Controller
         $job = $this->jobs->create($data, array_values((array) $request->file('photos', [])), $request);
         PageView::milestone($request, 'fachora_job');
 
-        return redirect()->route('fachora.intake', array_filter(['czekaj' => $job->token, 'fout' => $job->confirm_mails > 0 ? null : 1]));
+        // 1.107.1: de Google Ads-conversie al bij het indienen, in dezelfde browser als de advertentieklik.
+        // De bevestiging via de mail gebeurt vaak op een ander apparaat, waardoor Ads die niet aan de klik koppelt
+        // (een week advertenties: 67 klikken, 4 aanvragen, 0 gemeten conversies). "Eén per klik" voorkomt dubbel tellen.
+        return redirect()->route('fachora.intake', array_filter(['czekaj' => $job->token, 'fout' => $job->confirm_mails > 0 ? null : 1]))
+            ->with('ads_conversion', 'request');
     }
 
     public function resend(Request $request): RedirectResponse

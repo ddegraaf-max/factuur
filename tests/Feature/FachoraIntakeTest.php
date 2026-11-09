@@ -82,6 +82,7 @@ class FachoraIntakeTest extends TestCase
 
         $job = ServiceJob::firstOrFail();
         $response->assertRedirect(route('fachora.intake', ['czekaj' => $job->token]));
+        $response->assertSessionHas('ads_conversion', 'request'); // 1.107.1: conversie al bij het indienen (zelfde browser als de klik)
         $this->assertSame('pending', $job->status);
         $this->assertSame('FA-10001', $job->reference);
         $this->assertSame(64, strlen($job->token));
