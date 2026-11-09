@@ -88,6 +88,7 @@ class IncassoController extends Controller
                     'auto_transfer_label' => $demand->auto_transfer && ! $service->autoTransferBlocker($demand)
                         ? $service->autoTransferOn($demand)->translatedFormat('j M Y') : null,
                     'paused' => $demand->invoice->remindersPaused(),
+                    'pause_ended' => $demand->invoice->pauseEnded(),
                     'opened' => (bool) $demand->first_opened_at,
                     'response' => $demand->response,
                     'response_label' => $demand->response ? $service->responseLabel($demand) : null,

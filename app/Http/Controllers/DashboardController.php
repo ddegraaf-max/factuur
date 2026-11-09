@@ -83,6 +83,7 @@ class DashboardController extends Controller
                 'invoice_date' => $i->invoice_date->format('d M Y'),
                 'status' => $i->status,
                 'paused' => $i->isPaused(),
+                'pause_ended' => $i->isPauseEnded(),
                 'is_credit' => (bool) $i->is_credit,
                 'total' => (float) $i->total,
                 'paid_total' => (float) $i->paid_total,
@@ -170,7 +171,27 @@ class DashboardController extends Controller
             return round(($now - $before) / abs($before) * 100, 1);
         };
 
+        // Pauzes die om een besluit vragen (1.108.0): afgelopen (wacht op akkoord)
+        // of lopen morgen af. Een pauze vervalt nooit vanzelf.
+        $pauseNotices = Invoice::paused()
+            ->whereNotNull('reminders_paused_until')
+            ->whereDate('reminders_paused_until', '<=', now()->addDay()->toDateString())
+            ->orderBy('reminders_paused_until')
+            ->limit(10)
+            ->get()
+            ->map(fn (Invoice $i) => [
+                'id' => $i->id,
+                'number' => $i->number,
+                'customer_name' => $i->customer_name,
+                'ended' => $i->pauseEnded(),
+                'until_label' => $i->reminders_paused_until->translatedFormat('j M Y'),
+                'text' => $i->pauseEnded()
+                    ? __('De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.', ['number' => $i->number])
+                    : \App\Services\ReminderService::endingNotice($i),
+            ])->values();
+
         return Inertia::render('Dashboard', [
+            'pause_notices' => $pauseNotices,
             'kpis' => [
                 'outstanding' => (float) $outstanding,
                 'outstanding_count' => $outstandingCount,
@@ -180,6 +201,7 @@ class DashboardController extends Controller
                 'overdue' => (float) $overdue,
                 'overdue_count' => $overdueCount,
                 'overdue_paused_count' => Invoice::paused()->where('status', 'overdue')->count(),
+                'pause_ended_count' => Invoice::pauseLapsed()->count(),
                 'month_revenue' => (float) $monthRevenue,
                 'month_change' => $monthChange,
                 'vat_to_pay' => (float) $vatToPay,

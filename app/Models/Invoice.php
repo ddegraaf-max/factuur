@@ -49,6 +49,8 @@ class Invoice extends Model
         'thanks_sent_at' => 'datetime',
         'reminders_paused_at' => 'datetime',
         'reminders_paused_until' => 'date',
+        'reminders_pause_ended_at' => 'datetime',
+        'reminders_pause_warned_at' => 'datetime',
         'reminder_shift_days' => 'integer',
         'incasso_sent_at' => 'datetime',
         'peppol_sent_at' => 'datetime',
@@ -150,17 +152,34 @@ class Invoice extends Model
     }
 
     /**
-     * Staan herinneringen, aanmaningen en incasso op pauze? Een pauze met
-     * einddatum loopt tot en met die dag en vervalt daarna vanzelf.
+     * Staan herinneringen, aanmaningen en incasso op pauze? Zolang er een
+     * pauze op de factuur staat: ook als de einddatum voorbij is. Een pauze
+     * loopt nooit stilletjes af (1.108.0); na de einddatum wacht de factuur op
+     * jouw akkoord ("Pauze afgelopen", zie pauseEnded()).
      */
     public function remindersPaused(): bool
     {
-        if (! $this->reminders_paused_at) {
+        return (bool) $this->reminders_paused_at;
+    }
+
+    /** Pauze met een einddatum die voorbij is: wacht op akkoord om te hervatten. */
+    public function pauseEnded(): bool
+    {
+        return (bool) $this->reminders_paused_at
+            && $this->reminders_paused_until
+            && $this->reminders_paused_until->copy()->startOfDay()->lt(now()->startOfDay());
+    }
+
+    /** Loopt de pauze morgen (of vandaag) af? Dan vragen we: verlengen, hervatten of laten staan. */
+    public function pauseEndsSoon(): bool
+    {
+        if (! $this->reminders_paused_at || ! $this->reminders_paused_until) {
             return false;
         }
+        $until = $this->reminders_paused_until->copy()->startOfDay();
+        $today = now()->startOfDay();
 
-        return ! $this->reminders_paused_until
-            || $this->reminders_paused_until->copy()->startOfDay()->gte(now()->startOfDay());
+        return $until->gte($today) && $until->lte($today->copy()->addDay());
     }
 
     /** 'Op pauze' als status in lijsten: alleen zolang de factuur nog openstaat. */
@@ -169,6 +188,12 @@ class Invoice extends Model
         return ! $this->is_credit
             && in_array($this->status, ['sent', 'partial', 'overdue'], true)
             && $this->remindersPaused();
+    }
+
+    /** 'Pauze afgelopen' als status in lijsten: openstaand en wacht op jouw akkoord. */
+    public function isPauseEnded(): bool
+    {
+        return $this->isPaused() && $this->pauseEnded();
     }
 
     public function getRemainingAmountAttribute(): float
@@ -221,14 +246,23 @@ class Invoice extends Model
         return $query->where('is_credit', true);
     }
 
-    /** Openstaande facturen waarvan de pauze nu loopt (zie isPaused()). */
+    /**
+     * Openstaande facturen op pauze (zie isPaused()), ook die waarvan de
+     * pauze is afgelopen en die op jouw akkoord wachten: zo raken ze niet uit beeld.
+     */
     public function scopePaused(Builder $query): Builder
     {
         return $query->where('is_credit', false)
             ->whereIn('status', ['sent', 'partial', 'overdue'])
-            ->whereNotNull('reminders_paused_at')
-            ->where(fn (Builder $q) => $q->whereNull('reminders_paused_until')
-                ->orWhereDate('reminders_paused_until', '>=', now()));
+            ->whereNotNull('reminders_paused_at');
+    }
+
+    /** Openstaande facturen waarvan de pauze is afgelopen: wachten op akkoord. */
+    public function scopePauseLapsed(Builder $query): Builder
+    {
+        return $this->scopePaused($query)
+            ->whereNotNull('reminders_paused_until')
+            ->whereDate('reminders_paused_until', '<', now()->toDateString());
     }
 
     public function scopeForStatus(Builder $query, ?string $status): Builder

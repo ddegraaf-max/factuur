@@ -19,6 +19,7 @@ class DailySummaryService
      *   due_soon: array{count:int, amount:float, items:array},
      *   paid_yesterday: array{count:int, amount:float, items:array},
      *   drafts: int,
+ *   pauses: array<int, array{number:?string, customer:?string, ended:bool, text:string}>,
      *   incasso: array{count:int, amount:float}
      * }
      */
@@ -71,9 +72,24 @@ class DailySummaryService
 
         $openAll = $invoices->filter(fn ($i) => $remaining($i) > 0);
 
+        // Pauzes die om een besluit vragen (1.108.0): afgelopen en wachtend op
+        // jouw akkoord, of morgen aflopend. Een pauze vervalt nooit vanzelf.
+        $pauses = $invoices
+            ->filter(fn (Invoice $i) => $i->isPaused() && ($i->pauseEnded() || $i->pauseEndsSoon()))
+            ->sortBy(fn (Invoice $i) => $i->reminders_paused_until?->toDateString())
+            ->map(fn (Invoice $i) => [
+                'number' => $i->number,
+                'customer' => $i->customer_name,
+                'ended' => $i->pauseEnded(),
+                'text' => $i->pauseEnded()
+                    ? __('De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.', ['number' => $i->number])
+                    : ReminderService::endingNotice($i),
+            ])->values()->all();
+
         return [
             // Niets te melden? Dan sturen we ook geen mail.
-            'has_news' => $overdue->isNotEmpty() || $dueSoon->isNotEmpty() || $payments->isNotEmpty() || $drafts > 0,
+            'has_news' => $overdue->isNotEmpty() || $dueSoon->isNotEmpty() || $payments->isNotEmpty() || $drafts > 0 || $pauses !== [],
+            'pauses' => $pauses,
             'overdue' => $summarize($overdue),
             'due_soon' => $summarize($dueSoon),
             'open' => [

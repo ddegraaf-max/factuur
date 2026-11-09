@@ -123,6 +123,7 @@ const phaseLabels = {
             <td class="right num" :data-label="$t('Te betalen vandaag')">{{ eur(d.total) }}</td>
             <td class="right">
               <button v-if="d.due && !d.paused" class="btn btn-primary btn-sm" @click="transfer(d)">{{ $t('Overdragen') }}</button>
+              <span v-else-if="d.paused && d.pause_ended" class="sub">{{ $t('Pauze afgelopen') }}</span>
               <span v-else-if="d.paused" class="sub">{{ $t('Op pauze') }}</span>
             </td>
           </tr>

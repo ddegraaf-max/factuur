@@ -31,7 +31,17 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 6 november 2026 · {{ brand('version_prefix') }} 1.107.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 november 2026 · {{ brand('version_prefix') }} 1.108.0</div>
+        <h2>Een pauze loopt niet meer stilletjes af</h2>
+        <ul class="tl-list">
+          <li><b>Eerst jouw akkoord</b> — zet je een factuur op pauze met een einddatum (ook via "Akkoord met de toegezegde dag" bij een online aanmaning), dan gaan de herinneringen na die datum niet meer vanzelf lopen. De factuur krijgt de status "Pauze afgelopen" en er gaat niets uit (geen herinnering, aanmaning of incasso) tot je op "Hervat de herinneringen" klikt of de pauze verlengt. Het schema schuift dan op, zodat je klant geen inhaalslag krijgt.</li>
+          <li><b>Een dag van tevoren een seintje</b> — loopt een pauze morgen af, dan zie je dat op het dashboard en op de factuur (en in je dagoverzicht als dat aan staat): verlengen, hervatten of laten staan?</li>
+          <li><b>Niet uit beeld</b> — facturen met een afgelopen pauze staan in de facturenlijst als "Pauze afgelopen" en blijven in het filter "Op pauze".</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">6 november 2026 · {{ brand('version_prefix') }} 1.107.0</div>
         <h2>Offerte door twee personen ondertekenen</h2>
         <ul class="tl-list">
           <li><b>Twee ondertekenaars</b> — moet een offerte bij je klant door twee personen worden getekend (bijvoorbeeld twee bestuurders die samen tekenbevoegd zijn), kies dan bij het opstellen "Twee ondertekenaars" en vul de naam en het e-mailadres van de tweede in. Bij het versturen krijgt die persoon een eigen beveiligde ondertekenlink; beiden bevestigen eerst hun eigen e-mailadres met een code.</li>

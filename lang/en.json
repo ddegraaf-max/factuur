@@ -2219,5 +2219,16 @@
   ":company: factuur :number van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: invoice :number for :amount, due by :date. View and pay online: :link",
   ":company: factuur van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: invoice for :amount, due by :date. View and pay online: :link",
   "Factuur :number per sms verstuurd naar :number2.": "Invoice :number sent by SMS to :number2.",
-  ":company: je toegangscode is :code (10 minuten geldig).": ":company: your access code is :code (valid for 10 minutes)."
+  ":company: je toegangscode is :code (10 minuten geldig).": ":company: your access code is :code (valid for 10 minutes).",
+  ":label: na de afgelopen pauze hervat, herinneringen lopen weer": ":label: resumed after the pause ended, reminders are running again",
+  ":label: pauze afgelopen op :date. Er gaat niets uit tot je de herinneringen hervat.": ":label: pause ended on :date. Nothing is sent until you resume the reminders.",
+  "De pauze van factuur :number loopt morgen af. Verlengen, hervatten of laten staan?": "The pause on invoice :number ends tomorrow. Extend, resume or leave it?",
+  "De pauze van factuur :number loopt vandaag af. Verlengen, hervatten of laten staan?": "The pause on invoice :number ends today. Extend, resume or leave it?",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat de herinneringen eerst om er een te kunnen sturen.": "The pause on this invoice has ended and is waiting for your approval. Resume the reminders first to send one.",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je hem naar incasso stuurt.": "The pause on this invoice has ended and is waiting for your approval. Resume first before sending it to collection.",
+  "De pauze van de factuur is afgelopen en wacht op jouw akkoord. Tot je hervat, gaat het dossier niet naar de deurwaarder.": "The pause on the invoice has ended and is waiting for your approval. Until you resume, the file will not go to the bailiff.",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je een aanmaning stuurt.": "The pause on this invoice has ended and is waiting for your approval. Resume first before sending a final demand.",
+  "Pauze afgelopen: er gaat niets uit tot je hervat": "Pause ended: nothing is sent until you resume",
+  "De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.": "The pause on invoice :number has ended. Nothing is sent until you resume the reminders.",
+  "Pauzes die om een besluit vragen (:count)": "Pauses that need a decision (:count)"
 }

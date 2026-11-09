@@ -8,6 +8,9 @@ const props = defineProps({
   // Op pauze (geen herinneringen, aanmaningen of incasso): gaat vóór de gewone
   // status, die dan in de tooltip staat.
   paused: { type: Boolean, default: false },
+  // Pauze afgelopen (1.108.0): de factuur wacht op jouw akkoord om de
+  // herinneringen te hervatten; er gaat niets vanzelf uit.
+  pauseEnded: { type: Boolean, default: false },
   // Bij "deels betaald": wat er al binnen is en het factuurbedrag. Geef je ze
   // mee, dan staat er een taartje bij: groen is binnen, rood staat nog open.
   paid: { type: Number, default: null },
@@ -46,7 +49,8 @@ const dash = computed(() => (fraction.value === null ? '' : `${(fraction.value *
 </script>
 
 <template>
-  <span v-if="paused" class="pill pill-paused" :title="`${label} · ${$t('Op pauze: geen herinneringen, aanmaningen of incasso')}`">{{ $t('Op pauze') }}</span>
+  <span v-if="paused && pauseEnded" class="pill pill-paused pill-pause-ended" :title="`${label} · ${$t('Pauze afgelopen: er gaat niets uit tot je de herinneringen hervat')}`">{{ $t('Pauze afgelopen') }}</span>
+  <span v-else-if="paused" class="pill pill-paused" :title="`${label} · ${$t('Op pauze: geen herinneringen, aanmaningen of incasso')}`">{{ $t('Op pauze') }}</span>
   <span v-else :class="['pill', `pill-${status}`, { 'has-pie': fraction !== null }]" :title="percent !== null ? $t(':p% betaald, de rest staat nog open', { p: percent }) : undefined">
     <svg v-if="fraction !== null" class="pill-pie" viewBox="0 0 14 14" width="12" height="12" aria-hidden="true">
       <circle cx="7" cy="7" :r="R" fill="none" stroke="#DC2626" :stroke-width="R * 2" />
@@ -57,6 +61,8 @@ const dash = computed(() => (fraction.value === null ? '' : `${(fraction.value *
 </template>
 
 <style scoped>
+/* Afgelopen pauze: vraagt om een besluit, dus iets nadrukkelijker dan "Op pauze". */
+.pill-pause-ended { font-weight: 700; box-shadow: inset 0 0 0 1px currentColor; }
 .pill-pie { display: inline-block; vertical-align: -1px; flex: none; }
 /* Het taartje vervangt het standaardstipje van het label; anders staan er twee bolletjes. */
 .pill.has-pie::before { display: none; }

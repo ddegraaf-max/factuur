@@ -23,6 +23,9 @@ class IncassoService
         if ($invoice->status === 'incasso') {
             throw new \DomainException(__('Deze factuur is al bij incasso.'));
         }
+        if ($invoice->pauseEnded()) {
+            throw new \DomainException(__('De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je hem naar incasso stuurt.'));
+        }
         if ($invoice->remindersPaused()) {
             throw new \DomainException(__('Deze factuur staat op pauze. Hervat eerst voordat je hem naar incasso stuurt.'));
         }

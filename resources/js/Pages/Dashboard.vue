@@ -13,6 +13,7 @@ const props = defineProps({
   vat_due: { type: Object, default: null },
   quotes: { type: Object, default: null },
   onboarding: { type: Object, default: null }, // startlijst voor een nieuw account
+  pause_notices: { type: Array, default: () => [] }, // pauzes die afliepen of morgen aflopen (1.108.0)
 });
 
 // Offertestatus in dezelfde pil-kleuren als op de offertepagina.
@@ -99,6 +100,16 @@ const greeting = () => {
         </span>
       </div>
       <span class="vat-banner-cta">{{ $t('Aangifte voorbereiden →') }}</span>
+    </Link>
+
+    <!-- Pauzes die om een besluit vragen: afgelopen (wacht op jou) of lopen morgen af -->
+    <Link v-for="p in pause_notices" :key="'pause-' + p.id" :href="route('invoices.show', p.id)" class="vat-banner">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+      <div class="vat-banner-text">
+        <strong>{{ p.ended ? $t('Pauze afgelopen, wacht op jou') : $t('Pauze loopt af') }} · {{ p.number }} · {{ p.customer_name }}</strong>
+        <span>{{ p.text }}</span>
+      </div>
+      <span class="vat-banner-cta">{{ p.ended ? $t('Hervatten of verlengen →') : $t('Bekijken →') }}</span>
     </Link>
 
     <!-- KPI CARDS -->
@@ -199,7 +210,7 @@ const greeting = () => {
                 <td class="num cell-primary">{{ inv.number || '—' }}</td>
                 <td :data-label="$t('Klant')">{{ inv.customer_name }}</td>
                 <td :data-label="$t('Datum')">{{ inv.invoice_date }}</td>
-                <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" :paid="inv.paid_total" :total="inv.total" /></td>
+                <td :data-label="$t('Status')"><StatusPill :status="inv.status" :paused="inv.paused" :pause-ended="inv.pause_ended" :paid="inv.paid_total" :total="inv.total" /></td>
                 <td class="num right" :data-label="$t('Bedrag')">
                   {{ eur(inv.is_credit ? -Math.abs(inv.total) : inv.total) }}
                   <div v-if="inv.remaining !== null && inv.remaining !== undefined" style="font-size:11.5px;color:var(--text-3);font-weight:400;">{{ $t('nog :amount open', { amount: eur(inv.remaining) }) }}</div>

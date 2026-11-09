@@ -1,6 +1,38 @@
+**Afgerond in versie 1.108.0**
+
 # Herinneringen: een pauze loopt niet stilletjes af
 
-**Status: open**
+**Status: gebouwd in 1.108.0 (branch `pauze-afgelopen`); het onderzoek naar 9 november staat nog open**
+
+## Uitkomst
+
+- **9 november: nog niet nagegaan.** De bouwer kon de productiedatabase niet
+  bereiken (en leest geen wachtwoorden of sleutels). Dit moet nog gebeuren:
+  open factuur 2026-0023 (Toton Onderhoudsbedrijf) en kijk in de
+  geschiedenis / Instellingen → Logboek of er vlak vóór de herinnering van
+  9 november een regel "pauze afgelopen, herinneringen lopen weer" staat.
+  Staat die er niet, dan is er een andere oorzaak en moet die alsnog gezocht worden.
+- **Gebouwd:**
+  - Een pauze vervalt nooit meer vanzelf. Na de einddatum zet de dagelijkse
+    taak (`ReminderService::endExpiredPauses()`) de factuur op "Pauze
+    afgelopen" (`reminders_pause_ended_at`, logboek `pause_ended`); de pauze
+    blijft staan, dus herinneringen, handmatige herinnering, online aanmaning,
+    automatische overdracht en incasso blijven geblokkeerd
+    (`Invoice::remindersPaused()` is waar zolang er een pauze op staat).
+  - Pas na "Hervat de herinneringen" lopen ze weer; het schema schuift op tot
+    de dag van hervatten (geen inhaalslag). Verlengen houdt de oorspronkelijke start vast.
+  - De dag vóór de einddatum één seintje (`warnEndingPauses()`,
+    `reminders_pause_warned_at`, logboek `pause_ending`): op het dashboard, op
+    de factuur en in het dagoverzicht. Een nieuwe einddatum geeft een nieuw seintje.
+  - Pauzevenster en "Akkoord: op pauze tot en met die dag": "Na deze datum
+    vragen we je eerst of de herinneringen weer mogen lopen."
+  - Status "Pauze afgelopen" in facturenlijst, klantpagina, dashboard en
+    incassolijst; blijft in het filter "Op pauze" (met teller "n afgelopen").
+  - Migratie `2026_11_09_000001_add_pause_ended_to_invoices` (terug te draaien).
+  - Tests: `ReminderPauseEndedTest` (nieuw) en `ReminderPauseTest` (aangepast).
+- **Keuze:** het "seintje in de app" is geen apart meldingensysteem (dat heeft
+  de app niet) maar een balk op het dashboard en op de factuur plus een regel
+  in het logboek; in het dagoverzicht staat een blok "Pauzes die om een besluit vragen".
 
 ## Waarom
 

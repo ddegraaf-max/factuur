@@ -66,6 +66,9 @@ const canPause = computed(() =>
   !props.invoice.is_credit && ['sent', 'partial', 'overdue'].includes(props.invoice.status)
 );
 const paused = computed(() => canPause.value && !!props.invoice.reminders_paused);
+// Pauze afgelopen (1.108.0): er gaat niets vanzelf uit; jij kiest hervatten of verlengen.
+const pauseEnded = computed(() => paused.value && !!props.invoice.reminders_pause_ended);
+const pauseEndsSoon = computed(() => paused.value && !pauseEnded.value && !!props.invoice.reminders_pause_ends_soon);
 
 const showPauseModal = ref(false);
 const today = todayLocal();
@@ -89,7 +92,9 @@ const pauseReminders = () => {
 };
 
 const resumeReminders = () => {
-  if (confirm(t('Pauze opheffen? Herinneringen en aanmaningen lopen dan weer volgens schema.'))) {
+  if (confirm(pauseEnded.value
+    ? t('Herinneringen hervatten? De eerstvolgende stap volgt op dezelfde afstand als vóór de pauze.')
+    : t('Pauze opheffen? Herinneringen en aanmaningen lopen dan weer volgens schema.'))) {
     router.delete(route('invoices.resume', props.invoice.id), { preserveScroll: true });
   }
 };
@@ -560,7 +565,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
         </button>
         <button v-if="paused" class="btn btn-secondary btn-sm" :title="$t('Hef de pauze op; herinneringen lopen weer volgens schema')" @click="resumeReminders">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-          {{ $t('Hervatten') }}
+          {{ pauseEnded ? $t('Hervat de herinneringen') : $t('Hervatten') }}
         </button>
         <button
           v-if="canThank"
@@ -616,16 +621,23 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
     </div>
 
     <!-- Op pauze: geen herinneringen, aanmaningen of incasso -->
-    <div v-if="paused" class="sched-banner pause-banner">
+    <div v-if="paused" :class="['sched-banner', 'pause-banner', { 'pause-ended': pauseEnded }]">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
       <div>
-        <div v-if="invoice.reminders_paused_until_label" v-html="$t('Deze factuur staat <strong>op pauze t/m :date</strong>. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.', { date: esc(invoice.reminders_paused_until_label) })"></div>
+        <template v-if="pauseEnded">
+          <div v-html="$t('<strong>Pauze afgelopen, wacht op jou.</strong> De pauze liep t/m :date. Er gaan geen herinneringen of aanmaningen uit en de factuur gaat niet naar incasso tot je de herinneringen hervat of de pauze verlengt.', { date: esc(invoice.reminders_paused_until_label) })"></div>
+        </template>
+        <template v-else-if="pauseEndsSoon">
+          <div v-html="$t(invoice.reminders_pause_ends_tomorrow ? 'De pauze van deze factuur <strong>loopt morgen af</strong>. Verlengen, hervatten of laten staan?' : 'De pauze van deze factuur <strong>loopt vandaag af</strong>. Verlengen, hervatten of laten staan?')"></div>
+          <div class="pause-reason">{{ $t('Laat je hem staan, dan gaat er daarna niets vanzelf uit: we vragen je eerst of de herinneringen weer mogen lopen.') }}</div>
+        </template>
+        <div v-else-if="invoice.reminders_paused_until_label" v-html="$t('Deze factuur staat <strong>op pauze t/m :date</strong>. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.', { date: esc(invoice.reminders_paused_until_label) })"></div>
         <div v-else v-html="$t('Deze factuur staat <strong>op pauze</strong> tot je hervat. Er gaan geen herinneringen of aanmaningen uit en hij kan niet naar incasso.')"></div>
         <div v-if="invoice.reminders_pause_reason" class="pause-reason">{{ $t('Reden') }}: {{ invoice.reminders_pause_reason }}</div>
       </div>
       <div class="pause-actions">
-        <button type="button" class="link-btn" @click="openPauseModal">{{ $t('Aanpassen') }}</button>
-        <button type="button" class="link-btn" @click="resumeReminders">{{ $t('Hervatten') }}</button>
+        <button type="button" class="link-btn" @click="openPauseModal">{{ pauseEnded || pauseEndsSoon ? $t('Verlengen') : $t('Aanpassen') }}</button>
+        <button type="button" class="link-btn" @click="resumeReminders">{{ pauseEnded ? $t('Hervat de herinneringen') : $t('Hervatten') }}</button>
       </div>
     </div>
 
@@ -636,7 +648,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
             <div class="inv-number">{{ invoice.number || $t('— concept —') }}</div>
             <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <StatusPill :status="invoice.status" :days-overdue="invoice.days_overdue" :paid="Number(invoice.paid_total)" :total="Number(invoice.total)" />
-              <StatusPill v-if="paused" :status="invoice.status" :days-overdue="invoice.days_overdue" paused />
+              <StatusPill v-if="paused" :status="invoice.status" :days-overdue="invoice.days_overdue" paused :pause-ended="pauseEnded" />
               <span v-if="peppol?.sent_at_label" class="peppol-chip on" :title="$t('Afgeleverd via Peppol op :date', { date: peppol.sent_at_label })">
                 ⚡ {{ $t('Via Peppol afgeleverd') }}
               </span>
@@ -817,6 +829,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
               <template v-if="demand.response === 'promise'"> · {{ $t('Een toezegging is een erkenning van de schuld en stuit de verjaring.') }}</template>
             </div>
             <button v-if="demand.response === 'promise' && demand.active && !paused" type="button" class="btn btn-secondary btn-sm" style="margin-top:10px;" @click="acceptPromise">{{ $t('Akkoord: op pauze tot en met die dag') }}</button>
+            <div v-if="demand.response === 'promise' && demand.active && !paused" class="pause-hint">{{ $t('Na deze datum vragen we je eerst of de herinneringen weer mogen lopen.') }}</div>
           </div>
 
           <button type="button" class="link-btn dm-log-toggle" @click="showDemandLog = !showDemandLog">{{ showDemandLog ? $t('Logboek verbergen') : $t('Logboek tonen (:n)', { n: demand.events.length }) }}</button>
@@ -1446,7 +1459,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
     <div v-if="showPauseModal" class="modal-overlay" @click.self="showPauseModal = false">
       <div class="modal">
         <div class="modal-header">
-          <div class="modal-title">{{ paused ? $t('Pauze aanpassen') : $t('Factuur op pauze zetten') }}</div>
+          <div class="modal-title">{{ pauseEnded ? $t('Pauze verlengen') : (paused ? $t('Pauze aanpassen') : $t('Factuur op pauze zetten')) }}</div>
           <button class="icon-btn" @click="showPauseModal = false">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -1456,7 +1469,8 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
           <div class="form-group">
             <label>{{ $t('Pauzeren tot en met') }}<span class="label-hint">{{ $t('(optioneel)') }}</span></label>
             <input type="date" v-model="pauseForm.until" :min="today">
-            <div class="pause-hint">{{ $t('Leeg laten = op pauze tot je zelf hervat. Met een datum lopen de herinneringen de dag erna vanzelf weer.') }}</div>
+            <div class="pause-hint">{{ $t('Leeg laten = op pauze tot je zelf hervat.') }}</div>
+            <div class="pause-hint">{{ $t('Na deze datum vragen we je eerst of de herinneringen weer mogen lopen.') }}</div>
             <div v-if="pauseForm.errors.until" class="field-error">{{ pauseForm.errors.until }}</div>
           </div>
           <div class="form-group">
@@ -1726,6 +1740,7 @@ const saveKsef = () => ksefForm.patch(route('ksef.number', props.invoice.id), { 
 
 /* Op pauze */
 .pause-banner { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+.pause-banner.pause-ended { border-width: 2px; }
 .pause-reason { font-size: 12.5px; margin-top: 2px; opacity: 0.85; }
 .pause-actions { margin-left: auto; flex: none; display: flex; gap: 14px; }
 .pause-hint { font-size: 12px; color: var(--text-3); margin-top: 6px; line-height: 1.5; }

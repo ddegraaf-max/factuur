@@ -76,6 +76,20 @@
                 </tr>
             </table>
 
+            @if (! empty($s['pauses']))
+                <h2>⏸️ {{ __('Pauzes die om een besluit vragen (:count)', ['count' => count($s['pauses'])]) }}</h2>
+                <table class="list">
+                    @foreach ($s['pauses'] as $i)
+                        <tr>
+                            <td>
+                                <span class="who">{{ $i['customer'] }}</span><br>
+                                <span class="nr">{{ $i['text'] }}</span>
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            @endif
+
             @if ($s['overdue']['count'] > 0)
                 <h2>⚠️ {{ __('Vervallen facturen (:count)', ['count' => $s['overdue']['count']]) }}</h2>
                 <table class="list">

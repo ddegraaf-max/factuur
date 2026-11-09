@@ -86,28 +86,28 @@ class ReminderPauseTest extends TestCase
         $this->assertSame(2, $this->remindersSent($invoice));
     }
 
-    public function test_a_pause_with_an_end_date_lifts_itself(): void
+    public function test_a_pause_with_an_end_date_does_not_lift_itself(): void
     {
+        // Sinds 1.108.0 loopt een pauze niet stilletjes af: na de einddatum
+        // wacht de factuur op akkoord (zie ReminderPauseEndedTest).
         $invoice = $this->overdueInvoice(3);
         $invoice->forceFill([
             'reminders_paused_at' => now()->subDays(5),
             'reminders_paused_until' => now()->subDay()->toDateString(),
             'reminders_pause_reason' => 'Klacht in behandeling',
         ])->save();
-        $this->assertFalse($invoice->fresh()->remindersPaused());
+        $this->assertTrue($invoice->fresh()->remindersPaused());
+        $this->assertTrue($invoice->fresh()->pauseEnded());
         $service = app(ReminderService::class);
 
         $service->run();
-
-        $invoice->refresh();
-        $this->assertNull($invoice->reminders_paused_at);
-        $this->assertNull($invoice->reminders_pause_reason);
-        $this->assertSame(3, $invoice->reminder_shift_days);
-        $this->assertSame(0, $this->remindersSent($invoice), 'De eerste herinnering volgt pas de dag na de pauze.');
-
         $this->travel(1)->days();
         $service->run();
-        $this->assertSame(1, $this->remindersSent($invoice));
+
+        $invoice->refresh();
+        $this->assertNotNull($invoice->reminders_paused_at);
+        $this->assertSame('Klacht in behandeling', $invoice->reminders_pause_reason);
+        $this->assertSame(0, $this->remindersSent($invoice));
     }
 
     public function test_pausing_through_today_still_counts_as_paused(): void
@@ -206,7 +206,7 @@ class ReminderPauseTest extends TestCase
         $this->assertSame(0, Invoice::paused()->where('company_id', $this->user->company_id)->count());
     }
 
-    public function test_a_lapsed_pause_is_no_longer_a_status(): void
+    public function test_a_lapsed_pause_stays_a_status(): void
     {
         $invoice = $this->overdueInvoice();
         $invoice->forceFill([
@@ -214,8 +214,11 @@ class ReminderPauseTest extends TestCase
             'reminders_paused_until' => now()->subDay()->toDateString(),
         ])->save();
 
-        $this->assertFalse($invoice->fresh()->isPaused());
-        $this->assertSame(0, Invoice::paused()->where('company_id', $this->user->company_id)->count());
+        // "Pauze afgelopen" blijft in het filter "Op pauze", zodat hij niet uit beeld raakt.
+        $this->assertTrue($invoice->fresh()->isPaused());
+        $this->assertTrue($invoice->fresh()->isPauseEnded());
+        $this->assertSame(1, Invoice::paused()->where('company_id', $this->user->company_id)->count());
+        $this->assertSame(1, Invoice::pauseLapsed()->where('company_id', $this->user->company_id)->count());
     }
 
     public function test_a_paid_invoice_cannot_be_paused(): void

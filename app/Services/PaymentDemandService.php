@@ -113,6 +113,7 @@ class PaymentDemandService
     {
         return match (true) {
             filled($demand->response) => __('Je klant heeft gereageerd. Het dossier gaat daarom niet vanzelf naar de deurwaarder; jij beslist.'),
+            (bool) $demand->invoice?->pauseEnded() => __('De pauze van de factuur is afgelopen en wacht op jouw akkoord. Tot je hervat, gaat het dossier niet naar de deurwaarder.'),
             (bool) $demand->invoice?->remindersPaused() => __('De factuur staat op pauze. Zolang de pauze loopt, gaat het dossier niet naar de deurwaarder.'),
             default => null,
         };
@@ -142,6 +143,7 @@ class PaymentDemandService
             ! $invoice->due_date || ! $invoice->due_date->copy()->endOfDay()->isPast()
                 => __('De betaaltermijn van deze factuur is nog niet verstreken.'),
             blank($invoice->customer_email) => __('Deze klant heeft geen e-mailadres. Vul het aan bij de klantgegevens.'),
+            $invoice->pauseEnded() => __('De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je een aanmaning stuurt.'),
             $invoice->remindersPaused() => __('Deze factuur staat op pauze. Hervat eerst voordat je een aanmaning stuurt.'),
             $invoice->demands()->where('status', 'sent')->exists() => __('Er loopt al een aanmaning voor deze factuur.'),
             default => null,

@@ -54,6 +54,7 @@ class InvoiceController extends Controller
             'is_credit' => (bool) $i->is_credit,
             'days_overdue' => $i->days_overdue,
             'paused' => $i->isPaused(),
+            'pause_ended' => $i->isPauseEnded(),
             'viewed_label' => $i->first_viewed_at?->translatedFormat('j M Y, H:i'),
             'total' => (float) $i->total,
             'paid_total' => (float) $i->paid_total,
@@ -68,6 +69,7 @@ class InvoiceController extends Controller
             'partial' => Invoice::regular()->where('status', 'partial')->count(),
             'overdue' => Invoice::regular()->where('status', 'overdue')->count(),
             'paused' => Invoice::paused()->count(),
+            'pause_ended' => Invoice::pauseLapsed()->count(),
             'incasso' => Invoice::regular()->where('status', 'incasso')->count(),
             'paid' => Invoice::regular()->where('status', 'paid')->count(),
             'creditnota' => Invoice::credit()->count(),
@@ -169,6 +171,10 @@ class InvoiceController extends Controller
                 'reminders_paused' => $invoice->isPaused(),
                 'reminders_paused_until' => $invoice->reminders_paused_until?->format('Y-m-d'),
                 'reminders_paused_until_label' => $invoice->reminders_paused_until?->translatedFormat('j M Y'),
+                // Afgelopen pauze: wacht op akkoord; of: loopt morgen/vandaag af (seintje).
+                'reminders_pause_ended' => $invoice->isPauseEnded(),
+                'reminders_pause_ends_soon' => $invoice->isPaused() && $invoice->pauseEndsSoon(),
+                'reminders_pause_ends_tomorrow' => (bool) $invoice->reminders_paused_until?->isSameDay(now()->addDay()),
                 'history' => $this->history($invoice),
                 'portal_url' => $invoice->portalUrl(),
                 // Waar 'Versturen' naartoe mailt: het adres op de factuur, anders dat van de klant.
@@ -626,6 +632,7 @@ class InvoiceController extends Controller
     {
         $reminders->resume($invoice);
 
+        // Het schema schuift op met de pauze: de eerstvolgende stap komt op dezelfde afstand als vóór de pauze.
         return back()->with('flash', __('Pauze opgeheven: herinneringen lopen weer volgens schema.'));
     }
 
@@ -842,6 +849,9 @@ class InvoiceController extends Controller
             $push($invoice->reminders_paused_at, 'pause', $invoice->reminders_paused_until
                 ? __('Op pauze gezet t/m :date', ['date' => $invoice->reminders_paused_until->translatedFormat('j M Y')])
                 : __('Op pauze gezet'));
+            if ($invoice->pauseEnded()) {
+                $push($invoice->reminders_pause_ended_at ?? $invoice->reminders_paused_until->copy()->addDay(), 'pause', __('Pauze afgelopen: er gaat niets uit tot je hervat'));
+            }
         }
 
         $push($invoice->incasso_sent_at, 'gavel', __('Overgedragen aan incasso') . ($invoice->incasso_handler ? " ({$invoice->incasso_handler})" : ''));

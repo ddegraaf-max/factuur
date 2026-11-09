@@ -151,6 +151,7 @@ class CustomerController extends Controller
                 'status' => $i->status,
                 'days_overdue' => $i->days_overdue,
                 'paused' => $i->isPaused(),
+                'pause_ended' => $i->isPauseEnded(),
                 'total' => (float) $i->total,
                 'paid_total' => (float) $i->paid_total,
                 'remaining' => round((float) $i->total - (float) $i->paid_total, 2),

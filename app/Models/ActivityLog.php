@@ -29,6 +29,8 @@ class ActivityLog extends Model
         'viewed' => 'Bekeken',
         'paused' => 'Op pauze',
         'resumed' => 'Hervat',
+        'pause_ending' => 'Pauze loopt af',
+        'pause_ended' => 'Pauze afgelopen',
         'accepted' => 'Geaccepteerd',
         'rejected' => 'Afgewezen',
         'reopened' => 'Opnieuw aangeboden',

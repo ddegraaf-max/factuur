@@ -2219,5 +2219,16 @@
   ":company: factuur :number van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: faktura :number na :amount, płatna do :date. Zobacz i zapłać online: :link",
   ":company: factuur van :amount, te betalen vóór :date. Bekijk en betaal online: :link": ":company: faktura na :amount, płatna do :date. Zobacz i zapłać online: :link",
   "Factuur :number per sms verstuurd naar :number2.": "Faktura :number wysłana SMS-em na :number2.",
-  ":company: je toegangscode is :code (10 minuten geldig).": ":company: Twój kod dostępu to :code (ważny 10 minut)."
+  ":company: je toegangscode is :code (10 minuten geldig).": ":company: Twój kod dostępu to :code (ważny 10 minut).",
+  ":label: na de afgelopen pauze hervat, herinneringen lopen weer": ":label: wznowiono po zakończonym wstrzymaniu, przypomnienia znów są wysyłane",
+  ":label: pauze afgelopen op :date. Er gaat niets uit tot je de herinneringen hervat.": ":label: wstrzymanie zakończyło się :date. Nic nie zostanie wysłane, dopóki nie wznowisz przypomnień.",
+  "De pauze van factuur :number loopt morgen af. Verlengen, hervatten of laten staan?": "Wstrzymanie faktury :number kończy się jutro. Przedłużyć, wznowić czy zostawić?",
+  "De pauze van factuur :number loopt vandaag af. Verlengen, hervatten of laten staan?": "Wstrzymanie faktury :number kończy się dzisiaj. Przedłużyć, wznowić czy zostawić?",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat de herinneringen eerst om er een te kunnen sturen.": "Wstrzymanie tej faktury się zakończyło i czeka na Twoją zgodę. Najpierw wznów przypomnienia, aby móc je wysłać.",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je hem naar incasso stuurt.": "Wstrzymanie tej faktury się zakończyło i czeka na Twoją zgodę. Najpierw wznów, zanim przekażesz ją do windykacji.",
+  "De pauze van de factuur is afgelopen en wacht op jouw akkoord. Tot je hervat, gaat het dossier niet naar de deurwaarder.": "Wstrzymanie faktury się zakończyło i czeka na Twoją zgodę. Dopóki nie wznowisz, sprawa nie trafi do komornika.",
+  "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je een aanmaning stuurt.": "Wstrzymanie tej faktury się zakończyło i czeka na Twoją zgodę. Najpierw wznów, zanim wyślesz wezwanie do zapłaty.",
+  "Pauze afgelopen: er gaat niets uit tot je hervat": "Wstrzymanie zakończone: nic nie zostanie wysłane, dopóki nie wznowisz",
+  "De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.": "Wstrzymanie faktury :number się zakończyło. Nic nie zostanie wysłane, dopóki nie wznowisz przypomnień.",
+  "Pauzes die om een besluit vragen (:count)": "Wstrzymania wymagające decyzji (:count)"
 }

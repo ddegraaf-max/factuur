@@ -22,9 +22,11 @@ class ReminderService
     {
         $sent = 0;
 
-        // Pauzes met een verstreken einddatum vervallen eerst; wat daarna nog
-        // op pauze staat, slaan we over.
-        $this->liftExpiredPauses();
+        // Pauzes met een verstreken einddatum gaan naar "Pauze afgelopen" en
+        // blijven stilstaan tot jij akkoord geeft; pauzes die morgen aflopen
+        // krijgen één keer een seintje. Alles met een pauze slaan we over.
+        $this->endExpiredPauses();
+        $this->warnEndingPauses();
 
         // In console-context grijpt de company-scope niet, dus we zien alle facturen.
         // Demo-omgevingen slaan we over: daaruit mag nooit echte post vertrekken.
@@ -81,6 +83,9 @@ class ReminderService
         if ($invoice->status === 'draft') {
             throw new \DomainException('Verstuur de factuur eerst; een concept kan nog geen herinnering krijgen.');
         }
+        if ($invoice->pauseEnded()) {
+            throw new \DomainException(__('De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat de herinneringen eerst om er een te kunnen sturen.'));
+        }
         if ($invoice->remindersPaused()) {
             throw new \DomainException(__('Deze factuur staat op pauze. Hervat de herinneringen eerst om er een te kunnen sturen.'));
         }
@@ -126,15 +131,18 @@ class ReminderService
             throw new \DomainException(__('Alleen een verstuurde factuur die nog openstaat kun je op pauze zetten.'));
         }
 
-        // Een verlopen pauze die de dagelijkse taak nog niet heeft opgeruimd, eerst afsluiten.
-        if ($invoice->reminders_paused_at && ! $invoice->remindersPaused()) {
-            $this->resume($invoice, expired: true);
-        }
+        // Een afgelopen pauze verlengen: de pauze loopt gewoon door vanaf de
+        // oorspronkelijke start (bij hervatten schuift het schema dan over de
+        // hele periode op). Bij een nieuwe einddatum hoort een nieuw seintje.
+        $newUntil = $until?->toDateString();
+        $untilChanged = $newUntil !== $invoice->reminders_paused_until?->toDateString();
 
         $invoice->forceFill([
             'reminders_paused_at' => $invoice->reminders_paused_at ?? now(),
-            'reminders_paused_until' => $until?->toDateString(),
+            'reminders_paused_until' => $newUntil,
             'reminders_pause_reason' => filled($reason) ? trim($reason) : null,
+            'reminders_pause_ended_at' => null,
+            'reminders_pause_warned_at' => $untilChanged ? null : $invoice->reminders_pause_warned_at,
         ])->saveQuietly();
 
         $label = Audit::label($invoice);
@@ -145,53 +153,103 @@ class ReminderService
     }
 
     /**
-     * Heft de pauze op. Het herinneringsschema schuift op met de dagen dat de
-     * pauze ná de vervaldatum liep: de klant krijgt de eerstvolgende stap op
-     * dezelfde afstand als vóór de pauze, niet een inhaalslag van dag op dag.
+     * Heft de pauze op — altijd een keuze van de gebruiker, ook na een
+     * afgelopen pauze. Het herinneringsschema schuift op met de dagen dat de
+     * pauze ná de vervaldatum liep (tot vandaag): de klant krijgt de
+     * eerstvolgende stap op dezelfde afstand als vóór de pauze, niet een
+     * inhaalslag van dag op dag.
      */
-    public function resume(Invoice $invoice, bool $expired = false): void
+    public function resume(Invoice $invoice): void
     {
         if (! $invoice->reminders_paused_at) {
             return;
         }
+
+        $wasEnded = $invoice->pauseEnded();
 
         $from = $invoice->reminders_paused_at->copy()->startOfDay();
         $dueDay = $invoice->due_date?->copy()->startOfDay();
         if ($dueDay && $dueDay->gt($from)) {
             $from = $dueDay;
         }
-        $to = $expired && $invoice->reminders_paused_until
-            ? $invoice->reminders_paused_until->copy()->startOfDay()->addDay()
-            : now()->startOfDay();
+        $to = now()->startOfDay();
         $days = $to->gt($from) ? (int) round($from->diffInDays($to)) : 0;
 
         $invoice->forceFill([
             'reminders_paused_at' => null,
             'reminders_paused_until' => null,
             'reminders_pause_reason' => null,
+            'reminders_pause_ended_at' => null,
+            'reminders_pause_warned_at' => null,
             'reminder_shift_days' => min(3650, (int) $invoice->reminder_shift_days + $days),
         ])->saveQuietly();
 
         $label = Audit::label($invoice);
-        Audit::log('resumed', $invoice, $expired
-            ? __(':label: pauze afgelopen, herinneringen lopen weer', ['label' => $label])
+        Audit::log('resumed', $invoice, $wasEnded
+            ? __(':label: na de afgelopen pauze hervat, herinneringen lopen weer', ['label' => $label])
             : __(':label: pauze opgeheven, herinneringen lopen weer', ['label' => $label]), [], $invoice->company_id);
     }
 
-    /** Pauzes waarvan de einddatum voorbij is, vervallen vanzelf; geeft het aantal terug. */
-    public function liftExpiredPauses(): int
+    /**
+     * Pauzes waarvan de einddatum voorbij is: niet opheffen, maar markeren als
+     * "Pauze afgelopen". Er gaat niets uit (herinnering, aanmaning, incasso)
+     * tot de gebruiker hervat of verlengt. Geeft het aantal nieuw afgelopen pauzes terug.
+     */
+    public function endExpiredPauses(): int
     {
-        $expired = Invoice::query()
+        $ended = Invoice::query()
             ->whereNotNull('reminders_paused_at')
             ->whereNotNull('reminders_paused_until')
-            ->whereDate('reminders_paused_until', '<', now())
+            ->whereNull('reminders_pause_ended_at')
+            ->whereDate('reminders_paused_until', '<', now()->toDateString())
             ->get();
 
-        foreach ($expired as $invoice) {
-            $this->resume($invoice, expired: true);
+        foreach ($ended as $invoice) {
+            $invoice->forceFill(['reminders_pause_ended_at' => now()])->saveQuietly();
+            if (! $invoice->isPaused()) {
+                continue; // betaald of geannuleerd: niets te melden
+            }
+            Audit::log('pause_ended', $invoice, __(':label: pauze afgelopen op :date. Er gaat niets uit tot je de herinneringen hervat.', [
+                'label' => Audit::label($invoice),
+                'date' => $invoice->reminders_paused_until->translatedFormat('j M Y'),
+            ]), [], $invoice->company_id);
         }
 
-        return $expired->count();
+        return $ended->count();
+    }
+
+    /**
+     * De dag vóór de einddatum één seintje: "loopt morgen af". Eén keer per
+     * einddatum (reminders_pause_warned_at); een gemiste dag halen we op de
+     * einddatum zelf nog in. Geeft het aantal seintjes terug.
+     */
+    public function warnEndingPauses(): int
+    {
+        $today = now()->startOfDay();
+        $soon = Invoice::query()
+            ->paused()
+            ->whereNotNull('reminders_paused_until')
+            ->whereNull('reminders_pause_warned_at')
+            ->whereDate('reminders_paused_until', '>=', $today->toDateString())
+            ->whereDate('reminders_paused_until', '<=', $today->copy()->addDay()->toDateString())
+            ->get();
+
+        foreach ($soon as $invoice) {
+            $invoice->forceFill(['reminders_pause_warned_at' => now()])->saveQuietly();
+            Audit::log('pause_ending', $invoice, self::endingNotice($invoice), [], $invoice->company_id);
+        }
+
+        return $soon->count();
+    }
+
+    /** "De pauze van factuur 2026-0023 loopt morgen af. Verlengen, hervatten of laten staan?" */
+    public static function endingNotice(Invoice $invoice): string
+    {
+        $tomorrow = $invoice->reminders_paused_until?->isSameDay(now()->addDay());
+
+        return $tomorrow
+            ? __('De pauze van factuur :number loopt morgen af. Verlengen, hervatten of laten staan?', ['number' => $invoice->number])
+            : __('De pauze van factuur :number loopt vandaag af. Verlengen, hervatten of laten staan?', ['number' => $invoice->number]);
     }
 
     private function processInvoice(Invoice $invoice): bool
