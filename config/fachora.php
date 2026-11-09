@@ -168,6 +168,19 @@ return [
     'letters_per_batch' => 100,
 
     /*
+     * 1.109: brieven automatisch per post (fachora:letters, elke werkdag 09:15). Alleen aan
+     * niet-geclaimde bedrijven met postadres die een klant uit de lijst koos, in één stad
+     * (pilot), hoogstens per_day per dag, nooit twee keer. Zonder Pingen-gegevens of met
+     * dry_run=true wordt alleen gelogd wat er verstuurd zou worden.
+     */
+    'letters' => [
+        'enabled' => (bool) env('FACHORA_LETTERS', false),
+        'city' => env('FACHORA_LETTERS_CITY'),           // bijv. "Poznań"; leeg = alle steden
+        'per_day' => (int) env('FACHORA_LETTERS_PER_DAY', 10),
+        'dry_run' => (bool) env('FACHORA_LETTERS_DRY_RUN', true),
+    ],
+
+    /*
      * Categorieën. De sleutel is de slug in de URL (/uslugi/hydraulik), 'pkd'
      * de Poolse PKD-codes die erbij horen (voor de import uit CEIDG), 'icon'
      * een beeldmerk uit de set in resources/js/fachora-icons.js en in de Blade-partial.

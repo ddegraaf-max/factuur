@@ -428,3 +428,20 @@ HUISSTIJL (6 nov 2026, 1.105.0, ontwerp Daniël "Dobry fachowiec. Bez stresu.")
   kominiarz = rawpixel.com/image/6027141 (schoorstenen op een dak, CC0; 1.105.3, keuze Daniël; de
   houtkachel rawpixel.com/image/5910116 was het eerste idee). Geen naamsvermelding vereist.
 - Nog open: een scherpere herofoto; de huidige komt uit het ontwerpbeeld (668x420).
+
+BRIEVEN PER POST, AUTOMATISCH (9 nov 2026, 1.109.0, besluit Daniël: "wellicht met die brieven beginnen in een stad")
+- Aanleiding: eerste week advertenties (2–8 nov): 67 klikken, 217 zł, 4 echte aanvragen, maar geen enkel
+  bedrijf dat claimt en niemand die kan bellen. Advertenties op 9 nov gepauzeerd (bulkupload Edit, status
+  Paused). Post is de enige weg zonder toestemming (ConsentPolicy): per gekozen bedrijf een brief met claimcode.
+- fachora:letters (elke werkdag 09:15 Warschau; staat UIT tot FACHORA_LETTERS=true): kandidaten uit
+  LetterService::candidates(chosenOnly) — niet geclaimd, met postadres, door een klant gekozen in het laatste
+  half jaar — in de pilotstad FACHORA_LETTERS_CITY (bijv. Poznań), hoogstens FACHORA_LETTERS_PER_DAY (10) per run,
+  nooit twee keer (providers.letter_sent_at / letter_ref). Per brief een eigen PDF (pdf.fachora-letter met
+  $postal: adres in het venster links, 20 mm van links en 45–95 mm van boven) via PingenClient:
+  token (identity.pingen.com, client credentials, scope letter) → GET /file-upload → PUT pdf → POST
+  /organisations/{org}/letters (auto_send, cheap, simplex, grayscale, address_position left). Logboek:
+  fachora_privacy_log action letter_sent. Opties: --city, --limit, --all (ook niet-gekozen), --dry-run.
+- Nodig op Railway (Fachora): PINGEN_CLIENT_ID, PINGEN_CLIENT_SECRET, PINGEN_ORGANISATION (account op pingen.com,
+  Developer → API clients, scope letter), FACHORA_LETTERS=true, FACHORA_LETTERS_CITY, FACHORA_LETTERS_DRY_RUN=false.
+  Eerst testen met PINGEN_STAGING=true (niets wordt gedrukt). Kosten ≈ CHF 1,70–2,50 per brief naar Polen.
+- Test: FachoraLettersTest (proefdraai zonder gegevens, de drie API-stappen, één keer per bedrijf, stadsfilter, uit tot pilot aan).

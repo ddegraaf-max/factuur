@@ -156,4 +156,16 @@ return [
         // Secret van de delivery_report-webhook in Smstools; zonder secret geldt alleen een bekend messageid als controle.
         'webhook_secret' => env('SMSTOOLS_WEBHOOK_SECRET'),
     ],
+
+    /*
+     * Pingen (pingen.com): brieven per post vanuit de code (1.109, Fachora). Een API-client
+     * met de scope "letter" (Developer → API clients) en het id van de organisatie. Met
+     * PINGEN_STAGING=true praten we met de testomgeving (niets wordt echt gedrukt).
+     */
+    'pingen' => [
+        'client_id' => env('PINGEN_CLIENT_ID'),
+        'client_secret' => env('PINGEN_CLIENT_SECRET'),
+        'organisation' => env('PINGEN_ORGANISATION'),
+        'staging' => (bool) env('PINGEN_STAGING', false),
+    ],
 ];

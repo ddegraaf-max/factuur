@@ -34,6 +34,7 @@ class Provider extends Model
         'description', 'photo_data', 'company_id', 'user_id',
         'claim_code', 'claim_token', 'claim_email', 'claim_phone', 'claim_name', 'claim_requested_at', 'claimed_at',
         'consent_at', 'consent_source', 'email_blocked_at', 'optout_token', 'register_notice_at', 'removed_at',
+        'letter_sent_at', 'letter_ref', // 1.109: brief per post (fachora:letters)
         'email_verified_at', 'phone_verified_at', 'phone_code', 'phone_code_sent_at', 'terms_accepted_at', 'terms_version',
         'stripe_account_id', 'stripe_charges_enabled', 'stripe_payouts_enabled', 'stripe_requirements', 'stripe_checked_at',
         'insurance_until', 'insurance_note', 'verification_requested_at', 'verified_at', 'suspended_at', 'suspended_until', 'blocked_at',
@@ -64,6 +65,7 @@ class Provider extends Model
         'email_blocked_at' => 'datetime',
         'register_notice_at' => 'datetime',
         'removed_at' => 'datetime',
+        'letter_sent_at' => 'datetime',
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
         'phone_code_sent_at' => 'datetime',

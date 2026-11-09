@@ -185,6 +185,12 @@ Schedule::command('fachora:google-refresh')
     ->dailyAt('04:20')
     ->timezone('Europe/Warsaw');
 
+// Fachora 1.109: brieven per post (Pingen) aan bedrijven die een klant koos — pilot per stad, alleen met FACHORA_LETTERS=true.
+Schedule::command('fachora:letters')
+    ->weekdays()
+    ->dailyAt('09:15')
+    ->timezone('Europe/Warsaw');
+
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
     Schedule::command('fachora:local-search')

@@ -25,12 +25,15 @@
     ul { margin: 6px 0 12px 18px; padding: 0; }
     li { margin-bottom: 4px; }
     .foot { margin-top: 30px; border-top: 1px solid #E2E8F0; padding-top: 8px; font-size: 8.5pt; color: #94A3B8; }
+    /* 1.109: vensterenvelop (Pingen, venster links): adres 20 mm van links en 45–95 mm van boven; de tekst begint eronder. */
+    .postal .addr { position: absolute; left: 0; top: 26mm; width: 85mm; margin: 0; }
+    .postal .date { margin-top: 58mm; }
 </style>
 </head>
 <body>
 @foreach($letters as $l)
     @php($p = $l['provider'])
-    <div class="letter">
+    <div class="letter{{ ! empty($postal) ? ' postal' : '' }}">
         <div class="head">
             <div class="wordmark">FACH<span>ORA</span></div>
             <div class="tag">Sprawdzone firmy. Bezpieczne usługi. · {{ $domain }}</div>

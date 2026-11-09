@@ -31,7 +31,16 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 november 2026 · {{ brand('version_prefix') }} 1.108.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 november 2026 · {{ brand('version_prefix') }} 1.109.0</div>
+        <h2>Fachora: brieven per post, automatisch</h2>
+        <ul class="tl-list">
+          <li><b>Brief aan gekozen bedrijven</b> — kiest een klant op Fachora een bedrijf dat zijn profiel nog niet heeft geclaimd, dan krijgt dat bedrijf voortaan automatisch een brief per post met de claimcode en de melding dat een klant uit de buurt het koos. Post is de enige weg die zonder toestemming mag; e-mail en sms blijven uit.</li>
+          <li><b>Pilot per stad</b> — de brieven gaan via de postdienst Pingen, elke werkdag, hoogstens een vast aantal per dag, nooit twee keer aan hetzelfde bedrijf, en alleen in de gekozen pilotstad. Zolang de postdienst niet is gekoppeld, laat de taak alleen zien wat er verstuurd zou worden.</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">9 november 2026 · {{ brand('version_prefix') }} 1.108.0</div>
         <h2>Een pauze loopt niet meer stilletjes af</h2>
         <ul class="tl-list">
           <li><b>Eerst jouw akkoord</b> — zet je een factuur op pauze met een einddatum (ook via "Akkoord met de toegezegde dag" bij een online aanmaning), dan gaan de herinneringen na die datum niet meer vanzelf lopen. De factuur krijgt de status "Pauze afgelopen" en er gaat niets uit (geen herinnering, aanmaning of incasso) tot je op "Hervat de herinneringen" klikt of de pauze verlengt. Het schema schuift dan op, zodat je klant geen inhaalslag krijgt.</li>

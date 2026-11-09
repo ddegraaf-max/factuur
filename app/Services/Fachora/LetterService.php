@@ -19,8 +19,9 @@ class LetterService
     /**
      * @param  Collection<int, Provider>  $providers
      * @param  bool  $chosen  De brief noemt dat een klant uit de buurt het bedrijf koos (1.94).
+     * @param  bool  $postal  Adres in het venster van een vensterenvelop (1.109, Pingen leest het daaruit).
      */
-    public function pdf(Collection $providers, bool $chosen = false): string
+    public function pdf(Collection $providers, bool $chosen = false, bool $postal = false): string
     {
         $letters = $providers->map(function (Provider $provider) {
             if (blank($provider->claim_code)) {
@@ -40,6 +41,7 @@ class LetterService
         return Pdf::loadView('pdf.fachora-letter', [
             'letters' => $letters,
             'chosen' => $chosen,
+            'postal' => $postal,
             'date' => now()->format('d.m.Y'),
             'domain' => brand('domain'),
             'email' => brand('email'),
