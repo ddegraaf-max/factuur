@@ -31,12 +31,20 @@ class KvkController extends Controller
         }
     }
 
-    public function profile(string $kvkNumber): JsonResponse
+    /**
+     * Het betaalde basisprofiel. Mag het niet naar buiten (plafond of
+     * noodstop), dan is result null met een vriendelijke melding; het
+     * formulier vult dan in wat het zoekresultaat al weet.
+     */
+    public function profile(Request $request, string $kvkNumber): JsonResponse
     {
         abort_unless(preg_match('/^\d{8}$/', $kvkNumber), 404);
 
-        return response()->json([
-            'result' => $this->kvk->profile($kvkNumber),
-        ]);
+        $result = $this->kvk->profile($kvkNumber, $request->user()?->company_id);
+
+        return response()->json(array_filter([
+            'result' => $result,
+            'message' => $result === null ? $this->kvk->refusal() : null,
+        ], fn ($v, $k) => $k === 'result' || $v !== null, ARRAY_FILTER_USE_BOTH));
     }
 }

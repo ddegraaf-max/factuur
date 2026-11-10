@@ -155,13 +155,13 @@ class CustomerScoreService
                         ? ['status' => 'ok', 'text' => __('Btw-nummer geldig volgens VIES.') . ($vies['name'] ? ' ' . __('Op naam van :name.', ['name' => $vies['name']]) : ''), 'checked_at' => $vies['checked_at']]
                         : ['status' => 'bad', 'text' => __('Btw-nummer niet geldig volgens VIES.'), 'checked_at' => $vies['checked_at']]));
 
-            $facts = filled($customer->kvk_number) && $this->kvk->enabled() ? $this->kvk->facts($customer->kvk_number, $fresh) : null;
+            $facts = filled($customer->kvk_number) && $this->kvk->enabled() ? $this->kvk->facts($customer->kvk_number, $fresh, $customer->company_id) : null;
             $sources['kvk'] = blank($customer->kvk_number)
                 ? ['status' => 'off', 'text' => __('Geen KvK-nummer bij de klant ingevuld.')]
                 : (! $this->kvk->enabled()
                     ? ['status' => 'off', 'text' => __('De KvK-koppeling staat niet aan.')]
                     : ($facts === null
-                        ? ['status' => 'unknown', 'text' => __('Het Handelsregister gaf geen gegevens.')]
+                        ? ['status' => 'unknown', 'text' => $this->kvk->refusal() !== null ? __('Het Handelsregister is nu even niet automatisch op te vragen. Probeer het later opnieuw.') : __('Het Handelsregister gaf geen gegevens.')]
                         : $this->kvkSource($facts)));
         }
 

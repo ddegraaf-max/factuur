@@ -51,6 +51,8 @@ const kvkPick = async (result) => {
     // wat het zoekresultaat al weet (naam, straat, plaats).
     const { data } = await axios.get(route('kvk.profile', result.kvk_number));
     const p = data.result;
+    // Automatisch ophalen even niet beschikbaar: invullen wat het zoekresultaat weet, en dat zeggen.
+    if (!p && data.message) kvkError.value = data.message;
 
     form.name = (p?.name || result.name) ?? form.name;
     form.kvk_number = (p?.kvk_number || result.kvk_number) ?? form.kvk_number;
