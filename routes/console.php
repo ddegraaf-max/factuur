@@ -203,7 +203,13 @@ Schedule::command('fachora:google-refresh')
 Schedule::command('fachora:letters')
     ->weekdays()
     ->dailyAt('09:15')
-    ->timezone('Europe/Warsaw');
+    ->timezone('Europe/Warsaw')
+    // De planner start het commando met "> /dev/null 2>&1": ook stderr, en dus ook Log::info vanuit het
+    // commando, verdwijnt. Wat schedule:run zelf logt komt wél in het Railway-logboek — daarom hier de
+    // opgevangen uitvoer (proefregels, verstuurd/mislukt, samenvatting) als één logregel.
+    ->thenWithOutput(fn (\Illuminate\Support\Stringable $output) => \Illuminate\Support\Facades\Log::info(
+        'fachora:letters: ' . str_replace(PHP_EOL, ' | ', trim((string) $output))
+    ), true);
 
 // Fachora 1.87: import op aanvraag rond nieuwe klanten (de klant wacht hierop als er nog niemand is).
 if ((bool) config('fachora.local_import', true)) {
