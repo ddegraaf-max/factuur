@@ -31,7 +31,18 @@
     <div class="timeline">
       <article class="tl-item">
         <div class="tl-dot"></div>
-        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 9 november 2026 · {{ brand('version_prefix') }} 1.109.0</div>
+        <div class="tl-meta"><span class="value-pill" style="background:var(--brand-tint);color:var(--brand-darker);border-color:var(--brand-border);">Nieuw</span> 10 november 2026 · {{ brand('version_prefix') }} 1.111.0</div>
+        <h2>Extra administraties zijn écht inbegrepen</h2>
+        <ul class="tl-list">
+          <li><b>Eén prijs voor al je administraties</b> — maak je als beheerder een tweede (of derde) administratie aan, dan valt die voortaan onder je bestaande abonnement. Geen eigen proefperiode, geen eigen abonnement, geen balk "Abonnement afsluiten": op de abonnementspagina staat gewoon "Inbegrepen bij …". Heb je nog geen abonnement, dan begint de nieuwe administratie wel met een eigen proefperiode van 14 dagen.</li>
+          <li><b>Alleen de beheerder telt</b> — een boekhouder die bij meerdere klanten meekijkt dekt die klanten niet met het eigen abonnement; het gaat om administraties waarvan jij beheerder bent. Loopt het abonnement van de "moeder" af, dan vervalt de dekking vanzelf.</li>
+          <li><b>Slim geldt mee</b> — zit de betalende administratie op Slim, dan werken de AI-functies ook in de inbegrepen administraties.</li>
+          <li><b>Administratiespagina</b> — de kaartjes tonen nu de juiste status per administratie (vrijgesteld, inbegrepen, abonnement, proef, verlopen); een vrijgestelde administratie heette daar ten onrechte "Proefperiode verlopen".</li>
+        </ul>
+      </article>
+      <article class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-meta">9 november 2026 · {{ brand('version_prefix') }} 1.109.0</div>
         <h2>Fachora: brieven per post, automatisch</h2>
         <ul class="tl-list">
           <li><b>Brief aan gekozen bedrijven</b> — kiest een klant op Fachora een bedrijf dat zijn profiel nog niet heeft geclaimd, dan krijgt dat bedrijf voortaan automatisch een brief per post met de claimcode en de melding dat een klant uit de buurt het koos. Post is de enige weg die zonder toestemming mag; e-mail en sms blijven uit.</li>

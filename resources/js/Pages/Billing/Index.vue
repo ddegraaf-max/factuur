@@ -47,6 +47,9 @@ const statusMeta = computed(() => {
   if (status.value === 'exempt') {
     return { pill: t('Vrijgesteld'), cls: 'ok', note: t('Dit account is vrijgesteld — je hebt altijd volledige toegang tot alles, inclusief de AI-functies.') };
   }
+  if (status.value === 'covered') {
+    return { pill: t('Inbegrepen'), cls: 'ok', note: t('Deze administratie valt onder het abonnement van :name — je betaalt er niets extra voor.', { name: sub.value.covered_by }) };
+  }
   if (status.value === 'active') {
     return { pill: t('Actief abonnement'), cls: 'ok', note: t('Je abonnement is actief.') };
   }
@@ -96,10 +99,10 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
         <div class="card-body">
           <span class="status-pill" :class="statusMeta.cls">{{ statusMeta.pill }}</span>
 
-          <template v-if="status === 'exempt'">
+          <template v-if="status === 'exempt' || status === 'covered'">
             <div class="days-wrap">
               <div class="days-num">∞</div>
-              <div class="days-label">{{ $t('altijd toegang') }}</div>
+              <div class="days-label">{{ status === 'covered' ? $t('inbegrepen') : $t('altijd toegang') }}</div>
             </div>
           </template>
           <template v-else>
@@ -117,7 +120,7 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
           <p v-if="status === 'active'" class="status-sub">
             {{ $t('Huidig abonnement:') }} <strong>{{ currentPlan === 'slim' ? 'Slim' : 'Basis' }}</strong>
           </p>
-          <p v-if="endsAtLabel && status !== 'exempt'" class="status-sub">
+          <p v-if="endsAtLabel && status !== 'exempt' && status !== 'covered'" class="status-sub">
             <template v-if="status === 'active'">{{ $t('Volgende verlenging op') }} <strong>{{ endsAtLabel }}</strong></template>
             <template v-else-if="status === 'trialing'">{{ $t('Proefperiode loopt tot') }} <strong>{{ endsAtLabel }}</strong></template>
             <template v-else>{{ $t('Verlopen op') }} <strong>{{ endsAtLabel }}</strong></template>
@@ -151,6 +154,9 @@ const currentPlan = computed(() => (status.value === 'active' ? (sub.value.plan 
 
           <template v-if="status === 'exempt'">
             <p class="plan-hint">{{ $t('Vrijgesteld account — afsluiten is niet nodig.') }}</p>
+          </template>
+          <template v-else-if="status === 'covered'">
+            <p class="plan-hint">{{ $t('Inbegrepen bij :name — afsluiten is niet nodig.', { name: sub.covered_by }) }}</p>
           </template>
           <template v-else-if="status === 'active'">
             <button v-if="currentPlan === plan.key" class="btn btn-secondary btn-block" :disabled="portal.processing" @click="openPortal">

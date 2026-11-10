@@ -35,6 +35,10 @@ class SendTrialReminders extends Command
             if (! $company->onTrial()) {
                 continue;
             }
+            // Inbegrepen bij het abonnement van een zusteradministratie (1.111): de proef doet er niet toe.
+            if ($company->isCovered()) {
+                continue;
+            }
 
             $daysLeft = max(1, $company->daysLeft());
             $recipients = $company->users()->whereNotNull('email')->get();

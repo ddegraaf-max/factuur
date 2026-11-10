@@ -12,9 +12,11 @@ use Inertia\Response;
 
 /**
  * Meerdere administraties onder één inlog: elke administratie is een eigen
- * bedrijf met eigen KvK, klanten, facturen, nummering en abonnement. De
- * gebruiker wisselt moeiteloos; users.company_id wijst altijd naar de
- * actieve administratie zodat alle bestaande scoping blijft werken.
+ * bedrijf met eigen KvK, klanten, facturen en nummering. Extra administraties
+ * vallen onder het abonnement (of de vrijstelling) van de beheerder, zonder
+ * meerprijs (Company::coveringCompany). De gebruiker wisselt moeiteloos;
+ * users.company_id wijst altijd naar de actieve administratie zodat alle
+ * bestaande scoping blijft werken.
  */
 class AdministrationController extends Controller
 {
@@ -98,8 +100,10 @@ class AdministrationController extends Controller
                 'results_per_page' => 25,
                 'daily_notification_enabled' => true,
                 'daily_notification_email' => $user->email,
-                // Elke administratie heeft een eigen abonnement en dus een
-                // eigen proefperiode.
+                // Proefperiode van 14 dagen als terugval. Valt de administratie
+                // onder het abonnement of de vrijstelling van een andere
+                // administratie van deze beheerder (Company::coveringCompany),
+                // dan kost ze niets extra en komt de proef niet in beeld.
                 'trial_ends_at' => now()->addDays(14),
             ]);
 
@@ -111,8 +115,12 @@ class AdministrationController extends Controller
         // Direct wisselen naar de nieuwe administratie.
         $user->switchToCompany($company);
 
+        $cover = $company->fresh()->coveringCompany();
+
         return redirect()->route('settings.company')
-            ->with('flash', __('Administratie ":name" aangemaakt — vul de bedrijfsgegevens aan.', ['name' => $company->name]));
+            ->with('flash', $cover
+                ? __('Administratie ":name" aangemaakt — inbegrepen bij :cover, zonder meerprijs. Vul de bedrijfsgegevens aan.', ['name' => $company->name, 'cover' => $cover->name])
+                : __('Administratie ":name" aangemaakt — vul de bedrijfsgegevens aan.', ['name' => $company->name]));
     }
 
     /** Wisselen van administratie (alleen waar je lid van bent). */

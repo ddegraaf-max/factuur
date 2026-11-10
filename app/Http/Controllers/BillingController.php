@@ -131,6 +131,9 @@ class BillingController extends Controller
         if ($company->is_exempt) {
             return back()->with('flash', __('Dit account is vrijgesteld — je hoeft geen abonnement af te sluiten.'));
         }
+        if ($cover = $company->coveringCompany()) {
+            return back()->with('flash', __('Deze administratie valt al onder het abonnement van :name — je hoeft niets af te sluiten.', ['name' => $cover->name]));
+        }
 
         // Wordt er tijdens de proefperiode afgesloten, laat Stripe dan pas
         // afschrijven aan het einde van de proef (Stripe vereist >48u vooruit).

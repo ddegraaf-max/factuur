@@ -5,8 +5,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 
 const props = defineProps({ companies: Array });
 
-const accessLabel = { exempt: 'Vrijgesteld', active: 'Abonnement', trial: 'Proefperiode', expired: 'Verlopen', cancelled: 'Opgezegd' };
-const accessClass = { exempt: 'pill-paid', active: 'pill-paid', trial: 'pill-sent', expired: 'pill-overdue', cancelled: 'pill-draft' };
+const accessLabel = { exempt: 'Vrijgesteld', active: 'Abonnement', covered: 'Inbegrepen', trialing: 'Proefperiode', trial: 'Proefperiode', expired: 'Verlopen', cancelled: 'Opgezegd' };
+const accessClass = { exempt: 'pill-paid', active: 'pill-paid', covered: 'pill-paid', trialing: 'pill-sent', trial: 'pill-sent', expired: 'pill-overdue', cancelled: 'pill-draft' };
 const expired = computed(() => props.companies.filter(c => c.deletable && !c.is_demo && c.access === 'expired').length);
 
 const remove = (c) => {

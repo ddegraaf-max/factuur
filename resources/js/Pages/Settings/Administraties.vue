@@ -34,6 +34,8 @@ const switchTo = (a) => {
 
 const subscriptionLabel = (s) => {
   if (!s) return '';
+  if (s.status === 'exempt') return t('Vrijgesteld');
+  if (s.status === 'covered') return t('Inbegrepen bij :name — zonder meerprijs', { name: s.covered_by });
   if (s.status === 'active') return t('Abonnement actief');
   if (s.status === 'trialing') return s.days_left === 1 ? t('Proefperiode — nog 1 dag') : t('Proefperiode — nog :n dagen', { n: s.days_left });
   return t('Proefperiode verlopen');
@@ -51,7 +53,7 @@ const subscriptionLabel = (s) => {
       <div>
         <h1 class="page-title">{{ $t('Administraties') }}</h1>
         <p class="page-subtitle">
-          {{ $t('Beheer meerdere bedrijven onder één inlog — elk met een eigen :registry, klanten, facturen, nummering en abonnement. Wisselen kan altijd via het menu linksonder.', { registry: market.registry.short }) }}
+          {{ $t('Beheer meerdere bedrijven onder één inlog — elk met een eigen :registry, klanten, facturen en nummering. Extra administraties vallen onder je abonnement, zonder meerprijs. Wisselen kan altijd via het menu linksonder.', { registry: market.registry.short }) }}
         </p>
       </div>
       <button v-if="!showForm" type="button" class="btn btn-primary" @click="showForm = true">
@@ -65,7 +67,7 @@ const subscriptionLabel = (s) => {
       <div class="card-body">
         <div class="adm-form-title">{{ $t('Nieuwe administratie starten') }}</div>
         <p class="adm-hint">
-          {{ $t("De nieuwe administratie begint met een eigen gratis proefperiode van 14 dagen en een eigen abonnement. Jij wordt automatisch beheerder; collega's nodig je daarna uit via Instellingen → Team.") }}
+          {{ $t("Heb je al een abonnement of ben je vrijgesteld, dan valt de nieuwe administratie daar zonder meerprijs onder. Anders begint ze met een eigen gratis proefperiode van 14 dagen. Jij wordt automatisch beheerder; collega's nodig je daarna uit via Instellingen → Team.") }}
         </p>
         <form @submit.prevent="submit">
           <div class="form-row">

@@ -6,10 +6,16 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Company extends Model
 {
     use HasFactory;
+
+    /** Zusteradministratie die voor deze betaalt (zie coveringCompany), één keer per exemplaar bepaald. */
+    private ?Company $cover = null;
+
+    private bool $coverResolved = false;
 
     protected $fillable = [
         'name', 'is_demo', 'demo_expires_at',
@@ -371,10 +377,58 @@ class Company extends Model
             && $this->trial_ends_at->isFuture();
     }
 
-    /** Heeft toegang tot de app (vrijgesteld, proef of betaald). */
+    /**
+     * 1.111: meerdere administraties onder één inlog kosten niets extra ("één
+     * inlog, één prijs"). Een administratie zonder eigen abonnement valt onder
+     * het abonnement — of de vrijstelling — van een andere administratie
+     * waarvan dezelfde persoon beheerder is. Alleen de beheerdersrol telt: een
+     * boekhouder die bij tien klanten meekijkt dekt die klanten niet met zijn
+     * eigen abonnement. Vrijgesteld gaat vóór betaald, dan de oudste.
+     */
+    public function coveringCompany(): ?Company
+    {
+        if ($this->coverResolved) {
+            return $this->cover;
+        }
+        $this->coverResolved = true;
+
+        if (! $this->exists || $this->is_exempt || $this->is_demo || $this->subscriptionActive()) {
+            return $this->cover = null;
+        }
+
+        $admins = DB::table('company_user')->where('company_id', $this->id)->where('role', 'owner')->pluck('user_id');
+        if ($admins->isEmpty()) {
+            return $this->cover = null;
+        }
+        $siblings = DB::table('company_user')
+            ->whereIn('user_id', $admins)
+            ->where('role', 'owner')
+            ->where('company_id', '!=', $this->id)
+            ->pluck('company_id')
+            ->unique();
+        if ($siblings->isEmpty()) {
+            return $this->cover = null;
+        }
+
+        return $this->cover = static::query()
+            ->whereIn('id', $siblings)
+            ->where('is_demo', false)
+            ->where(fn ($q) => $q->where('is_exempt', true)->orWhere('subscription_ends_at', '>', now()))
+            ->orderByDesc('is_exempt')
+            ->orderBy('id')
+            ->first();
+    }
+
+    /** Inbegrepen bij het abonnement (of de vrijstelling) van een zusteradministratie. */
+    public function isCovered(): bool
+    {
+        return $this->coveringCompany() !== null;
+    }
+
+    /** Heeft toegang tot de app (vrijgesteld, proef, betaald of inbegrepen bij een zusteradministratie). */
     public function hasAccess(): bool
     {
-        return $this->is_exempt || $this->onTrial() || $this->subscriptionActive();
+        return $this->is_exempt || $this->onTrial() || $this->subscriptionActive() || $this->isCovered();
     }
 
     /**
@@ -387,7 +441,8 @@ class Company extends Model
         return $this->is_exempt
             || $this->is_demo
             || $this->onTrial()
-            || ($this->subscriptionActive() && $this->plan === 'slim');
+            || ($this->subscriptionActive() && $this->plan === 'slim')
+            || ($this->isCovered() && $this->coveringCompany()->hasAiAccess());
     }
 
     /** Tot wanneer loopt de toegang (proef of abonnement). */
@@ -400,6 +455,9 @@ class Company extends Model
         }
         if ($this->subscriptionActive()) {
             return $this->subscription_ends_at;
+        }
+        if ($this->isCovered()) {
+            return $this->coveringCompany()->accessEndsAt();
         }
         if ($this->onTrial()) {
             return $this->trial_ends_at;
@@ -419,7 +477,7 @@ class Company extends Model
         return (int) ceil((float) now()->diffInDays($end, true));
     }
 
-    /** Status voor de UI: 'exempt' | 'trialing' | 'active' | 'expired'. */
+    /** Status voor de UI: 'exempt' | 'active' | 'covered' | 'trialing' | 'expired'. */
     public function accessStatus(): string
     {
         if ($this->is_exempt) {
@@ -427,6 +485,9 @@ class Company extends Model
         }
         if ($this->subscriptionActive()) {
             return 'active';
+        }
+        if ($this->isCovered()) {
+            return 'covered';
         }
         if ($this->onTrial()) {
             return 'trialing';
@@ -485,6 +546,8 @@ class Company extends Model
             'plan' => $this->plan ?? 'basis',
             'is_exempt' => (bool) $this->is_exempt,
             'has_ai' => $this->hasAiAccess(),
+            // Naam van de zusteradministratie waar deze bij inbegrepen is (status 'covered').
+            'covered_by' => $this->coveringCompany()?->name,
         ];
     }
 }

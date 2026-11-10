@@ -51,9 +51,12 @@ class OwnerAccess
         }
 
         // Geen adres ingesteld: de (eerste) gebruiker van een vrijgestelde
-        // administratie — alleen het platform zelf betaalt niet.
+        // administratie — alleen het platform zelf betaalt niet. Lidmaatschap
+        // telt, niet alleen de actieve administratie: wie net naar een tweede
+        // administratie is gewisseld (1.111) blijft eigenaar.
+        $exempt = fn (Builder $q) => $q->withoutGlobalScope('company')->where('is_exempt', true)->where('is_demo', false);
         $exemptOwner = User::query()
-            ->whereHas('company', fn (Builder $q) => $q->withoutGlobalScope('company')->where('is_exempt', true)->where('is_demo', false))
+            ->where(fn (Builder $q) => $q->whereHas('company', $exempt)->orWhereHas('companies', $exempt))
             ->orderBy('id')
             ->first();
 
