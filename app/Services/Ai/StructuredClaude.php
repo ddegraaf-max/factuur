@@ -46,7 +46,7 @@ class StructuredClaude
         }
 
         try {
-            $message = $client->beta->messages->create(...$params);
+            $message = AiBudget::call(fn () => $client->beta->messages->create(...$params));
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error("{$label}: ongeldige Anthropic API-key", ['error' => $e->getMessage()]);
             throw new \DomainException('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).');

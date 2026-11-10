@@ -170,13 +170,13 @@ class CostGuard
         $month = now()->format('Y-m');
         $scopes = [['platform', $day], ['platform', $month]];
         if ($team !== null) {
-            $scopes[] = ['team:'.$team, $day];
+            $scopes[] = ['team:' . $team, $day];
         }
 
         try {
             foreach ($scopes as [$scope, $period]) {
                 DB::table('cost_counters')->where(['service' => $service, 'scope' => $scope, 'period' => $period])
-                    ->update(['cents' => DB::raw('cents + '.(int) $delta), 'updated_at' => now()]);
+                    ->update(['cents' => DB::raw('cents + ' . (int) $delta), 'updated_at' => now()]);
             }
         } catch (\Throwable $e) {
             Log::warning('Kostenplafond: verrekenen mislukt', ['service' => $service, 'error' => $e->getMessage()]);
@@ -242,7 +242,7 @@ class CostGuard
         $day = now()->format('Y-m-d');
         $buckets = [['scope' => 'platform', 'period' => $day, 'kind' => 'calls', 'limit' => $limits['dag'], 'reason' => 'dag']];
         if ($team !== null) {
-            $buckets[] = ['scope' => 'team:'.$team, 'period' => $day, 'kind' => 'calls', 'limit' => $limits['team'], 'reason' => 'team'];
+            $buckets[] = ['scope' => 'team:' . $team, 'period' => $day, 'kind' => 'calls', 'limit' => $limits['team'], 'reason' => 'team'];
         }
         $buckets[] = ['scope' => 'platform', 'period' => now()->format('Y-m'), 'kind' => 'cents', 'limit' => $limits['maand'], 'reason' => 'maand'];
 
@@ -288,7 +288,7 @@ class CostGuard
                             ? $query->where('calls', '<', $b['limit'])
                             : $query->whereRaw('cents + ? <= ?', [$cents, $b['limit']]);
                     }
-                    $updated = $query->update(['calls' => DB::raw('calls + 1'), 'cents' => DB::raw('cents + '.$cents), 'updated_at' => $now]);
+                    $updated = $query->update(['calls' => DB::raw('calls + 1'), 'cents' => DB::raw('cents + ' . $cents), 'updated_at' => $now]);
                     if ($updated === 0) {
                         $refused = $b['reason'];
                         throw new CostGuardRollback;
@@ -361,7 +361,7 @@ class CostGuard
     /** Telt deze aanroep mee in de huidige minuut en geeft het aantal terug. */
     private function minuteCount(string $service): int
     {
-        $key = "kostenplafond:{$service}:minuut:".now()->format('YmdHi');
+        $key = "kostenplafond:{$service}:minuut:" . now()->format('YmdHi');
         try {
             Cache::add($key, 0, 120);
             $count = Cache::increment($key);
@@ -396,13 +396,13 @@ class CostGuard
         $day = now()->format('Y-m-d');
         try {
             $first = DB::table('cost_counters')->insertOrIgnore([
-                'service' => $service, 'scope' => 'alarm:'.$kind, 'period' => $day,
+                'service' => $service, 'scope' => 'alarm:' . $kind, 'period' => $day,
                 'calls' => 1, 'cents' => 0, 'created_at' => now(), 'updated_at' => now(),
             ]) > 0;
         } catch (\Throwable) {
             $memoryKey = "{$service}|{$kind}|{$day}";
             try {
-                $first = Cache::add('kostenplafond:alarm:'.$memoryKey, true, now()->endOfDay());
+                $first = Cache::add('kostenplafond:alarm:' . $memoryKey, true, now()->endOfDay());
             } catch (\Throwable) {
                 $first = ! isset(self::$memoryAlarms[$memoryKey]);
             }
@@ -420,7 +420,7 @@ class CostGuard
             $usage = collect($this->overview()['diensten'])->firstWhere('key', $service) ?? [];
             $name = (string) ($this->config($service)['naam'] ?? $service);
             $env = strtoupper($service === 'kvk_zoeken' ? 'kvk' : $service);
-            $money = fn (?int $c) => $c === null ? 'geen' : '€ '.number_format($c / 100, 2, ',', '.');
+            $money = fn (?int $c) => $c === null ? 'geen' : '€ ' . number_format($c / 100, 2, ',', '.');
 
             $subject = match ($kind) {
                 'dag80' => "Kostenplafond: {$name} op 80% van het dagplafond",
@@ -429,17 +429,17 @@ class CostGuard
                 default => "Kostenplafond: {$name} heeft het maandbudget bereikt",
             };
             $body = implode("\n", [
-                $subject.'.',
+                $subject . '.',
                 '',
-                'Vandaag: '.($usage['today_calls'] ?? '?').' aanroepen'.($limits['dag'] !== null ? " van de {$limits['dag']}" : '').', '.$money($usage['today_cents'] ?? 0).'.',
-                'Deze maand: '.($usage['month_calls'] ?? '?').' aanroepen, '.$money($usage['month_cents'] ?? 0).' van het budget ('.$money($limits['maand']).').',
+                'Vandaag: ' . ($usage['today_calls'] ?? '?') . ' aanroepen' . ($limits['dag'] !== null ? " van de {$limits['dag']}" : '') . ', ' . $money($usage['today_cents'] ?? 0) . '.',
+                'Deze maand: ' . ($usage['month_calls'] ?? '?') . ' aanroepen, ' . $money($usage['month_cents'] ?? 0) . ' van het budget (' . $money($limits['maand']) . ').',
                 '',
                 str_ends_with($kind, '100')
                     ? 'De koppeling staat nu dicht. Gebruikers krijgen een vriendelijke melding en vullen de gegevens zelf in; de rest van de app werkt gewoon door.'
                     : 'Er gebeurt nog niets: de koppeling werkt door tot het plafond.',
                 '',
                 "Ruimer zetten kan in Railway met {$env}_DAGLIMIET, {$env}_TEAMLIMIET of {$env}_MAANDBUDGET (in euro's). Alles direct dicht: NOODSTOP_{$env}=1.",
-                'Overzicht: '.route('owner.companies.index'),
+                'Overzicht: ' . route('owner.companies.index'),
                 '',
                 'Je krijgt deze melding hooguit één keer per dag.',
             ]);

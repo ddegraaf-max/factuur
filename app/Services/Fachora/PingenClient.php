@@ -26,6 +26,9 @@ class PingenClient
     /** Verstuurt één PDF als brief; geeft het Pingen-kenmerk (letter id) terug. */
     public function sendLetter(string $pdf, string $filename): string
     {
+        // Elke brief kost porto: eerst langs de kostenbewaker.
+        app(\App\Services\CostGuard::class)->spend('post', 'fachora');
+
         $token = $this->token();
 
         $upload = Http::withToken($token)->acceptJson()->get($this->api('/file-upload'))->throw()->json('data.attributes');

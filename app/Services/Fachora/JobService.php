@@ -845,7 +845,7 @@ class JobService
                 . 'jednozdaniowe streszczenie po angielsku, realistyczny przedział ceny brutto w PLN dla takiej usługi w Polsce w 2026 r. '
                 . '(estimate_low/estimate_high, robocizna i dojazd, bez materiałów o dużej wartości) oraz maksymalnie trzy pytania po polsku, '
                 . 'które fachowiec powinien zadać przed wyceną. Jeśli opis jest zbyt ogólny, przedział może być szeroki.';
-            $result = $ai->json($prompt, $schema, 1200, 'low', [], 'Fachora intake');
+            $result = \App\Services\Ai\AiBudget::as('fachora', fn () => $ai->json($prompt, $schema, 1200, 'low', [], 'Fachora intake'));
             $job->forceFill([
                 'description_pl' => mb_substr((string) ($result['description_pl'] ?? ''), 0, 4000) ?: null,
                 'estimate_low' => isset($result['estimate_low']) ? max(0, round((float) $result['estimate_low'])) : null,

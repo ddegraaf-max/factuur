@@ -102,6 +102,11 @@ class CcbrService
             throw new \DomainException(__('Vul een geboortedatum in, of in elk geval het geboortejaar.'));
         }
 
+        // Gratis, maar met ons abonnement bij de Rechtspraak: grenzen tegen misbruik (één per controle).
+        if ($this->enabled()) {
+            app(CostGuard::class)->spend('ccbr', CostGuard::currentTeam());
+        }
+
         $geboorte = $geboortedatum
             ? '<b:Datum>' . $this->xml(substr($geboortedatum, 0, 10)) . 'T00:00:00</b:Datum><b:Jaar i:nil="true"/>'
             : '<b:Datum i:nil="true"/><b:Jaar>' . (int) $geboortejaar . '</b:Jaar>';

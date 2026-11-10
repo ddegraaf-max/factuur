@@ -83,7 +83,7 @@ class ReceiptScanService
         }
 
         try {
-            $message = $client->beta->messages->create(...$params);
+            $message = \App\Services\Ai\AiBudget::call(fn () => $client->beta->messages->create(...$params));
         } catch (\Anthropic\Core\Exceptions\AuthenticationException $e) {
             Log::error('Bonherkenning: ongeldige Anthropic API-key', ['error' => $e->getMessage()]);
             throw new \DomainException(__('De AI-koppeling is verkeerd geconfigureerd (ongeldige API-key).'));

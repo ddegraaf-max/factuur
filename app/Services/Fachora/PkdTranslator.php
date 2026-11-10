@@ -62,7 +62,7 @@ class PkdTranslator
             . "Return JSON {translations: [{pl, en}]} with exactly one entry per input name, pl copied verbatim.\n\nNames:\n"
             . implode("\n", array_map(fn (string $n) => '- ' . $n, $names));
         try {
-            $result = $this->ai->json($prompt, $schema, 2500, 'low', [], 'Fachora PKD-vertaling');
+            $result = \App\Services\Ai\AiBudget::as('fachora-vertalen', fn () => $this->ai->json($prompt, $schema, 2500, 'low', [], 'Fachora PKD-vertaling'));
         } catch (\DomainException $e) {
             Log::warning('Fachora: PKD-vertaling mislukt', ['error' => $e->getMessage()]);
 

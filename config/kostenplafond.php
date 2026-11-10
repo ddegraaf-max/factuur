@@ -30,7 +30,7 @@ return [
 
     // Werkt de database niet, dan telt CostGuard hier door (gedeeld door alle
     // processen op dezelfde server, met een bestandsslot).
-    'bestand' => env('KOSTENPLAFOND_BESTAND', storage_path('framework/kostenplafond.json')),
+    'bestand' => env('KOSTENPLAFOND_BESTAND', storage_path('framework/cache/kostenplafond.json')),
 
     // Waarschuwing bij dit deel van het dagplafond of maandbudget.
     'alarm_bij' => 0.8,
@@ -60,6 +60,8 @@ return [
             'naam' => 'AI (Claude)',
             'noodstop' => env('NOODSTOP_AI'),
             'prijs' => 8,
+            // Dollar per miljoen tokens (Claude Opus 5: $5 in, $25 uit), voor het verrekenen achteraf.
+            'tokenprijs' => ['in' => 5, 'uit' => 25],
             'dag' => [env('AI_DAGLIMIET'), 300],
             'team' => [env('AI_TEAMLIMIET'), 50],
             'maand' => [env('AI_MAANDBUDGET'), 150],

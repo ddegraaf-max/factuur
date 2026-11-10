@@ -161,6 +161,12 @@ class SmsService
                 : __('Je sms-tegoed is niet genoeg voor dit bericht. Koop een bundel bij Instellingen, Sms.'));
         }
 
+        // Gratis voor de eigen administraties van het platform: dan betaalt het platform, dus langs de kostenbewaker.
+        // Sms uit gekocht tegoed betaalt de klant zelf; die telt hier niet mee.
+        if ($free) {
+            app(CostGuard::class)->spend('sms', $company->id, $segments * (int) config('kostenplafond.diensten.sms.prijs', 8));
+        }
+
         $message = new SmsMessage([
             'company_id' => $company->id,
             'user_id' => $userId,
@@ -223,6 +229,12 @@ class SmsService
     {
         $number = PhoneNumber::mobile($to);
         if (! $this->configured() || $number === null) {
+            return false;
+        }
+        // Op kosten van het platform: langs de kostenbewaker, per afzender als eigen team.
+        try {
+            app(CostGuard::class)->spend('sms', mb_strtolower($sender) ?: 'platform');
+        } catch (CostCapReached) {
             return false;
         }
 

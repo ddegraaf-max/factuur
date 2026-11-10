@@ -349,6 +349,9 @@ class PeppolService
             // Lookup mislukt: gewoon NLCIUS proberen; Recommand valideert alsnog.
         }
 
+        // Versturen kost per document: eerst langs de kostenbewaker.
+        app(CostGuard::class)->spend('peppol', $company->id);
+
         $data = $this->client->sendXml($company->peppol_company_id, $participantId, $ubl, $doctype, self::PROCESS_BILLING);
         $reference = (string) ($data['id'] ?? $data['peppolMessageId'] ?? 'onbekend');
 

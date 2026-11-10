@@ -41,7 +41,7 @@ class KvkService
             return [];
         }
 
-        $cacheKey = 'kvk:zoek:'.sha1(mb_strtolower($query));
+        $cacheKey = 'kvk:zoek:' . sha1(mb_strtolower($query));
 
         return Cache::remember($cacheKey, 300, function () use ($query) {
             // Zoeken is gratis, maar gaat met onze sleutel: grens per minuut.
@@ -58,7 +58,7 @@ class KvkService
 
             $response = Http::timeout(8)
                 ->withHeaders(['apikey' => config('services.kvk.key')])
-                ->get(config('services.kvk.base').'/api/v2/zoeken', $params);
+                ->get(config('services.kvk.base') . '/api/v2/zoeken', $params);
 
             // "Niets gevonden" komt terug als fout IPD5200 — dat is geen storing.
             if ($response->failed()) {
@@ -154,7 +154,7 @@ class KvkService
 
         if ($address) {
             if (! empty($address['postbusnummer'])) {
-                $line = 'Postbus '.$address['postbusnummer'];
+                $line = 'Postbus ' . $address['postbusnummer'];
             } else {
                 $line = trim(implode(' ', array_filter([
                     $address['straatnaam'] ?? null,
@@ -165,7 +165,7 @@ class KvkService
             }
             $postalCode = $address['postcode'] ?? null;
             if ($postalCode && preg_match('/^(\d{4})([A-Z]{2})$/i', $postalCode, $m)) {
-                $postalCode = $m[1].' '.strtoupper($m[2]);
+                $postalCode = $m[1] . ' ' . strtoupper($m[2]);
             }
             $city = $address['plaats'] ?? null;
         }
@@ -230,7 +230,7 @@ class KvkService
         try {
             $response = Http::timeout(8)
                 ->withHeaders(['apikey' => config('services.kvk.key')])
-                ->get(config('services.kvk.base')."/api/v1/basisprofielen/{$kvkNumber}");
+                ->get(config('services.kvk.base') . "/api/v1/basisprofielen/{$kvkNumber}");
         } catch (\Throwable $e) {
             Log::info('KvK Basisprofiel niet bereikbaar', ['kvk' => $kvkNumber, 'error' => $e->getMessage()]);
 
@@ -265,7 +265,7 @@ class KvkService
     private function mayRefresh(string $kvkNumber, int|string|null $team): bool
     {
         try {
-            return Cache::add('kvk:ververst:'.($team ?? 'geen').":{$kvkNumber}", true, now()->addDay());
+            return Cache::add('kvk:ververst:' . ($team ?? 'geen') . ":{$kvkNumber}", true, now()->addDay());
         } catch (\Throwable) {
             return false;
         }

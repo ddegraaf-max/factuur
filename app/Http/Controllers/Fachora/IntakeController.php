@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Fachora;
 
 use App\Http\Controllers\Controller;
 use App\Models\PageView;
+use App\Services\Ai\AiBudget;
 use App\Services\Ai\StructuredClaude;
 use App\Services\Fachora\JobService;
 use App\Support\Fachora;
@@ -97,7 +98,8 @@ class IntakeController extends Controller
             . "- questions: at most 3 short questions in the draft's language about details that are missing but matter for a price (for example gas or electric, which floor, dimensions, materials already bought, when the fault started). An empty list if nothing important is missing.";
 
         try {
-            $result = $ai->json($prompt, $schema, 1200, 'low', [], 'Fachora asystent');
+            // Publiek formulier: telt bij de kostenbewaker als team 'fachora'.
+            $result = AiBudget::as('fachora', fn () => $ai->json($prompt, $schema, 1200, 'low', [], 'Fachora asystent'));
         } catch (\DomainException $e) {
             return response()->json(['message' => $e->getMessage()], 503);
         }
