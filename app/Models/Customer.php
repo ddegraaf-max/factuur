@@ -29,6 +29,9 @@ class Customer extends Model
         // Het subdomein van de VvE-omgeving die bij deze klant hoort. Leeg bij
         // een gewone klant, en dan gebeurt er met de koppeling ook niets.
         'vvemaat_slug',
+        // 1.110: het merk van het VvE/NextPro-pakket en het kenmerk van het
+        // kantoor of de vereniging daar (config/merken.php, MerkenService).
+        'merk_code', 'merk_kenmerk',
     ];
 
     protected $casts = [

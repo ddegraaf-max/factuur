@@ -34,6 +34,43 @@ class VvemaatService
     }
 
     /**
+     * Waar de betaalmelding voor deze factuur heen gaat, of null.
+     *
+     * Sinds 1.110 kent EasyInvoice zes merken (config/merken.php). Een klant
+     * met merk_code + merk_kenmerk meldt aan dat merk, met de sleutel van dat
+     * merk. Een klant met alleen het oude vvemaat_slug meldt zoals altijd aan
+     * VvEMaat (config/vvemaat.php).
+     *
+     * @return array{naam: string, url: string, sleutel: string, klant: string}|null
+     */
+    public function koppelingVoor(Invoice $invoice): ?array
+    {
+        $klant = $invoice->customer;
+        $code = (string) ($klant?->merk_code ?? '');
+        $kenmerk = (string) ($klant?->merk_kenmerk ?? '');
+        if ($code !== '' && $kenmerk !== '') {
+            $merk = config("merken.merken.{$code}");
+            if (is_array($merk) && ($merk['sleutel'] ?? '') !== '' && ($merk['url'] ?? '') !== '') {
+                return ['naam' => $merk['naam'], 'url' => $merk['url'], 'sleutel' => $merk['sleutel'], 'klant' => $kenmerk];
+            }
+        }
+
+        $slug = $this->slugVan($invoice);
+        if ($slug !== null && $this->actief()) {
+            return ['naam' => 'VvEMaat', 'url' => (string) config('vvemaat.url'), 'sleutel' => (string) config('vvemaat.sleutel'), 'klant' => $slug];
+        }
+
+        return null;
+    }
+
+    /** Staat er voor minstens één merk een koppeling aan? */
+    public function ergensActief(): bool
+    {
+        return $this->actief() || collect(config('merken.merken', []))
+            ->contains(fn ($m) => ($m['sleutel'] ?? '') !== '' && ($m['url'] ?? '') !== '');
+    }
+
+    /**
      * Hoort deze factuur bij een VvE-omgeving?
      *
      * Alleen als de klant een slug draagt. EasyInvoice factureert veel meer dan
@@ -70,14 +107,11 @@ class VvemaatService
      */
     public function meldBetaling(Invoice $invoice): bool
     {
-        if (! $this->actief()) {
+        $koppeling = $this->koppelingVoor($invoice);
+        if ($koppeling === null) {
             return false;
         }
-
-        $slug = $this->slugVan($invoice);
-        if ($slug === null) {
-            return false;
-        }
+        $slug = $koppeling['klant'];
 
         $tot = $this->betaaldTot($invoice);
         if ($tot === null) {
@@ -92,9 +126,9 @@ class VvemaatService
 
         try {
             $antwoord = Http::timeout((int) config('vvemaat.timeout'))
-                ->withHeaders(['X-Koppelvlak-Sleutel' => (string) config('vvemaat.sleutel')])
+                ->withHeaders(['X-Koppelvlak-Sleutel' => $koppeling['sleutel']])
                 ->acceptJson()
-                ->post(config('vvemaat.url').'/koppelvlak/abonnement/betaald', [
+                ->post($koppeling['url'].'/koppelvlak/abonnement/betaald', [
                     'klant' => $slug,
                     'betaald_tot' => $tot,
                     'bedrag_cent' => (int) round(((float) $invoice->total) * 100),
@@ -124,6 +158,7 @@ class VvemaatService
         $invoice->forceFill(['vvemaat_notified_at' => Carbon::now()])->saveQuietly();
 
         Log::info('VvEMaat: betaling gemeld', [
+            'merk' => $koppeling['naam'],
             'vvemaat_slug' => $slug,
             'factuur' => $invoice->number,
             'betaald_tot' => $tot,

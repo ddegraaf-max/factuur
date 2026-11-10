@@ -255,6 +255,10 @@ Route::middleware(['auth', 'owner'])->prefix('eigenaar')->name('owner.')->group(
     Route::post('demo-aanvragen/{demoRequest}/goedkeuren', [\App\Http\Controllers\OwnerDemoController::class, 'approve'])->name('demo.approve');
     Route::post('demo-aanvragen/{demoRequest}/afwijzen', [\App\Http\Controllers\OwnerDemoController::class, 'deny'])->name('demo.deny');
     Route::delete('demo-aanvragen/{demoRequest}', [\App\Http\Controllers\OwnerDemoController::class, 'destroy'])->name('demo.destroy');
+    // Merken van het VvE-pakket (1.110.0): extra verbruik ophalen en als concept klaarzetten.
+    Route::get('merken', [\App\Http\Controllers\OwnerMerkenController::class, 'index'])->name('merken.index');
+    Route::post('merken/ophalen', [\App\Http\Controllers\OwnerMerkenController::class, 'ophalen'])
+        ->middleware('throttle:10,1')->name('merken.ophalen');
 });
 
 // Merkbewaking (alleen eigenaar; check in de controller): verwarringslog + merkgebruik-dossiers.

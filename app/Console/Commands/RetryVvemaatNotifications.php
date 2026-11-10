@@ -26,7 +26,7 @@ class RetryVvemaatNotifications extends Command
 
     public function handle(VvemaatService $vvemaat): int
     {
-        if (! $vvemaat->actief()) {
+        if (! $vvemaat->ergensActief()) {
             $this->info('Koppeling met VvEMaat staat uit; niets te doen.');
 
             return self::SUCCESS;
@@ -46,7 +46,8 @@ class RetryVvemaatNotifications extends Command
             ->whereNotNull('period_end')
             ->where('paid_at', '>=', now()->subDays(30))
             ->whereHas('customer', fn ($q) => $q->withoutGlobalScope('company')
-                ->whereNotNull('vvemaat_slug')->where('vvemaat_slug', '<>', ''))
+                ->where(fn ($w) => $w->where(fn ($v) => $v->whereNotNull('vvemaat_slug')->where('vvemaat_slug', '<>', ''))
+                    ->orWhere(fn ($m) => $m->whereNotNull('merk_kenmerk')->where('merk_kenmerk', '<>', ''))))
             ->with('customer')
             ->orderBy('paid_at')
             ->limit(200)

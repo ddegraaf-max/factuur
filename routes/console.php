@@ -107,6 +107,20 @@ Schedule::command('purchases:scan-inbox')
 
 // Maandelijks (de 1e, 07:30): merkgebruik-dossier van de vorige maand naar de eigenaar.
 // Alleen voor het geregistreerde merk (EasyInvoice); de Lopra-omgeving slaat dit over.
+/*
+ * Maandelijks (de 1e, 06:40): extra verbruik van de merken van het VvE-pakket
+ * (bundels, brieven per post) ophalen en per klant een conceptfactuur
+ * klaarzetten in de administratie van NapoleonSoftware B.V. Niets gaat vanzelf
+ * de deur uit. Alleen in de omgeving waar een administratie is ingesteld
+ * (MERKEN_TEAM_ID of MERK_<CODE>_TEAM_ID); handmatig via Eigenaar → Merken.
+ */
+Schedule::command('merken:bundels-factureren')
+    ->monthlyOn(1, '06:40')
+    ->timezone('Europe/Amsterdam')
+    ->withoutOverlapping()
+    ->when(fn () => filled(config('merken.team_id'))
+        || collect(config('merken.merken', []))->contains(fn ($m) => filled($m['team_id'] ?? null)));
+
 Schedule::command('brand:evidence')
     ->monthlyOn(1, '07:30')
     ->timezone('Europe/Amsterdam')
