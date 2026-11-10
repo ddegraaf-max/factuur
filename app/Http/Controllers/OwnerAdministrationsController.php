@@ -35,7 +35,11 @@ class OwnerAdministrationsController extends Controller
             ];
         });
 
-        return Inertia::render('Stats/Administraties', ['companies' => $companies]);
+        return Inertia::render('Stats/Administraties', [
+            'companies' => $companies,
+            // Verbruik van de betaalde koppelingen vandaag en deze maand (kostenplafond).
+            'costs' => app(\App\Services\CostGuard::class)->overview(),
+        ]);
     }
 
     public function destroy(Request $request, int $company, CompanyPurger $purger)

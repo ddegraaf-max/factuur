@@ -6,6 +6,28 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    private ?string $costFile = null;
+
+    /**
+     * De kostenbewaker telt bij een storing door in een bestand en in het
+     * werkgeheugen; elke toets begint met een eigen, leeg bestand en geheugen.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->costFile = sys_get_temp_dir() . '/kostenplafond-' . bin2hex(random_bytes(6)) . '.json';
+        config(['kostenplafond.bestand' => $this->costFile]);
+        \App\Services\CostGuard::flushMemory();
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->costFile !== null) {
+            @unlink($this->costFile);
+        }
+        parent::tearDown();
+    }
+
     /**
      * Alle URL's uit de sitemap-index en haar deelsitemaps.
      *
