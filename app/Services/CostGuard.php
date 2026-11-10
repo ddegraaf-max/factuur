@@ -471,18 +471,24 @@ class CostGuard
     {
         [$raw, $default] = is_array($pair) ? array_pad(array_values($pair), 2, null) : [$pair, null];
 
-        $value = $default;
-        if (is_int($raw) || is_float($raw)) {
-            $value = $raw >= 0 ? $raw : $default;
-        } elseif (is_string($raw) && trim($raw) !== '') {
-            $text = str_replace(',', '.', trim($raw));
-            $value = is_numeric($text) && (float) $text >= 0 ? (float) $text : $default;
-        }
+        $read = function (mixed $v): ?float {
+            if (is_int($v) || is_float($v)) {
+                return $v >= 0 ? (float) $v : null;
+            }
+            if (is_string($v) && trim($v) !== '') {
+                $text = str_replace(',', '.', trim($v));
+
+                return is_numeric($text) && (float) $text >= 0 ? (float) $text : null;
+            }
+
+            return null;
+        };
+        $value = $read($raw) ?? $read($default);
         if ($value === null) {
             return null;
         }
 
-        return $euros ? (int) round(((float) $value) * 100) : (int) floor((float) $value);
+        return $euros ? (int) round($value * 100) : (int) floor($value);
     }
 
     private function truthy(mixed $value): bool
