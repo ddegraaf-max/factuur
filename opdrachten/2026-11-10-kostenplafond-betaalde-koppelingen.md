@@ -1,3 +1,5 @@
+**Afgerond in versie Easy 1.112.0**
+
 **Gebouwd in branch e1-kostenplafond**
 
 # Plafond op betaalde koppelingen: KvK eerst (prioriteit 1)
