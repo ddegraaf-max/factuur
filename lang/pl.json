@@ -2232,5 +2232,14 @@
   "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je een aanmaning stuurt.": "Wstrzymanie tej faktury się zakończyło i czeka na Twoją zgodę. Najpierw wznów, zanim wyślesz wezwanie do zapłaty.",
   "Pauze afgelopen: er gaat niets uit tot je hervat": "Wstrzymanie zakończone: nic nie zostanie wysłane, dopóki nie wznowisz",
   "De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.": "Wstrzymanie faktury :number się zakończyło. Nic nie zostanie wysłane, dopóki nie wznowisz przypomnień.",
-  "Pauzes die om een besluit vragen (:count)": "Wstrzymania wymagające decyzji (:count)"
+  "Pauzes die om een besluit vragen (:count)": "Wstrzymania wymagające decyzji (:count)",
+  "Automatisch ophalen is nu even niet beschikbaar, vul de gegevens zelf in.": "Automatyczne pobieranie jest teraz niedostępne, uzupełnij dane samodzielnie.",
+  "Zoeken in het KvK-register is nu even niet beschikbaar, vul de gegevens zelf in.": "Wyszukiwanie w rejestrze KvK jest teraz niedostępne, uzupełnij dane samodzielnie.",
+  "De AI-hulp is nu even niet beschikbaar. Probeer het later opnieuw, of vul het zelf in.": "Asystent AI jest teraz niedostępny. Spróbuj później lub uzupełnij samodzielnie.",
+  "Versturen via Peppol is nu even niet mogelijk. Probeer het later opnieuw, of verstuur de factuur per e-mail.": "Wysyłka przez Peppol jest teraz niemożliwa. Spróbuj później lub wyślij fakturę e-mailem.",
+  "Er kan nu even geen sms worden verstuurd. Probeer het later opnieuw.": "Nie można teraz wysłać SMS-a. Spróbuj ponownie później.",
+  "Er kan nu even geen brief worden verstuurd.": "Nie można teraz wysłać listu.",
+  "Het register raadplegen is nu even niet mogelijk. Probeer het later opnieuw.": "Sprawdzenie rejestru jest teraz niemożliwe. Spróbuj ponownie później.",
+  "Het Handelsregister is nu even niet automatisch op te vragen. Probeer het later opnieuw.": "Rejestr handlowy jest teraz niedostępny automatycznie. Spróbuj ponownie później.",
+  "Deze functie is nu even niet beschikbaar. Probeer het later opnieuw.": "Ta funkcja jest teraz niedostępna. Spróbuj ponownie później."
 }

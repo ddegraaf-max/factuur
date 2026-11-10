@@ -1,3 +1,5 @@
+**Gebouwd in branch e1-kostenplafond**
+
 # Plafond op betaalde koppelingen: KvK eerst (prioriteit 1)
 
 Open — 10 november 2026.
@@ -62,3 +64,33 @@ KvK-tarieven, opgezocht op developers.kvk.nl/pricing op 10 november 2026:
 
 - Geen bedragen of hoogtes van plafonds in meldingen aan gebruikers.
 - De functies blijven werken zonder KvK. Het plafond haalt alleen het invulgemak weg.
+
+## Gebouwd (branch e1-kostenplafond)
+
+- `app/Services/CostGuard.php` met de instellingen in `config/kostenplafond.php` en de tellers in de tabel `cost_counters`. Elke betaalde aanroep gaat erdoorheen: KvK-basisprofiel, KvK zoeken (alleen grens per minuut), AI (alle vier de aanroepplekken van Claude, via `Ai\AiBudget`), Peppol versturen, sms op kosten van het platform, brieven via Pingen en het CCBR.
+- Tellen: in de database met één `UPDATE … WHERE calls < plafond` per teller, alles in één transactie. Werkt de database niet, dan telt hij door in een bestand op de server (`storage/framework/cache/kostenplafond.json`, met slot), en lukt ook dat niet, dan in het werkgeheugen. Het plafond blijft in alle gevallen gelden.
+- Noodstop: `NOODSTOP=1` voor alles, of `NOODSTOP_KVK`, `NOODSTOP_AI`, `NOODSTOP_PEPPOL`, `NOODSTOP_SMS`, `NOODSTOP_POST`, `NOODSTOP_CCBR`.
+- KvK: `profile()` en `facts()` delen één geheugen per nummer (gevonden 7 dagen, niet gevonden 24 uur; storing niet). Verversen via de klantscore hoogstens één keer per 24 uur per nummer per team.
+- Bij het plafond: geen aanroep naar buiten; de gebruiker ziet een vriendelijke melding zonder bedragen; de rest van de app werkt door.
+- Alarm: mail naar `OwnerAccess::emails()` (hetzelfde adres als de foutmeldingen) bij 80% van het dagplafond, bij het bereiken ervan en bij 80% en 100% van het maandbudget; hoogstens één per soort per dienst per dag.
+- Overzicht: bovenaan Eigenaar → Administraties, met vandaag en deze maand per dienst.
+- Toetsen: `tests/Feature/KostenplafondTest.php`.
+
+## Gekozen standaarden
+
+Alle waarden zijn in te stellen met env; leeg of onleesbaar = standaard, 0 = dicht. Maandbudget in hele euro's.
+
+| Dienst | Prijs per aanroep | Per dag (platform) | Per team per dag | Maandbudget | Per minuut | Env |
+|---|---|---|---|---|---|---|
+| KvK basisprofiel | € 0,02 (developers.kvk.nl, 10-11-2026) | 50 | 10 | € 20 | – | `KVK_DAGLIMIET`, `KVK_TEAMLIMIET`, `KVK_MAANDBUDGET` |
+| KvK zoeken | € 0 | – | – | – | 60 | `KVK_ZOEKEN_MINUUTLIMIET` |
+| AI (Claude) | schatting € 0,08; achteraf verrekend met de tokens ($ 5 in / $ 25 uit per miljoen, Claude Opus 5) | 300 | 50 | € 150 | – | `AI_DAGLIMIET`, `AI_TEAMLIMIET`, `AI_MAANDBUDGET` |
+| Peppol (Recommand) | aanname € 0,10 per document (prijs niet gevonden, vraag Daniël) | 200 | 50 | € 50 | – | `PEPPOL_DAGLIMIET`, `PEPPOL_TEAMLIMIET`, `PEPPOL_MAANDBUDGET` |
+| Sms op kosten van het platform | aanname € 0,08 per sms (Smstools) | 100 | 50 | € 40 | – | `SMS_DAGLIMIET`, `SMS_TEAMLIMIET`, `SMS_MAANDBUDGET` |
+| Post (Pingen) | aanname € 1,50 per brief | 25 | – | € 100 | – | `POST_DAGLIMIET`, `POST_MAANDBUDGET` |
+| CCBR | € 0 (abonnement en gebruik gratis volgens rechtspraak.nl) | 200 | 40 | – | 20 | `CCBR_DAGLIMIET`, `CCBR_TEAMLIMIET`, `CCBR_MINUUTLIMIET` |
+
+Toelichting:
+- Het CCBR blijkt gratis (rechtspraak.nl, "Abonnement service CCBR"): er staat geen bedrag bij, alleen grenzen tegen misbruik van ons abonnement.
+- AI: een publiek onderdeel telt als eigen team: `fachora` (AI-hulp op het formulier en de verrijking van een opdracht) en `fachora-vertalen` (de PKD-vertaling die elke tien minuten draait). Zo kan het publieke formulier het AI-plafond van betalende klanten niet opmaken. De bestaande grens van `AI_MONTHLY_LIMIT` per administratie blijft gelden.
+- Sms: alleen wat het platform betaalt telt mee (verificatiecodes van Fachora en het klantportaal, per afzender een eigen team, en de eigen administraties zonder tegoed). Sms uit gekocht tegoed betaalt de klant; zonder tegoed gaat er niets uit (`remaining()` wordt vóór het versturen gecontroleerd).

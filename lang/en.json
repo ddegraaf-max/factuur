@@ -2232,5 +2232,14 @@
   "De pauze van deze factuur is afgelopen en wacht op jouw akkoord. Hervat eerst voordat je een aanmaning stuurt.": "The pause on this invoice has ended and is waiting for your approval. Resume first before sending a final demand.",
   "Pauze afgelopen: er gaat niets uit tot je hervat": "Pause ended: nothing is sent until you resume",
   "De pauze van factuur :number is afgelopen. Er gaat niets uit tot je de herinneringen hervat.": "The pause on invoice :number has ended. Nothing is sent until you resume the reminders.",
-  "Pauzes die om een besluit vragen (:count)": "Pauses that need a decision (:count)"
+  "Pauzes die om een besluit vragen (:count)": "Pauses that need a decision (:count)",
+  "Automatisch ophalen is nu even niet beschikbaar, vul de gegevens zelf in.": "Automatic lookup is not available right now, please fill in the details yourself.",
+  "Zoeken in het KvK-register is nu even niet beschikbaar, vul de gegevens zelf in.": "Searching the Chamber of Commerce register is not available right now, please fill in the details yourself.",
+  "De AI-hulp is nu even niet beschikbaar. Probeer het later opnieuw, of vul het zelf in.": "The AI assistant is not available right now. Try again later, or fill it in yourself.",
+  "Versturen via Peppol is nu even niet mogelijk. Probeer het later opnieuw, of verstuur de factuur per e-mail.": "Sending via Peppol is not possible right now. Try again later, or send the invoice by email.",
+  "Er kan nu even geen sms worden verstuurd. Probeer het later opnieuw.": "No text message can be sent right now. Please try again later.",
+  "Er kan nu even geen brief worden verstuurd.": "No letter can be sent right now.",
+  "Het register raadplegen is nu even niet mogelijk. Probeer het later opnieuw.": "The register cannot be consulted right now. Please try again later.",
+  "Het Handelsregister is nu even niet automatisch op te vragen. Probeer het later opnieuw.": "The trade register cannot be consulted automatically right now. Please try again later.",
+  "Deze functie is nu even niet beschikbaar. Probeer het later opnieuw.": "This feature is not available right now. Please try again later."
 }
