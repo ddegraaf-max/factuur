@@ -17,7 +17,7 @@
  * onleesbaar ("tien", "-3") = de standaard hieronder. 0 = de dienst staat dicht.
  *
  * Noodstop: NOODSTOP=1 zet álle betaalde koppelingen dicht, NOODSTOP_KVK=1 (of
- * _AI, _PEPPOL, _SMS, _POST, _CCBR) alleen die ene. Een env-variabele wijzigen
+ * _AI, _PEPPOL, _SMS, _POST, _CCBR, _GOOGLE) alleen die ene. Een env-variabele wijzigen
  * in Railway herstart de dienst; er hoeft geen code gedeployd te worden.
  *
  * 'prijs' is in eurocent per aanroep (voor AI een schatting: het werkelijke
@@ -96,6 +96,18 @@ return [
             'dag' => [env('POST_DAGLIMIET'), 25],
             'maand' => [env('POST_MAANDBUDGET'), 100],
             'melding' => 'Er kan nu even geen brief worden verstuurd.',
+        ],
+        // Google Places (Fachora): Text Search en Place Details met beoordelingen en
+        // contactgegevens (Enterprise-velden, ca. $ 35-40 per 1.000). Zoeken bij een
+        // nieuwe opdracht en het nachtelijk verversen (150 per nacht) tellen als eigen team.
+        'google' => [
+            'naam' => 'Google Places (Fachora)',
+            'noodstop' => env('NOODSTOP_GOOGLE'),
+            'prijs' => 4,
+            'dag' => [env('GOOGLE_DAGLIMIET'), 400],
+            'team' => [env('GOOGLE_TEAMLIMIET'), 250],
+            'maand' => [env('GOOGLE_MAANDBUDGET'), 150],
+            'melding' => 'Zoeken naar bedrijven is nu even niet beschikbaar.',
         ],
         // Curatele- en bewindregister: gratis, maar het abonnement hoort bij ons
         // account bij de Rechtspraak. Grenzen tegen misbruik, geen kosten.

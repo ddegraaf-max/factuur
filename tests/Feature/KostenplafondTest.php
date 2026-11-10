@@ -416,4 +416,19 @@ class KostenplafondTest extends TestCase
         $this->assertFalse($sms->platform('0612345679', 'Fachora: Twój kod to 654321'));
         Http::assertSentCount(1);
     }
+
+    public function test_google_places_searches_stop_at_the_cap(): void
+    {
+        config(['fachora.google_places_key' => 'sleutel', 'kostenplafond.diensten.google.dag' => [null, 1]]);
+        Http::fake(['places.googleapis.com/*' => Http::response(['places' => []], 200)]);
+        $google = app(\App\Services\Fachora\GooglePlacesClient::class);
+
+        $this->assertSame([], $google->searchText('hydraulik Płock', null, 30)['places']);
+        $this->expectException(CostCapReached::class);
+        try {
+            $google->searchText('elektryk Płock', null, 30);
+        } finally {
+            Http::assertSentCount(1);
+        }
+    }
 }

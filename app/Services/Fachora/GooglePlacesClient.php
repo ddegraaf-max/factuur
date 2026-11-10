@@ -189,6 +189,9 @@ class GooglePlacesClient
         if ($pageToken !== null) {
             $body['pageToken'] = $pageToken;
         }
+        // Elke zoekopdracht kost geld bij Google: eerst langs de kostenbewaker (team: zoeken bij een opdracht).
+        app(\App\Services\CostGuard::class)->spend('google', 'fachora-zoeken');
+
         $mask = implode(',', array_map(fn ($f) => 'places.' . $f, self::FIELDS)) . ',nextPageToken';
         $response = Http::timeout(12)->retry(2, 500)
             ->withHeaders(['X-Goog-Api-Key' => (string) config('fachora.google_places_key'), 'X-Goog-FieldMask' => $mask])
@@ -201,6 +204,8 @@ class GooglePlacesClient
     /** Place Details voor het verversen (zelfde velden). Null als Google het bedrijf niet meer kent. */
     public function details(string $placeId): ?array
     {
+        app(\App\Services\CostGuard::class)->spend('google', 'fachora-verversen');
+
         $response = Http::timeout(12)
             ->withHeaders(['X-Goog-Api-Key' => (string) config('fachora.google_places_key'), 'X-Goog-FieldMask' => implode(',', self::FIELDS)])
             ->get(self::DETAILS_URL . rawurlencode($placeId));

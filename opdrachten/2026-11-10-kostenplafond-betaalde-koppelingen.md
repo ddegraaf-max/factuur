@@ -67,9 +67,9 @@ KvK-tarieven, opgezocht op developers.kvk.nl/pricing op 10 november 2026:
 
 ## Gebouwd (branch e1-kostenplafond)
 
-- `app/Services/CostGuard.php` met de instellingen in `config/kostenplafond.php` en de tellers in de tabel `cost_counters`. Elke betaalde aanroep gaat erdoorheen: KvK-basisprofiel, KvK zoeken (alleen grens per minuut), AI (alle vier de aanroepplekken van Claude, via `Ai\AiBudget`), Peppol versturen, sms op kosten van het platform, brieven via Pingen en het CCBR.
+- `app/Services/CostGuard.php` met de instellingen in `config/kostenplafond.php` en de tellers in de tabel `cost_counters`. Elke betaalde aanroep gaat erdoorheen: KvK-basisprofiel, KvK zoeken (alleen grens per minuut), AI (alle vier de aanroepplekken van Claude, via `Ai\AiBudget`), Peppol versturen, sms op kosten van het platform, brieven via Pingen, Google Places (Fachora) en het CCBR.
 - Tellen: in de database met één `UPDATE … WHERE calls < plafond` per teller, alles in één transactie. Werkt de database niet, dan telt hij door in een bestand op de server (`storage/framework/cache/kostenplafond.json`, met slot), en lukt ook dat niet, dan in het werkgeheugen. Het plafond blijft in alle gevallen gelden.
-- Noodstop: `NOODSTOP=1` voor alles, of `NOODSTOP_KVK`, `NOODSTOP_AI`, `NOODSTOP_PEPPOL`, `NOODSTOP_SMS`, `NOODSTOP_POST`, `NOODSTOP_CCBR`.
+- Noodstop: `NOODSTOP=1` voor alles, of `NOODSTOP_KVK`, `NOODSTOP_AI`, `NOODSTOP_PEPPOL`, `NOODSTOP_SMS`, `NOODSTOP_POST`, `NOODSTOP_CCBR`, `NOODSTOP_GOOGLE`.
 - KvK: `profile()` en `facts()` delen één geheugen per nummer (gevonden 7 dagen, niet gevonden 24 uur; storing niet). Verversen via de klantscore hoogstens één keer per 24 uur per nummer per team.
 - Bij het plafond: geen aanroep naar buiten; de gebruiker ziet een vriendelijke melding zonder bedragen; de rest van de app werkt door.
 - Alarm: mail naar `OwnerAccess::emails()` (hetzelfde adres als de foutmeldingen) bij 80% van het dagplafond, bij het bereiken ervan en bij 80% en 100% van het maandbudget; hoogstens één per soort per dienst per dag.
@@ -88,6 +88,7 @@ Alle waarden zijn in te stellen met env; leeg of onleesbaar = standaard, 0 = dic
 | Peppol (Recommand) | aanname € 0,10 per document (prijs niet gevonden, vraag Daniël) | 200 | 50 | € 50 | – | `PEPPOL_DAGLIMIET`, `PEPPOL_TEAMLIMIET`, `PEPPOL_MAANDBUDGET` |
 | Sms op kosten van het platform | aanname € 0,08 per sms (Smstools) | 100 | 50 | € 40 | – | `SMS_DAGLIMIET`, `SMS_TEAMLIMIET`, `SMS_MAANDBUDGET` |
 | Post (Pingen) | aanname € 1,50 per brief | 25 | – | € 100 | – | `POST_DAGLIMIET`, `POST_MAANDBUDGET` |
+| Google Places (Fachora, niet in de opdracht maar wel betaald) | aanname € 0,04 per zoekopdracht of detailopvraging | 400 | 250 (zoeken bij opdrachten en nachtelijk verversen apart) | € 150 | – | `GOOGLE_DAGLIMIET`, `GOOGLE_TEAMLIMIET`, `GOOGLE_MAANDBUDGET` |
 | CCBR | € 0 (abonnement en gebruik gratis volgens rechtspraak.nl) | 200 | 40 | – | 20 | `CCBR_DAGLIMIET`, `CCBR_TEAMLIMIET`, `CCBR_MINUUTLIMIET` |
 
 Toelichting:
