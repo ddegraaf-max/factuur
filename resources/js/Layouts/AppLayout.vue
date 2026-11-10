@@ -627,7 +627,9 @@ table { border-collapse: collapse; width: 100%; }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
 .breadcrumb { font-size: 13px; color: var(--text-3); }
 .breadcrumb-current { color: var(--text); font-weight: 500; }
-.content { padding: 32px; max-width: 1400px; margin: 0 auto; }
+/* Onderaan extra ruimte: de zwevende knop van de assistent (rechtsonder, 56 px op 24 px van de rand)
+   viel anders over de laatste knoppenrij van een formulier als je naar beneden gescrold had. */
+.content { padding: 32px 32px 104px; max-width: 1400px; margin: 0 auto; }
 
 /* DEMO BANNER */
 .demo-banner {
@@ -1021,7 +1023,7 @@ table { border-collapse: collapse; width: 100%; }
   .sidebar.open { transform: translateX(0); }
   .sidebar-overlay { display: block; position: fixed; inset: 0; z-index: 90; background: rgba(28, 25, 23, 0.45); }
   .topbar-toggle { display: inline-flex; }
-  .content { padding: 16px; }
+  .content { padding: 16px 16px 96px; }
   .topbar { padding: 0 12px; }
   /* Zoekveld op een eigen regel; naast de filterknoppen bleef er "Zoe..." over. */
   .filter-search { flex: 1 0 100%; max-width: none; }

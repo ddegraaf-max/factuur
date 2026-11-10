@@ -31,7 +31,8 @@ watch(() => props.message, (msg) => {
 <style>
 .toast {
   position: fixed;
-  bottom: 24px;
+  /* Boven de knop van de assistent, die dezelfde hoek heeft. */
+  bottom: 96px;
   right: 24px;
   background: var(--text);
   color: white;
