@@ -77,5 +77,6 @@ hoeft niets gemigreerd te worden.
 - Verwijdert Daniël een concept, dan staan de regels in het merk als
   gefactureerd en in `merk_bundel_regels` zonder factuur; ze komen niet
   vanzelf terug.
-- Een merk dat via Stripe afrekent, weigert het koppelvlak (409); dat staat als
-  fout op het scherm.
+- Rekent een merk het abonnement via Stripe af, dan blijven de bundelroutes
+  werken (aangepast in de VvE-branch); alleen de abonnementsroutes weigeren (409),
+  en de betaalmelding staat dan als fout in de log.
